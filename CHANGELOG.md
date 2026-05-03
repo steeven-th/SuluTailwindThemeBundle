@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.4.0] - 2026-05-03
+
+### Added
+
+- customizable article listing cards with portrait ratio support ([2f802c0](https://github.com/steeven-th/SuluTailwindThemeBundle/commit/2f802c0451cf35b9d54832020abd78606b827006))
+
 ## [2.3.0] - 2026-05-02
 
 ### Added
@@ -147,6 +154,7 @@ php bin/adminconsole cache:clear
 - Auto-recompile via Doctrine listener
 - Translations (English, French, German)
 
+[2.4.0]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.1.0...v2.2.0
