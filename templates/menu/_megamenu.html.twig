@@ -156,7 +156,7 @@
                 {% if megaSource == 'snippet' and ctaTitle and ctaLink %}
                     <a
                         href="{{ sulu_content_path(ctaLink.url|default('#')) }}"
-                        class="hidden md:inline-block btn-{{ ctaStyle }} px-5 py-2 text-sm font-medium no-underline"
+                        class="hidden md:inline-block iw-button--{{ ctaStyle }} px-5 py-2 text-sm font-medium no-underline"
                     >
                         {{ ctaTitle }}
                     </a>
@@ -272,7 +272,7 @@
                                             {% endif %}
                                             {% if column.cta_title|default(null) and column.cta_link|default(null) %}
                                                 <a href="{{ sulu_content_path(column.cta_link.url|default('#')) }}"
-                                                   class="btn-{{ featBtnStyle }} text-xs">
+                                                   class="iw-button--{{ featBtnStyle }} text-xs">
                                                     {{ column.cta_title }}
                                                 </a>
                                             {% endif %}
@@ -401,7 +401,7 @@
                     <div class="pt-4 pb-2">
                         <a
                             href="{{ sulu_content_path(ctaLink.url|default('#')) }}"
-                            class="btn-{{ ctaStyle }} block text-center px-5 py-3 text-base font-medium no-underline"
+                            class="iw-button--{{ ctaStyle }} block text-center px-5 py-3 text-base font-medium no-underline"
                         >
                             {{ ctaTitle }}
                         </a>

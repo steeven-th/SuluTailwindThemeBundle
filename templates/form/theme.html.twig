@@ -137,7 +137,7 @@
 
 {# ── Submit button ── #}
 {%- block button_widget -%}
-    {% set attr = attr|merge({class: ('btn-variant inline-flex items-center justify-center px-8 py-3 text-sm font-medium transition cursor-pointer ' ~ attr.class|default(''))|trim }) %}
+    {% set attr = attr|merge({class: ('iw-button--variant inline-flex items-center justify-center px-8 py-3 text-sm font-medium transition cursor-pointer ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock button_widget -%}
 
