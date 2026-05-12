@@ -222,7 +222,7 @@ export default class extends Controller {
         const tiltX = ((y - centerY) / centerY) * -10;
         const tiltY = ((x - centerX) / centerX) * 10;
 
-        const inner = currentSlide.querySelector('.carousel-3d__slide-inner');
+        const inner = currentSlide.querySelector('.iw-carousel-3d__slide-inner');
         if (inner) {
             inner.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
         }
@@ -230,7 +230,7 @@ export default class extends Controller {
         // Parallax shift on info
         const currentInfo = this.hasInfoTarget ? this.infoTargets[this.current] : null;
         if (currentInfo) {
-            const infoInner = currentInfo.querySelector('.carousel-3d__info-inner');
+            const infoInner = currentInfo.querySelector('.iw-carousel-3d__info-inner');
             if (infoInner) {
                 infoInner.style.transform = `translateX(${tiltY * 0.5}px) translateY(${tiltX * -0.5}px)`;
             }
@@ -253,7 +253,7 @@ export default class extends Controller {
      */
     _resetTilt() {
         this.slideTargets.forEach((slide) => {
-            const inner = slide.querySelector('.carousel-3d__slide-inner');
+            const inner = slide.querySelector('.iw-carousel-3d__slide-inner');
             if (inner) {
                 inner.style.transform = '';
             }
@@ -261,7 +261,7 @@ export default class extends Controller {
 
         if (this.hasInfoTarget) {
             this.infoTargets.forEach((info) => {
-                const infoInner = info.querySelector('.carousel-3d__info-inner');
+                const infoInner = info.querySelector('.iw-carousel-3d__info-inner');
                 if (infoInner) {
                     infoInner.style.transform = '';
                 }
