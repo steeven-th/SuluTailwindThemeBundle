@@ -225,31 +225,31 @@
 
   /* ─── Buttons ─────────────────────────────────────────────────────────── */
   /* Primary button */
-  --btn-primary-bg: var(--color-primary, #6366f1);
-  --btn-primary-text: #ffffff;
-  --btn-primary-border: none;
-  --btn-primary-hoverBg: var(--color-primary-700, #4338ca);
-  --btn-primary-hoverText: #ffffff;
-  --btn-primary-hoverBorder: none;
-  --btn-primary-radius: var(--border-radius, 0.375rem);
+  --iw-button-primary-bg: var(--color-primary, #6366f1);
+  --iw-button-primary-text: #ffffff;
+  --iw-button-primary-border: none;
+  --iw-button-primary-hover-bg: var(--color-primary-700, #4338ca);
+  --iw-button-primary-hover-text: #ffffff;
+  --iw-button-primary-hover-border: none;
+  --iw-button-primary-radius: var(--border-radius, 0.375rem);
 
   /* Secondary button */
-  --btn-secondary-bg: transparent;
-  --btn-secondary-text: var(--color-primary, #6366f1);
-  --btn-secondary-border: currentColor;
-  --btn-secondary-hoverBg: transparent;
-  --btn-secondary-hoverText: var(--color-primary-700, #4338ca);
-  --btn-secondary-hoverBorder: currentColor;
-  --btn-secondary-radius: var(--border-radius, 0.375rem);
+  --iw-button-secondary-bg: transparent;
+  --iw-button-secondary-text: var(--color-primary, #6366f1);
+  --iw-button-secondary-border: currentColor;
+  --iw-button-secondary-hover-bg: transparent;
+  --iw-button-secondary-hover-text: var(--color-primary-700, #4338ca);
+  --iw-button-secondary-hover-border: currentColor;
+  --iw-button-secondary-radius: var(--border-radius, 0.375rem);
 
   /* Accent button */
-  --btn-accent-bg: var(--color-accent, #f59e0b);
-  --btn-accent-text: #ffffff;
-  --btn-accent-border: none;
-  --btn-accent-hoverBg: var(--color-accent-600, #d97706);
-  --btn-accent-hoverText: #ffffff;
-  --btn-accent-hoverBorder: none;
-  --btn-accent-radius: var(--border-radius, 0.375rem);
+  --iw-button-accent-bg: var(--color-accent, #f59e0b);
+  --iw-button-accent-text: #ffffff;
+  --iw-button-accent-border: none;
+  --iw-button-accent-hover-bg: var(--color-accent-600, #d97706);
+  --iw-button-accent-hover-text: #ffffff;
+  --iw-button-accent-hover-border: none;
+  --iw-button-accent-radius: var(--border-radius, 0.375rem);
 
   /* ─── Menu ────────────────────────────────────────────────────────────── */
   --menu-bg: #ffffff;

@@ -78,9 +78,9 @@ class ButtonEffectCatalog
      * @var array<string, string>
      */
     private const SHADOW_ANIMATIONS = [
-        'glow-pulse-primary' => 'btn-glow-pulse-primary',
-        'glow-pulse-secondary' => 'btn-glow-pulse-secondary',
-        'glow-pulse-accent' => 'btn-glow-pulse-accent',
+        'glow-pulse-primary' => 'iw-button-glow-pulse-primary',
+        'glow-pulse-secondary' => 'iw-button-glow-pulse-secondary',
+        'glow-pulse-accent' => 'iw-button-glow-pulse-accent',
     ];
 
     /**
@@ -342,23 +342,23 @@ class ButtonEffectCatalog
      *
      * Must be emitted exactly once per CSS file (typically at the top of the
      * button section). Variant-specific keyframes (e.g. background pulses
-     * driven by --btn-<variant>-bg / -hoverBg) are emitted separately by the
-     * compiler when the corresponding effect is configured.
+     * driven by --iw-button-<variant>-bg / -hover-bg) are emitted separately
+     * by the compiler when the corresponding effect is configured.
      *
      * @return string CSS @keyframes declarations
      */
     public static function buildSharedKeyframes(): string
     {
         $css = "/* Shared button keyframes */\n";
-        $css .= "@keyframes btn-glow-pulse-primary {\n";
+        $css .= "@keyframes iw-button-glow-pulse-primary {\n";
         $css .= "  0%, 100% { box-shadow: 0 0 5px color-mix(in srgb, var(--color-primary) 30%, transparent); }\n";
         $css .= "  50% { box-shadow: 0 0 22px color-mix(in srgb, var(--color-primary) 65%, transparent); }\n";
         $css .= "}\n";
-        $css .= "@keyframes btn-glow-pulse-secondary {\n";
+        $css .= "@keyframes iw-button-glow-pulse-secondary {\n";
         $css .= "  0%, 100% { box-shadow: 0 0 5px color-mix(in srgb, var(--color-secondary) 30%, transparent); }\n";
         $css .= "  50% { box-shadow: 0 0 22px color-mix(in srgb, var(--color-secondary) 65%, transparent); }\n";
         $css .= "}\n";
-        $css .= "@keyframes btn-glow-pulse-accent {\n";
+        $css .= "@keyframes iw-button-glow-pulse-accent {\n";
         $css .= "  0%, 100% { box-shadow: 0 0 5px color-mix(in srgb, var(--color-accent) 30%, transparent); }\n";
         $css .= "  50% { box-shadow: 0 0 22px color-mix(in srgb, var(--color-accent) 65%, transparent); }\n";
         $css .= "}\n\n";
@@ -369,17 +369,18 @@ class ButtonEffectCatalog
     /**
      * Generate a per-variant @keyframes block for the bg-pulse effect.
      *
-     * The keyframes resolve --btn-<variant>-bg and --btn-<variant>-hoverBg at
-     * runtime so they always honour the active theme palette. Only the
-     * variants that actually use the pulse-bg effect need a block emitted.
+     * The keyframes resolve --iw-button-<variant>-bg and
+     * --iw-button-<variant>-hover-bg at runtime so they always honour the
+     * active theme palette. Only the variants that actually use the pulse-bg
+     * effect need a block emitted.
      *
      * @param string $variant The button variant key (primary/secondary/accent)
      */
     public static function buildBgPulseKeyframes(string $variant): string
     {
-        $css = "@keyframes btn-{$variant}-bg-pulse {\n";
-        $css .= "  0%, 100% { background-color: var(--btn-{$variant}-bg); }\n";
-        $css .= "  50% { background-color: var(--btn-{$variant}-hoverBg, var(--btn-{$variant}-bg)); }\n";
+        $css = "@keyframes iw-button-{$variant}-bg-pulse {\n";
+        $css .= "  0%, 100% { background-color: var(--iw-button-{$variant}-bg); }\n";
+        $css .= "  50% { background-color: var(--iw-button-{$variant}-hover-bg, var(--iw-button-{$variant}-bg)); }\n";
         $css .= "}\n";
 
         return $css;

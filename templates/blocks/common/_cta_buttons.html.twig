@@ -10,7 +10,7 @@
 {% if primaryButtonLink|default('') is not empty %}
     {% set primaryTarget = primaryButtonView.target|default('_self') %}
     {% set primaryRel = primaryButtonView.rel|default('') %}
-    {% set primaryBtnClass = 'btn-' ~ (primaryButtonStyle|default('primary')) %}
+    {% set primaryBtnClass = 'iw-button--' ~ (primaryButtonStyle|default('primary')) %}
 
     {# Resolve primary button label: attribute title > page title > URL #}
     {% if primaryButtonView.title|default('') is not empty %}
@@ -34,7 +34,7 @@
         {% if secondaryButtonLink|default('') is not empty %}
             {% set secondaryTarget = secondaryButtonView.target|default('_self') %}
             {% set secondaryRel = secondaryButtonView.rel|default('') %}
-            {% set secondaryBtnClass = 'btn-' ~ (secondaryButtonStyle|default('secondary')) %}
+            {% set secondaryBtnClass = 'iw-button--' ~ (secondaryButtonStyle|default('secondary')) %}
 
             {# Resolve secondary button label: attribute title > page title > URL #}
             {% if secondaryButtonView.title|default('') is not empty %}

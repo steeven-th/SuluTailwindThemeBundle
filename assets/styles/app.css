@@ -93,13 +93,16 @@ a:hover {
 }
 
 /* ─── Buttons ───────────────────────────────────────────────────────────── */
-.btn-primary {
+/* Static fallbacks used when no compiled theme stylesheet is loaded.
+ * The full set of variants, hover effects, padding and radii is emitted by
+ * the ThemeCompiler — see Service/ThemeCompiler::generateButtonClasses(). */
+.iw-button--primary {
     display: inline-block;
-    background-color: var(--btn-primary-bg, var(--color-primary, #333));
-    color: var(--btn-primary-text, #fff);
-    border: var(--btn-primary-border, none);
-    border-radius: var(--btn-primary-radius, var(--border-radius, 6px));
-    padding: var(--btn-padding-y, 0.75rem) var(--btn-padding-x, 1.5rem);
+    background-color: var(--iw-button-primary-bg, var(--color-primary, #333));
+    color: var(--iw-button-primary-text, #fff);
+    border: var(--iw-button-primary-border, none);
+    border-radius: var(--iw-button-primary-radius, var(--border-radius, 6px));
+    padding: var(--iw-button-padding-y, 0.75rem) var(--iw-button-padding-x, 1.5rem);
     font-weight: 600;
     font-family: inherit;
     font-size: inherit;
@@ -113,17 +116,17 @@ a:hover {
 /* Hover colors are owned by the ThemeCompiler so they can coexist with hover
  * background effects (slide / gradient / pulse). The fallback opacity below
  * still gives a minimal feedback when no compiled theme stylesheet is loaded. */
-.btn-primary:hover {
+.iw-button--primary:hover {
     opacity: 0.9;
 }
 
-.btn-secondary {
+.iw-button--secondary {
     display: inline-block;
-    background-color: var(--btn-secondary-bg, transparent);
-    color: var(--btn-secondary-text, var(--color-primary, #333));
-    border: var(--btn-secondary-border, 2px solid currentColor);
-    border-radius: var(--btn-secondary-radius, var(--border-radius, 6px));
-    padding: var(--btn-padding-y, 0.75rem) var(--btn-padding-x, 1.5rem);
+    background-color: var(--iw-button-secondary-bg, transparent);
+    color: var(--iw-button-secondary-text, var(--color-primary, #333));
+    border: var(--iw-button-secondary-border, 2px solid currentColor);
+    border-radius: var(--iw-button-secondary-radius, var(--border-radius, 6px));
+    padding: var(--iw-button-padding-y, 0.75rem) var(--iw-button-padding-x, 1.5rem);
     font-weight: 600;
     font-family: inherit;
     font-size: inherit;
@@ -131,7 +134,7 @@ a:hover {
     text-decoration: none;
 }
 
-.btn-secondary:hover {
+.iw-button--secondary:hover {
     opacity: 0.9;
 }
 
@@ -571,7 +574,7 @@ section.block:has([data-slider-fullbleed-value]) {
 /* Force black text on all children — overrides variant selectors like .block-variant-* p */
 .location-overlay-card p,
 .location-overlay-card span,
-.location-overlay-card a:not(.btn-variant),
+.location-overlay-card a:not(.iw-button--variant),
 .location-overlay-card li,
 .location-overlay-card h1,
 .location-overlay-card h2,
