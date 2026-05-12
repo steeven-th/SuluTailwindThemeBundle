@@ -79,7 +79,7 @@ export default class extends Controller {
 
         // Toggle animated burger (3 lines → X)
         if (this.hasBurgerTarget) {
-            this.burgerTarget.classList.toggle('is-open', this.isOpen);
+            this.burgerTarget.classList.toggle('iw-menu__burger--open', this.isOpen);
         }
 
         this._updateOverlayState();
@@ -125,7 +125,7 @@ export default class extends Controller {
         // Find the submenu: either next sibling of button, or next sibling of button's parent wrapper (split button case)
         let submenu = button.nextElementSibling;
         if (!submenu || !submenu.hasAttribute('data-menu-target')) {
-            submenu = button.closest('.iw-menu-parent-item')?.querySelector('[data-menu-target="submenu"]');
+            submenu = button.closest('.iw-menu__parent-item')?.querySelector('[data-menu-target="submenu"]');
         }
         const arrow = button.querySelector('svg');
 
@@ -159,7 +159,7 @@ export default class extends Controller {
 
         // Toggle burger → X on desktop
         if (this.hasSidebarBurgerTarget) {
-            this.sidebarBurgerTarget.classList.toggle('is-open', this.isSidebarOpen);
+            this.sidebarBurgerTarget.classList.toggle('iw-menu__burger--open', this.isSidebarOpen);
         }
     }
 

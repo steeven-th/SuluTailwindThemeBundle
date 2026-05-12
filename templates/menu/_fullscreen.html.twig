@@ -47,7 +47,7 @@
     data-controller="menu"
     data-menu-animation-value="{{ animation }}"
     data-menu-slide-direction-value="right"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu-transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
+    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
     {# Navbar — z-30 so the fullscreen panel (z-50) covers it when open #}
     <nav class="relative z-30 container mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,12 +55,12 @@
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu-text flex items-center gap-2 no-underline">
+                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
                     {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
-                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu-logo-desktop hidden md:block w-auto">
+                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                     {% endif %}
                     {% if config.displayLogoMobile|default(false) and logoMobileUrl %}
-                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu-logo-mobile block md:hidden w-auto">
+                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
                     {% endif %}
                     {% if config.displaySiteName|default(false) %}
                         <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
@@ -103,12 +103,12 @@
                     type="button"
                     data-action="menu#toggle"
                     data-menu-target="burger"
-                    class="iw-menu-burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+                    class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                     aria-label="Menu"
                 >
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
                 </button>
             </div>
         </div>
@@ -123,12 +123,12 @@
             <button
                 type="button"
                 data-action="menu#toggle"
-                class="iw-menu-burger is-open w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+                class="iw-menu__burger iw-menu__burger--open w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                 aria-label="Close"
             >
-                <span class="iw-menu-burger-line"></span>
-                <span class="iw-menu-burger-line"></span>
-                <span class="iw-menu-burger-line"></span>
+                <span class="iw-menu__burger-line"></span>
+                <span class="iw-menu__burger-line"></span>
+                <span class="iw-menu__burger-line"></span>
             </button>
         </div>
     {% endmacro %}
@@ -145,7 +145,7 @@
                     {# L1 link — always a direct link in fullscreen #}
                     <a
                         href="{{ sulu_content_path(item.url) }}"
-                        class="iw-menu-text text-2xl md:text-4xl lg:text-5xl font-bold hover:opacity-80 transition-opacity no-underline"
+                        class="iw-menu__text text-2xl md:text-4xl lg:text-5xl font-bold hover:opacity-80 transition-opacity no-underline"
                     >
                         {{ item.title }}
                     </a>
@@ -156,20 +156,20 @@
                             {% for child in item.children %}
                                 {% if child.children is defined and child.children|length > 0 %}
                                     {# L2 with L3 children #}
-                                    <div class="iw-menu-parent-item">
+                                    <div class="iw-menu__parent-item">
                                         {% if clickMode == 'split' %}
                                             {# Split button: L2 is a link + separate chevron #}
                                             <div class="flex items-center gap-2 w-full {{ twoColumns ? 'justify-start' : 'justify-center' }}">
                                                 <a
                                                     href="{{ sulu_content_path(child.url) }}"
-                                                    class="iw-menu-text-l2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                    class="iw-menu__text--level-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
                                                 >
                                                     {{ child.title }}
                                                 </a>
                                                 <button
                                                     type="button"
                                                     data-action="menu#toggleMobileSubmenu"
-                                                    class="iw-menu-text-l2 opacity-60 hover:opacity-100 cursor-pointer"
+                                                    class="iw-menu__text--level-2 opacity-60 hover:opacity-100 cursor-pointer"
                                                 >
                                                     <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -181,7 +181,7 @@
                                             <button
                                                 type="button"
                                                 data-action="menu#toggleMobileSubmenu"
-                                                class="iw-menu-text-l2 flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
+                                                class="iw-menu__text--level-2 flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
                                             >
                                                 <span>{{ child.title }}</span>
                                                 <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,7 +194,7 @@
                                                 {# Self-link to the L2 page itself #}
                                                 <a
                                                     href="{{ sulu_content_path(child.url) }}"
-                                                    class="iw-menu-text-l3 block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
+                                                    class="iw-menu__text--level-3 block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
                                                 >
                                                     {{ child.title }}
                                                 </a>
@@ -203,7 +203,7 @@
                                             {% for grandchild in child.children %}
                                                 <a
                                                     href="{{ sulu_content_path(grandchild.url) }}"
-                                                    class="iw-menu-text-l3 block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                    class="iw-menu__text--level-3 block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
                                                 >
                                                     {{ grandchild.title }}
                                                 </a>
@@ -214,7 +214,7 @@
                                     {# L2 without children — simple link #}
                                     <a
                                         href="{{ sulu_content_path(child.url) }}"
-                                        class="iw-menu-text-l2 block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                        class="iw-menu__text--level-2 block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
                                     >
                                         {{ child.title }}
                                     </a>
@@ -232,10 +232,10 @@
         {% if (displayDesktop and logoDesktopUrl) or (displayMobile and logoMobileUrl) %}
             <div class="flex items-center justify-center pt-4 pb-2">
                 {% if displayDesktop and logoDesktopUrl %}
-                    <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu-logo-desktop hidden md:block w-auto">
+                    <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                 {% endif %}
                 {% if displayMobile and logoMobileUrl %}
-                    <img src="{{ logoMobileUrl }}" alt="" class="iw-menu-logo-mobile block md:hidden w-auto">
+                    <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
                 {% endif %}
             </div>
         {% endif %}
@@ -280,7 +280,7 @@
                     <img src="{{ fullscreenImageUrl }}" alt="" class="w-full h-full object-cover">
                 </div>
                 {# Right volet — nav + background, slides from the right #}
-                <div data-menu-target="curtainRight" class="iw-menu-fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
+                <div data-menu-target="curtainRight" class="iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
                     {{ _self.render_close_button() }}
                     {% if navItems is not empty %}
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
@@ -292,10 +292,10 @@
         </div>
     {% else %}
         {# ═══ WITHOUT IMAGE — full panel slides from right ═══ #}
-        {# Panel has iw-menu-overlay background, slides as one block #}
+        {# Panel has iw-menu__overlay background, slides as one block #}
         <div
             data-menu-target="panel"
-            class="iw-menu-overlay fixed inset-0 z-50 invisible opacity-0 flex flex-col items-center justify-center"
+            class="iw-menu__overlay fixed inset-0 z-50 invisible opacity-0 flex flex-col items-center justify-center"
         >
             {{ _self.render_close_button() }}
             {% if navItems is not empty %}

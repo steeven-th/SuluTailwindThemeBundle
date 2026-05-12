@@ -887,6 +887,29 @@ class ThemeCompiler
     }
 
     /**
+     * Mapping from internal camelCase menu color keys to the kebab-case
+     * suffix used in the public `--iw-menu-<suffix>` variables. Keeps the
+     * admin tokens stable (camelCase) while emitting variables that follow
+     * the 3.0.0 kebab-case convention.
+     */
+    private const MENU_COLOR_VAR_SUFFIX = [
+        'bg' => 'bg',
+        'text' => 'text',
+        'textHover' => 'text-hover',
+        'secondBg' => 'second-bg',
+        'secondText' => 'second-text',
+        'secondTextHover' => 'second-text-hover',
+        'thirdBg' => 'third-bg',
+        'thirdText' => 'third-text',
+        'thirdTextHover' => 'third-text-hover',
+        'divider' => 'divider',
+        'burgerOpen' => 'burger-open',
+        'burgerClose' => 'burger-close',
+        'socialMedia' => 'social-media',
+        'socialMediaHover' => 'social-media-hover',
+    ];
+
+    /**
      * Generate CSS custom properties for menu colors.
      *
      * Only the "colors" sub-object of menuConfig generates CSS variables.
@@ -903,10 +926,15 @@ class ThemeCompiler
 
         $colors = $menuConfig['colors'] ?? [];
         foreach ($colors as $key => $value) {
-            if (!is_array($value)) {
-                $resolved = $this->resolveColorValue((string) $value);
-                $css .= "  --menu-{$key}: {$resolved};\n";
+            if (is_array($value)) {
+                continue;
             }
+            $suffix = self::MENU_COLOR_VAR_SUFFIX[$key] ?? null;
+            if (null === $suffix) {
+                continue;
+            }
+            $resolved = $this->resolveColorValue((string) $value);
+            $css .= "  --iw-menu-{$suffix}: {$resolved};\n";
         }
 
         return $css . "\n";
@@ -919,6 +947,9 @@ class ThemeCompiler
      * dividers, burger icons, logo sizing, fullscreen overlay, and
      * social media icons (mask-image technique for SVG coloring).
      *
+     * The mega menu lives under the `iw-mega-menu` sub-namespace so the
+     * megamenu classes are not confused with the regular menu primitives.
+     *
      * @return string CSS class declarations
      */
     private function generateMenuClasses(): string
@@ -926,65 +957,66 @@ class ThemeCompiler
         $css = "/* Menu component */\n";
 
         // Base: navbar header + overlay background/text
-        $css .= ".iw-menu { background-color: var(--menu-bg); color: var(--menu-text); }\n";
+        $css .= ".iw-menu { background-color: var(--iw-menu-bg); color: var(--iw-menu-text); }\n";
         $css .= ".iw-menu > nav { background-color: inherit; }\n";
 
-        // Transparent navbar variant
-        $css .= ".iw-menu.iw-menu-transparent { background-color: transparent; }\n";
+        // Transparent navbar modifier
+        $css .= ".iw-menu.iw-menu--transparent { background-color: transparent; }\n";
 
         // Text colors per navigation level (with hover transition)
-        $css .= ".iw-menu-text { color: var(--menu-text); transition: color 0.2s ease; }\n";
-        $css .= ".iw-menu-text:hover { color: var(--menu-textHover, var(--menu-text)); }\n";
-        $css .= ".iw-menu-text-l2 { color: var(--menu-secondText, var(--menu-text)); transition: color 0.2s ease; }\n";
-        $css .= ".iw-menu-text-l2:hover { color: var(--menu-secondTextHover, var(--menu-secondText, var(--menu-text))); }\n";
-        $css .= ".iw-menu-text-l3 { color: var(--menu-thirdText, var(--menu-secondText, var(--menu-text))); transition: color 0.2s ease; }\n";
-        $css .= ".iw-menu-text-l3:hover { color: var(--menu-thirdTextHover, var(--menu-thirdText, var(--menu-secondText, var(--menu-text)))); }\n";
+        $css .= ".iw-menu__text { color: var(--iw-menu-text); transition: color 0.2s ease; }\n";
+        $css .= ".iw-menu__text:hover { color: var(--iw-menu-text-hover, var(--iw-menu-text)); }\n";
+        $css .= ".iw-menu__text--level-2 { color: var(--iw-menu-second-text, var(--iw-menu-text)); transition: color 0.2s ease; }\n";
+        $css .= ".iw-menu__text--level-2:hover { color: var(--iw-menu-second-text-hover, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
+        $css .= ".iw-menu__text--level-3 { color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); transition: color 0.2s ease; }\n";
+        $css .= ".iw-menu__text--level-3:hover { color: var(--iw-menu-third-text-hover, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
 
         // Dropdown backgrounds per level
-        $css .= ".iw-menu-dropdown-l2 { background-color: var(--menu-secondBg, var(--menu-bg)); border-radius: var(--border-radius); }\n";
-        $css .= ".iw-menu-dropdown-l3 { background-color: var(--menu-thirdBg, var(--menu-secondBg, var(--menu-bg))); border-radius: var(--border-radius); }\n";
+        $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); border-radius: var(--border-radius); }\n";
+        $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); border-radius: var(--border-radius); }\n";
 
         // Dividers
-        $css .= ".iw-menu-divider { border-color: var(--menu-divider, rgba(255,255,255,0.1)); }\n";
+        $css .= ".iw-menu__divider { border-color: var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
 
-        // Animated burger button (3 lines → X)
-        $css .= ".iw-menu-burger { color: var(--menu-burgerOpen, var(--menu-text)); }\n";
-        $css .= ".iw-menu-burger-line {\n";
+        // Animated burger button (3 lines → X). State is controlled by
+        // toggling .iw-menu__burger--open via the menu_controller Stimulus.
+        $css .= ".iw-menu__burger { color: var(--iw-menu-burger-open, var(--iw-menu-text)); }\n";
+        $css .= ".iw-menu__burger-line {\n";
         $css .= "  display: block;\n";
         $css .= "  width: 22px;\n";
         $css .= "  height: 2px;\n";
         $css .= "  background-color: currentColor;\n";
         $css .= "  transition: transform 0.3s ease, opacity 0.3s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-menu-burger.is-open { color: var(--menu-burgerClose, var(--menu-text)); }\n";
-        $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }\n";
-        $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(2) { opacity: 0; }\n";
-        $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
+        $css .= ".iw-menu__burger--open { color: var(--iw-menu-burger-close, var(--iw-menu-text)); }\n";
+        $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }\n";
+        $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(2) { opacity: 0; }\n";
+        $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
 
         // Logo sizing
-        $css .= ".iw-menu-logo-desktop { max-height: 40px; }\n";
-        $css .= ".iw-menu-logo-mobile { max-height: 32px; }\n";
+        $css .= ".iw-menu__logo--desktop { max-height: 40px; }\n";
+        $css .= ".iw-menu__logo--mobile { max-height: 32px; }\n";
 
         // Fullscreen overlay (transition is handled by JS, not CSS, to avoid conflicts)
-        $css .= ".iw-menu-overlay {\n";
-        $css .= "  background-color: var(--menu-bg);\n";
-        $css .= "  color: var(--menu-text);\n";
+        $css .= ".iw-menu__overlay {\n";
+        $css .= "  background-color: var(--iw-menu-bg);\n";
+        $css .= "  color: var(--iw-menu-text);\n";
         $css .= "}\n";
-        $css .= ".iw-menu-overlay-nav { height: 100%; }\n";
+        $css .= ".iw-menu__overlay-nav { height: 100%; }\n";
 
         // Fullscreen split layout (curtain effect)
-        $css .= ".iw-menu-fullscreen-nav { background-color: var(--menu-bg); }\n";
+        $css .= ".iw-menu__fullscreen-nav { background-color: var(--iw-menu-bg); }\n";
 
         // Sidebar panel
-        $css .= ".iw-menu-sidebar { background-color: var(--menu-bg); }\n";
+        $css .= ".iw-menu__sidebar { background-color: var(--iw-menu-bg); }\n";
 
         // Backdrop overlay
-        $css .= ".iw-menu-backdrop { background-color: rgba(0, 0, 0, 0.5); }\n";
+        $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); }\n";
 
         // Social media icons — mask-image technique for SVG coloring
         $css .= ".iw-social-icon {\n";
         $css .= "  display: inline-block;\n";
-        $css .= "  background-color: var(--menu-socialMedia);\n";
+        $css .= "  background-color: var(--iw-menu-social-media);\n";
         $css .= "  -webkit-mask-size: contain;\n";
         $css .= "  mask-size: contain;\n";
         $css .= "  -webkit-mask-repeat: no-repeat;\n";
@@ -993,61 +1025,61 @@ class ThemeCompiler
         $css .= "  mask-position: center;\n";
         $css .= "  transition: background-color 0.2s ease;\n";
         $css .= "}\n";
-        $css .= "a:hover > .iw-social-icon { background-color: var(--menu-socialMediaHover, var(--menu-socialMedia)); }\n";
-        $css .= ".iw-social-text { color: var(--menu-socialMedia); transition: color 0.2s ease; }\n";
-        $css .= "a:hover > .iw-social-text { color: var(--menu-socialMediaHover, var(--menu-socialMedia)); }\n\n";
+        $css .= "a:hover > .iw-social-icon { background-color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n";
+        $css .= ".iw-social-text { color: var(--iw-menu-social-media); transition: color 0.2s ease; }\n";
+        $css .= "a:hover > .iw-social-text { color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n\n";
 
-        // Mega menu dropdown panel
-        $css .= ".iw-mega-dropdown { background-color: var(--menu-secondBg, var(--menu-bg)); ";
-        $css .= "border-top: 1px solid var(--menu-divider, rgba(0,0,0,0.1)); }\n";
-        // Mega menu featured column
-        $css .= ".iw-mega-featured { background-color: var(--menu-thirdBg, var(--menu-secondBg, var(--menu-bg))); ";
+        // ─── Mega menu (sub-namespace iw-mega-menu) ──────────────────────────
+        // Dropdown panel
+        $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); ";
+        $css .= "border-top: 1px solid var(--iw-menu-divider, rgba(0,0,0,0.1)); }\n";
+        // Featured column
+        $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
         $css .= "border-radius: var(--border-radius); padding: 1.5rem; }\n";
-        // Mega menu image card (radius by default for consistent hover shadow)
-        $css .= ".iw-mega-card { border-radius: var(--border-radius); overflow: hidden; ";
+        // Image card (radius by default for consistent hover shadow)
+        $css .= ".iw-mega-menu__card { border-radius: var(--border-radius); overflow: hidden; ";
         $css .= "transition: transform 0.2s ease, box-shadow 0.2s ease; }\n";
-        $css .= ".iw-mega-card:hover { transform: translateY(-2px); ";
+        $css .= ".iw-mega-menu__card:hover { transform: translateY(-2px); ";
         $css .= "box-shadow: 0 4px 12px rgba(0,0,0,0.1); }\n";
-        // Mega menu card image (uses theme image radius by default)
-        $css .= ".iw-mega-card img { width: 100%; height: auto; object-fit: cover; ";
+        $css .= ".iw-mega-menu__card img { width: 100%; height: auto; object-fit: cover; ";
         $css .= "border-radius: var(--border-imageRadius, var(--border-radius)); }\n";
-        // Mega menu card with background: radius on card, overflow clips image corners, no image radius
-        $css .= ".iw-mega-card-bg { background-color: var(--menu-thirdBg, var(--menu-secondBg, var(--menu-bg))); ";
+        // Card with background modifier: radius on card, overflow clips image, no image radius
+        $css .= ".iw-mega-menu__card--bg { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
         $css .= "border-radius: var(--border-radius); overflow: hidden; }\n";
-        $css .= ".iw-mega-card-bg img { border-radius: 0; }\n";
-        // Mega menu featured image (uses theme image radius)
-        $css .= ".iw-mega-featured img { width: 100%; height: auto; object-fit: cover; ";
+        $css .= ".iw-mega-menu__card--bg img { border-radius: 0; }\n";
+        // Featured image (uses theme image radius)
+        $css .= ".iw-mega-menu__featured img { width: 100%; height: auto; object-fit: cover; ";
         $css .= "border-radius: var(--border-imageRadius, var(--border-radius)); }\n";
-        // Mega menu column grid (1 to 5 columns) with responsive breakpoints
+        // Column grid (1 to 5 columns) with responsive breakpoints
         for ($i = 1; $i <= 5; $i++) {
-            $css .= ".iw-mega-grid-{$i} { display: grid; gap: 2rem; ";
+            $css .= ".iw-mega-menu__grid--cols-{$i} { display: grid; gap: 2rem; ";
             $css .= "grid-template-columns: repeat({$i}, 1fr); }\n";
         }
         // Responsive: 3 columns → 2 under 900px
         $css .= "@media (max-width: 900px) {\n";
-        $css .= "  .iw-mega-grid-3 { grid-template-columns: repeat(2, 1fr); }\n";
+        $css .= "  .iw-mega-menu__grid--cols-3 { grid-template-columns: repeat(2, 1fr); }\n";
         $css .= "}\n";
         // Responsive: 4-5 columns → 2 under 1024px, then 1 under 768px
         $css .= "@media (max-width: 1024px) {\n";
-        $css .= "  .iw-mega-grid-4 { grid-template-columns: repeat(2, 1fr); }\n";
-        $css .= "  .iw-mega-grid-5 { grid-template-columns: repeat(2, 1fr); }\n";
+        $css .= "  .iw-mega-menu__grid--cols-4 { grid-template-columns: repeat(2, 1fr); }\n";
+        $css .= "  .iw-mega-menu__grid--cols-5 { grid-template-columns: repeat(2, 1fr); }\n";
         $css .= "}\n";
         $css .= "@media (max-width: 768px) {\n";
-        $css .= "  .iw-mega-grid-3,\n";
-        $css .= "  .iw-mega-grid-4,\n";
-        $css .= "  .iw-mega-grid-5 { grid-template-columns: 1fr; }\n";
+        $css .= "  .iw-mega-menu__grid--cols-3,\n";
+        $css .= "  .iw-mega-menu__grid--cols-4,\n";
+        $css .= "  .iw-mega-menu__grid--cols-5 { grid-template-columns: 1fr; }\n";
         $css .= "}\n";
 
-        // Mega menu horizontal card layout (image + text side by side)
-        $css .= ".iw-mega-card-horizontal { display: flex; align-items: center; }\n";
-        $css .= ".iw-mega-card-horizontal img { width: 40%; flex-shrink: 0; }\n";
-        $css .= ".iw-mega-card-horizontal .iw-mega-card-body { flex: 1; }\n";
-        $css .= ".iw-mega-card-img-right { flex-direction: row-reverse; }\n";
-        // Mega menu horizontal featured layout (image + content side by side)
-        $css .= ".iw-mega-featured-horizontal { display: flex; align-items: flex-start; gap: 1.5rem; }\n";
-        $css .= ".iw-mega-featured-horizontal img { width: 45%; flex-shrink: 0; }\n";
-        $css .= ".iw-mega-featured-horizontal .iw-mega-featured-body { flex: 1; }\n";
-        $css .= ".iw-mega-featured-img-right { flex-direction: row-reverse; }\n";
+        // Horizontal card layout (image + text side by side)
+        $css .= ".iw-mega-menu__card--horizontal { display: flex; align-items: center; }\n";
+        $css .= ".iw-mega-menu__card--horizontal img { width: 40%; flex-shrink: 0; }\n";
+        $css .= ".iw-mega-menu__card--horizontal .iw-mega-menu__card-body { flex: 1; }\n";
+        $css .= ".iw-mega-menu__card--img-right { flex-direction: row-reverse; }\n";
+        // Horizontal featured layout (image + content side by side)
+        $css .= ".iw-mega-menu__featured--horizontal { display: flex; align-items: flex-start; gap: 1.5rem; }\n";
+        $css .= ".iw-mega-menu__featured--horizontal img { width: 45%; flex-shrink: 0; }\n";
+        $css .= ".iw-mega-menu__featured--horizontal .iw-mega-menu__featured-body { flex: 1; }\n";
+        $css .= ".iw-mega-menu__featured--img-right { flex-direction: row-reverse; }\n";
         $css .= "\n";
 
         return $css;
