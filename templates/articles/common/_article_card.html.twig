@@ -29,9 +29,11 @@
 {% set hoverShadow = cardHoverShadow|default('none') %}
 {% set hasHoverBorder = hasBorder and (cardHoverBorder|default('none')) != 'none' %}
 {% set imagePadded = cardImagePadded is defined ? cardImagePadded : true %}
-{# In horizontal+bleed mode the image must stretch to card height,
-   so we drop the aspect-ratio that would otherwise constrain it. #}
-{% set keepAspectRatio = imagePadded or layout != 'horizontal' %}
+{# The aspect-ratio is always applied so every card in a listing keeps the
+   same image height. Dropping it (previous behavior in horizontal+bleed
+   mode) let the native image size push the card, producing inconsistent
+   row heights with portrait sources. #}
+{% set keepAspectRatio = true %}
 
 {% set articleTitle = article.title|default('') %}
 {% set articleUrl = article.routePath|default(article.url|default('#')) %}
