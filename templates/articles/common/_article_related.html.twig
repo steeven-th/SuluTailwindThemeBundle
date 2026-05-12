@@ -4,20 +4,29 @@
     Parameters:
     - articles: array of resolved article objects (from smart_content)
     - title: section title (default: translation key)
-    - columns: number of grid columns (default: 3)
+    - columns: number of grid columns (default: 3) — must be 2, 3 or 4
     - maxItems: maximum items to show (default: 3)
+
+    Public CSS API:
+    - .iw-article-related (block — wrapping <section>)
+    - .iw-article-related__title (section title <h2>)
+    - .iw-article-related__grid (grid of cards)
+    - .iw-article-related--cols-2 / --cols-3 / --cols-4 (column count modifier)
+
+    Override via --iw-article-related-{gap,title-color,title-size,margin}.
 #}
 {% set columns = columns|default(3) %}
+{% set cols = columns in [2, 3, 4] ? columns : 3 %}
 {% set maxItems = maxItems|default(3) %}
 {% set sectionTitle = title|default('iw_sulu_tailwind_theme.article.related_articles'|trans) %}
 
 {% if articles is defined and articles is iterable and articles|length > 0 %}
-    <section class="article-related mt-16 mb-8">
+    <section class="iw-article-related iw-article-related--cols-{{ cols }}">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="font-[var(--font-family-heading)] text-[var(--font-size-h3)] font-semibold mb-8">
+            <h2 class="iw-article-related__title">
                 {{ sectionTitle }}
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ columns }} gap-8">
+            <div class="iw-article-related__grid">
                 {% for article in articles|slice(0, maxItems) %}
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,

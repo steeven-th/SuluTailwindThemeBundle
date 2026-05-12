@@ -717,3 +717,390 @@ section.block:has([data-slider-fullbleed-value]) {
         display: none;
     }
 }
+
+/* ─── Article page wrapper ──────────────────────────────────────────────── */
+/* The <article> wrapper that hosts hero, header, body and footer. Doesn't
+   carry visual styling itself — its elements (__header, __body, __footer)
+   own the spacing and the dropcap modifier. */
+.iw-article-page {
+    display: block;
+}
+
+.iw-article-page__header {
+    margin-bottom: var(--iw-article-page-header-margin-bottom, 1.5rem);
+}
+
+.iw-article-page__title {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-h1-weight);
+    line-height: var(--line-height-h1);
+    margin-bottom: 1rem;
+}
+
+.iw-article-page__subtitle {
+    font-size: var(--font-size-h4);
+    color: var(--color-secondary-600);
+    line-height: 1.5;
+}
+
+.iw-article-page__body {
+    margin-top: var(--iw-article-page-body-margin-top, 2rem);
+}
+
+/* Dropcap modifier on the body — large first letter on the first inner block */
+.iw-article-page__body--dropcap > *:first-child::first-letter {
+    float: left;
+    font-size: 3.5em;
+    line-height: 0.8;
+    padding-right: 0.1em;
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.iw-article-page__footer {
+    margin-top: var(--iw-article-page-footer-margin-top, 2.5rem);
+    padding-top: var(--iw-article-page-footer-padding-top, 1.5rem);
+    border-top: 1px solid var(--color-border);
+}
+
+/* ─── Article hero ──────────────────────────────────────────────────────── */
+/* Image displayed at the top of an article page. Three layout modifiers
+   (fullwidth, contained, parallax) and one visual modifier (editorial,
+   used by the blog editorial style as a hero with overlay text).
+
+   The radius is owned by the *wrapper* that clips with `overflow: hidden`,
+   never by the <img> itself. Otherwise, when `max-height` crops the image,
+   the bottom corners aren't rounded (the radius is hidden below the crop).
+   The global `img { border-radius: var(--radius-img); }` rule of app.css
+   is overridden to 0 on the hero image so only the wrapper applies it. */
+.iw-article-hero {
+    width: 100%;
+    overflow: hidden;
+    max-height: var(--iw-article-hero-max-height, 500px);
+}
+
+.iw-article-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Drop the global image radius — the wrapper owns the clip. */
+    border-radius: 0;
+}
+
+/* Fullwidth: image spans the viewport, no radius (default behavior of
+   .iw-article-hero already provides overflow:hidden + max-height). */
+
+/* Contained: the outer wrapper becomes a layout helper that centers the
+   hero inside the page container. The inner wrapper does the actual
+   clipping + radius, so the bottom corners stay rounded even when
+   max-height crops the image. */
+.iw-article-hero--contained {
+    overflow: visible;
+    max-height: none;
+    max-width: var(--iw-article-hero-contained-max-width, 1280px);
+    margin-inline: auto;
+    padding-inline: 1rem;
+    margin-bottom: 2rem;
+}
+
+.iw-article-hero--contained .iw-article-hero__inner {
+    overflow: hidden;
+    max-height: var(--iw-article-hero-max-height, 500px);
+    border-radius: var(--iw-article-hero-radius, var(--border-imageRadius));
+}
+
+@media (min-width: 640px) {
+    .iw-article-hero--contained {
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-article-hero--contained {
+        padding-inline: 2rem;
+    }
+}
+
+/* Parallax: relative positioning so the slide controller can apply the
+   parallax transform via .parallax-slide-img on the inner <img>. No radius
+   — the image spans the viewport. */
+.iw-article-hero--parallax {
+    position: relative;
+}
+
+/* Editorial: oversized hero with background-image and overlay text. The
+   background-image is wired via a per-instance <style> block in the
+   template; here we only set the structural defaults. */
+.iw-article-hero--editorial {
+    overflow: visible;
+    max-height: none;
+}
+
+/* ─── Article meta ──────────────────────────────────────────────────────── */
+/* Inline strip of meta entries below the article title: date, authors,
+   categories, reading time, separated by a vertical pipe. */
+.iw-article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--iw-article-meta-gap, 0.75rem);
+    color: var(--iw-article-meta-color, var(--color-secondary-600));
+    font-size: 1rem;
+}
+
+.iw-article-meta--compact {
+    font-size: 0.875rem;
+}
+
+.iw-article-meta__date,
+.iw-article-meta__authors,
+.iw-article-meta__reading-time,
+.iw-article-meta__categories {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.iw-article-meta__icon {
+    width: var(--iw-article-meta-icon-size, 1rem);
+    height: var(--iw-article-meta-icon-size, 1rem);
+    opacity: var(--iw-article-meta-icon-opacity, 0.6);
+    flex-shrink: 0;
+}
+
+.iw-article-meta__separator {
+    color: var(--iw-article-meta-separator-color, var(--color-border));
+}
+
+.iw-article-meta__category {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: var(--iw-article-meta-category-radius, var(--border-radius));
+    background-color: var(--iw-article-meta-category-bg, var(--color-primary-100));
+    color: var(--iw-article-meta-category-text, var(--color-primary-700));
+}
+
+/* ─── Article author ────────────────────────────────────────────────────── */
+/* Avatar (image or initials fallback) + name + optional role. Three size
+   modifiers (sm/md/lg) drive the avatar dimensions and the text scale. */
+.iw-article-author {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--iw-article-author-gap, 0.75rem);
+}
+
+.iw-article-author__avatar {
+    border-radius: 9999px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.iw-article-author__avatar--initials {
+    background-color: var(--iw-article-author-avatar-bg, var(--color-primary-100));
+    color: var(--iw-article-author-avatar-text, var(--color-primary-700));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.iw-article-author--sm .iw-article-author__avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
+}
+
+.iw-article-author--md .iw-article-author__avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+}
+
+.iw-article-author--lg .iw-article-author__avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.125rem;
+}
+
+.iw-article-author__details {
+    display: flex;
+    flex-direction: column;
+}
+
+.iw-article-author__name {
+    font-weight: 500;
+    color: var(--iw-article-author-name-color, var(--color-text));
+}
+
+.iw-article-author__role {
+    font-size: 0.875rem;
+    color: var(--iw-article-author-role-color, var(--color-secondary-500));
+}
+
+/* ─── Article related ───────────────────────────────────────────────────── */
+/* "Articles similaires" section at the bottom of an article page. Cards
+   are reused from the listing component, so we only style the wrapper. */
+.iw-article-related {
+    margin-top: var(--iw-article-related-margin-top, 4rem);
+    margin-bottom: var(--iw-article-related-margin-bottom, 2rem);
+}
+
+.iw-article-related__title {
+    font-family: var(--font-family-heading);
+    font-size: var(--iw-article-related-title-size, var(--font-size-h3));
+    font-weight: 600;
+    color: var(--iw-article-related-title-color, inherit);
+    margin-bottom: 2rem;
+}
+
+.iw-article-related__grid {
+    display: grid;
+    gap: var(--iw-article-related-gap, 2rem);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .iw-article-related__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-article-related--cols-2 .iw-article-related__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .iw-article-related--cols-3 .iw-article-related__grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .iw-article-related--cols-4 .iw-article-related__grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* ─── Article categories & tags ─────────────────────────────────────────── */
+/* Flex row of colored badges. Categories use the primary palette; tags
+   are bordered with a hover state that switches to the primary tint. */
+.iw-article-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--iw-article-categories-gap, 0.5rem);
+}
+
+.iw-article-categories__item {
+    display: inline-block;
+    padding: var(--iw-article-categories-item-padding, 0.25rem 0.75rem);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--iw-article-categories-item-radius, var(--border-radius));
+    background-color: var(--iw-article-categories-item-bg, var(--color-primary-100));
+    color: var(--iw-article-categories-item-text, var(--color-primary-700));
+}
+
+.iw-article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--iw-article-tags-gap, 0.5rem);
+}
+
+.iw-article-tags__item {
+    display: inline-block;
+    padding: var(--iw-article-tags-item-padding, 0.25rem 0.75rem);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid var(--iw-article-tags-item-border, var(--color-border));
+    border-radius: var(--iw-article-tags-item-radius, var(--border-radius));
+    color: var(--iw-article-tags-item-text, var(--color-secondary-600));
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.iw-article-tags__item:hover {
+    background-color: var(--iw-article-tags-item-hover-bg, var(--color-primary-50));
+    color: var(--iw-article-tags-item-hover-text, var(--color-primary-700));
+    border-color: var(--iw-article-tags-item-hover-border, var(--color-primary-200));
+}
+
+/* ─── Event info card ───────────────────────────────────────────────────── */
+/* Floating card with date, location/online badge and organizer. Designed
+   to sit on top of a hero image (translucent background + backdrop blur). */
+.iw-event-info {
+    background-color: var(--iw-event-info-bg, rgba(255, 255, 255, 0.95));
+    -webkit-backdrop-filter: blur(var(--iw-event-info-blur, 12px));
+    backdrop-filter: blur(var(--iw-event-info-blur, 12px));
+    border-radius: var(--iw-event-info-radius, var(--border-radius));
+    box-shadow: var(--iw-event-info-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
+    padding: var(--iw-event-info-padding, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-event-info-gap, 1rem);
+}
+
+.iw-event-info__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.iw-event-info__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--iw-event-info-icon-color, var(--color-primary));
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.iw-event-info__content {
+    flex: 1;
+}
+
+.iw-event-info__date {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.iw-event-info__date-end {
+    font-size: 0.875rem;
+    color: var(--color-secondary-500);
+}
+
+.iw-event-info__online-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    background-color: var(--iw-event-info-online-badge-bg, var(--color-success-100));
+    color: var(--iw-event-info-online-badge-text, var(--color-success-700));
+}
+
+.iw-event-info__online-link {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+}
+
+.iw-event-info__online-link:hover {
+    text-decoration: underline;
+}
+
+.iw-event-info__location {
+    color: var(--color-text);
+}
+
+.iw-event-info__organizer-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-secondary-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.iw-event-info__organizer-name {
+    display: block;
+    font-weight: 500;
+    color: var(--color-text);
+}

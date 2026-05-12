@@ -4,10 +4,21 @@
     Parameters:
     - image: media ID or resolved media object
     - style: 'fullwidth' (default) | 'contained' | 'parallax'
-    - maxHeight: CSS max-height value (default: '500px')
+    - maxHeight: optional CSS max-height value — emitted as an inline
+                 `--iw-article-hero-max-height` only when explicitly passed;
+                 otherwise the CSS fallback (500px) applies.
+
+    Public CSS API:
+    - .iw-article-hero (block)
+    - .iw-article-hero--fullwidth (default modifier — full viewport width, no radius)
+    - .iw-article-hero--contained (inside the page container, with image radius)
+    - .iw-article-hero--parallax (parallax scroll effect, no radius)
+    - .iw-article-hero--editorial (background-image cover, used by blog editorial style)
+    - .iw-article-hero__inner (used only by the `contained` modifier to clip the image with radius)
+    - .iw-article-hero__image (the rendered <img>)
+
+    Override via --iw-article-hero-max-height / --iw-article-hero-radius / --iw-article-hero-contained-max-width.
 #}
-{% set heroStyle = style|default('fullwidth') %}
-{% set heroMaxHeight = maxHeight|default('500px') %}
 
 {% if image is defined and image is not empty %}
     {% if image is iterable and image.url is defined %}
@@ -26,22 +37,19 @@
         {% set imgUrl = media.thumbnails['iw_hero_lg']|default(media.thumbnails['iw_theme_16_9']|default(media.url)) %}
         {% set imgAlt = media.title|default('') %}
 
-        {% if heroStyle == 'fullwidth' %}
-            <div class="article-hero w-full overflow-hidden" style="max-height: {{ heroMaxHeight }}">
-                <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="w-full h-full object-cover" loading="eager" itemprop="image">
-            </div>
-        {% elseif heroStyle == 'contained' %}
-            <div class="article-hero container mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-                <div class="overflow-hidden rounded-[var(--border-imageRadius)]" style="max-height: {{ heroMaxHeight }}">
-                    <img src="{{ imgUrl }}" alt="{{ imgAlt }}"
-                         class="w-full h-full object-cover" loading="eager" itemprop="image">
+        {# Whitelist the modifier so legacy values fall back to fullwidth #}
+        {% set heroStyle = style|default('fullwidth') %}
+        {% set modifier = heroStyle in ['fullwidth', 'contained', 'parallax'] ? heroStyle : 'fullwidth' %}
+        {% set imgClass = 'iw-article-hero__image' ~ (modifier == 'parallax' ? ' parallax-slide-img' : '') %}
+
+        <div class="iw-article-hero iw-article-hero--{{ modifier }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
+            {% if modifier == 'contained' %}
+                <div class="iw-article-hero__inner">
+                    <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="{{ imgClass }}" loading="eager" itemprop="image">
                 </div>
-            </div>
-        {% elseif heroStyle == 'parallax' %}
-            <div class="article-hero w-full overflow-hidden relative" style="max-height: {{ heroMaxHeight }}">
-                <img src="{{ imgUrl }}" alt="{{ imgAlt }}"
-                     class="w-full h-full object-cover parallax-slide-img" loading="eager" itemprop="image">
-            </div>
-        {% endif %}
+            {% else %}
+                <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="{{ imgClass }}" loading="eager" itemprop="image">
+            {% endif %}
+        </div>
     {% endif %}
 {% endif %}

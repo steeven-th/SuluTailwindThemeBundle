@@ -4,11 +4,17 @@
 
     Parameters:
     - categories: array of category objects (from excerpt)
+
+    Public CSS API:
+    - .iw-article-categories (block — flex row of badges)
+    - .iw-article-categories__item (single category badge)
+
+    Override via --iw-article-categories-{gap,item-bg,item-text,item-radius,item-padding}.
 #}
 {% if categories is defined and categories is iterable and categories|length > 0 %}
-    <div class="article-categories flex flex-wrap gap-2">
+    <div class="iw-article-categories">
         {% for category in categories %}
-            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-[var(--border-radius)] bg-[var(--color-primary-100)] text-[var(--color-primary-700)]">
+            <span class="iw-article-categories__item">
                 {{ category.name|default(category.title|default('')) }}
             </span>
         {% endfor %}

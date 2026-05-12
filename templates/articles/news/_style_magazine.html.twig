@@ -60,7 +60,7 @@
 {% block article_meta %}{% endblock %}
 
 {% block article_footer %}
-    <footer class="article-footer mt-10 pt-6 border-t border-[var(--color-border)]">
+    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}
