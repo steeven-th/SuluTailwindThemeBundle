@@ -275,12 +275,12 @@ The article card component reads its appearance from a small set of CSS custom p
 
 | Variable | Purpose |
 |----------|---------|
-| `--iw-card-surface` | Card background color (or `transparent` when `cardSurface = none`) |
-| `--iw-card-padding` | Inner padding shorthand |
-| `--iw-card-border` | Border shorthand (`width style color`) ready to drop into `border:` |
-| `--iw-card-hover-border-color` | Border color applied on hover when `cardHoverBorder` is configured |
-| `--iw-card-hover-duration` | Shared hover transition duration |
-| `--iw-card-hover-easing` | Shared hover transition timing function |
+| `--iw-article-card-surface` | Card background color (or `transparent` when `cardSurface = none`) |
+| `--iw-article-card-padding` | Inner padding shorthand |
+| `--iw-article-card-border` | Border shorthand (`width style color`) ready to drop into `border:` |
+| `--iw-article-card-hover-border-color` | Border color applied on hover when `cardHoverBorder` is configured |
+| `--iw-article-card-hover-duration` | Shared hover transition duration |
+| `--iw-article-card-hover-easing` | Shared hover transition timing function |
 
 All values are wired to the matching admin tokens (`articles_card*`) in `iw_theme_config_articles.xml`.
 
@@ -288,19 +288,19 @@ All values are wired to the matching admin tokens (`articles_card*`) in `iw_them
 
 ## Article card CSS classes
 
-The component is exposed as a stable, surchargeable API on top of the BEM-lite convention `iw-article-card[-element][--modifier]`.
+The component is exposed as a stable, surchargeable API on top of the strict BEM convention `iw-article-card[__element][--modifier]` documented in [`css-conventions.md`](./css-conventions.md).
 
 **Block + elements:**
 
 | Class | Role |
 |-------|------|
 | `.iw-article-card` | Card root (vertical layout by default) |
-| `.iw-article-card-image` | Image wrapper (sets overflow + image radius) |
-| `.iw-article-card-body` | Text content wrapper |
-| `.iw-article-card-category` | Category badge |
-| `.iw-article-card-title` | Article title (`<h3>`) |
-| `.iw-article-card-date` | Publication date (`<time>`) |
-| `.iw-article-card-excerpt` | Short excerpt with 2-line clamp |
+| `.iw-article-card__image` | Image wrapper (sets overflow + image radius) |
+| `.iw-article-card__body` | Text content wrapper |
+| `.iw-article-card__category` | Category badge |
+| `.iw-article-card__title` | Article title (`<h3>`) |
+| `.iw-article-card__date` | Publication date (`<time>`) |
+| `.iw-article-card__excerpt` | Short excerpt with 2-line clamp |
 
 **Layout modifier:**
 
@@ -340,7 +340,7 @@ The component is exposed as a stable, surchargeable API on top of the BEM-lite c
 
 | Class | Effect |
 |-------|--------|
-| `.iw-article-card--hover-border` | Switches `border-color` to `--iw-card-hover-border-color` on hover |
+| `.iw-article-card--hover-border` | Switches `border-color` to `--iw-article-card-hover-border-color` on hover |
 
 **Listing wrappers** (used by `_style_cards.html.twig`, `_style_grid.html.twig`, `_style_list.html.twig`):
 
@@ -351,7 +351,7 @@ The component is exposed as a stable, surchargeable API on top of the BEM-lite c
 | `.iw-article-listing--grid` | Three-column grid (two on tablet, one on mobile) |
 | `.iw-article-listing--list` | Vertical stack of horizontal cards |
 | `.iw-article-listing--portrait` | Adjusts the column count so portrait images don't blow the card height while keeping the `cards`-vs-`grid` differential (`cards-portrait`: 1/2/3 · `grid-portrait`: 2/3/4 across mobile/tablet/desktop). Applied automatically by the cards/grid templates when `cardOrientation` is `portrait`. |
-| `.iw-article-listing-empty` | Centered "no articles" message |
+| `.iw-article-listing__empty` | Centered "no articles" message |
 
 **Overriding the look in your project:**
 
@@ -363,12 +363,12 @@ The component is exposed as a stable, surchargeable API on top of the BEM-lite c
 }
 
 /* Tighten the spacing of the body */
-.iw-article-card-body {
+.iw-article-card__body {
     padding-top: 0.75rem;
 }
 
 /* Replace the title font on listings only */
-.iw-article-listing--cards .iw-article-card-title {
+.iw-article-listing--cards .iw-article-card__title {
     font-family: 'Playfair Display', serif;
 }
 ```
