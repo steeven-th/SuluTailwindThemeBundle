@@ -21,9 +21,9 @@
         {% endif %}
     {% endif %}
 
-    <div class="article-hero-editorial relative flex items-end min-h-[60vh] {{ heroBgUrl ? 'bg-cover bg-center' : 'bg-[var(--color-primary-900)]' }}" itemprop="image" content="{{ heroBgUrl|default('') }}">
+    <div class="iw-article-hero iw-article-hero--editorial relative flex items-end min-h-[60vh] {{ heroBgUrl ? 'bg-cover bg-center' : 'bg-[var(--color-primary-900)]' }}" itemprop="image" content="{{ heroBgUrl|default('') }}">
         {% if heroBgUrl %}
-            <style>.article-hero-editorial { background-image: url('{{ heroBgUrl }}'); }</style>
+            <style>.iw-article-hero--editorial { background-image: url('{{ heroBgUrl }}'); }</style>
         {% endif %}
         {# Dark overlay for text readability #}
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
@@ -62,10 +62,10 @@
 {% block article_meta %}{% endblock %}
 
 {% block article_content %}
-    <div class="article-body mt-10 max-w-3xl mx-auto">
+    <div class="iw-article-page__body mt-10 max-w-3xl mx-auto">
         {# Drop cap styling via first-letter pseudo-element #}
         <style>
-            .article-dropcap > *:first-child::first-letter {
+            .iw-article-page__body--dropcap > *:first-child::first-letter {
                 float: left;
                 font-size: 3.5em;
                 line-height: 0.8;
@@ -75,7 +75,7 @@
                 color: var(--color-primary);
             }
         </style>
-        <div class="article-dropcap">
+        <div class="iw-article-page__body--dropcap">
             {% if content.blocks is defined and content.blocks is iterable %}
                 {% for contentBlock in content.blocks %}
                     {% set blockType = contentBlock.type|default('text') %}
@@ -94,7 +94,7 @@
 {% endblock %}
 
 {% block article_footer %}
-    <footer class="article-footer mt-10 pt-6 border-t border-[var(--color-border)]">
+    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}

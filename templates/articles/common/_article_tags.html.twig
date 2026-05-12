@@ -4,11 +4,17 @@
 
     Parameters:
     - tags: array of tag objects (from excerpt)
+
+    Public CSS API:
+    - .iw-article-tags (block — flex row of tag pills)
+    - .iw-article-tags__item (single tag pill with hover state)
+
+    Override via --iw-article-tags-{gap,item-border,item-text,item-hover-bg,item-hover-text,item-hover-border,item-radius,item-padding}.
 #}
 {% if tags is defined and tags is iterable and tags|length > 0 %}
-    <div class="article-tags flex flex-wrap gap-2">
+    <div class="iw-article-tags">
         {% for tag in tags %}
-            <span class="inline-block px-3 py-1 text-xs font-medium rounded-[var(--border-radius)] border border-[var(--color-border)] text-[var(--color-secondary-600)] hover:bg-[var(--color-primary-50)] hover:text-[var(--color-primary-700)] hover:border-[var(--color-primary-200)] transition-colors">
+            <span class="iw-article-tags__item">
                 {{ tag.name|default(tag) }}
             </span>
         {% endfor %}

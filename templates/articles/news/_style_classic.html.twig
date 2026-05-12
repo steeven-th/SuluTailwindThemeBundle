@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block article_header %}
-    <header class="article-header mt-8 mb-6">
+    <header class="iw-article-page__header mt-8 mb-6">
         {% if articleConfig.showBreadcrumbs|iw_article_visible('page') %}
             {% include '@ItechWorldSuluTailwindTheme/articles/common/_breadcrumbs.html.twig' with {
                 items: breadcrumb|default([]),
@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block article_footer %}
-    <footer class="article-footer mt-10 pt-6 border-t border-[var(--color-border)]">
+    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}

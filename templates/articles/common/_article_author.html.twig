@@ -7,14 +7,20 @@
     - size: 'sm' | 'md' (default) | 'lg'
 
     For sulu_user type, the author name is resolved from the Sulu user's contact.
+
+    Public CSS API:
+    - .iw-article-author (block — flex row)
+    - .iw-article-author--sm / --md / --lg (size modifiers)
+    - .iw-article-author__avatar (avatar <img> or initials fallback span)
+    - .iw-article-author__avatar--initials (modifier on the initials fallback)
+    - .iw-article-author__details (name + role wrapper)
+    - .iw-article-author__name (author display name)
+    - .iw-article-author__role (optional role/title)
+
+    Override via --iw-article-author-{gap,name-color,role-color,avatar-bg,avatar-text}.
 #}
 {% set showAvatar = showAvatar is defined ? showAvatar : true %}
-{% set size = size|default('md') %}
-{% set sizeClasses = {
-    'sm': 'w-8 h-8 text-sm',
-    'md': 'w-10 h-10 text-base',
-    'lg': 'w-14 h-14 text-lg',
-} %}
+{% set size = size in ['sm', 'md', 'lg'] ? size : 'md' %}
 
 {% set authorType = author.type|default('custom') %}
 {% set authorRole = author.role|default('') %}
@@ -23,7 +29,7 @@
 {% set authorName = iw_sulu_tailwind_theme_author_name(author) %}
 
 {% if authorName is not empty %}
-    <div class="article-author flex items-center gap-3" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <div class="iw-article-author iw-article-author--{{ size }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
         {% if showAvatar %}
             {% set avatarMedia = null %}
             {% if authorType == 'custom' and author.avatar is defined and author.avatar is iterable and author.avatar|length > 0 %}
@@ -33,20 +39,20 @@
             {% if avatarMedia %}
                 <img src="{{ avatarMedia.thumbnails['sulu-100x100']|default(avatarMedia.url) }}"
                      alt="{{ authorName }}"
-                     class="{{ sizeClasses[size]|split(' ')|first }} {{ sizeClasses[size]|split(' ')[1]|default('') }} rounded-full object-cover">
+                     class="iw-article-author__avatar">
             {% else %}
                 {# Initials fallback #}
                 {% set initials = authorName|split(' ')|map(w => w|first|upper)|join('')|slice(0, 2) %}
-                <span class="{{ sizeClasses[size] }} rounded-full bg-[var(--color-primary-100)] text-[var(--color-primary-700)] flex items-center justify-center font-semibold">
+                <span class="iw-article-author__avatar iw-article-author__avatar--initials" aria-hidden="true">
                     {{ initials }}
                 </span>
             {% endif %}
         {% endif %}
 
-        <div>
-            <span class="font-medium text-[var(--color-text)]" itemprop="name">{{ authorName }}</span>
+        <div class="iw-article-author__details">
+            <span class="iw-article-author__name" itemprop="name">{{ authorName }}</span>
             {% if authorRole is not empty %}
-                <span class="block text-sm text-[var(--color-secondary-500)]">{{ authorRole }}</span>
+                <span class="iw-article-author__role">{{ authorRole }}</span>
             {% endif %}
         </div>
     </div>

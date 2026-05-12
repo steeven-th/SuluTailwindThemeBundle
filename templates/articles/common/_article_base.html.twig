@@ -32,17 +32,17 @@
 {% set articleConfig = iw_sulu_tailwind_theme_article_config() %}
 {% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([])) %}
 
-<article class="article" itemscope itemtype="https://schema.org/Article">
+<article class="iw-article-page" itemscope itemtype="https://schema.org/Article">
     {% block article_hero %}{% endblock %}
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         {% block article_header %}
-            <header class="article-header mb-6">
-                <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-4" itemprop="headline">
+            <header class="iw-article-page__header">
+                <h1 class="iw-article-page__title" itemprop="headline">
                     {{ content.title }}
                 </h1>
                 {% if content.subtitle is defined and content.subtitle is not empty %}
-                    <p class="text-[var(--font-size-h4)] text-[var(--color-secondary-600)] leading-relaxed">
+                    <p class="iw-article-page__subtitle">
                         {{ content.subtitle }}
                     </p>
                 {% endif %}
@@ -53,7 +53,7 @@
 
         {% block article_content %}
             {% if content.blocks is defined and content.blocks is iterable %}
-                <div class="article-body mt-8">
+                <div class="iw-article-page__body">
                     {% for contentBlock in content.blocks %}
                         {% set blockType = contentBlock.type|default('text') %}
                         {% set blockStyle = contentBlock.style|default('') %}
