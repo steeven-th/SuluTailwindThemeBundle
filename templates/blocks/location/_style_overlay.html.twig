@@ -42,18 +42,18 @@
 
             {# Floating collapsible info card #}
             {% if hasInfo %}
-                <div class="location-overlay-card"
+                <div class="iw-location-card"
                      data-controller="location-overlay"
                      data-location-overlay-target="card"
                 >
                     {# Always-visible header with title + toggle #}
                     <button type="button"
-                            class="location-overlay-card__header"
+                            class="iw-location-card__header"
                             data-location-overlay-target="header"
                             data-action="location-overlay#toggle"
                             aria-expanded="false"
                     >
-                        <span class="location-overlay-card__header-content">
+                        <span class="iw-location-card__header-content">
                             {% if title is defined and title is not empty %}
                                 <span class="text-base font-semibold text-black leading-tight">{{ title }}</span>
                             {% endif %}
@@ -61,7 +61,7 @@
                                 <span class="text-sm text-black/75 leading-tight">{{ formattedAddress|split("\n")|first }}</span>
                             {% endif %}
                         </span>
-                        <svg class="location-overlay-card__chevron"
+                        <svg class="iw-location-card__chevron"
                              data-location-overlay-target="chevron"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         >
@@ -70,7 +70,7 @@
                     </button>
 
                     {# Collapsible body — hidden by default #}
-                    <div class="location-overlay-card__body"
+                    <div class="iw-location-card__body"
                          data-location-overlay-target="body"
                          style="display: none; max-height: 0px; opacity: 0;"
                     >
@@ -98,7 +98,7 @@
                     </div>
 
                     {# Scroll indicator — visible only when body is open and has overflow #}
-                    <div class="location-overlay-card__scroll-hint"
+                    <div class="iw-location-card__scroll-hint"
                          data-location-overlay-target="scrollHint"
                          data-action="click->location-overlay#scrollDown"
                          style="display: none; opacity: 0; pointer-events: none;"
