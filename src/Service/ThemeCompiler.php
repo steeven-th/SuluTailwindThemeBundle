@@ -238,16 +238,18 @@ class ThemeCompiler
      */
     private function generateArticleVariables(array $tokens): string
     {
-        $articleKeys = [
-            'articles_newsStyle',
-            'articles_eventStyle',
-            'articles_blogStyle',
-            'articles_listingStyle',
-            'articles_cardImageRatio',
+        // Map admin token keys (snake_case + camelCase suffix) to the kebab-case
+        // suffix used in the emitted `--iw-article-<suffix>` variables.
+        $articleVarSuffix = [
+            'articles_newsStyle' => 'news-style',
+            'articles_eventStyle' => 'event-style',
+            'articles_blogStyle' => 'blog-style',
+            'articles_listingStyle' => 'listing-style',
+            'articles_cardImageRatio' => 'card-image-ratio',
         ];
 
         $hasAny = false;
-        foreach ($articleKeys as $key) {
+        foreach ($articleVarSuffix as $key => $_) {
             if (!empty($tokens[$key])) {
                 $hasAny = true;
                 break;
@@ -260,10 +262,9 @@ class ThemeCompiler
 
         $css = "  /* Article configuration */\n";
 
-        foreach ($articleKeys as $key) {
+        foreach ($articleVarSuffix as $key => $suffix) {
             if (!empty($tokens[$key])) {
-                $cssKey = str_replace('_', '-', $key);
-                $css .= "  --{$cssKey}: {$tokens[$key]};\n";
+                $css .= "  --iw-article-{$suffix}: {$tokens[$key]};\n";
             }
         }
 
@@ -302,12 +303,12 @@ class ThemeCompiler
             : $this->resolveColorValue($hoverBorder);
 
         $css = "  /* Article card */\n";
-        $css .= "  --iw-card-surface: {$surfaceValue};\n";
-        $css .= "  --iw-card-padding: {$padding};\n";
-        $css .= "  --iw-card-border: {$borderValue};\n";
-        $css .= "  --iw-card-hover-border-color: {$hoverBorderValue};\n";
-        $css .= "  --iw-card-hover-duration: {$hoverDuration};\n";
-        $css .= "  --iw-card-hover-easing: {$hoverEasing};\n";
+        $css .= "  --iw-article-card-surface: {$surfaceValue};\n";
+        $css .= "  --iw-article-card-padding: {$padding};\n";
+        $css .= "  --iw-article-card-border: {$borderValue};\n";
+        $css .= "  --iw-article-card-hover-border-color: {$hoverBorderValue};\n";
+        $css .= "  --iw-article-card-hover-duration: {$hoverDuration};\n";
+        $css .= "  --iw-article-card-hover-easing: {$hoverEasing};\n";
 
         return $css . "\n";
     }
@@ -317,7 +318,7 @@ class ThemeCompiler
      *
      * Each entry is a tuple [base, hover] of CSS declarations to apply on the
      * card image. Either side can be empty when the effect only needs a hover
-     * transition. The base is applied to `.iw-article-card-image img`, the
+     * transition. The base is applied to `.iw-article-card__image img`, the
      * hover is scoped under `.iw-article-card--image-<key>:hover`.
      *
      * @var array<string, array{base: string, hover: string}>
@@ -354,15 +355,15 @@ class ThemeCompiler
         $css .= ".iw-article-card {\n";
         $css .= "  display: flex;\n";
         $css .= "  flex-direction: column;\n";
-        $css .= "  gap: var(--iw-card-padding, 1rem);\n";
-        $css .= "  background-color: var(--iw-card-surface, transparent);\n";
-        $css .= "  border: var(--iw-card-border, none);\n";
+        $css .= "  gap: var(--iw-article-card-padding, 1rem);\n";
+        $css .= "  background-color: var(--iw-article-card-surface, transparent);\n";
+        $css .= "  border: var(--iw-article-card-border, none);\n";
         $css .= "  border-radius: var(--border-radius);\n";
-        $css .= "  padding: var(--iw-card-padding, 0);\n";
-        $css .= "  transition: background-color var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out),\n";
-        $css .= "    border-color var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out),\n";
-        $css .= "    box-shadow var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out),\n";
-        $css .= "    transform var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out);\n";
+        $css .= "  padding: var(--iw-article-card-padding, 0);\n";
+        $css .= "  transition: background-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
+        $css .= "    border-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
+        $css .= "    box-shadow var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
+        $css .= "    transform var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out);\n";
         $css .= "}\n";
 
         // Horizontal layout (used by the list style)
@@ -372,32 +373,32 @@ class ThemeCompiler
         $css .= "}\n";
 
         // Image wrapper + image transitions (transition target for zoom/grayscale/brightness)
-        $css .= ".iw-article-card-image {\n";
+        $css .= ".iw-article-card__image {\n";
         $css .= "  display: block;\n";
         $css .= "  overflow: hidden;\n";
         $css .= "  border-radius: var(--border-imageRadius, var(--border-radius));\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-image img {\n";
+        $css .= ".iw-article-card__image img {\n";
         $css .= "  width: 100%;\n";
         $css .= "  height: auto;\n";
         $css .= "  object-fit: cover;\n";
-        $css .= "  transition: transform var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out),\n";
-        $css .= "    filter var(--iw-card-hover-duration, 300ms) var(--iw-card-hover-easing, ease-out);\n";
+        $css .= "  transition: transform var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
+        $css .= "    filter var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out);\n";
         $css .= "}\n";
         // In horizontal layout the image takes a third of the width, content fills the rest
-        $css .= ".iw-article-card--horizontal .iw-article-card-image {\n";
+        $css .= ".iw-article-card--horizontal .iw-article-card__image {\n";
         $css .= "  width: 33%;\n";
         $css .= "  flex-shrink: 0;\n";
         $css .= "}\n";
 
         // Body wrapper (text content)
-        $css .= ".iw-article-card-body {\n";
+        $css .= ".iw-article-card__body {\n";
         $css .= "  flex: 1;\n";
         $css .= "  min-width: 0;\n";
         $css .= "}\n";
 
         // Sub-elements (sourced from the original template's inline Tailwind classes)
-        $css .= ".iw-article-card-category {\n";
+        $css .= ".iw-article-card__category {\n";
         $css .= "  display: inline-block;\n";
         $css .= "  padding: 0.125rem 0.5rem;\n";
         $css .= "  margin-bottom: 0.5rem;\n";
@@ -407,28 +408,28 @@ class ThemeCompiler
         $css .= "  background-color: var(--color-primary-100);\n";
         $css .= "  color: var(--color-primary-700);\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-title {\n";
+        $css .= ".iw-article-card__title {\n";
         $css .= "  font-family: var(--font-family-heading);\n";
         $css .= "  font-weight: 600;\n";
         $css .= "  font-size: 1.125rem;\n";
         $css .= "  line-height: 1.375;\n";
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-title a {\n";
+        $css .= ".iw-article-card__title a {\n";
         $css .= "  color: var(--color-text);\n";
         $css .= "  text-decoration: none;\n";
         $css .= "  transition: color 0.2s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-title a:hover {\n";
+        $css .= ".iw-article-card__title a:hover {\n";
         $css .= "  color: var(--color-primary);\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-date {\n";
+        $css .= ".iw-article-card__date {\n";
         $css .= "  display: block;\n";
         $css .= "  font-size: 0.875rem;\n";
         $css .= "  color: var(--color-secondary-500);\n";
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
-        $css .= ".iw-article-card-excerpt {\n";
+        $css .= ".iw-article-card__excerpt {\n";
         $css .= "  font-size: 0.875rem;\n";
         $css .= "  color: var(--color-secondary-600);\n";
         $css .= "  display: -webkit-box;\n";
@@ -450,9 +451,9 @@ class ThemeCompiler
         $css .= "/* Article card — hover image modifiers */\n";
         foreach (self::ARTICLE_CARD_IMAGE_EFFECTS as $key => $effect) {
             if ('' !== $effect['base']) {
-                $css .= ".iw-article-card--image-{$key} .iw-article-card-image img { {$effect['base']} }\n";
+                $css .= ".iw-article-card--image-{$key} .iw-article-card__image img { {$effect['base']} }\n";
             }
-            $css .= ".iw-article-card--image-{$key}:hover .iw-article-card-image img { {$effect['hover']} }\n";
+            $css .= ".iw-article-card--image-{$key}:hover .iw-article-card__image img { {$effect['hover']} }\n";
         }
         $css .= "\n";
 
@@ -467,7 +468,7 @@ class ThemeCompiler
 
         // Hover border color modifier (only meaningful when border is configured)
         $css .= "/* Article card — hover border color modifier */\n";
-        $css .= ".iw-article-card--hover-border:hover { border-color: var(--iw-card-hover-border-color); }\n\n";
+        $css .= ".iw-article-card--hover-border:hover { border-color: var(--iw-article-card-hover-border-color); }\n\n";
 
         // Image-bleed modifier: image touches card edges (no padding around it,
         // no own radius). Card needs overflow:hidden so the negative margins
@@ -479,25 +480,25 @@ class ThemeCompiler
         // body, so the bleed sides only emit negative margins.
         $css .= "/* Article card — image bleed modifier (image touches card edges) */\n";
         $css .= ".iw-article-card--image-bleed { overflow: hidden; }\n";
-        $css .= ".iw-article-card--image-bleed .iw-article-card-image,\n";
-        $css .= ".iw-article-card--image-bleed .iw-article-card-image img { border-radius: 0; }\n";
+        $css .= ".iw-article-card--image-bleed .iw-article-card__image,\n";
+        $css .= ".iw-article-card--image-bleed .iw-article-card__image img { border-radius: 0; }\n";
         // Vertical: image bleeds top + sides
-        $css .= ".iw-article-card--image-bleed:not(.iw-article-card--horizontal) .iw-article-card-image {\n";
-        $css .= "  margin-top: calc(-1 * var(--iw-card-padding, 0));\n";
-        $css .= "  margin-left: calc(-1 * var(--iw-card-padding, 0));\n";
-        $css .= "  margin-right: calc(-1 * var(--iw-card-padding, 0));\n";
+        $css .= ".iw-article-card--image-bleed:not(.iw-article-card--horizontal) .iw-article-card__image {\n";
+        $css .= "  margin-top: calc(-1 * var(--iw-article-card-padding, 0));\n";
+        $css .= "  margin-left: calc(-1 * var(--iw-article-card-padding, 0));\n";
+        $css .= "  margin-right: calc(-1 * var(--iw-article-card-padding, 0));\n";
         $css .= "}\n";
         // Horizontal: image bleeds top + bottom + left. Force image to stretch
         // to card height (the inline aspect-ratio is dropped by the Twig
         // template in this mode so object-fit:cover wins).
         $css .= ".iw-article-card--image-bleed.iw-article-card--horizontal { align-items: stretch; }\n";
-        $css .= ".iw-article-card--image-bleed.iw-article-card--horizontal .iw-article-card-image {\n";
-        $css .= "  margin-top: calc(-1 * var(--iw-card-padding, 0));\n";
-        $css .= "  margin-bottom: calc(-1 * var(--iw-card-padding, 0));\n";
-        $css .= "  margin-left: calc(-1 * var(--iw-card-padding, 0));\n";
+        $css .= ".iw-article-card--image-bleed.iw-article-card--horizontal .iw-article-card__image {\n";
+        $css .= "  margin-top: calc(-1 * var(--iw-article-card-padding, 0));\n";
+        $css .= "  margin-bottom: calc(-1 * var(--iw-article-card-padding, 0));\n";
+        $css .= "  margin-left: calc(-1 * var(--iw-article-card-padding, 0));\n";
         $css .= "  display: flex;\n";
         $css .= "}\n";
-        $css .= ".iw-article-card--image-bleed.iw-article-card--horizontal .iw-article-card-image img {\n";
+        $css .= ".iw-article-card--image-bleed.iw-article-card--horizontal .iw-article-card__image img {\n";
         $css .= "  width: 100%;\n";
         $css .= "  height: 100%;\n";
         $css .= "  object-fit: cover;\n";
@@ -543,7 +544,7 @@ class ThemeCompiler
         $css .= "  .iw-article-listing--portrait.iw-article-listing--grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }\n";
         $css .= "}\n";
 
-        $css .= ".iw-article-listing-empty {\n";
+        $css .= ".iw-article-listing__empty {\n";
         $css .= "  text-align: center;\n";
         $css .= "  padding: 3rem 0;\n";
         $css .= "  color: var(--color-secondary-500);\n";

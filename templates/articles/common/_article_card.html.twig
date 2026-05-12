@@ -1,6 +1,6 @@
 {#
     Article card component for listings.
-    Renders a single article using the iw-article-card-* CSS classes generated
+    Renders a single article using the iw-article-card__* CSS classes generated
     by the ThemeCompiler. Surface, border, padding and hover effects are driven
     by the article configuration tokens (passed in as named parameters).
 
@@ -62,7 +62,7 @@
         {% endif %}
 
         {% if imgMedia %}
-            <a href="{{ articleUrl }}" class="iw-article-card-image">
+            <a href="{{ articleUrl }}" class="iw-article-card__image">
                 <img src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
                      alt="{{ imgMedia.title|default(articleTitle) }}"
                      {% if keepAspectRatio %}style="aspect-ratio: {{ imageRatio }}"{% endif %}
@@ -71,27 +71,27 @@
         {% endif %}
     {% endif %}
 
-    <div class="iw-article-card-body">
+    <div class="iw-article-card__body">
         {% if showCategory and articleCategories is iterable and articleCategories|length > 0 %}
             {% for category in articleCategories|slice(0, 1) %}
-                <span class="iw-article-card-category">
+                <span class="iw-article-card__category">
                     {{ category.name|default(category.title|default('')) }}
                 </span>
             {% endfor %}
         {% endif %}
 
-        <h3 class="iw-article-card-title">
+        <h3 class="iw-article-card__title">
             <a href="{{ articleUrl }}">{{ articleTitle }}</a>
         </h3>
 
         {% if showDate and articleDate is not empty %}
-            <time datetime="{{ articleDate|date('c') }}" class="iw-article-card-date">
+            <time datetime="{{ articleDate|date('c') }}" class="iw-article-card__date">
                 {{ iw_sulu_tailwind_theme_format_date(articleDate, 'medium') }}
             </time>
         {% endif %}
 
         {% if showExcerpt and articleExcerpt is not empty %}
-            <p class="iw-article-card-excerpt">
+            <p class="iw-article-card__excerpt">
                 {{ articleExcerpt|striptags|trim }}
             </p>
         {% endif %}
