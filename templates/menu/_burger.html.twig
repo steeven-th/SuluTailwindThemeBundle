@@ -38,19 +38,19 @@
     data-controller="menu"
     data-menu-animation-value="{{ animation }}"
     data-menu-slide-direction-value="{{ slideDirection }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu-transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
+    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
     <nav class="relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu-text flex items-center gap-2 no-underline">
+                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
                     {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
-                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu-logo-desktop hidden md:block w-auto">
+                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                     {% endif %}
                     {% if config.displayLogoMobile|default(false) and logoMobileUrl %}
-                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu-logo-mobile block md:hidden w-auto">
+                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
                     {% endif %}
                     {% if config.displaySiteName|default(false) %}
                         <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
@@ -93,12 +93,12 @@
                     type="button"
                     data-action="menu#toggle"
                     data-menu-target="burger"
-                    class="iw-menu-burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+                    class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                     aria-label="Menu"
                 >
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
                 </button>
             </div>
         </div>
@@ -108,26 +108,26 @@
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
     <div
         data-menu-target="panel"
-        class="iw-menu-overlay fixed inset-0 z-30 invisible opacity-0"
+        class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0"
     >
-        <nav class="iw-menu-overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
+        <nav class="iw-menu__overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
             {% if navItems is not empty %}
                 {% for item in navItems %}
                     {% if item.children is defined and item.children|length > 0 %}
-                        <div class="iw-menu-divider border-b iw-menu-parent-item">
+                        <div class="iw-menu__divider border-b iw-menu__parent-item">
                             {% if clickMode == 'split' %}
                                 {# Split button: link + separate chevron toggle #}
                                 <div class="flex items-center justify-between w-full">
                                     <a
                                         href="{{ sulu_content_path(item.url) }}"
-                                        class="iw-menu-text flex-1 py-4 text-lg font-medium no-underline"
+                                        class="iw-menu__text flex-1 py-4 text-lg font-medium no-underline"
                                     >
                                         {{ item.title }}
                                     </a>
                                     <button
                                         type="button"
                                         data-action="menu#toggleMobileSubmenu"
-                                        class="iw-menu-text p-2 cursor-pointer"
+                                        class="iw-menu__text p-2 cursor-pointer"
                                     >
                                         <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
@@ -137,18 +137,18 @@
                                 <button
                                     type="button"
                                     data-action="menu#toggleMobileSubmenu"
-                                    class="iw-menu-text flex items-center justify-between w-full py-4 text-left cursor-pointer"
+                                    class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
                                 >
                                     <span class="text-lg font-medium">{{ item.title }}</span>
                                     <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                             {% endif %}
-                            <div data-menu-target="submenu" class="iw-menu-dropdown-l2 hidden pb-3 mt-1 px-4">
+                            <div data-menu-target="submenu" class="iw-menu__dropdown--level-2 hidden pb-3 mt-1 px-4">
                                 {# Self-link: add parent page as first item in submenu #}
                                 {% if clickMode == 'selflink' %}
                                     <a
                                         href="{{ sulu_content_path(item.url) }}"
-                                        class="iw-menu-text-l2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
+                                        class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
                                     >
                                         {{ item.title }}
                                     </a>
@@ -156,19 +156,19 @@
                                 {% for child in item.children %}
                                     {% if child.children is defined and child.children|length > 0 %}
                                         {# Level 2 with level 3 sub-accordion #}
-                                        <div class="iw-menu-parent-item">
+                                        <div class="iw-menu__parent-item">
                                             {% if clickMode == 'split' %}
                                                 <div class="flex items-center justify-between w-full">
                                                     <a
                                                         href="{{ sulu_content_path(child.url) }}"
-                                                        class="iw-menu-text-l2 flex-1 py-2.5 no-underline"
+                                                        class="iw-menu__text--level-2 flex-1 py-2.5 no-underline"
                                                     >
                                                         {{ child.title }}
                                                     </a>
                                                     <button
                                                         type="button"
                                                         data-action="menu#toggleMobileSubmenu"
-                                                        class="iw-menu-text-l2 p-1 cursor-pointer"
+                                                        class="iw-menu__text--level-2 p-1 cursor-pointer"
                                                     >
                                                         <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                                     </button>
@@ -177,17 +177,17 @@
                                                 <button
                                                     type="button"
                                                     data-action="menu#toggleMobileSubmenu"
-                                                    class="iw-menu-text-l2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
+                                                    class="iw-menu__text--level-2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
                                                 >
                                                     <span>{{ child.title }}</span>
                                                     <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                                 </button>
                                             {% endif %}
-                                            <div data-menu-target="submenu" class="iw-menu-dropdown-l3 hidden pb-2 mt-1 px-4">
+                                            <div data-menu-target="submenu" class="iw-menu__dropdown--level-3 hidden pb-2 mt-1 px-4">
                                                 {% if clickMode == 'selflink' %}
                                                     <a
                                                         href="{{ sulu_content_path(child.url) }}"
-                                                        class="iw-menu-text-l3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
+                                                        class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
                                                     >
                                                         {{ child.title }}
                                                     </a>
@@ -195,7 +195,7 @@
                                                 {% for grandchild in child.children %}
                                                     <a
                                                         href="{{ sulu_content_path(grandchild.url) }}"
-                                                        class="iw-menu-text-l3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
+                                                        class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
                                                     >
                                                         {{ grandchild.title }}
                                                     </a>
@@ -205,7 +205,7 @@
                                     {% else %}
                                         <a
                                             href="{{ sulu_content_path(child.url) }}"
-                                            class="iw-menu-text-l2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
+                                            class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
                                         >
                                             {{ child.title }}
                                         </a>
@@ -216,7 +216,7 @@
                     {% else %}
                         <a
                             href="{{ sulu_content_path(item.url) }}"
-                            class="iw-menu-text iw-menu-divider block py-4 text-lg font-medium border-b no-underline"
+                            class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
                         >
                             {{ item.title }}
                         </a>

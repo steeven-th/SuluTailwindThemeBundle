@@ -252,18 +252,18 @@
   --iw-button-accent-radius: var(--border-radius, 0.375rem);
 
   /* ─── Menu ────────────────────────────────────────────────────────────── */
-  --menu-bg: #ffffff;
-  --menu-text: #171717;
-  --menu-textHover: var(--color-primary, #6366f1);
-  --menu-secondBg: #f8fafc;
-  --menu-secondText: #64748b;
-  --menu-secondTextHover: var(--color-primary, #6366f1);
-  --menu-thirdBg: #f1f5f9;
-  --menu-thirdText: #94a3b8;
-  --menu-thirdTextHover: var(--color-primary, #6366f1);
-  --menu-divider: #e2e8f0;
-  --menu-burgerOpen: #1e293b;
-  --menu-burgerClose: #ffffff;
-  --menu-socialMedia: #94a3b8;
-  --menu-socialMediaHover: var(--color-primary, #6366f1);
+  --iw-menu-bg: #ffffff;
+  --iw-menu-text: #171717;
+  --iw-menu-text-hover: var(--color-primary, #6366f1);
+  --iw-menu-second-bg: #f8fafc;
+  --iw-menu-second-text: #64748b;
+  --iw-menu-second-text-hover: var(--color-primary, #6366f1);
+  --iw-menu-third-bg: #f1f5f9;
+  --iw-menu-third-text: #94a3b8;
+  --iw-menu-third-text-hover: var(--color-primary, #6366f1);
+  --iw-menu-divider: #e2e8f0;
+  --iw-menu-burger-open: #1e293b;
+  --iw-menu-burger-close: #ffffff;
+  --iw-menu-social-media: #94a3b8;
+  --iw-menu-social-media-hover: var(--color-primary, #6366f1);
 }

@@ -46,7 +46,7 @@
     data-controller="menu"
     data-menu-animation-value="none"
     data-menu-slide-direction-value="top"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu-transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
+    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
     {# ─── Desktop navbar ─── #}
     <nav class="relative z-50 md:container md:mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,12 +54,12 @@
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center {{ navPosition == 'left' ? 'mr-0' : '' }}">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu-text flex items-center gap-2 no-underline">
+                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
                     {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
-                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu-logo-desktop hidden md:block w-auto">
+                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                     {% endif %}
                     {% if config.displayLogoMobile|default(false) and logoMobileUrl %}
-                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu-logo-mobile block md:hidden w-auto">
+                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
                     {% endif %}
                     {% if config.displaySiteName|default(false) %}
                         <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
@@ -84,7 +84,7 @@
                         {% if item.type == 'simple_link' %}
                             <a
                                 href="{{ sulu_content_path(item.link.url|default('#')) }}"
-                                class="iw-menu-text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
+                                class="iw-menu__text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
                                 {{ item.open_in_new_tab|default(false) ? 'target="_blank" rel="noopener noreferrer"' : '' }}
                             >
                                 {{ item.title }}
@@ -94,7 +94,7 @@
                                 type="button"
                                 data-action="menu#toggleMegaDropdown"
                                 data-menu-target="megaParent"
-                                class="iw-menu-text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
+                                class="iw-menu__text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
                             >
                                 {{ item.title }}
                                 <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -109,7 +109,7 @@
                                 type="button"
                                 data-action="menu#toggleMegaDropdown"
                                 data-menu-target="megaParent"
-                                class="iw-menu-text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
+                                class="iw-menu__text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
                             >
                                 {{ item.title }}
                                 <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -117,7 +117,7 @@
                         {% else %}
                             <a
                                 href="{{ sulu_content_path(item.url) }}"
-                                class="iw-menu-text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
+                                class="iw-menu__text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
                             >
                                 {{ item.title }}
                             </a>
@@ -167,12 +167,12 @@
                     type="button"
                     data-action="menu#toggle"
                     data-menu-target="burger"
-                    class="iw-menu-burger md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+                    class="iw-menu__burger md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                     aria-label="Menu"
                 >
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
-                    <span class="iw-menu-burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
+                    <span class="iw-menu__burger-line"></span>
                 </button>
             </div>
         </div>
@@ -185,16 +185,16 @@
             {% if item.type == 'mega_dropdown' %}
                 <div
                     data-menu-target="megaDropdown"
-                    class="iw-mega-dropdown hidden absolute left-0 right-0 z-40 shadow-lg"
+                    class="iw-mega-menu__dropdown hidden absolute left-0 right-0 z-40 shadow-lg"
                 >
                     <div class="md:container md:mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div class="iw-mega-grid-{{ min(item.columns|default([])|length|default(1), 5) }}">
+                        <div class="iw-mega-menu__grid--cols-{{ min(item.columns|default([])|length|default(1), 5) }}">
                             {% for column in item.columns|default([]) %}
                                 {% if column.type == 'link_column' %}
                                     {# Link column: title + list of links #}
                                     <div>
                                         {% if column.column_title|default(null) %}
-                                            <span class="iw-menu-text-l2 font-semibold mb-3 block text-sm uppercase tracking-wider">
+                                            <span class="iw-menu__text--level-2 font-semibold mb-3 block text-sm uppercase tracking-wider">
                                                 {{ column.column_title }}
                                             </span>
                                         {% endif %}
@@ -202,7 +202,7 @@
                                             {% for linkItem in column.links|default([]) %}
                                                 <li>
                                                     <a href="{{ sulu_content_path(linkItem.link.url|default('#')) }}"
-                                                       class="iw-menu-text-l3 block no-underline hover:opacity-80 transition-opacity">
+                                                       class="iw-menu__text--level-3 block no-underline hover:opacity-80 transition-opacity">
                                                         <span class="text-sm">{{ linkItem.title }}</span>
                                                         {% if linkItem.description|default(null) %}
                                                             <span class="block text-xs opacity-60 mt-0.5">{{ linkItem.description }}</span>
@@ -218,7 +218,7 @@
                                     {% set imgPos = column.image_position|default('left') %}
                                     <div>
                                         {% if column.column_title|default(null) %}
-                                            <span class="iw-menu-text-l2 font-semibold mb-3 block text-sm uppercase tracking-wider">
+                                            <span class="iw-menu__text--level-2 font-semibold mb-3 block text-sm uppercase tracking-wider">
                                                 {{ column.column_title }}
                                             </span>
                                         {% endif %}
@@ -228,7 +228,7 @@
                                                 {% set cardRatioClass = ratioClasses[card.image_ratio|default('auto')]|default('') %}
                                                 {% set cardHasBg = card.show_background|default(false) %}
                                                 <a href="{{ sulu_content_path(card.link.url|default('#')) }}"
-                                                   class="iw-mega-card block no-underline group {{ cardHasBg ? 'iw-mega-card-bg' : '' }} {{ cardLayout == 'horizontal' ? 'iw-mega-card-horizontal' : '' }} {{ cardLayout == 'horizontal' and imgPos == 'right' ? 'iw-mega-card-img-right' : '' }}">
+                                                   class="iw-mega-menu__card block no-underline group {{ cardHasBg ? 'iw-mega-menu__card--bg' : '' }} {{ cardLayout == 'horizontal' ? 'iw-mega-menu__card--horizontal' : '' }} {{ cardLayout == 'horizontal' and imgPos == 'right' ? 'iw-mega-menu__card--img-right' : '' }}">
                                                     {% if card.image is defined and card.image.id|default(null) is not null %}
                                                         {% set cardMedia = sulu_resolve_media(card.image.id, app.request.locale) %}
                                                         {% if cardMedia is not null %}
@@ -238,10 +238,10 @@
                                                                  class="{{ cardRatioClass }}">
                                                         {% endif %}
                                                     {% endif %}
-                                                    <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-card-body' : '' }} p-2">
-                                                        <span class="iw-menu-text-l3 text-sm font-medium">{{ card.title }}</span>
+                                                    <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
+                                                        <span class="iw-menu__text--level-3 text-sm font-medium">{{ card.title }}</span>
                                                         {% if card.description|default(null) %}
-                                                            <span class="iw-menu-text-l3 block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
+                                                            <span class="iw-menu__text--level-3 block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
                                                         {% endif %}
                                                     </div>
                                                 </a>
@@ -255,7 +255,7 @@
                                     {% set featRatioClasses = {'1-1': 'aspect-square', '9-16': 'aspect-[9/16]', '16-9': 'aspect-video'} %}
                                     {% set featRatioClass = featRatioClasses[column.image_ratio|default('auto')]|default('') %}
                                     {% set featBtnStyle = column.cta_style|default('primary') %}
-                                    <div class="iw-mega-featured {{ featLayout == 'horizontal' ? 'iw-mega-featured-horizontal' : '' }} {{ featLayout == 'horizontal' and featImgPos == 'right' ? 'iw-mega-featured-img-right' : '' }}">
+                                    <div class="iw-mega-menu__featured {{ featLayout == 'horizontal' ? 'iw-mega-menu__featured--horizontal' : '' }} {{ featLayout == 'horizontal' and featImgPos == 'right' ? 'iw-mega-menu__featured--img-right' : '' }}">
                                         {% if column.image is defined and column.image.id|default(null) is not null %}
                                             {% set featMedia = sulu_resolve_media(column.image.id, app.request.locale) %}
                                             {% if featMedia is not null %}
@@ -265,10 +265,10 @@
                                                      loading="lazy">
                                             {% endif %}
                                         {% endif %}
-                                        <div class="{{ featLayout == 'horizontal' ? 'iw-mega-featured-body' : '' }}">
-                                            <span class="iw-menu-text-l2 font-semibold text-sm block mb-2">{{ column.title }}</span>
+                                        <div class="{{ featLayout == 'horizontal' ? 'iw-mega-menu__featured-body' : '' }}">
+                                            <span class="iw-menu__text--level-2 font-semibold text-sm block mb-2">{{ column.title }}</span>
                                             {% if column.description|default(null) %}
-                                                <p class="iw-menu-text-l3 text-xs opacity-70 mb-3">{{ column.description }}</p>
+                                                <p class="iw-menu__text--level-3 text-xs opacity-70 mb-3">{{ column.description }}</p>
                                             {% endif %}
                                             {% if column.cta_title|default(null) and column.cta_link|default(null) %}
                                                 <a href="{{ sulu_content_path(column.cta_link.url|default('#')) }}"
@@ -291,14 +291,14 @@
             {% if item.children is defined and item.children|length > 0 %}
                 <div
                     data-menu-target="megaDropdown"
-                    class="iw-mega-dropdown hidden absolute left-0 right-0 z-40 shadow-lg"
+                    class="iw-mega-menu__dropdown hidden absolute left-0 right-0 z-40 shadow-lg"
                 >
                     <div class="md:container md:mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div class="iw-mega-grid-{{ min(item.children|length, 5) }}">
+                        <div class="iw-mega-menu__grid--cols-{{ min(item.children|length, 5) }}">
                             {% for child in item.children %}
                                 <div>
                                     <a href="{{ sulu_content_path(child.url) }}"
-                                       class="iw-menu-text-l2 font-semibold mb-3 block text-sm no-underline hover:opacity-80 transition-opacity">
+                                       class="iw-menu__text--level-2 font-semibold mb-3 block text-sm no-underline hover:opacity-80 transition-opacity">
                                         {{ child.title }}
                                     </a>
                                     {% if child.children is defined and child.children|length > 0 %}
@@ -306,7 +306,7 @@
                                             {% for grandchild in child.children %}
                                                 <li>
                                                     <a href="{{ sulu_content_path(grandchild.url) }}"
-                                                       class="iw-menu-text-l3 text-sm no-underline hover:opacity-80 transition-opacity">
+                                                       class="iw-menu__text--level-3 text-sm no-underline hover:opacity-80 transition-opacity">
                                                         {{ grandchild.title }}
                                                     </a>
                                                 </li>
@@ -325,26 +325,26 @@
     {# ─── Mobile overlay panel ─── #}
     <div
         data-menu-target="panel"
-        class="iw-menu-overlay fixed left-0 right-0 bottom-0 top-16 z-30 md:hidden invisible opacity-0"
+        class="iw-menu__overlay fixed left-0 right-0 bottom-0 top-16 z-30 md:hidden invisible opacity-0"
     >
-        <nav class="iw-menu-overlay-nav px-6 sm:px-8 overflow-y-auto h-full">
+        <nav class="iw-menu__overlay-nav px-6 sm:px-8 overflow-y-auto h-full">
             {% if megaSource == 'snippet' %}
                 {# ─── Snippet mode: mobile accordion ─── #}
                 {% for item in menuItems %}
                     {% if item.type == 'simple_link' %}
                         <a
                             href="{{ sulu_content_path(item.link.url|default('#')) }}"
-                            class="iw-menu-text iw-menu-divider block py-4 text-lg font-medium border-b no-underline"
+                            class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
                             {{ item.open_in_new_tab|default(false) ? 'target="_blank" rel="noopener noreferrer"' : '' }}
                         >
                             {{ item.title }}
                         </a>
                     {% elseif item.type == 'mega_dropdown' %}
-                        <div class="iw-menu-divider border-b">
+                        <div class="iw-menu__divider border-b">
                             <button
                                 type="button"
                                 data-action="menu#toggleMobileSubmenu"
-                                class="iw-menu-text flex items-center justify-between w-full py-4 text-left cursor-pointer"
+                                class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
                             >
                                 <span class="text-lg font-medium">{{ item.title }}</span>
                                 <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -354,7 +354,7 @@
                                 {% if item.link is defined and item.link.url|default(null) %}
                                     <a
                                         href="{{ sulu_content_path(item.link.url) }}"
-                                        class="iw-menu-text-l2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
+                                        class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
                                     >
                                         {{ item.title }}
                                     </a>
@@ -363,29 +363,29 @@
                                 {% for column in item.columns|default([]) %}
                                     {% if column.type == 'link_column' %}
                                         {% if column.column_title|default(null) %}
-                                            <span class="iw-menu-text-l2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
+                                            <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
                                         {% endif %}
                                         {% for linkItem in column.links|default([]) %}
                                             <a href="{{ sulu_content_path(linkItem.link.url|default('#')) }}"
-                                               class="iw-menu-text-l3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                               class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                 {{ linkItem.title }}
                                             </a>
                                         {% endfor %}
                                     {% elseif column.type == 'image_column' %}
                                         {% if column.column_title|default(null) %}
-                                            <span class="iw-menu-text-l2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
+                                            <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
                                         {% endif %}
                                         {% for card in column.cards|default([]) %}
                                             <a href="{{ sulu_content_path(card.link.url|default('#')) }}"
-                                               class="iw-menu-text-l3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                               class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                 {{ card.title }}
                                             </a>
                                         {% endfor %}
                                     {% elseif column.type == 'featured_column' %}
-                                        <span class="iw-menu-text-l2 block py-2 font-semibold text-sm">{{ column.title }}</span>
+                                        <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.title }}</span>
                                         {% if column.cta_title|default(null) and column.cta_link|default(null) %}
                                             <a href="{{ sulu_content_path(column.cta_link.url|default('#')) }}"
-                                               class="iw-menu-text-l3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                               class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                 {{ column.cta_title }}
                                             </a>
                                         {% endif %}
@@ -411,11 +411,11 @@
                 {# ─── Native mode: mobile accordion from page tree ─── #}
                 {% for item in navItems %}
                     {% if item.children is defined and item.children|length > 0 %}
-                        <div class="iw-menu-divider border-b">
+                        <div class="iw-menu__divider border-b">
                             <button
                                 type="button"
                                 data-action="menu#toggleMobileSubmenu"
-                                class="iw-menu-text flex items-center justify-between w-full py-4 text-left cursor-pointer"
+                                class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
                             >
                                 <span class="text-lg font-medium">{{ item.title }}</span>
                                 <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -427,7 +427,7 @@
                                         <button
                                             type="button"
                                             data-action="menu#toggleMobileSubmenu"
-                                            class="iw-menu-text-l2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
+                                            class="iw-menu__text--level-2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
                                         >
                                             <span>{{ child.title }}</span>
                                             <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -435,14 +435,14 @@
                                         <div data-menu-target="submenu" class="hidden pb-2 mt-1 px-4">
                                             <a
                                                 href="{{ sulu_content_path(child.url) }}"
-                                                class="iw-menu-text-l3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
+                                                class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
                                             >
                                                 {{ child.title }}
                                             </a>
                                             {% for grandchild in child.children %}
                                                 <a
                                                     href="{{ sulu_content_path(grandchild.url) }}"
-                                                    class="iw-menu-text-l3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
+                                                    class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
                                                 >
                                                     {{ grandchild.title }}
                                                 </a>
@@ -451,7 +451,7 @@
                                     {% else %}
                                         <a
                                             href="{{ sulu_content_path(child.url) }}"
-                                            class="iw-menu-text-l2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
+                                            class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
                                         >
                                             {{ child.title }}
                                         </a>
@@ -462,7 +462,7 @@
                     {% else %}
                         <a
                             href="{{ sulu_content_path(item.url) }}"
-                            class="iw-menu-text iw-menu-divider block py-4 text-lg font-medium border-b no-underline"
+                            class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
                         >
                             {{ item.title }}
                         </a>
