@@ -26,13 +26,13 @@
 
         <div class="relative z-10 container mx-auto {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} text-white">
             {% if title is defined and title is not empty %}
-                <h2 class="block-title text-3xl md:text-4xl lg:text-5xl font-[var(--font-h2-weight)] text-white {{ titleAlignClass }}">{{ title }}</h2>
+                <h2 class="iw-block__title text-3xl md:text-4xl lg:text-5xl font-[var(--font-h2-weight)] text-white {{ titleAlignClass }}">{{ title }}</h2>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="block-subtitle text-lg md:text-xl mt-3 text-white/80 {{ titleAlignClass }}">{{ subTitle }}</h3>
+                <h3 class="iw-block__subtitle text-lg md:text-xl mt-3 text-white/80 {{ titleAlignClass }}">{{ subTitle }}</h3>
             {% endif %}
             {% if text is defined and text is not empty %}
-                <div class="block-text prose prose-invert max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
+                <div class="iw-block__text prose prose-invert max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
                     {{ text|raw }}
                 </div>
             {% endif %}

@@ -25,7 +25,10 @@
 {% endif %}
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
 {% set radiusClass = (lateralMode == 'exterior' and blockRadius|default('') is not empty) ? 'sm:' ~ blockRadius : '' %}
-{% set bgAttr = (showBackground|default(true)) ? 'data-has-bg="true"' : '' %}
+{# `?? true` keeps the default-on-undefined behavior while letting an explicit
+   `false` from the admin toggle disable the background. Twig's `|default(true)`
+   would wrongly treat `false` as empty and reapply the default. #}
+{% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Detect effective block padding per axis (same logic as text_images) #}
 {% set hasTopPad = paddingTop is defined and paddingTop is not empty and paddingTop != 'pt-0' %}

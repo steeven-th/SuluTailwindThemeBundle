@@ -2,16 +2,10 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% set widthMap = {
-        'thin': 'border-t',
-        'medium': 'border-t-2',
-        'thick': 'border-t-4'
-    } %}
-    {% set styleMap = {
-        'solid': 'border-solid',
-        'dashed': 'border-dashed',
-        'dotted': 'border-dotted'
-    } %}
+    {% set widthModifier = 'iw-block-separator__line--' ~ (lineWidth|default('thin')) %}
+    {% set styleModifier = 'iw-block-separator__line--' ~ (lineStyle|default('solid')) %}
 
-    <div class="{{ widthMap[lineWidth|default('thin')]|default('border-t') }} {{ styleMap[lineStyle|default('solid')]|default('border-solid') }} border-[var(--variant-hr-color,var(--color-border,currentColor))]"></div>
+    <div class="iw-block-separator iw-block-separator--line">
+        <div class="iw-block-separator__line {{ widthModifier }} {{ styleModifier }}"></div>
+    </div>
 {% endblock %}

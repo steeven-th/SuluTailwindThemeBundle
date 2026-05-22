@@ -9,7 +9,12 @@
         variant: variant|default(0)
     } only %}
 
-    {% set articleItems = articles|default([]) %}
+    {# Hero style: 1 article. Use the style-specific smart_content property,
+       fall back to the legacy `articles` (max 3) for blocks created before
+       the multi-property XML was introduced. #}
+    {% set articleItems = articles_hero is defined and articles_hero is not empty
+        ? articles_hero
+        : articles|default([]) %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         {% set article = articleItems|first %}
@@ -33,51 +38,53 @@
             {% endif %}
         {% endif %}
 
-        <a href="{{ articleUrl }}" class="group block relative overflow-hidden rounded-[var(--border-imageRadius)]">
-            {# Image with aspect-ratio — the img is in-flow so it gives height to the <a> #}
-            {% if imgMedia %}
-                <img
-                    src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
-                    alt="{{ imgMedia.title|default(articleTitle) }}"
-                    class="w-full object-cover aspect-[21/9] sm:aspect-[2/1] lg:aspect-[21/9] transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                >
-            {% else %}
-                {# Fallback when no image: colored placeholder #}
-                <div class="w-full aspect-[21/9] sm:aspect-[2/1] lg:aspect-[21/9] bg-[var(--color-primary-100)]"></div>
-            {% endif %}
-
-            {# Gradient overlay + text #}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6 sm:p-8 lg:p-12">
-                {% if articleCategories is iterable and articleCategories|length > 0 %}
-                    <div class="mb-3">
-                        {% for category in articleCategories|slice(0, 1) %}
-                            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-[var(--border-radius)] bg-white/20 text-white backdrop-blur-sm">
-                                {{ category.name|default(category.title|default('')) }}
-                            </span>
-                        {% endfor %}
-                    </div>
+        <div class="iw-block-article-featured iw-block-article-featured--hero">
+            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--hero {{ paragraphImageRadius|default('') }}">
+                {# Image with aspect-ratio — gives height to the card #}
+                {% if imgMedia %}
+                    <img
+                        src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
+                        alt="{{ imgMedia.title|default(articleTitle) }}"
+                        class="iw-featured-article-card__image iw-featured-article-card__image--hero"
+                        loading="lazy"
+                    >
+                {% else %}
+                    {# Fallback when no image: colored placeholder #}
+                    <div class="iw-featured-article-card__image-placeholder iw-featured-article-card__image-placeholder--hero"></div>
                 {% endif %}
 
-                <h3 class="font-[var(--font-family-heading)] font-bold text-2xl sm:text-3xl lg:text-4xl text-white leading-tight mb-3">
-                    {{ articleTitle }}
-                </h3>
+                {# Gradient overlay + text #}
+                <div class="iw-featured-article-card__overlay">
+                    {% if articleCategories is iterable and articleCategories|length > 0 %}
+                        <div class="iw-featured-article-card__category-wrap">
+                            {% for category in articleCategories|slice(0, 1) %}
+                                <span class="iw-featured-article-card__category iw-featured-article-card__category--overlay">
+                                    {{ category.name|default(category.title|default('')) }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
-                {% if articleExcerpt is not empty %}
-                    <p class="text-white/80 text-base sm:text-lg line-clamp-2 max-w-3xl mb-3">
-                        {{ articleExcerpt|striptags|trim }}
-                    </p>
-                {% endif %}
+                    <h3 class="iw-featured-article-card__title iw-featured-article-card__title--hero">
+                        {{ articleTitle }}
+                    </h3>
 
-                {% if articleDate is not empty %}
-                    <time datetime="{{ articleDate|date('c') }}" class="text-sm text-white/60">
-                        {{ iw_sulu_tailwind_theme_format_date(articleDate, 'medium') }}
-                    </time>
-                {% endif %}
-            </div>
-        </a>
+                    {% if articleExcerpt is not empty %}
+                        <p class="iw-featured-article-card__excerpt iw-featured-article-card__excerpt--hero">
+                            {{ articleExcerpt|striptags|trim }}
+                        </p>
+                    {% endif %}
+
+                    {% if articleDate is not empty %}
+                        <time datetime="{{ articleDate|date('c') }}" class="iw-featured-article-card__date iw-featured-article-card__date--hero">
+                            {{ iw_sulu_tailwind_theme_format_date(articleDate, 'medium') }}
+                        </time>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
     {% else %}
-        <p class="text-center text-[var(--color-secondary-500)] py-12">
+        <p class="iw-block-article-list__empty">
             {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
         </p>
     {% endif %}

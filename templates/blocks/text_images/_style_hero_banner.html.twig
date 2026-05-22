@@ -13,7 +13,7 @@
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
 
-{% set bgAttr = (showBackground|default(true)) ? 'data-has-bg="true"' : '' %}
+{% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: applied from sm: breakpoint only (edge-to-edge on mobile). #}
 {% set blockRadiusVal = blockRadius|default('') %}
@@ -80,7 +80,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="block-text prose prose-invert prose-lg max-w-2xl mx-auto{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text prose prose-invert prose-lg max-w-2xl mx-auto{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

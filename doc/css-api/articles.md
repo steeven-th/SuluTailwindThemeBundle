@@ -1,0 +1,333 @@
+# Articles — CSS API
+
+Public CSS surface for everything related to articles: the **card** (used in listings and related sections), the **page** (hero, header, body, footer), and the **inline components** (meta strip, author block, related articles, categories, tags, event info).
+
+All values are exposed as `--iw-article-*` custom properties so a user-land project can re-skin the entire article surface with a handful of variables, without touching the Twig templates.
+
+> Conventions: strict BEM, `iw-` prefix. See [`css-conventions.md`](../css-conventions.md).
+
+---
+
+## Article card
+
+### Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-card-surface` | Card background color (or `transparent` when `cardSurface = none`) |
+| `--iw-article-card-padding` | Inner padding shorthand |
+| `--iw-article-card-border` | Border shorthand (`width style color`) ready to drop into `border:` |
+| `--iw-article-card-hover-border-color` | Border color applied on hover when `cardHoverBorder` is configured |
+| `--iw-article-card-hover-duration` | Shared hover transition duration |
+| `--iw-article-card-hover-easing` | Shared hover transition timing function |
+
+All values are wired to the matching admin tokens (`articles_card*`) in `iw_theme_config_articles.xml`.
+
+### Classes
+
+**Block + elements:**
+
+| Class | Role |
+|-------|------|
+| `.iw-article-card` | Card root (vertical layout by default) |
+| `.iw-article-card__image` | Image wrapper (sets overflow + image radius) |
+| `.iw-article-card__body` | Text content wrapper |
+| `.iw-article-card__category` | Category badge |
+| `.iw-article-card__title` | Article title (`<h3>`) |
+| `.iw-article-card__date` | Publication date (`<time>`) |
+| `.iw-article-card__excerpt` | Short excerpt with 2-line clamp |
+
+**Layout modifier:**
+
+| Class | Effect |
+|-------|--------|
+| `.iw-article-card--horizontal` | Switches to a row layout (image left, content right). Used by the `list` listing style. |
+| `.iw-article-card--image-bleed` | Removes the image's own padding/radius. The card receives `overflow: hidden` and the image is shifted with negative margins to touch the card edges (top + sides in vertical layout, top + bottom + left in horizontal layout). The image then follows the card border-radius via the `overflow: hidden` clip. |
+
+**Card hover transform modifiers** (mutually exclusive — one per card):
+
+| Class | Effect on hover |
+|-------|-----------------|
+| `.iw-article-card--hover-lift` | Card translates up by 2px |
+| `.iw-article-card--hover-lift-strong` | Card translates up by 4px |
+| `.iw-article-card--hover-scale-up` | Card scales to 1.05 |
+| `.iw-article-card--hover-scale-down` | Card scales to 0.97 |
+| `.iw-article-card--hover-tilt` | Slight rotation + scale |
+
+**Image hover modifiers** (mutually exclusive — one per card):
+
+| Class | Effect |
+|-------|--------|
+| `.iw-article-card--image-zoom` | Image scales to 1.05 on hover |
+| `.iw-article-card--image-zoom-strong` | Image scales to 1.10 on hover |
+| `.iw-article-card--image-grayscale` | Image is grayscale at rest, regains color on hover |
+| `.iw-article-card--image-brightness` | Image brightens on hover |
+
+**Hover shadow modifiers** (mutually exclusive — one per card):
+
+| Class | Effect on hover |
+|-------|-----------------|
+| `.iw-article-card--shadow-sm` to `--shadow-xl` | Box-shadow presets |
+| `.iw-article-card--shadow-glow-primary` | Tinted glow using `--color-primary` |
+| `.iw-article-card--shadow-glow-accent` | Tinted glow using `--color-accent` |
+
+**Hover border modifier:**
+
+| Class | Effect |
+|-------|--------|
+| `.iw-article-card--hover-border` | Switches `border-color` to `--iw-article-card-hover-border-color` on hover |
+
+**Listing wrappers** (used by `_style_cards.html.twig`, `_style_grid.html.twig`, `_style_list.html.twig`):
+
+| Class | Role |
+|-------|------|
+| `.iw-article-listing` | Bare listing container |
+| `.iw-article-listing--cards` | Two-column grid (single column on mobile) |
+| `.iw-article-listing--grid` | Three-column grid (two on tablet, one on mobile) |
+| `.iw-article-listing--list` | Vertical stack of horizontal cards |
+| `.iw-article-listing--portrait` | Adjusts the column count so portrait images don't blow the card height while keeping the `cards`-vs-`grid` differential (`cards-portrait`: 1/2/3 · `grid-portrait`: 2/3/4 across mobile/tablet/desktop). Applied automatically by the cards/grid templates when `cardOrientation` is `portrait`. |
+| `.iw-article-listing__empty` | Centered "no articles" message |
+
+### Overriding the look in your project
+
+```css
+/* Increase the visual weight of cards */
+.iw-article-card {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition-duration: 200ms;
+}
+
+/* Tighten the spacing of the body */
+.iw-article-card__body {
+    padding-top: 0.75rem;
+}
+
+/* Replace the title font on listings only */
+.iw-article-listing--cards .iw-article-card__title {
+    font-family: 'Playfair Display', serif;
+}
+```
+
+---
+
+## Article page wrapper
+
+The `<article>` root that hosts the hero, header, body and footer.
+
+| Class | Role |
+|-------|------|
+| `.iw-article-page` | Article root |
+| `.iw-article-page__header` | Title + subtitle block above the article body |
+| `.iw-article-page__title` | `<h1>` of the article |
+| `.iw-article-page__subtitle` | Optional `<p>` subtitle |
+| `.iw-article-page__body` | Wrapper around the rendered content blocks |
+| `.iw-article-page__body--dropcap` | Modifier on the body — drops a large first letter on the first inner block (used by the blog editorial style) |
+| `.iw-article-page__footer` | Below-content footer (tags, share buttons) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-page-header-margin-bottom` | Space between header and meta (default `1.5rem`) |
+| `--iw-article-page-body-margin-top` | Space above the article body (default `2rem`) |
+| `--iw-article-page-footer-margin-top` | Space above the footer (default `2.5rem`) |
+| `--iw-article-page-footer-padding-top` | Padding above the footer (default `1.5rem`) |
+
+---
+
+## Article hero
+
+| Class | Role |
+|-------|------|
+| `.iw-article-hero` | Hero block. Owns the `overflow: hidden` clip in `--fullwidth` and `--parallax` modes |
+| `.iw-article-hero--fullwidth` | Default — image spans the viewport width, **no radius** |
+| `.iw-article-hero--contained` | Image inside the page container. Radius is applied on `__inner` (not on the wrapper) so the bottom corners stay rounded even when `max-height` crops the image |
+| `.iw-article-hero--parallax` | Container for the `parallax-slide-img` parallax effect, no radius |
+| `.iw-article-hero--editorial` | Oversized hero with overlay text + background-image (used by the blog editorial style) |
+| `.iw-article-hero__inner` | Inner wrapper, only present in `--contained` mode. Carries the `overflow: hidden` and the radius for the contained variant |
+| `.iw-article-hero__image` | The `<img>` element inside the hero. Its own radius is forced to `0` — the wrapper (or `__inner`) does the clipping |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-hero-max-height` | Max height of the hero (default `500px`). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
+| `--iw-article-hero-radius` | Image radius in `contained` mode (default falls back to `--border-imageRadius`) |
+| `--iw-article-hero-contained-max-width` | Max-width of the centered container in `contained` mode (default `1280px`) |
+
+---
+
+## Article meta
+
+Inline strip of meta entries (date, authors, categories, reading time).
+
+| Class | Role |
+|-------|------|
+| `.iw-article-meta` | Block |
+| `.iw-article-meta--compact` | Modifier — switches to a smaller text scale |
+| `.iw-article-meta__date` / `__authors` / `__categories` / `__reading-time` | Single entries |
+| `.iw-article-meta__separator` | Vertical pipe between entries |
+| `.iw-article-meta__icon` | Inline SVG icon |
+| `.iw-article-meta__category` | Single category badge inside `__categories` |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-meta-gap` | Gap between entries (default `0.75rem`) |
+| `--iw-article-meta-color` | Text color (default `--color-secondary-600`) |
+| `--iw-article-meta-icon-size` | Icon dimensions (default `1rem`) |
+| `--iw-article-meta-icon-opacity` | Icon opacity (default `0.6`) |
+| `--iw-article-meta-separator-color` | Pipe color (default `--color-border`) |
+| `--iw-article-meta-category-bg` | Category badge background (default `--color-primary-100`) |
+| `--iw-article-meta-category-text` | Category badge text (default `--color-primary-700`) |
+| `--iw-article-meta-category-radius` | Category badge radius (default `--border-radius`) |
+
+---
+
+## Article author
+
+Avatar (image or initials fallback) + name + optional role.
+
+| Class | Role |
+|-------|------|
+| `.iw-article-author` | Block |
+| `.iw-article-author--sm` / `--md` / `--lg` | Size modifiers (avatar + text scale) |
+| `.iw-article-author__avatar` | `<img>` or initials `<span>` |
+| `.iw-article-author__avatar--initials` | Modifier on the initials fallback (background + foreground tint) |
+| `.iw-article-author__details` | Wrapper around name + role |
+| `.iw-article-author__name` | Author display name |
+| `.iw-article-author__role` | Optional role/title under the name |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-author-gap` | Gap between avatar and details (default `0.75rem`) |
+| `--iw-article-author-name-color` | Name text color (default `--color-text`) |
+| `--iw-article-author-role-color` | Role text color (default `--color-secondary-500`) |
+| `--iw-article-author-avatar-bg` | Initials fallback background (default `--color-primary-100`) |
+| `--iw-article-author-avatar-text` | Initials fallback foreground (default `--color-primary-700`) |
+
+---
+
+## Article related
+
+"Related articles" section at the bottom of an article page.
+
+| Class | Role |
+|-------|------|
+| `.iw-article-related` | Block — full `<section>` |
+| `.iw-article-related--cols-2` / `--cols-3` / `--cols-4` | Column-count modifier (desktop) |
+| `.iw-article-related__title` | Section `<h2>` title |
+| `.iw-article-related__grid` | Grid of article cards |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-related-margin-top` | Space above the section (default `4rem`) |
+| `--iw-article-related-margin-bottom` | Space below the section (default `2rem`) |
+| `--iw-article-related-title-size` | Title font-size (default `--font-size-h3`) |
+| `--iw-article-related-title-color` | Title color (default `inherit`) |
+| `--iw-article-related-gap` | Gap between cards (default `2rem`) |
+
+---
+
+## Article categories & tags
+
+| Class | Role |
+|-------|------|
+| `.iw-article-categories` | Flex row of category badges |
+| `.iw-article-categories__item` | Single category badge |
+| `.iw-article-tags` | Flex row of tag pills |
+| `.iw-article-tags__item` | Single tag pill (with hover state) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-article-categories-gap` | Gap between badges (default `0.5rem`) |
+| `--iw-article-categories-item-bg` | Badge background (default `--color-primary-100`) |
+| `--iw-article-categories-item-text` | Badge text color (default `--color-primary-700`) |
+| `--iw-article-categories-item-radius` | Badge radius (default `--border-radius`) |
+| `--iw-article-categories-item-padding` | Badge padding (default `0.25rem 0.75rem`) |
+| `--iw-article-tags-gap` | Gap between tags (default `0.5rem`) |
+| `--iw-article-tags-item-border` | Tag border color (default `--color-border`) |
+| `--iw-article-tags-item-text` | Tag text (default `--color-secondary-600`) |
+| `--iw-article-tags-item-hover-bg` | Hover background (default `--color-primary-50`) |
+| `--iw-article-tags-item-hover-text` | Hover text (default `--color-primary-700`) |
+| `--iw-article-tags-item-hover-border` | Hover border (default `--color-primary-200`) |
+| `--iw-article-tags-item-radius` | Tag radius (default `--border-radius`) |
+| `--iw-article-tags-item-padding` | Tag padding (default `0.25rem 0.75rem`) |
+
+---
+
+## Event info
+
+Floating card with date, location and organizer — designed to sit on top of an event hero image.
+
+| Class | Role |
+|-------|------|
+| `.iw-event-info` | Block — floating card |
+| `.iw-event-info__row` | Single info row (date row, location row, organizer row) |
+| `.iw-event-info__icon` | Leading icon for the row |
+| `.iw-event-info__content` | Text wrapper next to the icon |
+| `.iw-event-info__date` | Primary date line |
+| `.iw-event-info__date-end` | Optional "until …" secondary line |
+| `.iw-event-info__online-badge` | Green pill for online events |
+| `.iw-event-info__online-link` | CTA link to join an online event |
+| `.iw-event-info__location` | Physical location label |
+| `.iw-event-info__organizer-label` | "Organized by" small caps label |
+| `.iw-event-info__organizer-name` | Organizer display name |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-event-info-bg` | Card background (default translucent white) |
+| `--iw-event-info-blur` | Backdrop-filter blur radius (default `12px`) |
+| `--iw-event-info-padding` | Card inner padding (default `1.5rem`) |
+| `--iw-event-info-radius` | Card border-radius (default `--border-radius`) |
+| `--iw-event-info-shadow` | Card box-shadow |
+| `--iw-event-info-gap` | Gap between rows (default `1rem`) |
+| `--iw-event-info-icon-color` | Icon color (default `--color-primary`) |
+| `--iw-event-info-online-badge-bg` | Online badge background (default `--color-success-100`) |
+| `--iw-event-info-online-badge-text` | Online badge text (default `--color-success-700`) |
+
+---
+
+## Override examples
+
+### Stretch the hero on large screens
+
+```css
+:root {
+    --iw-article-hero-max-height: 80vh;
+}
+```
+
+### Re-skin the meta strip for a dark theme
+
+```css
+.iw-article-meta {
+    --iw-article-meta-color: var(--color-secondary-300);
+    --iw-article-meta-separator-color: var(--color-secondary-700);
+    --iw-article-meta-category-bg: var(--color-secondary-800);
+    --iw-article-meta-category-text: var(--color-secondary-100);
+}
+```
+
+### Pill-shaped tags
+
+```css
+.iw-article-tags__item {
+    --iw-article-tags-item-radius: 9999px;
+    --iw-article-tags-item-padding: 0.375rem 1rem;
+}
+```
+
+### Solid event-info card with accent border
+
+```css
+.iw-event-info {
+    --iw-event-info-bg: var(--color-background);
+    --iw-event-info-blur: 0;
+    border: 2px solid var(--color-accent);
+}
+```
+
+### Custom dropcap color
+
+```css
+.iw-article-page__body--dropcap > *:first-child::first-letter {
+    color: var(--color-accent);
+    font-style: italic;
+}
+```

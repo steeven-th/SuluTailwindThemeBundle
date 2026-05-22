@@ -51,21 +51,10 @@
                         </param>
                     </params>
                 </property>
-                <property name="articlesCount" type="number" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.block.article_carousel.count</title>
-                        <info_text>iw_sulu_tailwind_theme.block.article_carousel.count_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="6"/>
-                        <param name="min" value="2"/>
-                        <param name="max" value="12"/>
-                    </params>
-                </property>
-                <property name="autoplay" type="checkbox" colspan="4">
+                <property name="autoplay" type="checkbox" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.block.article_carousel.autoplay</title></meta>
                 </property>
-                <property name="interval" type="number" colspan="4"
+                <property name="interval" type="number" colspan="6"
                           visibleCondition="__parent.autoplay == true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.block.article_carousel.interval</title>

@@ -1,4 +1,4 @@
-{# Linked pages block — carousel of page cards #}
+{# Linked pages — auto-playing carousel of single-card slides #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -9,92 +9,99 @@
         variant: variant|default(0)
     } only %}
 
-    {% if links is defined and links is iterable %}
-        {# Collect all page items into a flat list #}
-        {% set allPages = [] %}
-        {% for link in links %}
-            {% if link.type == 'internal' and link.pages is defined %}
-                {% for page in link.pages %}
-                    {% set allPages = allPages|merge([{type: 'internal', page: page}]) %}
-                {% endfor %}
-            {% elseif link.type == 'external' %}
-                {% set allPages = allPages|merge([{type: 'external', link: link}]) %}
-            {% endif %}
-        {% endfor %}
+    {% if links is defined and links is iterable and links|length > 0 %}
+        {# Capture the parent block index before entering the loop — `_key` may be
+           rebound to the sub-block index inside the loop scope. #}
+        {% set parentBlockKey = _key %}
+        {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        <div
+            data-controller="slider"
+            data-slider-mode-value="carousel"
+            data-slider-autoplay-value="true"
+            data-slider-interval-value="5000"
+            class="iw-block-linked-pages iw-block-linked-pages--carousel"
+        >
+            {# Slides — the `hidden` class is toggled by the slider controller. #}
+            <div class="iw-block-linked-pages__slides">
+                {% for link in links %}
+                    {% set linkView = linksView[loop.index0].link|default({}) %}
+                    {% set linkUrl = link.link|default('') %}
+                    {% if linkUrl is not empty %}
+                        {% set linkTarget = linkView.target|default('_self') %}
+                        {% set linkRel = linkView.rel|default('') %}
+                        {% set linkLabel = linkView.title|default('') %}
+                        {% set linkExcerpt = link.excerpt|default('') %}
+                        {# Fallback: pull title and/or excerpt from the linked page when not explicitly provided #}
+                        {% set isPage = linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
+                        {% if isPage and (linkLabel is empty or linkExcerpt is empty) %}
+                            {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerpt': 'excerpt'}) %}
+                            {% if linkLabel is empty %}{% set linkLabel = linkedPage.title|default('') %}{% endif %}
+                            {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerpt.description|default('') %}{% endif %}
+                        {% endif %}
+                        {# Fallback: pull the media title (or filename) when linking to a media asset #}
+                        {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
+                            {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
+                            {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                        {% endif %}
+                        {# Last-resort fallback: show the URL itself if no label could be resolved #}
+                        {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
 
-        {% if allPages|length > 0 %}
-            <div
-                data-controller="slider"
-                data-slider-mode-value="carousel"
-                data-slider-autoplay-value="true"
-                data-slider-interval-value="5000"
-                class="relative"
-                style="--nav-color: var(--variant-hr-color, var(--color-primary)); --dot-color: var(--variant-hr-color, var(--color-primary));"
-            >
-                {# Slides #}
-                <div class="overflow-hidden">
-                    {% for item in allPages %}
                         <div
                             data-slider-target="slide"
-                            class="{{ loop.first ? '' : 'hidden' }}"
+                            class="iw-block-linked-pages__slide {{ loop.first ? '' : 'hidden' }}"
                         >
-                            <div class="max-w-2xl mx-auto p-8 text-center">
-                                {% if item.type == 'internal' %}
-                                    <a href="{{ sulu_content_path(item.page.url|default('/')) }}" class="block no-underline group">
-                                        <span class="block text-xl md:text-2xl font-semibold group-hover:text-[var(--variant-link-hover,inherit)]">
-                                            {{ item.page.title|default('') }}
-                                        </span>
-                                        {% if item.page.excerpt is defined and item.page.excerpt.description is defined %}
-                                            <p class="mt-3 opacity-75 line-clamp-3">{{ item.page.excerpt.description }}</p>
-                                        {% endif %}
-                                    </a>
-                                {% else %}
-                                    {% set linkUrl = item.link.url|default('#') %}
-                                    {% if item.link.anchor is defined and item.link.anchor is not empty %}
-                                        {% set linkUrl = linkUrl ~ '#' ~ item.link.anchor %}
-                                    {% endif %}
-                                    <a href="{{ linkUrl }}" target="{{ item.link.target|default('_self') }}" class="block no-underline group">
-                                        <span class="block text-xl md:text-2xl font-semibold group-hover:text-[var(--variant-link-hover,inherit)]">
-                                            {{ item.link.label|default(item.link.url|default('')) }}
-                                        </span>
-                                    </a>
+                            <a
+                                href="{{ linkUrl }}"
+                                {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+                                {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
+                                class="iw-block-linked-pages__slide-link"
+                            >
+                                <span class="iw-block-linked-pages__slide-title">{{ linkLabel }}</span>
+                                {% if linkExcerpt is not empty %}
+                                    <p class="iw-block-linked-pages__slide-excerpt">{{ linkExcerpt }}</p>
                                 {% endif %}
-                            </div>
+                            </a>
                         </div>
-                    {% endfor %}
-                </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
 
-                {# Navigation #}
-                <button
-                    type="button"
-                    data-action="slider#prev"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[var(--nav-color)]/10 hover:bg-[var(--nav-color)]/20 transition-colors"
-                    aria-label="Previous"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button
-                    type="button"
-                    data-action="slider#next"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-[var(--nav-color)]/10 hover:bg-[var(--nav-color)]/20 transition-colors"
-                    aria-label="Next"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </button>
+            {# Navigation arrows #}
+            <button
+                type="button"
+                data-action="slider#prev"
+                class="iw-block-linked-pages__nav iw-block-linked-pages__nav--prev"
+                aria-label="Previous"
+            >
+                <svg class="iw-block-linked-pages__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <button
+                type="button"
+                data-action="slider#next"
+                class="iw-block-linked-pages__nav iw-block-linked-pages__nav--next"
+                aria-label="Next"
+            >
+                <svg class="iw-block-linked-pages__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
 
-                {# Dots #}
-                <div data-slider-target="dots" class="flex items-center justify-center gap-2 mt-6">
-                    {% for item in allPages %}
+            {# Dots — the slider controller drives the active state via inline opacity. #}
+            <div data-slider-target="dots" class="iw-block-linked-pages__dots">
+                {% for link in links %}
+                    {% if (link.link|default('')) is not empty %}
                         <button
                             type="button"
                             data-action="slider#goTo"
                             data-slider-index-param="{{ loop.index0 }}"
-                            class="w-2.5 h-2.5 rounded-full {{ loop.first ? 'bg-[var(--dot-color)]' : 'bg-[var(--dot-color)]/30' }} transition-colors"
+                            class="iw-block-linked-pages__dot {{ loop.first ? 'iw-block-linked-pages__dot--active' : '' }}"
                             aria-label="Slide {{ loop.index }}"
                         ></button>
-                    {% endfor %}
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-        {% endif %}
+        </div>
     {% endif %}
 {% endblock %}

@@ -2,13 +2,7 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% set heightMap = {
-        'xs': 'h-8',
-        'sm': 'h-16',
-        'md': 'h-24',
-        'lg': 'h-32',
-        'xl': 'h-48'
-    } %}
+    {% set heightModifier = 'iw-block-separator--height-' ~ (height|default('md')) %}
 
-    <div class="{{ heightMap[height|default('md')]|default('h-24') }}" aria-hidden="true"></div>
+    <div class="iw-block-separator iw-block-separator--spacer {{ heightModifier }}" aria-hidden="true"></div>
 {% endblock %}

@@ -31,44 +31,30 @@
                         </param>
                     </params>
                 </property>
-                <block name="links" default-type="internal" minOccurs="0">
+                <block name="links" default-type="link" minOccurs="0">
                     <meta>
                         <title>iw_sulu_tailwind_theme.links</title>
                     </meta>
                     <types>
-                        <type name="internal">
+                        <type name="link">
                             <meta>
-                                <title>iw_sulu_tailwind_theme.internal_link</title>
+                                <title>iw_sulu_tailwind_theme.link</title>
                             </meta>
                             <properties>
-                                <property name="pages" type="page_selection">
-                                    <meta><title>iw_sulu_tailwind_theme.pages</title></meta>
-                                </property>
-                            </properties>
-                        </type>
-                        <type name="external">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.external_link</title>
-                            </meta>
-                            <properties>
-                                <property name="url" type="text_line">
-                                    <meta><title>iw_sulu_tailwind_theme.url</title></meta>
-                                </property>
-                                <property name="label" type="text_line">
-                                    <meta><title>iw_sulu_tailwind_theme.label</title></meta>
-                                </property>
-                                <property name="anchor" type="text_line">
-                                    <meta><title>iw_sulu_tailwind_theme.anchor</title></meta>
-                                </property>
-                                <property name="target" type="single_select">
-                                    <meta><title>iw_sulu_tailwind_theme.target</title></meta>
+                                <property name="link" type="link">
+                                    <meta><title>iw_sulu_tailwind_theme.link</title></meta>
                                     <params>
-                                        <param name="default_value" value="_self"/>
-                                        <param name="values" type="collection">
-                                            <param name="_self"><meta><title>iw_sulu_tailwind_theme.target_self</title></meta></param>
-                                            <param name="_blank"><meta><title>iw_sulu_tailwind_theme.target_blank</title></meta></param>
+                                        <param name="enable_anchor" value="true"/>
+                                        <param name="enable_attributes" value="true"/>
+                                        <param name="types" type="collection">
+                                            <param name="page"/>
+                                            <param name="external"/>
+                                            <param name="media"/>
                                         </param>
                                     </params>
+                                </property>
+                                <property name="excerpt" type="text_area">
+                                    <meta><title>iw_sulu_tailwind_theme.excerpt</title></meta>
                                 </property>
                             </properties>
                         </type>

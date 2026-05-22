@@ -1,4 +1,4 @@
-{# Linked pages block — simple minimal links list #}
+{# Linked pages — minimal stacked nav of links #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -10,29 +10,40 @@
     } only %}
 
     {% if links is defined and links is iterable %}
-        <nav class="space-y-2">
+        {# Capture the parent block index before entering the loop — `_key` may be
+           rebound to the sub-block index inside the loop scope. #}
+        {% set parentBlockKey = _key %}
+        {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        <nav class="iw-block-linked-pages iw-block-linked-pages--minimal">
             {% for link in links %}
-                {% if link.type == 'internal' and link.pages is defined %}
-                    {% for page in link.pages %}
-                        <a href="{{ sulu_content_path(page.url|default('/')) }}" class="block text-[var(--variant-link-color,inherit)] hover:text-[var(--variant-link-hover,inherit)] transition-colors py-1">
-                            {{ page.title|default('') }}
-                        </a>
-                    {% endfor %}
-                {% elseif link.type == 'external' %}
-                    {% set linkTarget = link.target|default('_self') %}
-                    {% set linkUrl = link.url|default('#') %}
-                    {% if link.anchor is defined and link.anchor is not empty %}
-                        {% set linkUrl = linkUrl ~ '#' ~ link.anchor %}
+                {% set linkView = linksView[loop.index0].link|default({}) %}
+                {% set linkUrl = link.link|default('') %}
+                {% if linkUrl is not empty %}
+                    {% set linkTarget = linkView.target|default('_self') %}
+                    {% set linkRel = linkView.rel|default('') %}
+                    {% set linkLabel = linkView.title|default('') %}
+                    {# Fallback: pull title from the linked page when not explicitly provided #}
+                    {% if linkLabel is empty and linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
+                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title'}) %}
+                        {% set linkLabel = linkedPage.title|default('') %}
                     {% endif %}
+                    {# Fallback: pull the media title (or filename) when linking to a media asset #}
+                    {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
+                        {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
+                        {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                    {% endif %}
+                    {# Last-resort fallback: show the URL itself if no label could be resolved #}
+                    {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
+
                     <a
                         href="{{ linkUrl }}"
-                        target="{{ linkTarget }}"
-                        {{ linkTarget == '_blank' ? 'rel="noopener noreferrer"' : '' }}
-                        class="block text-[var(--variant-link-color,inherit)] hover:text-[var(--variant-link-hover,inherit)] transition-colors py-1"
+                        {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+                        {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
+                        class="iw-block-linked-pages__minimal-link"
                     >
-                        {{ link.label|default(link.url|default('')) }}
+                        {{ linkLabel }}
                         {% if linkTarget == '_blank' %}
-                            <span class="text-xs">&#8599;</span>
+                            <span class="iw-block-linked-pages__minimal-external-icon">&#8599;</span>
                         {% endif %}
                     </a>
                 {% endif %}

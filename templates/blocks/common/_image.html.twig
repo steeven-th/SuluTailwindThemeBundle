@@ -7,7 +7,7 @@
 #}
 {% if media is defined and media is not empty %}
     {% set format = imageFormat|default('iw_theme_16_9') %}
-    {% set enableLightbox = lightbox|default(true) %}
+    {% set enableLightbox = lightbox ?? true %}
 
     <figure class="block-image">
         {% if enableLightbox %}

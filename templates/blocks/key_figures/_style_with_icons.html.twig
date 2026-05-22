@@ -1,23 +1,24 @@
-{# Key figures block — figures with icon images #}
+{# Key figures block — figures with large icons (1..4 columns on desktop) #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
     {% if figures is defined and figures is iterable %}
+        {% set colsLg = figures|length > 4 ? 4 : figures|length %}
         <div
             data-controller="key-figures"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ figures|length > 4 ? 4 : figures|length }} gap-8"
+            class="iw-block-key-figures iw-block-key-figures--with-icons iw-block-key-figures--cols-{{ colsLg }}"
         >
             {% for figure in figures %}
-                <div class="flex flex-col items-center text-center p-6">
+                <div class="iw-key-figure iw-key-figure--with-icon">
                     {# Icon / Image #}
                     {% if figure.image is defined and figure.image.id is defined %}
                         {% set media = sulu_resolve_media(figure.image.id, app.request.locale) %}
-                        <div class="w-16 h-16 md:w-20 md:h-20 mb-4">
+                        <div class="iw-key-figure__icon iw-key-figure__icon--lg">
                             <img
                                 src="{{ media.thumbnails['iw_theme_1_1']|default(media.url) }}"
                                 alt="{{ media.title|default('') }}"
                                 loading="lazy"
-                                class="w-full h-full object-contain"
+                                class="iw-key-figure__icon-img"
                             >
                         </div>
                     {% endif %}
@@ -26,16 +27,16 @@
                         <span
                             data-key-figures-target="counter"
                             data-key-figures-end-value="{{ figure.number }}"
-                            class="text-3xl md:text-4xl font-bold text-[var(--variant-paragraph-color,inherit)]"
+                            class="iw-key-figure__counter iw-key-figure__counter--lg"
                         >
                             0
                         </span>
                     {% endif %}
                     {% if figure.title is defined and figure.title is not empty %}
-                        <span class="block-title mt-2 text-base font-semibold">{{ figure.title }}</span>
+                        <span class="iw-key-figure__title iw-block__title">{{ figure.title }}</span>
                     {% endif %}
                     {% if figure.subTitle is defined and figure.subTitle is not empty %}
-                        <span class="block-subtitle text-sm opacity-75 mt-1">{{ figure.subTitle }}</span>
+                        <span class="iw-key-figure__subtitle iw-block__subtitle">{{ figure.subTitle }}</span>
                     {% endif %}
                 </div>
             {% endfor %}

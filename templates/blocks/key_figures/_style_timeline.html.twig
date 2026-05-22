@@ -3,34 +3,31 @@
 
 {% block block_content %}
     {% if figures is defined and figures is iterable %}
-        <div class="relative" data-controller="key-figures"
-             style="--timeline-accent: var(--variant-hr-color, var(--color-primary)); --timeline-ring: var(--color-secondary, var(--color-primary)); --timeline-line: var(--timeline-accent); --timeline-card-border: var(--timeline-accent); --timeline-card-bg: color-mix(in srgb, var(--timeline-accent) 60%, transparent);"
-        >
-            {# Vertical line — centered on desktop, left on mobile #}
-            <div class="absolute left-4 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-[var(--timeline-line)]"></div>
+        <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--timeline">
+            {# Vertical timeline line — left on mobile, centered on desktop #}
+            <div class="iw-block-key-figures__timeline-line"></div>
 
-            <div class="space-y-8 md:space-y-12">
+            <div class="iw-block-key-figures__timeline-items">
                 {% for item in figures %}
                     {% if item.type|default('figure') == 'figure' %}
-                        <div class="relative flex items-start md:items-center {{ loop.index is even ? 'md:flex-row-reverse' : '' }}">
-                            {# Timeline dot — accent fill with secondary ring #}
-                            <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[var(--timeline-accent)] border-4 border-[var(--timeline-ring)] z-10"></div>
-
-                            {# Content card #}
-                            <div class="ml-12 md:ml-0 md:w-[calc(50%-2rem)] {{ loop.index is even ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8' }}">
-                                <div class="p-6 {{ paragraphImageRadius|default('') }} border border-[var(--timeline-card-border)] bg-[var(--timeline-card-bg)]">
-                                    {% if item.number is defined and item.number is not empty %}
-                                        <span class="text-2xl md:text-3xl font-bold text-[var(--variant-paragraph-color,inherit)]" data-key-figures-target="counter" data-key-figures-end-value="{{ item.number }}">
-                                            {{ item.number }}
-                                        </span>
-                                    {% endif %}
-                                    {% if item.title is defined and item.title is not empty %}
-                                        <h4 class="text-lg font-semibold mt-2">{{ item.title }}</h4>
-                                    {% endif %}
-                                    {% if item.subTitle is defined and item.subTitle is not empty %}
-                                        <p class="block-subtitle text-sm opacity-75 mt-1">{{ item.subTitle }}</p>
-                                    {% endif %}
-                                </div>
+                        <div class="iw-key-figure iw-key-figure--timeline">
+                            <div class="iw-key-figure__timeline-dot"></div>
+                            <div class="iw-key-figure__timeline-card {{ paragraphImageRadius|default('') }}">
+                                {% if item.number is defined and item.number is not empty %}
+                                    <span
+                                        data-key-figures-target="counter"
+                                        data-key-figures-end-value="{{ item.number }}"
+                                        class="iw-key-figure__counter iw-key-figure__counter--md"
+                                    >
+                                        {{ item.number }}
+                                    </span>
+                                {% endif %}
+                                {% if item.title is defined and item.title is not empty %}
+                                    <h4 class="iw-key-figure__title iw-block__title">{{ item.title }}</h4>
+                                {% endif %}
+                                {% if item.subTitle is defined and item.subTitle is not empty %}
+                                    <p class="iw-key-figure__subtitle iw-block__subtitle">{{ item.subTitle }}</p>
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}

@@ -31,10 +31,52 @@
                         </param>
                     </params>
                 </property>
-                <property name="articles" type="smart_content">
+                <property name="articles_hero" type="smart_content"
+                          visibleCondition="__parent.style == 'hero'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.block.article_featured.source</title>
-                        <info_text>iw_sulu_tailwind_theme.block.article_featured.source_info_with_limits</info_text>
+                    </meta>
+                    <params>
+                        <param name="provider" value="articles"/>
+                        <param name="properties" type="collection">
+                            <param name="title" value="title"/>
+                            <param name="url" value="url"/>
+                            <param name="heroImage" value="heroImage"/>
+                            <param name="subtitle" value="subtitle"/>
+                            <param name="authored" value="authored"/>
+                            <param name="excerptTitle" value="excerpt.title"/>
+                            <param name="excerptDescription" value="excerpt.description"/>
+                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptCategories" value="excerpt.categories"/>
+                            <param name="excerptTags" value="excerpt.tags"/>
+                        </param>
+                    </params>
+                </property>
+                <property name="articles_side_by_side" type="smart_content"
+                          visibleCondition="__parent.style == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.article_featured.source</title>
+                    </meta>
+                    <params>
+                        <param name="provider" value="articles"/>
+                        <param name="properties" type="collection">
+                            <param name="title" value="title"/>
+                            <param name="url" value="url"/>
+                            <param name="heroImage" value="heroImage"/>
+                            <param name="subtitle" value="subtitle"/>
+                            <param name="authored" value="authored"/>
+                            <param name="excerptTitle" value="excerpt.title"/>
+                            <param name="excerptDescription" value="excerpt.description"/>
+                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptCategories" value="excerpt.categories"/>
+                            <param name="excerptTags" value="excerpt.tags"/>
+                        </param>
+                    </params>
+                </property>
+                <property name="articles" type="smart_content"
+                          visibleCondition="__parent.style == 'spotlight'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.article_featured.source</title>
                     </meta>
                     <params>
                         <param name="provider" value="articles"/>

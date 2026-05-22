@@ -76,6 +76,17 @@
                         </param>
                     </params>
                 </property>
+                <property name="showBackground" type="checkbox">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.show_background</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
             </properties>
         </section>
 

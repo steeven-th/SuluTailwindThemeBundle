@@ -1,4 +1,4 @@
-{# Testimonial block — carousel slider #}
+{# Testimonial block — carousel slider with equal-height stack #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -16,26 +16,37 @@
             data-slider-equal-height-value="true"
             data-slider-autoplay-value="true"
             data-slider-interval-value="6000"
-            class="relative"
-            style="--iw-gallery-nav-color: currentColor; --iw-gallery-nav-bg: color-mix(in srgb, currentColor 8%, transparent); --iw-gallery-nav-bg-hover: color-mix(in srgb, currentColor 15%, transparent);"
+            class="iw-block-testimonial iw-block-testimonial--slider"
         >
-            {# Grid stack: all slides in the same cell, container takes tallest height #}
-            <div class="grid px-14">
+            {# Grid stack: all slides in the same cell, container height = tallest slide #}
+            <div class="iw-block-testimonial__stack">
                 {% for item in testimonials %}
                     {% if item.type|default('testimonial') == 'testimonial' %}
-                        <div data-slider-target="slide"
-                             style="grid-area: 1/1;"
-                             class="text-center {{ paragraphImageRadius|default('') }} {{ loop.first ? '' : 'invisible pointer-events-none' }}">
-                            {# Large quote #}
-                            <svg class="w-12 h-12 text-[var(--color-primary)] opacity-20 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
+                        <div
+                            data-slider-target="slide"
+                            class="iw-testimonial iw-testimonial--slider {{ paragraphImageRadius|default('') }} {{ loop.first ? '' : 'invisible pointer-events-none' }}"
+                        >
+                            {# Large quote mark #}
+                            <svg class="iw-testimonial__quote-icon iw-testimonial__quote-icon--lg" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11h4v10H0z"/>
                             </svg>
 
                             {% if item.quote is defined and item.quote is not empty %}
-                                <p class="text-xl md:text-2xl italic leading-relaxed">{{ item.quote }}</p>
+                                <p class="iw-testimonial__quote iw-testimonial__quote--lg">{{ item.quote }}</p>
                             {% endif %}
 
-                            <div class="flex items-center justify-center gap-3 mt-6">
+                            {# Rating stars #}
+                            {% if item.rating is defined and item.rating > 0 %}
+                                <div class="iw-testimonial__rating">
+                                    {% for i in 1..5 %}
+                                        <svg class="iw-testimonial__rating-star {{ i <= item.rating ? 'iw-testimonial__rating-star--filled' : '' }}" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="iw-testimonial__author iw-testimonial__author--centered">
                                 {% if item.avatar is defined and item.avatar.id is defined %}
                                     {% set avatarMedia = sulu_resolve_media(item.avatar.id, app.request.locale) %}
                                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_avatar.html.twig' with {
@@ -44,12 +55,12 @@
                                         size: 'lg'
                                     } only %}
                                 {% endif %}
-                                <div class="text-left">
+                                <div class="iw-testimonial__author-info">
                                     {% if item.author is defined and item.author is not empty %}
-                                        <span class="block font-semibold">{{ item.author }}</span>
+                                        <span class="iw-testimonial__author-name">{{ item.author }}</span>
                                     {% endif %}
                                     {% if item.role is defined and item.role is not empty %}
-                                        <span class="block text-sm opacity-60">{{ item.role }}</span>
+                                        <span class="iw-testimonial__author-role">{{ item.role }}</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -58,33 +69,37 @@
                 {% endfor %}
             </div>
 
-            {# Navigation arrows — same style as gallery sliders #}
+            {# Navigation arrows — reuse shared .iw-gallery-nav styling #}
             <button
                 type="button"
                 data-action="slider#prev"
-                class="iw-gallery-nav absolute left-0 top-1/2 -translate-y-1/2 z-10"
+                class="iw-gallery-nav iw-block-testimonial__nav iw-block-testimonial__nav--prev"
                 aria-label="Previous"
             >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
             </button>
             <button
                 type="button"
                 data-action="slider#next"
-                class="iw-gallery-nav absolute right-0 top-1/2 -translate-y-1/2 z-10"
+                class="iw-gallery-nav iw-block-testimonial__nav iw-block-testimonial__nav--next"
                 aria-label="Next"
             >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </button>
 
-            {# Dots — adapts to variant via currentColor #}
-            <div data-slider-target="dots" class="flex items-center justify-center gap-2 mt-6">
+            {# Dots — slider controller drives the active state via inline opacity. #}
+            <div data-slider-target="dots" class="iw-block-testimonial__dots">
                 {% for item in testimonials %}
                     {% if item.type|default('testimonial') == 'testimonial' %}
                         <button
                             type="button"
                             data-action="slider#goTo"
                             data-slider-index-param="{{ loop.index0 }}"
-                            class="w-2.5 h-2.5 rounded-full bg-current transition-opacity {{ loop.first ? '' : 'opacity-30' }}"
+                            class="iw-block-testimonial__dot {{ loop.first ? 'iw-block-testimonial__dot--active' : '' }}"
                             aria-label="Slide {{ loop.index }}"
                         ></button>
                     {% endif %}

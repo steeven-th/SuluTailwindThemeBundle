@@ -3,26 +3,23 @@
 
 {% block block_content %}
     {% if figures is defined and figures is iterable %}
-        <div
-            data-controller="key-figures"
-            class="flex flex-wrap justify-center gap-8 md:gap-16 text-center"
-        >
+        <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--inline">
             {% for figure in figures %}
-                <div class="flex flex-col items-center min-w-[120px]">
+                <div class="iw-key-figure iw-key-figure--inline">
                     {% if figure.number is defined and figure.number is not empty %}
                         <span
                             data-key-figures-target="counter"
                             data-key-figures-end-value="{{ figure.number }}"
-                            class="text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--variant-paragraph-color,inherit)]"
+                            class="iw-key-figure__counter iw-key-figure__counter--xl"
                         >
                             0
                         </span>
                     {% endif %}
                     {% if figure.title is defined and figure.title is not empty %}
-                        <span class="block-title mt-2 text-base md:text-lg font-semibold">{{ figure.title }}</span>
+                        <span class="iw-key-figure__title iw-block__title">{{ figure.title }}</span>
                     {% endif %}
                     {% if figure.subTitle is defined and figure.subTitle is not empty %}
-                        <span class="block-subtitle text-sm opacity-75">{{ figure.subTitle }}</span>
+                        <span class="iw-key-figure__subtitle iw-block__subtitle">{{ figure.subTitle }}</span>
                     {% endif %}
                 </div>
             {% endfor %}

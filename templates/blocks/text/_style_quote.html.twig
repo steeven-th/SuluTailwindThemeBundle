@@ -5,20 +5,22 @@
     {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
     {% set titleAlignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
 
-    {% if title is defined and title is not empty %}
-        <h2 class="block-title text-2xl md:text-3xl font-[var(--font-h2-weight)] mb-6 {{ titleAlignClass }}">{{ title }}</h2>
-    {% endif %}
+    <div class="iw-block-text iw-block-text--quote">
+        {% if title is defined and title is not empty %}
+            <h2 class="iw-block__title text-2xl md:text-3xl font-[var(--font-h2-weight)] mb-6 {{ titleAlignClass }}">{{ title }}</h2>
+        {% endif %}
 
-    {% if text is defined and text is not empty %}
-        <blockquote class="border-l-4 border-[var(--variant-hr-color,var(--color-primary))] pl-6 md:pl-8">
-            <div class="block-text prose max-w-none text-xl md:text-2xl italic leading-relaxed {{ resolvedParagraphRadius|default('') }}">
-                {{ text|raw }}
-            </div>
-            {% if subTitle is defined and subTitle is not empty %}
-                <footer class="mt-4 text-base not-italic opacity-75">
-                    — {{ subTitle }}
-                </footer>
-            {% endif %}
-        </blockquote>
-    {% endif %}
+        {% if text is defined and text is not empty %}
+            <blockquote class="iw-block-text__quote">
+                <div class="iw-block-text__quote-body iw-block__text prose max-w-none text-xl md:text-2xl italic leading-relaxed {{ resolvedParagraphRadius|default('') }}">
+                    {{ text|raw }}
+                </div>
+                {% if subTitle is defined and subTitle is not empty %}
+                    <footer class="iw-block-text__quote-footer">
+                        — {{ subTitle }}
+                    </footer>
+                {% endif %}
+            </blockquote>
+        {% endif %}
+    </div>
 {% endblock %}

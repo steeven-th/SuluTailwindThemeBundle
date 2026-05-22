@@ -37,7 +37,7 @@
 {% endif %}
 
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
-{% set bgAttr = (showBackground|default(true)) ? 'data-has-bg="true"' : '' %}
+{% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: only in exterior mode (interior = image fills full width, no radius).
    Applied from sm: breakpoint only (edge-to-edge on mobile). #}
@@ -107,7 +107,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="block-text prose prose-invert max-w-none{% if hasParagraphBg and radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text prose prose-invert max-w-none{% if hasParagraphBg and radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

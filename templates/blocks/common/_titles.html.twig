@@ -12,12 +12,12 @@
 {% set separatorMode = variantConfig.separatorMode|default('style') %}
 
 {% if (title is defined and title is not empty) or (subTitle is defined and subTitle is not empty) %}
-<div class="{{ alignClass }} px-4">
+<div class="{{ alignClass }}">
     {% if title is defined and title is not empty %}
-        <h2 class="block-title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ alignClass }}">{{ title }}</h2>
+        <h2 class="iw-block__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ alignClass }}">{{ title }}</h2>
     {% endif %}
     {% if subTitle is defined and subTitle is not empty %}
-        <h3 class="block-subtitle text-lg md:text-xl mt-2 {{ alignClass }}">{{ subTitle }}</h3>
+        <h3 class="iw-block__subtitle text-lg md:text-xl mt-2 {{ alignClass }}">{{ subTitle }}</h3>
     {% endif %}
 
     {# Separator: style mode → CSS handles rendering via .block-variant-* hr rules #}
@@ -26,7 +26,7 @@
     {% elseif separatorMode == 'image' and variantConfig.separatorImage is defined and variantConfig.separatorImage.id is defined %}
         {# Image mode → render custom image separator #}
         {% set separatorMedia = sulu_resolve_media(variantConfig.separatorImage.id, app.request.locale) %}
-        <div class="block-separator my-6">
+        <div class="iw-block__separator my-6">
             <img src="{{ separatorMedia.url }}" alt="" loading="lazy" class="mx-auto max-h-8 w-auto">
         </div>
     {% elseif separatorMode != 'none' %}

@@ -1,4 +1,4 @@
-{# Linked pages block — card grid layout #}
+{# Linked pages — grid of card-shaped links #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -10,44 +10,47 @@
     } only %}
 
     {% if links is defined and links is iterable %}
-        <div
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            style="--card-border: var(--variant-hr-color, var(--color-border, #e5e7eb)); --card-bg: color-mix(in srgb, var(--card-border) 60%, transparent);"
-        >
+        {# Capture the parent block index before entering the loop — `_key` may be
+           rebound to the sub-block index inside the loop scope. #}
+        {% set parentBlockKey = _key %}
+        {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        <div class="iw-block-linked-pages iw-block-linked-pages--cards">
             {% for link in links %}
-                {% if link.type == 'internal' and link.pages is defined %}
-                    {% for page in link.pages %}
-                        <a href="{{ sulu_content_path(page.url|default('/')) }}" class="group block no-underline">
-                            <div class="p-6 {{ paragraphImageRadius|default('') }} border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--variant-link-color,inherit)] transition-shadow duration-300 hover:shadow-lg h-full">
-                                <span class="block text-lg font-semibold group-hover:text-[var(--variant-link-hover,inherit)]">
-                                    {{ page.title|default('') }}
-                                </span>
-                                {% if page.excerpt is defined and page.excerpt.description is defined %}
-                                    <p class="mt-2 text-sm opacity-75 line-clamp-3">{{ page.excerpt.description }}</p>
-                                {% endif %}
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% elseif link.type == 'external' %}
-                    {% set linkTarget = link.target|default('_self') %}
-                    {% set linkUrl = link.url|default('#') %}
-                    {% if link.anchor is defined and link.anchor is not empty %}
-                        {% set linkUrl = linkUrl ~ '#' ~ link.anchor %}
+                {% set linkView = linksView[loop.index0].link|default({}) %}
+                {% set linkUrl = link.link|default('') %}
+                {% if linkUrl is not empty %}
+                    {% set linkTarget = linkView.target|default('_self') %}
+                    {% set linkRel = linkView.rel|default('') %}
+                    {% set linkLabel = linkView.title|default('') %}
+                    {% set linkExcerpt = link.excerpt|default('') %}
+                    {# Fallback: pull title and/or excerpt from the linked page when not explicitly provided #}
+                    {% set isPage = linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
+                    {% if isPage and (linkLabel is empty or linkExcerpt is empty) %}
+                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerpt': 'excerpt'}) %}
+                        {% if linkLabel is empty %}{% set linkLabel = linkedPage.title|default('') %}{% endif %}
+                        {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerpt.description|default('') %}{% endif %}
                     {% endif %}
+                    {# Fallback: pull the media title (or filename) when linking to a media asset #}
+                    {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
+                        {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
+                        {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                    {% endif %}
+                    {# Last-resort fallback: show the URL itself if no label could be resolved #}
+                    {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
+
                     <a
                         href="{{ linkUrl }}"
-                        target="{{ linkTarget }}"
-                        {{ linkTarget == '_blank' ? 'rel="noopener noreferrer"' : '' }}
-                        class="group block no-underline"
+                        {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+                        {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
+                        class="iw-linked-page-card {{ paragraphImageRadius|default('') }}"
                     >
-                        <div class="p-6 {{ paragraphImageRadius|default('') }} border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--variant-link-color,inherit)] transition-shadow duration-300 hover:shadow-lg h-full">
-                            <span class="block text-lg font-semibold group-hover:text-[var(--variant-link-hover,inherit)]">
-                                {{ link.label|default(link.url|default('')) }}
-                            </span>
-                            {% if linkTarget == '_blank' %}
-                                <span class="text-xs opacity-50 mt-1 inline-block">&#8599;</span>
-                            {% endif %}
-                        </div>
+                        <span class="iw-linked-page-card__title">{{ linkLabel }}</span>
+                        {% if linkExcerpt is not empty %}
+                            <p class="iw-linked-page-card__excerpt">{{ linkExcerpt }}</p>
+                        {% endif %}
+                        {% if linkTarget == '_blank' %}
+                            <span class="iw-linked-page-card__external-icon">&#8599;</span>
+                        {% endif %}
                     </a>
                 {% endif %}
             {% endfor %}

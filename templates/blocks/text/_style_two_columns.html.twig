@@ -2,16 +2,18 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
-        title: title|default(''),
-        subTitle: subTitle|default(''),
-        titleAlignment: titleAlignment|default('left'),
-        variant: variant|default(0)
-    } only %}
+    <div class="iw-block-text iw-block-text--two-columns">
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+            title: title|default(''),
+            subTitle: subTitle|default(''),
+            titleAlignment: titleAlignment|default('left'),
+            variant: variant|default(0)
+        } only %}
 
-    {% if text is defined and text is not empty %}
-        <div class="block-text prose max-w-none columns-1 md:columns-2 gap-8 {{ resolvedParagraphRadius|default('') }}">
-            {{ text|raw }}
-        </div>
-    {% endif %}
+        {% if text is defined and text is not empty %}
+            <div class="iw-block-text__columns iw-block__text prose max-w-none {{ resolvedParagraphRadius|default('') }}">
+                {{ text|raw }}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

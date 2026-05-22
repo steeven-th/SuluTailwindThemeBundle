@@ -10,39 +10,50 @@
     } only %}
 
     {% set articleItems = articles|default([]) %}
-    {% set maxCount = articlesCount|default(6) %}
     {% set isAutoplay = autoplay is defined ? autoplay : false %}
     {% set autoplayInterval = interval|default(5000) %}
 
+    {# Image collides with the item edges when no inner radius is requested,
+       otherwise the L4 card pads the image with its own radius inside. #}
+    {% set hasImageRadius = paragraphImageRadius|default('') is not empty and paragraphImageRadius != 'rounded-none' %}
+
+    {# Resolve the variant's button style so the carousel arrows use the same
+       color as the buttons configured for this variant. #}
+    {% set variantIndex = variant|default(0) %}
+    {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
+    {% if variantIndex >= allVariants|length %}{% set variantIndex = 0 %}{% endif %}
+    {% set variantConfig = allVariants[variantIndex]|default({}) %}
+    {% set carouselButtonStyle = variantConfig.buttonStyle|default('primary') %}
+
     {% if articleItems is iterable and articleItems|length > 0 %}
-        {% set displayedArticles = articleItems|slice(0, maxCount) %}
+        {% set displayedArticles = articleItems %}
 
         <div
             data-controller="slider"
             data-slider-mode-value="scroll"
             data-slider-autoplay-value="{{ isAutoplay ? 'true' : 'false' }}"
             data-slider-interval-value="{{ autoplayInterval }}"
-            class="relative"
+            class="iw-block-article-carousel iw-block-article-carousel--button-{{ carouselButtonStyle }}"
         >
             {# Navigation arrows — positioned above the track #}
-            <div class="flex justify-end gap-2 mb-4">
+            <div class="iw-block-article-carousel__nav">
                 <button
                     type="button"
                     data-action="slider#prev"
-                    class="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] shadow-sm text-[var(--color-secondary-600)] hover:text-[var(--color-primary)] transition-colors"
+                    class="iw-block-article-carousel__nav-button iw-block-article-carousel__nav-button--prev"
                     aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_previous'|trans }}"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="iw-block-article-carousel__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </button>
                 <button
                     type="button"
                     data-action="slider#next"
-                    class="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] shadow-sm text-[var(--color-secondary-600)] hover:text-[var(--color-primary)] transition-colors"
+                    class="iw-block-article-carousel__nav-button iw-block-article-carousel__nav-button--next"
                     aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_next'|trans }}"
                 >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="iw-block-article-carousel__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                 </button>
@@ -51,18 +62,18 @@
             {# Scrollable track — cards fill full width with calculated sizes #}
             <div
                 data-slider-target="track"
-                class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 pb-2 scrollbar-hide"
+                class="iw-block-article-carousel__track scrollbar-hide"
             >
                 {% for article in displayedArticles %}
-                    <div class="flex-none w-[85%] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] snap-start">
-                        <div class="bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] rounded-[var(--border-imageRadius)] shadow-sm overflow-hidden h-full">
+                    <div class="iw-block-article-carousel__slide">
+                        <div class="iw-block-article-carousel__item {{ paragraphImageRadius|default('') }}">
                             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                                 article: article,
                                 imageRatio: '16/9',
                                 showDate: true,
                                 showExcerpt: true,
                                 showCategory: true,
-                                cardMode: true,
+                                cardImagePadded: hasImageRadius,
                             } only %}
                         </div>
                     </div>
@@ -70,7 +81,7 @@
             </div>
         </div>
     {% else %}
-        <p class="text-center text-[var(--color-secondary-500)] py-12">
+        <p class="iw-block-article-list__empty">
             {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
         </p>
     {% endif %}

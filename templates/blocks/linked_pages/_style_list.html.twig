@@ -1,4 +1,4 @@
-{# Linked pages block — vertical list #}
+{# Linked pages — vertical divider list #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -10,37 +10,47 @@
     } only %}
 
     {% if links is defined and links is iterable %}
-        <ul class="divide-y divide-[var(--list-border)] max-w-3xl"
-            style="--list-border: var(--variant-hr-color, var(--color-border, #e5e7eb));"
-        >
+        {# Capture the parent block index before entering the loop — `_key` may be
+           rebound to the sub-block index inside the loop scope. #}
+        {% set parentBlockKey = _key %}
+        {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        <ul class="iw-block-linked-pages iw-block-linked-pages--list">
             {% for link in links %}
-                {% if link.type == 'internal' and link.pages is defined %}
-                    {% for page in link.pages %}
-                        <li>
-                            <a href="{{ sulu_content_path(page.url|default('/')) }}" class="flex items-center justify-between py-4 hover:text-[var(--variant-link-hover,inherit)] transition-colors no-underline group">
-                                <span class="font-medium">{{ page.title|default('') }}</span>
-                                <svg class="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </a>
-                        </li>
-                    {% endfor %}
-                {% elseif link.type == 'external' %}
-                    {% set linkTarget = link.target|default('_self') %}
-                    {% set linkUrl = link.url|default('#') %}
-                    {% if link.anchor is defined and link.anchor is not empty %}
-                        {% set linkUrl = linkUrl ~ '#' ~ link.anchor %}
+                {% set linkView = linksView[loop.index0].link|default({}) %}
+                {% set linkUrl = link.link|default('') %}
+                {% if linkUrl is not empty %}
+                    {% set linkTarget = linkView.target|default('_self') %}
+                    {% set linkRel = linkView.rel|default('') %}
+                    {% set linkLabel = linkView.title|default('') %}
+                    {# Fallback: pull title from the linked page when not explicitly provided #}
+                    {% if linkLabel is empty and linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
+                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title'}) %}
+                        {% set linkLabel = linkedPage.title|default('') %}
                     {% endif %}
-                    <li>
+                    {# Fallback: pull the media title (or filename) when linking to a media asset #}
+                    {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
+                        {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
+                        {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                    {% endif %}
+                    {# Last-resort fallback: show the URL itself if no label could be resolved #}
+                    {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
+
+                    <li class="iw-block-linked-pages__list-item">
                         <a
                             href="{{ linkUrl }}"
-                            target="{{ linkTarget }}"
-                            {{ linkTarget == '_blank' ? 'rel="noopener noreferrer"' : '' }}
-                            class="flex items-center justify-between py-4 hover:text-[var(--variant-link-hover,inherit)] transition-colors no-underline group"
+                            {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+                            {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
+                            class="iw-block-linked-pages__list-link"
                         >
-                            <span class="font-medium">{{ link.label|default(link.url|default('')) }}</span>
+                            <span class="iw-block-linked-pages__list-label">{{ linkLabel }}</span>
                             {% if linkTarget == '_blank' %}
-                                <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <svg class="iw-block-linked-pages__list-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
                             {% else %}
-                                <svg class="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                <svg class="iw-block-linked-pages__list-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
                             {% endif %}
                         </a>
                     </li>
