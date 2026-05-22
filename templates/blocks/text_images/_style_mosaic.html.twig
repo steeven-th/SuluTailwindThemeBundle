@@ -35,7 +35,7 @@
 {% endif %}
 
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
-{% set bgAttr = (showBackground|default(true)) ? 'data-has-bg="true"' : '' %}
+{% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: only in exterior mode. #}
 {% set blockRadiusVal = blockRadius|default('') %}
@@ -69,7 +69,7 @@
             {# Text area — takes 1 column #}
             <div class="lg:col-span-1">
                 {% if text is defined and text is not empty %}
-                    <div class="block-text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                    <div class="iw-block__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                         {{ text|raw }}
                     </div>
                 {% endif %}

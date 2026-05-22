@@ -2,15 +2,17 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
-        title: title|default(''),
-        subTitle: subTitle|default(''),
-        titleAlignment: titleAlignment|default('left'),
-        variant: variant|default(0)
-    } only %}
+    <div class="iw-block-text iw-block-text--one-column">
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+            title: title|default(''),
+            subTitle: subTitle|default(''),
+            titleAlignment: titleAlignment|default('left'),
+            variant: variant|default(0)
+        } only %}
 
-    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
-        text: text|default(''),
-        paragraphImageRadius: resolvedParagraphRadius|default('')
-    } only %}
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
+            text: text|default(''),
+            paragraphImageRadius: resolvedParagraphRadius|default('')
+        } only %}
+    </div>
 {% endblock %}

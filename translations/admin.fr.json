@@ -4,6 +4,8 @@
     "iw_sulu_tailwind_theme.name": "Nom technique",
     "iw_sulu_tailwind_theme.name_info": "Identifiant unique du thème (ex: corporate, creative)",
     "iw_sulu_tailwind_theme.label": "Libellé",
+    "iw_sulu_tailwind_theme.link": "Lien",
+    "iw_sulu_tailwind_theme.excerpt": "Extrait",
     "iw_sulu_tailwind_theme.label_info": "Nom affiché dans l'interface d'administration",
     "iw_sulu_tailwind_theme.webspaces": "Webspaces",
     "iw_sulu_tailwind_theme.webspace_theme_info": "Sélectionnez le thème à utiliser pour ce webspace",

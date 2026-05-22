@@ -1,4 +1,4 @@
-{# Document block — grid of document cards #}
+{# Document block — multi-column grid of document cards #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -10,30 +10,30 @@
     } only %}
 
     {% if documents is defined and documents is iterable %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-             style="--card-border: var(--variant-hr-color, var(--color-border, #e5e7eb)); --card-bg: color-mix(in srgb, var(--card-border) 60%, transparent);"
-        >
+        <div class="iw-block-document iw-block-document--grid">
             {% for mediaId in documents %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                 <a
                     href="{{ media.url }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex flex-col items-center gap-3 p-6 {{ paragraphImageRadius|default('') }} border border-[var(--card-border)] bg-[var(--card-bg)] hover:shadow-lg transition-shadow no-underline group text-center"
+                    class="iw-document-card {{ paragraphImageRadius|default('') }}"
                     download
                 >
                     {# File type icon #}
-                    <div class="w-14 h-14 flex items-center justify-center {{ paragraphImageRadius|default('') }} bg-[var(--variant-link-color,var(--color-primary))]/10">
-                        <svg class="w-7 h-7 text-[var(--variant-link-color,var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="iw-document-card__icon-wrap {{ paragraphImageRadius|default('') }}">
+                        <svg class="iw-document-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
-                    <div>
-                        <span class="block block-title font-medium truncate group-hover:text-[var(--variant-link-color,var(--color-link))]">
+
+                    {# File info #}
+                    <div class="iw-document-card__info">
+                        <span class="iw-document-card__title">
                             {{ media.title|default(media.name|default('Document')) }}
                         </span>
                         {% if media.mimeType is defined %}
-                            <span class="text-xs text-[var(--variant-paragraph-color,inherit)] opacity-50 uppercase mt-1 block">
+                            <span class="iw-document-card__mime">
                                 {{ media.mimeType|split('/')|last }}
                             </span>
                         {% endif %}

@@ -7,60 +7,65 @@
 {% block article_hero %}{% endblock %}
 
 {% block article_header %}
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mt-8 mb-8">
-        {# Image left (40%) #}
-        {% if content.heroImage is defined and content.heroImage is not empty %}
-            {% set heroIds = content.heroImage %}
-            {% if heroIds is iterable %}
-                {% set heroId = heroIds|first %}
-            {% else %}
-                {% set heroId = heroIds %}
+    <header class="iw-article-page__header iw-article-page__header--inline">
+        <div class="iw-article-page__hero-inline">
+            {# Image left (40%) #}
+            {% if content.heroImage is defined and content.heroImage is not empty %}
+                {% set heroIds = content.heroImage %}
+                {% if heroIds is iterable %}
+                    {% set heroId = heroIds|first %}
+                {% else %}
+                    {% set heroId = heroIds %}
+                {% endif %}
+                {% if heroId %}
+                    {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
+                    <div class="iw-article-page__hero-inline-image">
+                        <img
+                            src="{{ heroMedia.thumbnails['iw_hero_md']|default(heroMedia.thumbnails['iw_theme_16_9']|default(heroMedia.url)) }}"
+                            alt="{{ heroMedia.title|default(content.title) }}"
+                            class="iw-article-page__hero-inline-image-img"
+                            loading="eager"
+                            itemprop="image"
+                        >
+                    </div>
+                {% endif %}
             {% endif %}
-            {% if heroId %}
-                {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
-                <div class="md:col-span-2 overflow-hidden rounded-[var(--border-imageRadius)]">
-                    <img src="{{ heroMedia.thumbnails['iw_hero_md']|default(heroMedia.thumbnails['iw_theme_16_9']|default(heroMedia.url)) }}"
-                         alt="{{ heroMedia.title|default(content.title) }}"
-                         class="w-full h-full object-cover"
-                         loading="eager" itemprop="image">
-                </div>
-            {% endif %}
-        {% endif %}
 
-        {# Title + meta right (60%) #}
-        <div class="md:col-span-3 flex flex-col justify-center">
-            {% if articleConfig.showCategories|iw_article_visible('page') %}
-                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
-                    categories: content.excerptCategories|default([]),
+            {# Title + meta right (60%) #}
+            <div class="iw-article-page__hero-inline-content">
+                {% if articleConfig.showCategories|iw_article_visible('page') %}
+                    {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
+                        categories: content.excerptCategories|default([]),
+                    } only %}
+                {% endif %}
+
+                <h1 class="iw-article-page__title" itemprop="headline">
+                    {{ content.title }}
+                </h1>
+
+                {% if content.subtitle is defined and content.subtitle is not empty %}
+                    <p class="iw-article-page__subtitle iw-article-page__subtitle--sm">
+                        {{ content.subtitle }}
+                    </p>
+                {% endif %}
+
+                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
+                    date: authored|default(null),
+                    authors: articleAuthors|default([]),
+                    showDate: articleConfig.showDates|iw_article_visible('page'),
+                    showAuthors: articleConfig.showAuthors|iw_article_visible('page'),
+                    showCategories: false,
                 } only %}
-            {% endif %}
-
-            <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mt-3 mb-4" itemprop="headline">
-                {{ content.title }}
-            </h1>
-
-            {% if content.subtitle is defined and content.subtitle is not empty %}
-                <p class="text-[var(--font-size-h5)] text-[var(--color-secondary-600)] leading-relaxed mb-4">
-                    {{ content.subtitle }}
-                </p>
-            {% endif %}
-
-            {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
-                date: authored|default(null),
-                authors: articleAuthors|default([]),
-                showDate: articleConfig.showDates|iw_article_visible('page'),
-                showAuthors: articleConfig.showAuthors|iw_article_visible('page'),
-                showCategories: false,
-            } only %}
+            </div>
         </div>
-    </div>
-    <hr class="mb-8 border-[var(--color-border)]">
+    </header>
+    <hr class="iw-article-page__separator">
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
 
 {% block article_footer %}
-    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
+    <footer class="iw-article-page__footer">
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}

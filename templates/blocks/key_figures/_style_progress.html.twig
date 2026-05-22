@@ -3,27 +3,24 @@
 
 {% block block_content %}
     {% if figures is defined and figures is iterable %}
-        <div class="max-w-3xl mx-auto space-y-6" data-controller="key-figures"
-             style="--progress-color: var(--variant-hr-color, var(--color-primary));"
-        >
+        <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--progress">
             {% for item in figures %}
                 {% if item.type|default('figure') == 'figure' %}
                     {% set percentage = item.number|default('0')|replace({',': '', '%': ''})|number_format(0) %}
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-semibold">{{ item.title|default('') }}</span>
-                            <span class="text-sm opacity-75" data-key-figures-target="counter" data-key-figures-end-value="{{ percentage }}%">0%</span>
+                    <div class="iw-key-figure iw-key-figure--progress">
+                        <div class="iw-key-figure__progress-header">
+                            <span class="iw-key-figure__progress-label">{{ item.title|default('') }}</span>
+                            <span class="iw-key-figure__progress-value" data-key-figures-target="counter" data-key-figures-end-value="{{ percentage }}%">0%</span>
                         </div>
-                        <div class="w-full h-3 bg-[var(--progress-color)]/10 rounded-full overflow-hidden">
+                        <div class="iw-key-figure__progress-track">
                             <div
                                 data-key-figures-target="progressBar"
                                 data-value="{{ percentage }}"
-                                class="h-full bg-[var(--progress-color)] rounded-full"
-                                style="width: 0%;"
+                                class="iw-key-figure__progress-bar"
                             ></div>
                         </div>
                         {% if item.subTitle is defined and item.subTitle is not empty %}
-                            <p class="block-subtitle text-sm opacity-60 mt-1">{{ item.subTitle }}</p>
+                            <p class="iw-key-figure__subtitle iw-block__subtitle">{{ item.subTitle }}</p>
                         {% endif %}
                     </div>
                 {% endif %}

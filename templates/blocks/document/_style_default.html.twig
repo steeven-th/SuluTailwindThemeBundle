@@ -1,4 +1,4 @@
-{# Document block — card list layout #}
+{# Document block — vertical card list layout #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -10,39 +10,37 @@
     } only %}
 
     {% if documents is defined and documents is iterable %}
-        <div class="space-y-3"
-             style="--card-border: var(--variant-hr-color, var(--color-border, #e5e7eb)); --card-bg: color-mix(in srgb, var(--card-border) 60%, transparent);"
-        >
+        <div class="iw-block-document iw-block-document--default">
             {% for mediaId in documents %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                 <a
                     href="{{ media.url }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="flex items-center gap-4 p-4 {{ paragraphImageRadius|default('') }} border border-[var(--card-border)] bg-[var(--card-bg)] hover:shadow-md transition-shadow no-underline group"
+                    class="iw-document-card {{ paragraphImageRadius|default('') }}"
                     download
                 >
                     {# File type icon #}
-                    <div class="flex-none w-10 h-10 flex items-center justify-center {{ paragraphImageRadius|default('') }} bg-[var(--variant-link-color,var(--color-primary))]/10">
-                        <svg class="w-5 h-5 text-[var(--variant-link-color,var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="iw-document-card__icon-wrap {{ paragraphImageRadius|default('') }}">
+                        <svg class="iw-document-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
 
                     {# File info #}
-                    <div class="flex-1 min-w-0">
-                        <span class="block block-title font-medium truncate group-hover:text-[var(--variant-link-color,var(--color-link))]">
+                    <div class="iw-document-card__info">
+                        <span class="iw-document-card__title">
                             {{ media.title|default(media.name|default('Document')) }}
                         </span>
                         {% if media.mimeType is defined %}
-                            <span class="text-xs text-[var(--variant-paragraph-color,inherit)] opacity-50 uppercase">
+                            <span class="iw-document-card__mime">
                                 {{ media.mimeType|split('/')|last }}
                             </span>
                         {% endif %}
                     </div>
 
                     {# Download arrow #}
-                    <svg class="flex-none w-5 h-5 text-[var(--variant-paragraph-color,inherit)] opacity-50 group-hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="iw-document-card__download" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
                 </a>

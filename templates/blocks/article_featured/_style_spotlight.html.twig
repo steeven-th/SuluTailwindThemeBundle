@@ -15,7 +15,7 @@
         {% set mainArticle = articleItems|first %}
         {% set secondaryArticles = articleItems|slice(1, 2) %}
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="iw-block-article-featured iw-block-article-featured--spotlight">
             {# ── Main article (left) — determines the row height ── #}
             {% set articleTitle = mainArticle.title|default('') %}
             {% set articleUrl = mainArticle.routePath|default(mainArticle.url|default('#')) %}
@@ -27,7 +27,7 @@
             {% set articleImage = mainArticle.excerptImages|default(mainArticle.excerpt.images|default(mainArticle.heroImage|default(null))) %}
             {% set articleCategories = mainArticle.excerptCategories|default(mainArticle.excerpt.categories|default([])) %}
 
-            <a href="{{ articleUrl }}" class="group block bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] rounded-[var(--border-imageRadius)] shadow-sm overflow-hidden">
+            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--main iw-featured-article-card--lg {{ paragraphImageRadius|default('') }}">
                 {% if articleImage is not empty %}
                     {% set imgMedia = null %}
                     {% if articleImage is iterable and articleImage|length > 0 %}
@@ -38,41 +38,40 @@
                     {% endif %}
 
                     {% if imgMedia %}
-                        <div class="overflow-hidden">
+                        <div class="iw-featured-article-card__image-wrap">
                             <img
                                 src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
                                 alt="{{ imgMedia.title|default(articleTitle) }}"
-                                class="w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                style="aspect-ratio: 16/9"
+                                class="iw-featured-article-card__image"
                                 loading="lazy"
                             >
                         </div>
                     {% endif %}
                 {% endif %}
 
-                <div class="p-5">
+                <div class="iw-featured-article-card__body">
                     {% if articleCategories is iterable and articleCategories|length > 0 %}
-                        <div class="mb-2">
+                        <div class="iw-featured-article-card__category-wrap">
                             {% for category in articleCategories|slice(0, 1) %}
-                                <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-[var(--border-radius)] bg-[var(--color-primary-100)] text-[var(--color-primary-700)]">
+                                <span class="iw-featured-article-card__category">
                                     {{ category.name|default(category.title|default('')) }}
                                 </span>
                             {% endfor %}
                         </div>
                     {% endif %}
 
-                    <h3 class="font-[var(--font-family-heading)] font-bold text-2xl leading-snug mb-3 text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
+                    <h3 class="iw-featured-article-card__title iw-featured-article-card__title--lg">
                         {{ articleTitle }}
                     </h3>
 
                     {% if articleExcerpt is not empty %}
-                        <p class="text-[var(--color-secondary-600)] line-clamp-3 mb-3">
+                        <p class="iw-featured-article-card__excerpt">
                             {{ articleExcerpt|striptags|trim }}
                         </p>
                     {% endif %}
 
                     {% if articleDate is not empty %}
-                        <time datetime="{{ articleDate|date('c') }}" class="text-sm text-[var(--color-secondary-500)]">
+                        <time datetime="{{ articleDate|date('c') }}" class="iw-featured-article-card__date">
                             {{ iw_sulu_tailwind_theme_format_date(articleDate, 'medium') }}
                         </time>
                     {% endif %}
@@ -81,7 +80,7 @@
 
             {# ── Secondary articles (right, horizontal cards splitting full height) ── #}
             {% if secondaryArticles|length > 0 %}
-                <div class="flex flex-col gap-8">
+                <div class="iw-block-article-featured__secondary-list">
                     {% for article in secondaryArticles %}
                         {% set secTitle = article.title|default('') %}
                         {% set secUrl = article.routePath|default(article.url|default('#')) %}
@@ -93,7 +92,7 @@
                         {% set secImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
                         {% set secCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
-                        <a href="{{ secUrl }}" class="group flex-1 flex bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] rounded-[var(--border-imageRadius)] shadow-sm overflow-hidden">
+                        <a href="{{ secUrl }}" class="iw-featured-article-card iw-featured-article-card--horizontal {{ paragraphImageRadius|default('') }}">
                             {# Image left — fills card height #}
                             {% if secImage is not empty %}
                                 {% set secImgMedia = null %}
@@ -105,11 +104,11 @@
                                 {% endif %}
 
                                 {% if secImgMedia %}
-                                    <div class="w-2/5 flex-shrink-0 overflow-hidden">
+                                    <div class="iw-featured-article-card__image-wrap iw-featured-article-card__image-wrap--horizontal">
                                         <img
                                             src="{{ secImgMedia.thumbnails['iw_theme_4_3']|default(secImgMedia.url) }}"
                                             alt="{{ secImgMedia.title|default(secTitle) }}"
-                                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            class="iw-featured-article-card__image iw-featured-article-card__image--horizontal"
                                             loading="lazy"
                                         >
                                     </div>
@@ -117,29 +116,29 @@
                             {% endif %}
 
                             {# Text right #}
-                            <div class="flex-1 min-w-0 p-4 flex flex-col justify-center">
+                            <div class="iw-featured-article-card__body iw-featured-article-card__body--horizontal">
                                 {% if secCategories is iterable and secCategories|length > 0 %}
-                                    <div class="mb-2">
+                                    <div class="iw-featured-article-card__category-wrap">
                                         {% for category in secCategories|slice(0, 1) %}
-                                            <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-[var(--border-radius)] bg-[var(--color-primary-100)] text-[var(--color-primary-700)]">
+                                            <span class="iw-featured-article-card__category">
                                                 {{ category.name|default(category.title|default('')) }}
                                             </span>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
 
-                                <h3 class="font-[var(--font-family-heading)] font-semibold text-lg leading-snug mb-2 text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
+                                <h3 class="iw-featured-article-card__title iw-featured-article-card__title--sm">
                                     {{ secTitle }}
                                 </h3>
 
                                 {% if secExcerpt is not empty %}
-                                    <p class="text-sm text-[var(--color-secondary-600)] line-clamp-3 mb-2">
+                                    <p class="iw-featured-article-card__excerpt iw-featured-article-card__excerpt--sm">
                                         {{ secExcerpt|striptags|trim }}
                                     </p>
                                 {% endif %}
 
                                 {% if secDate is not empty %}
-                                    <time datetime="{{ secDate|date('c') }}" class="text-xs text-[var(--color-secondary-500)]">
+                                    <time datetime="{{ secDate|date('c') }}" class="iw-featured-article-card__date iw-featured-article-card__date--xs">
                                         {{ iw_sulu_tailwind_theme_format_date(secDate, 'medium') }}
                                     </time>
                                 {% endif %}
@@ -150,7 +149,7 @@
             {% endif %}
         </div>
     {% else %}
-        <p class="text-center text-[var(--color-secondary-500)] py-12">
+        <p class="iw-block-article-list__empty">
             {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
         </p>
     {% endif %}

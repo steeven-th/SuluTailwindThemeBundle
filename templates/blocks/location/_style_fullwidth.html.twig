@@ -58,7 +58,7 @@
                 {% endif %}
 
                 {% if text is defined and text is not empty %}
-                    <div class="block-text prose max-w-none text-[var(--variant-paragraph-color,inherit)] {{ paragraphImageRadius|default('') }} overflow-hidden">
+                    <div class="iw-block__text prose max-w-none text-[var(--variant-paragraph-color,inherit)] {{ paragraphImageRadius|default('') }} overflow-hidden">
                         {{ text|raw }}
                     </div>
                 {% endif %}

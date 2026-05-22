@@ -489,33 +489,87 @@ export default class StylePicker extends React.Component {
     static blockStyles = {};
 
     /**
-     * Apply default value (first available style) when field is empty on mount.
-     * Uses setTimeout to ensure the Sulu form is fully initialized before
-     * calling onChange, which avoids race conditions with form state setup.
+     * Tracks whether the first-time default-value lookup has been performed
+     * for the current block type. Reset to `false` whenever the block type
+     * changes so the picker re-applies a default after a type switch.
      */
+    _defaultApplied = false;
+
+    /**
+     * Last detected block type. Used to detect type switches across renders
+     * (e.g. user changes the dropdown from "separator" to "text") so we can
+     * re-run the default lookup against the new style catalog.
+     */
+    _lastBlockType = null;
+
     componentDidMount() {
+        this.applyDefaultIfNeeded();
+    }
+
+    componentDidUpdate() {
+        // Retry on every re-render. The internal flags guarantee idempotence
+        // when nothing has actually changed and ensure a re-apply after a
+        // block type switch.
+        this.applyDefaultIfNeeded();
+    }
+
+    /**
+     * Apply the first available style as default when the field has no value,
+     * or when the stored value does not match any of the available styles
+     * for the current block type (e.g. a style key that was renamed/removed,
+     * or a stale style left over after a block type switch).
+     *
+     * Uses setTimeout to ensure the Sulu form has finished its own
+     * initialization before we call onChange, which avoids race conditions
+     * with form state setup.
+     */
+    applyDefaultIfNeeded() {
         const {value, onChange} = this.props;
-        if ((value === null || value === undefined || value === '') && onChange) {
-            const blockType = this.getBlockType();
-            const styles = StylePicker.blockStyles[blockType] || [];
-            if (styles.length > 0) {
-                setTimeout(() => onChange(styles[0].key), 0);
-            }
+        if (!onChange) return;
+
+        const blockType = this.getBlockType();
+        const styles = StylePicker.blockStyles[blockType] || [];
+        if (styles.length === 0) return;
+
+        // Reset the applied flag when the block type changes so the default
+        // is re-evaluated against the new style catalog.
+        if (blockType !== this._lastBlockType) {
+            this._defaultApplied = false;
+            this._lastBlockType = blockType;
+        }
+
+        if (this._defaultApplied) return;
+
+        const isValid = typeof value === 'string'
+            && styles.some((style) => style.key === value);
+
+        this._defaultApplied = true;
+        if (!isValid) {
+            setTimeout(() => onChange(styles[0].key), 0);
         }
     }
 
     /**
-     * Detect the block type from the form data or schema options.
+     * Detect the block type from the schema options or the form data.
      *
-     * Primary: reads the "type" field of the parent block via formInspector.
-     * Fallback: reads block_type from schemaOptions (XML params).
+     * Primary: reads block_type from schemaOptions (XML `<param name="block_type" ... />`).
+     * Always available at mount time, so it is the reliable source of truth.
+     *
+     * Fallback: reads the "type" field of the parent block via formInspector.
+     * Kept for safety when a host project consumes this picker without
+     * supplying the block_type schema option.
      *
      * @returns {string} The detected block type name
      */
     getBlockType() {
         const {formInspector, dataPath, schemaOptions} = this.props;
 
-        // Primary: detect from form data via formInspector
+        // Primary: XML schema option (always available at mount)
+        if (schemaOptions && schemaOptions.block_type && schemaOptions.block_type.value) {
+            return schemaOptions.block_type.value;
+        }
+
+        // Fallback: detect from form data via formInspector
         // dataPath is e.g. "/blocks/0/style" → parent block is "/blocks/0"
         if (formInspector && dataPath) {
             const pathParts = dataPath.split('/');
@@ -530,11 +584,6 @@ export default class StylePicker extends React.Component {
             } catch (e) {
                 // formInspector may throw if path is invalid
             }
-        }
-
-        // Fallback: read from XML schema options
-        if (schemaOptions && schemaOptions.block_type && schemaOptions.block_type.value) {
-            return schemaOptions.block_type.value;
         }
 
         return 'default';

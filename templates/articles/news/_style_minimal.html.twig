@@ -7,7 +7,7 @@
 {% block article_hero %}{% endblock %}
 
 {% block article_header %}
-    <header class="iw-article-page__header mt-12 mb-8 max-w-3xl mx-auto">
+    <header class="iw-article-page__header iw-article-page__header--centered">
         {% if articleConfig.showBreadcrumbs|iw_article_visible('page') %}
             {% include '@ItechWorldSuluTailwindTheme/articles/common/_breadcrumbs.html.twig' with {
                 items: breadcrumb|default([]),
@@ -24,23 +24,23 @@
             compact: true,
         } only %}
 
-        <h1 class="font-[var(--font-family-heading)] text-4xl md:text-5xl font-[var(--font-h1-weight)] leading-tight mt-4 mb-4" itemprop="headline">
+        <h1 class="iw-article-page__title iw-article-page__title--minimal" itemprop="headline">
             {{ content.title }}
         </h1>
 
         {% if content.subtitle is defined and content.subtitle is not empty %}
-            <p class="text-xl text-[var(--color-secondary-500)] leading-relaxed">
+            <p class="iw-article-page__subtitle iw-article-page__subtitle--lg">
                 {{ content.subtitle }}
             </p>
         {% endif %}
     </header>
-    <hr class="mb-8 border-[var(--color-border)] max-w-3xl mx-auto">
+    <hr class="iw-article-page__separator iw-article-page__separator--centered">
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
 
 {% block article_footer %}
-    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
+    <footer class="iw-article-page__footer">
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}

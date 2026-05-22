@@ -38,6 +38,7 @@
                     </meta>
                     <params>
                         <param name="provider" value="articles"/>
+                        <param name="max_per_page" value="6"/>
                         <param name="properties" type="collection">
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>

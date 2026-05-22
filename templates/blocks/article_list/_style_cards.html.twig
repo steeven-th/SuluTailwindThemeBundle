@@ -12,31 +12,36 @@
     {% set articleItems = articles|default([]) %}
     {% set maxCount = articlesCount|default(6) %}
 
+    {# Image collides with the item edges when no inner radius is requested,
+       otherwise the L4 card pads the image with its own radius inside. #}
+    {% set hasImageRadius = paragraphImageRadius|default('') is not empty and paragraphImageRadius != 'rounded-none' %}
+
     {% if articleItems is iterable and articleItems|length > 0 %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="iw-block-article-list iw-block-article-list--cards">
             {% for article in articleItems|slice(0, maxCount) %}
-                <div class="bg-[var(--variant-paragraph-bg,var(--variant-subtle-bg))] rounded-[var(--border-imageRadius)] shadow-sm overflow-hidden">
+                <div class="iw-block-article-list__item {{ paragraphImageRadius|default('') }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
                         imageRatio: '16/9',
                         showDate: true,
                         showExcerpt: true,
                         showCategory: true,
-                        cardMode: true,
+                        cardImagePadded: hasImageRadius,
                     } only %}
                 </div>
             {% endfor %}
         </div>
 
         {% if showPagination is defined and showPagination %}
+            {% set articlesView = view.blocks[_key].articles|default({}) %}
             {% include '@ItechWorldSuluTailwindTheme/articles/common/_pagination.html.twig' with {
-                currentPage: articles.page|default(1),
-                totalPages: articles.pages|default(1),
+                currentPage: articlesView.page|default(1),
+                totalPages: articlesView.maxPage|default(1),
                 baseUrl: app.request.pathInfo,
             } only %}
         {% endif %}
     {% else %}
-        <p class="text-center text-[var(--color-secondary-500)] py-12">
+        <p class="iw-block-article-list__empty">
             {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
         </p>
     {% endif %}
