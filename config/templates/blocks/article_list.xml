@@ -38,7 +38,6 @@
                     </meta>
                     <params>
                         <param name="provider" value="articles"/>
-                        <param name="max_per_page" value="6"/>
                         <param name="properties" type="collection">
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
@@ -52,20 +51,6 @@
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>
                     </params>
-                </property>
-                <property name="articlesCount" type="number" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.block.article_list.count</title>
-                        <info_text>iw_sulu_tailwind_theme.block.article_list.count_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="6"/>
-                        <param name="min" value="1"/>
-                        <param name="max" value="24"/>
-                    </params>
-                </property>
-                <property name="showPagination" type="checkbox" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.block.article_list.show_pagination</title></meta>
                 </property>
             </properties>
         </section>

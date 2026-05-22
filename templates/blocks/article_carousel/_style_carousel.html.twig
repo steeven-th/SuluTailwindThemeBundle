@@ -10,7 +10,6 @@
     } only %}
 
     {% set articleItems = articles|default([]) %}
-    {% set maxCount = articlesCount|default(6) %}
     {% set isAutoplay = autoplay is defined ? autoplay : false %}
     {% set autoplayInterval = interval|default(5000) %}
 
@@ -27,7 +26,7 @@
     {% set carouselButtonStyle = variantConfig.buttonStyle|default('primary') %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
-        {% set displayedArticles = articleItems|slice(0, maxCount) %}
+        {% set displayedArticles = articleItems %}
 
         <div
             data-controller="slider"

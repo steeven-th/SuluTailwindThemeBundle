@@ -10,7 +10,6 @@
     } only %}
 
     {% set articleItems = articles|default([]) %}
-    {% set maxCount = articlesCount|default(6) %}
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}
@@ -18,7 +17,7 @@
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         <div class="iw-block-article-list iw-block-article-list--list">
-            {% for article in articleItems|slice(0, maxCount) %}
+            {% for article in articleItems %}
                 <div class="iw-block-article-list__item {{ paragraphImageRadius|default('') }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
@@ -33,14 +32,6 @@
             {% endfor %}
         </div>
 
-        {% if showPagination is defined and showPagination %}
-            {% set articlesView = view.blocks[_key].articles|default({}) %}
-            {% include '@ItechWorldSuluTailwindTheme/articles/common/_pagination.html.twig' with {
-                currentPage: articlesView.page|default(1),
-                totalPages: articlesView.maxPage|default(1),
-                baseUrl: app.request.pathInfo,
-            } only %}
-        {% endif %}
     {% else %}
         <p class="iw-block-article-list__empty">
             {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
