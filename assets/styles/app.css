@@ -2327,43 +2327,74 @@ section.block:has([data-slider-fullbleed-value]) {
     opacity: var(--iw-block-form-map-address-opacity, 0.9);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Location Overlay — Collapsible info card
-   Floats over the map on desktop, full-width bottom sheet on mobile.
-   Header always on top, body below with capped scroll on desktop.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* ─── Block: location ──────────────────────────────────────────────────── */
+/* Four layout modifiers:
+   - --map-only: just the OpenStreetMap iframe.
+   - --fullwidth: map + info column (title, address card, optional text,
+     "open in maps" link) stacked below.
+   - --map-with-info: map (2 columns) + info column (1 column) side by side
+     on lg+.
+   - --overlay: map full width with a floating collapsible info card on
+     desktop, full-width bottom sheet on mobile (driven by the
+     `location-overlay` Stimulus controller).
 
-.iw-location-card {
+   The OSM embed is the same across modes; only the surrounding layout
+   differs. The address card and the info column expose their colors via
+   custom properties that fall back to the active variant. */
+
+.iw-block-location {
+    /* Hook only — no default styling. */
+}
+
+/* Address card shared by --fullwidth and --map-with-info. The default
+   background is the variant's paragraph-bg (the admin-configured token
+   designed to host paragraph-colored text), with the auto-computed
+   subtle-bg as fallback when paragraph-bg is `transparent`. The border
+   still derives from hr-color, which is the canonical "thin separator"
+   token in the variant. Both are overridable via custom properties for
+   downstream theming. */
+.iw-block-location__address {
+    border: 1px solid var(--iw-block-location-info-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-block-location-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-block-location-info-color, var(--iw-variant-paragraph-color, inherit));
+}
+
+/* ── --overlay: floating collapsible info card ──
+   Floats over the map on desktop, full-width bottom sheet on mobile.
+   Header always on top, body below with capped scroll on desktop. */
+.iw-block-location__card {
     position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: min(22rem, calc(100% - 3rem));
+    bottom: var(--iw-block-location-card-offset, 1.5rem);
+    right: var(--iw-block-location-card-offset, 1.5rem);
+    width: min(var(--iw-block-location-card-width, 22rem), calc(100% - 3rem));
     z-index: 20;
     display: flex;
     flex-direction: column;
-    border-radius: var(--radius-img, 0.5rem);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: #000;
+    border-radius: var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
+    box-shadow: var(--iw-block-location-card-shadow, 0 8px 32px rgba(0, 0, 0, 0.18));
+    backdrop-filter: blur(var(--iw-block-location-card-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--iw-block-location-card-blur, 12px));
+    color: var(--iw-block-location-card-color, #000);
 }
 
-/* Force black text on all children — overrides per-variant rules like .iw-variant--* p */
-.iw-location-card p,
-.iw-location-card span,
-.iw-location-card a:not(.iw-button--variant),
-.iw-location-card li,
-.iw-location-card h1,
-.iw-location-card h2,
-.iw-location-card h3,
-.iw-location-card h4,
-.iw-location-card h5,
-.iw-location-card h6 {
-    color: #000;
+/* Force the card text color on all children — overrides per-variant rules
+   like .iw-variant--* p so the overlay reads correctly against the blurred
+   map even when the variant uses a contrasted palette. */
+.iw-block-location__card p,
+.iw-block-location__card span,
+.iw-block-location__card a:not(.iw-button--variant),
+.iw-block-location__card li,
+.iw-block-location__card h1,
+.iw-block-location__card h2,
+.iw-block-location__card h3,
+.iw-block-location__card h4,
+.iw-block-location__card h5,
+.iw-block-location__card h6 {
+    color: var(--iw-block-location-card-color, #000);
 }
 
-/* ── Header (always visible, always on top) ── */
-.iw-location-card__header {
+/* Header (always visible, always on top) */
+.iw-block-location__card-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -2379,11 +2410,11 @@ section.block:has([data-slider-fullbleed-value]) {
     border-radius: inherit;
 }
 
-.iw-location-card__header:hover {
-    background: rgba(0, 0, 0, 0.04);
+.iw-block-location__card-header:hover {
+    background: var(--iw-block-location-card-header-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
-.iw-location-card__header-content {
+.iw-block-location__card-header-content {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -2391,18 +2422,18 @@ section.block:has([data-slider-fullbleed-value]) {
     gap: 0.125rem;
 }
 
-/* ── Chevron ── */
-.iw-location-card__chevron {
+/* Chevron */
+.iw-block-location__card-chevron {
     width: 1.25rem;
     height: 1.25rem;
     flex-shrink: 0;
     transition: transform 0.3s ease;
-    color: black;
+    color: var(--iw-block-location-card-color, black);
     opacity: 0.5;
 }
 
-/* ── Body (collapsible) ── */
-.iw-location-card__body {
+/* Body (collapsible) */
+.iw-block-location__card-body {
     padding: 0 1rem 1rem;
     display: flex;
     flex-direction: column;
@@ -2415,45 +2446,45 @@ section.block:has([data-slider-fullbleed-value]) {
     scrollbar-width: none;
 }
 
-.iw-location-card__body::-webkit-scrollbar {
+.iw-block-location__card-body::-webkit-scrollbar {
     display: none;
 }
 
 /* Subtle separator between header and body */
-.iw-location-card__body::before {
+.iw-block-location__card-body::before {
     content: '';
     display: block;
     flex-shrink: 0;
     height: 1px;
-    background: rgba(0, 0, 0, 0.15);
+    background: var(--iw-block-location-card-divider, rgba(0, 0, 0, 0.15));
     opacity: 0.5;
 }
 
-/* ── Scroll hint arrow ── */
-.iw-location-card__scroll-hint {
+/* Scroll hint arrow */
+.iw-block-location__card-scroll-hint {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0.25rem 0 0.5rem;
     cursor: pointer;
-    color: black;
+    color: var(--iw-block-location-card-color, black);
     opacity: 0;
     transition: opacity 0.25s ease;
     pointer-events: none;
 }
 
-.iw-location-card__scroll-hint svg {
-    animation: iw-location-card-bounce 1.5s ease-in-out infinite;
+.iw-block-location__card-scroll-hint svg {
+    animation: iw-block-location-card-bounce 1.5s ease-in-out infinite;
 }
 
-@keyframes iw-location-card-bounce {
+@keyframes iw-block-location-card-bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(4px); }
 }
 
-/* ── Responsive: mobile ── */
+/* Responsive: mobile bottom-sheet */
 @media (max-width: 768px) {
-    .iw-location-card {
+    .iw-block-location__card {
         position: relative;
         bottom: auto;
         right: auto;
@@ -2466,31 +2497,31 @@ section.block:has([data-slider-fullbleed-value]) {
     }
 
     /* White solid background on mobile — no blur */
-    .iw-location-card__header {
-        background: #fff;
-        border-radius: 0 0 var(--radius-img, 0.5rem) var(--radius-img, 0.5rem);
+    .iw-block-location__card-header {
+        background: var(--iw-block-location-card-bg-mobile, #fff);
+        border-radius: 0 0 var(--iw-block-location-card-radius, var(--radius-img, 0.5rem)) var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
     }
 
     /* Lose bottom radius when open */
-    .iw-location-card__header[aria-expanded="true"] {
+    .iw-block-location__card-header[aria-expanded="true"] {
         border-radius: 0;
     }
 
-    .iw-location-card__body {
+    .iw-block-location__card-body {
         max-height: none;
         overflow-y: visible;
-        background: #fff;
+        background: var(--iw-block-location-card-bg-mobile, #fff);
         margin-top: -1px;
-        border-radius: 0 0 var(--radius-img, 0.5rem) var(--radius-img, 0.5rem);
+        border-radius: 0 0 var(--iw-block-location-card-radius, var(--radius-img, 0.5rem)) var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
     }
 
     /* No separator on mobile */
-    .iw-location-card__body::before {
+    .iw-block-location__card-body::before {
         display: none;
     }
 
     /* Hide scroll hint on mobile */
-    .iw-location-card__scroll-hint {
+    .iw-block-location__card-scroll-hint {
         display: none;
     }
 }
