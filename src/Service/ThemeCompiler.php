@@ -1747,7 +1747,7 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-title-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".iw-variant--{$index} .block-subtitle {\n";
+            $css .= ".iw-variant--{$index} .iw-block__subtitle {\n";
             $css .= "  color: var(--iw-variant-subtitle-color, inherit);\n";
             $css .= "}\n";
 
@@ -1768,9 +1768,9 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-list-color, inherit);\n";
             $css .= "}\n";
 
-            // List bottom margin inside block-text
-            $css .= ".iw-variant--{$index} .block-text ul,\n";
-            $css .= ".iw-variant--{$index} .block-text ol {\n";
+            // List bottom margin inside iw-block__text
+            $css .= ".iw-variant--{$index} .iw-block__text ul,\n";
+            $css .= ".iw-variant--{$index} .iw-block__text ol {\n";
             $css .= "  margin-bottom: 1em;\n";
             $css .= "}\n";
 
@@ -1866,23 +1866,24 @@ class ThemeCompiler
             // No visible paragraphBg → no background, no padding, no margin.
             $pgBg = $this->resolveColorValue(trim($props['paragraphBg'] ?? ''));
             if ($pgBg !== '' && strtolower($pgBg) !== 'transparent') {
-                $css .= ".iw-variant--{$index} .block-text {\n";
+                $css .= ".iw-variant--{$index} .iw-block__text {\n";
                 $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
                 $css .= "  padding: 1rem 1.5rem;\n";
                 $css .= "  margin-block: 1rem;\n";
                 $css .= "  overflow: hidden;\n";
                 $css .= "}\n";
-                // Remove bottom margin when block-text is the last child
+                // Remove bottom margin when iw-block__text is the last child
                 // to prevent it from stacking with the section's padding-bottom
                 // or overflowing when pb is 0.
-                $css .= ".iw-variant--{$index} .block-text:last-child {\n";
+                $css .= ".iw-variant--{$index} .iw-block__text:last-child {\n";
                 $css .= "  margin-bottom: 0;\n";
                 $css .= "}\n";
-                // Hide the dark overlay on background images when paragraph has its own bg
-                $css .= ".iw-variant--{$index} .block-bg-overlay {\n";
-                $css .= "  display: none;\n";
-                $css .= "}\n";
             }
+            // Note: the dark overlay on background images is now kept visible
+            // for every variant (including those with their own paragraphBg) so
+            // that text legibility on the underlying image stays consistent
+            // across variants. The variant's paragraphBg layers on top of the
+            // overlay where it applies.
 
             $css .= "\n";
         }

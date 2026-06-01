@@ -72,16 +72,46 @@
     {% endif %}
 {% endif %}
 
+{# Image wrap: by default the fullwidth image is edge-to-edge. It gets a
+   margin (lateral + matching top/bottom according to imageBottom) in two cases:
+     - the admin configured a real paragraphImageRadius (anything other than
+       `rounded-none` — otherwise the rounded corners wouldn't be visible
+       against the section edges);
+     - the admin enabled the `imagePadding` toggle manually.
+   When both conditions are off, the wrap is skipped and the image stays
+   edge-to-edge. Lateral margin reuses paddingLateral (fallback mx-4),
+   vertical margin reuses paddingTop / paddingBottom (fallback mt-4 / mb-4).
+
+   NOTE: `paragraphImageRadius` defaults to the literal string `rounded-none`
+   from the XML radius selector (it's not empty), so a plain `radius is not
+   empty` check would always wrap. We explicitly exclude `rounded-none`. #}
+{% set hasRealRadius = radius is not empty and radius != 'rounded-none' %}
+{% set hasImagePadding = imagePadding|default(false) %}
+{% set applyImageWrap = hasRealRadius or hasImagePadding %}
+{% if applyImageWrap %}
+    {% set imgMarginX = hasLatPad ? paddingLateral|replace({'px-': 'mx-'}) : 'mx-4' %}
+    {% if isBottom %}
+        {% set imgMarginV = hasBotPad ? paddingBottom|replace({'pb-': 'mb-'}) : 'mb-4' %}
+    {% else %}
+        {% set imgMarginV = hasTopPad ? paddingTop|replace({'pt-': 'mt-'}) : 'mt-4' %}
+    {% endif %}
+    {% set imageWrapClass = imgMarginX ~ ' ' ~ imgMarginV ~ (hasRealRadius ? ' ' ~ radius ~ ' overflow-hidden' : '') %}
+{% else %}
+    {% set imageWrapClass = '' %}
+{% endif %}
+
 {# ── Section: no padding, image fills edge-to-edge ────────────────────────── #}
 {# Image NEVER has its own radius — it follows the section edges.
    In exterior mode the section's overflow-hidden + blockRadius handle rounding. #}
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--fullwidth iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ isBottom ? 'bottom' : 'top' }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
     {% if not isBottom %}
-        {# Image first — edge-to-edge, no radius (follows section edges) #}
+        {# Image first — edge-to-edge by default, framed with margin + radius
+           when paragraphImageRadius is configured. #}
+        {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
             images: images|default([]),
             imageFormat: format,
@@ -89,10 +119,11 @@
             autoplay: true,
             aspectRatio: ratio
         } only %}
+        {% if imageWrapClass %}</div>{% endif %}
     {% endif %}
 
     {# Content: titles + paragraph with padding #}
-    <div class="{{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+    <div class="iw-block-text-images__content {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
         {% if lateralMode == 'interior' %}
         <div class="container mx-auto">
         {% endif %}
@@ -125,7 +156,9 @@
     </div>
 
     {% if isBottom %}
-        {# Image last — edge-to-edge, no radius (follows section edges) #}
+        {# Image last — edge-to-edge by default, framed with margin + radius
+           when paragraphImageRadius is configured. #}
+        {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
             images: images|default([]),
             imageFormat: format,
@@ -133,5 +166,6 @@
             autoplay: true,
             aspectRatio: ratio
         } only %}
+        {% if imageWrapClass %}</div>{% endif %}
     {% endif %}
 </section>

@@ -66,7 +66,7 @@
 
 {# ── Section: no padding, image fills edge-to-edge ────────────────────────── #}
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--overlay iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
@@ -76,7 +76,7 @@
             src="{{ bgImageUrl }}"
             alt=""
             loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover"
+            class="iw-block-text-images__image absolute inset-0 w-full h-full object-cover"
         >
     {% endif %}
 
@@ -86,18 +86,18 @@
     {# Overlay — below lg: uniform dark cover (content spans full width).
        From lg: directional gradient, dark on the text side, transparent on the image side. #}
     {% set gradientDir = isRight ? 'to left' : 'to right' %}
-    <div class="block-bg-overlay absolute inset-0 bg-black/60 lg:hidden"></div>
+    <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--mobile absolute inset-0 bg-black/60 lg:hidden"></div>
     <div
-        class="block-bg-overlay absolute inset-0 hidden lg:block"
+        class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--gradient absolute inset-0 hidden lg:block"
         style="background: linear-gradient({{ gradientDir }}, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, transparent 100%);"
     ></div>
 
     {# Content — gets the section padding, container wraps only the text #}
-    <div class="relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+    <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
         {% if lateralMode == 'interior' %}
         <div class="container mx-auto">
         {% endif %}
-            <div class="min-h-[300px] md:min-h-[400px] flex items-center{{ isRight ? ' lg:justify-end' : '' }}">
+            <div class="iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex items-center{{ isRight ? ' lg:justify-end' : '' }}">
                 <div class="lg:max-w-2xl text-white">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),
@@ -107,7 +107,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text prose prose-invert max-w-none{% if hasParagraphBg and radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg and radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

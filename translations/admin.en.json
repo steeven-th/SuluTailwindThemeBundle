@@ -620,5 +620,7 @@
     "iw_sulu_tailwind_theme.parallax_intensity_subtle": "Subtle",
     "iw_sulu_tailwind_theme.parallax_intensity_medium": "Medium",
     "iw_sulu_tailwind_theme.parallax_intensity_strong": "Strong",
-    "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extreme"
+    "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extreme",
+    "iw_sulu_tailwind_theme.image_padding": "Margin around the image",
+    "iw_sulu_tailwind_theme.image_padding_info": "The margin is applied automatically when an image radius is configured (so the rounded corners stay visible)."
 }

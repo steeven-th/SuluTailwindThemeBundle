@@ -51,7 +51,7 @@
 
 {# ── Section: image as full background, content overlaid ──────────────────── #}
 <section
-    class="block {{ variantClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--hero-banner {{ variantClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
     {{ bgAttr|raw }}
 >
     {# Background image — covers the entire section #}
@@ -60,17 +60,17 @@
             src="{{ heroImageUrl }}"
             alt="{{ heroImageAlt }}"
             loading="lazy"
-            class="absolute inset-0 w-full h-full object-cover"
+            class="iw-block-text-images__image absolute inset-0 w-full h-full object-cover"
         >
     {% endif %}
 
     {# Uniform dark overlay for text readability (content is always centered) #}
-    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="iw-block-text-images__bg-overlay absolute inset-0 bg-black/60"></div>
 
     {# Content — centered over the image, always interior container #}
-    <div class="relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+    <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
         <div class="container mx-auto">
-            <div class="min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white">
+            <div class="iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white">
                 <div class="max-w-4xl mx-auto">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),
@@ -80,7 +80,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text prose prose-invert prose-lg max-w-2xl mx-auto{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert prose-lg max-w-2xl mx-auto{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

@@ -62,15 +62,15 @@
 
 {# ── Section: no padding, image fills its half edge-to-edge ───────────────── #}
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--split-screen iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    <div class="grid grid-cols-1 lg:grid-cols-2">
+    <div class="iw-block-text-images__grid grid grid-cols-1 lg:grid-cols-2">
         {# Image side — full-height cover with slider support.
            Custom rendering (not _image_slider partial) because images must fill
            the full grid cell height with no aspect-ratio constraint. #}
-        <div class="{{ isRight ? 'lg:order-2' : 'lg:order-1' }} relative min-h-[300px] lg:min-h-[400px]"
+        <div class="iw-block-text-images__image-side {{ isRight ? 'lg:order-2' : 'lg:order-1' }} relative min-h-[300px] lg:min-h-[400px]"
             {% if resolvedImages|length > 1 %}
                 data-controller="slider"
                 data-slider-mode-value="carousel"
@@ -153,7 +153,7 @@
         </div>
 
         {# Text side — vertically centered with padding, max-w to keep lines readable on wide screens #}
-        <div class="{{ isRight ? 'lg:order-1' : 'lg:order-2' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+        <div class="iw-block-text-images__content {{ isRight ? 'lg:order-1' : 'lg:order-2' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
             <div class="w-full max-w-2xl{{ isRight ? ' ml-auto' : '' }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                     title: title|default(''),
@@ -163,7 +163,7 @@
                 } only %}
 
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                    <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                         {{ text|raw }}
                     </div>
                 {% endif %}
