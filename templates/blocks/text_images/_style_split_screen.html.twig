@@ -36,6 +36,13 @@
 {# Content position: contentRight = true → text right, image left (default: text left, image right) #}
 {% set isRight = contentRight|default(false) %}
 
+{# Mobile image position: drives the DOM stacking order on `<lg` so the
+   editor can choose whether the image sits above or below the text on
+   mobile, independently from the desktop left/right placement. #}
+{% set mobilePos = mobileImagePosition|default('top') %}
+{% set imageMobileOrder = mobilePos == 'top' ? 'order-1' : 'order-2' %}
+{% set contentMobileOrder = mobilePos == 'top' ? 'order-2' : 'order-1' %}
+
 {# ── Padding for content area only ────────────────────────────────────────── #}
 {# Content must ALWAYS have padding so text never touches the edges.
    If a value is undefined, null, empty or explicitly 0 → force default. #}
@@ -70,7 +77,7 @@
         {# Image side — full-height cover with slider support.
            Custom rendering (not _image_slider partial) because images must fill
            the full grid cell height with no aspect-ratio constraint. #}
-        <div class="iw-block-text-images__image-side {{ isRight ? 'lg:order-2' : 'lg:order-1' }} relative min-h-[300px] lg:min-h-[400px]"
+        <div class="iw-block-text-images__image-side {{ imageMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} relative min-h-[300px] lg:min-h-[400px]"
             {% if resolvedImages|length > 1 %}
                 data-controller="slider"
                 data-slider-mode-value="carousel"
@@ -153,7 +160,7 @@
         </div>
 
         {# Text side — vertically centered with padding, max-w to keep lines readable on wide screens #}
-        <div class="iw-block-text-images__content {{ isRight ? 'lg:order-1' : 'lg:order-2' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+        <div class="iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-1' : 'lg:order-2' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
             <div class="w-full max-w-2xl{{ isRight ? ' ml-auto' : '' }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                     title: title|default(''),

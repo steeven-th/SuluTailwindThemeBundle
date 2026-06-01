@@ -69,6 +69,23 @@
                         </param>
                     </params>
                 </property>
+                <!-- Classic (left/right) + Split-screen: mobile-only image position
+                     (desktop position is driven by imagePosition / contentRight) -->
+                <property name="mobileImagePosition" type="single_select"
+                          visibleCondition="(__parent.style == 'classic' AND (__parent.imagePosition == 'left' OR __parent.imagePosition == 'right')) OR __parent.style == 'split_screen'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.mobile_image_position</title>
+                        <info_text>iw_sulu_tailwind_theme.mobile_image_position_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="top"/>
+                        <param name="values" type="collection">
+                            <param name="top"><meta><title>iw_sulu_tailwind_theme.position_top</title></meta></param>
+                            <param name="bottom"><meta><title>iw_sulu_tailwind_theme.position_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- Mosaic: choose where the mosaic sits relative to the text -->
                 <property name="mosaicImagePosition" type="single_select"
                           visibleCondition="__parent.style == 'mosaic'">

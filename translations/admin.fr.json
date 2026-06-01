@@ -713,5 +713,7 @@
     "iw_sulu_tailwind_theme.parallax_intensity_strong": "Forte",
     "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extrême",
     "iw_sulu_tailwind_theme.image_padding": "Marge autour de l'image",
-    "iw_sulu_tailwind_theme.image_padding_info": "La marge est appliquée automatiquement quand un radius d'image est configuré (pour que les coins arrondis soient visibles)."
+    "iw_sulu_tailwind_theme.image_padding_info": "La marge est appliquée automatiquement quand un radius d'image est configuré (pour que les coins arrondis soient visibles).",
+    "iw_sulu_tailwind_theme.mobile_image_position": "Position de l'image sur mobile",
+    "iw_sulu_tailwind_theme.mobile_image_position_info": "Sur grand écran, la position est définie par les réglages 'Position de l'image' / 'Contenu à droite'."
 }

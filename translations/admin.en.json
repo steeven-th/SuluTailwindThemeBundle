@@ -622,5 +622,7 @@
     "iw_sulu_tailwind_theme.parallax_intensity_strong": "Strong",
     "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extreme",
     "iw_sulu_tailwind_theme.image_padding": "Margin around the image",
-    "iw_sulu_tailwind_theme.image_padding_info": "The margin is applied automatically when an image radius is configured (so the rounded corners stay visible)."
+    "iw_sulu_tailwind_theme.image_padding_info": "The margin is applied automatically when an image radius is configured (so the rounded corners stay visible).",
+    "iw_sulu_tailwind_theme.mobile_image_position": "Image position on mobile",
+    "iw_sulu_tailwind_theme.mobile_image_position_info": "On larger screens the position is controlled by the 'Image position' / 'Content on the right' settings."
 }
