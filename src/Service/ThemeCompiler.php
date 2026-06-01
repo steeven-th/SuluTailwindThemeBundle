@@ -1725,11 +1725,15 @@ class ThemeCompiler
 
             $css .= "}\n";
 
-            // Block background only visible when showBackground is checked (data-has-bg)
+            // Block background only visible when showBackground is checked (data-has-bg).
+            // The resolved color is ALSO published as `--iw-variant-block-bg` so that nested
+            // components (e.g. fullbleed banners, hero sections) can mirror the variant
+            // background without re-implementing the resolution logic.
             if (!empty($props['blockBg'])) {
                 $resolvedBlockBg = $this->resolveColorValue((string) $props['blockBg']);
                 $css .= ".iw-variant--{$index}[data-has-bg=\"true\"] {\n";
                 $css .= "  background-color: {$resolvedBlockBg};\n";
+                $css .= "  --iw-variant-block-bg: {$resolvedBlockBg};\n";
                 $css .= "}\n";
             }
 

@@ -16,7 +16,7 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 |-------|------|
 | `.iw-block-cta` | Root wrapper. Posed on the first `<div>` inside the block section. |
 | `.iw-block-cta--centered` | Default layout: title + subtitle + text + actions, all aligned per `titleAlignment`. |
-| `.iw-block-cta--banner` | Fullbleed banner that breaks out of the section padding and container to span the full viewport width. Hosts an optional background image + dark overlay; falls back to `var(--color-primary)` when no image is set. Text is forced to white. |
+| `.iw-block-cta--banner` | Fullbleed hero banner that breaks out of the section padding and container to span the full viewport width. Uses XXL typography (`text-4xl` → `text-7xl`), generous vertical padding (`py-16` → `py-24`), centered content (`max-w-2xl mx-auto`), and white text on a dark background. Background color inherits from the active variant (`--iw-variant-block-bg`) with `--color-primary` as fallback; an optional background image with dark overlay sits on top. The `lateralMargins` / `paddingLateral` / `paddingTop` / `paddingBottom` / `blockRadius` / `paragraphImageRadius` admin fields are hidden in this mode because the hero owns its layout. |
 | `.iw-block-cta--split` | Two-column grid (`grid-cols-1 lg:grid-cols-2`): content + image. The `contentRight` block setting flips the columns on desktop (image first on the source order, image left/right on the rendered layout). |
 
 ### Elements
@@ -42,6 +42,7 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
+| `--iw-block-cta-banner-bg` | `var(--iw-variant-block-bg, var(--color-primary))` | Background color of the fullbleed banner. Cascades from the active variant when `showBackground` is on; falls back to `--color-primary`. |
 | `--iw-block-cta-overlay-color` | `rgb(0 0 0 / 0.5)` | Color of the dark overlay above the background image in `--banner`. |
 | `--iw-block-cta-background-position` | `center` | `object-position` of the background image in `--banner`. |
 | `--iw-block-cta-actions-gap` | `1rem` | Gap between the primary and secondary buttons. |

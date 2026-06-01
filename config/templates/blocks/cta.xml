@@ -53,7 +53,7 @@
                     <meta><title>iw_sulu_tailwind_theme.secondary_button_style</title></meta>
                 </property>
                 <property name="image" type="single_media_selection"
-                          visibleCondition="__parent.style == 'split'">
+                          visibleCondition="__parent.style == 'split' OR __parent.style == 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.image</title></meta>
                 </property>
                 <property name="contentRight" type="checkbox"
@@ -102,7 +102,8 @@
                         <param name="default_value" value="mb-5"/>
                     </params>
                 </property>
-                <property name="lateralMargins" type="single_select">
+                <property name="lateralMargins" type="single_select"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
                     <params>
                         <param name="default_value" value="exterior"/>
@@ -113,32 +114,37 @@
                         </param>
                     </params>
                 </property>
-                <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
+                <property name="paddingTop" type="iw_theme_margin_selector" colspan="6"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
                     <params>
                         <param name="default_value" value="pt-5"/>
                     </params>
                 </property>
-                <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6">
+                <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.padding_bottom</title></meta>
                     <params>
                         <param name="default_value" value="pb-5"/>
                     </params>
                 </property>
-                <property name="paddingLateral" type="iw_theme_margin_selector">
+                <property name="paddingLateral" type="iw_theme_margin_selector"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
                     <params>
                         <param name="prefix" value="px"/>
                         <param name="default_value" value="px-5"/>
                     </params>
                 </property>
-                <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
+                <property name="blockRadius" type="iw_theme_radius_selector" colspan="6"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
                     <params>
                         <param name="default_value" value="rounded-none"/>
                     </params>
                 </property>
-                <property name="paragraphImageRadius" type="iw_theme_radius_selector" colspan="6">
+                <property name="paragraphImageRadius" type="iw_theme_radius_selector" colspan="6"
+                          visibleCondition="__parent.style != 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.paragraph_image_radius</title></meta>
                     <params>
                         <param name="default_value" value="rounded-none"/>

@@ -2093,21 +2093,26 @@ section.block:has([data-slider-fullbleed-value]) {
    via Tailwind classes (py-*, px-*) directly on the <section> in _block_wrapper.html.twig. */
 
 /* ─── Block: cta ───────────────────────────────────────────────────────── */
-/* Three layout modifiers: --centered (default), --banner (fullbleed with
-   optional background image + dark overlay), --split (image + content
+/* Three layout modifiers: --centered (default), --banner (fullbleed hero
+   with optional background image + dark overlay), --split (image + content
    side-by-side). All sizing, spacing, alignment, container behavior and
    text inversion is driven by Tailwind utility classes emitted by the
-   Twig templates — the rules below are hooks meant for downstream theming
-   only. Override by setting a custom property or by writing your own rule
-   scoped through the modifier (e.g. `.iw-block-cta--banner .iw-block-cta__overlay`). */
+   Twig templates — the rules below expose customisation hooks via custom
+   properties. */
 
 .iw-block-cta {
     /* Hook only — no default styling. */
 }
 
-/* Background image and dark overlay used by --banner. They sit at z-index 0,
-   the content (.iw-block-cta__content) is lifted above them via Tailwind
-   `relative z-10`. Override the overlay color or opacity here. */
+/* --banner: fullbleed hero. The background color cascades from the active
+   variant's `--iw-variant-block-bg` (published by ThemeCompiler when the
+   block has `data-has-bg="true"`), with `--color-primary` as final fallback.
+   A background image (when set in the admin) sits on top of this color,
+   followed by a dark overlay that ensures legibility of the white text. */
+.iw-block-cta--banner {
+    background-color: var(--iw-block-cta-banner-bg, var(--iw-variant-block-bg, var(--color-primary)));
+}
+
 .iw-block-cta--banner .iw-block-cta__overlay {
     background-color: var(--iw-block-cta-overlay-color, rgb(0 0 0 / 0.5));
 }
