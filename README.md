@@ -41,7 +41,7 @@
 * **Admin interface**: Full CRUD with 7 tabs (details, colors, typography, buttons, borders, block variants, menu)
 * **Multi-webspace support**: Assign different themes to different webspaces (sites) in a multi-site Sulu installation
 * **Multiple themes**: Create and switch between 7 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu)
-* **CSS compilation**: Automatic generation of `:root` variables, `.block-variant-*` classes, `.btn-*` styles
+* **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--*` classes, `.iw-button--*` styles
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
 * **Block variants**: Per-block color schemes (light, accent, dark) applied via CSS custom properties
@@ -504,7 +504,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Screenshots](doc/screenshots.md) | Visual overview of the admin interface (colors, typography, buttons, blocks, menu) |
 | [Page Templates](doc/page-templates.md) | Modular architecture, creating custom templates, block types, XInclude fragments |
 | [CSS Variables Reference](doc/css-variables.md) | All CSS custom properties: colors, palettes, typography, borders, buttons, menu |
-| [Block Variants](doc/block-variants.md) | Variant classes, auto-styled elements, separator styles, `.btn-variant` |
+| [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
 | [Button Hover Effects](doc/button-effects.md) | Catalog of composable hover effects (shadow, transform, opacity, duration, easing) |
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |

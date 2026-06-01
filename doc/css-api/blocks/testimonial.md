@@ -75,7 +75,7 @@ The `.iw-testimonial` subcomponent is shared by the three modes.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-testimonial-padding` | `1.5rem` | Card inner padding. |
-| `--iw-testimonial-border` | `var(--variant-hr-color, var(--color-border, #e5e7eb))` | Card border + author-block separator. |
+| `--iw-testimonial-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border + author-block separator. |
 | `--iw-testimonial-hover-shadow` | large shadow | Box-shadow on hover. |
 | `--iw-testimonial-transition-duration` | `0.2s` | Hover transition. |
 

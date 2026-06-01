@@ -56,11 +56,11 @@ Set global border radius values: default, small, large, full, and image radius.
 
 ## Block variants tab
 
-Define **color schemes** for content blocks (e.g., light, accent, dark). Each variant controls heading color, paragraph color, link color, background color, button style, and more. Variants are applied to blocks via the `.block-variant-{index}` CSS class.
+Define **color schemes** for content blocks (e.g., light, accent, dark). Each variant controls heading color, paragraph color, link color, background color, button style, and more. Variants are applied to blocks via the `.iw-variant--{index}` CSS class.
 
 ![Block variants configuration](images/screen/settings-theme-variants.png)
 
-> See [Block Variants](block-variants.md) for the full reference.
+> See [Block Variants](css-api/block-variants.md) for the full reference.
 
 ---
 

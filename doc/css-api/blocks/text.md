@@ -42,7 +42,7 @@ Generic helpers used inside (see [`../../css-variables.md#generic-block-helpers`
 | `--iw-block-text-columns-count-md` | `2` | `.iw-block-text__columns` — desktop (`>=768px`) column count |
 | `--iw-block-text-columns-gap` | `2rem` | `.iw-block-text__columns` — column gap |
 | `--iw-block-text-quote-border-width` | `4px` | `.iw-block-text__quote` — left border thickness |
-| `--iw-block-text-quote-border-color` | `var(--variant-hr-color, var(--color-primary))` | `.iw-block-text__quote` — left border color |
+| `--iw-block-text-quote-border-color` | `var(--iw-variant-hr-color, var(--color-primary))` | `.iw-block-text__quote` — left border color |
 | `--iw-block-text-quote-padding-x` | `1.5rem` | `.iw-block-text__quote` — mobile left padding |
 | `--iw-block-text-quote-padding-x-md` | `2rem` | `.iw-block-text__quote` — desktop left padding |
 | `--iw-block-text-quote-footer-margin-top` | `1rem` | `.iw-block-text__quote-footer` |
@@ -53,7 +53,7 @@ Generic helpers used inside (see [`../../css-variables.md#generic-block-helpers`
 
 ## Override examples
 
-> Always scope your override via the **block + modifier** pair (`.iw-block-text--quote .iw-block-text__quote`) so that your rule matches the bundle's own specificity (0,2,0) and wins against the legacy `.block-variant-N blockquote` shorthand that ships with the theme (will be removed in lot L8).
+> Always scope your override via the **block + modifier** pair (`.iw-block-text--quote .iw-block-text__quote`) so that your rule matches the bundle's own specificity (0,2,0) and wins against the legacy `.iw-variant--N blockquote` shorthand that ships with the theme (will be removed in lot L8).
 
 ### Three-column layout on wide screens
 

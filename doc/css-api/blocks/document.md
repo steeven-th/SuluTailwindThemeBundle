@@ -46,7 +46,7 @@ Each document is rendered as an `<a>` element (the `.iw-document-card`) that dow
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-document-card-border` | `var(--variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
+| `--iw-document-card-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
 | `--iw-document-card-bg` | `color-mix(in srgb, [border] 60%, transparent)` | Card background (lightly tinted with the border color). |
 | `--iw-document-card-padding` | `1rem` | Card inner padding in `--default` mode. |
 | `--iw-document-card-padding-grid` | `1.5rem` | Card inner padding in `--grid` mode. |
@@ -60,13 +60,13 @@ Each document is rendered as an `<a>` element (the `.iw-document-card`) that dow
 |----------|---------|---------|
 | `--iw-document-card-hover-shadow` | medium shadow | Box-shadow on hover in `--default` mode. |
 | `--iw-document-card-hover-shadow-grid` | large shadow | Box-shadow on hover in `--grid` mode. |
-| `--iw-document-card-title-hover-color` | `var(--variant-link-color, var(--color-link))` | Title color on card hover. |
+| `--iw-document-card-title-hover-color` | `var(--iw-variant-link-color, var(--color-link))` | Title color on card hover. |
 
 ### Icon
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-document-card-icon-color` | `var(--variant-link-color, var(--color-primary))` | Icon stroke color. |
+| `--iw-document-card-icon-color` | `var(--iw-variant-link-color, var(--color-primary))` | Icon stroke color. |
 | `--iw-document-card-icon-bg` | `color-mix(in srgb, [icon-color] 10%, transparent)` | Background of the icon wrapper square. |
 | `--iw-document-card-icon-wrap-size` | `2.5rem` | Size of the icon wrapper square in `--default` mode. |
 | `--iw-document-card-icon-wrap-size-grid` | `3.5rem` | Size of the icon wrapper square in `--grid` mode. |

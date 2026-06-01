@@ -27,7 +27,7 @@
         {% set hasInfo = (title is defined and title is not empty) or formattedAddress is not empty or (text is defined and text is not empty) %}
 
         <div class="relative"
-             style="--card-border: var(--variant-hr-color, var(--color-border, #e5e7eb));"
+             style="--card-border: var(--iw-variant-hr-color, var(--color-border, #e5e7eb));"
         >
             {# Map background #}
             <div class="{{ paragraphImageRadius|default('') }} overflow-hidden">
@@ -76,7 +76,7 @@
                     >
                         {% if formattedAddress is not empty %}
                             <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-[var(--variant-link-color,var(--color-primary))] flex-none mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))] flex-none mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <p class="text-sm whitespace-pre-line text-black/75">{{ formattedAddress }}</p>
                             </div>
                         {% endif %}

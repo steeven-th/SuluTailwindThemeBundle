@@ -32,7 +32,7 @@ The card surface reuses the same variables as `article_list` (`--iw-block-articl
 | `--iw-block-article-carousel-nav-gap` | `0.5rem` | Gap between prev/next buttons. |
 | `--iw-block-article-carousel-nav-margin-bottom` | `1rem` | Space below the nav row. |
 | `--iw-block-article-carousel-nav-size` | `2.5rem` | Diameter of arrow buttons. |
-| `--iw-block-article-carousel-nav-accent` | `var(--variant-hr-color, var(--color-primary))` | Master accent color — drives the icon color and the (tinted) bg. Override this single variable to re-color both. |
+| `--iw-block-article-carousel-nav-accent` | `var(--iw-variant-hr-color, var(--color-primary))` | Master accent color — drives the icon color and the (tinted) bg. Override this single variable to re-color both. |
 | `--iw-block-article-carousel-nav-bg` | `color-mix(in srgb, [accent] 10%, transparent)` | Arrow background at rest. |
 | `--iw-block-article-carousel-nav-bg-hover` | `color-mix(in srgb, [accent] 20%, transparent)` | Arrow background on hover. |
 | `--iw-block-article-carousel-nav-color` | derives from `--accent` | Arrow icon color. |
