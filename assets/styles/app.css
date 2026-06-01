@@ -2249,6 +2249,42 @@ section.block:has([data-slider-fullbleed-value]) {
     }
 }
 
+/* ─── Block: form ──────────────────────────────────────────────────────── */
+/* Wrapper-only API. The actual form fields (`iw-form-*`, `iw-combobox-*`) and
+   their `--form-*` variables are owned by the SuluFormBundle theme integration
+   and refactored separately in L9. Three layout modifiers:
+   --centered (single column, max-w-2xl), --card (single column, max-w-xl with
+   white surface + shadow), --split (info column with primary background +
+   form column). All layout/typography/colors are driven by Tailwind utility
+   classes in the templates; the rules below expose customisation hooks. */
+
+.iw-block-form {
+    /* Hook only — no default styling. */
+}
+
+/* --split info side: the primary-color panel that hosts the duplicated title
+   + subtitle. Exposed as a CSS variable so a theme can override without
+   rewriting the template. */
+.iw-block-form--split .iw-block-form__info {
+    background-color: var(--iw-block-form-info-bg, var(--iw-variant-block-bg, var(--color-primary)));
+    color: var(--iw-block-form-info-color, #fff);
+}
+
+.iw-block-form--split .iw-block-form__info-title {
+    color: var(--iw-block-form-info-title-color, var(--iw-block-form-info-color, #fff));
+}
+
+.iw-block-form--split .iw-block-form__info-subtitle {
+    color: var(--iw-block-form-info-subtitle-color, var(--iw-block-form-info-color, rgb(255 255 255 / 0.8)));
+}
+
+/* --card surface (white background by default). The radius is inlined via the
+   Tailwind utility `rounded-[var(--border-radius,8px)]` so it follows the
+   theme tokens automatically. */
+.iw-block-form--card {
+    background-color: var(--iw-block-form-card-bg, #fff);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Location Overlay — Collapsible info card
    Floats over the map on desktop, full-width bottom sheet on mobile.
