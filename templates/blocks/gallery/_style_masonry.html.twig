@@ -40,20 +40,20 @@
     } only %}
 
     {% if images is defined and images is iterable %}
-        <div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 {{ gapClass }}">
+        <div class="iw-block-gallery iw-block-gallery--masonry columns-1 sm:columns-2 lg:columns-3 xl:columns-4 {{ gapClass }}">
             {% for mediaId in images %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
-                <figure class="block-image break-inside-avoid {{ mbClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
+                <figure class="iw-block__image iw-block-gallery__item break-inside-avoid {{ mbClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
                     <a
                         href="{{ media.url }}"
-                        class="glightbox"
+                        class="iw-block-gallery__link glightbox"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                     >
                         <img
                             src="{{ media.thumbnails['iw_theme_gallery_thumb']|default(media.url) }}"
                             alt="{{ media.title|default('') }}"
                             loading="lazy"
-                            class="w-full h-auto cursor-pointer"
+                            class="iw-block-gallery__img w-full h-auto cursor-pointer"
                         >
                     </a>
                 </figure>

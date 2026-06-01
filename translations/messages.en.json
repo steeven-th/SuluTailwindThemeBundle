@@ -21,5 +21,8 @@
     "iw_sulu_tailwind_theme.article.sidebar_tags": "Tags",
     "iw_sulu_tailwind_theme.article.pagination_previous": "Previous page",
     "iw_sulu_tailwind_theme.article.pagination_next": "Next page",
-    "iw_sulu_tailwind_theme.article.pagination_info": "Page %current% of %total%"
+    "iw_sulu_tailwind_theme.article.pagination_info": "Page %current% of %total%",
+    "iw_sulu_tailwind_theme.accessory_video": "Video",
+    "iw_sulu_tailwind_theme.accessory_location": "Map",
+    "iw_sulu_tailwind_theme.widget_location": "Map"
 }

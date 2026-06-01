@@ -22,9 +22,9 @@
         {% set primaryLabel = primaryButtonLink %}
     {% endif %}
 
-    <div class="flex flex-wrap items-center gap-4 mt-6">
+    <div class="iw-block-cta__actions flex flex-wrap items-center gap-4 mt-6">
         <a href="{{ primaryButtonLink }}"
-           class="{{ primaryBtnClass }} inline-block px-6 py-3 text-center no-underline"
+           class="{{ primaryBtnClass }} iw-block-cta__action iw-block-cta__action--primary inline-block px-6 py-3 text-center no-underline"
            {{ primaryTarget != '_self' ? 'target="' ~ primaryTarget ~ '"' : '' }}
            {{ primaryRel is not empty ? 'rel="' ~ primaryRel ~ '"' : (primaryTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
         >
@@ -47,7 +47,7 @@
             {% endif %}
 
             <a href="{{ secondaryButtonLink }}"
-               class="{{ secondaryBtnClass }} inline-block px-6 py-3 text-center no-underline"
+               class="{{ secondaryBtnClass }} iw-block-cta__action iw-block-cta__action--secondary inline-block px-6 py-3 text-center no-underline"
                {{ secondaryTarget != '_self' ? 'target="' ~ secondaryTarget ~ '"' : '' }}
                {{ secondaryRel is not empty ? 'rel="' ~ secondaryRel ~ '"' : (secondaryTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
             >

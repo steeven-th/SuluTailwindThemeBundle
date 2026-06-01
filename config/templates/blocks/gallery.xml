@@ -55,6 +55,19 @@
                           visibleCondition="__parent.style == 'wide_carousel'">
                     <meta><title>iw_sulu_tailwind_theme.enable_parallax</title></meta>
                 </property>
+                <property name="parallaxIntensity" type="single_select"
+                          visibleCondition="__parent.style == 'wide_carousel' AND __parent.enableParallax == true">
+                    <meta><title>iw_sulu_tailwind_theme.parallax_intensity</title></meta>
+                    <params>
+                        <param name="default_value" value="medium"/>
+                        <param name="values" type="collection">
+                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_subtle</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_strong</title></meta></param>
+                            <param name="extreme"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_extreme</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="showImagesName" type="checkbox">
                     <meta><title>iw_sulu_tailwind_theme.show_images_name</title></meta>
                 </property>

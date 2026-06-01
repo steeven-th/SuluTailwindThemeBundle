@@ -401,7 +401,8 @@ img.object-cover {
     gap: var(--iw-document-card-gap, 1rem);
     padding: var(--iw-document-card-padding, 1rem);
     border: 1px solid var(--iw-document-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    background-color: var(--iw-document-card-bg, color-mix(in srgb, var(--iw-document-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb))) 60%, transparent));
+    background-color: var(--iw-document-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-document-card-color, var(--iw-variant-paragraph-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-document-card-transition-duration, 0.2s) ease;
 }
@@ -534,7 +535,7 @@ img.object-cover {
     height: 100%;
     padding: var(--iw-linked-page-card-padding, 1.5rem);
     border: 1px solid var(--iw-linked-page-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    background-color: var(--iw-linked-page-card-bg, color-mix(in srgb, var(--iw-linked-page-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb))) 60%, transparent));
+    background-color: var(--iw-linked-page-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1253,7 +1254,8 @@ img.object-cover {
     margin-left: 3rem;
     padding: var(--iw-key-figure-timeline-card-padding, 1.5rem);
     border: 1px solid var(--iw-block-key-figures-timeline-card-border, var(--iw-block-key-figures-timeline-accent, var(--iw-variant-hr-color, var(--color-primary))));
-    background-color: var(--iw-block-key-figures-timeline-card-bg, color-mix(in srgb, var(--iw-block-key-figures-timeline-accent, var(--iw-variant-hr-color, var(--color-primary))) 60%, transparent));
+    background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
 }
 
 @media (min-width: 768px) {
@@ -1770,6 +1772,104 @@ img.object-cover {
     color: var(--iw-featured-article-card-date-color-hero, rgb(255 255 255 / 0.6));
 }
 
+/* ─── Block: text_images ───────────────────────────────────────────────── */
+/* Seven layout modifiers covering the full matrix of text/image arrangements:
+   - --classic: positional layout where `imagePosition` (left/right/top/bottom/
+     background) is encoded in the secondary modifier `--position-{value}`.
+     This is the only style that adds the position modifier; the conditional
+     Twig logic owns the actual responsive layout.
+   - --fullwidth: image edge-to-edge + content with padding; the position
+     modifier `--position-{top|bottom}` mirrors the admin choice.
+   - --hero-banner: fullbleed image with centered title + dark overlay.
+   - --mosaic: text column + image mosaic grid (hero + 2 columns of tiles).
+   - --overlay: image background + text overlay; uses a directional gradient
+     bg-overlay on lg+ depending on the `contentRight` admin toggle.
+   - --sidebar: 3/5 text + 2/5 sticky image strip.
+   - --split-screen: 50/50 split with full-height image (with optional
+     internal slider when multiple images).
+   The optional secondary modifier `--lateral-mode-{interior|exterior}` is
+   added to the styles that consume the lateralMargins admin field, so
+   downstream rules can branch on it directly.
+
+   Layout / sizing / aspect-ratios / responsive radius / overflow rules are
+   all driven by Tailwind utility classes emitted by the templates because
+   they depend on the admin's lateralMargins / paddingLateral / paddingTop /
+   paddingBottom / paragraphImageRadius / imageFilter settings. The rules
+   below are hooks meant for downstream theming only. */
+
+.iw-block-text-images {
+    /* Hook only — no default styling. */
+}
+
+/* --hero-banner / --overlay / --classic (background mode) all render a dark
+   overlay above the background image. The overlay color is exposed as a
+   custom property so a theme can change the opacity without rewriting the
+   template's Tailwind utility. */
+.iw-block-text-images__bg-overlay {
+    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+}
+
+/* The --overlay style renders two overlays (mobile uniform + desktop
+   gradient); the mobile one is the same as the default, the gradient
+   variant ships its directional linear-gradient inline via Twig and can
+   be re-themed via the same CSS variable since it falls back to the
+   same default. */
+.iw-block-text-images--overlay .iw-block-text-images__bg-overlay--mobile {
+    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+}
+
+/* ─── Block: gallery ───────────────────────────────────────────────────── */
+/* Six layout modifiers:
+   - --grid: responsive CSS grid (1/2/3/4 cols, mobile→xl).
+   - --masonry: CSS columns layout (1/2/3/4 cols, mobile→xl) for ragged-row
+     gallery walls.
+   - --slider: horizontal scroll track with snap; optional --slider-single
+     sub-modifier switches to a single-image autoplay carousel.
+   - --filmstrip: large main image + thumbnail strip with prev/next arrows.
+   - --wide-carousel: fullbleed autoplay carousel with centered title
+     overlay; optional --wide-carousel-parallax for the parallax variant.
+   - --carousel: 3D carousel with parallax tilt and blurred backgrounds
+     (driven by the `carousel3d` Stimulus controller, see .iw-carousel-3d
+     section below for the inner anatomy).
+
+   Layout, sizing, gaps and aspect ratios are all driven by Tailwind utility
+   classes emitted by the Twig templates (because the gap/radius/aspect-ratio
+   are conditional on the admin's lateralMargins / paddingLateral / image
+   format settings). The rules below expose customisation hooks via custom
+   properties.
+
+   The shared image hook `.iw-block__image` is applied to every `<figure>`
+   that wraps a single image (grid/masonry items, slider items, etc.) so
+   downstream styles can target images consistently across all gallery
+   variants and across other blocks that surface images. */
+
+.iw-block-gallery {
+    /* Hook only — no default styling. */
+}
+
+/* Neutralise the global `img { border-radius: var(--radius-img) }` rule for
+   gallery images: the radius is owned by the wrapping `.iw-block-gallery__item`
+   (with `overflow-hidden`) so it tracks the admin's `paragraphImageRadius`
+   setting. Without this override, masonry images would inherit a default
+   radius from the theme token even when no radius is configured. */
+.iw-block-gallery .iw-block-gallery__img {
+    border-radius: 0;
+}
+
+/* Optional shared image hook (also used by `_image.html.twig`,
+   `_image_slider.html.twig`, `text_images/_style_mosaic.html.twig`).
+   Resets the default `<figure>` user-agent margin so the wrapping
+   container fully controls the image's lateral and vertical placement
+   (no surprise 40px gutter from the browser's default figure styling). */
+.iw-block__image {
+    margin: 0;
+}
+
+/* Filmstrip thumbnails — opacity is set inline via Tailwind utilities
+   (`opacity-50` / `opacity-100` with the `is-active` class toggled by JS).
+   The hook below is provided for downstream theming if you need to change
+   the look without rewriting the template. */
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Shared gallery navigation arrows
    Used across all gallery layouts.  Override the --iw-gallery-nav-* custom
@@ -2092,43 +2192,309 @@ section.block:has([data-slider-fullbleed-value]) {
 /* Block variant background and padding are handled
    via Tailwind classes (py-*, px-*) directly on the <section> in _block_wrapper.html.twig. */
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Location Overlay — Collapsible info card
-   Floats over the map on desktop, full-width bottom sheet on mobile.
-   Header always on top, body below with capped scroll on desktop.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* ─── Block: cta ───────────────────────────────────────────────────────── */
+/* Three layout modifiers: --centered (default), --banner (fullbleed hero
+   with optional background image + dark overlay), --split (image + content
+   side-by-side). All sizing, spacing, alignment, container behavior and
+   text inversion is driven by Tailwind utility classes emitted by the
+   Twig templates — the rules below expose customisation hooks via custom
+   properties. */
 
-.iw-location-card {
+.iw-block-cta {
+    /* Hook only — no default styling. */
+}
+
+/* --banner: fullbleed hero. The background color cascades from the active
+   variant's `--iw-variant-block-bg` (published by ThemeCompiler when the
+   block has `data-has-bg="true"`), with `--color-primary` as final fallback.
+   A background image (when set in the admin) sits on top of this color,
+   followed by a dark overlay that ensures legibility of the white text. */
+.iw-block-cta--banner {
+    background-color: var(--iw-block-cta-banner-bg, var(--iw-variant-block-bg, var(--color-primary)));
+}
+
+.iw-block-cta--banner .iw-block-cta__overlay {
+    background-color: var(--iw-block-cta-overlay-color, rgb(0 0 0 / 0.5));
+}
+
+.iw-block-cta--banner .iw-block-cta__background {
+    object-position: var(--iw-block-cta-background-position, center);
+}
+
+/* Actions row (primary + optional secondary button). The Twig template
+   pre-sets `flex flex-wrap items-center gap-4 mt-6`; the gap is also
+   exposed as a custom property so it can be tweaked without rewriting
+   the template. */
+.iw-block-cta__actions {
+    gap: var(--iw-block-cta-actions-gap, 1rem);
+    margin-top: var(--iw-block-cta-actions-margin-top, 1.5rem);
+}
+
+/* --split accessory widgets — image, video, location, counter.
+   The wrapper `.iw-block-cta__accessory` is the stable hook; modifier
+   classes (`--image`, `--video`, `--location`, `--counter`) carry the
+   widget-specific layout. */
+
+/* Video iframe/video sit on aspect-ratio 16/9 set inline.
+   `object-fit: cover` makes the <video> poster (and the playing frames)
+   fill the player edge-to-edge instead of letterboxing — the default
+   browser behaviour is `contain` which can leave black bars when the
+   poster aspect differs from 16/9. */
+.iw-block-cta--split .iw-block-cta__video {
+    display: block;
+    object-fit: cover;
+    background-color: var(--iw-block-cta-video-bg, #000);
+}
+
+/* Location accessory — map iframe + formatted address row below.
+   OpenStreetMap's embed doesn't expose a clickable marker tooltip, so the
+   address is rendered as text under the map for legibility. */
+.iw-block-cta__accessory--location {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-cta-map-address-gap, 0.75rem);
+}
+
+.iw-block-cta__map-address {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--iw-block-cta-map-address-icon-gap, 0.5rem);
+    color: var(--iw-block-cta-map-address-color, var(--iw-variant-paragraph-color, inherit));
+}
+
+.iw-block-cta__map-address-icon {
+    flex: none;
+    width: var(--iw-block-cta-map-address-icon-size, 1.25rem);
+    height: var(--iw-block-cta-map-address-icon-size, 1.25rem);
+    margin-top: 0.125rem;
+    color: var(--iw-block-cta-map-address-icon-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__map-address-text {
+    margin: 0;
+    font-size: var(--iw-block-cta-map-address-size, 0.875rem);
+    line-height: 1.5;
+    opacity: var(--iw-block-cta-map-address-opacity, 0.85);
+}
+
+/* Counter accessory — 1 to 3 animated numbers + labels.
+   Three responsive layouts driven by flex-basis:
+   - Mobile (<480px): one per row
+   - Tablet (480–767px): two per row; a lonely 3rd counter wraps and is
+     centered horizontally by `justify-content: center` on the row below
+   - Desktop (≥768px): three per row when there are three; two centered
+     when there are two; one centered when there is one.
+   `justify-content: center` is what makes the lonely counter sit in the
+   middle of its wrap row at every breakpoint. */
+.iw-block-cta__accessory--counter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--iw-block-cta-counter-gap, 1.5rem);
+    text-align: center;
+}
+
+.iw-block-cta__counter {
+    flex: 0 1 100%;
+}
+
+@media (min-width: 480px) {
+    .iw-block-cta__counter {
+        /* Two per row — gap is divided across both items so 2 × basis + gap = 100% */
+        flex-basis: calc(50% - (var(--iw-block-cta-counter-gap, 1.5rem) / 2));
+    }
+}
+
+@media (min-width: 768px) {
+    .iw-block-cta__counter {
+        /* Three per row — gap × 2 is divided across three items */
+        flex-basis: calc((100% - 2 * var(--iw-block-cta-counter-gap, 1.5rem)) / 3);
+    }
+}
+
+.iw-block-cta__counter-value {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--iw-block-cta-counter-value-gap, 0.125rem);
+    justify-content: center;
+}
+
+.iw-block-cta__counter-number {
+    font-size: var(--iw-block-cta-counter-number-size, 3rem);
+    font-weight: var(--iw-block-cta-counter-number-weight, 700);
+    line-height: 1;
+    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__counter-unit {
+    font-size: var(--iw-block-cta-counter-unit-size, 1.5rem);
+    font-weight: var(--iw-block-cta-counter-unit-weight, 600);
+    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__counter-label {
+    display: block;
+    margin-top: var(--iw-block-cta-counter-label-margin-top, 0.5rem);
+    font-size: var(--iw-block-cta-counter-label-size, 0.875rem);
+    color: var(--iw-block-cta-counter-label-color, var(--iw-variant-paragraph-color, inherit));
+    opacity: var(--iw-block-cta-counter-label-opacity, 0.75);
+}
+
+@media (min-width: 768px) {
+    .iw-block-cta__counter-number {
+        font-size: var(--iw-block-cta-counter-number-size-md, 3.75rem);
+    }
+    .iw-block-cta__counter-unit {
+        font-size: var(--iw-block-cta-counter-unit-size-md, 1.875rem);
+    }
+}
+
+/* ─── Block: form ──────────────────────────────────────────────────────── */
+/* Wrapper-only API. The actual form fields (`iw-form-*`, `iw-combobox-*`) and
+   their `--form-*` variables are owned by the SuluFormBundle theme integration
+   and refactored separately in L9. Three layout modifiers:
+   --centered (single column, max-w-2xl), --card (single column, max-w-xl with
+   white surface + shadow), --split (info column with primary background +
+   form column). All layout/typography/colors are driven by Tailwind utility
+   classes in the templates; the rules below expose customisation hooks. */
+
+.iw-block-form {
+    /* Hook only — no default styling. */
+}
+
+/* --split info side: the primary-color panel that hosts the duplicated title
+   + subtitle. Exposed as a CSS variable so a theme can override without
+   rewriting the template. */
+.iw-block-form--split .iw-block-form__info {
+    background-color: var(--iw-block-form-info-bg, var(--iw-variant-block-bg, var(--color-primary)));
+    color: var(--iw-block-form-info-color, #fff);
+}
+
+.iw-block-form--split .iw-block-form__info-title {
+    color: var(--iw-block-form-info-title-color, var(--iw-block-form-info-color, #fff));
+}
+
+.iw-block-form--split .iw-block-form__info-subtitle {
+    color: var(--iw-block-form-info-subtitle-color, var(--iw-block-form-info-color, rgb(255 255 255 / 0.8)));
+}
+
+/* --card surface (white background by default). The radius is inlined via the
+   Tailwind utility `rounded-[var(--border-radius,8px)]` so it follows the
+   theme tokens automatically. */
+.iw-block-form--card {
+    background-color: var(--iw-block-form-card-bg, #fff);
+}
+
+/* --split widget (text / image / location). The widget partial fills the info
+   column to the edges so its background matches `.iw-block-form__info`. */
+.iw-block-form__widget {
+    width: 100%;
+}
+
+.iw-block-form__widget--image {
+    height: 100%;
+    min-height: var(--iw-block-form-widget-image-min-height, 12rem);
+}
+
+/* Location widget — map iframe + formatted address row below. Same layout
+   pattern as the CTA accessory location, but the variables are scoped under
+   the form namespace so each block can be themed independently. */
+.iw-block-form__widget--location {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-form-map-address-gap, 0.75rem);
+}
+
+.iw-block-form__map-address {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--iw-block-form-map-address-icon-gap, 0.5rem);
+    color: var(--iw-block-form-map-address-color, inherit);
+}
+
+.iw-block-form__map-address-icon {
+    flex: none;
+    width: var(--iw-block-form-map-address-icon-size, 1.25rem);
+    height: var(--iw-block-form-map-address-icon-size, 1.25rem);
+    margin-top: 0.125rem;
+    color: var(--iw-block-form-map-address-icon-color, currentColor);
+}
+
+.iw-block-form__map-address-text {
+    margin: 0;
+    font-size: var(--iw-block-form-map-address-size, 0.875rem);
+    line-height: 1.5;
+    opacity: var(--iw-block-form-map-address-opacity, 0.9);
+}
+
+/* ─── Block: location ──────────────────────────────────────────────────── */
+/* Four layout modifiers:
+   - --map-only: just the OpenStreetMap iframe.
+   - --fullwidth: map + info column (title, address card, optional text,
+     "open in maps" link) stacked below.
+   - --map-with-info: map (2 columns) + info column (1 column) side by side
+     on lg+.
+   - --overlay: map full width with a floating collapsible info card on
+     desktop, full-width bottom sheet on mobile (driven by the
+     `location-overlay` Stimulus controller).
+
+   The OSM embed is the same across modes; only the surrounding layout
+   differs. The address card and the info column expose their colors via
+   custom properties that fall back to the active variant. */
+
+.iw-block-location {
+    /* Hook only — no default styling. */
+}
+
+/* Address card shared by --fullwidth and --map-with-info. The default
+   background is the variant's paragraph-bg (the admin-configured token
+   designed to host paragraph-colored text), with the auto-computed
+   subtle-bg as fallback when paragraph-bg is `transparent`. The border
+   still derives from hr-color, which is the canonical "thin separator"
+   token in the variant. Both are overridable via custom properties for
+   downstream theming. */
+.iw-block-location__address {
+    border: 1px solid var(--iw-block-location-info-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-block-location-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-block-location-info-color, var(--iw-variant-paragraph-color, inherit));
+}
+
+/* ── --overlay: floating collapsible info card ──
+   Floats over the map on desktop, full-width bottom sheet on mobile.
+   Header always on top, body below with capped scroll on desktop. */
+.iw-block-location__card {
     position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: min(22rem, calc(100% - 3rem));
+    bottom: var(--iw-block-location-card-offset, 1.5rem);
+    right: var(--iw-block-location-card-offset, 1.5rem);
+    width: min(var(--iw-block-location-card-width, 22rem), calc(100% - 3rem));
     z-index: 20;
     display: flex;
     flex-direction: column;
-    border-radius: var(--radius-img, 0.5rem);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: #000;
+    border-radius: var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
+    box-shadow: var(--iw-block-location-card-shadow, 0 8px 32px rgba(0, 0, 0, 0.18));
+    backdrop-filter: blur(var(--iw-block-location-card-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--iw-block-location-card-blur, 12px));
+    color: var(--iw-block-location-card-color, #000);
 }
 
-/* Force black text on all children — overrides per-variant rules like .iw-variant--* p */
-.iw-location-card p,
-.iw-location-card span,
-.iw-location-card a:not(.iw-button--variant),
-.iw-location-card li,
-.iw-location-card h1,
-.iw-location-card h2,
-.iw-location-card h3,
-.iw-location-card h4,
-.iw-location-card h5,
-.iw-location-card h6 {
-    color: #000;
+/* Force the card text color on all children — overrides per-variant rules
+   like .iw-variant--* p so the overlay reads correctly against the blurred
+   map even when the variant uses a contrasted palette. */
+.iw-block-location__card p,
+.iw-block-location__card span,
+.iw-block-location__card a:not(.iw-button--variant),
+.iw-block-location__card li,
+.iw-block-location__card h1,
+.iw-block-location__card h2,
+.iw-block-location__card h3,
+.iw-block-location__card h4,
+.iw-block-location__card h5,
+.iw-block-location__card h6 {
+    color: var(--iw-block-location-card-color, #000);
 }
 
-/* ── Header (always visible, always on top) ── */
-.iw-location-card__header {
+/* Header (always visible, always on top) */
+.iw-block-location__card-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -2144,11 +2510,11 @@ section.block:has([data-slider-fullbleed-value]) {
     border-radius: inherit;
 }
 
-.iw-location-card__header:hover {
-    background: rgba(0, 0, 0, 0.04);
+.iw-block-location__card-header:hover {
+    background: var(--iw-block-location-card-header-hover-bg, rgba(0, 0, 0, 0.04));
 }
 
-.iw-location-card__header-content {
+.iw-block-location__card-header-content {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -2156,18 +2522,18 @@ section.block:has([data-slider-fullbleed-value]) {
     gap: 0.125rem;
 }
 
-/* ── Chevron ── */
-.iw-location-card__chevron {
+/* Chevron */
+.iw-block-location__card-chevron {
     width: 1.25rem;
     height: 1.25rem;
     flex-shrink: 0;
     transition: transform 0.3s ease;
-    color: black;
+    color: var(--iw-block-location-card-color, black);
     opacity: 0.5;
 }
 
-/* ── Body (collapsible) ── */
-.iw-location-card__body {
+/* Body (collapsible) */
+.iw-block-location__card-body {
     padding: 0 1rem 1rem;
     display: flex;
     flex-direction: column;
@@ -2180,45 +2546,45 @@ section.block:has([data-slider-fullbleed-value]) {
     scrollbar-width: none;
 }
 
-.iw-location-card__body::-webkit-scrollbar {
+.iw-block-location__card-body::-webkit-scrollbar {
     display: none;
 }
 
 /* Subtle separator between header and body */
-.iw-location-card__body::before {
+.iw-block-location__card-body::before {
     content: '';
     display: block;
     flex-shrink: 0;
     height: 1px;
-    background: rgba(0, 0, 0, 0.15);
+    background: var(--iw-block-location-card-divider, rgba(0, 0, 0, 0.15));
     opacity: 0.5;
 }
 
-/* ── Scroll hint arrow ── */
-.iw-location-card__scroll-hint {
+/* Scroll hint arrow */
+.iw-block-location__card-scroll-hint {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0.25rem 0 0.5rem;
     cursor: pointer;
-    color: black;
+    color: var(--iw-block-location-card-color, black);
     opacity: 0;
     transition: opacity 0.25s ease;
     pointer-events: none;
 }
 
-.iw-location-card__scroll-hint svg {
-    animation: iw-location-card-bounce 1.5s ease-in-out infinite;
+.iw-block-location__card-scroll-hint svg {
+    animation: iw-block-location-card-bounce 1.5s ease-in-out infinite;
 }
 
-@keyframes iw-location-card-bounce {
+@keyframes iw-block-location-card-bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(4px); }
 }
 
-/* ── Responsive: mobile ── */
+/* Responsive: mobile bottom-sheet */
 @media (max-width: 768px) {
-    .iw-location-card {
+    .iw-block-location__card {
         position: relative;
         bottom: auto;
         right: auto;
@@ -2231,31 +2597,31 @@ section.block:has([data-slider-fullbleed-value]) {
     }
 
     /* White solid background on mobile — no blur */
-    .iw-location-card__header {
-        background: #fff;
-        border-radius: 0 0 var(--radius-img, 0.5rem) var(--radius-img, 0.5rem);
+    .iw-block-location__card-header {
+        background: var(--iw-block-location-card-bg-mobile, #fff);
+        border-radius: 0 0 var(--iw-block-location-card-radius, var(--radius-img, 0.5rem)) var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
     }
 
     /* Lose bottom radius when open */
-    .iw-location-card__header[aria-expanded="true"] {
+    .iw-block-location__card-header[aria-expanded="true"] {
         border-radius: 0;
     }
 
-    .iw-location-card__body {
+    .iw-block-location__card-body {
         max-height: none;
         overflow-y: visible;
-        background: #fff;
+        background: var(--iw-block-location-card-bg-mobile, #fff);
         margin-top: -1px;
-        border-radius: 0 0 var(--radius-img, 0.5rem) var(--radius-img, 0.5rem);
+        border-radius: 0 0 var(--iw-block-location-card-radius, var(--radius-img, 0.5rem)) var(--iw-block-location-card-radius, var(--radius-img, 0.5rem));
     }
 
     /* No separator on mobile */
-    .iw-location-card__body::before {
+    .iw-block-location__card-body::before {
         display: none;
     }
 
     /* Hide scroll hint on mobile */
-    .iw-location-card__scroll-hint {
+    .iw-block-location__card-scroll-hint {
         display: none;
     }
 }

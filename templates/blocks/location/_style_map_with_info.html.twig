@@ -31,15 +31,13 @@
         {% endif %}
         {% set formattedAddress = addressParts|join("\n") %}
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8"
-             style="--card-border: var(--iw-variant-hr-color, var(--color-border, #e5e7eb)); --card-bg: color-mix(in srgb, var(--card-border) 60%, transparent);"
-        >
+        <div class="iw-block-location iw-block-location--map-with-info grid grid-cols-1 lg:grid-cols-3 gap-8">
             {# Map — 2 columns #}
             <div class="lg:col-span-2">
-                <div class="{{ paragraphImageRadius|default('') }} overflow-hidden h-full min-h-[300px]">
+                <div class="iw-block-location__map-wrap {{ paragraphImageRadius|default('') }} overflow-hidden h-full min-h-[300px]">
                     <iframe
                         src="https://www.openstreetmap.org/export/embed.html?bbox={{ location.long - offset }}%2C{{ location.lat - offset }}%2C{{ location.long + offset }}%2C{{ location.lat + offset }}&amp;layer=mapnik&amp;marker={{ location.lat }}%2C{{ location.long }}"
-                        class="w-full h-full min-h-[300px] border-0"
+                        class="iw-block-location__map w-full h-full min-h-[300px] border-0"
                         loading="lazy"
                         title="{{ title|default('Map') }}"
                         allowfullscreen
@@ -48,19 +46,19 @@
             </div>
 
             {# Info sidebar — 1 column #}
-            <div class="lg:col-span-1 space-y-6">
+            <div class="iw-block-location__info lg:col-span-1 space-y-6">
                 {% if formattedAddress is not empty %}
-                    <div class="{{ paragraphImageRadius|default('') }} border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-                        <span class="block font-semibold mb-2 flex items-center gap-2 text-[var(--iw-variant-title-color,inherit)]">
-                            <svg class="w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <div class="iw-block-location__address {{ paragraphImageRadius|default('') }} p-5">
+                        <span class="iw-block-location__address-label block font-semibold mb-2 flex items-center gap-2 text-[var(--iw-variant-title-color,inherit)]">
+                            <svg class="iw-block-location__address-icon w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             {{ 'iw_sulu_tailwind_theme.address'|trans|default('Address') }}
                         </span>
-                        <p class="whitespace-pre-line text-[var(--iw-variant-paragraph-color,inherit)] opacity-75">{{ formattedAddress }}</p>
+                        <p class="iw-block-location__address-text whitespace-pre-line text-[var(--iw-variant-paragraph-color,inherit)]">{{ formattedAddress }}</p>
                     </div>
                 {% endif %}
 
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text prose max-w-none text-[var(--iw-variant-paragraph-color,inherit)] {{ paragraphImageRadius|default('') }} overflow-hidden">
+                    <div class="iw-block__text iw-block-location__text prose max-w-none text-[var(--iw-variant-paragraph-color,inherit)] {{ paragraphImageRadius|default('') }} overflow-hidden">
                         {{ text|raw }}
                     </div>
                 {% endif %}
@@ -70,7 +68,7 @@
                     href="https://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.long }}#map={{ zoom }}/{{ location.lat }}/{{ location.long }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="iw-button--variant inline-block px-6 py-3 text-center no-underline"
+                    class="iw-button--variant iw-block-location__action inline-block px-6 py-3 text-center no-underline"
                 >
                     {{ 'iw_sulu_tailwind_theme.open_map'|trans|default('Open in maps') }} &#8599;
                 </a>

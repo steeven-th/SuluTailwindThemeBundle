@@ -47,7 +47,8 @@ Each document is rendered as an `<a>` element (the `.iw-document-card`) that dow
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-document-card-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
-| `--iw-document-card-bg` | `color-mix(in srgb, [border] 60%, transparent)` | Card background (lightly tinted with the border color). |
+| `--iw-document-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background. Uses the variant's `paragraphBg` token (admin-configurable, designed to host paragraph-colored text), with the auto-computed `--iw-variant-subtle-bg` as fallback when `paragraphBg` is `transparent`. |
+| `--iw-document-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Default text color inside the card. Matches the variant's `paragraph` token so contrast against the background is preserved. |
 | `--iw-document-card-padding` | `1rem` | Card inner padding in `--default` mode. |
 | `--iw-document-card-padding-grid` | `1.5rem` | Card inner padding in `--grid` mode. |
 | `--iw-document-card-gap` | `1rem` | Gap between icon, info and download arrow in `--default` mode. |

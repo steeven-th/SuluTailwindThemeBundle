@@ -55,7 +55,7 @@
 
 {# ── Section ──────────────────────────────────────────────────────────────── #}
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }}"
+    class="block iw-block-text-images iw-block-text-images--sidebar iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }}"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
@@ -70,11 +70,11 @@
             variant: variant|default(0)
         } only %}
 
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-5">
+        <div class="iw-block-text-images__grid grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-5">
             {# Main text area — 3/5 = 60% #}
-            <div class="md:col-span-3{{ isRight ? ' md:order-2' : ' md:order-1' }}">
+            <div class="iw-block-text-images__content md:col-span-3{{ isRight ? ' md:order-2' : ' md:order-1' }}">
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                    <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                         {{ text|raw }}
                     </div>
                 {% endif %}
@@ -82,8 +82,8 @@
 
             {# Sidebar images — 2/5 = 40%.
                Grid cell stretches to full row height; sticky child stays visible while text scrolls. #}
-            <div class="md:col-span-2{{ isRight ? ' md:order-1' : ' md:order-2' }}">
-                <div class="{% if radius %}{{ radius }} overflow-hidden{% endif %}" style="position: sticky; top: 6rem;">
+            <div class="iw-block-text-images__image-column md:col-span-2{{ isRight ? ' md:order-1' : ' md:order-2' }}">
+                <div class="iw-block-text-images__image-wrap{% if radius %} {{ radius }} overflow-hidden{% endif %}" style="position: sticky; top: 6rem;">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
                         images: images|default([]),
                         imageFormat: format,

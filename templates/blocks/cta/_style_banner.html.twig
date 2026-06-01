@@ -1,50 +1,56 @@
-{# CTA block — full-width banner with background image or primary color #}
+{# CTA block — fullbleed hero banner with optional background image.
+   The banner ignores `lateralMargins` / `paddingLateral` / `paddingTop` /
+   `paddingBottom` / `blockRadius` / `paragraphImageRadius` (masked in cta.xml)
+   and owns its own viewport-wide layout: centered hero typography, large
+   internal padding, and background color cascading from the active variant
+   (`--iw-variant-block-bg`) with a `--color-primary` fallback. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
-    {% set titleAlignClass = alignMap[titleAlignment|default('center')]|default('text-center') %}
-
     {% set bgImageUrl = '' %}
-    {% if image is defined and image.id is defined %}
-        {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
+    {% if bannerImage is defined and bannerImage.id is defined %}
+        {% set resolvedImage = sulu_resolve_media(bannerImage.id, app.request.locale) %}
         {% set bgImageUrl = resolvedImage.thumbnails['iw_theme_16_9']|default(resolvedImage.url) %}
     {% endif %}
 
-    {# Convert padding class numbers to rem values for negative margins (fullbleed) #}
+    {# Neutralise the wrapper's pt-*/pb-* via negative margins so the banner
+       fills the section edge-to-edge vertically. The Hero owns its own padding. #}
     {% set spacingMap = {'0': '0px', '1': '0.25rem', '2': '0.5rem', '3': '0.75rem', '4': '1rem', '5': '1.25rem', '6': '1.5rem', '7': '1.75rem', '8': '2rem', '9': '2.25rem', '10': '2.5rem', '11': '2.75rem', '12': '3rem', '14': '3.5rem', '16': '4rem', '20': '5rem', '24': '6rem'} %}
     {% set ptNum = ptClass|default('pt-0')|split('-')|last %}
     {% set pbNum = pbClass|default('pb-0')|split('-')|last %}
 
-    {# Fullbleed wrapper: breaks out of section padding + container to fill the entire section #}
-    <div class="relative overflow-hidden {{ resolvedParagraphRadius|default('') }} {{ bgImageUrl is empty ? 'bg-[var(--color-primary)]' : '' }}"
-         style="margin-top: -{{ spacingMap[ptNum]|default('0px') }}; margin-bottom: -{{ spacingMap[pbNum]|default('0px') }}; margin-inline: calc(-50vw + 50%); width: 100vw;">
+    {# Fullbleed via `position+left+margin-left`: works inside `container mx-auto`
+       wrappers too, unlike the older `margin-inline: calc(-50vw + 50%)` trick. #}
+    <div class="iw-block-cta iw-block-cta--banner relative overflow-hidden"
+         style="margin-top: -{{ spacingMap[ptNum]|default('0px') }}; margin-bottom: -{{ spacingMap[pbNum]|default('0px') }}; position: relative; left: 50%; margin-left: -50vw; width: 100vw;">
         {% if bgImageUrl is not empty %}
-            <img src="{{ bgImageUrl }}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/50"></div>
+            <img src="{{ bgImageUrl }}" alt="" loading="lazy" class="iw-block-cta__background absolute inset-0 w-full h-full object-cover">
+            <div class="iw-block-cta__overlay absolute inset-0 bg-black/50"></div>
         {% endif %}
 
-        <div class="relative z-10 container mx-auto {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} text-white">
+        <div class="iw-block-cta__content relative z-10 container mx-auto py-16 md:py-20 lg:py-24 px-6 md:px-8 text-center text-white">
             {% if title is defined and title is not empty %}
-                <h2 class="iw-block__title text-3xl md:text-4xl lg:text-5xl font-[var(--font-h2-weight)] text-white {{ titleAlignClass }}">{{ title }}</h2>
+                <h2 class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] text-white">{{ title }}</h2>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="iw-block__subtitle text-lg md:text-xl mt-3 text-white/80 {{ titleAlignClass }}">{{ subTitle }}</h3>
+                <h3 class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 text-white/80">{{ subTitle }}</h3>
             {% endif %}
             {% if text is defined and text is not empty %}
-                <div class="iw-block__text prose prose-invert max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
+                <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-2xl mx-auto mt-8">
                     {{ text|raw }}
                 </div>
             {% endif %}
 
-            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
-                primaryButtonLink: primaryButtonLink|default(''),
-                primaryButtonView: view.blocks[_key].primaryButtonLink|default({}),
-                primaryButtonStyle: primaryButtonStyle|default('primary'),
-                secondaryButtonLink: secondaryButtonLink|default(''),
-                secondaryButtonView: view.blocks[_key].secondaryButtonLink|default({}),
-                secondaryButtonStyle: secondaryButtonStyle|default('secondary')
-            } only %}
+            <div class="iw-block-cta__actions-wrap flex justify-center">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    primaryButtonLink: primaryButtonLink|default(''),
+                    primaryButtonView: view.blocks[_key].primaryButtonLink|default({}),
+                    primaryButtonStyle: primaryButtonStyle|default('primary'),
+                    secondaryButtonLink: secondaryButtonLink|default(''),
+                    secondaryButtonView: view.blocks[_key].secondaryButtonLink|default({}),
+                    secondaryButtonStyle: secondaryButtonStyle|default('secondary')
+                } only %}
+            </div>
         </div>
     </div>
 {% endblock %}

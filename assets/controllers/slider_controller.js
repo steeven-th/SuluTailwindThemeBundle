@@ -34,6 +34,9 @@ export default class extends Controller {
         mode: { type: String, default: 'scroll' },
         fullbleed: { type: Boolean, default: false },
         parallax: { type: Boolean, default: false },
+        // Multiplier on the parallax shift (1 = medium / 15% headroom, 2 = extreme).
+        // The image wrapper height/top are set inline by Twig to match this scale.
+        parallaxIntensity: { type: Number, default: 1 },
         equalHeight: { type: Boolean, default: false },
     };
 
@@ -336,8 +339,10 @@ export default class extends Controller {
         const offset = (viewportHeight / 2 - sectionCenter) / (viewportHeight / 2);
         const clamped = Math.max(-1, Math.min(1, offset));
 
-        // Translate the image within the 15% headroom (image is 130% tall)
-        const maxShift = rect.height * 0.15;
+        // Translate the image within the configured headroom. Default intensity = 1
+        // means 15% (image is 130% tall); extreme = 2 means 30% (image is 160% tall).
+        // The image wrapper height/top is set inline by Twig to match this scale.
+        const maxShift = rect.height * 0.15 * this.parallaxIntensityValue;
         const translateY = clamped * maxShift;
 
         this.slideTargets.forEach((slide) => {

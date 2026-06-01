@@ -20,7 +20,7 @@
 {% if resolvedImages|length == 1 %}
     {# Single image with lightbox #}
     {% set media = resolvedImages[0] %}
-    <figure class="block-image">
+    <figure class="iw-block__image">
         <a
             href="{{ media.url }}"
             class="glightbox"
@@ -30,16 +30,18 @@
                 src="{{ media.thumbnails[imageFormat|default('iw_theme_4_3')]|default(media.url) }}"
                 alt="{{ media.title|default('') }}"
                 loading="lazy"
-                class="w-full object-cover rounded-[var(--radius-img)] cursor-pointer"
+                class="w-full object-cover cursor-pointer"
                 style="aspect-ratio: {{ ratio }};"
             >
         </a>
     </figure>
 
 {% elseif resolvedImages|length > 1 %}
-    {# Multiple images — carousel slider with lightbox on each slide #}
+    {# Multiple images — carousel slider with lightbox on each slide.
+       The radius is owned by the wrapping element in the consuming template
+       (via `paragraphImageRadius`) so we don't apply one here. #}
     <div
-        class="relative overflow-hidden rounded-[var(--radius-img)]"
+        class="relative overflow-hidden"
         data-controller="slider"
         data-slider-mode-value="carousel"
         data-slider-autoplay-value="{{ autoplay|default(false) ? 'true' : 'false' }}"

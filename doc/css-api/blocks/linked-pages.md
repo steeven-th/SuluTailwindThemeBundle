@@ -86,7 +86,7 @@ The `.iw-linked-page-card` subcomponent is shared by `--cards` and `--carousel`.
 |----------|---------|---------|
 | `--iw-linked-page-card-padding` | `1.5rem` | Card inner padding. |
 | `--iw-linked-page-card-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
-| `--iw-linked-page-card-bg` | `color-mix(in srgb, [border] 60%, transparent)` | Card background. |
+| `--iw-linked-page-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background. Uses the variant's `paragraphBg` token (admin-configurable), with the auto-computed `--iw-variant-subtle-bg` as fallback when `paragraphBg` is `transparent`. |
 | `--iw-linked-page-card-link-color` | `var(--iw-variant-link-color, inherit)` | Default text color inside the card. |
 | `--iw-linked-page-card-link-hover` | `var(--iw-variant-link-hover, inherit)` | Hover text color (title + lists + minimal). |
 | `--iw-linked-page-card-hover-shadow` | medium shadow | Box-shadow applied on card hover. |

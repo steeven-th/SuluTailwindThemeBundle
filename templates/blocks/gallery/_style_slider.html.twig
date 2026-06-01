@@ -49,7 +49,7 @@
                 data-slider-autoplay-value="true"
                 data-slider-interval-value="5000"
                 data-slider-mode-value="carousel"
-                class="relative overflow-hidden{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}"
+                class="iw-block-gallery iw-block-gallery--slider iw-block-gallery--slider-single relative overflow-hidden{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}"
                 style="aspect-ratio: {{ aspectRatio }};"
             >
                 {# Carousel slides #}
@@ -57,79 +57,81 @@
                     {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                     <div
                         data-slider-target="slide"
-                        class="absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
+                        class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
                     >
                         <a
                             href="{{ media.url }}"
-                            class="glightbox relative block w-full h-full"
+                            class="iw-block-gallery__link glightbox relative block w-full h-full"
                             data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                         >
                             <img
                                 src="{{ media.thumbnails[format]|default(media.url) }}"
                                 alt="{{ media.title|default('') }}"
                                 loading="lazy"
-                                class="absolute inset-0 w-full h-full object-cover cursor-pointer"
+                                class="iw-block-gallery__img absolute inset-0 w-full h-full object-cover cursor-pointer"
                             >
                         </a>
                     </div>
                 {% endfor %}
 
-                {# Prev / Next buttons #}
-                <button
-                    type="button"
-                    data-action="slider#prev"
-                    class="iw-gallery-nav absolute left-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Previous"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button
-                    type="button"
-                    data-action="slider#next"
-                    class="iw-gallery-nav absolute right-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Next"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </button>
+                {# Prev / Next buttons + dots only when there is something to navigate to #}
+                {% if images|length > 1 %}
+                    <button
+                        type="button"
+                        data-action="slider#prev"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--prev absolute left-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Previous"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button
+                        type="button"
+                        data-action="slider#next"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--next absolute right-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Next"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
 
-                {# Dot indicators #}
-                <div data-slider-target="dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
-                    {% for mediaId in images %}
-                        <button
-                            type="button"
-                            data-action="slider#goTo"
-                            data-slider-index-param="{{ loop.index0 }}"
-                            class="w-2.5 h-2.5 rounded-full {{ loop.first ? 'bg-white' : 'bg-white/50' }} transition-colors"
-                            aria-label="Slide {{ loop.index }}"
-                        ></button>
-                    {% endfor %}
-                </div>
+                    {# Dot indicators #}
+                    <div data-slider-target="dots" class="iw-block-gallery__dots absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
+                        {% for mediaId in images %}
+                            <button
+                                type="button"
+                                data-action="slider#goTo"
+                                data-slider-index-param="{{ loop.index0 }}"
+                                class="iw-block-gallery__dot w-2.5 h-2.5 rounded-full {{ loop.first ? 'bg-white' : 'bg-white/50' }} transition-colors"
+                                aria-label="Slide {{ loop.index }}"
+                            ></button>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         {% else %}
             {# ── Default horizontal scroll mode ── #}
             <div
                 data-controller="slider"
                 data-slider-autoplay-value="false"
-                class="relative"
+                class="iw-block-gallery iw-block-gallery--slider relative"
             >
                 {# Slider track #}
                 <div
                     data-slider-target="track"
-                    class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory {{ gapClass }} pb-4 scrollbar-hide"
+                    class="iw-block-gallery__track flex overflow-x-auto scroll-smooth snap-x snap-mandatory {{ gapClass }} pb-4 scrollbar-hide"
                 >
                     {% for mediaId in images %}
                         {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
-                        <figure class="block-image flex-none w-[80%] sm:w-[60%] md:w-[40%] lg:w-[30%] snap-start{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
+                        <figure class="iw-block__image iw-block-gallery__item flex-none w-[80%] sm:w-[60%] md:w-[40%] lg:w-[30%] snap-start{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
                             <a
                                 href="{{ media.url }}"
-                                class="glightbox"
+                                class="iw-block-gallery__link glightbox"
                                 data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                             >
                                 <img
                                     src="{{ media.thumbnails[format]|default(media.url) }}"
                                     alt="{{ media.title|default('') }}"
                                     loading="lazy"
-                                    class="w-full object-cover cursor-pointer"
+                                    class="iw-block-gallery__img w-full object-cover cursor-pointer"
                                     style="aspect-ratio: {{ aspectRatio }};"
                                 >
                             </a>
@@ -137,23 +139,25 @@
                     {% endfor %}
                 </div>
 
-                {# Navigation buttons #}
-                <button
-                    type="button"
-                    data-action="slider#prev"
-                    class="iw-gallery-nav absolute left-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Previous"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button
-                    type="button"
-                    data-action="slider#next"
-                    class="iw-gallery-nav absolute right-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Next"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </button>
+                {# Navigation buttons only when there is something to scroll to #}
+                {% if images|length > 1 %}
+                    <button
+                        type="button"
+                        data-action="slider#prev"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--prev absolute left-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Previous"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button
+                        type="button"
+                        data-action="slider#next"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--next absolute right-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Next"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                {% endif %}
             </div>
         {% endif %}
     {% endif %}

@@ -1,4 +1,10 @@
-{# Form block — form + info side by side #}
+{# Form block — info widget + form side by side.
+   The info column renders one of 3 widgets based on the `widgetType` admin
+   field: rich text, image, or location map. The `formRight` toggle controls
+   the column order:
+     - formRight = false (default): form LEFT (desktop) / form TOP (mobile)
+     - formRight = true:            form RIGHT (desktop) / form BOTTOM (mobile)
+   HTML order drives mobile order; CSS grid keeps the columns aligned on lg+. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -9,24 +15,46 @@
         variant: variant|default(0)
     } only %}
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {# Info / decorative side #}
-        <div class="flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
-            {% if title is defined and title is not empty %}
-                <h3 class="text-2xl md:text-3xl font-bold text-white">{{ title }}</h3>
-            {% endif %}
-            {% if subTitle is defined and subTitle is not empty %}
-                <p class="mt-4 text-white/80 text-lg">{{ subTitle }}</p>
-            {% endif %}
-        </div>
+    {% set widgetKind = widgetType|default('text') %}
+    {% set isFormRight = formRight|default(false) %}
 
-        {# Form side #}
-        <div>
-            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_form_content.html.twig' with {
-                useSuluFormBundle: useSuluFormBundle|default(false),
-                form: form|default(null),
-                twigTemplate: twigTemplate|default('')
-            } only %}
-        </div>
+    <div class="iw-block-form iw-block-form--split grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {% if isFormRight %}
+            {# Widget first (LEFT desktop / TOP mobile), form after #}
+            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/form/widgets/_widget_' ~ widgetKind ~ '.html.twig' with {
+                    text: widgetText|default(''),
+                    image: widgetImage|default(null),
+                    location: widgetLocation|default(null),
+                    paragraphImageRadius: resolvedParagraphRadius|default('')
+                } only %}
+            </div>
+
+            <div class="iw-block-form__content">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_form_content.html.twig' with {
+                    useSuluFormBundle: useSuluFormBundle|default(false),
+                    form: form|default(null),
+                    twigTemplate: twigTemplate|default('')
+                } only %}
+            </div>
+        {% else %}
+            {# Form first (LEFT desktop / TOP mobile), widget after #}
+            <div class="iw-block-form__content">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_form_content.html.twig' with {
+                    useSuluFormBundle: useSuluFormBundle|default(false),
+                    form: form|default(null),
+                    twigTemplate: twigTemplate|default('')
+                } only %}
+            </div>
+
+            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/form/widgets/_widget_' ~ widgetKind ~ '.html.twig' with {
+                    text: widgetText|default(''),
+                    image: widgetImage|default(null),
+                    location: widgetLocation|default(null),
+                    paragraphImageRadius: resolvedParagraphRadius|default('')
+                } only %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

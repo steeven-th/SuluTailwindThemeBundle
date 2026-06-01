@@ -26,14 +26,12 @@
 
         {% set hasInfo = (title is defined and title is not empty) or formattedAddress is not empty or (text is defined and text is not empty) %}
 
-        <div class="relative"
-             style="--card-border: var(--iw-variant-hr-color, var(--color-border, #e5e7eb));"
-        >
+        <div class="iw-block-location iw-block-location--overlay relative">
             {# Map background #}
-            <div class="{{ paragraphImageRadius|default('') }} overflow-hidden">
+            <div class="iw-block-location__map-wrap {{ paragraphImageRadius|default('') }} overflow-hidden">
                 <iframe
                     src="https://www.openstreetmap.org/export/embed.html?bbox={{ location.long - offset }}%2C{{ location.lat - offset }}%2C{{ location.long + offset }}%2C{{ location.lat + offset }}&amp;layer=mapnik&amp;marker={{ location.lat }}%2C{{ location.long }}"
-                    class="w-full h-[400px] md:h-[500px] border-0"
+                    class="iw-block-location__map w-full h-[400px] md:h-[500px] border-0"
                     loading="lazy"
                     title="{{ title|default('Map') }}"
                     allowfullscreen
@@ -42,18 +40,18 @@
 
             {# Floating collapsible info card #}
             {% if hasInfo %}
-                <div class="iw-location-card"
+                <div class="iw-block-location__card"
                      data-controller="location-overlay"
                      data-location-overlay-target="card"
                 >
                     {# Always-visible header with title + toggle #}
                     <button type="button"
-                            class="iw-location-card__header"
+                            class="iw-block-location__card-header"
                             data-location-overlay-target="header"
                             data-action="location-overlay#toggle"
                             aria-expanded="false"
                     >
-                        <span class="iw-location-card__header-content">
+                        <span class="iw-block-location__card-header-content">
                             {% if title is defined and title is not empty %}
                                 <span class="text-base font-semibold text-black leading-tight">{{ title }}</span>
                             {% endif %}
@@ -61,7 +59,7 @@
                                 <span class="text-sm text-black/75 leading-tight">{{ formattedAddress|split("\n")|first }}</span>
                             {% endif %}
                         </span>
-                        <svg class="iw-location-card__chevron"
+                        <svg class="iw-block-location__card-chevron"
                              data-location-overlay-target="chevron"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         >
@@ -70,19 +68,19 @@
                     </button>
 
                     {# Collapsible body — hidden by default #}
-                    <div class="iw-location-card__body"
+                    <div class="iw-block-location__card-body"
                          data-location-overlay-target="body"
                          style="display: none; max-height: 0px; opacity: 0;"
                     >
                         {% if formattedAddress is not empty %}
                             <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))] flex-none mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <p class="text-sm whitespace-pre-line text-black/75">{{ formattedAddress }}</p>
+                                <svg class="iw-block-location__address-icon w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))] flex-none mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <p class="iw-block-location__address-text text-sm whitespace-pre-line text-black/75">{{ formattedAddress }}</p>
                             </div>
                         {% endif %}
 
                         {% if text is defined and text is not empty %}
-                            <div class="prose prose-sm max-w-none text-black">
+                            <div class="iw-block__text iw-block-location__text prose prose-sm max-w-none text-black">
                                 {{ text|raw }}
                             </div>
                         {% endif %}
@@ -91,14 +89,14 @@
                             href="https://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.long }}#map={{ zoom }}/{{ location.lat }}/{{ location.long }}"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="iw-button--variant inline-block px-4 py-2 text-sm text-center no-underline flex-shrink-0"
+                            class="iw-button--variant iw-block-location__action inline-block px-4 py-2 text-sm text-center no-underline flex-shrink-0"
                         >
                             {{ 'iw_sulu_tailwind_theme.open_map'|trans|default('Open in maps') }} &#8599;
                         </a>
                     </div>
 
                     {# Scroll indicator — visible only when body is open and has overflow #}
-                    <div class="iw-location-card__scroll-hint"
+                    <div class="iw-block-location__card-scroll-hint"
                          data-location-overlay-target="scrollHint"
                          data-action="click->location-overlay#scrollDown"
                          style="display: none; opacity: 0; pointer-events: none;"
