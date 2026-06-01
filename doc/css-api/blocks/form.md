@@ -4,7 +4,7 @@ Wrapper block that renders a contact / signup form (either a raw `_form_content.
 
 - `--centered`: single column constrained to `max-w-2xl`, centered horizontally.
 - `--card`: single column constrained to `max-w-xl` with a white surface, shadow and large internal padding.
-- `--split`: two columns on `lg+`. The left column is a decorative "info" panel with the primary color background, the right column hosts the form.
+- `--split`: two columns on `lg+`. One column hosts the form, the other is an "info" panel with the primary color background that hosts a **configurable widget** (rich text, image, or location map — picked via the `widgetType` admin field). The `formRight` toggle controls the column order: off by default → form on the left, widget on the right; on → form on the right, widget on the left.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 >
@@ -28,9 +28,24 @@ Wrapper block that renders a contact / signup form (either a raw `_form_content.
 | Class | Role |
 |-------|------|
 | `.iw-block-form__content` | Wrapper around the included `_form_content.html.twig` partial. Always present, but the surrounding layout differs per modifier. |
-| `.iw-block-form__info` | `--split` only — decorative panel rendered on the left column on `lg+` (stacks above the form on mobile). Carries `bg-[var(--color-primary)] text-white` by default but the background is overridable via custom property (see below). |
-| `.iw-block-form__info-title` | The duplicated `<h3>` title inside the info panel. |
-| `.iw-block-form__info-subtitle` | The duplicated `<p>` subtitle inside the info panel. |
+| `.iw-block-form__info` | `--split` only — info panel rendered on the left column on `lg+` (stacks above the form on mobile). Carries `bg-[var(--color-primary)] text-white` by default but the background is overridable via custom property (see below). Hosts the widget partial selected by `widgetType`. |
+
+### `--split` widget elements
+
+The info column renders one of three partials depending on the `widgetType` admin field:
+
+| Class | Role |
+|-------|------|
+| `.iw-block-form__widget` | Stable hook on the widget wrapper. Always present in `--split`. |
+| `.iw-block-form__widget--text` | Modifier when `widgetType=text`. Wraps a `prose max-w-none` rich-text block fed by the `widgetText` text_editor field. |
+| `.iw-block-form__widget--image` | Modifier when `widgetType=image`. Wraps an `<img>` (`object-fit: cover`, height fills the info column). |
+| `.iw-block-form__widget--location` | Modifier when `widgetType=location`. Wraps the OpenStreetMap iframe + the formatted address row. |
+| `.iw-block-form__image` | The `<img>` inside `--image`. |
+| `.iw-block-form__map-wrap` | Wrapper around the OSM iframe (carries `paragraphImageRadius + overflow-hidden` when set). |
+| `.iw-block-form__map` | The OSM `<iframe>` inside `--location`. |
+| `.iw-block-form__map-address` | Row rendered below the map with a pin icon + formatted address. |
+| `.iw-block-form__map-address-icon` | The pin SVG. |
+| `.iw-block-form__map-address-text` | The `<p>` holding the multi-line address. |
 
 ---
 
@@ -43,6 +58,14 @@ Wrapper block that renders a contact / signup form (either a raw `_form_content.
 | `--iw-block-form-info-title-color` | `var(--iw-block-form-info-color, #fff)` | Color for the info-panel title. |
 | `--iw-block-form-info-subtitle-color` | `rgb(255 255 255 / 0.8)` | Color for the info-panel subtitle (semi-transparent white by default). |
 | `--iw-block-form-card-bg` | `#fff` | Background of the `--card` surface. |
+| `--iw-block-form-widget-image-min-height` | `12rem` | Minimum height of the image widget (it stretches to fill the info column). |
+| `--iw-block-form-map-address-gap` | `0.75rem` | Vertical gap between the map and the address row in the `location` widget. |
+| `--iw-block-form-map-address-color` | `inherit` | Address text color (inherits the info-panel `--iw-block-form-info-color` by default). |
+| `--iw-block-form-map-address-icon-color` | `currentColor` | Pin icon color. |
+| `--iw-block-form-map-address-icon-size` | `1.25rem` | Pin icon size. |
+| `--iw-block-form-map-address-icon-gap` | `0.5rem` | Gap between the pin icon and the address text. |
+| `--iw-block-form-map-address-size` | `0.875rem` | Address font-size. |
+| `--iw-block-form-map-address-opacity` | `0.9` | Address opacity. |
 
 ---
 

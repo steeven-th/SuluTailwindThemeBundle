@@ -603,5 +603,10 @@
     "iw_sulu_tailwind_theme.accessory_counter_count": "Zahl",
     "iw_sulu_tailwind_theme.accessory_counter_unit": "Einheit",
     "iw_sulu_tailwind_theme.accessory_counter_unit_info": "Suffix neben der Zahl (%, +, k, M)",
-    "iw_sulu_tailwind_theme.accessory_counter_label": "Bezeichnung"
+    "iw_sulu_tailwind_theme.accessory_counter_label": "Bezeichnung",
+    "iw_sulu_tailwind_theme.widget_type": "Widget-Typ",
+    "iw_sulu_tailwind_theme.widget_text": "Text",
+    "iw_sulu_tailwind_theme.widget_image": "Bild",
+    "iw_sulu_tailwind_theme.widget_location": "Karte",
+    "iw_sulu_tailwind_theme.form_position_right": "Formular rechts"
 }

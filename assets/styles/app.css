@@ -2285,6 +2285,48 @@ section.block:has([data-slider-fullbleed-value]) {
     background-color: var(--iw-block-form-card-bg, #fff);
 }
 
+/* --split widget (text / image / location). The widget partial fills the info
+   column to the edges so its background matches `.iw-block-form__info`. */
+.iw-block-form__widget {
+    width: 100%;
+}
+
+.iw-block-form__widget--image {
+    height: 100%;
+    min-height: var(--iw-block-form-widget-image-min-height, 12rem);
+}
+
+/* Location widget — map iframe + formatted address row below. Same layout
+   pattern as the CTA accessory location, but the variables are scoped under
+   the form namespace so each block can be themed independently. */
+.iw-block-form__widget--location {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-form-map-address-gap, 0.75rem);
+}
+
+.iw-block-form__map-address {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--iw-block-form-map-address-icon-gap, 0.5rem);
+    color: var(--iw-block-form-map-address-color, inherit);
+}
+
+.iw-block-form__map-address-icon {
+    flex: none;
+    width: var(--iw-block-form-map-address-icon-size, 1.25rem);
+    height: var(--iw-block-form-map-address-icon-size, 1.25rem);
+    margin-top: 0.125rem;
+    color: var(--iw-block-form-map-address-icon-color, currentColor);
+}
+
+.iw-block-form__map-address-text {
+    margin: 0;
+    font-size: var(--iw-block-form-map-address-size, 0.875rem);
+    line-height: 1.5;
+    opacity: var(--iw-block-form-map-address-opacity, 0.9);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Location Overlay — Collapsible info card
    Floats over the map on desktop, full-width bottom sheet on mobile.

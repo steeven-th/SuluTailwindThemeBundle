@@ -701,5 +701,10 @@
     "iw_sulu_tailwind_theme.accessory_counter_count": "Nombre",
     "iw_sulu_tailwind_theme.accessory_counter_unit": "Unité",
     "iw_sulu_tailwind_theme.accessory_counter_unit_info": "Suffixe affiché à côté du nombre (%, +, k, M)",
-    "iw_sulu_tailwind_theme.accessory_counter_label": "Libellé"
+    "iw_sulu_tailwind_theme.accessory_counter_label": "Libellé",
+    "iw_sulu_tailwind_theme.widget_type": "Type de widget",
+    "iw_sulu_tailwind_theme.widget_text": "Texte",
+    "iw_sulu_tailwind_theme.widget_image": "Image",
+    "iw_sulu_tailwind_theme.widget_location": "Carte",
+    "iw_sulu_tailwind_theme.form_position_right": "Formulaire à droite"
 }

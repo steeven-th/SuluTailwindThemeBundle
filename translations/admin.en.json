@@ -610,5 +610,10 @@
     "iw_sulu_tailwind_theme.accessory_counter_count": "Count",
     "iw_sulu_tailwind_theme.accessory_counter_unit": "Unit",
     "iw_sulu_tailwind_theme.accessory_counter_unit_info": "Suffix shown next to the number (%, +, k, M)",
-    "iw_sulu_tailwind_theme.accessory_counter_label": "Label"
+    "iw_sulu_tailwind_theme.accessory_counter_label": "Label",
+    "iw_sulu_tailwind_theme.widget_type": "Widget type",
+    "iw_sulu_tailwind_theme.widget_text": "Text",
+    "iw_sulu_tailwind_theme.widget_image": "Image",
+    "iw_sulu_tailwind_theme.widget_location": "Map",
+    "iw_sulu_tailwind_theme.form_position_right": "Form on the right"
 }

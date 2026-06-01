@@ -23,5 +23,6 @@
     "iw_sulu_tailwind_theme.article.pagination_next": "Page suivante",
     "iw_sulu_tailwind_theme.article.pagination_info": "Page %current% sur %total%",
     "iw_sulu_tailwind_theme.accessory_video": "Vidéo",
-    "iw_sulu_tailwind_theme.accessory_location": "Carte"
+    "iw_sulu_tailwind_theme.accessory_location": "Carte",
+    "iw_sulu_tailwind_theme.widget_location": "Carte"
 }
