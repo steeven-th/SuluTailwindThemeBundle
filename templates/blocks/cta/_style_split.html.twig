@@ -9,35 +9,35 @@
     {# HTML order determines mobile order:
        contentRight=false → text first, image below (mobile) / image right (desktop)
        contentRight=true  → image first, image above (mobile) / image left (desktop) #}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-5 items-center">
+    <div class="iw-block-cta iw-block-cta--split grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-5 items-center">
         {% if isContentRight %}
         {# Image LEFT (desktop) / Image TOP (mobile) #}
-        <div{% if resolvedParagraphRadius %} class="{{ resolvedParagraphRadius }} overflow-hidden"{% endif %}>
+        <div class="iw-block-cta__image-wrap{% if resolvedParagraphRadius %} {{ resolvedParagraphRadius }} overflow-hidden{% endif %}">
             {% if image is defined and image.id is defined %}
                 {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
                 <img
                     src="{{ resolvedImage.thumbnails['iw_theme_4_3']|default(resolvedImage.url) }}"
                     alt="{{ resolvedImage.title|default('') }}"
                     loading="lazy"
-                    class="w-full object-cover"
+                    class="iw-block-cta__image w-full object-cover"
                     style="aspect-ratio: 4/3;"
                 >
             {% endif %}
         </div>
 
-        <div>
+        <div class="iw-block-cta__content">
         {% else %}
         {# Text LEFT (desktop) / Text TOP (mobile) #}
-        <div>
+        <div class="iw-block-cta__content">
         {% endif %}
             {% if title is defined and title is not empty %}
-                <h2 class="iw-block__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ titleAlignClass }}">{{ title }}</h2>
+                <h2 class="iw-block__title iw-block-cta__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ titleAlignClass }}">{{ title }}</h2>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="iw-block__subtitle text-lg md:text-xl mt-2 opacity-75 {{ titleAlignClass }}">{{ subTitle }}</h3>
+                <h3 class="iw-block__subtitle iw-block-cta__subtitle text-lg md:text-xl mt-2 opacity-75 {{ titleAlignClass }}">{{ subTitle }}</h3>
             {% endif %}
             {% if text is defined and text is not empty %}
-                <div class="iw-block__text prose max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
+                <div class="iw-block__text iw-block-cta__text prose max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
                     {{ text|raw }}
                 </div>
             {% endif %}
@@ -54,14 +54,14 @@
 
         {% if not isContentRight %}
         {# Image RIGHT (desktop) / Image BOTTOM (mobile) #}
-        <div{% if resolvedParagraphRadius %} class="{{ resolvedParagraphRadius }} overflow-hidden"{% endif %}>
+        <div class="iw-block-cta__image-wrap{% if resolvedParagraphRadius %} {{ resolvedParagraphRadius }} overflow-hidden{% endif %}">
             {% if image is defined and image.id is defined %}
                 {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
                 <img
                     src="{{ resolvedImage.thumbnails['iw_theme_4_3']|default(resolvedImage.url) }}"
                     alt="{{ resolvedImage.title|default('') }}"
                     loading="lazy"
-                    class="w-full object-cover"
+                    class="iw-block-cta__image w-full object-cover"
                     style="aspect-ratio: 4/3;"
                 >
             {% endif %}

@@ -17,22 +17,22 @@
     {% set pbNum = pbClass|default('pb-0')|split('-')|last %}
 
     {# Fullbleed wrapper: breaks out of section padding + container to fill the entire section #}
-    <div class="relative overflow-hidden {{ resolvedParagraphRadius|default('') }} {{ bgImageUrl is empty ? 'bg-[var(--color-primary)]' : '' }}"
+    <div class="iw-block-cta iw-block-cta--banner relative overflow-hidden {{ resolvedParagraphRadius|default('') }} {{ bgImageUrl is empty ? 'bg-[var(--color-primary)]' : '' }}"
          style="margin-top: -{{ spacingMap[ptNum]|default('0px') }}; margin-bottom: -{{ spacingMap[pbNum]|default('0px') }}; margin-inline: calc(-50vw + 50%); width: 100vw;">
         {% if bgImageUrl is not empty %}
-            <img src="{{ bgImageUrl }}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/50"></div>
+            <img src="{{ bgImageUrl }}" alt="" loading="lazy" class="iw-block-cta__background absolute inset-0 w-full h-full object-cover">
+            <div class="iw-block-cta__overlay absolute inset-0 bg-black/50"></div>
         {% endif %}
 
-        <div class="relative z-10 container mx-auto {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} text-white">
+        <div class="iw-block-cta__content relative z-10 container mx-auto {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} text-white">
             {% if title is defined and title is not empty %}
-                <h2 class="iw-block__title text-3xl md:text-4xl lg:text-5xl font-[var(--font-h2-weight)] text-white {{ titleAlignClass }}">{{ title }}</h2>
+                <h2 class="iw-block__title iw-block-cta__title text-3xl md:text-4xl lg:text-5xl font-[var(--font-h2-weight)] text-white {{ titleAlignClass }}">{{ title }}</h2>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="iw-block__subtitle text-lg md:text-xl mt-3 text-white/80 {{ titleAlignClass }}">{{ subTitle }}</h3>
+                <h3 class="iw-block__subtitle iw-block-cta__subtitle text-lg md:text-xl mt-3 text-white/80 {{ titleAlignClass }}">{{ subTitle }}</h3>
             {% endif %}
             {% if text is defined and text is not empty %}
-                <div class="iw-block__text prose prose-invert max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
+                <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">
                     {{ text|raw }}
                 </div>
             {% endif %}

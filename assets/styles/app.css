@@ -2092,6 +2092,39 @@ section.block:has([data-slider-fullbleed-value]) {
 /* Block variant background and padding are handled
    via Tailwind classes (py-*, px-*) directly on the <section> in _block_wrapper.html.twig. */
 
+/* ─── Block: cta ───────────────────────────────────────────────────────── */
+/* Three layout modifiers: --centered (default), --banner (fullbleed with
+   optional background image + dark overlay), --split (image + content
+   side-by-side). All sizing, spacing, alignment, container behavior and
+   text inversion is driven by Tailwind utility classes emitted by the
+   Twig templates — the rules below are hooks meant for downstream theming
+   only. Override by setting a custom property or by writing your own rule
+   scoped through the modifier (e.g. `.iw-block-cta--banner .iw-block-cta__overlay`). */
+
+.iw-block-cta {
+    /* Hook only — no default styling. */
+}
+
+/* Background image and dark overlay used by --banner. They sit at z-index 0,
+   the content (.iw-block-cta__content) is lifted above them via Tailwind
+   `relative z-10`. Override the overlay color or opacity here. */
+.iw-block-cta--banner .iw-block-cta__overlay {
+    background-color: var(--iw-block-cta-overlay-color, rgb(0 0 0 / 0.5));
+}
+
+.iw-block-cta--banner .iw-block-cta__background {
+    object-position: var(--iw-block-cta-background-position, center);
+}
+
+/* Actions row (primary + optional secondary button). The Twig template
+   pre-sets `flex flex-wrap items-center gap-4 mt-6`; the gap is also
+   exposed as a custom property so it can be tweaked without rewriting
+   the template. */
+.iw-block-cta__actions {
+    gap: var(--iw-block-cta-actions-gap, 1rem);
+    margin-top: var(--iw-block-cta-actions-margin-top, 1.5rem);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Location Overlay — Collapsible info card
    Floats over the map on desktop, full-width bottom sheet on mobile.
