@@ -126,7 +126,8 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-timeline-ring` | `var(--color-secondary, var(--color-primary))` | Dot outer ring color. |
 | `--iw-block-key-figures-timeline-line` | inherits `--accent` | Overrides the line color if you want it different from the accent. |
 | `--iw-block-key-figures-timeline-card-border` | inherits `--accent` | Card border color. |
-| `--iw-block-key-figures-timeline-card-bg` | `color-mix(--accent 60%, transparent)` | Card background. |
+| `--iw-block-key-figures-timeline-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background. Uses the variant's `paragraphBg` token (admin-configurable), with the auto-computed `--iw-variant-subtle-bg` as fallback when `paragraphBg` is `transparent`. |
+| `--iw-block-key-figures-timeline-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Default text color inside the timeline card. |
 | `--iw-key-figure-timeline-dot-size` | `1rem` | Dot diameter. |
 | `--iw-key-figure-timeline-dot-ring-width` | `4px` | Dot ring thickness. |
 | `--iw-key-figure-timeline-card-padding` | `1.5rem` | Card padding. |

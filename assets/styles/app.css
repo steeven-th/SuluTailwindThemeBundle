@@ -401,7 +401,8 @@ img.object-cover {
     gap: var(--iw-document-card-gap, 1rem);
     padding: var(--iw-document-card-padding, 1rem);
     border: 1px solid var(--iw-document-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    background-color: var(--iw-document-card-bg, color-mix(in srgb, var(--iw-document-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb))) 60%, transparent));
+    background-color: var(--iw-document-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-document-card-color, var(--iw-variant-paragraph-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-document-card-transition-duration, 0.2s) ease;
 }
@@ -534,7 +535,7 @@ img.object-cover {
     height: 100%;
     padding: var(--iw-linked-page-card-padding, 1.5rem);
     border: 1px solid var(--iw-linked-page-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    background-color: var(--iw-linked-page-card-bg, color-mix(in srgb, var(--iw-linked-page-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb))) 60%, transparent));
+    background-color: var(--iw-linked-page-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1253,7 +1254,8 @@ img.object-cover {
     margin-left: 3rem;
     padding: var(--iw-key-figure-timeline-card-padding, 1.5rem);
     border: 1px solid var(--iw-block-key-figures-timeline-card-border, var(--iw-block-key-figures-timeline-accent, var(--iw-variant-hr-color, var(--color-primary))));
-    background-color: var(--iw-block-key-figures-timeline-card-bg, color-mix(in srgb, var(--iw-block-key-figures-timeline-accent, var(--iw-variant-hr-color, var(--color-primary))) 60%, transparent));
+    background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
 }
 
 @media (min-width: 768px) {
