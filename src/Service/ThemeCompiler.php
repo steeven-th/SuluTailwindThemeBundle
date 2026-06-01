@@ -1662,9 +1662,11 @@ class ThemeCompiler
     /**
      * Generate CSS classes for block variants.
      *
-     * Each variant generates a `.block-variant-{index}` class with CSS custom
-     * properties for title, subtitle, paragraph, link, list, hr, paragraphBg,
-     * blockBg, and form colors. Templates use these properties for consistent styling.
+     * Each variant generates a `.iw-variant--{index}` class exposing CSS custom
+     * properties (`--iw-variant-title-color`, `--iw-variant-paragraph-color`,
+     * `--iw-variant-link-color`, `--iw-variant-hr-color`, `--iw-variant-paragraph-bg`,
+     * `--iw-variant-subtle-bg`, plus form-related vars). Templates and the bundle
+     * CSS consume these variables for consistent styling.
      *
      * Variants are stored as an indexed array; the array position (0, 1, 2...)
      * is the identifier, making variants interchangeable between themes.
@@ -1681,21 +1683,21 @@ class ThemeCompiler
         // Map from token keys to CSS custom property names
         $propertyMap = [
             'blockBg' => 'background-color',
-            'title' => '--variant-title-color',
-            'subtitle' => '--variant-subtitle-color',
-            'paragraph' => '--variant-paragraph-color',
-            'link' => '--variant-link-color',
-            'linkHover' => '--variant-link-hover',
-            'list' => '--variant-list-color',
-            'hr' => '--variant-hr-color',
-            'paragraphBg' => '--variant-paragraph-bg',
+            'title' => '--iw-variant-title-color',
+            'subtitle' => '--iw-variant-subtitle-color',
+            'paragraph' => '--iw-variant-paragraph-color',
+            'link' => '--iw-variant-link-color',
+            'linkHover' => '--iw-variant-link-hover',
+            'list' => '--iw-variant-list-color',
+            'hr' => '--iw-variant-hr-color',
+            'paragraphBg' => '--iw-variant-paragraph-bg',
         ];
 
         foreach ($blockVariants as $index => $props) {
             if (!is_array($props)) {
                 continue;
             }
-            $css .= ".block-variant-{$index} {\n";
+            $css .= ".iw-variant--{$index} {\n";
 
             foreach ($propertyMap as $tokenKey => $cssProperty) {
                 // blockBg is handled separately with the [data-has-bg] selector
@@ -1719,133 +1721,133 @@ class ThemeCompiler
             $subtleBg = $this->isLightBackground($blockBgHex)
                 ? 'rgba(0,0,0,0.04)'
                 : 'rgba(255,255,255,0.07)';
-            $css .= "  --variant-subtle-bg: {$subtleBg};\n";
+            $css .= "  --iw-variant-subtle-bg: {$subtleBg};\n";
 
             $css .= "}\n";
 
             // Block background only visible when showBackground is checked (data-has-bg)
             if (!empty($props['blockBg'])) {
                 $resolvedBlockBg = $this->resolveColorValue((string) $props['blockBg']);
-                $css .= ".block-variant-{$index}[data-has-bg=\"true\"] {\n";
+                $css .= ".iw-variant--{$index}[data-has-bg=\"true\"] {\n";
                 $css .= "  background-color: {$resolvedBlockBg};\n";
                 $css .= "}\n";
             }
 
             // Child element selectors using custom properties
-            $css .= ".block-variant-{$index} h1,\n";
-            $css .= ".block-variant-{$index} h2,\n";
-            $css .= ".block-variant-{$index} h3,\n";
-            $css .= ".block-variant-{$index} h4,\n";
-            $css .= ".block-variant-{$index} h5,\n";
-            $css .= ".block-variant-{$index} h6 {\n";
-            $css .= "  color: var(--variant-title-color, inherit);\n";
+            $css .= ".iw-variant--{$index} h1,\n";
+            $css .= ".iw-variant--{$index} h2,\n";
+            $css .= ".iw-variant--{$index} h3,\n";
+            $css .= ".iw-variant--{$index} h4,\n";
+            $css .= ".iw-variant--{$index} h5,\n";
+            $css .= ".iw-variant--{$index} h6 {\n";
+            $css .= "  color: var(--iw-variant-title-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} .block-subtitle {\n";
-            $css .= "  color: var(--variant-subtitle-color, inherit);\n";
+            $css .= ".iw-variant--{$index} .block-subtitle {\n";
+            $css .= "  color: var(--iw-variant-subtitle-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} p {\n";
-            $css .= "  color: var(--variant-paragraph-color, inherit);\n";
+            $css .= ".iw-variant--{$index} p {\n";
+            $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} a:not([class*=\"iw-button--\"]) {\n";
-            $css .= "  color: var(--variant-link-color, inherit);\n";
+            $css .= ".iw-variant--{$index} a:not([class*=\"iw-button--\"]) {\n";
+            $css .= "  color: var(--iw-variant-link-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} a:not([class*=\"iw-button--\"]):hover {\n";
-            $css .= "  color: var(--variant-link-hover, var(--variant-link-color, inherit));\n";
+            $css .= ".iw-variant--{$index} a:not([class*=\"iw-button--\"]):hover {\n";
+            $css .= "  color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} ul,\n";
-            $css .= ".block-variant-{$index} ol {\n";
-            $css .= "  color: var(--variant-list-color, inherit);\n";
+            $css .= ".iw-variant--{$index} ul,\n";
+            $css .= ".iw-variant--{$index} ol {\n";
+            $css .= "  color: var(--iw-variant-list-color, inherit);\n";
             $css .= "}\n";
 
             // List bottom margin inside block-text
-            $css .= ".block-variant-{$index} .block-text ul,\n";
-            $css .= ".block-variant-{$index} .block-text ol {\n";
+            $css .= ".iw-variant--{$index} .block-text ul,\n";
+            $css .= ".iw-variant--{$index} .block-text ol {\n";
             $css .= "  margin-bottom: 1em;\n";
             $css .= "}\n";
 
             // Table styling (CKEditor wraps in <figure class="table">)
-            $css .= ".block-variant-{$index} figure.table {\n";
+            $css .= ".iw-variant--{$index} figure.table {\n";
             $css .= "  margin: 1rem 0;\n";
             $css .= "  overflow-x: auto;\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} table {\n";
+            $css .= ".iw-variant--{$index} table {\n";
             $css .= "  width: 100%;\n";
             $css .= "  border-collapse: collapse;\n";
-            $css .= "  color: var(--variant-paragraph-color, inherit);\n";
+            $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} table th,\n";
-            $css .= ".block-variant-{$index} table td {\n";
+            $css .= ".iw-variant--{$index} table th,\n";
+            $css .= ".iw-variant--{$index} table td {\n";
             $css .= "  padding: 0.75rem 1rem;\n";
-            $css .= "  border: 1px solid var(--variant-hr-color, #e5e7eb);\n";
+            $css .= "  border: 1px solid var(--iw-variant-hr-color, #e5e7eb);\n";
             $css .= "  text-align: left;\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} table th {\n";
+            $css .= ".iw-variant--{$index} table th {\n";
             $css .= "  font-weight: 600;\n";
-            $css .= "  color: var(--variant-title-color, inherit);\n";
-            $css .= "  background-color: var(--variant-subtle-bg);\n";
+            $css .= "  color: var(--iw-variant-title-color, inherit);\n";
+            $css .= "  background-color: var(--iw-variant-subtle-bg);\n";
             $css .= "}\n";
 
             // Inline code (<code> not inside <pre>)
-            $css .= ".block-variant-{$index} :not(pre) > code {\n";
-            $css .= "  background-color: var(--variant-subtle-bg);\n";
+            $css .= ".iw-variant--{$index} :not(pre) > code {\n";
+            $css .= "  background-color: var(--iw-variant-subtle-bg);\n";
             $css .= "  padding: 0.15em 0.4em;\n";
             $css .= "  border-radius: 4px;\n";
             $css .= "  font-size: 0.875em;\n";
-            $css .= "  border: 1px solid var(--variant-hr-color, #e5e7eb);\n";
+            $css .= "  border: 1px solid var(--iw-variant-hr-color, #e5e7eb);\n";
             $css .= "}\n";
 
             // Code blocks (<pre><code>)
-            $css .= ".block-variant-{$index} pre {\n";
-            $css .= "  background-color: var(--variant-subtle-bg);\n";
+            $css .= ".iw-variant--{$index} pre {\n";
+            $css .= "  background-color: var(--iw-variant-subtle-bg);\n";
             $css .= "  padding: 1rem 1.25rem;\n";
             $css .= "  border-radius: var(--border-radius, 8px);\n";
             $css .= "  overflow-x: auto;\n";
             $css .= "  margin: 1rem 0;\n";
-            $css .= "  border: 1px solid var(--variant-hr-color, #e5e7eb);\n";
+            $css .= "  border: 1px solid var(--iw-variant-hr-color, #e5e7eb);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} pre code {\n";
+            $css .= ".iw-variant--{$index} pre code {\n";
             $css .= "  background: none;\n";
             $css .= "  padding: 0;\n";
             $css .= "  border-radius: 0;\n";
             $css .= "  border: none;\n";
             $css .= "  font-size: 0.875em;\n";
-            $css .= "  color: var(--variant-paragraph-color, inherit);\n";
+            $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
             // Blockquote
-            $css .= ".block-variant-{$index} blockquote {\n";
-            $css .= "  border-left: 4px solid var(--variant-hr-color, #e5e7eb);\n";
+            $css .= ".iw-variant--{$index} blockquote {\n";
+            $css .= "  border-left: 4px solid var(--iw-variant-hr-color, #e5e7eb);\n";
             $css .= "  padding: 0.5rem 0 0.5rem 1rem;\n";
             $css .= "  margin: 1rem 0;\n";
-            $css .= "  color: var(--variant-subtitle-color, inherit);\n";
+            $css .= "  color: var(--iw-variant-subtitle-color, inherit);\n";
             $css .= "  font-style: italic;\n";
             $css .= "}\n";
 
             // To-do list (CKEditor <ul class="todo-list">)
-            $css .= ".block-variant-{$index} .todo-list {\n";
+            $css .= ".iw-variant--{$index} .todo-list {\n";
             $css .= "  list-style: none;\n";
             $css .= "  padding-left: 0;\n";
-            $css .= "  color: var(--variant-list-color, inherit);\n";
+            $css .= "  color: var(--iw-variant-list-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} .todo-list .todo-list__label {\n";
+            $css .= ".iw-variant--{$index} .todo-list .todo-list__label {\n";
             $css .= "  display: flex;\n";
             $css .= "  align-items: flex-start;\n";
             $css .= "  gap: 0.5rem;\n";
             $css .= "}\n";
 
-            $css .= ".block-variant-{$index} .todo-list input[type=\"checkbox\"] {\n";
+            $css .= ".iw-variant--{$index} .todo-list input[type=\"checkbox\"] {\n";
             $css .= "  margin-top: 0.25em;\n";
-            $css .= "  accent-color: var(--variant-link-color, var(--color-primary, currentColor));\n";
+            $css .= "  accent-color: var(--iw-variant-link-color, var(--color-primary, currentColor));\n";
             $css .= "}\n";
 
             $css .= $this->generateVariantFormCss((string) $index, $props);
@@ -1860,8 +1862,8 @@ class ThemeCompiler
             // No visible paragraphBg → no background, no padding, no margin.
             $pgBg = $this->resolveColorValue(trim($props['paragraphBg'] ?? ''));
             if ($pgBg !== '' && strtolower($pgBg) !== 'transparent') {
-                $css .= ".block-variant-{$index} .block-text {\n";
-                $css .= "  background-color: var(--variant-paragraph-bg);\n";
+                $css .= ".iw-variant--{$index} .block-text {\n";
+                $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
                 $css .= "  padding: 1rem 1.5rem;\n";
                 $css .= "  margin-block: 1rem;\n";
                 $css .= "  overflow: hidden;\n";
@@ -1869,11 +1871,11 @@ class ThemeCompiler
                 // Remove bottom margin when block-text is the last child
                 // to prevent it from stacking with the section's padding-bottom
                 // or overflowing when pb is 0.
-                $css .= ".block-variant-{$index} .block-text:last-child {\n";
+                $css .= ".iw-variant--{$index} .block-text:last-child {\n";
                 $css .= "  margin-bottom: 0;\n";
                 $css .= "}\n";
                 // Hide the dark overlay on background images when paragraph has its own bg
-                $css .= ".block-variant-{$index} .block-bg-overlay {\n";
+                $css .= ".iw-variant--{$index} .block-bg-overlay {\n";
                 $css .= "  display: none;\n";
                 $css .= "}\n";
             }
@@ -1922,7 +1924,7 @@ class ThemeCompiler
         $css = '';
 
         // Set CSS custom properties on the variant root
-        $css .= ".block-variant-{$variantName} {\n";
+        $css .= ".iw-variant--{$variantName} {\n";
         foreach ($formProps as $tokenKey => $cssVar) {
             if (!empty($props[$tokenKey])) {
                 $css .= "  {$cssVar}: {$this->resolveColorValue((string) $props[$tokenKey])};\n";
@@ -1931,7 +1933,7 @@ class ThemeCompiler
         $css .= "}\n";
 
         // Input, textarea, select styling
-        $v = ".block-variant-{$variantName}";
+        $v = ".iw-variant--{$variantName}";
         $inputSelector = "{$v} input:not([type=\"checkbox\"]):not([type=\"radio\"]):not([type=\"submit\"]):not([type=\"button\"]),\n"
             . "{$v} textarea,\n"
             . "{$v} select";
@@ -1960,17 +1962,17 @@ class ThemeCompiler
         $css .= "}\n";
 
         // Labels
-        $css .= ".block-variant-{$variantName} label {\n";
+        $css .= ".iw-variant--{$variantName} label {\n";
         $css .= "  color: var(--form-label, inherit);\n";
         $css .= "}\n";
 
         // Error state (SuluFormBundle uses .has-error or invalid pseudo-class)
-        $css .= ".block-variant-{$variantName} .has-error input,\n";
-        $css .= ".block-variant-{$variantName} .has-error textarea,\n";
-        $css .= ".block-variant-{$variantName} .has-error select,\n";
-        $css .= ".block-variant-{$variantName} input:invalid,\n";
-        $css .= ".block-variant-{$variantName} textarea:invalid,\n";
-        $css .= ".block-variant-{$variantName} select:invalid {\n";
+        $css .= ".iw-variant--{$variantName} .has-error input,\n";
+        $css .= ".iw-variant--{$variantName} .has-error textarea,\n";
+        $css .= ".iw-variant--{$variantName} .has-error select,\n";
+        $css .= ".iw-variant--{$variantName} input:invalid,\n";
+        $css .= ".iw-variant--{$variantName} textarea:invalid,\n";
+        $css .= ".iw-variant--{$variantName} select:invalid {\n";
         $css .= "  border-color: var(--form-border-error, #ef4444);\n";
         $css .= "}\n";
 
@@ -1982,7 +1984,7 @@ class ThemeCompiler
      *
      * Reads the variant's buttonStyle choice (primary, secondary, accent) and
      * generates a `.iw-button--variant` class with the chosen button's direct values.
-     * Mirrors generateButtonClasses() so that block-variant buttons inherit
+     * Mirrors generateButtonClasses() so that variant-scoped buttons inherit
      * the same border, padding, and hover effects as the standalone
      * .iw-button--<variant> classes. The file-selector-button shares padding
      * and opacity with the main button but skips transform/shadow because
@@ -2019,7 +2021,7 @@ class ThemeCompiler
         $bgEffectKey = (string) ($btnData['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
         $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
 
-        $btnSelector = ".block-variant-{$variantName} .iw-button--variant";
+        $btnSelector = ".iw-variant--{$variantName} .iw-button--variant";
 
         $css = "{$btnSelector} {\n";
         if (isset($btnData['bg'])) {
@@ -2059,7 +2061,7 @@ class ThemeCompiler
         // but we skip transform/shadow/bg-effect because those would feel
         // awkward on a native form control.
         $opacityKey = (string) ($btnData['hoverOpacity'] ?? ButtonEffectCatalog::DEFAULT_OPACITY);
-        $css .= ".block-variant-{$variantName} .iw-form-file::file-selector-button {\n";
+        $css .= ".iw-variant--{$variantName} .iw-form-file::file-selector-button {\n";
         if (isset($btnData['bg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $btnData['bg'])};\n";
         }
@@ -2078,7 +2080,7 @@ class ThemeCompiler
         $css .= "  transition: background-color {$duration} {$easing}, color {$duration} {$easing}, opacity {$duration} {$easing};\n";
         $css .= "}\n";
 
-        $css .= ".block-variant-{$variantName} .iw-form-file::file-selector-button:hover {\n";
+        $css .= ".iw-variant--{$variantName} .iw-form-file::file-selector-button:hover {\n";
         if (isset($btnData['hoverBg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $btnData['hoverBg'])};\n";
         }
@@ -2109,8 +2111,8 @@ class ThemeCompiler
     private function generateSeparatorCss(string $variantName, array $props): string
     {
         $css = '';
-        $prefix = ".block-variant-{$variantName}";
-        $hrColor = 'var(--variant-hr-color, var(--color-border, #e5e7eb))';
+        $prefix = ".iw-variant--{$variantName}";
+        $hrColor = 'var(--iw-variant-hr-color, var(--color-border, #e5e7eb))';
         $mode = $props['separatorMode'] ?? 'style';
         $style = $props['separatorStyle'] ?? 'solid';
 

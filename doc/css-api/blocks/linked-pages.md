@@ -71,8 +71,8 @@ The `.iw-linked-page-card` subcomponent is shared by `--cards` and `--carousel`.
 |----------|---------|---------|
 | `--iw-block-linked-pages-cards-gap` | `1.5rem` | Gap between cards in `--cards`. |
 | `--iw-block-linked-pages-cards-cols` | `3` | Number of columns on desktop (`>=1024px`). Mobile/tablet are `1`/`2`. |
-| `--iw-block-linked-pages-nav-color` | `var(--variant-hr-color, var(--color-primary))` | Color used for carousel arrows and dots. |
-| `--iw-block-linked-pages-list-divider` | `var(--variant-hr-color, var(--color-border, #e5e7eb))` | Color of the divider rule between list items. |
+| `--iw-block-linked-pages-nav-color` | `var(--iw-variant-hr-color, var(--color-primary))` | Color used for carousel arrows and dots. |
+| `--iw-block-linked-pages-list-divider` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Color of the divider rule between list items. |
 | `--iw-block-linked-pages-list-padding-y` | `1rem` | Vertical padding of each list link. |
 | `--iw-block-linked-pages-list-link-weight` | `500` | Font weight of list links. |
 | `--iw-block-linked-pages-list-chevron-size` | `1.25rem` | Chevron SVG size in `--list`. |
@@ -85,10 +85,10 @@ The `.iw-linked-page-card` subcomponent is shared by `--cards` and `--carousel`.
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-linked-page-card-padding` | `1.5rem` | Card inner padding. |
-| `--iw-linked-page-card-border` | `var(--variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
+| `--iw-linked-page-card-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
 | `--iw-linked-page-card-bg` | `color-mix(in srgb, [border] 60%, transparent)` | Card background. |
-| `--iw-linked-page-card-link-color` | `var(--variant-link-color, inherit)` | Default text color inside the card. |
-| `--iw-linked-page-card-link-hover` | `var(--variant-link-hover, inherit)` | Hover text color (title + lists + minimal). |
+| `--iw-linked-page-card-link-color` | `var(--iw-variant-link-color, inherit)` | Default text color inside the card. |
+| `--iw-linked-page-card-link-hover` | `var(--iw-variant-link-hover, inherit)` | Hover text color (title + lists + minimal). |
 | `--iw-linked-page-card-hover-shadow` | medium shadow | Box-shadow applied on card hover. |
 | `--iw-linked-page-card-transition-duration` | `0.3s` | Transition for box-shadow and color. |
 | `--iw-linked-page-card-title-size` | `1.125rem` | Title font-size. |

@@ -4,7 +4,7 @@
 {% if variantIndex >= allVariants|length %}
     {% set variantIndex = 0 %}
 {% endif %}
-{% set variantClass = 'block-variant-' ~ variantIndex %}
+{% set variantClass = 'iw-variant--' ~ variantIndex %}
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
 {% set ptClass = paddingTop|default('pt-3') %}

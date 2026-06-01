@@ -40,7 +40,7 @@ The admin XML uses `visibleCondition` to hide irrelevant fields depending on the
 
 | Variable | Default |
 |----------|---------|
-| `--iw-block-separator-color` | `var(--variant-hr-color, var(--color-border, currentColor))` — line color (used by `--line` and `--divider`) |
+| `--iw-block-separator-color` | `var(--iw-variant-hr-color, var(--color-border, currentColor))` — line color (used by `--line` and `--divider`) |
 
 ### `--line` / `--divider` line widths and styles
 

@@ -67,7 +67,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-key-figure-counter-color` | `var(--variant-paragraph-color, inherit)` | Counter color. |
+| `--iw-key-figure-counter-color` | `var(--iw-variant-paragraph-color, inherit)` | Counter color. |
 | `--iw-key-figure-counter-weight` | `700` | Counter font-weight. |
 | `--iw-key-figure-counter-size` | `1.5rem` | Default counter size. |
 | `--iw-key-figure-counter-size-md` | `1.5rem` | `__counter--md` mobile size. |
@@ -100,7 +100,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-gap` | `1.5rem` | Gap between cards. |
 | `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Max-width of the grid (centered). |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |
-| `--iw-key-figure-border` | `var(--variant-hr-color, var(--color-border, #e5e7eb))` | Card border. |
+| `--iw-key-figure-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border. |
 
 ### Inline
 
@@ -113,7 +113,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-key-figures-progress-color` | `var(--variant-hr-color, var(--color-primary))` | Bar fill + track tint. |
+| `--iw-block-key-figures-progress-color` | `var(--iw-variant-hr-color, var(--color-primary))` | Bar fill + track tint. |
 | `--iw-block-key-figures-progress-gap` | `1.5rem` | Gap between rows. |
 | `--iw-block-key-figures-progress-max-width` | `48rem` | Max-width of the progress block. |
 | `--iw-key-figure-progress-height` | `0.75rem` | Bar height. |
@@ -122,7 +122,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-key-figures-timeline-accent` | `var(--variant-hr-color, var(--color-primary))` | Dot fill, card border, default line color. |
+| `--iw-block-key-figures-timeline-accent` | `var(--iw-variant-hr-color, var(--color-primary))` | Dot fill, card border, default line color. |
 | `--iw-block-key-figures-timeline-ring` | `var(--color-secondary, var(--color-primary))` | Dot outer ring color. |
 | `--iw-block-key-figures-timeline-line` | inherits `--accent` | Overrides the line color if you want it different from the accent. |
 | `--iw-block-key-figures-timeline-card-border` | inherits `--accent` | Card border color. |

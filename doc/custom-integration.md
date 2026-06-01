@@ -141,7 +141,7 @@ Apply a variant class to your own sections for automatic color theming:
     {% set variantIndex = 0 %}
 {% endif %}
 
-<section class="block-variant-{{ variantIndex }}" data-has-bg="true">
+<section class="iw-variant--{{ variantIndex }}" data-has-bg="true">
     <div class="container mx-auto py-16 text-center">
         <h1 class="text-4xl font-bold mb-4">{{ title }}</h1>
         <p class="text-xl mb-8">{{ subtitle }}</p>
@@ -153,7 +153,7 @@ Apply a variant class to your own sections for automatic color theming:
 ```
 
 Key points:
-- `.block-variant-{index}` applies all variant colors (headings, paragraphs, links, etc.)
+- `.iw-variant--{index}` applies all variant colors (headings, paragraphs, links, etc.)
 - `data-has-bg="true"` enables the variant background color
 - `.btn-variant` picks the button style defined in the variant (primary, secondary, or accent)
 
@@ -285,7 +285,7 @@ Use the block wrapper `embed` to benefit from all variant/margin/padding logic:
 ```
 
 The wrapper handles:
-- Variant CSS class (`.block-variant-{index}`) with fallback to index 0
+- Variant CSS class (`.iw-variant--{index}`) with fallback to index 0
 - Margin top/bottom (Tailwind classes: `mt-*`, `mb-*`)
 - Padding top/bottom/lateral (`pt-*`, `pb-*`, `pl-*`, `pr-*`)
 - Lateral margins mode (exterior container, interior container, or none)
@@ -315,7 +315,7 @@ If you only need variant colors without the full wrapper:
     {% set variantIndex = 0 %}
 {% endif %}
 
-<section class="block-variant-{{ variantIndex }}">
+<section class="iw-variant--{{ variantIndex }}">
     {# All h1-h6, p, a, ul, ol, table, code, blockquote elements
        inside this section are automatically styled by the variant CSS #}
     <h2>{{ block.headline }}</h2>

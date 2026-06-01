@@ -20,7 +20,7 @@
         <h3 class="iw-block__subtitle text-lg md:text-xl mt-2 {{ alignClass }}">{{ subTitle }}</h3>
     {% endif %}
 
-    {# Separator: style mode → CSS handles rendering via .block-variant-* hr rules #}
+    {# Separator: style mode → CSS handles rendering via .iw-variant--* hr rules #}
     {% if separatorMode == 'style' or separatorMode is empty %}
         <hr class="my-6">
     {% elseif separatorMode == 'image' and variantConfig.separatorImage is defined and variantConfig.separatorImage.id is defined %}

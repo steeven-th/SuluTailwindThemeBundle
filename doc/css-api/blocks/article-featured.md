@@ -58,7 +58,7 @@ The card surface **falls back to the L4 `--iw-article-card-*` variables** when t
 
 | Variable | Default |
 |----------|---------|
-| `--iw-featured-article-card-bg` | `var(--iw-article-card-surface, var(--variant-paragraph-bg, var(--variant-subtle-bg)))` |
+| `--iw-featured-article-card-bg` | `var(--iw-article-card-surface, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)))` |
 | `--iw-featured-article-card-border` | `var(--iw-article-card-border, none)` |
 | `--iw-featured-article-card-radius` | `var(--border-imageRadius)` |
 | `--iw-featured-article-card-shadow` | `0 1px 2px rgb(0 0 0 / 0.05)` |

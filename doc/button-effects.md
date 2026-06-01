@@ -2,7 +2,7 @@
 
 Each of the three button variants (`primary`, `secondary`, `accent`) exposes six composable hover axes in addition to the existing color tokens. Combined with the new global padding and per-variant border width/style, this lets the admin design distinctive button styles without writing a single line of CSS.
 
-The six axes are catalogued in [`ButtonEffectCatalog`](../src/Service/ButtonEffectCatalog.php) and consumed by [`ThemeCompiler`](../src/Service/ThemeCompiler.php) when generating `.btn-{variant}` and `.block-variant-{key} .btn-variant` classes.
+The six axes are catalogued in [`ButtonEffectCatalog`](../src/Service/ButtonEffectCatalog.php) and consumed by [`ThemeCompiler`](../src/Service/ThemeCompiler.php) when generating `.iw-button--{variant}` and `.iw-variant--{key} .iw-button--variant` classes.
 
 ---
 
@@ -122,7 +122,7 @@ Example output for a button configured with `hoverShadow=glow-primary`, `hoverTr
 }
 ```
 
-The same logic applies to `.block-variant-{key} .btn-variant` so block-variant buttons inherit the configured effects. The file-selector input button is styled along with `.btn-variant` but skips `transform` and `box-shadow` because those would feel awkward on a native form control.
+The same logic applies to `.iw-variant--{key} .iw-button--variant` so variant-scoped buttons inherit the configured effects. The file-selector input button is styled along with `.iw-button--variant` but skips `transform` and `box-shadow` because those would feel awkward on a native form control.
 
 ---
 
