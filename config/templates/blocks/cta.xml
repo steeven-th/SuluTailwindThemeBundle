@@ -52,10 +52,13 @@
                 <property name="secondaryButtonStyle" type="iw_theme_button_style_picker">
                     <meta><title>iw_sulu_tailwind_theme.secondary_button_style</title></meta>
                 </property>
-                <property name="image" type="single_media_selection"
-                          visibleCondition="__parent.style == 'split' OR __parent.style == 'banner'">
+                <!-- Banner-only: optional background image -->
+                <property name="bannerImage" type="single_media_selection"
+                          visibleCondition="__parent.style == 'banner'">
                     <meta><title>iw_sulu_tailwind_theme.image</title></meta>
                 </property>
+
+                <!-- Split-only: position of the content column vs the accessory -->
                 <property name="contentRight" type="checkbox"
                           visibleCondition="__parent.style == 'split'">
                     <params>
@@ -67,6 +70,100 @@
                         </param>
                     </params>
                 </property>
+
+                <!-- Split-only: choose which kind of widget sits next to the content -->
+                <property name="accessoryType" type="single_select"
+                          visibleCondition="__parent.style == 'split'">
+                    <meta><title>iw_sulu_tailwind_theme.accessory_type</title></meta>
+                    <params>
+                        <param name="default_value" value="image"/>
+                        <param name="values" type="collection">
+                            <param name="image"><meta><title>iw_sulu_tailwind_theme.accessory_image</title></meta></param>
+                            <param name="video"><meta><title>iw_sulu_tailwind_theme.accessory_video</title></meta></param>
+                            <param name="location"><meta><title>iw_sulu_tailwind_theme.accessory_location</title></meta></param>
+                            <param name="counter"><meta><title>iw_sulu_tailwind_theme.accessory_counter</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Accessory: image -->
+                <property name="accessoryImage" type="single_media_selection"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'image'">
+                    <meta><title>iw_sulu_tailwind_theme.image</title></meta>
+                </property>
+
+                <!-- Accessory: video — provider switcher + per-provider source -->
+                <property name="accessoryVideoProvider" type="single_select"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'video'">
+                    <meta><title>iw_sulu_tailwind_theme.accessory_video_provider</title></meta>
+                    <params>
+                        <param name="default_value" value="youtube"/>
+                        <param name="values" type="collection">
+                            <param name="youtube"><meta><title>iw_sulu_tailwind_theme.accessory_video_provider_youtube</title></meta></param>
+                            <param name="vimeo"><meta><title>iw_sulu_tailwind_theme.accessory_video_provider_vimeo</title></meta></param>
+                            <param name="file"><meta><title>iw_sulu_tailwind_theme.accessory_video_provider_file</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="accessoryYoutubeId" type="text_line"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'video' AND __parent.accessoryVideoProvider == 'youtube'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accessory_youtube_id</title>
+                        <info_text>iw_sulu_tailwind_theme.accessory_youtube_id_info</info_text>
+                    </meta>
+                </property>
+                <property name="accessoryVimeoId" type="text_line"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'video' AND __parent.accessoryVideoProvider == 'vimeo'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accessory_vimeo_id</title>
+                        <info_text>iw_sulu_tailwind_theme.accessory_vimeo_id_info</info_text>
+                    </meta>
+                </property>
+                <property name="accessoryVideoFile" type="single_media_selection"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'video' AND __parent.accessoryVideoProvider == 'file'">
+                    <meta><title>iw_sulu_tailwind_theme.accessory_video_file</title></meta>
+                    <params>
+                        <param name="types" value="video"/>
+                    </params>
+                </property>
+                <property name="accessoryVideoPoster" type="single_media_selection"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'video' AND __parent.accessoryVideoProvider == 'file'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accessory_video_poster</title>
+                        <info_text>iw_sulu_tailwind_theme.accessory_video_poster_info</info_text>
+                    </meta>
+                </property>
+
+                <!-- Accessory: location (Sulu native location field with OSM iframe) -->
+                <property name="accessoryLocation" type="location"
+                          visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'location'">
+                    <meta><title>iw_sulu_tailwind_theme.accessory_location</title></meta>
+                </property>
+
+                <!-- Accessory: counter — up to 3 animated numbers -->
+                <block name="accessoryCounters" default-type="counter" minOccurs="0" maxOccurs="3"
+                       visibleCondition="__parent.style == 'split' AND __parent.accessoryType == 'counter'">
+                    <meta><title>iw_sulu_tailwind_theme.accessory_counters</title></meta>
+                    <types>
+                        <type name="counter">
+                            <meta><title>iw_sulu_tailwind_theme.accessory_counter</title></meta>
+                            <properties>
+                                <property name="count" type="text_line">
+                                    <meta><title>iw_sulu_tailwind_theme.accessory_counter_count</title></meta>
+                                </property>
+                                <property name="unit" type="text_line">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.accessory_counter_unit</title>
+                                        <info_text>iw_sulu_tailwind_theme.accessory_counter_unit_info</info_text>
+                                    </meta>
+                                </property>
+                                <property name="label" type="text_line">
+                                    <meta><title>iw_sulu_tailwind_theme.accessory_counter_label</title></meta>
+                                </property>
+                            </properties>
+                        </type>
+                    </types>
+                </block>
             </properties>
         </section>
 

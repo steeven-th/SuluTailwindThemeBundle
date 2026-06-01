@@ -2130,6 +2130,125 @@ section.block:has([data-slider-fullbleed-value]) {
     margin-top: var(--iw-block-cta-actions-margin-top, 1.5rem);
 }
 
+/* --split accessory widgets — image, video, location, counter.
+   The wrapper `.iw-block-cta__accessory` is the stable hook; modifier
+   classes (`--image`, `--video`, `--location`, `--counter`) carry the
+   widget-specific layout. */
+
+/* Video iframe/video sit on aspect-ratio 16/9 set inline.
+   `object-fit: cover` makes the <video> poster (and the playing frames)
+   fill the player edge-to-edge instead of letterboxing — the default
+   browser behaviour is `contain` which can leave black bars when the
+   poster aspect differs from 16/9. */
+.iw-block-cta--split .iw-block-cta__video {
+    display: block;
+    object-fit: cover;
+    background-color: var(--iw-block-cta-video-bg, #000);
+}
+
+/* Location accessory — map iframe + formatted address row below.
+   OpenStreetMap's embed doesn't expose a clickable marker tooltip, so the
+   address is rendered as text under the map for legibility. */
+.iw-block-cta__accessory--location {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-cta-map-address-gap, 0.75rem);
+}
+
+.iw-block-cta__map-address {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--iw-block-cta-map-address-icon-gap, 0.5rem);
+    color: var(--iw-block-cta-map-address-color, var(--iw-variant-paragraph-color, inherit));
+}
+
+.iw-block-cta__map-address-icon {
+    flex: none;
+    width: var(--iw-block-cta-map-address-icon-size, 1.25rem);
+    height: var(--iw-block-cta-map-address-icon-size, 1.25rem);
+    margin-top: 0.125rem;
+    color: var(--iw-block-cta-map-address-icon-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__map-address-text {
+    margin: 0;
+    font-size: var(--iw-block-cta-map-address-size, 0.875rem);
+    line-height: 1.5;
+    opacity: var(--iw-block-cta-map-address-opacity, 0.85);
+}
+
+/* Counter accessory — 1 to 3 animated numbers + labels.
+   Three responsive layouts driven by flex-basis:
+   - Mobile (<480px): one per row
+   - Tablet (480–767px): two per row; a lonely 3rd counter wraps and is
+     centered horizontally by `justify-content: center` on the row below
+   - Desktop (≥768px): three per row when there are three; two centered
+     when there are two; one centered when there is one.
+   `justify-content: center` is what makes the lonely counter sit in the
+   middle of its wrap row at every breakpoint. */
+.iw-block-cta__accessory--counter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--iw-block-cta-counter-gap, 1.5rem);
+    text-align: center;
+}
+
+.iw-block-cta__counter {
+    flex: 0 1 100%;
+}
+
+@media (min-width: 480px) {
+    .iw-block-cta__counter {
+        /* Two per row — gap is divided across both items so 2 × basis + gap = 100% */
+        flex-basis: calc(50% - (var(--iw-block-cta-counter-gap, 1.5rem) / 2));
+    }
+}
+
+@media (min-width: 768px) {
+    .iw-block-cta__counter {
+        /* Three per row — gap × 2 is divided across three items */
+        flex-basis: calc((100% - 2 * var(--iw-block-cta-counter-gap, 1.5rem)) / 3);
+    }
+}
+
+.iw-block-cta__counter-value {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--iw-block-cta-counter-value-gap, 0.125rem);
+    justify-content: center;
+}
+
+.iw-block-cta__counter-number {
+    font-size: var(--iw-block-cta-counter-number-size, 3rem);
+    font-weight: var(--iw-block-cta-counter-number-weight, 700);
+    line-height: 1;
+    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__counter-unit {
+    font-size: var(--iw-block-cta-counter-unit-size, 1.5rem);
+    font-weight: var(--iw-block-cta-counter-unit-weight, 600);
+    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
+}
+
+.iw-block-cta__counter-label {
+    display: block;
+    margin-top: var(--iw-block-cta-counter-label-margin-top, 0.5rem);
+    font-size: var(--iw-block-cta-counter-label-size, 0.875rem);
+    color: var(--iw-block-cta-counter-label-color, var(--iw-variant-paragraph-color, inherit));
+    opacity: var(--iw-block-cta-counter-label-opacity, 0.75);
+}
+
+@media (min-width: 768px) {
+    .iw-block-cta__counter-number {
+        font-size: var(--iw-block-cta-counter-number-size-md, 3.75rem);
+    }
+    .iw-block-cta__counter-unit {
+        font-size: var(--iw-block-cta-counter-unit-size-md, 1.875rem);
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Location Overlay — Collapsible info card
    Floats over the map on desktop, full-width bottom sheet on mobile.

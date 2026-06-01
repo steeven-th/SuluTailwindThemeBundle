@@ -21,5 +21,7 @@
     "iw_sulu_tailwind_theme.article.sidebar_tags": "Tags",
     "iw_sulu_tailwind_theme.article.pagination_previous": "Page précédente",
     "iw_sulu_tailwind_theme.article.pagination_next": "Page suivante",
-    "iw_sulu_tailwind_theme.article.pagination_info": "Page %current% sur %total%"
+    "iw_sulu_tailwind_theme.article.pagination_info": "Page %current% sur %total%",
+    "iw_sulu_tailwind_theme.accessory_video": "Vidéo",
+    "iw_sulu_tailwind_theme.accessory_location": "Carte"
 }

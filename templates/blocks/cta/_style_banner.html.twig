@@ -8,8 +8,8 @@
 
 {% block block_content %}
     {% set bgImageUrl = '' %}
-    {% if image is defined and image.id is defined %}
-        {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
+    {% if bannerImage is defined and bannerImage.id is defined %}
+        {% set resolvedImage = sulu_resolve_media(bannerImage.id, app.request.locale) %}
         {% set bgImageUrl = resolvedImage.thumbnails['iw_theme_16_9']|default(resolvedImage.url) %}
     {% endif %}
 
