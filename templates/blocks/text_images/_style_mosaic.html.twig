@@ -50,7 +50,7 @@
 
 {# ── Section ──────────────────────────────────────────────────────────────── #}
 <section
-    class="block iw-block-text-images iw-block-text-images--mosaic iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}overflow-hidden{% endif %}"
+    class="block iw-block-text-images iw-block-text-images--mosaic iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ mosaicImagePosition|default('right') }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}overflow-hidden{% endif %}"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
@@ -65,9 +65,18 @@
             variant: variant|default(0)
         } only %}
 
-        <div class="iw-block-text-images__grid grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-5">
-            {# Text area — takes 1 column #}
-            <div class="iw-block-text-images__content lg:col-span-1">
+        {# Mosaic image position (top / bottom / left / right). Default = right.
+           - left / right: text + mosaic side-by-side on lg+ (lg:grid-cols-3),
+             order swap via lg:order utilities. Stacks vertically on mobile.
+           - top / bottom: text + mosaic stacked vertically full-width,
+             order swap via flex order utilities. #}
+        {% set mosaicPos = mosaicImagePosition|default('right') %}
+        {% set isSideBySide = mosaicPos in ['left', 'right'] %}
+        {% set imageFirst = mosaicPos in ['left', 'top'] %}
+
+        <div class="iw-block-text-images__grid {{ isSideBySide ? 'grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-5' : 'flex flex-col gap-2 md:gap-5' }}">
+            {# Text area — full width when stacked, 1 column when side-by-side #}
+            <div class="iw-block-text-images__content {{ isSideBySide ? 'lg:col-span-1' : '' }} {{ imageFirst ? 'order-2' : 'order-1' }} {{ isSideBySide ? (imageFirst ? 'lg:order-2' : 'lg:order-1') : '' }}">
                 {% if text is defined and text is not empty %}
                     <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
                         {{ text|raw }}
@@ -75,9 +84,9 @@
                 {% endif %}
             </div>
 
-            {# Mosaic images — takes 2 columns #}
+            {# Mosaic images — full width when stacked, 2 columns when side-by-side #}
             {% if images is defined and images is iterable %}
-                <div class="iw-block-text-images__mosaic-grid lg:col-span-2 grid grid-cols-2 gap-2 md:gap-5">
+                <div class="iw-block-text-images__mosaic-grid {{ isSideBySide ? 'lg:col-span-2' : '' }} {{ imageFirst ? 'order-1' : 'order-2' }} {{ isSideBySide ? (imageFirst ? 'lg:order-1' : 'lg:order-2') : '' }} grid grid-cols-2 gap-2 md:gap-5">
                     {% for mediaId in images %}
                         {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                         {# First image spans full width in 16:9, others use selected format #}

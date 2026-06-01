@@ -69,6 +69,20 @@
                         </param>
                     </params>
                 </property>
+                <!-- Mosaic: choose where the mosaic sits relative to the text -->
+                <property name="mosaicImagePosition" type="single_select"
+                          visibleCondition="__parent.style == 'mosaic'">
+                    <meta><title>iw_sulu_tailwind_theme.image_position</title></meta>
+                    <params>
+                        <param name="default_value" value="right"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.position_left</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.position_right</title></meta></param>
+                            <param name="top"><meta><title>iw_sulu_tailwind_theme.position_top</title></meta></param>
+                            <param name="bottom"><meta><title>iw_sulu_tailwind_theme.position_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="showImagesName" type="checkbox"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
                     <meta><title>iw_sulu_tailwind_theme.show_images_name</title></meta>
