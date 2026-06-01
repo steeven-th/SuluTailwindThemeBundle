@@ -706,5 +706,10 @@
     "iw_sulu_tailwind_theme.widget_text": "Texte",
     "iw_sulu_tailwind_theme.widget_image": "Image",
     "iw_sulu_tailwind_theme.widget_location": "Carte",
-    "iw_sulu_tailwind_theme.form_position_right": "Formulaire à droite"
+    "iw_sulu_tailwind_theme.form_position_right": "Formulaire à droite",
+    "iw_sulu_tailwind_theme.parallax_intensity": "Intensité de l'effet parallax",
+    "iw_sulu_tailwind_theme.parallax_intensity_subtle": "Subtile",
+    "iw_sulu_tailwind_theme.parallax_intensity_medium": "Moyenne",
+    "iw_sulu_tailwind_theme.parallax_intensity_strong": "Forte",
+    "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extrême"
 }

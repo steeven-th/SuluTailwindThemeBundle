@@ -83,7 +83,7 @@
                         {# First image spans full width in 16:9, others use selected format #}
                         {% set isHero = loop.first %}
                         {% set imgFormat = isHero ? 'iw_theme_16_9' : baseFormat %}
-                        <figure class="block-image {{ isHero ? 'col-span-2' : '' }}{% if radius %} {{ radius }} overflow-hidden{% endif %}">
+                        <figure class="iw-block__image {{ isHero ? 'col-span-2' : '' }}{% if radius %} {{ radius }} overflow-hidden{% endif %}">
                             <a
                                 href="{{ media.url }}"
                                 class="glightbox"

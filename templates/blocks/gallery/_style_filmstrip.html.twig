@@ -43,59 +43,64 @@
             data-controller="slider"
             data-slider-mode-value="carousel"
             data-slider-autoplay-value="false"
+            class="iw-block-gallery iw-block-gallery--filmstrip"
         >
-            {# Main image display #}
-            <div class="relative overflow-hidden{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }} mb-4" style="aspect-ratio: {{ aspectRatio }};">
+            {# Main image display — bottom margin only when the thumbnail strip is rendered below #}
+            <div class="iw-block-gallery__main relative overflow-hidden{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}{{ images|length > 1 ? ' mb-4' : '' }}" style="aspect-ratio: {{ aspectRatio }};">
                 {% for mediaId in images %}
                     {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                     <div
                         data-slider-target="slide"
-                        class="absolute inset-0 w-full h-full {{ loop.first ? '' : 'hidden' }}"
+                        class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ loop.first ? '' : 'hidden' }}"
                     >
                         <a
                             href="{{ media.url }}"
-                            class="glightbox block w-full h-full"
+                            class="iw-block-gallery__link glightbox block w-full h-full"
                             data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                         >
                             <img
                                 src="{{ media.thumbnails[format]|default(media.url) }}"
                                 alt="{{ media.title|default('') }}"
                                 loading="eager"
-                                class="w-full h-full object-cover cursor-pointer"
+                                class="iw-block-gallery__img w-full h-full object-cover cursor-pointer"
                             >
                         </a>
                     </div>
                 {% endfor %}
 
-                {# Prev / Next arrows on the main image #}
-                <button
-                    type="button"
-                    data-action="slider#prev"
-                    class="iw-gallery-nav absolute left-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Previous"
-                >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button
-                    type="button"
-                    data-action="slider#next"
-                    class="iw-gallery-nav absolute right-4 top-1/2 -translate-y-1/2 z-10"
-                    aria-label="Next"
-                >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </button>
+                {# Prev / Next arrows on the main image only when there is more than one #}
+                {% if images|length > 1 %}
+                    <button
+                        type="button"
+                        data-action="slider#prev"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--prev absolute left-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Previous"
+                    >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button
+                        type="button"
+                        data-action="slider#next"
+                        class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--next absolute right-4 top-1/2 -translate-y-1/2 z-10"
+                        aria-label="Next"
+                    >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                {% endif %}
             </div>
 
-            {# Thumbnail strip with navigation arrows.
+            {# Thumbnail strip with navigation arrows. Rendered only when there
+               is more than one image, otherwise the strip is useless.
                When paddingLateral is absent or 0, add horizontal padding so
                the arrows and thumbnails don't touch the block edges. #}
-            <div class="flex items-center gap-2{{ noGap ? ' px-4' : '' }}">
+            {% if images|length > 1 %}
+            <div class="iw-block-gallery__thumbnails flex items-center gap-2{{ noGap ? ' px-4' : '' }}">
                 {# Prev thumbnails #}
                 <button
                     type="button"
                     data-action="slider#scrollThumbnailsBy"
                     data-slider-direction-param="-1"
-                    class="iw-gallery-nav iw-gallery-nav--sm"
+                    class="iw-gallery-nav iw-gallery-nav--sm iw-block-gallery__thumbnails-nav iw-block-gallery__thumbnails-nav--prev"
                     style="--iw-gallery-nav-bg: rgba(0,0,0,0.08); --iw-gallery-nav-bg-hover: rgba(0,0,0,0.2); --iw-gallery-nav-color: currentColor;"
                     aria-label="Previous thumbnails"
                 >
@@ -105,7 +110,7 @@
                 {# Scrollable thumbnail track (no visible scrollbar) #}
                 <div
                     data-slider-target="thumbnailTrack"
-                    class="flex gap-2 overflow-x-auto flex-1 min-w-0 scrollbar-hide py-1"
+                    class="iw-block-gallery__thumbnails-track flex gap-2 overflow-x-auto flex-1 min-w-0 scrollbar-hide py-1"
                 >
                     {% for mediaId in images %}
                         {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
@@ -114,13 +119,13 @@
                             data-slider-target="thumbnail"
                             data-action="slider#selectThumbnail"
                             data-slider-index-param="{{ loop.index0 }}"
-                            class="flex-none w-20 h-14 overflow-hidden cursor-pointer transition-opacity {{ imageRadiusClass ? imageRadiusClass : '' }} {{ loop.first ? 'is-active opacity-100' : 'opacity-50' }}"
+                            class="iw-block-gallery__thumbnail flex-none w-20 h-14 overflow-hidden cursor-pointer transition-opacity {{ imageRadiusClass ? imageRadiusClass : '' }} {{ loop.first ? 'is-active opacity-100' : 'opacity-50' }}"
                         >
                             <img
                                 src="{{ media.thumbnails[format]|default(media.url) }}"
                                 alt="{{ media.title|default('') }}"
                                 loading="lazy"
-                                class="w-full h-full object-cover"
+                                class="iw-block-gallery__thumbnail-img w-full h-full object-cover"
                             >
                         </button>
                     {% endfor %}
@@ -131,13 +136,14 @@
                     type="button"
                     data-action="slider#scrollThumbnailsBy"
                     data-slider-direction-param="1"
-                    class="iw-gallery-nav iw-gallery-nav--sm"
+                    class="iw-gallery-nav iw-gallery-nav--sm iw-block-gallery__thumbnails-nav iw-block-gallery__thumbnails-nav--next"
                     style="--iw-gallery-nav-bg: rgba(0,0,0,0.08); --iw-gallery-nav-bg-hover: rgba(0,0,0,0.2); --iw-gallery-nav-color: currentColor;"
                     aria-label="Next thumbnails"
                 >
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}

@@ -34,6 +34,7 @@
             data-controller="carousel3d"
             data-carousel3d-autoplay-value="true"
             data-carousel3d-interval-value="5000"
+            class="iw-block-gallery iw-block-gallery--carousel"
         >
             {# Blurred backgrounds — JS will move this to the parent <section> #}
             <div class="iw-carousel-3d__bgs" data-carousel3d-target="bgsContainer">
@@ -60,7 +61,8 @@
 
             {# Carousel #}
             <div class="iw-carousel-3d{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}" style="--slide-aspect: {{ slideAspect }};">
-                {# Previous button #}
+                {# Previous button only when there is more than one slide #}
+                {% if images|length > 1 %}
                 <button
                     type="button"
                     data-action="carousel3d#prev"
@@ -69,6 +71,7 @@
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
+                {% endif %}
 
                 <div class="iw-carousel-3d__wrapper">
                     {# ── Slides ── #}
@@ -119,7 +122,8 @@
                     {% endif %}
                 </div>
 
-                {# Next button #}
+                {# Next button only when there is more than one slide #}
+                {% if images|length > 1 %}
                 <button
                     type="button"
                     data-action="carousel3d#next"
@@ -128,6 +132,7 @@
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
+                {% endif %}
             </div>
         </div>
     {% else %}

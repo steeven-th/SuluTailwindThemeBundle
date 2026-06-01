@@ -4,6 +4,17 @@
 {% block block_content %}
     {% if images is defined and images is iterable %}
         {% set isParallax = enableParallax|default(false) %}
+        {% set overlayRadius = paragraphImageRadius|default('') %}
+
+        {# Parallax intensity: maps a 4-level admin select to a numeric percentage.
+           The slider Stimulus controller multiplies its `maxShift` by this value
+           (passed via `data-slider-parallax-intensity-value`) and the image
+           wrapper sizes (height/top) follow the same scale so the image always
+           stays large enough to cover its container at extreme offsets. #}
+        {% set parallaxLevels = {'subtle': 7.5, 'medium': 15, 'strong': 22.5, 'extreme': 30} %}
+        {% set parallaxN = parallaxLevels[parallaxIntensity|default('medium')]|default(15) %}
+        {% set parallaxHeight = 100 + 2 * parallaxN %}
+        {% set parallaxTop = -parallaxN %}
 
         {# Map imageFilter value to Sulu thumbnail name and CSS aspect-ratio #}
         {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
@@ -17,7 +28,8 @@
             data-slider-interval-value="6000"
             data-slider-mode-value="carousel"
             data-slider-fullbleed-value="true"
-            {{ isParallax ? 'data-slider-parallax-value="true"' : '' }}
+            {% if isParallax %}data-slider-parallax-value="true" data-slider-parallax-intensity-value="{{ parallaxN / 15 }}"{% endif %}
+            class="iw-block-gallery iw-block-gallery--wide-carousel{{ isParallax ? ' iw-block-gallery--wide-carousel-parallax' : '' }}"
         >
             {# Height spacer — aspect-ratio by default, fixed height for parallax #}
             <div style="{{ isParallax ? 'height: clamp(300px, 60vh, 700px);' : 'aspect-ratio: ' ~ aspectRatio ~ ';' }}"></div>
@@ -28,19 +40,19 @@
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
                 <div
                     data-slider-target="slide"
-                    class="absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
+                    class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
                 >
                     <a
                         href="{{ media.url }}"
-                        class="glightbox block w-full h-full"
+                        class="iw-block-gallery__link glightbox block w-full h-full"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                     >
                         <img
                             src="{{ media.thumbnails[format]|default(media.url) }}"
                             alt="{{ media.title|default('') }}"
                             loading="eager"
-                            class="absolute w-full object-cover cursor-pointer {{ isParallax ? 'inset-x-0' : 'inset-0 h-full' }}"
-                            {% if isParallax %}style="height: 130%; top: -15%; will-change: transform;"{% endif %}
+                            class="iw-block-gallery__img absolute w-full object-cover cursor-pointer {{ isParallax ? 'inset-x-0' : 'inset-0 h-full' }}"
+                            {% if isParallax %}style="height: {{ parallaxHeight }}%; top: {{ parallaxTop }}%; will-change: transform;"{% endif %}
                         >
                     </a>
                 </div>
@@ -48,48 +60,50 @@
 
             {# Centered title overlay #}
             {% if (title is defined and title is not empty) or (subTitle is defined and subTitle is not empty) %}
-                <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                    <div class="text-center px-8 py-6 bg-black/50 backdrop-blur-sm rounded-lg max-w-2xl">
+                <div class="iw-block-gallery__overlay absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div class="iw-block-gallery__overlay-content text-center px-8 py-6 bg-black/50 backdrop-blur-sm max-w-2xl{% if overlayRadius %} {{ overlayRadius }}{% endif %}">
                         {% if title is defined and title is not empty %}
-                            <h2 class="text-white text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">{{ title }}</h2>
+                            <h2 class="iw-block-gallery__overlay-title text-white text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">{{ title }}</h2>
                         {% endif %}
                         {% if subTitle is defined and subTitle is not empty %}
-                            <h3 class="text-white/80 text-lg md:text-xl mt-3">{{ subTitle }}</h3>
+                            <h3 class="iw-block-gallery__overlay-subtitle text-white/80 text-lg md:text-xl mt-3">{{ subTitle }}</h3>
                         {% endif %}
                     </div>
                 </div>
             {% endif %}
 
-            {# Navigation buttons #}
-            <button
-                type="button"
-                data-action="slider#prev"
-                class="iw-gallery-nav absolute left-6 top-1/2 -translate-y-1/2 z-20"
-                aria-label="Previous"
-            >
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button
-                type="button"
-                data-action="slider#next"
-                class="iw-gallery-nav absolute right-6 top-1/2 -translate-y-1/2 z-20"
-                aria-label="Next"
-            >
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+            {# Navigation buttons + dots only when there is more than one slide #}
+            {% if images|length > 1 %}
+                <button
+                    type="button"
+                    data-action="slider#prev"
+                    class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--prev absolute left-6 top-1/2 -translate-y-1/2 z-20"
+                    aria-label="Previous"
+                >
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button
+                    type="button"
+                    data-action="slider#next"
+                    class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--next absolute right-6 top-1/2 -translate-y-1/2 z-20"
+                    aria-label="Next"
+                >
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
 
-            {# Dot indicators #}
-            <div data-slider-target="dots" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
-                {% for mediaId in images %}
-                    <button
-                        type="button"
-                        data-action="slider#goTo"
-                        data-slider-index-param="{{ loop.index0 }}"
-                        class="w-2.5 h-2.5 rounded-full {{ loop.first ? 'bg-white' : 'bg-white/50' }} transition-colors"
-                        aria-label="Slide {{ loop.index }}"
-                    ></button>
-                {% endfor %}
-            </div>
+                {# Dot indicators #}
+                <div data-slider-target="dots" class="iw-block-gallery__dots absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
+                    {% for mediaId in images %}
+                        <button
+                            type="button"
+                            data-action="slider#goTo"
+                            data-slider-index-param="{{ loop.index0 }}"
+                            class="iw-block-gallery__dot w-2.5 h-2.5 rounded-full {{ loop.first ? 'bg-white' : 'bg-white/50' }} transition-colors"
+                            aria-label="Slide {{ loop.index }}"
+                        ></button>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}

@@ -615,5 +615,10 @@
     "iw_sulu_tailwind_theme.widget_text": "Text",
     "iw_sulu_tailwind_theme.widget_image": "Image",
     "iw_sulu_tailwind_theme.widget_location": "Map",
-    "iw_sulu_tailwind_theme.form_position_right": "Form on the right"
+    "iw_sulu_tailwind_theme.form_position_right": "Form on the right",
+    "iw_sulu_tailwind_theme.parallax_intensity": "Parallax intensity",
+    "iw_sulu_tailwind_theme.parallax_intensity_subtle": "Subtle",
+    "iw_sulu_tailwind_theme.parallax_intensity_medium": "Medium",
+    "iw_sulu_tailwind_theme.parallax_intensity_strong": "Strong",
+    "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extreme"
 }

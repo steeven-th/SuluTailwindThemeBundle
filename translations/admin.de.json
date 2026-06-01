@@ -608,5 +608,10 @@
     "iw_sulu_tailwind_theme.widget_text": "Text",
     "iw_sulu_tailwind_theme.widget_image": "Bild",
     "iw_sulu_tailwind_theme.widget_location": "Karte",
-    "iw_sulu_tailwind_theme.form_position_right": "Formular rechts"
+    "iw_sulu_tailwind_theme.form_position_right": "Formular rechts",
+    "iw_sulu_tailwind_theme.parallax_intensity": "Parallax-Intensität",
+    "iw_sulu_tailwind_theme.parallax_intensity_subtle": "Dezent",
+    "iw_sulu_tailwind_theme.parallax_intensity_medium": "Mittel",
+    "iw_sulu_tailwind_theme.parallax_intensity_strong": "Stark",
+    "iw_sulu_tailwind_theme.parallax_intensity_extreme": "Extrem"
 }

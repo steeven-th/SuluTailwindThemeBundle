@@ -1772,6 +1772,56 @@ img.object-cover {
     color: var(--iw-featured-article-card-date-color-hero, rgb(255 255 255 / 0.6));
 }
 
+/* ─── Block: gallery ───────────────────────────────────────────────────── */
+/* Six layout modifiers:
+   - --grid: responsive CSS grid (1/2/3/4 cols, mobile→xl).
+   - --masonry: CSS columns layout (1/2/3/4 cols, mobile→xl) for ragged-row
+     gallery walls.
+   - --slider: horizontal scroll track with snap; optional --slider-single
+     sub-modifier switches to a single-image autoplay carousel.
+   - --filmstrip: large main image + thumbnail strip with prev/next arrows.
+   - --wide-carousel: fullbleed autoplay carousel with centered title
+     overlay; optional --wide-carousel-parallax for the parallax variant.
+   - --carousel: 3D carousel with parallax tilt and blurred backgrounds
+     (driven by the `carousel3d` Stimulus controller, see .iw-carousel-3d
+     section below for the inner anatomy).
+
+   Layout, sizing, gaps and aspect ratios are all driven by Tailwind utility
+   classes emitted by the Twig templates (because the gap/radius/aspect-ratio
+   are conditional on the admin's lateralMargins / paddingLateral / image
+   format settings). The rules below expose customisation hooks via custom
+   properties.
+
+   The shared image hook `.iw-block__image` is applied to every `<figure>`
+   that wraps a single image (grid/masonry items, slider items, etc.) so
+   downstream styles can target images consistently across all gallery
+   variants and across other blocks that surface images. */
+
+.iw-block-gallery {
+    /* Hook only — no default styling. */
+}
+
+/* Neutralise the global `img { border-radius: var(--radius-img) }` rule for
+   gallery images: the radius is owned by the wrapping `.iw-block-gallery__item`
+   (with `overflow-hidden`) so it tracks the admin's `paragraphImageRadius`
+   setting. Without this override, masonry images would inherit a default
+   radius from the theme token even when no radius is configured. */
+.iw-block-gallery .iw-block-gallery__img {
+    border-radius: 0;
+}
+
+/* Optional shared image hook (also used by `_image.html.twig`,
+   `_image_slider.html.twig`, `text_images/_style_mosaic.html.twig`).
+   No default styling — exposed for downstream theming. */
+.iw-block__image {
+    /* Hook only. */
+}
+
+/* Filmstrip thumbnails — opacity is set inline via Tailwind utilities
+   (`opacity-50` / `opacity-100` with the `is-active` class toggled by JS).
+   The hook below is provided for downstream theming if you need to change
+   the look without rewriting the template. */
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Shared gallery navigation arrows
    Used across all gallery layouts.  Override the --iw-gallery-nav-* custom
