@@ -1,6 +1,6 @@
-{# SuluFormBundle form theme — applies iw-form-field styling and variant-aware colors.
+{# SuluFormBundle form theme — applies iw-form__field styling and variant-aware colors.
    Extends the SuluFormBundle basic theme and adds Tailwind-compatible classes
-   so that forms automatically adapt to the active block variant via --form-* CSS variables.
+   so that forms automatically adapt to the active block variant via --iw-form-* CSS variables.
 
    Layout: The <form> element is turned into a flex-wrap container with gap,
    and each row uses flex-basis for column widths instead of inline-block. #}
@@ -9,7 +9,7 @@
 
 {# ── Form container — flex-wrap grid with gap ── #}
 {%- block form_start -%}
-    {% set attr = attr|merge({class: ('iw-form-grid ' ~ attr.class|default(''))|trim }) %}
+    {% set attr = attr|merge({class: ('iw-form iw-form__grid ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock form_start -%}
 
@@ -35,31 +35,31 @@
             {# Dropzone area #}
             <div data-fileinput-target="dropzone"
                  data-action="click->fileinput#openDialog dragover->fileinput#onDragOver dragenter->fileinput#onDragEnter dragleave->fileinput#onDragLeave drop->fileinput#onDrop"
-                 class="iw-fileinput-dropzone">
-                <svg class="iw-fileinput-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                 class="iw-fileinput__dropzone">
+                <svg class="iw-fileinput__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                <span class="iw-fileinput-dropzone-text">{{ 'iw_sulu_tailwind_theme.fileinput_drop_or'|trans({}, 'messages') }}</span>
-                <span class="iw-fileinput-dropzone-link">{{ 'iw_sulu_tailwind_theme.fileinput_browse'|trans({}, 'messages') }}</span>
+                <span class="iw-fileinput__text">{{ 'iw_sulu_tailwind_theme.fileinput_drop_or'|trans({}, 'messages') }}</span>
+                <span class="iw-fileinput__link">{{ 'iw_sulu_tailwind_theme.fileinput_browse'|trans({}, 'messages') }}</span>
                 {# Info hints (accepted types, max files, max size) #}
-                <div data-fileinput-target="info" class="iw-fileinput-info"></div>
+                <div data-fileinput-target="info" class="iw-fileinput__info"></div>
             </div>
             {# Error message #}
-            <div data-fileinput-target="error" class="iw-fileinput-error hidden"></div>
+            <div data-fileinput-target="error" class="iw-fileinput__error hidden"></div>
             {# File badges #}
-            <div data-fileinput-target="list" class="iw-fileinput-list"></div>
+            <div data-fileinput-target="list" class="iw-fileinput__list"></div>
         </div>
     {%- else -%}
-        {% set attr = attr|merge({class: ('iw-form-field ' ~ attr.class|default(''))|trim }) %}
+        {% set attr = attr|merge({class: ('iw-form__field ' ~ attr.class|default(''))|trim }) %}
         {{- parent() -}}
     {%- endif -%}
 {%- endblock form_widget_simple -%}
 
 {# ── Textarea ── #}
 {%- block textarea_widget -%}
-    {% set attr = attr|merge({class: ('iw-form-field resize-y min-h-[120px] ' ~ attr.class|default(''))|trim }) %}
+    {% set attr = attr|merge({class: ('iw-form__field resize-y min-h-[120px] ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock textarea_widget -%}
 
@@ -75,9 +75,9 @@
         {# Hidden native select for form submission #}
         <div data-combobox-target="select" class="hidden">
             {% if isMultiple %}
-                {% set attr = attr|merge({class: 'iw-form-select-multiple'}) %}
+                {% set attr = attr|merge({class: 'iw-form__select iw-form__select--multiple'}) %}
             {% else %}
-                {% set attr = attr|merge({class: 'iw-form-select'}) %}
+                {% set attr = attr|merge({class: 'iw-form__select'}) %}
             {% endif %}
             {{- parent() -}}
         </div>
@@ -85,24 +85,24 @@
         <button type="button"
                 data-combobox-target="trigger"
                 data-action="combobox#toggle"
-                class="iw-form-field iw-combobox-trigger">
-            <span data-combobox-target="display" class="iw-combobox-display"></span>
-            <svg class="iw-combobox-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="iw-form__field iw-combobox__trigger">
+            <span data-combobox-target="display" class="iw-combobox__display"></span>
+            <svg class="iw-combobox__chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
         </button>
         {# Dropdown panel #}
         <div data-combobox-target="dropdown"
-             class="iw-combobox-dropdown hidden">
-            <div class="iw-combobox-search-wrap">
+             class="iw-combobox__dropdown hidden">
+            <div class="iw-combobox__search-wrap">
                 <input type="text"
                        data-combobox-target="search"
                        data-action="input->combobox#onSearch"
                        placeholder="{{ 'iw_sulu_tailwind_theme.combobox_search'|trans({}, 'messages') }}"
-                       class="iw-form-field iw-combobox-search"
+                       class="iw-form__field iw-combobox__search"
                        autocomplete="off">
             </div>
-            <div data-combobox-target="list" class="iw-combobox-list"></div>
+            <div data-combobox-target="list" class="iw-combobox__list"></div>
         </div>
     </div>
 {%- endblock choice_widget_collapsed -%}
@@ -122,7 +122,9 @@
 {# ── Labels ── #}
 {%- block form_label -%}
     {%- if label is not same as(false) -%}
-        {% set label_attr = label_attr|merge({class: ('block text-sm font-medium mb-1.5 ' ~ label_attr.class|default(''))|trim }) %}
+        {# Stable override hooks: iw-form__label (+ --required when the field is required) #}
+        {% set labelClasses = 'iw-form__label' ~ (required ? ' iw-form__label--required' : '') %}
+        {% set label_attr = label_attr|merge({class: (labelClasses ~ ' block text-sm font-medium mb-1.5 ' ~ label_attr.class|default(''))|trim }) %}
         {%- set label %}{{ label|raw }}{% endset -%}
         {{ parent() }}
     {%- endif -%}
@@ -130,14 +132,15 @@
 
 {# ── Submit button row — extra top spacing, full width ── #}
 {%- block button_row -%}
-    <div class="iw-form-col-full pt-2">
+    <div class="iw-form__col iw-form__col--full iw-form__actions pt-2">
         {{- form_widget(form) -}}
     </div>
 {%- endblock button_row -%}
 
 {# ── Submit button ── #}
 {%- block button_widget -%}
-    {% set attr = attr|merge({class: ('iw-button--variant inline-flex items-center justify-center px-8 py-3 text-sm font-medium transition cursor-pointer ' ~ attr.class|default(''))|trim }) %}
+    {# iw-form__submit is the stable hook; iw-button--variant carries the variant styling #}
+    {% set attr = attr|merge({class: ('iw-form__submit iw-button--variant inline-flex items-center justify-center px-8 py-3 text-sm font-medium transition cursor-pointer ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock button_widget -%}
 
@@ -150,7 +153,7 @@
 {# ── Errors ── #}
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
-        <ul class="iw-form-errors mt-1.5 text-sm">
+        <ul class="iw-form__errors mt-1.5 text-sm">
             {%- for error in errors -%}
                 <li>{{ error.message }}</li>
             {%- endfor -%}
@@ -177,48 +180,51 @@
 
 {# ── Checkbox widget ── #}
 {%- block checkbox_widget -%}
-    {% set attr = attr|merge({class: ('iw-form-check ' ~ attr.class|default(''))|trim }) %}
+    {% set attr = attr|merge({class: ('iw-form__check ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock checkbox_widget -%}
 
 {# ── Radio widget ── #}
 {%- block radio_widget -%}
-    {% set attr = attr|merge({class: ('iw-form-check ' ~ attr.class|default(''))|trim }) %}
+    {% set attr = attr|merge({class: ('iw-form__check ' ~ attr.class|default(''))|trim }) %}
     {{- parent() -}}
 {%- endblock radio_widget -%}
 
-{# ── Grid column classes — map SuluFormBundle widths to flex-basis ── #}
+{# ── Grid column classes — map SuluFormBundle widths to flex-basis ──
+   Each column emits the base class iw-form__col plus a width modifier so users
+   can target every column with iw-form__col and a specific width with the modifier. #}
 {%- block sulu_form_row_class_name -%}
     {%- set width = attr.width|default('full') -%}
     {%- if width == 'half' -%}
-        {{- 'iw-form-col-half' -}}
+        {{- 'iw-form__col iw-form__col--half' -}}
     {%- elseif width == 'one-third' -%}
-        {{- 'iw-form-col-third' -}}
+        {{- 'iw-form__col iw-form__col--third' -}}
     {%- elseif width == 'two-third' -%}
-        {{- 'iw-form-col-two-third' -}}
+        {{- 'iw-form__col iw-form__col--two-third' -}}
     {%- elseif width == 'one-quarter' -%}
-        {{- 'iw-form-col-quarter' -}}
+        {{- 'iw-form__col iw-form__col--quarter' -}}
     {%- elseif width == 'three-quarter' -%}
-        {{- 'iw-form-col-three-quarter' -}}
+        {{- 'iw-form__col iw-form__col--three-quarter' -}}
     {%- else -%}
-        {{- 'iw-form-col-full' -}}
+        {{- 'iw-form__col iw-form__col--full' -}}
     {%- endif -%}
 {%- endblock sulu_form_row_class_name -%}
 
 {# ── Headline (SuluFormBundle special field) ── #}
 {%- block headline_row -%}
-    <div class="iw-form-col-full pt-2">
+    <div class="iw-form__col iw-form__col--full pt-2">
         {{- form_widget(form) -}}
     </div>
 {%- endblock headline_row -%}
 
 {%- block headline_widget -%}
-    <h4 class="text-xl font-semibold border-b pb-2" style="border-color: var(--form-border, var(--color-border, #e5e7eb))">{{- label|raw -}}</h4>
+    {# iw-form__headline owns the bottom border color (no inline style) #}
+    <h4 class="iw-form__headline text-xl font-semibold border-b pb-2">{{- label|raw -}}</h4>
 {%- endblock headline_widget -%}
 
 {# ── FreeText (SuluFormBundle special field) ── #}
 {%- block freeText_row -%}
-    <div class="iw-form-col-full">
+    <div class="iw-form__col iw-form__col--full">
         {{- form_widget(form) -}}
     </div>
 {%- endblock freeText_row -%}

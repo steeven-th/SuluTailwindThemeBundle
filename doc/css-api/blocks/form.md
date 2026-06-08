@@ -1,6 +1,6 @@
 # Block: form — CSS API
 
-Wrapper block that renders a contact / signup form (either a raw `_form_content.html.twig` partial or a SuluFormBundle form, controlled by the `useSuluFormBundle` admin field). Three layout modifiers select the surrounding visual treatment:
+Wrapper block that renders a contact / signup form. The `useSuluFormBundle` admin field switches between two modes: a **SuluFormBundle form** (styled by the bundle's form theme), or a **custom Twig template** you provide in your own project via the `twigTemplate` field. Three layout modifiers select the surrounding visual treatment:
 
 - `--centered`: single column constrained to `max-w-2xl`, centered horizontally.
 - `--card`: single column constrained to `max-w-xl` with a white surface, shadow and large internal padding.
@@ -8,7 +8,7 @@ Wrapper block that renders a contact / signup form (either a raw `_form_content.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 >
-> The **form fields themselves** (`iw-form-*`, `iw-combobox-*`) and their `--form-*` custom properties are owned by the SuluFormBundle theme integration and documented separately. This page only covers the wrapper API.
+> The **form fields themselves** (`iw-form__*`, `iw-combobox__*`) and their `--iw-form-*` custom properties are owned by the SuluFormBundle theme integration and documented separately in [`../forms.md`](../forms.md). This page only covers the wrapper API.
 
 ---
 
