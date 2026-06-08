@@ -156,7 +156,7 @@ export default class extends Controller {
 
         options.forEach((opt) => {
             const item = document.createElement('div');
-            item.className = 'iw-combobox-item';
+            item.className = 'iw-combobox__item';
             item.dataset.value = opt.value;
             item.dataset.action = 'click->combobox#selectOption';
 
@@ -167,18 +167,18 @@ export default class extends Controller {
 
             if (this.multipleValue) {
                 item.innerHTML = `
-                    <label class="iw-combobox-label">
+                    <label class="iw-combobox__label">
                         <input type="checkbox" value="${opt.value}"
                             ${opt.selected ? 'checked' : ''}
                             data-action="change->combobox#onCheckboxChange"
-                            class="iw-form-check">
+                            class="iw-form__check">
                         <span>${label}</span>
                     </label>
                 `;
             } else {
                 item.innerHTML = `<span>${label}</span>`;
                 if (opt.selected) {
-                    item.classList.add('is-active');
+                    item.classList.add('iw-combobox__item--active');
                 }
             }
 
@@ -196,19 +196,19 @@ export default class extends Controller {
         this.displayTarget.innerHTML = '';
 
         if (selected.length === 0 || (selected.length === 1 && selected[0].value === '')) {
-            this.displayTarget.innerHTML = `<span class="iw-combobox-placeholder">${this.placeholderValue}</span>`;
+            this.displayTarget.innerHTML = `<span class="iw-combobox__placeholder">${this.placeholderValue}</span>`;
             return;
         }
 
         if (this.multipleValue) {
             selected.forEach((opt) => {
                 const tag = document.createElement('span');
-                tag.className = 'iw-combobox-tag';
+                tag.className = 'iw-combobox__tag';
                 tag.innerHTML = `
                     ${opt.textContent}
                     <button type="button" data-value="${opt.value}"
                             data-action="click->combobox#removeTag"
-                            class="iw-combobox-tag-remove" aria-label="Remove">&times;</button>
+                            class="iw-combobox__tag-remove" aria-label="Remove">&times;</button>
                 `;
                 this.displayTarget.appendChild(tag);
             });
@@ -224,8 +224,8 @@ export default class extends Controller {
      * @private
      */
     _markActive(value) {
-        this.listTarget.querySelectorAll('.iw-combobox-item').forEach((item) => {
-            item.classList.toggle('is-active', item.dataset.value === value);
+        this.listTarget.querySelectorAll('.iw-combobox__item').forEach((item) => {
+            item.classList.toggle('iw-combobox__item--active', item.dataset.value === value);
         });
     }
 
@@ -249,7 +249,7 @@ export default class extends Controller {
      * @private
      */
     _filterOptions(term) {
-        this.listTarget.querySelectorAll('.iw-combobox-item').forEach((item) => {
+        this.listTarget.querySelectorAll('.iw-combobox__item').forEach((item) => {
             const text = item.textContent.toLowerCase();
             item.style.display = text.includes(term) ? '' : 'none';
         });

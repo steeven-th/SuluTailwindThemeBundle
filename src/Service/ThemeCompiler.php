@@ -1310,43 +1310,43 @@ class ThemeCompiler
     }
 
     /**
-     * Generate the .iw-form-field utility class for form inputs.
+     * Generate the .iw-form__field utility class for form inputs.
      *
      * Provides base layout styling (width, padding, radius, border) and
-     * uses --form-* CSS custom properties for colors so that form fields
+     * uses --iw-form-* CSS custom properties for colors so that form fields
      * automatically adapt to the active block variant.
      *
      * @return string CSS declarations
      */
     private function generateFormFieldClass(): string
     {
-        $css = "/* Form layout grid — targets both the form and the Symfony-generated wrapper div */\n";
-        $css .= ".iw-form-grid,\n";
-        $css .= ".iw-form-grid > div {\n";
+        $css = "/* ── Forms — SuluFormBundle integration (BEM strict) ── */\n";
+        $css .= "/* .iw-form, .iw-form__submit, .iw-form__actions and .iw-form__label--required\n";
+        $css .= "   are pure override hooks (present in the DOM, no default styling). */\n";
+
+        $css .= "/* Layout grid — targets both the form and the Symfony-generated wrapper div */\n";
+        $css .= ".iw-form__grid,\n";
+        $css .= ".iw-form__grid > div {\n";
         $css .= "  display: flex;\n";
         $css .= "  flex-wrap: wrap;\n";
         $css .= "  gap: 1rem 1.25rem;\n";
         $css .= "}\n";
 
-        // Column classes using flex-basis (gap-aware)
-        $css .= ".iw-form-col-full { flex: 0 0 100%; min-width: 0; }\n";
-        $css .= ".iw-form-col-half { flex: 0 0 100%; min-width: 0; }\n";
-        $css .= ".iw-form-col-third { flex: 0 0 100%; min-width: 0; }\n";
-        $css .= ".iw-form-col-two-third { flex: 0 0 100%; min-width: 0; }\n";
-        $css .= ".iw-form-col-quarter { flex: 0 0 100%; min-width: 0; }\n";
-        $css .= ".iw-form-col-three-quarter { flex: 0 0 100%; min-width: 0; }\n";
+        // Column base + width modifiers using flex-basis (gap-aware).
+        // Base is full width on mobile; width modifiers only kick in at md.
+        $css .= ".iw-form__col { flex: 0 0 100%; min-width: 0; }\n";
 
-        // Responsive: columns activate at md breakpoint
+        // Responsive: column widths activate at md breakpoint
         $css .= "@media (min-width: 768px) {\n";
-        $css .= "  .iw-form-col-half { flex: 0 0 calc(50% - 0.625rem); }\n";
-        $css .= "  .iw-form-col-third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
-        $css .= "  .iw-form-col-two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
-        $css .= "  .iw-form-col-quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
-        $css .= "  .iw-form-col-three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
+        $css .= "  .iw-form__col--half { flex: 0 0 calc(50% - 0.625rem); }\n";
+        $css .= "  .iw-form__col--third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
+        $css .= "  .iw-form__col--two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
+        $css .= "  .iw-form__col--quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
+        $css .= "  .iw-form__col--three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
         $css .= "}\n\n";
 
-        $css .= "/* Form field utility class */\n";
-        $css .= ".iw-form-field {\n";
+        $css .= "/* Form field */\n";
+        $css .= ".iw-form__field {\n";
         $css .= "  display: block;\n";
         $css .= "  width: 100%;\n";
         $css .= "  padding: 0.625rem 1rem;\n";
@@ -1355,25 +1355,45 @@ class ThemeCompiler
         $css .= "  border-width: 1px;\n";
         $css .= "  border-style: solid;\n";
         $css .= "  border-radius: var(--border-radius, 0.5rem);\n";
-        $css .= "  background-color: var(--form-bg, transparent);\n";
-        $css .= "  color: var(--form-text, inherit);\n";
-        $css .= "  border-color: var(--form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  background-color: var(--iw-form-bg, transparent);\n";
+        $css .= "  color: var(--iw-form-text, inherit);\n";
+        $css .= "  border-color: var(--iw-form-border, var(--color-border, #d1d5db));\n";
         $css .= "  transition: border-color 0.2s ease, box-shadow 0.2s ease;\n";
         $css .= "}\n";
 
-        $css .= ".iw-form-field::placeholder {\n";
-        $css .= "  color: var(--form-placeholder, var(--form-text, inherit));\n";
+        $css .= ".iw-form__field::placeholder {\n";
+        $css .= "  color: var(--iw-form-placeholder, var(--iw-form-text, inherit));\n";
         $css .= "  opacity: 0.5;\n";
         $css .= "}\n";
 
-        $css .= ".iw-form-field:focus {\n";
+        // Focus state — :focus plus a --focused hook so the state can be forced
+        $css .= ".iw-form__field:focus,\n";
+        $css .= ".iw-form__field--focused {\n";
         $css .= "  outline: none;\n";
-        $css .= "  border-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
-        $css .= "  box-shadow: 0 0 0 2px color-mix(in srgb, var(--form-border-focus, var(--color-primary, #3b82f6)) 25%, transparent);\n";
+        $css .= "  border-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= "  box-shadow: 0 0 0 2px color-mix(in srgb, var(--iw-form-border-focus, var(--color-primary, #3b82f6)) 25%, transparent);\n";
+        $css .= "}\n";
+
+        // Error state hook (apply iw-form__field--error to mark a field invalid)
+        $css .= ".iw-form__field--error {\n";
+        $css .= "  border-color: var(--iw-form-border-error, #ef4444);\n";
+        $css .= "}\n";
+        $css .= ".iw-form__field--error:focus {\n";
+        $css .= "  box-shadow: 0 0 0 2px color-mix(in srgb, var(--iw-form-border-error, #ef4444) 25%, transparent);\n";
+        $css .= "}\n\n";
+
+        // Label hook — centralises label color on the BEM class
+        $css .= ".iw-form__label {\n";
+        $css .= "  color: var(--iw-form-label, inherit);\n";
+        $css .= "}\n";
+
+        // Headline field bottom border (replaces former inline style)
+        $css .= ".iw-form__headline {\n";
+        $css .= "  border-color: var(--iw-form-border, var(--color-border, #e5e7eb));\n";
         $css .= "}\n\n";
 
         // Select dropdown arrow
-        $css .= ".iw-form-select {\n";
+        $css .= ".iw-form__select {\n";
         $css .= "  appearance: none;\n";
         $css .= "  background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E\");\n";
         $css .= "  background-position: right 0.75rem center;\n";
@@ -1382,48 +1402,50 @@ class ThemeCompiler
         $css .= "  padding-right: 2.5rem;\n";
         $css .= "}\n\n";
 
-        // Multiple select — constrained height with scroll
-        $css .= ".iw-form-select-multiple {\n";
+        // Multiple select — list style, no arrow, constrained height with scroll.
+        // Resets the single-select arrow/padding since both classes are applied together.
+        $css .= ".iw-form__select--multiple {\n";
+        $css .= "  background-image: none;\n";
         $css .= "  padding: 0.5rem;\n";
         $css .= "  max-height: 10rem;\n";
         $css .= "  overflow-y: auto;\n";
         $css .= "}\n";
-        $css .= ".iw-form-select-multiple option {\n";
+        $css .= ".iw-form__select--multiple option {\n";
         $css .= "  padding: 0.375rem 0.625rem;\n";
         $css .= "  border-radius: calc(var(--border-radius, 0.5rem) / 2);\n";
         $css .= "  cursor: pointer;\n";
         $css .= "}\n";
-        $css .= ".iw-form-select-multiple option:checked {\n";
-        $css .= "  background-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= ".iw-form__select--multiple option:checked {\n";
+        $css .= "  background-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "  color: #fff;\n";
         $css .= "}\n\n";
 
         // Checkbox and radio
-        $css .= ".iw-form-check {\n";
+        $css .= ".iw-form__check {\n";
         $css .= "  width: 1.125rem;\n";
         $css .= "  height: 1.125rem;\n";
         $css .= "  cursor: pointer;\n";
-        $css .= "  accent-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= "  accent-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "}\n\n";
 
-        // File input
-        $css .= ".iw-form-file {\n";
+        // Native file input (simple styled <input type=file>)
+        $css .= ".iw-form__file {\n";
         $css .= "  display: block;\n";
         $css .= "  width: 100%;\n";
         $css .= "  font-size: 0.875rem;\n";
-        $css .= "  color: var(--form-text, inherit);\n";
-        $css .= "  border: 1px dashed var(--form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  color: var(--iw-form-text, inherit);\n";
+        $css .= "  border: 1px dashed var(--iw-form-border, var(--color-border, #d1d5db));\n";
         $css .= "  border-radius: var(--border-radius, 0.5rem);\n";
         $css .= "  padding: 0.625rem 1rem;\n";
-        $css .= "  background-color: var(--form-bg, transparent);\n";
+        $css .= "  background-color: var(--iw-form-bg, transparent);\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  transition: border-color 0.2s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-form-file:hover {\n";
-        $css .= "  border-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= ".iw-form__file:hover {\n";
+        $css .= "  border-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "}\n";
         // file-selector-button base layout (colors are set per variant)
-        $css .= ".iw-form-file::file-selector-button {\n";
+        $css .= ".iw-form__file::file-selector-button {\n";
         $css .= "  font-size: 0.8125rem;\n";
         $css .= "  font-weight: 500;\n";
         $css .= "  padding: 0.375rem 0.75rem;\n";
@@ -1433,8 +1455,8 @@ class ThemeCompiler
         $css .= "}\n\n";
 
         // Error messages
-        $css .= ".iw-form-errors {\n";
-        $css .= "  color: var(--form-border-error, #ef4444);\n";
+        $css .= ".iw-form__errors {\n";
+        $css .= "  color: var(--iw-form-border-error, #ef4444);\n";
         $css .= "  list-style: none;\n";
         $css .= "  padding: 0;\n";
         $css .= "}\n\n";
@@ -1443,7 +1465,7 @@ class ThemeCompiler
         $css .= "/* Combobox component */\n";
         $css .= ".iw-combobox { position: relative; }\n";
 
-        $css .= ".iw-combobox-trigger {\n";
+        $css .= ".iw-combobox__trigger {\n";
         $css .= "  display: flex;\n";
         $css .= "  align-items: center;\n";
         $css .= "  justify-content: space-between;\n";
@@ -1453,7 +1475,7 @@ class ThemeCompiler
         $css .= "  min-height: 2.75rem;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-display {\n";
+        $css .= ".iw-combobox__display {\n";
         $css .= "  flex: 1;\n";
         $css .= "  display: flex;\n";
         $css .= "  flex-wrap: wrap;\n";
@@ -1461,9 +1483,9 @@ class ThemeCompiler
         $css .= "  overflow: hidden;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-placeholder { opacity: 0.5; }\n";
+        $css .= ".iw-combobox__placeholder { opacity: 0.5; }\n";
 
-        $css .= ".iw-combobox-chevron {\n";
+        $css .= ".iw-combobox__chevron {\n";
         $css .= "  width: 1.25rem;\n";
         $css .= "  height: 1.25rem;\n";
         $css .= "  flex-shrink: 0;\n";
@@ -1471,31 +1493,31 @@ class ThemeCompiler
         $css .= "  transition: transform 0.2s ease;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-dropdown {\n";
+        $css .= ".iw-combobox__dropdown {\n";
         $css .= "  position: absolute;\n";
         $css .= "  z-index: 50;\n";
         $css .= "  top: 100%;\n";
         $css .= "  left: 0;\n";
         $css .= "  right: 0;\n";
         $css .= "  margin-top: 0.25rem;\n";
-        $css .= "  border: 1px solid var(--form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  border: 1px solid var(--iw-form-border, var(--color-border, #d1d5db));\n";
         $css .= "  border-radius: var(--border-radius, 0.5rem);\n";
-        $css .= "  background-color: var(--form-bg, #fff);\n";
+        $css .= "  background-color: var(--iw-form-bg, #fff);\n";
         $css .= "  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);\n";
         $css .= "  overflow: hidden;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-search-wrap {\n";
+        $css .= ".iw-combobox__search-wrap {\n";
         $css .= "  padding: 0.5rem;\n";
-        $css .= "  border-bottom: 1px solid var(--form-border, var(--color-border, #e5e7eb));\n";
+        $css .= "  border-bottom: 1px solid var(--iw-form-border, var(--color-border, #e5e7eb));\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-search {\n";
+        $css .= ".iw-combobox__search {\n";
         $css .= "  border-radius: calc(var(--border-radius, 0.5rem) / 2) !important;\n";
         $css .= "  padding: 0.375rem 0.625rem !important;\n";
         $css .= "  font-size: 0.8125rem !important;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-list {\n";
+        $css .= ".iw-combobox__list {\n";
         $css .= "  max-height: 15rem;\n";
         $css .= "  overflow-y: auto;\n";
         $css .= "  padding: 0.25rem;\n";
@@ -1504,47 +1526,47 @@ class ThemeCompiler
         $css .= "  gap: 0.125rem;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-item {\n";
+        $css .= ".iw-combobox__item {\n";
         $css .= "  padding: 0.5rem 0.75rem;\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  border-radius: calc(var(--border-radius, 0.5rem) / 2);\n";
         $css .= "  font-size: 0.875rem;\n";
         $css .= "  transition: background-color 0.15s ease, color 0.15s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-item:hover {\n";
-        $css .= "  background-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= ".iw-combobox__item:hover {\n";
+        $css .= "  background-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "  color: #fff;\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-item.is-active {\n";
-        $css .= "  background-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= ".iw-combobox__item--active {\n";
+        $css .= "  background-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "  color: #fff;\n";
         $css .= "}\n";
         // Inherit white text on all children (span, label) without re-applying background
-        $css .= ".iw-combobox-item:hover *,\n";
-        $css .= ".iw-combobox-item.is-active * {\n";
+        $css .= ".iw-combobox__item:hover *,\n";
+        $css .= ".iw-combobox__item--active * {\n";
         $css .= "  color: inherit;\n";
         $css .= "}\n";
 
-        $css .= ".iw-combobox-label {\n";
+        $css .= ".iw-combobox__label {\n";
         $css .= "  display: flex;\n";
         $css .= "  align-items: center;\n";
         $css .= "  gap: 0.5rem;\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  pointer-events: none;\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-label input { pointer-events: auto; }\n";
+        $css .= ".iw-combobox__label input { pointer-events: auto; }\n";
 
-        $css .= ".iw-combobox-tag {\n";
+        $css .= ".iw-combobox__tag {\n";
         $css .= "  display: inline-flex;\n";
         $css .= "  align-items: center;\n";
         $css .= "  gap: 0.25rem;\n";
         $css .= "  padding: 0.125rem 0.5rem;\n";
         $css .= "  font-size: 0.75rem;\n";
         $css .= "  border-radius: calc(var(--border-radius, 0.5rem) / 2);\n";
-        $css .= "  background-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= "  background-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "  color: #fff;\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-tag-remove {\n";
+        $css .= ".iw-combobox__tag-remove {\n";
         $css .= "  background: none;\n";
         $css .= "  border: none;\n";
         $css .= "  color: inherit;\n";
@@ -1554,85 +1576,85 @@ class ThemeCompiler
         $css .= "  opacity: 0.7;\n";
         $css .= "  padding: 0;\n";
         $css .= "}\n";
-        $css .= ".iw-combobox-tag-remove:hover { opacity: 1; }\n\n";
+        $css .= ".iw-combobox__tag-remove:hover { opacity: 1; }\n\n";
 
         // File input component
         $css .= "/* File input component */\n";
-        $css .= ".iw-fileinput-dropzone {\n";
+        $css .= ".iw-fileinput__dropzone {\n";
         $css .= "  display: flex;\n";
         $css .= "  flex-direction: column;\n";
         $css .= "  align-items: center;\n";
         $css .= "  justify-content: center;\n";
         $css .= "  gap: 0.5rem;\n";
         $css .= "  padding: 2rem 1.5rem;\n";
-        $css .= "  border: 2px dashed var(--form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  border: 2px dashed var(--iw-form-border, var(--color-border, #d1d5db));\n";
         $css .= "  border-radius: var(--border-radius, 0.5rem);\n";
-        $css .= "  background-color: var(--form-bg, transparent);\n";
+        $css .= "  background-color: var(--iw-form-bg, transparent);\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  transition: border-color 0.2s ease, background-color 0.2s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-dropzone:hover {\n";
-        $css .= "  border-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= ".iw-fileinput__dropzone:hover {\n";
+        $css .= "  border-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-dropzone.is-dragover {\n";
-        $css .= "  border-color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
-        $css .= "  background-color: color-mix(in srgb, var(--form-border-focus, var(--color-primary, #3b82f6)) 8%, transparent);\n";
+        $css .= ".iw-fileinput__dropzone--dragover {\n";
+        $css .= "  border-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= "  background-color: color-mix(in srgb, var(--iw-form-border-focus, var(--color-primary, #3b82f6)) 8%, transparent);\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-dropzone-icon {\n";
+        $css .= ".iw-fileinput__icon {\n";
         $css .= "  width: 2rem;\n";
         $css .= "  height: 2rem;\n";
         $css .= "  opacity: 0.4;\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-dropzone-text {\n";
+        $css .= ".iw-fileinput__text {\n";
         $css .= "  font-size: 0.875rem;\n";
         $css .= "  opacity: 0.6;\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-dropzone-link {\n";
+        $css .= ".iw-fileinput__link {\n";
         $css .= "  font-size: 0.875rem;\n";
         $css .= "  font-weight: 500;\n";
-        $css .= "  color: var(--form-border-focus, var(--color-primary, #3b82f6));\n";
+        $css .= "  color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "  text-decoration: underline;\n";
         $css .= "  text-underline-offset: 2px;\n";
         $css .= "}\n\n";
 
-        $css .= ".iw-fileinput-list {\n";
+        $css .= ".iw-fileinput__list {\n";
         $css .= "  display: flex;\n";
         $css .= "  flex-wrap: wrap;\n";
         $css .= "  gap: 0.5rem;\n";
         $css .= "  margin-top: 0.75rem;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge {\n";
+        $css .= ".iw-fileinput__badge {\n";
         $css .= "  display: inline-flex;\n";
         $css .= "  align-items: center;\n";
         $css .= "  gap: 0.375rem;\n";
         $css .= "  padding: 0.375rem 0.625rem;\n";
         $css .= "  font-size: 0.8125rem;\n";
         $css .= "  border-radius: var(--border-radius, 0.5rem);\n";
-        $css .= "  border: 1px solid var(--form-border, var(--color-border, #d1d5db));\n";
-        $css .= "  background-color: var(--form-bg, transparent);\n";
-        $css .= "  color: var(--form-text, inherit);\n";
+        $css .= "  border: 1px solid var(--iw-form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  background-color: var(--iw-form-bg, transparent);\n";
+        $css .= "  color: var(--iw-form-text, inherit);\n";
         $css .= "  max-width: 100%;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-icon {\n";
+        $css .= ".iw-fileinput__badge-icon {\n";
         $css .= "  flex-shrink: 0;\n";
         $css .= "  display: flex;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-svg {\n";
+        $css .= ".iw-fileinput__badge-svg {\n";
         $css .= "  width: 1rem;\n";
         $css .= "  height: 1rem;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-name {\n";
+        $css .= ".iw-fileinput__badge-name {\n";
         $css .= "  overflow: hidden;\n";
         $css .= "  text-overflow: ellipsis;\n";
         $css .= "  white-space: nowrap;\n";
         $css .= "  max-width: 12rem;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-size {\n";
+        $css .= ".iw-fileinput__badge-size {\n";
         $css .= "  flex-shrink: 0;\n";
         $css .= "  opacity: 0.6;\n";
         $css .= "  font-size: 0.75rem;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-remove {\n";
+        $css .= ".iw-fileinput__badge-remove {\n";
         $css .= "  background: none;\n";
         $css .= "  border: none;\n";
         $css .= "  color: inherit;\n";
@@ -1644,15 +1666,15 @@ class ThemeCompiler
         $css .= "  flex-shrink: 0;\n";
         $css .= "  transition: opacity 0.15s ease;\n";
         $css .= "}\n";
-        $css .= ".iw-file-badge-remove:hover { opacity: 1; }\n";
-        $css .= ".iw-fileinput-info {\n";
+        $css .= ".iw-fileinput__badge-remove:hover { opacity: 1; }\n";
+        $css .= ".iw-fileinput__info {\n";
         $css .= "  font-size: 0.75rem;\n";
         $css .= "  opacity: 0.5;\n";
         $css .= "  margin-top: 0.375rem;\n";
         $css .= "}\n";
-        $css .= ".iw-fileinput-error {\n";
+        $css .= ".iw-fileinput__error {\n";
         $css .= "  font-size: 0.8125rem;\n";
-        $css .= "  color: var(--form-border-error, #ef4444);\n";
+        $css .= "  color: var(--iw-form-border-error, #ef4444);\n";
         $css .= "  margin-top: 0.375rem;\n";
         $css .= "}\n\n";
 
@@ -1894,7 +1916,7 @@ class ThemeCompiler
     /**
      * Generate CSS custom properties and selectors for form elements within a variant.
      *
-     * Sets --form-* custom properties on the variant class and generates
+     * Sets --iw-form-* custom properties on the variant class and generates
      * targeted selectors for inputs, textareas, selects, and labels.
      *
      * @param string               $variantName The variant index
@@ -1905,13 +1927,13 @@ class ThemeCompiler
     private function generateVariantFormCss(string $variantName, array $props): string
     {
         $formProps = [
-            'formBg' => '--form-bg',
-            'formText' => '--form-text',
-            'formLabel' => '--form-label',
-            'formPlaceholder' => '--form-placeholder',
-            'formBorder' => '--form-border',
-            'formBorderFocus' => '--form-border-focus',
-            'formBorderError' => '--form-border-error',
+            'formBg' => '--iw-form-bg',
+            'formText' => '--iw-form-text',
+            'formLabel' => '--iw-form-label',
+            'formPlaceholder' => '--iw-form-placeholder',
+            'formBorder' => '--iw-form-border',
+            'formBorderFocus' => '--iw-form-border-focus',
+            'formBorderError' => '--iw-form-border-error',
         ];
 
         $hasAny = false;
@@ -1944,9 +1966,9 @@ class ThemeCompiler
             . "{$v} select";
 
         $css .= "{$inputSelector} {\n";
-        $css .= "  background-color: var(--form-bg, transparent);\n";
-        $css .= "  color: var(--form-text, inherit);\n";
-        $css .= "  border-color: var(--form-border, var(--color-border, #d1d5db));\n";
+        $css .= "  background-color: var(--iw-form-bg, transparent);\n";
+        $css .= "  color: var(--iw-form-text, inherit);\n";
+        $css .= "  border-color: var(--iw-form-border, var(--color-border, #d1d5db));\n";
         $css .= "}\n";
 
         // Focus state — each selector must have :focus individually
@@ -1954,21 +1976,21 @@ class ThemeCompiler
             . "{$v} textarea:focus,\n"
             . "{$v} select:focus";
         $css .= "{$focusSelector} {\n";
-        $css .= "  border-color: var(--form-border-focus, var(--color-primary));\n";
-        $css .= "  outline-color: var(--form-border-focus, var(--color-primary));\n";
+        $css .= "  border-color: var(--iw-form-border-focus, var(--color-primary));\n";
+        $css .= "  outline-color: var(--iw-form-border-focus, var(--color-primary));\n";
         $css .= "}\n";
 
         // Placeholder
         $placeholderSelector = "{$v} input::placeholder,\n"
             . "{$v} textarea::placeholder";
         $css .= "{$placeholderSelector} {\n";
-        $css .= "  color: var(--form-placeholder, var(--form-text, inherit));\n";
+        $css .= "  color: var(--iw-form-placeholder, var(--iw-form-text, inherit));\n";
         $css .= "  opacity: 0.6;\n";
         $css .= "}\n";
 
         // Labels
         $css .= ".iw-variant--{$variantName} label {\n";
-        $css .= "  color: var(--form-label, inherit);\n";
+        $css .= "  color: var(--iw-form-label, inherit);\n";
         $css .= "}\n";
 
         // Error state (SuluFormBundle uses .has-error or invalid pseudo-class)
@@ -1978,7 +2000,7 @@ class ThemeCompiler
         $css .= ".iw-variant--{$variantName} input:invalid,\n";
         $css .= ".iw-variant--{$variantName} textarea:invalid,\n";
         $css .= ".iw-variant--{$variantName} select:invalid {\n";
-        $css .= "  border-color: var(--form-border-error, #ef4444);\n";
+        $css .= "  border-color: var(--iw-form-border-error, #ef4444);\n";
         $css .= "}\n";
 
         return $css;
@@ -2066,7 +2088,7 @@ class ThemeCompiler
         // but we skip transform/shadow/bg-effect because those would feel
         // awkward on a native form control.
         $opacityKey = (string) ($btnData['hoverOpacity'] ?? ButtonEffectCatalog::DEFAULT_OPACITY);
-        $css .= ".iw-variant--{$variantName} .iw-form-file::file-selector-button {\n";
+        $css .= ".iw-variant--{$variantName} .iw-form__file::file-selector-button {\n";
         if (isset($btnData['bg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $btnData['bg'])};\n";
         }
@@ -2085,7 +2107,7 @@ class ThemeCompiler
         $css .= "  transition: background-color {$duration} {$easing}, color {$duration} {$easing}, opacity {$duration} {$easing};\n";
         $css .= "}\n";
 
-        $css .= ".iw-variant--{$variantName} .iw-form-file::file-selector-button:hover {\n";
+        $css .= ".iw-variant--{$variantName} .iw-form__file::file-selector-button:hover {\n";
         if (isset($btnData['hoverBg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $btnData['hoverBg'])};\n";
         }

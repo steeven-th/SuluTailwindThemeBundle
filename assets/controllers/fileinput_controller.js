@@ -136,14 +136,14 @@ export default class extends Controller {
     onDragEnter(event) {
         event.preventDefault();
         if (this.hasDropzoneTarget) {
-            this.dropzoneTarget.classList.add('is-dragover');
+            this.dropzoneTarget.classList.add('iw-fileinput__dropzone--dragover');
         }
     }
 
     /** Remove visual feedback when leaving the dropzone. */
     onDragLeave(event) {
         if (this.hasDropzoneTarget) {
-            this.dropzoneTarget.classList.remove('is-dragover');
+            this.dropzoneTarget.classList.remove('iw-fileinput__dropzone--dragover');
         }
     }
 
@@ -155,7 +155,7 @@ export default class extends Controller {
     onDrop(event) {
         event.preventDefault();
         if (this.hasDropzoneTarget) {
-            this.dropzoneTarget.classList.remove('is-dragover');
+            this.dropzoneTarget.classList.remove('iw-fileinput__dropzone--dragover');
         }
 
         const droppedFiles = event.dataTransfer.files;
@@ -249,18 +249,18 @@ export default class extends Controller {
 
         for (let i = 0; i < files.length; i++) {
             const badge = document.createElement('span');
-            badge.className = 'iw-file-badge';
+            badge.className = 'iw-fileinput__badge';
 
             const icon = this._getFileIcon(files[i]);
             const size = this._formatSize(files[i].size);
 
             badge.innerHTML = `
-                <span class="iw-file-badge-icon">${icon}</span>
-                <span class="iw-file-badge-name">${files[i].name}</span>
-                <span class="iw-file-badge-size">${size}</span>
+                <span class="iw-fileinput__badge-icon">${icon}</span>
+                <span class="iw-fileinput__badge-name">${files[i].name}</span>
+                <span class="iw-fileinput__badge-size">${size}</span>
                 <button type="button" data-index="${i}"
                         data-action="fileinput#removeFile"
-                        class="iw-file-badge-remove" aria-label="Remove">&times;</button>
+                        class="iw-fileinput__badge-remove" aria-label="Remove">&times;</button>
             `;
             this.listTarget.appendChild(badge);
         }
@@ -338,18 +338,18 @@ export default class extends Controller {
     _getFileIcon(file) {
         const type = file.type || '';
         if (type.startsWith('image/')) {
-            return '<svg class="iw-file-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+            return '<svg class="iw-fileinput__badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
         }
         if (type.startsWith('video/')) {
-            return '<svg class="iw-file-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>';
+            return '<svg class="iw-fileinput__badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>';
         }
         if (type.startsWith('audio/')) {
-            return '<svg class="iw-file-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+            return '<svg class="iw-fileinput__badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
         }
         if (type.includes('pdf')) {
-            return '<svg class="iw-file-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M10 13h4"/><path d="M10 17h4"/></svg>';
+            return '<svg class="iw-fileinput__badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M10 13h4"/><path d="M10 17h4"/></svg>';
         }
-        return '<svg class="iw-file-badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
+        return '<svg class="iw-fileinput__badge-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
     }
 
     /**
