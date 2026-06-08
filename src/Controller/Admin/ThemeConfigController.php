@@ -95,6 +95,14 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const FONT_ROLES = ['heading', 'body', 'accent'];
 
     /**
+     * Site-wide transverse component config keys (Components tab), stored flat in tokens.
+     */
+    private const COMPONENT_KEYS = [
+        'breadcrumbs_enabled', 'breadcrumbs_separator', 'breadcrumbs_align',
+        'breadcrumbs_homeLink', 'breadcrumbs_homeLabel',
+    ];
+
+    /**
      * Properties for each typography assignment element.
      */
     private const TYPO_ASSIGNMENT_PROPS = ['family', 'weight', 'size', 'style', 'lineHeight'];
@@ -490,10 +498,17 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
             'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
             'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showBreadcrumbs', 'articles_showRelated',
+            'articles_showExcerpts', 'articles_showRelated',
             'articles_relatedCount',
         ];
         foreach ($articleKeys as $key) {
+            if (isset($tokens[$key])) {
+                $data[$key] = $tokens[$key];
+            }
+        }
+
+        // Components configuration (site-wide transverse components): flat keys
+        foreach (self::COMPONENT_KEYS as $key) {
             if (isset($tokens[$key])) {
                 $data[$key] = $tokens[$key];
             }
@@ -663,10 +678,17 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
             'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
             'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showBreadcrumbs', 'articles_showRelated',
+            'articles_showExcerpts', 'articles_showRelated',
             'articles_relatedCount',
         ];
         foreach ($articleKeys as $key) {
+            if (\array_key_exists($key, $data)) {
+                $tokens[$key] = $data[$key];
+            }
+        }
+
+        // Components configuration (site-wide transverse components): flat keys
+        foreach (self::COMPONENT_KEYS as $key) {
             if (\array_key_exists($key, $data)) {
                 $tokens[$key] = $data[$key];
             }

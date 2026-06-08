@@ -2,11 +2,15 @@
     Breadcrumbs component with schema.org BreadcrumbList microdata.
 
     Parameters:
-    - items: array of {title, url} objects (breadcrumb trail)
-              If not provided, uses Sulu navigation.
+    - items: array of {title, url} objects (breadcrumb trail). The last item is
+             rendered as the current (non-link) page.
+    - separator: 'chevron' (default) | 'slash' | 'dot' — glyph between items.
+    - align: 'left' (default) | 'center' | 'right' — horizontal alignment.
 #}
+{% set separator = separator|default('chevron') %}
+{% set align = align|default('left') %}
 {% if items is defined and items is iterable and items|length > 0 %}
-    <nav aria-label="Breadcrumb" class="iw-breadcrumbs">
+    <nav aria-label="Breadcrumb" class="iw-breadcrumbs{{ align != 'left' ? ' iw-breadcrumbs--align-' ~ align }}">
         <ol class="iw-breadcrumbs__list"
             itemscope itemtype="https://schema.org/BreadcrumbList">
             {% for item in items %}
@@ -17,9 +21,15 @@
                             <span itemprop="name">{{ item.title }}</span>
                         </a>
                         <meta itemprop="position" content="{{ loop.index }}">
-                        <svg class="iw-breadcrumbs__separator" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
+                        {% if separator == 'slash' %}
+                            <span class="iw-breadcrumbs__separator" aria-hidden="true">/</span>
+                        {% elseif separator == 'dot' %}
+                            <span class="iw-breadcrumbs__separator" aria-hidden="true">&middot;</span>
+                        {% else %}
+                            <svg class="iw-breadcrumbs__separator" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        {% endif %}
                     {% else %}
                         <span itemprop="name" class="iw-breadcrumbs__current">{{ item.title }}</span>
                         <meta itemprop="position" content="{{ loop.index }}">

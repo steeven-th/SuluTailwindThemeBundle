@@ -10,7 +10,11 @@ Components used across multiple blocks, templates or pages — not tied to a sin
 
 ## Breadcrumbs
 
-Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Rendered by `templates/components/_breadcrumbs.html.twig` (parameter: `items` — an array of `{title, url}`). Reusable on any page, not article-specific.
+Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Reusable on any page, not article-specific.
+
+**Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Components** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (theme → Components tab): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
+
+**Manual rendering.** The low-level partial `templates/components/_breadcrumbs.html.twig` takes `items` (an array of `{title, url}`, last item = current page) and an optional `separator` (`chevron` | `slash` | `dot`), for fully custom trails.
 
 | Class | Role |
 |-------|------|
