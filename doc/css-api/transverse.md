@@ -44,6 +44,46 @@ Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Rendered by
 
 ---
 
+## Pagination
+
+Generic pager rendered by `templates/components/_pagination.html.twig` (parameters: `currentPage`, `totalPages`, `baseUrl`). Prev/next arrows, numbered links with an active state, ellipsis for gaps, and an info line.
+
+| Class | Role |
+|-------|------|
+| `.iw-pagination` | Root `<nav>` (centered flex row). |
+| `.iw-pagination__link` | A numbered page link. |
+| `.iw-pagination__link--current` | The current page (non-link, highlighted). |
+| `.iw-pagination__arrow` | Prev/next arrow button. |
+| `.iw-pagination__arrow--prev` | Previous-page modifier. |
+| `.iw-pagination__arrow--next` | Next-page modifier. |
+| `.iw-pagination__ellipsis` | The `…` gap indicator. |
+| `.iw-pagination__info` | "Page X of Y" line below the pager. |
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--iw-pagination-gap` | Gap between items | `0.25rem` |
+| `--iw-pagination-margin-top` | Space above the pager | `3rem` |
+| `--iw-pagination-item-padding` | Link/arrow padding | `0.5rem 0.75rem` |
+| `--iw-pagination-item-radius` | Link/arrow radius | `var(--border-radius)` |
+| `--iw-pagination-color` | Link/arrow color at rest | `var(--color-secondary-600)` |
+| `--iw-pagination-hover-bg` | Hover background | `var(--color-primary-50)` |
+| `--iw-pagination-hover-color` | Hover text color | `var(--color-primary)` |
+| `--iw-pagination-current-bg` | Current page background | `var(--color-primary)` |
+| `--iw-pagination-current-color` | Current page text color | `#fff` |
+| `--iw-pagination-ellipsis-color` | Ellipsis color | `var(--color-secondary-400)` |
+| `--iw-pagination-info-color` | Info-line color | `var(--color-secondary-500)` |
+
+**Override example:**
+```css
+.iw-pagination {
+    --iw-pagination-current-bg: var(--color-accent);
+    --iw-pagination-hover-bg: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    --iw-pagination-hover-color: var(--color-accent);
+}
+```
+
+---
+
 ## Gallery navigation
 
 Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sliders, testimonial slider, linked-pages carousel, etc.).

@@ -3149,3 +3149,56 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-breadcrumbs-current-color, var(--color-text));
     font-weight: var(--iw-breadcrumbs-current-weight, 500);
 }
+
+/* ─── Transverse: pagination ────────────────────────────────────────────── */
+/* Generic pager (prev/next arrows, numbered links, ellipsis, info line).
+   Rendered by templates/components/_pagination.html.twig. */
+.iw-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--iw-pagination-gap, 0.25rem);
+    margin-top: var(--iw-pagination-margin-top, 3rem);
+}
+
+.iw-pagination__link,
+.iw-pagination__arrow {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
+    border-radius: var(--iw-pagination-item-radius, var(--border-radius));
+    font-size: 0.875rem;
+    color: var(--iw-pagination-color, var(--color-secondary-600));
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.iw-pagination__link:hover,
+.iw-pagination__arrow:hover {
+    background-color: var(--iw-pagination-hover-bg, var(--color-primary-50));
+    color: var(--iw-pagination-hover-color, var(--color-primary));
+}
+
+.iw-pagination__link--current,
+.iw-pagination__link--current:hover {
+    font-weight: 600;
+    background-color: var(--iw-pagination-current-bg, var(--color-primary));
+    color: var(--iw-pagination-current-color, #fff);
+}
+
+.iw-pagination__arrow svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.iw-pagination__ellipsis {
+    padding: 0 0.25rem;
+    color: var(--iw-pagination-ellipsis-color, var(--color-secondary-400));
+}
+
+.iw-pagination__info {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--iw-pagination-info-color, var(--color-secondary-500));
+}
