@@ -10,13 +10,13 @@
 {% set totalPages = totalPages|default(1) %}
 
 {% if totalPages > 1 %}
-    <nav aria-label="Pagination" class="article-pagination flex justify-center items-center gap-1 mt-12">
+    <nav aria-label="Pagination" class="iw-pagination">
         {# Previous button #}
         {% if currentPage > 1 %}
             <a href="{{ baseUrl }}?page={{ currentPage - 1 }}"
-               class="px-3 py-2 rounded-[var(--border-radius)] text-sm text-[var(--color-secondary-600)] hover:bg-[var(--color-primary-50)] hover:text-[var(--color-primary)] transition-colors"
+               class="iw-pagination__arrow iw-pagination__arrow--prev"
                aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_previous'|trans }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
             </a>
@@ -26,26 +26,25 @@
         {% for page in 1..totalPages %}
             {% if page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
                 {% if page == currentPage %}
-                    <span class="px-3 py-2 rounded-[var(--border-radius)] text-sm font-semibold bg-[var(--color-primary)] text-white" aria-current="page">
+                    <span class="iw-pagination__link iw-pagination__link--current" aria-current="page">
                         {{ page }}
                     </span>
                 {% else %}
-                    <a href="{{ baseUrl }}?page={{ page }}"
-                       class="px-3 py-2 rounded-[var(--border-radius)] text-sm text-[var(--color-secondary-600)] hover:bg-[var(--color-primary-50)] hover:text-[var(--color-primary)] transition-colors">
+                    <a href="{{ baseUrl }}?page={{ page }}" class="iw-pagination__link">
                         {{ page }}
                     </a>
                 {% endif %}
             {% elseif page == 2 or page == totalPages - 1 %}
-                <span class="px-1 text-[var(--color-secondary-400)]">&hellip;</span>
+                <span class="iw-pagination__ellipsis">&hellip;</span>
             {% endif %}
         {% endfor %}
 
         {# Next button #}
         {% if currentPage < totalPages %}
             <a href="{{ baseUrl }}?page={{ currentPage + 1 }}"
-               class="px-3 py-2 rounded-[var(--border-radius)] text-sm text-[var(--color-secondary-600)] hover:bg-[var(--color-primary-50)] hover:text-[var(--color-primary)] transition-colors"
+               class="iw-pagination__arrow iw-pagination__arrow--next"
                aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_next'|trans }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
             </a>
@@ -53,7 +52,7 @@
     </nav>
 
     {# Page indicator #}
-    <p class="text-center text-sm text-[var(--color-secondary-500)] mt-3">
+    <p class="iw-pagination__info">
         {{ 'iw_sulu_tailwind_theme.article.pagination_info'|trans({'%current%': currentPage, '%total%': totalPages}) }}
     </p>
 {% endif %}

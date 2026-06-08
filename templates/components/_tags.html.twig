@@ -1,0 +1,24 @@
+{#
+    Tags component — renders a list of tags as pills. Generic and reusable
+    anywhere (article excerpts, taxonomies, etc.).
+
+    Parameters:
+    - tags: array of tag objects (each with a `name`, or a plain string)
+
+    Public CSS API:
+    - .iw-tags (block — flex row wrapper)
+    - .iw-tag (single tag pill with hover state)
+    - .iw-tag--variant-{primary|secondary|accent} (color variants)
+
+    Override via --iw-tag-{padding,font-size,font-weight,border,radius,text,hover-bg,hover-text,hover-border}
+    and --iw-tags-gap. See doc/css-api/transverse.md.
+#}
+{% if tags is defined and tags is iterable and tags|length > 0 %}
+    <div class="iw-tags">
+        {% for tag in tags %}
+            <span class="iw-tag">
+                {{ tag.name|default(tag) }}
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}

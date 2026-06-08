@@ -30,7 +30,7 @@
 
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-12 pt-32">
             {% if articleConfig.showCategories|iw_article_visible('page') %}
-                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
+                {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                     categories: content.excerptCategories|default([]),
                 } only %}
             {% endif %}
@@ -95,7 +95,7 @@
 
 {% block article_footer %}
     <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
-        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
+        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}
     </footer>

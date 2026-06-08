@@ -58,7 +58,7 @@
         <span class="iw-article-meta__separator" aria-hidden="true">|</span>
         <span class="iw-article-meta__categories">
             {% for category in categories %}
-                <span class="iw-article-meta__category">
+                <span class="iw-category-badge iw-article-meta__category">
                     {{ category.name|default(category.title|default('')) }}
                 </span>
             {% endfor %}

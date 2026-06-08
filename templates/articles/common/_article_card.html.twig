@@ -76,7 +76,7 @@
     <div class="iw-article-card__body">
         {% if showCategory and articleCategories is iterable and articleCategories|length > 0 %}
             {% for category in articleCategories|slice(0, 1) %}
-                <span class="iw-article-card__category">
+                <span class="iw-category-badge iw-article-card__category">
                     {{ category.name|default(category.title|default('')) }}
                 </span>
             {% endfor %}
