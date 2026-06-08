@@ -9,7 +9,7 @@
 {% block article_header %}
     <header class="iw-article-page__header iw-article-page__header--centered">
         {% if articleConfig.showBreadcrumbs|iw_article_visible('page') %}
-            {% include '@ItechWorldSuluTailwindTheme/articles/common/_breadcrumbs.html.twig' with {
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
                 items: breadcrumb|default([]),
             } only %}
         {% endif %}
