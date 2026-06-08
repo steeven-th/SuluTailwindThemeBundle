@@ -84,6 +84,72 @@ Generic pager rendered by `templates/components/_pagination.html.twig` (paramete
 
 ---
 
+## Tags
+
+Generic bordered pills with a hover state. Rendered by `templates/components/_tags.html.twig` (parameter: `tags`). Used for article tags and any keyword/taxonomy list.
+
+| Class | Role |
+|-------|------|
+| `.iw-tags` | Flex-row wrapper. |
+| `.iw-tag` | A single tag pill (bordered, hover state). |
+| `.iw-tag--variant-primary` | Primary-palette color variant. |
+| `.iw-tag--variant-secondary` | Secondary-palette color variant. |
+| `.iw-tag--variant-accent` | Accent-palette color variant. |
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--iw-tags-gap` | Gap between pills | `0.5rem` |
+| `--iw-tag-padding` | Pill padding | `0.25rem 0.75rem` |
+| `--iw-tag-font-size` | Font size | `0.75rem` |
+| `--iw-tag-font-weight` | Font weight | `500` |
+| `--iw-tag-border` | Border color | `var(--color-border)` |
+| `--iw-tag-radius` | Corner radius | `var(--border-radius)` |
+| `--iw-tag-text` | Text color | `var(--color-secondary-600)` |
+| `--iw-tag-hover-bg` | Hover background | `var(--color-primary-50)` |
+| `--iw-tag-hover-text` | Hover text color | `var(--color-primary-700)` |
+| `--iw-tag-hover-border` | Hover border color | `var(--color-primary-200)` |
+
+The variant modifiers simply re-point the `--iw-tag-*` variables to a different palette, so you can override a variant by setting those same variables.
+
+**Override example — pill-shaped accent tags:**
+```css
+.iw-tag {
+    --iw-tag-radius: 9999px;
+    --iw-tag-padding: 0.375rem 1rem;
+}
+```
+
+---
+
+## Category badge
+
+Generic filled badge (primary palette by default). Rendered by `templates/components/_categories.html.twig` (parameter: `categories`), and reused for the single category badge in article cards (`.iw-article-card__category`) and meta strips (`.iw-article-meta__category`), which only tweak its size.
+
+| Class | Role |
+|-------|------|
+| `.iw-categories` | Flex-row wrapper. |
+| `.iw-category-badge` | A single category badge (filled). |
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--iw-categories-gap` | Gap between badges | `0.5rem` |
+| `--iw-category-badge-padding` | Badge padding | `0.25rem 0.75rem` |
+| `--iw-category-badge-font-size` | Font size | `0.75rem` |
+| `--iw-category-badge-font-weight` | Font weight | `600` |
+| `--iw-category-badge-radius` | Corner radius | `var(--border-radius)` |
+| `--iw-category-badge-bg` | Background color | `var(--color-primary-100)` |
+| `--iw-category-badge-text` | Text color | `var(--color-primary-700)` |
+
+**Override example — accent category badges:**
+```css
+.iw-category-badge {
+    --iw-category-badge-bg: var(--color-accent-100);
+    --iw-category-badge-text: var(--color-accent-700);
+}
+```
+
+---
+
 ## Gallery navigation
 
 Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sliders, testimonial slider, linked-pages carousel, etc.).

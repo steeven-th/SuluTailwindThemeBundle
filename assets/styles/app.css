@@ -2871,14 +2871,11 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-article-meta-separator-color, var(--color-border));
 }
 
+/* The badge visual comes from the generic .iw-category-badge component; the
+   meta strip only tweaks it to a more compact size via its custom properties. */
 .iw-article-meta__category {
-    display: inline-block;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: var(--iw-article-meta-category-radius, var(--border-radius));
-    background-color: var(--iw-article-meta-category-bg, var(--color-primary-100));
-    color: var(--iw-article-meta-category-text, var(--color-primary-700));
+    --iw-category-badge-padding: 0.125rem 0.5rem;
+    --iw-category-badge-font-weight: 500;
 }
 
 /* ─── Article author ────────────────────────────────────────────────────── */
@@ -2979,46 +2976,9 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 /* ─── Article categories & tags ─────────────────────────────────────────── */
-/* Flex row of colored badges. Categories use the primary palette; tags
-   are bordered with a hover state that switches to the primary tint. */
-.iw-article-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--iw-article-categories-gap, 0.5rem);
-}
-
-.iw-article-categories__item {
-    display: inline-block;
-    padding: var(--iw-article-categories-item-padding, 0.25rem 0.75rem);
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: var(--iw-article-categories-item-radius, var(--border-radius));
-    background-color: var(--iw-article-categories-item-bg, var(--color-primary-100));
-    color: var(--iw-article-categories-item-text, var(--color-primary-700));
-}
-
-.iw-article-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--iw-article-tags-gap, 0.5rem);
-}
-
-.iw-article-tags__item {
-    display: inline-block;
-    padding: var(--iw-article-tags-item-padding, 0.25rem 0.75rem);
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid var(--iw-article-tags-item-border, var(--color-border));
-    border-radius: var(--iw-article-tags-item-radius, var(--border-radius));
-    color: var(--iw-article-tags-item-text, var(--color-secondary-600));
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.iw-article-tags__item:hover {
-    background-color: var(--iw-article-tags-item-hover-bg, var(--color-primary-50));
-    color: var(--iw-article-tags-item-hover-text, var(--color-primary-700));
-    border-color: var(--iw-article-tags-item-hover-border, var(--color-primary-200));
-}
+/* Now provided by the generic transverse components .iw-tags / .iw-tag and
+   .iw-categories / .iw-category-badge (see the "Transverse: tags" and
+   "Transverse: category badge" sections at the end of this file). */
 
 /* ─── Event info card ───────────────────────────────────────────────────── */
 /* Floating card with date, location/online badge and organizer. Designed
@@ -3201,4 +3161,79 @@ section.block:has([data-slider-fullbleed-value]) {
     text-align: center;
     font-size: 0.875rem;
     color: var(--iw-pagination-info-color, var(--color-secondary-500));
+}
+
+/* ─── Transverse: tags ──────────────────────────────────────────────────── */
+/* Generic bordered pills with a hover state. Used for article tags and any
+   keyword/taxonomy list. Color variants re-point the component's own vars. */
+.iw-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--iw-tags-gap, 0.5rem);
+}
+
+.iw-tag {
+    display: inline-block;
+    padding: var(--iw-tag-padding, 0.25rem 0.75rem);
+    font-size: var(--iw-tag-font-size, 0.75rem);
+    font-weight: var(--iw-tag-font-weight, 500);
+    border: 1px solid var(--iw-tag-border, var(--color-border));
+    border-radius: var(--iw-tag-radius, var(--border-radius));
+    color: var(--iw-tag-text, var(--color-secondary-600));
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.iw-tag:hover {
+    background-color: var(--iw-tag-hover-bg, var(--color-primary-50));
+    color: var(--iw-tag-hover-text, var(--color-primary-700));
+    border-color: var(--iw-tag-hover-border, var(--color-primary-200));
+}
+
+.iw-tag--variant-primary {
+    --iw-tag-border: var(--color-primary-200);
+    --iw-tag-text: var(--color-primary-700);
+    --iw-tag-hover-bg: var(--color-primary-50);
+    --iw-tag-hover-text: var(--color-primary-800);
+    --iw-tag-hover-border: var(--color-primary-300);
+}
+
+.iw-tag--variant-secondary {
+    --iw-tag-border: var(--color-secondary-200);
+    --iw-tag-text: var(--color-secondary-700);
+    --iw-tag-hover-bg: var(--color-secondary-50);
+    --iw-tag-hover-text: var(--color-secondary-800);
+    --iw-tag-hover-border: var(--color-secondary-300);
+}
+
+.iw-tag--variant-accent {
+    --iw-tag-border: var(--color-accent-200);
+    --iw-tag-text: var(--color-accent-700);
+    --iw-tag-hover-bg: var(--color-accent-50);
+    --iw-tag-hover-text: var(--color-accent-800);
+    --iw-tag-hover-border: var(--color-accent-300);
+}
+
+/* ─── Transverse: category badge ────────────────────────────────────────── */
+/* Generic filled badge (primary palette by default). Used for article
+   categories in cards, meta strips and category lists. */
+.iw-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--iw-categories-gap, 0.5rem);
+}
+
+.iw-category-badge {
+    display: inline-block;
+    padding: var(--iw-category-badge-padding, 0.25rem 0.75rem);
+    font-size: var(--iw-category-badge-font-size, 0.75rem);
+    font-weight: var(--iw-category-badge-font-weight, 600);
+    border-radius: var(--iw-category-badge-radius, var(--border-radius));
+    background-color: var(--iw-category-badge-bg, var(--color-primary-100));
+    color: var(--iw-category-badge-text, var(--color-primary-700));
+}
+
+/* Card context — spacing above the title */
+.iw-article-card__category {
+    margin-bottom: 0.5rem;
+    --iw-category-badge-padding: 0.125rem 0.5rem;
 }

@@ -1,0 +1,23 @@
+{#
+    Categories component — renders a list of categories as colored badges.
+    Generic and reusable anywhere (article excerpts, taxonomies, etc.).
+
+    Parameters:
+    - categories: array of category objects (each with a `name` or `title`)
+
+    Public CSS API:
+    - .iw-categories (block — flex row wrapper)
+    - .iw-category-badge (single category badge)
+
+    Override via --iw-category-badge-{padding,font-size,font-weight,bg,text,radius}
+    and --iw-categories-gap. See doc/css-api/transverse.md.
+#}
+{% if categories is defined and categories is iterable and categories|length > 0 %}
+    <div class="iw-categories">
+        {% for category in categories %}
+            <span class="iw-category-badge">
+                {{ category.name|default(category.title|default('')) }}
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}

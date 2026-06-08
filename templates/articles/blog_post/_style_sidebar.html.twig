@@ -80,7 +80,7 @@
                         <h3 class="text-xs uppercase tracking-wide text-[var(--color-secondary-500)] font-semibold mb-3">
                             {{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}
                         </h3>
-                        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
+                        {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                             categories: content.excerptCategories,
                         } only %}
                     </div>
@@ -92,7 +92,7 @@
                         <h3 class="text-xs uppercase tracking-wide text-[var(--color-secondary-500)] font-semibold mb-3">
                             {{ 'iw_sulu_tailwind_theme.article.sidebar_tags'|trans }}
                         </h3>
-                        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
+                        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
                             tags: content.excerptTags,
                         } only %}
                     </div>

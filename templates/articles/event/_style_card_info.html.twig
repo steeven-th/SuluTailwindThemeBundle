@@ -37,7 +37,7 @@
         {% endif %}
 
         {% if articleConfig.showCategories|iw_article_visible('page') %}
-            {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
+            {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                 categories: content.excerptCategories|default([]),
             } only %}
         {% endif %}
@@ -58,7 +58,7 @@
 
 {% block article_footer %}
     <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
-        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
+        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}
     </footer>

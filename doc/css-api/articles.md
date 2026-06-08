@@ -173,9 +173,8 @@ Inline strip of meta entries (date, authors, categories, reading time).
 | `--iw-article-meta-icon-size` | Icon dimensions (default `1rem`) |
 | `--iw-article-meta-icon-opacity` | Icon opacity (default `0.6`) |
 | `--iw-article-meta-separator-color` | Pipe color (default `--color-border`) |
-| `--iw-article-meta-category-bg` | Category badge background (default `--color-primary-100`) |
-| `--iw-article-meta-category-text` | Category badge text (default `--color-primary-700`) |
-| `--iw-article-meta-category-radius` | Category badge radius (default `--border-radius`) |
+
+The category badge in the meta strip is the generic **`.iw-category-badge`** component (see [Transverse → Category badge](transverse.md#category-badge)); the meta strip only makes it compact. Override its colors via `--iw-category-badge-bg` / `--iw-category-badge-text` (e.g. scoped to `.iw-article-meta__category`).
 
 ---
 
@@ -226,28 +225,12 @@ Avatar (image or initials fallback) + name + optional role.
 
 ## Article categories & tags
 
-| Class | Role |
-|-------|------|
-| `.iw-article-categories` | Flex row of category badges |
-| `.iw-article-categories__item` | Single category badge |
-| `.iw-article-tags` | Flex row of tag pills |
-| `.iw-article-tags__item` | Single tag pill (with hover state) |
+Article categories and tags are rendered by the **generic transverse components**, not by article-specific classes:
 
-| Variable | Purpose |
-|----------|---------|
-| `--iw-article-categories-gap` | Gap between badges (default `0.5rem`) |
-| `--iw-article-categories-item-bg` | Badge background (default `--color-primary-100`) |
-| `--iw-article-categories-item-text` | Badge text color (default `--color-primary-700`) |
-| `--iw-article-categories-item-radius` | Badge radius (default `--border-radius`) |
-| `--iw-article-categories-item-padding` | Badge padding (default `0.25rem 0.75rem`) |
-| `--iw-article-tags-gap` | Gap between tags (default `0.5rem`) |
-| `--iw-article-tags-item-border` | Tag border color (default `--color-border`) |
-| `--iw-article-tags-item-text` | Tag text (default `--color-secondary-600`) |
-| `--iw-article-tags-item-hover-bg` | Hover background (default `--color-primary-50`) |
-| `--iw-article-tags-item-hover-text` | Hover text (default `--color-primary-700`) |
-| `--iw-article-tags-item-hover-border` | Hover border (default `--color-primary-200`) |
-| `--iw-article-tags-item-radius` | Tag radius (default `--border-radius`) |
-| `--iw-article-tags-item-padding` | Tag padding (default `0.25rem 0.75rem`) |
+- **Categories** → `.iw-categories` / `.iw-category-badge` (filled badge)
+- **Tags** → `.iw-tags` / `.iw-tag` (bordered pill, with `--variant-{primary|secondary|accent}` modifiers)
+
+Both have a full override API documented in [Transverse components → Tags](transverse.md#tags) and [Category badge](transverse.md#category-badge) (`--iw-tag-*`, `--iw-category-badge-*`). The partials live in `templates/components/_tags.html.twig` and `_categories.html.twig`.
 
 ---
 
@@ -299,17 +282,20 @@ Floating card with date, location and organizer — designed to sit on top of an
 .iw-article-meta {
     --iw-article-meta-color: var(--color-secondary-300);
     --iw-article-meta-separator-color: var(--color-secondary-700);
-    --iw-article-meta-category-bg: var(--color-secondary-800);
-    --iw-article-meta-category-text: var(--color-secondary-100);
+}
+
+.iw-article-meta__category {
+    --iw-category-badge-bg: var(--color-secondary-800);
+    --iw-category-badge-text: var(--color-secondary-100);
 }
 ```
 
 ### Pill-shaped tags
 
 ```css
-.iw-article-tags__item {
-    --iw-article-tags-item-radius: 9999px;
-    --iw-article-tags-item-padding: 0.375rem 1rem;
+.iw-tag {
+    --iw-tag-radius: 9999px;
+    --iw-tag-padding: 0.375rem 1rem;
 }
 ```
 

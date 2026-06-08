@@ -34,7 +34,7 @@
             {# Title + meta right (60%) #}
             <div class="iw-article-page__hero-inline-content">
                 {% if articleConfig.showCategories|iw_article_visible('page') %}
-                    {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_categories.html.twig' with {
+                    {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                         categories: content.excerptCategories|default([]),
                     } only %}
                 {% endif %}
@@ -66,7 +66,7 @@
 
 {% block article_footer %}
     <footer class="iw-article-page__footer">
-        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_tags.html.twig' with {
+        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
             tags: content.excerptTags|default([]),
         } only %}
     </footer>

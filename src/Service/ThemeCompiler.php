@@ -397,17 +397,8 @@ class ThemeCompiler
         $css .= "  min-width: 0;\n";
         $css .= "}\n";
 
-        // Sub-elements (sourced from the original template's inline Tailwind classes)
-        $css .= ".iw-article-card__category {\n";
-        $css .= "  display: inline-block;\n";
-        $css .= "  padding: 0.125rem 0.5rem;\n";
-        $css .= "  margin-bottom: 0.5rem;\n";
-        $css .= "  font-size: 0.75rem;\n";
-        $css .= "  font-weight: 600;\n";
-        $css .= "  border-radius: var(--border-radius);\n";
-        $css .= "  background-color: var(--color-primary-100);\n";
-        $css .= "  color: var(--color-primary-700);\n";
-        $css .= "}\n";
+        // Card category badge: visual provided by the generic .iw-category-badge
+        // component (app.css); the card only adds spacing via .iw-article-card__category.
         $css .= ".iw-article-card__title {\n";
         $css .= "  font-family: var(--font-family-heading);\n";
         $css .= "  font-weight: 600;\n";
