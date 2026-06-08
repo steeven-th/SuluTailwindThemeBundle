@@ -150,6 +150,38 @@ Generic filled badge (primary palette by default). Rendered by `templates/compon
 
 ---
 
+## Prose (rich text)
+
+Rich-text content (the `paragraph` block, text widgets, CTA/text-image bodies, etc.) is styled with the Tailwind Typography plugin's **`.prose`** class — the bundle deliberately keeps this Tailwind convention rather than introducing a custom `.iw-prose` class, so the full Typography ecosystem (modifiers, plugin config) stays available.
+
+Templates typically combine `.prose` with `max-w-none` and an optional size/scheme modifier:
+
+| Class | Role |
+|-------|------|
+| `.prose` | Base rich-text styling (Tailwind Typography). |
+| `.prose-sm` / `.prose-lg` | Smaller / larger type scale. |
+| `.prose-invert` | Light text on dark backgrounds. |
+| `max-w-none` | Removes the plugin's default max-width (almost always used alongside). |
+
+On top of the plugin, the bundle adds a few overrides in `app.css` so prose content follows the active theme/variant:
+
+| Selector | Effect |
+|----------|--------|
+| `.prose a` | Link color follows `--iw-variant-link-color` → `--color-link`. |
+| `.prose a:hover` | Hover color follows `--iw-variant-link-hover` → `--color-link-hover`. |
+| `.prose img` | Image radius follows `--radius-img`. |
+| `.prose blockquote` | Left border in `--color-primary`, italic, slightly dimmed. |
+
+**Customise** by overriding these rules (or any Tailwind Typography variable) in your own CSS:
+```css
+.prose {
+    --tw-prose-body: var(--color-text);
+    --tw-prose-headings: var(--color-primary);
+}
+```
+
+---
+
 ## Gallery navigation
 
 Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sliders, testimonial slider, linked-pages carousel, etc.).
