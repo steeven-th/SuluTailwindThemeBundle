@@ -164,6 +164,11 @@ services:
         tags:
             - { name: 'twig.extension' }
 
+    # ─── Article discovery services (F2) ─────────────────────────────────
+    ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService: ~
+
+    ItechWorld\SuluTailwindThemeBundle\Service\ArticleListingResolver: ~
+
     # ─── FQCN Aliases ────────────────────────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler: '@itech_world.sulu_tailwind_theme.compiler'
