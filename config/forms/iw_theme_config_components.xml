@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Components tab.
+    Configuration for site-wide transverse components (breadcrumb today;
+    table of contents, share buttons, back-to-top, reading progress later).
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_components</key>
+
+    <properties>
+        <!-- Breadcrumb section -->
+        <section name="componentsBreadcrumb">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_breadcrumb</title>
+            </meta>
+            <properties>
+                <property name="breadcrumbs_enabled" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled</title></meta>
+                    <params>
+                        <param name="default_value" value="both"/>
+                        <param name="values" type="collection">
+                            <param name="off"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled_off</title></meta></param>
+                            <param name="pages"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled_pages</title></meta></param>
+                            <param name="articles"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled_articles</title></meta></param>
+                            <param name="both"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled_both</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="breadcrumbs_separator" type="single_select" colspan="6"
+                          visibleCondition="breadcrumbs_enabled != 'off'">
+                    <meta><title>iw_sulu_tailwind_theme.breadcrumbs_separator</title></meta>
+                    <params>
+                        <param name="default_value" value="chevron"/>
+                        <param name="values" type="collection">
+                            <param name="chevron"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_separator_chevron</title></meta></param>
+                            <param name="slash"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_separator_slash</title></meta></param>
+                            <param name="dot"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_separator_dot</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="breadcrumbs_align" type="single_select" colspan="6"
+                          visibleCondition="breadcrumbs_enabled != 'off'">
+                    <meta><title>iw_sulu_tailwind_theme.breadcrumbs_align</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.breadcrumbs_align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="breadcrumbs_homeLabel" type="text_line" colspan="6"
+                          visibleCondition="breadcrumbs_enabled != 'off' AND breadcrumbs_homeLink == true">
+                    <meta><title>iw_sulu_tailwind_theme.breadcrumbs_home_label</title></meta>
+                </property>
+
+                <property name="breadcrumbs_homeLink" type="checkbox" colspan="6"
+                          visibleCondition="breadcrumbs_enabled != 'off'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.breadcrumbs_home_link</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>

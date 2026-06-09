@@ -1,0 +1,62 @@
+{#
+    Auto breadcrumb — reads the theme "Components" config, builds the trail from
+    Sulu's native page breadcrumb, and renders the generic _breadcrumbs component.
+
+    Parameters:
+    - context: 'page' (default) or 'article' — gates display via breadcrumbs_enabled.
+    - pageUuid: UUID used to resolve the page trail.
+        · pages:    resource.uuid
+        · articles: view.url.page.uuid (parent page of a page_tree_route article)
+    - currentTitle: appended as the current (non-link) item — used for articles
+        whose own title is not part of the page trail.
+
+    Config (theme tokens, Components tab):
+    - breadcrumbs_enabled: off | pages | articles | both (default both)
+    - breadcrumbs_homeLink: prepend a Home link (default true)
+    - breadcrumbs_homeLabel: custom Home label (falls back to a translation)
+    - breadcrumbs_separator: chevron | slash | dot (default chevron)
+#}
+{% set cfg = iw_sulu_tailwind_theme|default({}) %}
+{% set enabled = cfg.breadcrumbs_enabled|default('both') %}
+{% set ctx = context|default('page') %}
+{% set show = enabled == 'both' or enabled == (ctx == 'article' ? 'articles' : 'pages') %}
+
+{% set hasUuid = pageUuid is defined and pageUuid %}
+{% set hasTitle = currentTitle is defined and currentTitle %}
+
+{% if show and (hasUuid or (ctx == 'article' and hasTitle)) %}
+    {% set items = [] %}
+    {% set homeLink = cfg.breadcrumbs_homeLink|default(true) %}
+    {% set homeLabel = cfg.breadcrumbs_homeLabel|default('') %}
+
+    {% if hasUuid %}
+        {# Native Sulu trail (homepage → … → current page). The FIRST item is the
+           webspace homepage: the Home toggle keeps/hides it, the label renames it. #}
+        {% for item in sulu_page_breadcrumb(pageUuid) %}
+            {% if loop.first %}
+                {% if homeLink %}
+                    {% set items = items|merge([{ title: homeLabel ?: item.title, url: sulu_content_path(item.url) }]) %}
+                {% endif %}
+            {% else %}
+                {% set items = items|merge([{ title: item.title, url: sulu_content_path(item.url) }]) %}
+            {% endif %}
+        {% endfor %}
+    {% elseif homeLink %}
+        {# Article without a page trail → a single manual Home item #}
+        {% set items = items|merge([{
+            title: homeLabel ?: 'iw_sulu_tailwind_theme.breadcrumbs_home'|trans({}, 'messages'),
+            url: sulu_content_root_path(),
+        }]) %}
+    {% endif %}
+
+    {# Article: append its own title as the current item #}
+    {% if ctx == 'article' and hasTitle %}
+        {% set items = items|merge([{ title: currentTitle, url: '' }]) %}
+    {% endif %}
+
+    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
+        items: items,
+        separator: cfg.breadcrumbs_separator|default('chevron'),
+        align: cfg.breadcrumbs_align|default('left'),
+    } only %}
+{% endif %}

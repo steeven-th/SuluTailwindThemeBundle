@@ -14,11 +14,11 @@
 
 {% block article_header %}
     <header class="iw-article-page__header mb-6">
-        {% if articleConfig.showBreadcrumbs|iw_article_visible('page') %}
-            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
-                items: breadcrumb|default([]),
-            } only %}
-        {% endif %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+            context: 'article',
+            pageUuid: view.url.page.uuid|default(null),
+            currentTitle: content.title|default(''),
+        } only %}
 
         {% if articleConfig.showCategories|iw_article_visible('page') %}
             {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {

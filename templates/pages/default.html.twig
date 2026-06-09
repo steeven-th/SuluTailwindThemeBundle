@@ -2,6 +2,16 @@
 {% extends '@ItechWorldSuluTailwindTheme/base.html.twig' %}
 
 {% block content %}
+    {# Site-wide breadcrumb (pages) — gated by the Components config #}
+    {% if (iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both')) in ['both', 'pages'] %}
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'page',
+                pageUuid: resource.uuid|default(null),
+            } only %}
+        </div>
+    {% endif %}
+
     {% if content.blocks is defined and content.blocks is iterable %}
         {% for block in content.blocks %}
             {% set blockType = block.type|default('text') %}

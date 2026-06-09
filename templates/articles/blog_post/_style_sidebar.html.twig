@@ -14,11 +14,11 @@
 
 {% block article_header %}
     <header class="iw-article-page__header mb-6">
-        {% if articleConfig.showBreadcrumbs|iw_article_visible('page') %}
-            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
-                items: breadcrumb|default([]),
-            } only %}
-        {% endif %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+            context: 'article',
+            pageUuid: view.url.page.uuid|default(null),
+            currentTitle: content.title|default(''),
+        } only %}
 
         <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-4" itemprop="headline">
             {{ content.title }}

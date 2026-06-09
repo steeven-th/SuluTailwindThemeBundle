@@ -3100,9 +3100,30 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-breadcrumbs__separator {
     flex-shrink: 0;
+    opacity: var(--iw-breadcrumbs-separator-opacity, 0.4);
+}
+
+/* Chevron (SVG) separator */
+svg.iw-breadcrumbs__separator {
     width: var(--iw-breadcrumbs-separator-size, 0.875rem);
     height: var(--iw-breadcrumbs-separator-size, 0.875rem);
-    opacity: var(--iw-breadcrumbs-separator-opacity, 0.4);
+}
+
+/* Text separators (slash / dot) — center the glyph vertically */
+span.iw-breadcrumbs__separator {
+    display: inline-flex;
+    align-items: center;
+    align-self: stretch;
+    line-height: 1;
+}
+
+/* Horizontal alignment of the trail */
+.iw-breadcrumbs--align-center .iw-breadcrumbs__list {
+    justify-content: center;
+}
+
+.iw-breadcrumbs--align-right .iw-breadcrumbs__list {
+    justify-content: flex-end;
 }
 
 .iw-breadcrumbs__current {

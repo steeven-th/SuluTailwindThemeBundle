@@ -344,6 +344,16 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
+            // ── Edit form: components tab (site-wide transverse components) ──
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.components', '/components')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_components')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+
             // ── Edit form: articles tab (only if article_templates enabled) ──
             if ($this->articleTemplatesEnabled) {
                 $viewCollection->add(
