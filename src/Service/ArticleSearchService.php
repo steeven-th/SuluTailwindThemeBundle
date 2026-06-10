@@ -28,9 +28,10 @@ final class ArticleSearchService
 
     /**
      * Resource key identifying article documents inside the shared index
-     * (the index also holds pages).
+     * (the index also holds pages). Sulu indexes articles under the plural
+     * resource key "articles".
      */
-    private const RESOURCE_KEY = 'article';
+    private const RESOURCE_KEY = 'articles';
 
     public function __construct(
         private readonly EngineInterface $engine,

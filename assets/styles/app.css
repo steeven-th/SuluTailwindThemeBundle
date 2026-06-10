@@ -1311,7 +1311,7 @@ img.object-cover {
 
    Within an article block the inner .iw-article-card cards follow the
    block's Color variant (the editor's choice), not the theme-level
-   `articles_card_*` configuration — those tokens are intended for standalone
+   `card_*` configuration — those tokens are intended for standalone
    article listings driven by the page templates.
 
    Element rules are scoped via the block selector (specificity 0,2,0). */
@@ -1325,7 +1325,7 @@ img.object-cover {
        for article-list/carousel, `.iw-featured-article-card` for featured).
        This guarantees:
        1. The block's Color variant drives the surface (not the global
-          `articles_card_*` theme tokens which target standalone listings).
+          `card_*` theme tokens which target standalone listings).
        2. The `paragraphImageRadius` choice is honored per block by simply
           applying the Tailwind class on the wrapper.
        3. The image-bleed behavior is controlled at the wrapper level. */
@@ -3079,7 +3079,7 @@ section.block:has([data-slider-fullbleed-value]) {
     padding: 0;
     list-style: none;
     font-size: var(--iw-breadcrumbs-font-size, 0.875rem);
-    color: var(--iw-breadcrumbs-color, var(--color-secondary-500));
+    color: var(--iw-breadcrumbs-color, var(--color-surface-muted));
 }
 
 .iw-breadcrumbs__item {
@@ -3095,7 +3095,7 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-breadcrumbs__link:hover {
-    color: var(--iw-breadcrumbs-link-hover, var(--color-primary));
+    color: var(--iw-breadcrumbs-link-hover, var(--color-surface-accent));
 }
 
 .iw-breadcrumbs__separator {
@@ -3127,7 +3127,7 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-breadcrumbs__current {
-    color: var(--iw-breadcrumbs-current-color, var(--color-text));
+    color: var(--iw-breadcrumbs-current-color, var(--color-surface-foreground));
     font-weight: var(--iw-breadcrumbs-current-weight, 500);
 }
 
@@ -3149,22 +3149,22 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
     font-size: 0.875rem;
-    color: var(--iw-pagination-color, var(--color-secondary-600));
+    color: var(--iw-pagination-color, var(--color-surface-muted));
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .iw-pagination__link:hover,
 .iw-pagination__arrow:hover {
-    background-color: var(--iw-pagination-hover-bg, var(--color-primary-50));
-    color: var(--iw-pagination-hover-color, var(--color-primary));
+    background-color: var(--iw-pagination-hover-bg, color-mix(in srgb, var(--color-surface-accent) 12%, transparent));
+    color: var(--iw-pagination-hover-color, var(--color-surface-accent));
 }
 
 .iw-pagination__link--current,
 .iw-pagination__link--current:hover {
     font-weight: 600;
-    background-color: var(--iw-pagination-current-bg, var(--color-primary));
-    color: var(--iw-pagination-current-color, #fff);
+    background-color: var(--iw-pagination-current-bg, var(--color-surface-accent));
+    color: var(--iw-pagination-current-color, var(--color-surface-on-accent, #fff));
 }
 
 .iw-pagination__arrow svg {
@@ -3174,14 +3174,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-pagination__ellipsis {
     padding: 0 0.25rem;
-    color: var(--iw-pagination-ellipsis-color, var(--color-secondary-400));
-}
-
-.iw-pagination__info {
-    margin-top: 0.75rem;
-    text-align: center;
-    font-size: 0.875rem;
-    color: var(--iw-pagination-info-color, var(--color-secondary-500));
+    color: var(--iw-pagination-ellipsis-color, var(--color-surface-muted));
 }
 
 /* ─── Transverse: tags ──────────────────────────────────────────────────── */
@@ -3198,16 +3191,16 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-tag-padding, 0.25rem 0.75rem);
     font-size: var(--iw-tag-font-size, 0.75rem);
     font-weight: var(--iw-tag-font-weight, 500);
-    border: 1px solid var(--iw-tag-border, var(--color-border));
+    border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
-    color: var(--iw-tag-text, var(--color-secondary-600));
+    color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .iw-tag:hover {
-    background-color: var(--iw-tag-hover-bg, var(--color-primary-50));
-    color: var(--iw-tag-hover-text, var(--color-primary-700));
-    border-color: var(--iw-tag-hover-border, var(--color-primary-200));
+    background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--color-surface-accent) 10%, transparent));
+    color: var(--iw-tag-hover-text, var(--color-surface-accent));
+    border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--color-surface-accent) 30%, transparent));
 }
 
 .iw-tag--variant-primary {
@@ -3253,8 +3246,272 @@ span.iw-breadcrumbs__separator {
     color: var(--iw-category-badge-text, var(--color-primary-700));
 }
 
-/* Card context — spacing above the title */
+/* Card context — spacing above the title + configurable badge colors
+   (from the Components > Cards admin section, default = primary tint). */
 .iw-article-card__category {
     margin-bottom: 0.5rem;
     --iw-category-badge-padding: 0.125rem 0.5rem;
+    --iw-category-badge-bg: var(--iw-article-card-badge-bg, var(--color-primary-100));
+    --iw-category-badge-text: var(--iw-article-card-badge-text, var(--color-primary-700));
+}
+
+/* ─── Article discovery: listing layout + filters sidebar (F3) ───────────── */
+/* Two-column listing: a left filter sidebar and the results column. Collapses
+   to a single column on small screens. Override --iw-article-layout-* to retune
+   the sidebar width and gap, or the whole grid to relocate the sidebar. */
+.iw-article-layout {
+    display: grid;
+    grid-template-columns: var(--iw-article-layout-sidebar-width, 16rem) 1fr;
+    gap: var(--iw-article-layout-gap, 2rem);
+    align-items: start;
+}
+
+/* Below the side-by-side breakpoint the sidebar stacks on top of the results. */
+@media (max-width: 767.98px) {
+    .iw-article-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.iw-article-layout__results {
+    min-width: 0; /* allow the grid/list inside to shrink instead of overflowing */
+}
+
+/* The listing grids (in the theme CSS) switch columns on the *viewport* width.
+   Inside the sidebar layout the results column is ~16rem narrower than the
+   viewport, so those breakpoints pack too many cards — worst in portrait, which
+   reaches 4 columns. While the sidebar sits beside the results (>=768px), drop
+   one column so cards keep a comfortable size. These descendant selectors win
+   over the theme rules by specificity, regardless of stylesheet order. */
+@media (min-width: 768px) {
+    .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-article-layout__results .iw-article-listing--grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* On 2xl screens the results column is wide enough (~1180px, the container caps
+   at 1536px) that the sidebar no longer costs a column: restore the full-width
+   counts. Same specificity as the 1024 block above, placed after, so it wins. */
+@media (min-width: 1536px) {
+    .iw-article-layout__results .iw-article-listing--grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Filters sidebar. All visual properties are routed through --iw-article-filters-*
+   custom properties so the whole component can be restyled without touching Twig. */
+.iw-article-filters {
+    font-size: var(--iw-article-filters-font-size, 0.875rem);
+}
+
+.iw-article-filters__form {
+    position: var(--iw-article-filters-position, sticky);
+    top: var(--iw-article-filters-top, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-article-filters-group-gap, 1.5rem);
+    padding: var(--iw-article-filters-padding, 1.25rem);
+    background-color: var(--iw-article-filters-bg, var(--color-surface));
+    border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
+    border-radius: var(--iw-article-filters-radius, var(--border-radius));
+}
+
+.iw-article-filters__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.iw-article-filters__title {
+    font-size: var(--iw-article-filters-title-size, 1rem);
+    font-weight: var(--iw-article-filters-title-weight, 600);
+    color: var(--iw-article-filters-title-color, var(--color-surface-foreground));
+    margin: 0;
+}
+
+.iw-article-filters__clear {
+    font-size: 0.75rem;
+    color: var(--iw-article-filters-clear-color, var(--color-surface-muted));
+    text-decoration: underline;
+}
+
+.iw-article-filters__clear:hover {
+    color: var(--iw-article-filters-clear-hover, var(--color-surface-accent));
+}
+
+.iw-article-filters__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.iw-article-filters__fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.iw-article-filters__label,
+.iw-article-filters__legend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--iw-article-filters-label-color, var(--color-surface-muted));
+    padding: 0;
+}
+
+.iw-article-filters__search,
+.iw-article-filters__select {
+    width: 100%;
+    padding: var(--iw-article-filters-control-padding, 0.5rem 0.75rem);
+    font-size: 0.875rem;
+    color: var(--iw-article-filters-control-color, var(--color-surface-foreground));
+    background-color: var(--iw-article-filters-control-bg, var(--color-background));
+    border: 1px solid var(--iw-article-filters-control-border, var(--color-surface-border));
+    border-radius: var(--iw-article-filters-control-radius, var(--border-radius));
+}
+
+.iw-article-filters__search:focus,
+.iw-article-filters__select:focus {
+    outline: none;
+    border-color: var(--iw-article-filters-control-focus, var(--color-surface-accent));
+}
+
+.iw-article-filters__option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.iw-article-filters__checkbox {
+    accent-color: var(--iw-article-filters-accent, var(--color-surface-accent));
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.iw-article-filters__option-label {
+    color: var(--iw-article-filters-option-color, var(--color-surface-foreground));
+}
+
+.iw-article-filters__option:hover .iw-article-filters__option-label {
+    color: var(--iw-article-filters-option-hover, var(--color-surface-accent));
+}
+
+.iw-article-filters__apply {
+    padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--iw-article-filters-apply-color, var(--color-surface-on-accent, #fff));
+    background-color: var(--iw-article-filters-apply-bg, var(--color-surface-accent));
+    border: 0;
+    border-radius: var(--iw-article-filters-apply-radius, var(--border-radius));
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.iw-article-filters__apply:hover {
+    background-color: var(--iw-article-filters-apply-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+}
+
+/* Layout-only wrapper when a theme button style (iw-button--*) owns the colors:
+   never sets background/color so the chosen button variant shows through. */
+.iw-article-filters__apply-btn {
+    display: inline-flex;
+    justify-content: center;
+    padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--iw-article-filters-apply-radius, var(--border-radius));
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ─── Article results header: count + active filter chips (F4-A) ─────────── */
+.iw-article-results {
+    margin-bottom: var(--iw-article-results-gap, 1.5rem);
+}
+
+.iw-article-results__count {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-surface-foreground);
+}
+
+.iw-article-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.iw-article-active-filters__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--color-surface-foreground);
+    background-color: color-mix(in srgb, var(--color-surface-accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-surface-accent) 25%, transparent);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.iw-article-active-filters__chip:hover {
+    background-color: color-mix(in srgb, var(--color-surface-accent) 18%, transparent);
+}
+
+.iw-article-active-filters__remove {
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-surface-muted);
+}
+
+.iw-article-active-filters__chip:hover .iw-article-active-filters__remove {
+    color: var(--color-surface-accent);
+}
+
+.iw-article-active-filters__clear {
+    margin-left: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--color-surface-muted);
+    text-decoration: underline;
+}
+
+.iw-article-active-filters__clear:hover {
+    color: var(--color-surface-accent);
+}
+
+/* Empty state — clear-filters call to action (the base .iw-article-listing__empty
+   layout/color comes from the theme CSS). */
+.iw-article-listing__empty-action {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--color-surface-accent);
+    text-decoration: underline;
 }

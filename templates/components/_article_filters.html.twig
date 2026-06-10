@@ -1,0 +1,100 @@
+{#
+    Article filters sidebar (F3).
+    Server-side filtering via a plain GET form — works without JavaScript.
+    Checkboxes submit as `category[]` / `tag[]`; the search and sort submit as
+    scalar params. Submitting resets pagination (the form does not carry `page`).
+
+    Parameters:
+    - facets: { categories: [{id, key, name}], tags: [{id, name}] }
+    - active: { categories: string[], tags: string[], q: string, sort: string }
+    - baseUrl: page path, used by the "clear all" link
+    - resultCount: total number of matching articles (optional)
+#}
+{% set facets = facets|default({}) %}
+{% set active = active|default({}) %}
+{% set activeCategories = active.categories|default([]) %}
+{% set activeTags = active.tags|default([]) %}
+{% set activeQ = active.q|default('') %}
+{% set activeSort = active.sort|default('') %}
+{% set hasActiveFilters = activeQ is not empty or activeSort is not empty or activeCategories|length > 0 or activeTags|length > 0 %}
+
+<aside class="iw-article-filters">
+    <form method="get" class="iw-article-filters__form">
+        <div class="iw-article-filters__header">
+            <h2 class="iw-article-filters__title">{{ 'iw_sulu_tailwind_theme.article.filters_title'|trans }}</h2>
+            {% if hasActiveFilters %}
+                <a href="{{ baseUrl|default('') }}" class="iw-article-filters__clear">
+                    {{ 'iw_sulu_tailwind_theme.article.filters_clear'|trans }}
+                </a>
+            {% endif %}
+        </div>
+
+        {# Search #}
+        <div class="iw-article-filters__group">
+            <label class="iw-article-filters__label" for="iw-filter-q">
+                {{ 'iw_sulu_tailwind_theme.article.filters_search'|trans }}
+            </label>
+            <input type="search" id="iw-filter-q" name="q" value="{{ activeQ }}"
+                   class="iw-article-filters__search"
+                   placeholder="{{ 'iw_sulu_tailwind_theme.article.filters_search_placeholder'|trans }}">
+        </div>
+
+        {# Sort #}
+        <div class="iw-article-filters__group">
+            <label class="iw-article-filters__label" for="iw-filter-sort">
+                {{ 'iw_sulu_tailwind_theme.article.filters_sort'|trans }}
+            </label>
+            <select id="iw-filter-sort" name="sort" class="iw-article-filters__select">
+                <option value="">{{ 'iw_sulu_tailwind_theme.article.filters_sort_default'|trans }}</option>
+                <option value="recent" {{ activeSort == 'recent' ? 'selected' }}>{{ 'iw_sulu_tailwind_theme.article.filters_sort_recent'|trans }}</option>
+                <option value="oldest" {{ activeSort == 'oldest' ? 'selected' }}>{{ 'iw_sulu_tailwind_theme.article.filters_sort_oldest'|trans }}</option>
+                <option value="title" {{ activeSort == 'title' ? 'selected' }}>{{ 'iw_sulu_tailwind_theme.article.filters_sort_title'|trans }}</option>
+            </select>
+        </div>
+
+        {# Categories #}
+        {% if facets.categories is defined and facets.categories|length > 0 %}
+            <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
+                <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}</legend>
+                {% for category in facets.categories %}
+                    {% set value = category.key is not empty ? category.key : category.id %}
+                    <label class="iw-article-filters__option">
+                        <input type="checkbox" name="category[]" value="{{ value }}"
+                               class="iw-article-filters__checkbox"
+                               {{ value|trim in activeCategories ? 'checked' }}>
+                        <span class="iw-article-filters__option-label">{{ category.name }}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+        {% endif %}
+
+        {# Tags #}
+        {% if facets.tags is defined and facets.tags|length > 0 %}
+            <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
+                <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_tags'|trans }}</legend>
+                {% for tag in facets.tags %}
+                    <label class="iw-article-filters__option">
+                        <input type="checkbox" name="tag[]" value="{{ tag.name }}"
+                               class="iw-article-filters__checkbox"
+                               {{ tag.name in activeTags ? 'checked' }}>
+                        <span class="iw-article-filters__option-label">{{ tag.name }}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+        {% endif %}
+
+        {# Apply button: use a theme button style when configured (Components >
+           Filter sidebar), otherwise the component's own surface-accent button. #}
+        {% set applyButtonStyle = iw_sulu_tailwind_theme.components_sidebarButtonStyle|default('') %}
+        {% if applyButtonStyle is not empty %}
+            {# Themed button: iw-button--<style> owns the colors, __apply-btn only the layout. #}
+            <button type="submit" class="iw-button--{{ applyButtonStyle }} iw-article-filters__apply-btn">
+                {{ 'iw_sulu_tailwind_theme.article.filters_apply'|trans }}
+            </button>
+        {% else %}
+            <button type="submit" class="iw-article-filters__apply">
+                {{ 'iw_sulu_tailwind_theme.article.filters_apply'|trans }}
+            </button>
+        {% endif %}
+    </form>
+</aside>

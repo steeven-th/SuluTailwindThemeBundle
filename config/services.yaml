@@ -50,6 +50,19 @@ services:
         tags:
             - { name: 'controller.service_arguments' }
 
+    # Article listing page controller (F2): extends Sulu's ContentController to
+    # inject the server-side filtered/paginated article list and filter facets.
+    ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleListingController:
+        autowire: true
+        autoconfigure: true
+        public: true
+        arguments:
+            # GroupProviderInterface is not autowirable: bind the concrete service
+            # (used to expand article types to their template keys).
+            $groupProvider: '@sulu_admin.metadata_group_provider'
+        tags:
+            - { name: 'controller.service_arguments' }
+
     # ─── Services ────────────────────────────────────────────────────────
     itech_world.sulu_tailwind_theme.palette_generator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator
@@ -168,6 +181,8 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService: ~
 
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleListingResolver: ~
+
+    ItechWorld\SuluTailwindThemeBundle\Service\ArticleFacetsService: ~
 
     # ─── FQCN Aliases ────────────────────────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'

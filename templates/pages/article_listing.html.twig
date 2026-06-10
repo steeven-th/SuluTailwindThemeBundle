@@ -3,38 +3,112 @@
     Renders a paginated list of articles using the active listing style
     from theme configuration (grid/list/cards).
 
-    Uses Sulu's native smart_content for article fetching and filtering.
-    The admin selects the source, categories, tags, and sorting in the
-    smart_content configuration panel.
+    When the custom ArticleListingController is active, articles are filtered
+    server-side from the query string (?category=&tag=&q=&sort=&page=) and exposed
+    as `filteredArticles` + `articlePagination` + `articleFacets` + `activeFilters`
+    + `articleFilterQuery`. A left filter sidebar (F3) lets visitors refine within
+    the page's editorial scope. Pagination links preserve the active filters.
+    Falls back to the native smart_content (`content.articles`) when the controller
+    is not in use (e.g. preview).
 #}
 {% extends 'base.html.twig' %}
 
 {% block content %}
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    {# Page title #}
-    {% if content.title is defined and content.title is not empty %}
-        <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-8">
-            {{ content.title }}
-        </h1>
+    {# Site-wide breadcrumb (pages) — gated by the Components config #}
+    {% if (iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both')) in ['both', 'articles'] %}
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'page',
+                pageUuid: resource.uuid|default(null),
+            } only %}
+        </div>
     {% endif %}
 
-    {# Article listing with active style #}
-    {% if content.articles is defined and content.articles is iterable and content.articles|length > 0 %}
-        {% set listingStyle = iw_sulu_tailwind_theme_listing_style() %}
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {# Page title #}
+        {% if content.title is defined and content.title is not empty %}
+            <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-8">
+                {{ content.title }}
+            </h1>
+        {% endif %}
 
-        {% set stylePath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_' ~ listingStyle ~ '.html.twig' %}
-        {% set fallbackPath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_grid.html.twig' %}
+        {# Prefer the server-side filtered list; fall back to native smart_content. #}
+        {% set isFiltered = filteredArticles is defined %}
+        {% set listingArticles = isFiltered ? filteredArticles : (content.articles|default([])) %}
 
-        {% include [stylePath, fallbackPath] with {
-            articles: content.articles,
-            currentPage: view.articles.page|default(1),
-            totalPages: view.articles.hasNextPage is defined and view.articles.hasNextPage ? view.articles.page + 1 : view.articles.page|default(1),
-            baseUrl: sulu_content_path(content.url),
-        } only %}
-    {% else %}
-        <p class="text-center text-[var(--color-secondary-500)] py-16">
-            {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
-        </p>
-    {% endif %}
-</div>
+        {% if isFiltered %}
+            {% set listingCurrentPage = articlePagination.page %}
+            {% set listingTotalPages = articlePagination.totalPages %}
+            {% set listingFilterQuery = articleFilterQuery|default({}) %}
+        {% else %}
+            {% set listingCurrentPage = view.articles.page|default(1) %}
+            {% set listingTotalPages = view.articles.hasNextPage is defined and view.articles.hasNextPage ? view.articles.page + 1 : view.articles.page|default(1) %}
+            {% set listingFilterQuery = {} %}
+        {% endif %}
+
+        {% set baseUrl = sulu_content_path(content.url) %}
+
+        {% set activeFiltersData = activeFilters|default({}) %}
+        {% set hasActiveFilters = (activeFiltersData.categories|default([])|length > 0)
+            or (activeFiltersData.tags|default([])|length > 0)
+            or (activeFiltersData.q|default('') is not empty) %}
+
+        {# The results column: result count + active filters, then the active
+           listing style + pagination, or a soigné empty state. #}
+        {% set resultsColumn %}
+            {% if isFiltered %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_article_active_filters.html.twig' with {
+                    total: articlePagination.total|default(0),
+                    active: activeFiltersData,
+                    facets: articleFacets|default({}),
+                    baseUrl: baseUrl,
+                } only %}
+            {% endif %}
+
+            {% if listingArticles is iterable and listingArticles|length > 0 %}
+                {% set listingStyle = iw_sulu_tailwind_theme_listing_style() %}
+                {% set stylePath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_' ~ listingStyle ~ '.html.twig' %}
+                {% set fallbackPath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_grid.html.twig' %}
+
+                {% include [stylePath, fallbackPath] with {
+                    articles: listingArticles,
+                    currentPage: listingCurrentPage,
+                    totalPages: listingTotalPages,
+                    baseUrl: baseUrl,
+                    filterQuery: listingFilterQuery,
+                } only %}
+            {% elseif isFiltered and hasActiveFilters %}
+                {# Empty because the active filters match nothing — offer a way out. #}
+                <div class="iw-article-listing__empty">
+                    <p class="iw-article-listing__empty-text">
+                        {{ 'iw_sulu_tailwind_theme.article.no_results_filtered'|trans }}
+                    </p>
+                    <a class="iw-article-listing__empty-action" href="{{ baseUrl }}">
+                        {{ 'iw_sulu_tailwind_theme.article.filters_clear'|trans }}
+                    </a>
+                </div>
+            {% else %}
+                <p class="iw-article-listing__empty iw-article-listing__empty-text">
+                    {{ 'iw_sulu_tailwind_theme.article.no_articles'|trans }}
+                </p>
+            {% endif %}
+        {% endset %}
+
+        {% if isFiltered %}
+            {# Two-column layout: filter sidebar (left) + results (right). #}
+            <div class="iw-article-layout">
+                {% include '@ItechWorldSuluTailwindTheme/components/_article_filters.html.twig' with {
+                    facets: articleFacets|default({}),
+                    active: activeFilters|default({}),
+                    baseUrl: baseUrl,
+                    resultCount: articlePagination.total|default(0),
+                } only %}
+                <div class="iw-article-layout__results">
+                    {{ resultsColumn }}
+                </div>
+            </div>
+        {% else %}
+            {{ resultsColumn }}
+        {% endif %}
+    </div>
 {% endblock %}

@@ -100,6 +100,21 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const COMPONENT_KEYS = [
         'breadcrumbs_enabled', 'breadcrumbs_separator', 'breadcrumbs_align',
         'breadcrumbs_homeLink', 'breadcrumbs_homeLabel',
+        // Semantic surfaces shared by all transverse components (sidebar,
+        // pagination, breadcrumb, badges). Empty = derived from the theme.
+        'components_surfaceBg', 'components_surfaceText', 'components_surfaceMuted',
+        'components_surfaceBorder', 'components_surfaceAccent', 'components_surfaceOnAccent',
+        // Per-component surface overrides (empty = inherit the global surfaces).
+        'components_sidebarBg', 'components_sidebarText', 'components_sidebarMuted',
+        'components_sidebarBorder', 'components_sidebarAccent', 'components_sidebarButtonStyle',
+        'components_paginationText', 'components_paginationAccent',
+        'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
+        // Site-wide card appearance (moved from the Articles tab in 3.0).
+        'cardImageRatio', 'cardSurface', 'cardPadding', 'cardImagePadded',
+        'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
+        'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
+        'cardHoverDuration', 'cardHoverEasing',
+        'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
     ];
 
     /**
@@ -492,11 +507,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         // Article configuration: flat keys passed through directly
         $articleKeys = [
             'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle', 'articles_cardImageRatio',
-            'articles_cardSurface', 'articles_cardPadding', 'articles_cardImagePadded',
-            'articles_cardBorder', 'articles_cardBorderWidth', 'articles_cardBorderStyle',
-            'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
-            'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
+            'articles_listingStyle',
             'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
             'articles_showExcerpts', 'articles_showRelated',
             'articles_relatedCount',
@@ -672,11 +683,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         // Article configuration: flat keys stored directly in tokens
         $articleKeys = [
             'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle', 'articles_cardImageRatio',
-            'articles_cardSurface', 'articles_cardPadding', 'articles_cardImagePadded',
-            'articles_cardBorder', 'articles_cardBorderWidth', 'articles_cardBorderStyle',
-            'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
-            'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
+            'articles_listingStyle',
             'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
             'articles_showExcerpts', 'articles_showRelated',
             'articles_relatedCount',

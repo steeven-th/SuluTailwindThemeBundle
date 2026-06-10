@@ -4,16 +4,25 @@
     Parameters:
     - currentPage: int (current page number, 1-based)
     - totalPages: int (total number of pages)
-    - baseUrl: string (URL pattern, page number will be appended)
+    - baseUrl: string (URL pattern, the page query param is appended)
+    - queryParams: hash (optional) extra query params to preserve in every link
+      (e.g. the active article filters), merged with the page number.
 #}
 {% set currentPage = currentPage|default(1) %}
 {% set totalPages = totalPages|default(1) %}
+{% set queryParams = queryParams|default({}) %}
+
+{# Build a page URL preserving the active query params (filters, sort, search). #}
+{% macro page_url(baseUrl, queryParams, page) -%}
+    {{- baseUrl }}?{{ queryParams|merge({page: page})|url_encode -}}
+{%- endmacro %}
+{% import _self as iw_pagination %}
 
 {% if totalPages > 1 %}
     <nav aria-label="Pagination" class="iw-pagination">
         {# Previous button #}
         {% if currentPage > 1 %}
-            <a href="{{ baseUrl }}?page={{ currentPage - 1 }}"
+            <a href="{{ iw_pagination.page_url(baseUrl, queryParams, currentPage - 1) }}"
                class="iw-pagination__arrow iw-pagination__arrow--prev"
                aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_previous'|trans }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,7 +39,7 @@
                         {{ page }}
                     </span>
                 {% else %}
-                    <a href="{{ baseUrl }}?page={{ page }}" class="iw-pagination__link">
+                    <a href="{{ iw_pagination.page_url(baseUrl, queryParams, page) }}" class="iw-pagination__link">
                         {{ page }}
                     </a>
                 {% endif %}
@@ -41,7 +50,7 @@
 
         {# Next button #}
         {% if currentPage < totalPages %}
-            <a href="{{ baseUrl }}?page={{ currentPage + 1 }}"
+            <a href="{{ iw_pagination.page_url(baseUrl, queryParams, currentPage + 1) }}"
                class="iw-pagination__arrow iw-pagination__arrow--next"
                aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_next'|trans }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,9 +59,4 @@
             </a>
         {% endif %}
     </nav>
-
-    {# Page indicator #}
-    <p class="iw-pagination__info">
-        {{ 'iw_sulu_tailwind_theme.article.pagination_info'|trans({'%current%': currentPage, '%total%': totalPages}) }}
-    </p>
 {% endif %}

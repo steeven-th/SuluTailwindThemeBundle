@@ -11,12 +11,116 @@
     <key>iw_theme_config_components</key>
 
     <properties>
+        <!-- Surfaces section: semantic colors shared by every transverse component
+             (filter sidebar, pagination, breadcrumb, badges). Leave a field empty
+             to derive it automatically from the theme (works light AND dark). -->
+        <section name="componentsSurfaces">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_surfaces</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_surfaces_info</info_text>
+            </meta>
+            <properties>
+                <property name="components_surfaceBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_surfaceText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_surfaceMuted" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_muted</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_surfaceBorder" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_surfaceAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_surfaceOnAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_surface_on_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Filter sidebar colors (empty = inherit the global surfaces) -->
+        <section name="componentsSidebar">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_sidebar</title>
+            </meta>
+            <properties>
+                <property name="components_sidebarBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarMuted" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_muted</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarBorder" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_sidebarButtonStyle" type="iw_theme_button_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_sidebar_button_style</title></meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Pagination colors (empty = inherit the global surfaces) -->
+        <section name="componentsPagination">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_pagination</title>
+            </meta>
+            <properties>
+                <property name="components_paginationText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_paginationAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+            </properties>
+        </section>
+
         <!-- Breadcrumb section -->
         <section name="componentsBreadcrumb">
             <meta>
                 <title>iw_sulu_tailwind_theme.components_section_breadcrumb</title>
             </meta>
             <properties>
+                <property name="components_breadcrumbText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_breadcrumbCurrent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_current</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_breadcrumbAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
                 <property name="breadcrumbs_enabled" type="single_select" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.breadcrumbs_enabled</title></meta>
                     <params>
@@ -70,6 +174,191 @@
                             <meta>
                                 <title>iw_sulu_tailwind_theme.breadcrumbs_home_link</title>
                             </meta>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Cards (site-wide): appearance of article/listing cards, moved here in
+             3.0 so it applies to every card. Empty colors = theme defaults. -->
+        <section name="componentsCards">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_cards</title>
+            </meta>
+            <properties>
+                <property name="cardImageRatio" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_image_ratio</title></meta>
+                    <params>
+                        <param name="default_value" value="16:9"/>
+                        <param name="values" type="collection">
+                            <param name="16:9"><meta><title>16:9</title></meta></param>
+                            <param name="4:3"><meta><title>4:3</title></meta></param>
+                            <param name="1:1"><meta><title>1:1</title></meta></param>
+                            <param name="3:4"><meta><title>3:4 (portrait)</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Surface -->
+                <property name="cardSurface" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardPadding" type="single_select" colspan="3">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_padding</title></meta>
+                    <params>
+                        <param name="default_value" value="1rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.articles_card_padding_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>XS (p-2)</title></meta></param>
+                            <param name="1rem"><meta><title>S (p-4)</title></meta></param>
+                            <param name="1.5rem"><meta><title>M (p-6)</title></meta></param>
+                            <param name="2rem"><meta><title>L (p-8)</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardImagePadded" type="checkbox" colspan="3">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.articles_card_image_padded</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Content colors (empty = theme defaults) -->
+                <property name="cardTitleColor" type="iw_theme_color_token_editor" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.card_title_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardTextColor" type="iw_theme_color_token_editor" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.card_text_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardBadgeBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.card_badge_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardBadgeText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.card_badge_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <!-- Border -->
+                <property name="cardBorder" type="iw_theme_color_token_editor" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardBorderWidth" type="single_select" colspan="4"
+                          visibleCondition="cardBorder != 'none'">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_border_width</title></meta>
+                    <params>
+                        <param name="default_value" value="1px"/>
+                        <param name="values" type="collection">
+                            <param name="1px"><meta><title>1px</title></meta></param>
+                            <param name="2px"><meta><title>2px</title></meta></param>
+                            <param name="3px"><meta><title>3px</title></meta></param>
+                            <param name="4px"><meta><title>4px</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardBorderStyle" type="single_select" colspan="4"
+                          visibleCondition="cardBorder != 'none'">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_border_style</title></meta>
+                    <params>
+                        <param name="default_value" value="solid"/>
+                        <param name="values" type="collection">
+                            <param name="solid"><meta><title>Solid</title></meta></param>
+                            <param name="dashed"><meta><title>Dashed</title></meta></param>
+                            <param name="dotted"><meta><title>Dotted</title></meta></param>
+                            <param name="double"><meta><title>Double</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Hover effects -->
+                <property name="cardHoverTransform" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform</title></meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_none</title></meta></param>
+                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift</title></meta></param>
+                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift_strong</title></meta></param>
+                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_up</title></meta></param>
+                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_down</title></meta></param>
+                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_tilt</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardHoverImage" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_image</title></meta>
+                    <params>
+                        <param name="default_value" value="zoom"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_none</title></meta></param>
+                            <param name="zoom"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom</title></meta></param>
+                            <param name="zoom-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom_strong</title></meta></param>
+                            <param name="grayscale"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_grayscale</title></meta></param>
+                            <param name="brightness"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_brightness</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardHoverShadow" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow</title></meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_none</title></meta></param>
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_lg</title></meta></param>
+                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_xl</title></meta></param>
+                            <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_glow_primary</title></meta></param>
+                            <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_glow_accent</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="cardBorder != 'none'">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardHoverDuration" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_duration</title></meta>
+                    <params>
+                        <param name="default_value" value="300ms"/>
+                        <param name="values" type="collection">
+                            <param name="150ms"><meta><title>150ms</title></meta></param>
+                            <param name="300ms"><meta><title>300ms</title></meta></param>
+                            <param name="500ms"><meta><title>500ms</title></meta></param>
+                            <param name="700ms"><meta><title>700ms</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="cardHoverEasing" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing</title></meta>
+                    <params>
+                        <param name="default_value" value="ease-out"/>
+                        <param name="values" type="collection">
+                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_linear</title></meta></param>
+                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_out</title></meta></param>
+                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_in_out</title></meta></param>
+                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_bounce</title></meta></param>
                         </param>
                     </params>
                 </property>

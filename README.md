@@ -48,7 +48,9 @@
 * **Menu configuration**: Configurable menu type, colors, animation, and display options
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
-* **Customizable article cards**: configure surface, border (width + style), padding, and composable hover effects (card transform, image effect, shadow, border color, duration, easing) for the listing card, grid and list styles via the admin Articles tab
+* **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
+* **Site-wide cards**: configure surface, title/text/badge colors, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
+* **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
 * **CLI commands**: Install preset themes, assign to webspaces, recompile CSS, and run integration diagnostics from the command line
 * **Auto-recompile**: Doctrine listener recompiles CSS on theme save
 
@@ -335,6 +337,34 @@ Article templates extend the project's `base.html.twig` — your menu, footer, a
 >         enabled: true
 >         types: ['news', 'event']  # blog_post will not be registered
 > ```
+
+#### Article listing page (server-side filtering)
+
+The `iw_article_listing` page template renders a filtered, paginated article list. Create a page with this template (e.g. `/news`, `/blog`) and the articles are filtered **server-side** from the URL query string:
+
+| Query param | Example | Description |
+|-------------|---------|-------------|
+| `category` | `?category=news` | Filter by category key (slug). Multiple values comma-separated (`news,blog`), OR-combined. |
+| `tag` | `?tag=featured` | Filter by tag name. Multiple values comma-separated, OR-combined. |
+| `q` | `?q=release` | Full-text search on title and content (uses the Sulu search index). |
+| `sort` | `?sort=title` | Sort order: `recent` (default, newest first), `oldest`, `title` (A→Z). |
+| `page` | `?page=2` | Page number (12 articles per page). |
+
+Filters combine (`/news?category=news&q=release&sort=title&page=2`) and pagination links preserve the active filters. URLs are shareable and SEO-friendly; filtering works without JavaScript.
+
+**Editorial scope vs visitor filters.** The page's smart_content defines the **editorial scope** — the admin picks the article types (news/event/blog), optional base categories/tags, default sort and a result cap. The visitor filters **refine within that scope**: the chosen type is always enforced, and the sidebar/URL filters narrow the list further (a search for "blog" on a News page returns nothing — it never escapes the news scope). The visitor sort overrides the admin default.
+
+**Filter sidebar.** A left sidebar exposes a search box, a sort dropdown (most recent / oldest / title) and category/tag checkboxes (every site category/tag is listed). It is a plain GET form — filtering works without JavaScript. Restyle it with the `--iw-article-filters-*` and `--iw-article-layout-*` custom properties; no Twig override needed.
+
+> **Full-text search requires a search index.** The `q` parameter queries Sulu's website search index. After installing the bundle (or importing existing articles) run an initial reindex so articles become searchable:
+>
+> ```bash
+> php bin/console cmsig:seal:reindex
+> ```
+>
+> The index then stays up to date automatically as articles are published/unpublished. Category and tag filtering work without reindexing (they query the database directly).
+>
+> _Single-webspace note:_ article filtering targets the database directly and does not constrain by webspace. In a multi-webspace setup sharing the same articles, the listing is not scoped per webspace.
 
 ## Usage
 
