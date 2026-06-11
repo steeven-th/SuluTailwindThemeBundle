@@ -90,7 +90,17 @@ final class ArticleListingController extends ContentController
             'total' => $result['total'],
             'limit' => $result['limit'],
         ];
-        $parameters['articleFacets'] = $this->facetsService->getFacets($locale);
+        // Contextual facets: only the categories/tags present in the page's
+        // editorial scope (independent of the visitor's active filters).
+        $scopeTaxonomy = $this->listingResolver->resolveScopeTaxonomy(
+            array_merge($scope, ['locale' => $locale, 'webspaceKey' => $webspaceKey]),
+            $locale,
+        );
+        $parameters['articleFacets'] = $this->facetsService->getFacets(
+            $locale,
+            $scopeTaxonomy['categoryIds'],
+            $scopeTaxonomy['tagNames'],
+        );
         $parameters['activeFilters'] = [
             'categories' => $categoryKeys,
             'tags' => $tagNames,

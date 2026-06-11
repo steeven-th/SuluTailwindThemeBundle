@@ -206,6 +206,71 @@ final class ArticleListingResolver
     }
 
     /**
+     * Resolve the distinct category ids and tag names actually used by the
+     * articles of the admin editorial scope — used to restrict the sidebar facets
+     * to taxonomy present in the page, instead of every site category/tag.
+     *
+     * It is computed from the editorial scope only (before any visitor filter),
+     * so the facet list stays stable whatever the visitor has selected. The
+     * matching category ids are the ones articles carry directly (root categories
+     * in the common case); the facet list (root categories) is then filtered to
+     * this set by the caller.
+     *
+     * Note: this scans the scope's articles (bounded by the admin "limit
+     * results"). The result is identical for every visitor-filter combination of
+     * the page, so the HTTP page cache amortises it; an app-level cache keyed by
+     * the scope is a possible later optimisation.
+     *
+     * @param array<string, mixed> $request Same scope keys as {@see resolve()}
+     *
+     * @return array{categoryIds: int[], tagNames: string[]}
+     */
+    public function resolveScopeTaxonomy(array $request, string $locale): array
+    {
+        $scopeUuids = $this->resolveScopeUuids($request, $locale);
+        if ([] === $scopeUuids) {
+            return ['categoryIds' => [], 'tagNames' => []];
+        }
+
+        $selects = [ArticleRepositoryInterface::GROUP_SELECT_ARTICLE_WEBSITE => true];
+        $filters = [
+            'locale' => $locale,
+            'stage' => DimensionContentInterface::STAGE_LIVE,
+            'uuids' => $scopeUuids,
+        ];
+
+        $categoryIds = [];
+        $tagNames = [];
+        foreach ($this->articleRepository->findBy($filters, [], $selects) as $article) {
+            $dimensionContent = $this->contentManager->resolve($article, [
+                'locale' => $locale,
+                'stage' => DimensionContentInterface::STAGE_LIVE,
+            ]);
+
+            // Skip articles without a published dimension in this locale.
+            if (!\is_string($dimensionContent->getLocale())) {
+                continue;
+            }
+
+            if (method_exists($dimensionContent, 'getExcerptCategoryIds')) {
+                foreach ($dimensionContent->getExcerptCategoryIds() as $id) {
+                    $categoryIds[$id] = $id;
+                }
+            }
+            if (method_exists($dimensionContent, 'getExcerptTagNames')) {
+                foreach ($dimensionContent->getExcerptTagNames() as $name) {
+                    $tagNames[$name] = $name;
+                }
+            }
+        }
+
+        return [
+            'categoryIds' => array_values($categoryIds),
+            'tagNames' => array_values($tagNames),
+        ];
+    }
+
+    /**
      * Resolve the given article UUIDs into renderable card items, preserving the
      * requested order.
      *
