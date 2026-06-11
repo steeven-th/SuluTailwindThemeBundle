@@ -104,7 +104,8 @@
                The article-filters controller turns the sidebar into a mobile
                offcanvas drawer (progressive enhancement) — without JS the sidebar
                stays in flow and the GET form keeps working. #}
-            <div class="iw-article-layout" data-controller="article-filters">
+            <div class="iw-article-layout" data-controller="article-filters"
+                 data-article-filters-auto-submit-value="{{ iw_sulu_tailwind_theme.components_filtersAutoSubmit|default(false) ? 'true' : 'false' }}">
                 {# Mobile drawer toggle: hidden in markup, revealed by JS on small
                    screens only (the CSS media query gates its actual display).
                    When a theme button style is configured (Components > Filter
@@ -137,7 +138,7 @@
                     baseUrl: baseUrl,
                     resultCount: articlePagination.total|default(0),
                 } only %}
-                <div class="iw-article-layout__results">
+                <div class="iw-article-layout__results" data-article-filters-target="results">
                     {{ resultsColumn }}
                 </div>
             </div>

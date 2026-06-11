@@ -3277,6 +3277,14 @@ span.iw-breadcrumbs__separator {
     min-width: 0; /* allow the grid/list inside to shrink instead of overflowing */
 }
 
+/* AJAX loading state: dim and disable the results while a fetch is in flight.
+   Override --iw-article-layout-loading-* to retune. */
+.iw-article-layout--loading .iw-article-layout__results {
+    opacity: var(--iw-article-layout-loading-opacity, 0.5);
+    pointer-events: none;
+    transition: opacity var(--iw-article-layout-loading-transition, 0.15s ease);
+}
+
 /* The listing grids (in the theme CSS) switch columns on the *viewport* width.
    Inside the sidebar layout the results column is ~16rem narrower than the
    viewport, so those breakpoints pack too many cards — worst in portrait, which

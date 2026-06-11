@@ -9,18 +9,40 @@ import { Controller } from '@hotwired/stimulus';
  * stacking breakpoint the sidebar is hidden behind a "Filters" button and slides
  * in as an offcanvas panel with a backdrop. Desktop layout is untouched.
  *
+ * It also filters the listing over AJAX: the form submit, the sidebar changes
+ * (when auto-submit is on) and the in-page filter links (pagination, active-filter
+ * chips, "clear all") fetch the filtered URL, swap just the results region and
+ * push history — no full reload. Back/forward re-fetch and re-sync the sidebar.
+ * With JavaScript off everything falls back to the plain GET form + reload.
+ *
  * Targets:
  *   - toggle: The "Filters" button that opens the drawer (mobile only)
  *   - panel: The sidebar <aside> that becomes the offcanvas panel
  *   - backdrop: The full-screen overlay shown behind the open panel
+ *   - form: The filter GET form
+ *   - apply: The "Apply" submit button (hidden when auto-submit is on)
+ *   - results: The results region swapped on AJAX navigation
+ *
+ * Values:
+ *   - autoSubmit: Whether sidebar changes filter automatically (else via Apply)
+ *   - searchDelay: Debounce delay (ms) for the search field
  *
  * Actions:
- *   - open(): Open the drawer
- *   - close(): Close the drawer
- *   - toggle(): Toggle the drawer open/closed
+ *   - open() / close() / toggle(): Drawer control
+ *   - onSubmit(event): Intercept the form submit and filter over AJAX
+ *   - onChange(event): Filter on checkbox/sort change (auto-submit only)
+ *   - onSearchInput(): Filter after the search debounce (auto-submit only)
  */
 export default class extends Controller {
-    static targets = ['toggle', 'panel', 'backdrop'];
+    static targets = ['toggle', 'panel', 'backdrop', 'form', 'apply', 'results'];
+
+    /** Modifier flagging an in-flight AJAX navigation (dims the results). */
+    static LOADING_CLASS = 'iw-article-layout--loading';
+
+    static values = {
+        autoSubmit: Boolean,
+        searchDelay: { type: Number, default: 400 },
+    };
 
     /** Modifier marking the layout as drawer-enhanced (set once JS runs). */
     static DRAWER_CLASS = 'iw-article-layout--drawer';
@@ -65,9 +87,26 @@ export default class extends Controller {
             // Safari < 14 fallback.
             this._mobile.addListener(this._onViewportChange);
         }
+
+        // Auto-submit: with JS on, the "Apply" button is redundant — hide it so
+        // changes apply on their own. Without JS the button stays (fallback).
+        if (this.autoSubmitValue && this.hasApplyTarget) {
+            this.applyTarget.hidden = true;
+        }
+
+        // AJAX filtering: intercept the in-page filter links (pagination, active
+        // chips, results + sidebar "clear all") and handle browser back/forward.
+        // We delegate from the controller root (it covers both the sidebar and
+        // the results, and survives the result swaps); the same-path check in the
+        // handler keeps article-card links untouched.
+        this._onFilterLinkClick = this._onFilterLinkClick.bind(this);
+        this._onPopState = this._onPopState.bind(this);
+        this.element.addEventListener('click', this._onFilterLinkClick);
+        window.addEventListener('popstate', this._onPopState);
     }
 
     disconnect() {
+        clearTimeout(this._searchTimer);
         this._teardownOpenState();
         if (this._mobile) {
             if (this._mobile.removeEventListener) {
@@ -76,6 +115,8 @@ export default class extends Controller {
                 this._mobile.removeListener(this._onViewportChange);
             }
         }
+        this.element.removeEventListener('click', this._onFilterLinkClick);
+        window.removeEventListener('popstate', this._onPopState);
     }
 
     /**
@@ -127,6 +168,202 @@ export default class extends Controller {
      */
     toggle() {
         this.isOpen ? this.close() : this.open();
+    }
+
+    /**
+     * Intercept the form submit (Apply button / Enter) and filter over AJAX.
+     * Always active when JS is on, regardless of auto-submit.
+     *
+     * @param {Event} event
+     */
+    onSubmit(event) {
+        if (!this.hasFormTarget) {
+            return;
+        }
+        event.preventDefault();
+        clearTimeout(this._searchTimer);
+        this._navigate(this._formUrl());
+    }
+
+    /**
+     * Filter on checkbox / sort change. No-op unless auto-submit is enabled.
+     * The search field is excluded here — it is debounced via onSearchInput.
+     *
+     * @param {Event} event
+     */
+    onChange(event) {
+        if (!this.autoSubmitValue || !this.hasFormTarget) {
+            return;
+        }
+        if (event.target && event.target.name === 'q') {
+            return;
+        }
+        clearTimeout(this._searchTimer);
+        this._navigate(this._formUrl());
+    }
+
+    /**
+     * Filter after the search debounce delay. No-op unless auto-submit is on.
+     */
+    onSearchInput() {
+        if (!this.autoSubmitValue || !this.hasFormTarget) {
+            return;
+        }
+        clearTimeout(this._searchTimer);
+        this._searchTimer = setTimeout(() => {
+            this._navigate(this._formUrl());
+        }, this.searchDelayValue);
+    }
+
+    /**
+     * Intercept clicks on in-page filter links (pagination, active-filter chips,
+     * "clear all") and filter over AJAX. Links pointing elsewhere (article cards,
+     * external) are left alone — only same-path listing URLs are hijacked.
+     *
+     * @param {MouseEvent} event
+     * @private
+     */
+    _onFilterLinkClick(event) {
+        // Ignore modified clicks (new tab, etc.) and non-left buttons.
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+        const link = event.target.closest('a[href]');
+        if (!link) {
+            return;
+        }
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) {
+            return;
+        }
+        event.preventDefault();
+        this._navigate(url.href, { scrollTop: true });
+    }
+
+    /**
+     * Re-fetch on browser back/forward (the sidebar is re-synced inside _navigate).
+     *
+     * @private
+     */
+    _onPopState() {
+        this._navigate(window.location.href, { push: false });
+    }
+
+    /**
+     * Fetch a filtered URL, swap the results region and push history.
+     * Falls back to a hard navigation on any failure.
+     *
+     * @param {string} url
+     * @param {{push?: boolean, scrollTop?: boolean}} [options]
+     * @private
+     */
+    async _navigate(url, { push = true, scrollTop = false } = {}) {
+        if (!this.hasResultsTarget) {
+            window.location = url;
+            return;
+        }
+        this._setLoading(true);
+        try {
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const fresh = doc.querySelector('[data-article-filters-target="results"]');
+            if (!fresh) {
+                throw new Error('results fragment not found');
+            }
+            this.resultsTarget.innerHTML = fresh.innerHTML;
+            // Keep the sidebar inputs in sync with the URL we navigated to, so a
+            // chip removal / "clear all" / back-forward updates the checkboxes.
+            this._syncFormFromUrl(url);
+            if (push) {
+                window.history.pushState({ articleFilters: true }, '', url);
+            }
+            if (scrollTop) {
+                this.resultsTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (error) {
+            // Any failure: let the browser do a normal navigation.
+            window.location = url;
+        } finally {
+            this._setLoading(false);
+        }
+    }
+
+    /**
+     * Build the filtered URL from the current form state.
+     *
+     * @returns {string}
+     * @private
+     */
+    _formUrl() {
+        const params = new URLSearchParams(new FormData(this.formTarget));
+        const action = (this.formTarget.getAttribute('action') || window.location.pathname).split('?')[0];
+        const query = params.toString();
+        return query ? `${action}?${query}` : action;
+    }
+
+    /**
+     * Restore the sidebar inputs from a URL's query string (used on popstate).
+     * Handles both `name[]` (form) and `name[i]` (paginated links) list params.
+     *
+     * @param {string} url
+     * @private
+     */
+    _syncFormFromUrl(url) {
+        if (!this.hasFormTarget) {
+            return;
+        }
+        const params = new URL(url, window.location.href).searchParams;
+        const categories = this._collectListParam(params, 'category');
+        const tags = this._collectListParam(params, 'tag');
+
+        this.formTarget.querySelectorAll('input[name="category[]"]').forEach((cb) => {
+            cb.checked = categories.includes(cb.value);
+        });
+        this.formTarget.querySelectorAll('input[name="tag[]"]').forEach((cb) => {
+            cb.checked = tags.includes(cb.value);
+        });
+        const search = this.formTarget.querySelector('input[name="q"]');
+        if (search) {
+            search.value = params.get('q') || '';
+        }
+        const sort = this.formTarget.querySelector('select[name="sort"]');
+        if (sort) {
+            sort.value = params.get('sort') || '';
+        }
+    }
+
+    /**
+     * Collect every value of a list param, accepting `base[]` and `base[i]` keys.
+     *
+     * @param {URLSearchParams} params
+     * @param {string} base
+     * @returns {string[]}
+     * @private
+     */
+    _collectListParam(params, base) {
+        const values = [];
+        for (const [key, value] of params) {
+            if (key === `${base}[]` || key.startsWith(`${base}[`)) {
+                values.push(value);
+            }
+        }
+        return values;
+    }
+
+    /**
+     * Toggle the loading state on the results region.
+     *
+     * @param {boolean} loading
+     * @private
+     */
+    _setLoading(loading) {
+        this.element.classList.toggle(this.constructor.LOADING_CLASS, loading);
+        if (this.hasResultsTarget) {
+            this.resultsTarget.setAttribute('aria-busy', loading ? 'true' : 'false');
+        }
     }
 
     /**

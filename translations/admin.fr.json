@@ -674,6 +674,8 @@
     "iw_sulu_tailwind_theme.components_surface_on_accent": "Texte des boutons (vide = blanc)",
     "iw_sulu_tailwind_theme.components_sidebar_button_style": "Style du bouton « Appliquer »",
     "iw_sulu_tailwind_theme.components_filters_toggle_style": "Style du bouton « Filtres » (mobile)",
+    "iw_sulu_tailwind_theme.components_filters_auto_submit": "Filtrage automatique (instantané, sans rechargement de page)",
+    "iw_sulu_tailwind_theme.components_filters_auto_submit_info": "Applique les filtres dès qu'une case est cochée ou le tri modifié (la recherche après une courte pause), sans bouton « Appliquer » et sans recharger la page. Désactivé, le visiteur coche plusieurs filtres puis clique « Appliquer » — le filtrage reste sans rechargement.",
     "iw_sulu_tailwind_theme.components_section_sidebar": "Sidebar de filtres",
     "iw_sulu_tailwind_theme.components_section_pagination": "Pagination",
     "iw_sulu_tailwind_theme.components_label_bg": "Fond",

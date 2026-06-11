@@ -360,6 +360,10 @@ Filters combine (`/news?category=news&q=release&sort=title&page=2`) and paginati
 
 The **Filters** button has its own button-style picker under **Components > Filter sidebar** (separate from the "Apply" button, since it sits on the page background): leave it empty for the neutral surface style, or pick a theme button variant (primary / secondary / accent) — the count badge stays legible whichever you choose.
 
+**AJAX filtering.** With JavaScript on, filtering happens over AJAX: the form submit, the in-page filter links (pagination, active-filter chips, "clear all") and — when auto-submit is enabled — the sidebar changes fetch the filtered URL, swap only the results region and update the address bar (`history.pushState`), with no full page reload. Browser back/forward re-fetch the results and re-sync the sidebar. The results dim while loading (override `--iw-article-layout-loading-*`). This is progressive enhancement: with JavaScript disabled the plain GET form reloads the page as usual, and any fetch failure falls back to a normal navigation.
+
+**Auto-submit (optional).** Enable **Auto-submit filters** under **Components > Filter sidebar** to filter as soon as the visitor ticks a category/tag or changes the sort (the search field filters after a short debounce), hiding the redundant "Apply" button. With it off (the default), the visitor batches their choices and clicks "Apply" — either way the request goes over AJAX. With JavaScript disabled the "Apply" button stays and the form behaves normally.
+
 > **Full-text search requires a search index.** The `q` parameter queries Sulu's website search index. After installing the bundle (or importing existing articles) run an initial reindex so articles become searchable:
 >
 > ```bash
