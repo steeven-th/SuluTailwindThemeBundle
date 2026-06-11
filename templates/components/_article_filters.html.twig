@@ -18,6 +18,12 @@
 {% set activeSort = active.sort|default('') %}
 {% set hasActiveFilters = activeQ is not empty or activeSort is not empty or activeCategories|length > 0 or activeTags|length > 0 %}
 
+{# Which controls the admin enabled (Components > Filter sidebar) — all on by default. #}
+{% set showSearch = iw_sulu_tailwind_theme.components_filtersShowSearch|default(true) %}
+{% set showSort = iw_sulu_tailwind_theme.components_filtersShowSort|default(true) %}
+{% set showCategories = iw_sulu_tailwind_theme.components_filtersShowCategories|default(true) %}
+{% set showTags = iw_sulu_tailwind_theme.components_filtersShowTags|default(true) %}
+
 <aside class="iw-article-filters"
        id="iw-article-filters-panel"
        data-article-filters-target="panel"
@@ -43,6 +49,7 @@
         </div>
 
         {# Search #}
+        {% if showSearch %}
         <div class="iw-article-filters__group">
             <label class="iw-article-filters__label" for="iw-filter-q">
                 {{ 'iw_sulu_tailwind_theme.article.filters_search'|trans }}
@@ -52,8 +59,10 @@
                    placeholder="{{ 'iw_sulu_tailwind_theme.article.filters_search_placeholder'|trans }}"
                    data-action="input->article-filters#onSearchInput">
         </div>
+        {% endif %}
 
         {# Sort #}
+        {% if showSort %}
         <div class="iw-article-filters__group">
             <label class="iw-article-filters__label" for="iw-filter-sort">
                 {{ 'iw_sulu_tailwind_theme.article.filters_sort'|trans }}
@@ -65,9 +74,10 @@
                 <option value="title" {{ activeSort == 'title' ? 'selected' }}>{{ 'iw_sulu_tailwind_theme.article.filters_sort_title'|trans }}</option>
             </select>
         </div>
+        {% endif %}
 
         {# Categories #}
-        {% if facets.categories is defined and facets.categories|length > 0 %}
+        {% if showCategories and facets.categories is defined and facets.categories|length > 0 %}
             <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
                 <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}</legend>
                 {% for category in facets.categories %}
@@ -83,7 +93,7 @@
         {% endif %}
 
         {# Tags #}
-        {% if facets.tags is defined and facets.tags|length > 0 %}
+        {% if showTags and facets.tags is defined and facets.tags|length > 0 %}
             <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
                 <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_tags'|trans }}</legend>
                 {% for tag in facets.tags %}

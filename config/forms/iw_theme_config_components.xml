@@ -107,6 +107,51 @@
                         </param>
                     </params>
                 </property>
+
+                <!-- Sidebar layout: left/right column, or a permanent offcanvas
+                     drawer (behind a "Filters" button at every screen size). On
+                     small screens left/right collapse to the drawer anyway. -->
+                <property name="components_sidebarStyle" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_sidebar_style</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_left</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_right</title></meta></param>
+                            <param name="offcanvas"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_offcanvas</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Which filter controls to expose in the sidebar (all on by default). -->
+                <property name="components_filtersShowSearch" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_search</title></meta></param>
+                    </params>
+                </property>
+                <property name="components_filtersShowSort" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_sort</title></meta></param>
+                    </params>
+                </property>
+                <property name="components_filtersShowCategories" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_categories</title></meta></param>
+                    </params>
+                </property>
+                <property name="components_filtersShowTags" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_tags</title></meta></param>
+                    </params>
+                </property>
             </properties>
         </section>
 

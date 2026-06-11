@@ -41,29 +41,28 @@ export default class extends Controller {
 
     static values = {
         autoSubmit: Boolean,
+        // When true (offcanvas sidebar style) the drawer is armed at every screen
+        // size; otherwise only below the mobile breakpoint.
+        offcanvas: Boolean,
         searchDelay: { type: Number, default: 400 },
     };
 
-    /** Modifier marking the layout as drawer-enhanced (set once JS runs). */
-    static DRAWER_CLASS = 'iw-article-layout--drawer';
+    /** Modifier flagging that the sidebar is currently a drawer (mobile or offcanvas). */
+    static ARMED_CLASS = 'iw-article-layout--drawer-armed';
 
     /** Modifier reflecting the open state of the drawer. */
     static OPEN_CLASS = 'iw-article-layout--drawer-open';
 
-    /** Below this width the sidebar collapses into a drawer (matches the CSS). */
+    /** Below this width a left/right sidebar collapses into a drawer (matches the CSS). */
     static MOBILE_QUERY = '(max-width: 767.98px)';
 
     /** @type {boolean} Whether the drawer is currently open. */
     isOpen = false;
 
     connect() {
-        // Arm the drawer: the CSS only switches to offcanvas mode once this class
-        // is present, so non-JS visitors keep the in-flow sidebar.
-        this.element.classList.add(this.constructor.DRAWER_CLASS);
-
         // The toggle and backdrop are hidden in markup to avoid a flash before
         // enhancement; reveal them now that JS owns their visibility (the CSS
-        // media query decides whether the toggle actually shows on mobile).
+        // shows them only while the drawer is armed).
         if (this.hasToggleTarget) {
             this.toggleTarget.hidden = false;
         }
@@ -75,12 +74,12 @@ export default class extends Controller {
         this._onKeydown = this._onKeydown.bind(this);
         this._onViewportChange = this._onViewportChange.bind(this);
 
-        // Reflect the closed drawer to assistive tech on mobile only — never hide
-        // the in-flow desktop sidebar from the accessibility tree.
-        this._syncPanelA11y();
+        // Arm the drawer now (offcanvas style = always; otherwise mobile only).
+        // The CSS only switches to offcanvas mode once the armed class is present,
+        // so non-JS visitors keep the in-flow sidebar.
+        this._updateArmed();
 
-        // Close (and clean up) when the viewport grows past the drawer breakpoint
-        // so an open drawer never lingers over the desktop layout.
+        // Re-arm / disarm when crossing the mobile breakpoint.
         if (this._mobile.addEventListener) {
             this._mobile.addEventListener('change', this._onViewportChange);
         } else {
@@ -388,9 +387,35 @@ export default class extends Controller {
     }
 
     /**
+     * Whether the sidebar is currently a drawer: always for the offcanvas style,
+     * otherwise only below the mobile breakpoint.
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _isArmed() {
+        return this.offcanvasValue || (this._mobile && this._mobile.matches);
+    }
+
+    /**
+     * Reflect the armed state on the layout (drives the CSS offcanvas mode) and
+     * keep the panel's a11y in sync. Closes an open drawer when it disarms.
+     *
+     * @private
+     */
+    _updateArmed() {
+        const armed = this._isArmed();
+        this.element.classList.toggle(this.constructor.ARMED_CLASS, armed);
+        if (!armed && this.isOpen) {
+            this.close();
+        }
+        this._syncPanelA11y();
+    }
+
+    /**
      * Mirror the drawer state to the panel's aria-hidden, but only while the
-     * sidebar is collapsed into a drawer. On desktop the panel is a normal
-     * in-flow sidebar and must stay exposed to assistive tech.
+     * sidebar is a drawer. As an in-flow sidebar the panel must stay exposed to
+     * assistive tech.
      *
      * @private
      */
@@ -398,7 +423,7 @@ export default class extends Controller {
         if (!this.hasPanelTarget) {
             return;
         }
-        if (this._mobile && this._mobile.matches) {
+        if (this._isArmed()) {
             this.panelTarget.setAttribute('aria-hidden', this.isOpen ? 'false' : 'true');
         } else {
             this.panelTarget.removeAttribute('aria-hidden');
@@ -418,19 +443,12 @@ export default class extends Controller {
     }
 
     /**
-     * When the viewport leaves the mobile range, reset any open drawer.
+     * Re-evaluate the armed state when crossing the mobile breakpoint.
      *
-     * @param {MediaQueryListEvent} event
      * @private
      */
-    _onViewportChange(event) {
-        if (event.matches) {
-            // Entering the mobile range: hide the closed drawer from AT.
-            this._syncPanelA11y();
-        } else {
-            // Leaving it: drop any open drawer and re-expose the sidebar.
-            this.close();
-            this._syncPanelA11y();
-        }
+    _onViewportChange() {
+        // Re-arm or disarm for the new viewport (offcanvas stays armed regardless).
+        this._updateArmed();
     }
 }
