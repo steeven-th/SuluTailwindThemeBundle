@@ -61,6 +61,12 @@
                 "name": "article-filters",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "back_to_top": {
+                "main": "controllers/back_to_top_controller.js",
+                "name": "back-to-top",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

@@ -3625,6 +3625,57 @@ span.iw-breadcrumbs__separator {
     }
 }
 
+/* ─── Back-to-top button (F5 reading component) ──────────────────────────── */
+/* Floating button revealed by the back-to-top controller past a scroll
+   threshold. Everything routes through --iw-back-to-top-* for restyling. */
+.iw-back-to-top {
+    position: fixed;
+    right: var(--iw-back-to-top-offset, 1.5rem);
+    bottom: var(--iw-back-to-top-offset, 1.5rem);
+    z-index: var(--iw-back-to-top-z, 50);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--iw-back-to-top-size, 2.75rem);
+    height: var(--iw-back-to-top-size, 2.75rem);
+    color: var(--iw-back-to-top-color, var(--color-surface-on-accent, #fff));
+    background-color: var(--iw-back-to-top-bg, var(--color-surface-accent));
+    border: 0;
+    border-radius: var(--iw-back-to-top-radius, 999px);
+    box-shadow: var(--iw-back-to-top-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
+    cursor: pointer;
+    /* Hidden until the controller adds --visible (and absent without JS). */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(var(--iw-back-to-top-travel, 0.75rem));
+    transition: opacity var(--iw-back-to-top-transition, 0.25s ease),
+                visibility var(--iw-back-to-top-transition, 0.25s ease),
+                transform var(--iw-back-to-top-transition, 0.25s ease);
+}
+
+.iw-back-to-top--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.iw-back-to-top:hover {
+    background-color: var(--iw-back-to-top-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+}
+
+.iw-back-to-top__icon {
+    width: var(--iw-back-to-top-icon-size, 1.25rem);
+    height: var(--iw-back-to-top-icon-size, 1.25rem);
+    object-fit: contain; /* keep a custom media icon within the button */
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-back-to-top,
+    .iw-back-to-top--visible {
+        transform: none;
+    }
+}
+
 /* ─── Article results header: count + active filter chips (F4-A) ─────────── */
 .iw-article-results {
     margin-bottom: var(--iw-article-results-gap, 1.5rem);

@@ -115,7 +115,7 @@
                     <meta><title>iw_sulu_tailwind_theme.components_sidebar_style</title></meta>
                     <params>
                         <param name="default_value" value="left"/>
-                        <param name="values">
+                        <param name="values" type="collection">
                             <param name="left"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_left</title></meta></param>
                             <param name="right"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_right</title></meta></param>
                             <param name="offcanvas"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_offcanvas</title></meta></param>
@@ -430,6 +430,87 @@
                             <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_in_out</title></meta></param>
                             <param name="bounce"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_bounce</title></meta></param>
                         </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Site-wide components: floating helpers shown across the whole site
+             (rendered in base.html.twig). Opt-in (off by default). -->
+        <section name="componentsSiteWide">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_sitewide</title>
+            </meta>
+            <properties>
+                <property name="components_backToTopEnabled" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="components_backToTopThreshold" type="number" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_threshold</title></meta>
+                    <params>
+                        <param name="default_value" value="400"/>
+                    </params>
+                </property>
+
+                <property name="components_backToTopShape" type="iw_theme_radius_selector" colspan="12"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_shape</title></meta>
+                    <params><param name="default_value" value="rounded-full"/></params>
+                </property>
+
+                <property name="components_backToTopSize" type="single_select" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_size</title></meta>
+                    <params>
+                        <param name="default_value" value="md"/>
+                        <param name="values" type="collection">
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_size_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_size_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_size_lg</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_backToTopBg" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_backToTopIconColor" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_backToTopIcon" type="single_select" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon</title></meta>
+                    <params>
+                        <param name="default_value" value="arrow"/>
+                        <param name="values" type="collection">
+                            <param name="arrow"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_arrow</title></meta></param>
+                            <param name="chevron"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_chevron</title></meta></param>
+                            <param name="chevron_double"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_chevron_double</title></meta></param>
+                            <param name="arrow_line"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_arrow_line</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Custom icon from the media library, overrides the preset above. -->
+                <property name="components_backToTopIconMedia" type="single_media_selection" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_back_to_top_icon_media</title>
+                        <info_text>iw_sulu_tailwind_theme.components_back_to_top_icon_media_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
                     </params>
                 </property>
             </properties>

@@ -110,6 +110,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'components_filtersToggleStyle', 'components_filtersAutoSubmit',
         'components_sidebarStyle', 'components_filtersShowSearch', 'components_filtersShowSort',
         'components_filtersShowCategories', 'components_filtersShowTags',
+        'components_backToTopEnabled', 'components_backToTopThreshold',
+        'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg',
+        'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
         'components_paginationText', 'components_paginationAccent',
         'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
         // Site-wide card appearance (moved from the Articles tab in 3.0).

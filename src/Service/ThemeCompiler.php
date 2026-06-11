@@ -203,6 +203,7 @@ class ThemeCompiler
         $css .= $this->generateMenuVariables($menuConfig);
         $css .= $this->generateArticleVariables($tokens);
         $css .= $this->generateArticleCardVariables($tokens);
+        $css .= $this->generateBackToTopVariables($tokens);
         $css .= "}\n\n";
 
         // Per-component surface overrides (scoped redefinitions of the surface tokens)
@@ -287,6 +288,50 @@ class ThemeCompiler
      *
      * @return string CSS variable declarations
      */
+    /**
+     * Button + icon sizes for the back-to-top component, keyed by the admin
+     * size option: [button diameter, icon size].
+     *
+     * @var array<string, array{0: string, 1: string}>
+     */
+    private const BACK_TO_TOP_SIZES = [
+        'sm' => ['2.25rem', '1rem'],
+        'md' => ['2.75rem', '1.25rem'],
+        'lg' => ['3.25rem', '1.5rem'],
+    ];
+
+    /**
+     * Generate CSS custom properties for the site-wide back-to-top button.
+     *
+     * Emits --iw-back-to-top-* from the admin config (shape, size, colors).
+     * Empty colors fall back to the surface-accent tokens, which already adapt
+     * to light/dark themes.
+     *
+     * @param array<string, mixed> $tokens Theme token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateBackToTopVariables(array $tokens): string
+    {
+        $shape = (string) ($tokens['components_backToTopShape'] ?? 'rounded-full');
+        $radius = str_starts_with($shape, 'rounded-') ? $this->resolveRadius($shape) : $shape;
+
+        $size = (string) ($tokens['components_backToTopSize'] ?? 'md');
+        [$button, $icon] = self::BACK_TO_TOP_SIZES[$size] ?? self::BACK_TO_TOP_SIZES['md'];
+
+        $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
+        $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
+
+        $css = "  /* Back-to-top (site-wide) */\n";
+        $css .= "  --iw-back-to-top-radius: {$radius};\n";
+        $css .= "  --iw-back-to-top-size: {$button};\n";
+        $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
+        $css .= "  --iw-back-to-top-bg: {$bg};\n";
+        $css .= "  --iw-back-to-top-color: {$color};\n";
+
+        return $css . "\n";
+    }
+
     private function generateArticleCardVariables(array $tokens): string
     {
         $surface = (string) ($tokens['cardSurface'] ?? 'none');

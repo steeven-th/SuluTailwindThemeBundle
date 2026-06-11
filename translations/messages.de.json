@@ -33,6 +33,7 @@
     "iw_sulu_tailwind_theme.article.filters_sort_title": "Titel (A–Z)",
     "iw_sulu_tailwind_theme.article.filters_apply": "Anwenden",
     "iw_sulu_tailwind_theme.article.filters_close": "Filter schließen",
+    "iw_sulu_tailwind_theme.back_to_top": "Nach oben",
     "iw_sulu_tailwind_theme.article.results_count": "%count% Artikel",
     "iw_sulu_tailwind_theme.article.results_count_one": "1 Artikel",
     "iw_sulu_tailwind_theme.article.filter_search_label": "Suche: %query%",

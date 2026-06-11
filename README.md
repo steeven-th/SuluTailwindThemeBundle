@@ -376,6 +376,22 @@ The **Filters** button has its own button-style picker under **Components > Filt
 >
 > _Single-webspace note:_ article filtering targets the database directly and does not constrain by webspace. In a multi-webspace setup sharing the same articles, the listing is not scoped per webspace.
 
+#### Site-wide components
+
+Optional floating helpers shown across the whole site, enabled under **Components > Site-wide components** (off by default). They are progressive enhancement — nothing shows without JavaScript.
+
+- **Back to top** — a floating button that fades in once the visitor scrolls past a configurable threshold (px) and smoothly scrolls back up. Its **shape** (round → square), **size** (S/M/L), **background** and **icon colors**, and **icon** are all configurable in the admin. The icon is a preset (arrow / chevron / double chevron / thin arrow) or a **custom image from the media library** (SVG recommended) which overrides the preset. Fine-tune further via the `--iw-back-to-top-*` custom properties (offset, shadow, hover). It honors `prefers-reduced-motion`.
+
+The bundle's `base.html.twig` renders it automatically when enabled. **If you use your own base template** (the bundle's `base.html.twig` is only an example), copy the include into it, before the closing `</body>`:
+
+```twig
+{% if iw_sulu_tailwind_theme.components_backToTopEnabled|default(false) %}
+    {% include '@ItechWorldSuluTailwindTheme/components/_back_to_top.html.twig' with {
+        threshold: iw_sulu_tailwind_theme.components_backToTopThreshold|default(400),
+    } only %}
+{% endif %}
+```
+
 ## Usage
 
 ### Admin interface
