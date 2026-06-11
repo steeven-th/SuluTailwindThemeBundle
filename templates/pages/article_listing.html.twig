@@ -108,6 +108,11 @@
             <div class="iw-article-layout iw-article-layout--{{ sidebarStyle }}" data-controller="article-filters"
                  data-article-filters-auto-submit-value="{{ iw_sulu_tailwind_theme.components_filtersAutoSubmit|default(false) ? 'true' : 'false' }}"
                  data-article-filters-offcanvas-value="{{ sidebarStyle == 'offcanvas' ? 'true' : 'false' }}">
+                {# Anti-FOUC: arm the drawer synchronously before paint so the
+                   in-flow sidebar never flashes before the (lazy) Stimulus
+                   controller connects. Runs only with JS, so the no-JS fallback
+                   (in-flow sidebar) is preserved. The controller re-syncs after. #}
+                <script>(function(){var e=document.currentScript.parentElement;if('true'===e.getAttribute('data-article-filters-offcanvas-value')||window.matchMedia('(max-width: 767.98px)').matches){e.classList.add('iw-article-layout--drawer-armed');}})();</script>
                 {# Mobile drawer toggle: hidden in markup, revealed by JS on small
                    screens only (the CSS media query gates its actual display).
                    When a theme button style is configured (Components > Filter
