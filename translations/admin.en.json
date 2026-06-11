@@ -582,6 +582,7 @@
     "iw_sulu_tailwind_theme.components_surface_accent": "Accent color (empty = primary)",
     "iw_sulu_tailwind_theme.components_surface_on_accent": "Button text (empty = white)",
     "iw_sulu_tailwind_theme.components_sidebar_button_style": "\"Apply\" button style",
+    "iw_sulu_tailwind_theme.components_filters_toggle_style": "\"Filters\" button style (mobile)",
     "iw_sulu_tailwind_theme.components_section_sidebar": "Filter sidebar",
     "iw_sulu_tailwind_theme.components_section_pagination": "Pagination",
     "iw_sulu_tailwind_theme.components_label_bg": "Background",

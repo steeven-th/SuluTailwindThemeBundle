@@ -3449,6 +3449,152 @@ span.iw-breadcrumbs__separator {
     cursor: pointer;
 }
 
+/* ─── Article filters: mobile offcanvas drawer (B, progressive enhancement) ── */
+/* The drawer mode is only armed once the article-filters Stimulus controller
+   adds .iw-article-layout--drawer; without JS the sidebar stays in flow and the
+   GET form keeps working. Every drawer visual routes through
+   --iw-article-filters-drawer-* / --iw-article-filters-toggle-* so the whole
+   thing can be restyled in a few lines. */
+
+/* Drawer-only chrome is inert until the drawer is armed on a small viewport. */
+.iw-article-filters__toggle,
+.iw-article-filters__close,
+.iw-article-filters__backdrop {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    /* The "Filters" button that opens the drawer — layout for both the default
+       and the themed (iw-button--*) variants. */
+    .iw-article-layout--drawer .iw-article-filters__toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-self: start;
+        padding: var(--iw-article-filters-toggle-padding, 0.5rem 1rem);
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: var(--iw-article-filters-toggle-radius, var(--border-radius));
+        cursor: pointer;
+    }
+
+    /* Neutral surface skin — applied only when no theme button variant
+       (iw-button--*) owns the colors, so a configured variant shows through. */
+    .iw-article-layout--drawer .iw-article-filters__toggle:not([class*="iw-button--"]) {
+        color: var(--iw-article-filters-toggle-color, var(--color-surface-foreground));
+        background-color: var(--iw-article-filters-toggle-bg, var(--color-surface));
+        border: 1px solid var(--iw-article-filters-toggle-border, var(--color-surface-border));
+    }
+
+    /* Active-filter count badge on the toggle (default surface-accent look). */
+    .iw-article-layout--drawer .iw-article-filters__toggle-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.25rem;
+        height: 1.25rem;
+        padding: 0 0.375rem;
+        font-size: 0.75rem;
+        line-height: 1;
+        color: var(--iw-article-filters-toggle-count-color, var(--color-surface-on-accent, #fff));
+        background-color: var(--iw-article-filters-toggle-count-bg, var(--color-surface-accent));
+        border-radius: 999px;
+    }
+
+    /* On a themed toggle the badge contrasts via currentColor, so it stays
+       legible whatever the chosen button variant's background is. */
+    .iw-article-layout--drawer .iw-article-filters__toggle--themed .iw-article-filters__toggle-count {
+        color: currentColor;
+        background-color: color-mix(in srgb, currentColor 22%, transparent);
+    }
+
+    /* The sidebar becomes a fixed offcanvas panel sliding in from the left. */
+    .iw-article-layout--drawer .iw-article-filters {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: var(--iw-article-filters-drawer-z, 60);
+        width: var(--iw-article-filters-drawer-width, min(20rem, 85vw));
+        max-width: 85vw;
+        overflow-y: auto;
+        padding: var(--iw-article-filters-drawer-padding, 1.25rem);
+        background-color: var(--iw-article-filters-drawer-bg, var(--color-surface));
+        box-shadow: var(--iw-article-filters-drawer-shadow, 0 0 2.5rem rgba(0, 0, 0, 0.25));
+        transform: translateX(-100%);
+        transition: transform var(--iw-article-filters-drawer-transition, 0.3s ease);
+    }
+
+    /* In drawer mode the inner form drops its own card chrome — the panel owns it. */
+    .iw-article-layout--drawer .iw-article-filters__form {
+        position: static;
+        top: auto;
+        padding: 0;
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+    }
+
+    /* Open state: slide the panel into view. */
+    .iw-article-layout--drawer.iw-article-layout--drawer-open .iw-article-filters {
+        transform: translateX(0);
+    }
+
+    /* Close (×) button, pinned to the panel's top-right corner. */
+    .iw-article-layout--drawer .iw-article-filters__close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 2rem;
+        height: 2rem;
+        font-size: 1.5rem;
+        line-height: 1;
+        color: var(--iw-article-filters-close-color, var(--color-surface-muted));
+        background: transparent;
+        border: 0;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+    }
+
+    .iw-article-layout--drawer .iw-article-filters__close:hover {
+        color: var(--iw-article-filters-close-hover, var(--color-surface-accent));
+    }
+
+    /* Reserve room so the close button never overlaps the filters title. */
+    .iw-article-layout--drawer .iw-article-filters__header {
+        padding-right: 2rem;
+    }
+
+    /* Backdrop behind the open drawer. */
+    .iw-article-layout--drawer .iw-article-filters__backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: var(--iw-article-filters-backdrop-z, 59);
+        background-color: var(--iw-article-filters-backdrop-bg, rgba(0, 0, 0, 0.5));
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--iw-article-filters-drawer-transition, 0.3s ease),
+                    visibility var(--iw-article-filters-drawer-transition, 0.3s ease);
+    }
+
+    .iw-article-layout--drawer.iw-article-layout--drawer-open .iw-article-filters__backdrop {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* Honor reduced-motion: no slide/fade (matches the drawer rules' specificity). */
+@media (prefers-reduced-motion: reduce) {
+    .iw-article-layout--drawer .iw-article-filters,
+    .iw-article-layout--drawer .iw-article-filters__backdrop {
+        transition: none;
+    }
+}
+
 /* ─── Article results header: count + active filter chips (F4-A) ─────────── */
 .iw-article-results {
     margin-bottom: var(--iw-article-results-gap, 1.5rem);

@@ -52,6 +52,11 @@
         {% set hasActiveFilters = (activeFiltersData.categories|default([])|length > 0)
             or (activeFiltersData.tags|default([])|length > 0)
             or (activeFiltersData.q|default('') is not empty) %}
+        {# Number of active filter criteria (sort excluded) — shown on the mobile
+           drawer toggle so a filtered state is visible while the drawer is closed. #}
+        {% set activeFilterCount = (activeFiltersData.categories|default([])|length)
+            + (activeFiltersData.tags|default([])|length)
+            + (activeFiltersData.q|default('') is not empty ? 1 : 0) %}
 
         {# The results column: result count + active filters, then the active
            listing style + pagination, or a soigné empty state. #}
@@ -95,8 +100,37 @@
         {% endset %}
 
         {% if isFiltered %}
-            {# Two-column layout: filter sidebar (left) + results (right). #}
-            <div class="iw-article-layout">
+            {# Two-column layout: filter sidebar (left) + results (right).
+               The article-filters controller turns the sidebar into a mobile
+               offcanvas drawer (progressive enhancement) — without JS the sidebar
+               stays in flow and the GET form keeps working. #}
+            <div class="iw-article-layout" data-controller="article-filters">
+                {# Mobile drawer toggle: hidden in markup, revealed by JS on small
+                   screens only (the CSS media query gates its actual display).
+                   When a theme button style is configured (Components > Filter
+                   sidebar), iw-button--<style> owns the colors and --themed keeps
+                   the count badge legible; empty = the neutral surface style. #}
+                {% set toggleButtonStyle = iw_sulu_tailwind_theme.components_filtersToggleStyle|default('') %}
+                <button type="button"
+                        class="iw-article-filters__toggle{% if toggleButtonStyle is not empty %} iw-button--{{ toggleButtonStyle }} iw-article-filters__toggle--themed{% endif %}"
+                        hidden
+                        data-article-filters-target="toggle"
+                        data-action="article-filters#open"
+                        aria-haspopup="dialog"
+                        aria-expanded="false"
+                        aria-controls="iw-article-filters-panel">
+                    <span class="iw-article-filters__toggle-label">{{ 'iw_sulu_tailwind_theme.article.filters_title'|trans }}</span>
+                    {% if activeFilterCount > 0 %}
+                        <span class="iw-article-filters__toggle-count" aria-hidden="true">{{ activeFilterCount }}</span>
+                    {% endif %}
+                </button>
+
+                {# Backdrop behind the open drawer (hidden until JS enhances). #}
+                <div class="iw-article-filters__backdrop"
+                     hidden
+                     data-article-filters-target="backdrop"
+                     data-action="article-filters#close"></div>
+
                 {% include '@ItechWorldSuluTailwindTheme/components/_article_filters.html.twig' with {
                     facets: articleFacets|default({}),
                     active: activeFilters|default({}),

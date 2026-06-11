@@ -356,6 +356,10 @@ Filters combine (`/news?category=news&q=release&sort=title&page=2`) and paginati
 
 **Filter sidebar.** A left sidebar exposes a search box, a sort dropdown (most recent / oldest / title) and category/tag checkboxes (every site category/tag is listed). It is a plain GET form — filtering works without JavaScript. Restyle it with the `--iw-article-filters-*` and `--iw-article-layout-*` custom properties; no Twig override needed.
 
+**Mobile drawer.** On small screens (< 768px) the sidebar collapses behind a **Filters** button and slides in as an offcanvas drawer (backdrop, close button, `Escape` to dismiss). The button carries a badge with the active-filter count. This is progressive enhancement: with JavaScript disabled the sidebar simply stays stacked above the results and keeps working. Tune the drawer with the `--iw-article-filters-drawer-*` (panel width, background, shadow, transition, z-index), `--iw-article-filters-toggle-*` (the Filters button + count badge) and `--iw-article-filters-backdrop-*` (overlay) custom properties. The motion is disabled automatically under `prefers-reduced-motion`.
+
+The **Filters** button has its own button-style picker under **Components > Filter sidebar** (separate from the "Apply" button, since it sits on the page background): leave it empty for the neutral surface style, or pick a theme button variant (primary / secondary / accent) — the count badge stays legible whichever you choose.
+
 > **Full-text search requires a search index.** The `q` parameter queries Sulu's website search index. After installing the bundle (or importing existing articles) run an initial reindex so articles become searchable:
 >
 > ```bash

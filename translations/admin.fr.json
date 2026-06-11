@@ -673,6 +673,7 @@
     "iw_sulu_tailwind_theme.components_surface_accent": "Couleur d'accent (vide = primaire)",
     "iw_sulu_tailwind_theme.components_surface_on_accent": "Texte des boutons (vide = blanc)",
     "iw_sulu_tailwind_theme.components_sidebar_button_style": "Style du bouton « Appliquer »",
+    "iw_sulu_tailwind_theme.components_filters_toggle_style": "Style du bouton « Filtres » (mobile)",
     "iw_sulu_tailwind_theme.components_section_sidebar": "Sidebar de filtres",
     "iw_sulu_tailwind_theme.components_section_pagination": "Pagination",
     "iw_sulu_tailwind_theme.components_label_bg": "Fond",

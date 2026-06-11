@@ -82,6 +82,12 @@
                 <property name="components_sidebarButtonStyle" type="iw_theme_button_style_picker" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_sidebar_button_style</title></meta>
                 </property>
+
+                <!-- Mobile "Filters" toggle button. Empty = neutral surface style;
+                     it sits on the page background, so it has its own picker. -->
+                <property name="components_filtersToggleStyle" type="iw_theme_button_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_filters_toggle_style</title></meta>
+                </property>
             </properties>
         </section>
 

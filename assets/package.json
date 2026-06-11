@@ -55,6 +55,12 @@
                 "name": "fileinput",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "article_filters": {
+                "main": "controllers/article_filters_controller.js",
+                "name": "article-filters",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

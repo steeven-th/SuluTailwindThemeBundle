@@ -575,6 +575,7 @@
     "iw_sulu_tailwind_theme.components_surface_accent": "Akzentfarbe (leer = primär)",
     "iw_sulu_tailwind_theme.components_surface_on_accent": "Schaltflächentext (leer = weiß)",
     "iw_sulu_tailwind_theme.components_sidebar_button_style": "Stil der Schaltfläche „Anwenden“",
+    "iw_sulu_tailwind_theme.components_filters_toggle_style": "Stil der Schaltfläche „Filter“ (mobil)",
     "iw_sulu_tailwind_theme.components_section_sidebar": "Filter-Seitenleiste",
     "iw_sulu_tailwind_theme.components_section_pagination": "Pagination",
     "iw_sulu_tailwind_theme.components_label_bg": "Hintergrund",

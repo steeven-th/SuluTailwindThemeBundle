@@ -18,7 +18,18 @@
 {% set activeSort = active.sort|default('') %}
 {% set hasActiveFilters = activeQ is not empty or activeSort is not empty or activeCategories|length > 0 or activeTags|length > 0 %}
 
-<aside class="iw-article-filters">
+<aside class="iw-article-filters"
+       id="iw-article-filters-panel"
+       data-article-filters-target="panel"
+       aria-label="{{ 'iw_sulu_tailwind_theme.article.filters_title'|trans }}">
+    {# Drawer close button — only shown when the sidebar is collapsed into a
+       mobile offcanvas drawer (gated by CSS); inert otherwise. #}
+    <button type="button"
+            class="iw-article-filters__close"
+            data-action="article-filters#close"
+            aria-label="{{ 'iw_sulu_tailwind_theme.article.filters_close'|trans }}">
+        <span aria-hidden="true">&times;</span>
+    </button>
     <form method="get" class="iw-article-filters__form">
         <div class="iw-article-filters__header">
             <h2 class="iw-article-filters__title">{{ 'iw_sulu_tailwind_theme.article.filters_title'|trans }}</h2>
