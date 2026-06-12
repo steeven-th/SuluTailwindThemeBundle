@@ -4,7 +4,8 @@
     "license": "MIT",
     "style": "styles/app.css",
     "dependencies": {
-        "glightbox": "^3.3.0"
+        "glightbox": "^3.3.0",
+        "leaflet": "^1.9.4"
     },
     "symfony": {
         "controllers": {
@@ -41,6 +42,12 @@
             "location_overlay": {
                 "main": "controllers/location_overlay_controller.js",
                 "name": "location-overlay",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "location_map": {
+                "main": "controllers/location_map_controller.js",
+                "name": "location-map",
                 "fetch": "lazy",
                 "enabled": true
             },

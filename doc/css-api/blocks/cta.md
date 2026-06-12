@@ -4,7 +4,7 @@ Call-to-action block with three layout styles selectable from the admin:
 
 - `--centered`: horizontally-centered text + actions block.
 - `--banner`: fullbleed hero with XXL typography, optional background image, dark overlay.
-- `--split`: content (text + actions) on one side, **accessory widget** on the other. The accessory is selectable in the admin: an image, an embedded video (YouTube, Vimeo, or self-hosted file), an OpenStreetMap embed centered on a location, or up to 3 animated counters.
+- `--split`: content (text + actions) on one side, **accessory widget** on the other. The accessory is selectable in the admin: an image, an embedded video (YouTube, Vimeo, or self-hosted file), an interactive Leaflet map centered on a location, or up to 3 animated counters.
 
 Sizing, spacing, alignment, container behavior, prose-invert and the responsive grid are all driven by Tailwind utility classes emitted by the Twig templates. The classes documented here are stable **hooks** for downstream theming.
 
@@ -45,12 +45,12 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 | `.iw-block-cta__accessory` | Wrapper around the accessory widget. Always present in `--split`. |
 | `.iw-block-cta__accessory--image` | Modifier when the chosen widget is an image. Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
 | `.iw-block-cta__accessory--video` | Modifier when the chosen widget is a video (YouTube, Vimeo or `<video>`). |
-| `.iw-block-cta__accessory--location` | Modifier when the chosen widget is an OpenStreetMap iframe. |
+| `.iw-block-cta__accessory--location` | Modifier when the chosen widget is a Leaflet map. |
 | `.iw-block-cta__accessory--counter` | Modifier when the chosen widget is a vertical stack of 1–3 animated counters. Animation is driven by the shared `key-figures` Stimulus controller. |
 | `.iw-block-cta__image` | The `<img>` inside `--image`. |
 | `.iw-block-cta__video` | The `<iframe>` (YouTube/Vimeo) or `<video>` (file) inside `--video`. |
-| `.iw-block-cta__map-wrap` | Wrapper around the OSM iframe. Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
-| `.iw-block-cta__map` | The OSM `<iframe>` inside `--location`. |
+| `.iw-block-cta__map-wrap` | Wrapper around the Leaflet map. Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
+| `.iw-block-cta__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-cta__map-address` | Row rendered below the map with a pin icon + formatted address (street, postal code, town, country) built from the structured `location` field. Rendered only when at least one address field is filled. |
 | `.iw-block-cta__map-address-icon` | The pin SVG. |
 | `.iw-block-cta__map-address-text` | The `<p>` holding the multi-line address (`whitespace-pre-line`). |

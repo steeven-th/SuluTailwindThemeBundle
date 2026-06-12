@@ -51,6 +51,7 @@
 * **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
 * **Site-wide cards**: configure surface, title/text/badge colors, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
 * **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
+* **Interactive maps (Leaflet)**: every Sulu `location` field (location block, CTA accessory, form widget) renders an interactive Leaflet map with cooperative scroll-zoom (Ctrl + wheel, two-finger touch), a themed SVG marker (or a custom image from the media library), a POI popup (title, address, "open in maps" link) and configurable tile providers (OpenStreetMap, Carto, or custom URL) from **Components → Maps**
 * **CLI commands**: Install preset themes, assign to webspaces, recompile CSS, and run integration diagnostics from the command line
 * **Auto-recompile**: Doctrine listener recompiles CSS on theme save
 
@@ -155,6 +156,10 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
                 "fetch": "lazy"
             },
             "location_overlay": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "location_map": {
                 "enabled": true,
                 "fetch": "lazy"
             },

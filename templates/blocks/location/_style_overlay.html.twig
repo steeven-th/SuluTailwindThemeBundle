@@ -4,38 +4,20 @@
 {% block block_content %}
     {% if location is defined and location.lat is defined and location.long is defined %}
         {% set zoom = location.zoom|default(15) %}
-        {% set offset = 0.02 * (2 ** (15 - zoom)) %}
-
-        {# Build formatted address from structured location fields #}
-        {% set addressParts = [] %}
-        {% if location.street is defined and location.street is not empty %}
-            {% set streetLine = location.street %}
-            {% if location.number is defined and location.number is not empty %}
-                {% set streetLine = location.number ~ ' ' ~ streetLine %}
-            {% endif %}
-            {% set addressParts = addressParts|merge([streetLine]) %}
-        {% endif %}
-        {% set cityLine = [location.code|default(''), location.town|default('')]|filter(v => v is not empty)|join(' ') %}
-        {% if cityLine is not empty %}
-            {% set addressParts = addressParts|merge([cityLine]) %}
-        {% endif %}
-        {% if location.country is defined and location.country is not empty %}
-            {% set addressParts = addressParts|merge([location.country]) %}
-        {% endif %}
-        {% set formattedAddress = addressParts|join("\n") %}
+        {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
         {% set hasInfo = (title is defined and title is not empty) or formattedAddress is not empty or (text is defined and text is not empty) %}
 
         <div class="iw-block-location iw-block-location--overlay relative">
-            {# Map background #}
+            {# Map background — popup disabled: the floating card already shows the info #}
             <div class="iw-block-location__map-wrap {{ paragraphImageRadius|default('') }} overflow-hidden">
-                <iframe
-                    src="https://www.openstreetmap.org/export/embed.html?bbox={{ location.long - offset }}%2C{{ location.lat - offset }}%2C{{ location.long + offset }}%2C{{ location.lat + offset }}&amp;layer=mapnik&amp;marker={{ location.lat }}%2C{{ location.long }}"
-                    class="iw-block-location__map w-full h-[400px] md:h-[500px] border-0"
-                    loading="lazy"
-                    title="{{ title|default('Map') }}"
-                    allowfullscreen
-                ></iframe>
+                {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
+                    location: location,
+                    title: title|default(''),
+                    address: formattedAddress,
+                    popup: not hasInfo,
+                    mapClass: 'iw-block-location__map w-full h-[400px] md:h-[500px]'
+                } only %}
             </div>
 
             {# Floating collapsible info card #}

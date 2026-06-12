@@ -1,6 +1,6 @@
 # Transverse components — CSS API
 
-Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), and the shared **gallery navigation arrows** (slider/carousel previous/next buttons).
+Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), the **location map** (interactive Leaflet map shared by the location block, the CTA accessory and the form widget), and the shared **gallery navigation arrows** (slider/carousel previous/next buttons).
 
 > See [`css-conventions.md`](../css-conventions.md) for the BEM naming policy.
 >
@@ -250,3 +250,64 @@ Overlay card displayed on the location block, sitting on top of the map.
 | `.iw-location-card__scroll-hint` | "Scroll for more" hint (desktop only) |
 
 The card has an internal collapsed/expanded state on mobile. On desktop the body is always visible with a scroll hint.
+
+## Location map (Leaflet)
+
+Interactive Leaflet map rendered by the `location-map` Stimulus controller for every Sulu `location` field: the four location block styles, the CTA location accessory and the form location widget. All call sites go through the shared partial `templates/components/_location_map.html.twig`.
+
+Behavior (configured in **Theme > Components > Maps**):
+
+- **Tile provider**: OpenStreetMap (default), Carto Voyager / Positron / Dark Matter, or a custom tile URL template + attribution. The provider attribution is always displayed (OSM/Carto tile usage policies).
+- **Scroll zoom**: cooperative by default — the page keeps scrolling over the map unless `Ctrl`/`Cmd` is held; on touch devices one finger scrolls the page and two fingers pan/zoom. A translated hint overlay appears when a blocked gesture is attempted. Can be switched to "always on" or "disabled".
+- **POI popup**: clicking the marker opens a popup with the block title, the formatted address and an "open in maps" external link.
+- **Themed marker**: an inline SVG pin (DivIcon) colored through `--iw-location-map-marker-color` (defaults to the primary color), or a custom image from the media library (**Components > Maps > Custom marker** — same 36px box, bottom-center anchor; the marker color is ignored in that case).
+
+| Class | Role |
+|-------|------|
+| `.iw-location-map` | Root container (carries the Stimulus controller and the sizing utilities). |
+| `.iw-location-map--cooperative` | Added in `Ctrl + scroll` mode; restores `touch-action: pan-x pan-y` on the Leaflet container. |
+| `.iw-location-map__canvas` | The node Leaflet mounts into (fills the root). |
+| `.iw-location-map__marker` | The themed SVG pin (Leaflet DivIcon). |
+| `.iw-location-map__marker--custom` | Added when a custom marker image is configured (the inner `<img>` fills the box, `object-fit: contain`). |
+| `.iw-location-map__popup` | Popup pane class (passed to `bindPopup`). |
+| `.iw-location-map__popup-content` / `__popup-title` / `__popup-address` / `__popup-link` | Popup inner layout. |
+| `.iw-location-map__hint` / `__hint-text` | Cooperative-gesture hint overlay. |
+| `.iw-location-map__noscript` | No-JS fallback link to OpenStreetMap. |
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-location-map-marker-color` | `var(--color-primary)` ¹ | Pin color. |
+| `--iw-location-map-popup-bg` | `var(--color-surface, #fff)` ¹ | Popup (and tip) background. |
+| `--iw-location-map-popup-color` | `var(--color-surface-foreground, var(--color-text))` ¹ | Popup text color. |
+| `--iw-location-map-popup-radius` | `var(--border-radius, 0.5rem)` | Popup border-radius. |
+| `--iw-location-map-popup-shadow` | `0 0.5rem 1.5rem rgba(0, 0, 0, 0.2)` | Popup box-shadow. |
+| `--iw-location-map-popup-link-color` | the popup text color | "Open in maps" link color (follows `--iw-location-map-popup-color` unless overridden). |
+| `--iw-location-map-popup-title-weight` | `600` | Popup title weight. |
+| `--iw-location-map-controls-bg` | `var(--color-surface, #fff)` ¹ | Zoom controls + attribution background. |
+| `--iw-location-map-controls-color` | `var(--color-surface-foreground, var(--color-text))` ¹ | Zoom controls + attribution text color. |
+| `--iw-location-map-controls-radius` | `0.375rem` | Zoom controls border-radius. |
+| `--iw-location-map-controls-shadow` | `0 1px 4px rgba(0, 0, 0, 0.25)` | Zoom controls shadow. |
+| `--iw-location-map-attribution-size` | `0.6875rem` | Attribution font-size. |
+| `--iw-location-map-tile-bg` | `#e8e8e8` | Background shown while tiles load. |
+| `--iw-location-map-hint-bg` | `rgba(0, 0, 0, 0.45)` | Hint overlay backdrop. |
+| `--iw-location-map-hint-color` | `#fff` | Hint overlay text color. |
+| `--iw-location-map-hint-transition` | `0.25s ease` | Hint fade transition. |
+
+¹ Compiled from the admin **Components > Maps** colors by the `ThemeCompiler` (`:root` scope); the listed value is the empty-field fallback.
+
+### Override examples
+
+```css
+/* Accent-colored marker and dark popup */
+.iw-location-map {
+    --iw-location-map-marker-color: var(--color-accent);
+    --iw-location-map-popup-bg: #1f2937;
+    --iw-location-map-popup-color: #f3f4f6;
+}
+
+/* Square controls glued to the map corner */
+.iw-location-map {
+    --iw-location-map-controls-radius: 0;
+    --iw-location-map-controls-shadow: none;
+}
+```

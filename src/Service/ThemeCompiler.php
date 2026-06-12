@@ -205,6 +205,7 @@ class ThemeCompiler
         $css .= $this->generateArticleCardVariables($tokens);
         $css .= $this->generateBackToTopVariables($tokens);
         $css .= $this->generateReadingProgressVariables($tokens);
+        $css .= $this->generateLocationMapVariables($tokens);
         $css .= "}\n\n";
 
         // Per-component surface overrides (scoped redefinitions of the surface tokens)
@@ -370,6 +371,36 @@ class ThemeCompiler
         return $css . "\n";
     }
 
+
+    /**
+     * Generate CSS custom properties for the Leaflet location maps.
+     *
+     * Emits --iw-location-map-* from the admin config (marker, popup and
+     * controls colors). Empty colors fall back to the theme surface tokens,
+     * which already adapt to light/dark themes; the marker defaults to the
+     * primary color.
+     *
+     * @param array<string, mixed> $tokens Theme token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateLocationMapVariables(array $tokens): string
+    {
+        $marker = $this->surfaceValue($tokens['components_mapsMarkerColor'] ?? '', 'var(--color-primary)');
+        $popupBg = $this->surfaceValue($tokens['components_mapsPopupBg'] ?? '', 'var(--color-surface, #fff)');
+        $popupText = $this->surfaceValue($tokens['components_mapsPopupText'] ?? '', 'var(--color-surface-foreground, var(--color-text))');
+        $controlsBg = $this->surfaceValue($tokens['components_mapsControlsBg'] ?? '', 'var(--color-surface, #fff)');
+        $controlsText = $this->surfaceValue($tokens['components_mapsControlsText'] ?? '', 'var(--color-surface-foreground, var(--color-text))');
+
+        $css = "  /* Location maps (Leaflet) */\n";
+        $css .= "  --iw-location-map-marker-color: {$marker};\n";
+        $css .= "  --iw-location-map-popup-bg: {$popupBg};\n";
+        $css .= "  --iw-location-map-popup-color: {$popupText};\n";
+        $css .= "  --iw-location-map-controls-bg: {$controlsBg};\n";
+        $css .= "  --iw-location-map-controls-color: {$controlsText};\n";
+
+        return $css . "\n";
+    }
 
     private function generateArticleCardVariables(array $tokens): string
     {

@@ -412,5 +412,94 @@
                 </property>
             </properties>
         </section>
+
+        <!-- Maps section: Leaflet maps used by the location block, the CTA
+             location accessory and the form location widget. Attribution is
+             always displayed (OSM/Carto tile usage policies). -->
+        <section name="componentsMaps">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_maps</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_maps_info</info_text>
+            </meta>
+            <properties>
+                <property name="components_mapsTileProvider" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_tile_provider</title></meta>
+                    <params>
+                        <param name="default_value" value="osm"/>
+                        <param name="values" type="collection">
+                            <param name="osm"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_osm</title></meta></param>
+                            <param name="carto_voyager"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_voyager</title></meta></param>
+                            <param name="carto_positron"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_positron</title></meta></param>
+                            <param name="carto_dark"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_dark</title></meta></param>
+                            <param name="custom"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_custom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_mapsScrollZoom" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom</title></meta>
+                    <params>
+                        <param name="default_value" value="ctrl"/>
+                        <param name="values" type="collection">
+                            <param name="ctrl"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_ctrl</title></meta></param>
+                            <param name="always"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_always</title></meta></param>
+                            <param name="never"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_never</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_mapsCustomTileUrl" type="text_line" colspan="6"
+                          visibleCondition="components_mapsTileProvider == 'custom'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_maps_custom_tile_url</title>
+                        <info_text>iw_sulu_tailwind_theme.components_maps_custom_tile_url_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="components_mapsCustomAttribution" type="text_line" colspan="6"
+                          visibleCondition="components_mapsTileProvider == 'custom'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_maps_custom_attribution</title>
+                        <info_text>iw_sulu_tailwind_theme.components_maps_custom_attribution_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="components_mapsMarkerColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_marker_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <!-- Custom marker image from the media library, replaces the themed SVG pin. -->
+                <property name="components_mapsMarkerMedia" type="single_media_selection" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_maps_marker_media</title>
+                        <info_text>iw_sulu_tailwind_theme.components_maps_marker_media_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+
+                <property name="components_mapsPopupBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_popup_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_mapsPopupText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_popup_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_mapsControlsBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_controls_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_mapsControlsText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_maps_controls_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>
