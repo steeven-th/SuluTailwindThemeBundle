@@ -31,6 +31,15 @@
 
 {% block article_meta %}{% endblock %}
 
+{# A floating TOC would overlap the side column — when "sticky" is chosen it
+   is rendered at the top of the sticky column instead (see below); the
+   inline placement keeps the default behavior. #}
+{% block article_toc %}
+    {% if articleConfig.tocPosition|default('inline') == 'inline' %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
 {# Sidebar layout exception: the blocks stay constrained to the main column.
    article_content sits outside the page container in _article_base, so this
    style brings its own container around the two-column grid. #}
@@ -46,7 +55,19 @@
 
         {# Sidebar (30%) #}
         <aside class="lg:col-span-3">
-            <div class="lg:sticky lg:top-24 space-y-8">
+            {# flex+gap (not space-y): the gap spaces the widgets regardless of
+               their own margins (the TOC resets its margin inside an aside). #}
+            <div class="lg:sticky lg:top-24 flex flex-col gap-8">
+                {# Table of contents — the "sticky" position materializes here,
+                   inside the sticky column (a viewport-pinned panel would
+                   overlap it). #}
+                {% if articleConfig.tocEnabled and articleConfig.tocPosition == 'sticky' %}
+                    {% include '@ItechWorldSuluTailwindTheme/components/_toc.html.twig' with {
+                        position: 'inline',
+                        depth: articleConfig.tocDepth,
+                    } only %}
+                {% endif %}
+
                 {# Author card #}
                 {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}
                     <div class="p-5 rounded-[var(--border-radius)] bg-[var(--color-background-100)]">

@@ -269,6 +269,9 @@ class ArticleExtension extends AbstractExtension
             'shareEmail' => (bool) ($tokens['articles_shareEmail'] ?? true),
             'shareButtonStyle' => (string) ($tokens['articles_shareButtonStyle'] ?? ''),
             'readingProgressEnabled' => (bool) ($tokens['articles_readingProgressEnabled'] ?? false),
+            'tocEnabled' => (bool) ($tokens['articles_tocEnabled'] ?? false),
+            'tocPosition' => (string) ($tokens['articles_tocPosition'] ?? 'inline'),
+            'tocDepth' => (string) ($tokens['articles_tocDepth'] ?? 'h3'),
         ];
     }
 

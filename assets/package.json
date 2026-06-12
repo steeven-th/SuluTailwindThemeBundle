@@ -79,6 +79,12 @@
                 "name": "reading-progress",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "toc": {
+                "main": "controllers/toc_controller.js",
+                "name": "toc",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

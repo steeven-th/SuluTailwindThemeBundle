@@ -162,6 +162,35 @@ The breadcrumb of article pages is rendered by `_article_base.html.twig` **befor
 
 ---
 
+## Table of contents
+
+Collapsible panel filled by the `toc` Stimulus controller from the article headings (enabled under **Articles > Reading components**). Anchors are slugified and deduplicated, `<aside>` headings are skipped, and the panel stays hidden with fewer than two headings.
+
+| Class | Role |
+|-------|------|
+| `.iw-toc` | Root `<nav>` (max-width, margins) |
+| `.iw-toc--inline` / `.iw-toc--sticky` | Position modifiers — sticky pins the panel on the right from `1280px` (xl) up; below, the panel slides off-canvas behind a floating edge button. Column layouts (blog sidebar, event timeline) never float it: they render the TOC inside their own sticky side column |
+| `.iw-toc__toggle` / `.iw-toc__toggle-icon` | Floating edge button opening the off-canvas panel (sticky mode below xl only) |
+| `.iw-toc--open` | Set by the controller — slides the off-canvas panel in |
+| `.iw-toc__panel` | The `<details>` surface panel |
+| `.iw-toc__summary` | The collapsible "Table of contents" toggle |
+| `.iw-toc__list` / `.iw-toc__item` / `.iw-toc__item--h3` | Entry list — `--h3` entries are indented |
+| `.iw-toc__link` / `.iw-toc__link--active` | Anchor links — `--active` marks the section being read (scroll-spy, `aria-current`) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-toc-max-width` | Panel width in inline mode (default `28rem`) |
+| `--iw-toc-bg` / `--iw-toc-color` / `--iw-toc-border` | Panel skin (defaults derive from the surface tokens; the **Articles > Filter sidebar & table of contents** colors apply to both side panels) |
+| `--iw-toc-link-color` / `-hover` / `-active` | Link colors (active defaults to the surface accent) |
+| `--iw-toc-indent` | Sub-heading indentation (default `1rem`) |
+| `--iw-toc-sticky-top` / `-right` / `-width` / `-z` | Pinned panel geometry (sticky mode, xl and up) |
+| `--iw-toc-toggle-top` / `-size` / `-bg` / `-color` / `-border` / `-radius` / `-shadow` | Floating edge button (sticky mode below xl) — colors default to the panel skin |
+| `--iw-toc-drawer-top` / `-width` / `-z` / `-shadow` | Off-canvas panel geometry (sticky mode below xl) — `top` defaults to the pinned panel offset (`--iw-toc-sticky-top`) |
+
+The article content is wrapped in a bare `.iw-article-page__content` div (no layout impact) that scopes the heading scan — point the `selector` parameter elsewhere to index custom markup.
+
+---
+
 ## Reading progress bar
 
 Thin viewport-fixed bar filled by the `reading-progress` Stimulus controller as the visitor scrolls the article (enabled under **Articles > Reading components**). Decorative (`aria-hidden`), pointer-transparent, honors `prefers-reduced-motion`.

@@ -759,7 +759,9 @@ class ThemeCompiler
      * Components-tab per-component colour overrides.
      */
     private const COMPONENT_SURFACE_OVERRIDES = [
-        '.iw-article-filters' => [
+        // The sidebar colors are shared with the table of contents: both are
+        // article side panels and wear the same skin (one admin section).
+        '.iw-article-filters, .iw-toc' => [
             'components_sidebarBg' => '--color-surface',
             'components_sidebarText' => '--color-surface-foreground',
             'components_sidebarMuted' => '--color-surface-muted',

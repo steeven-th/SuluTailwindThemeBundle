@@ -165,6 +165,26 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
             "fileinput": {
                 "enabled": true,
                 "fetch": "lazy"
+            },
+            "article_filters": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "back_to_top": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "share": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "reading_progress": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "toc": {
+                "enabled": true,
+                "fetch": "lazy"
             }
         }
     },
@@ -356,15 +376,15 @@ Filters combine (`/news?category=news&q=release&sort=title&page=2`) and paginati
 
 **Filter sidebar.** A left sidebar exposes a search box, a sort dropdown (most recent / oldest / title) and category/tag checkboxes. The checkboxes are **contextual**: only the categories and tags actually used by the articles in the page's editorial scope are listed (a category with no article on this page is not shown), so visitors never land on an empty filter. The list reflects the scope, not the visitor's active selection, so options stay stable while filtering. It is a plain GET form — filtering works without JavaScript. Restyle it with the `--iw-article-filters-*` and `--iw-article-layout-*` custom properties; no Twig override needed.
 
-**Layout & enabled controls.** Under **Components > Filter sidebar** you can pick the **sidebar layout** — *left column* (default), *right column*, or *drawer* (a permanent offcanvas behind a **Filters** button at every screen size) — and toggle each control on/off (*search*, *sort*, *categories*, *tags*; all on by default). Left/right collapse into the drawer on small screens; the drawer style is offcanvas everywhere.
+**Layout & enabled controls.** Under **Articles > Filter sidebar & table of contents** you can pick the **sidebar layout** — *left column* (default), *right column*, or *drawer* (a permanent offcanvas behind a **Filters** button at every screen size) — and toggle each control on/off (*search*, *sort*, *categories*, *tags*; all on by default). Left/right collapse into the drawer on small screens; the drawer style is offcanvas everywhere.
 
 **Mobile drawer.** On small screens (< 768px) the left/right sidebar collapses behind a **Filters** button and slides in as an offcanvas drawer (backdrop, close button, `Escape` to dismiss). The button carries a badge with the active-filter count. This is progressive enhancement: with JavaScript disabled the sidebar simply stays stacked above the results and keeps working. Tune the drawer with the `--iw-article-filters-drawer-*` (panel width, background, shadow, transition, z-index), `--iw-article-filters-toggle-*` (the Filters button + count badge) and `--iw-article-filters-backdrop-*` (overlay) custom properties. The motion is disabled automatically under `prefers-reduced-motion`.
 
-The **Filters** button has its own button-style picker under **Components > Filter sidebar** (separate from the "Apply" button, since it sits on the page background): leave it empty for the neutral surface style, or pick a theme button variant (primary / secondary / accent) — the count badge stays legible whichever you choose.
+The **Filters** button has its own button-style picker under **Articles > Filter sidebar & table of contents** (separate from the "Apply" button, since it sits on the page background): leave it empty for the neutral surface style, or pick a theme button variant (primary / secondary / accent) — the count badge stays legible whichever you choose.
 
 **AJAX filtering.** With JavaScript on, filtering happens over AJAX: the form submit, the in-page filter links (pagination, active-filter chips, "clear all") and — when auto-submit is enabled — the sidebar changes fetch the filtered URL, swap only the results region and update the address bar (`history.pushState`), with no full page reload. Browser back/forward re-fetch the results and re-sync the sidebar. The results dim while loading (override `--iw-article-layout-loading-*`). This is progressive enhancement: with JavaScript disabled the plain GET form reloads the page as usual, and any fetch failure falls back to a normal navigation.
 
-**Auto-submit (optional).** Enable **Auto-submit filters** under **Components > Filter sidebar** to filter as soon as the visitor ticks a category/tag or changes the sort (the search field filters after a short debounce), hiding the redundant "Apply" button. With it off (the default), the visitor batches their choices and clicks "Apply" — either way the request goes over AJAX. With JavaScript disabled the "Apply" button stays and the form behaves normally.
+**Auto-submit (optional).** Enable **Auto-submit filters** under **Articles > Filter sidebar & table of contents** to filter as soon as the visitor ticks a category/tag or changes the sort (the search field filters after a short debounce), hiding the redundant "Apply" button. With it off (the default), the visitor batches their choices and clicks "Apply" — either way the request goes over AJAX. With JavaScript disabled the "Apply" button stays and the form behaves normally.
 
 > **Full-text search requires a search index.** The `q` parameter queries Sulu's website search index. After installing the bundle (or importing existing articles) run an initial reindex so articles become searchable:
 >
@@ -406,6 +426,8 @@ The share row is a reusable partial — include it in your own templates to shar
     title: 'Some page',
 } only %}
 ```
+
+- **Table of contents** — a collapsible "Table of contents" panel built automatically from the article's `h2`/`h3` headings: anchors are generated (slugified, deduplicated), the entry of the section being read is highlighted (scroll-spy), and anchor clicks scroll smoothly (honoring `prefers-reduced-motion`) while keeping the URL shareable. The **position** is configurable — top of the article, or **floating**: pinned on the right from the `xl` breakpoint up, and below that the panel slides off-canvas behind a floating edge button (closing on Escape or after navigating; on column layouts like the blog *sidebar* style the floating mode renders inside the sticky side column instead) — as well as the **depth** (main headings only, or with subheadings indented). Headings inside `<aside>` elements are ignored, and the panel stays hidden when fewer than two headings are found. Restyle it via the `--iw-toc-*` custom properties. The partial is reusable: include `components/_toc.html.twig` with a `selector` parameter to index any content element.
 
 - **Reading progress bar** — a thin bar fixed at the top of the viewport that fills as the visitor scrolls through the article content. Its **thickness** (thin / medium / thick) and **color** are configurable in the admin; an empty color derives from the surface accent token, so it adapts to the theme. Fine-tune further via the `--iw-reading-progress-*` custom properties (z-index, track background, transition). Progressive enhancement: nothing shows without JavaScript, and the fill transition honors `prefers-reduced-motion`. The partial is reusable too — include `components/_reading_progress.html.twig` with a `selector` parameter to track any content element.
 

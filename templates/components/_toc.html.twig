@@ -1,0 +1,52 @@
+{#
+    Table of contents (F5 reading component).
+    A collapsible panel listing the article's h2/h3 headings, built client-side
+    by the Stimulus controller: it scans the tracked content, gives every
+    heading an anchor id (slugified, deduplicated), fills the list and
+    highlights the section being read (scroll-spy). Pure progressive
+    enhancement: hidden in markup, revealed only when at least two headings
+    are found.
+
+    Headings inside <aside> elements are ignored (side columns, related
+    widgets) — only the actual article content is indexed.
+
+    Rendered on article pages by _article_base.html.twig when enabled
+    (Articles > Reading components). Reusable: include it in your own
+    templates and point `selector` at any content element.
+
+    Parameters (all optional):
+    - position: 'inline' (collapsible block before the content, default) or
+                'sticky' (floating panel pinned on the right from the xl
+                breakpoint up; below, it slides off-canvas behind a floating
+                edge button)
+    - selector: CSS selector of the indexed content (default '.iw-article-page__content')
+    - depth: deepest heading level, 'h2' or 'h3' (default 'h3')
+#}
+{% set tocPosition = position|default('inline') %}
+<nav class="iw-toc iw-toc--{{ tocPosition }}"
+     hidden
+     aria-label="{{ 'iw_sulu_tailwind_theme.toc'|trans }}"
+     data-controller="toc"
+     data-toc-depth-value="{{ depth|default('h3') }}"
+     {%- if selector is defined and selector %} data-toc-selector-value="{{ selector }}"{% endif %}>
+    {% if tocPosition == 'sticky' %}
+        {# Floating edge button opening the off-canvas panel below the xl
+           breakpoint (hidden by CSS from xl up, where the panel is pinned). #}
+        <button type="button"
+                class="iw-toc__toggle"
+                data-toc-target="toggle"
+                data-action="toc#toggle"
+                aria-expanded="false"
+                aria-controls="iw-toc-panel"
+                aria-label="{{ 'iw_sulu_tailwind_theme.toc'|trans }}">
+            <svg class="iw-toc__toggle-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+            </svg>
+        </button>
+    {% endif %}
+    <details id="iw-toc-panel" class="iw-toc__panel" open>
+        <summary class="iw-toc__summary">{{ 'iw_sulu_tailwind_theme.toc'|trans }}</summary>
+        <ol class="iw-toc__list" data-toc-target="list"></ol>
+    </details>
+</nav>

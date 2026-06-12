@@ -3709,6 +3709,154 @@ span.iw-breadcrumbs__separator {
     }
 }
 
+/* ─── Table of contents (F5 reading component) ───────────────────────────── */
+/* Collapsible panel filled by the toc controller from the article headings.
+   Neutral surface skin (adapts to light/dark themes); everything routes
+   through --iw-toc-* for restyling. Hidden until the controller finds at
+   least two headings. */
+.iw-toc {
+    max-width: var(--iw-toc-max-width, 28rem);
+    margin: var(--iw-toc-margin, 1.5rem 0);
+    font-size: var(--iw-toc-font-size, 0.875rem);
+}
+
+.iw-toc__panel {
+    padding: var(--iw-toc-padding, 1rem 1.25rem);
+    color: var(--iw-toc-color, var(--color-surface-foreground));
+    background-color: var(--iw-toc-bg, var(--color-surface));
+    border: var(--iw-toc-border, 1px solid var(--color-surface-border));
+    border-radius: var(--iw-toc-radius, var(--border-radius));
+}
+
+.iw-toc__summary {
+    font-weight: var(--iw-toc-title-weight, 600);
+    cursor: pointer;
+    user-select: none;
+}
+
+.iw-toc__list {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-toc-gap, 0.375rem);
+}
+
+/* Sub-headings (h3) are indented one step. */
+.iw-toc__item--h3 {
+    padding-left: var(--iw-toc-indent, 1rem);
+}
+
+.iw-toc__link {
+    color: var(--iw-toc-link-color, var(--color-surface-muted));
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.iw-toc__link:hover {
+    color: var(--iw-toc-link-hover, var(--color-surface-foreground));
+}
+
+/* Scroll-spy marker: the section currently being read. */
+.iw-toc__link--active {
+    color: var(--iw-toc-link-active, var(--color-surface-accent));
+    font-weight: var(--iw-toc-link-active-weight, 600);
+}
+
+/* Sticky variant — the "floating" mode. From the xl breakpoint up the panel
+   is pinned on the right of the viewport; below, it slides off-canvas behind
+   a floating edge button (opened by the toc controller). Column layouts
+   (blog sidebar, event timeline) never use it: they render the TOC inside
+   their own sticky side column instead. */
+.iw-toc__toggle {
+    display: none;
+}
+
+@media (min-width: 1280px) {
+    .iw-toc--sticky {
+        position: fixed;
+        top: var(--iw-toc-sticky-top, 6rem);
+        right: var(--iw-toc-sticky-right, 1.5rem);
+        width: var(--iw-toc-sticky-width, 17rem);
+        max-height: calc(100vh - var(--iw-toc-sticky-top, 6rem) - 2rem);
+        overflow-y: auto;
+        margin: 0;
+        z-index: var(--iw-toc-sticky-z, 30);
+    }
+}
+
+@media (max-width: 1279.98px) {
+    /* The nav is a neutral wrapper below xl — the panel itself becomes the
+       off-canvas drawer and the edge button appears. */
+    .iw-toc--sticky {
+        margin: 0;
+    }
+
+    /* The edge button wears the panel colors (incl. the admin "Filter
+       sidebar & table of contents" overrides, inherited from .iw-toc). */
+    .iw-toc--sticky .iw-toc__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: var(--iw-toc-toggle-top, 35%);
+        right: 0;
+        z-index: var(--iw-toc-drawer-z, 55);
+        width: var(--iw-toc-toggle-size, 2.5rem);
+        height: var(--iw-toc-toggle-size, 2.5rem);
+        color: var(--iw-toc-toggle-color, var(--iw-toc-color, var(--color-surface-foreground)));
+        background-color: var(--iw-toc-toggle-bg, var(--iw-toc-bg, var(--color-surface)));
+        border: var(--iw-toc-toggle-border, var(--iw-toc-border, 1px solid var(--color-surface-border)));
+        border-right: 0;
+        border-radius: var(--iw-toc-toggle-radius, 999px) 0 0 var(--iw-toc-toggle-radius, 999px);
+        box-shadow: var(--iw-toc-toggle-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
+        cursor: pointer;
+    }
+
+    .iw-toc__toggle-icon {
+        width: var(--iw-toc-toggle-icon-size, 1.25rem);
+        height: var(--iw-toc-toggle-icon-size, 1.25rem);
+    }
+
+    /* The open drawer sits exactly where the pinned panel lives on wide
+       screens (same top offset). */
+    .iw-toc--sticky .iw-toc__panel {
+        position: fixed;
+        top: var(--iw-toc-drawer-top, var(--iw-toc-sticky-top, 6rem));
+        right: 0;
+        width: var(--iw-toc-drawer-width, 18rem);
+        max-width: 85vw;
+        max-height: calc(100vh - var(--iw-toc-drawer-top, var(--iw-toc-sticky-top, 6rem)) - 2rem);
+        overflow-y: auto;
+        z-index: var(--iw-toc-drawer-z, 55);
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        box-shadow: var(--iw-toc-drawer-shadow, 0 0.5rem 2rem rgba(0, 0, 0, 0.25));
+        /* Hidden off-screen until the controller adds --open. */
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.25s ease, visibility 0.25s ease;
+    }
+
+    .iw-toc--sticky.iw-toc--open .iw-toc__panel {
+        transform: translateX(0);
+        visibility: visible;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-toc--sticky .iw-toc__panel {
+        transition: none;
+    }
+}
+
+/* Inside a side column (blog sidebar, event timeline) the column owns the
+   spacing and width — the panel just fills it. */
+aside .iw-toc {
+    max-width: none;
+    margin: 0;
+}
+
 /* ─── Reading progress bar (F5 reading component) ────────────────────────── */
 /* Thin bar fixed at the top of the viewport, filled by the reading-progress
    controller through --iw-reading-progress-value (0..1). Thickness and color
