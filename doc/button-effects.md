@@ -98,12 +98,12 @@ Shared `transition-timing-function`.
 
 ## How the compiler emits the rules
 
-For each variant, the compiler emits a `.btn-{variant}` rule with a `transition` listing every animated property (`background-color`, `color`, `border-color`, `box-shadow`, `transform`, `opacity`) using the resolved duration/easing. The corresponding `.btn-{variant}:hover` rule sets the hover values, but **only when the axis is not at its default**: e.g. selecting `hoverShadow=none` skips the `box-shadow` declaration entirely instead of emitting `box-shadow: none`.
+For each variant, the compiler emits a `.iw-button--{variant}` rule with a `transition` listing every animated property (`background-color`, `color`, `border-color`, `box-shadow`, `transform`, `opacity`) using the resolved duration/easing. The corresponding `.iw-button--{variant}:hover` rule sets the hover values, but **only when the axis is not at its default**: e.g. selecting `hoverShadow=none` skips the `box-shadow` declaration entirely instead of emitting `box-shadow: none`.
 
 Example output for a button configured with `hoverShadow=glow-primary`, `hoverTransform=lift`, `hoverDuration=300ms`, `hoverEasing=ease-out`:
 
 ```css
-.btn-primary {
+.iw-button--primary {
     /* ... background, color, border, padding ... */
     transition:
         background-color 300ms ease-out,
@@ -113,10 +113,10 @@ Example output for a button configured with `hoverShadow=glow-primary`, `hoverTr
         transform 300ms ease-out,
         opacity 300ms ease-out;
 }
-.btn-primary:hover {
-    background-color: var(--btn-primary-hoverBg, ...);
-    color: var(--btn-primary-hoverText, ...);
-    border-color: var(--btn-primary-hoverBorder, ...);
+.iw-button--primary:hover {
+    background-color: var(--iw-button-primary-hover-bg, ...);
+    color: var(--iw-button-primary-hover-text, ...);
+    border-color: var(--iw-button-primary-hover-border, ...);
     box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary) 40%, transparent);
     transform: translateY(-2px);
 }
@@ -149,6 +149,6 @@ Then expose the new key in the form XML:
 
 ## See also
 
-- [CSS variables](css-variables.md#button-variables) — the full list of `--btn-*` custom properties exposed to themes
+- [CSS variables](css-variables.md#button-variables) — the full list of `--iw-button-*` custom properties exposed to themes
 - [`ButtonEffectCatalog`](../src/Service/ButtonEffectCatalog.php) — the canonical source for axis values
 - [`ThemeCompiler`](../src/Service/ThemeCompiler.php) — `generateButtonClasses()` and `generateVariantButtonCss()` consume the catalog
