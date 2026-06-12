@@ -14,12 +14,6 @@
 
 {% block article_header %}
     <header class="iw-article-page__header mb-6">
-        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-            context: 'article',
-            pageUuid: view.url.page.uuid|default(null),
-            currentTitle: content.title|default(''),
-        } only %}
-
         {% if articleConfig.showCategories|iw_article_visible('page') %}
             {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                 categories: content.excerptCategories|default([]),
@@ -34,7 +28,11 @@
 
 {% block article_meta %}{% endblock %}
 
+{# Column layout exception (like blog sidebar): the blocks stay constrained to
+   the main column next to the sticky event card. article_content sits outside
+   the page container in _article_base, so this style brings its own. #}
 {% block article_content %}
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
         {# Sidebar: event details #}
         <aside class="md:col-span-1">
@@ -52,20 +50,11 @@
 
         {# Main content #}
         <div class="md:col-span-3">
-            {% if content.blocks is defined and content.blocks is iterable %}
-                {% for contentBlock in content.blocks %}
-                    {% set blockType = contentBlock.type|default('text') %}
-                    {% set blockStyle = contentBlock.style|default('') %}
-                    {% set defaultStyles = {'text': 'one_column', 'text_images': 'classic', 'gallery': 'grid', 'cta': 'centered', 'document': 'default', 'separator': 'default', 'location': 'default'} %}
-                    {% if blockStyle is empty %}
-                        {% set blockStyle = defaultStyles[blockType]|default('default') %}
-                    {% endif %}
-                    {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-                    {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-                    {% include [templatePath, fallbackPath] ignore missing with contentBlock %}
-                {% endfor %}
-            {% endif %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+                blocks: content.blocks|default([]),
+            } %}
         </div>
+    </div>
     </div>
 {% endblock %}
 

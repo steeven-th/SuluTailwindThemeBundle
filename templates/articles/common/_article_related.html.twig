@@ -20,6 +20,11 @@
 {% set maxItems = maxItems|default(3) %}
 {% set sectionTitle = title|default('iw_sulu_tailwind_theme.article.related_articles'|trans) %}
 
+{# Cards wear the site-wide card appearance (Components > Cards), exactly like
+   the article listings: surface, border, image ratio and hover effects. #}
+{% set config = iw_sulu_tailwind_theme_article_config() %}
+{% set cardRatio = config.cardImageRatio|default('16:9')|replace({':': '/'}) %}
+
 {% if articles is defined and articles is iterable and articles|length > 0 %}
     <section class="iw-article-related iw-article-related--cols-{{ cols }}">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,6 +35,14 @@
                 {% for article in articles|slice(0, maxItems) %}
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
+                        imageRatio: cardRatio,
+                        cardSurface: config.cardSurface,
+                        cardBorder: config.cardBorder,
+                        cardImagePadded: config.cardImagePadded,
+                        cardHoverTransform: config.cardHoverTransform,
+                        cardHoverImage: config.cardHoverImage,
+                        cardHoverShadow: config.cardHoverShadow,
+                        cardHoverBorder: config.cardHoverBorder,
                     } only %}
                 {% endfor %}
             </div>

@@ -332,6 +332,7 @@ class ThemeCompiler
         return $css . "\n";
     }
 
+
     private function generateArticleCardVariables(array $tokens): string
     {
         $surface = (string) ($tokens['cardSurface'] ?? 'none');
@@ -412,6 +413,7 @@ class ThemeCompiler
         // between the image and the body — same value horizontally and
         // vertically so the rhythm stays consistent with the inner padding.
         $css .= ".iw-article-card {\n";
+        $css .= "  position: relative;\n"; // anchors the stretched title link
         $css .= "  display: flex;\n";
         $css .= "  flex-direction: column;\n";
         $css .= "  gap: var(--iw-article-card-padding, 1rem);\n";
@@ -472,6 +474,14 @@ class ThemeCompiler
         $css .= "}\n";
         $css .= ".iw-article-card__title a:hover {\n";
         $css .= "  color: var(--iw-article-card-title-hover-color, var(--color-primary));\n";
+        $css .= "}\n";
+        // Stretched link: the title link covers the whole card so it is fully
+        // clickable (listings, related articles) without wrapping the markup
+        // in an anchor.
+        $css .= ".iw-article-card__title a::after {\n";
+        $css .= "  content: \"\";\n";
+        $css .= "  position: absolute;\n";
+        $css .= "  inset: 0;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__date {\n";
         $css .= "  display: block;\n";

@@ -3,11 +3,18 @@
     Extends the bundle's base template and defines article-specific blocks.
 
     Blocks available for override:
+    - article_breadcrumb: site breadcrumb rendered before the <article> landmark
+      (override when the style hosts the trail elsewhere, e.g. as a hero overlay)
     - article_hero: hero image area
     - article_header: title + subtitle
     - article_meta: date, authors, categories, reading time
-    - article_content: main content (blocks)
-    - article_footer: tags, share buttons
+    - article_share_header: share buttons below the header (override to empty
+      when the style renders _article_share.html.twig inside its own header)
+    - article_content: main content blocks — rendered OUTSIDE the page container
+      through the shared dispatcher (components/_blocks.html.twig), so blocks
+      behave exactly as on regular pages (each block owns its own layout/width)
+    - article_footer: tags
+    - article_share_footer: share buttons at the end of the article
     - article_related: related articles section
 
     Variables expected:
@@ -32,6 +39,22 @@
 {% set articleConfig = iw_sulu_tailwind_theme_article_config() %}
 {% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([])) %}
 
+{# Site breadcrumb — navigation, so it lives before the <article> landmark
+   (not inside the redistributable article content). Styles whose fullwidth
+   hero hosts the trail as a bottom overlay override this block to fall back
+   to this default only when the article has no hero image (see news classic). #}
+{% block article_breadcrumb %}
+    {% if iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 iw-article-page__breadcrumb">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'article',
+                pageUuid: view.url.page.uuid|default(null),
+                currentTitle: content.title|default(''),
+            } only %}
+        </div>
+    {% endif %}
+{% endblock %}
+
 <article class="iw-article-page" itemscope itemtype="https://schema.org/Article">
     {% block article_hero %}{% endblock %}
 
@@ -51,38 +74,37 @@
 
         {% block article_meta %}{% endblock %}
 
-        {% block article_content %}
-            {% if content.blocks is defined and content.blocks is iterable %}
-                <div class="iw-article-page__body">
-                    {% for contentBlock in content.blocks %}
-                        {% set blockType = contentBlock.type|default('text') %}
-                        {% set blockStyle = contentBlock.style|default('') %}
-
-                        {% set defaultStyles = {
-                            'text': 'one_column',
-                            'text_images': 'classic',
-                            'gallery': 'grid',
-                            'cta': 'centered',
-                            'document': 'default',
-                            'testimonial': 'default',
-                            'separator': 'default',
-                            'location': 'default',
-                        } %}
-
-                        {% if blockStyle is empty %}
-                            {% set blockStyle = defaultStyles[blockType]|default('default') %}
-                        {% endif %}
-
-                        {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-                        {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-
-                        {% include [templatePath, fallbackPath] ignore missing with contentBlock %}
-                    {% endfor %}
-                </div>
-            {% endif %}
+        {# Share buttons under the header (Articles > Reading components).
+           Styles that render the row inside their own header override this
+           block to empty and include _article_share.html.twig themselves. #}
+        {% block article_share_header %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
+                articleConfig: articleConfig,
+                content: content,
+                position: 'header',
+            } only %}
         {% endblock %}
+    </div>
 
+    {# Content blocks — outside the page container, dispatched exactly like on
+       regular pages: each block template owns its own layout and width. #}
+    {% block article_content %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+            blocks: content.blocks|default([]),
+        } %}
+    {% endblock %}
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         {% block article_footer %}{% endblock %}
+
+        {# Share buttons at the end of the article (Articles > Reading components). #}
+        {% block article_share_footer %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
+                articleConfig: articleConfig,
+                content: content,
+                position: 'footer',
+            } only %}
+        {% endblock %}
     </div>
 
     {% block article_related %}{% endblock %}

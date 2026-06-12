@@ -8,12 +8,6 @@
 
 {% block article_header %}
     <header class="iw-article-page__header iw-article-page__header--centered">
-        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-            context: 'article',
-            pageUuid: view.url.page.uuid|default(null),
-            currentTitle: content.title|default(''),
-        } only %}
-
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
             date: authored|default(null),
             authors: articleAuthors|default([]),
@@ -33,11 +27,20 @@
                 {{ content.subtitle }}
             </p>
         {% endif %}
+
+        {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
+            articleConfig: articleConfig,
+            content: content,
+            position: 'header',
+        } only %}
     </header>
     <hr class="iw-article-page__separator iw-article-page__separator--centered">
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
+
+{# The header share row lives inside the centered header (above). #}
+{% block article_share_header %}{% endblock %}
 
 {% block article_footer %}
     <footer class="iw-article-page__footer">

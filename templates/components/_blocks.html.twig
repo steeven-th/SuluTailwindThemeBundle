@@ -1,0 +1,46 @@
+{#
+    Shared content-block dispatcher.
+    Renders a list of Sulu content blocks through the per-type style templates
+    (blocks/<type>/_style_<style>.html.twig) with a single default-style map,
+    so blocks behave exactly the same wherever they are rendered (pages and
+    article pages alike — no extra container: each block template owns its own
+    layout and width).
+
+    Include WITHOUT `only` so the block templates keep access to the rendering
+    context, exactly as when dispatched from a page template.
+
+    Parameters:
+    - blocks: the list of content blocks (content.blocks)
+#}
+{% if blocks is defined and blocks is iterable %}
+    {% for contentBlock in blocks %}
+        {% set blockType = contentBlock.type|default('text') %}
+        {% set blockStyle = contentBlock.style|default('') %}
+
+        {# Use the style value directly — it matches the template file name.
+           Fallback to defaults when style is empty or template does not exist
+           (e.g. legacy values like "standard" from previous config). #}
+        {% set defaultStyles = {
+            'text': 'one_column',
+            'text_images': 'classic',
+            'gallery': 'grid',
+            'key_figures': 'inline',
+            'linked_pages': 'cards',
+            'location': 'map_with_info',
+            'form': 'centered',
+            'document': 'default',
+            'cta': 'centered',
+            'testimonial': 'cards',
+            'separator': 'line'
+        } %}
+
+        {% if blockStyle is empty %}
+            {% set blockStyle = defaultStyles[blockType]|default('default') %}
+        {% endif %}
+
+        {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
+        {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
+
+        {% include [templatePath, fallbackPath] with contentBlock %}
+    {% endfor %}
+{% endif %}

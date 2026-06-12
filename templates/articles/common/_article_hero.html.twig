@@ -7,6 +7,12 @@
     - maxHeight: optional CSS max-height value — emitted as an inline
                  `--iw-article-hero-max-height` only when explicitly passed;
                  otherwise the CSS fallback (500px) applies.
+    - breadcrumb: render the site breadcrumb as an overlay pinned to the bottom
+                  of the image, over a dark gradient (designed for the fullwidth
+                  style). The caller should override the article_breadcrumb
+                  block accordingly (see news classic). Requires:
+    - breadcrumbPageUuid: UUID for the page trail (view.url.page.uuid)
+    - breadcrumbCurrentTitle: current item label (content.title)
 
     Public CSS API:
     - .iw-article-hero (block)
@@ -16,8 +22,10 @@
     - .iw-article-hero--editorial (background-image cover, used by blog editorial style)
     - .iw-article-hero__inner (used only by the `contained` modifier to clip the image with radius)
     - .iw-article-hero__image (the rendered <img>)
+    - .iw-article-hero__breadcrumb (bottom overlay hosting the breadcrumb trail)
 
-    Override via --iw-article-hero-max-height / --iw-article-hero-radius / --iw-article-hero-contained-max-width.
+    Override via --iw-article-hero-max-height / --iw-article-hero-radius /
+    --iw-article-hero-contained-max-width / --iw-article-hero-breadcrumb-*.
 #}
 
 {% if image is defined and image is not empty %}
@@ -42,6 +50,11 @@
         {% set modifier = heroStyle in ['fullwidth', 'contained', 'parallax'] ? heroStyle : 'fullwidth' %}
         {% set imgClass = 'iw-article-hero__image' ~ (modifier == 'parallax' ? ' parallax-slide-img' : '') %}
 
+        {# Breadcrumb overlay: only when requested AND breadcrumbs are enabled
+           for articles in the admin — avoids rendering an empty gradient. #}
+        {% set showBreadcrumb = breadcrumb|default(false)
+            and iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
+
         <div class="iw-article-hero iw-article-hero--{{ modifier }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
             {% if modifier == 'contained' %}
                 <div class="iw-article-hero__inner">
@@ -49,6 +62,18 @@
                 </div>
             {% else %}
                 <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="{{ imgClass }}" loading="eager" itemprop="image">
+            {% endif %}
+
+            {% if showBreadcrumb %}
+                <div class="iw-article-hero__breadcrumb">
+                    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                            context: 'article',
+                            pageUuid: breadcrumbPageUuid|default(null),
+                            currentTitle: breadcrumbCurrentTitle|default(''),
+                        } only %}
+                    </div>
+                </div>
             {% endif %}
         </div>
     {% endif %}

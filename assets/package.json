@@ -67,6 +67,12 @@
                 "name": "back-to-top",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "share": {
+                "main": "controllers/share_controller.js",
+                "name": "share",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

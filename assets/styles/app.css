@@ -2673,6 +2673,13 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-article-page-subtitle-color-lg, var(--color-secondary-500));
 }
 
+/* Default placement of the article breadcrumb: before the <article> landmark
+   (rendered by _article_base.html.twig; fullwidth-hero styles host it as a
+   hero overlay instead — see .iw-article-hero__breadcrumb). */
+.iw-article-page__breadcrumb {
+    margin-top: var(--iw-article-page-breadcrumb-margin-top, 1.5rem);
+}
+
 /* Header layout modifiers — used by article styles */
 .iw-article-page__header--centered {
     max-width: var(--iw-article-page-header-max-width-centered, 48rem);
@@ -2741,11 +2748,8 @@ section.block:has([data-slider-fullbleed-value]) {
     margin-inline: auto;
 }
 
-.iw-article-page__body {
-    margin-top: var(--iw-article-page-body-margin-top, 2rem);
-}
-
-/* Dropcap modifier on the body — large first letter on the first inner block */
+/* Dropcap wrapper — large first letter on the first inner block (blog
+   editorial). Bare wrapper: it must not constrain the blocks' own layout. */
 .iw-article-page__body--dropcap > *:first-child::first-letter {
     float: left;
     font-size: 3.5em;
@@ -2773,9 +2777,34 @@ section.block:has([data-slider-fullbleed-value]) {
    The global `img { border-radius: var(--radius-img); }` rule of app.css
    is overridden to 0 on the hero image so only the wrapper applies it. */
 .iw-article-hero {
+    position: relative; /* anchors the breadcrumb overlay */
     width: 100%;
     overflow: hidden;
     max-height: var(--iw-article-hero-max-height, 500px);
+}
+
+/* Breadcrumb overlay pinned to the bottom of the hero image, over a dark
+   gradient so the trail stays readable on any picture. The colors are forced
+   light here (the theme breadcrumb colors target a page background) — all
+   overridable via --iw-article-hero-breadcrumb-* / --iw-breadcrumbs-*. */
+.iw-article-hero__breadcrumb {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: var(--iw-article-hero-breadcrumb-padding, 2.5rem 0 1rem);
+    background: var(--iw-article-hero-breadcrumb-gradient, linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent));
+    --iw-breadcrumbs-color: var(--iw-article-hero-breadcrumb-color, rgba(255, 255, 255, 0.85));
+    --iw-breadcrumbs-current-color: var(--iw-article-hero-breadcrumb-current-color, #fff);
+    --iw-breadcrumbs-link-hover: var(--iw-article-hero-breadcrumb-link-hover, #fff);
+    --iw-breadcrumbs-margin-bottom: 0;
+}
+
+/* Inline variant: sits in the hero content flow (blog editorial) where the
+   hero's own overlay already darkens the image — no gradient, no pinning. */
+.iw-article-hero__breadcrumb--inline {
+    position: static;
+    padding: var(--iw-article-hero-breadcrumb-inline-padding, 1rem 0 0);
+    background: none;
 }
 
 .iw-article-hero__image {
@@ -2787,7 +2816,11 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 /* Fullwidth: image spans the viewport, no radius (default behavior of
-   .iw-article-hero already provides overflow:hidden + max-height). */
+   .iw-article-hero already provides overflow:hidden + max-height). The bottom
+   margin keeps the header below (e.g. its breadcrumb) from hugging the image. */
+.iw-article-hero--fullwidth {
+    margin-bottom: var(--iw-article-hero-margin-bottom, 1.5rem);
+}
 
 /* Contained: the outer wrapper becomes a layout helper that centers the
    hero inside the page container. The inner wrapper does the actual
@@ -3674,6 +3707,66 @@ span.iw-breadcrumbs__separator {
     .iw-back-to-top--visible {
         transform: none;
     }
+}
+
+/* ─── Share buttons (F5 reading component) ───────────────────────────────── */
+/* Row of share actions (native share, copy link, email) rendered on article
+   pages. Everything routes through --iw-share-* for restyling. The native and
+   copy buttons are [hidden] until the share controller reveals them. */
+.iw-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--iw-share-gap, 0.5rem);
+    margin: var(--iw-share-margin, 1.5rem 0);
+}
+
+/* Inside an article header (e.g. news magazine inline hero, news minimal
+   centered header) the row only needs a top gap — the header already
+   provides the bottom spacing. */
+.iw-article-page__header .iw-share {
+    margin: var(--iw-share-margin-in-header, 1rem 0 0);
+}
+
+.iw-share__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--iw-share-button-gap, 0.5rem);
+    padding: var(--iw-share-button-padding, 0.5rem 1rem);
+    font-size: var(--iw-share-font-size, 0.875rem);
+    font-weight: var(--iw-share-font-weight, 500);
+    line-height: 1;
+    text-decoration: none;
+    border-radius: var(--iw-share-radius, 999px);
+    cursor: pointer;
+    transition: background-color var(--iw-share-transition, 0.15s ease);
+}
+
+/* Neutral surface skin — applied only when no theme button variant
+   (iw-button--*) owns the colors, so a configured variant shows through. */
+.iw-share__button:not([class*="iw-button--"]) {
+    color: var(--iw-share-color, var(--color-surface-foreground));
+    background-color: var(--iw-share-bg, var(--color-surface));
+    border: var(--iw-share-border, 1px solid var(--color-surface-border));
+}
+
+.iw-share__button:not([class*="iw-button--"]):hover {
+    background-color: var(--iw-share-hover-bg, color-mix(in srgb, var(--iw-share-bg, var(--color-surface)), var(--color-text) 8%));
+}
+
+.iw-share__button[hidden] {
+    display: none;
+}
+
+.iw-share__icon {
+    width: var(--iw-share-icon-size, 1rem);
+    height: var(--iw-share-icon-size, 1rem);
+    flex-shrink: 0;
+}
+
+.iw-share__feedback {
+    font-size: var(--iw-share-font-size, 0.875rem);
+    color: var(--iw-share-feedback-color, var(--color-surface-foreground));
 }
 
 /* ─── Article results header: count + active filter chips (F4-A) ─────────── */

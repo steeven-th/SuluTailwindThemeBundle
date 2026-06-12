@@ -1,0 +1,25 @@
+{#
+    Article share row gate.
+    Renders the share buttons (_share.html.twig) when they are enabled for the
+    given position (Articles > Reading components), wiring the admin config.
+
+    Used by _article_base.html.twig for the default placements, and by article
+    styles that reposition the row (e.g. news magazine/minimal render it inside
+    their header) — override the article_share_header block to empty and include
+    this partial where the row belongs.
+
+    Parameters:
+    - articleConfig: the article config array (iw_sulu_tailwind_theme_article_config())
+    - content: the article content object
+    - position: 'header' or 'footer' — rendered when the configured position
+                matches (or is 'both')
+#}
+{% if articleConfig.shareEnabled and articleConfig.sharePosition in [position, 'both'] %}
+    {% include '@ItechWorldSuluTailwindTheme/components/_share.html.twig' with {
+        title: content.title,
+        native: articleConfig.shareNative,
+        copy: articleConfig.shareCopy,
+        email: articleConfig.shareEmail,
+        buttonStyle: articleConfig.shareButtonStyle,
+    } only %}
+{% endif %}

@@ -95,6 +95,21 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const FONT_ROLES = ['heading', 'body', 'accent'];
 
     /**
+     * Article config keys (Articles tab), stored flat in tokens.
+     */
+    private const ARTICLE_KEYS = [
+        'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
+        'articles_listingStyle',
+        'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
+        'articles_showExcerpts', 'articles_showRelated',
+        'articles_relatedCount',
+        // Reading components (article pages): share buttons.
+        'articles_shareEnabled', 'articles_sharePosition',
+        'articles_shareNative', 'articles_shareCopy', 'articles_shareEmail',
+        'articles_shareButtonStyle',
+    ];
+
+    /**
      * Site-wide transverse component config keys (Components tab), stored flat in tokens.
      */
     private const COMPONENT_KEYS = [
@@ -511,14 +526,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $this->flattenMenuConfig($data, $menuConfig);
 
         // Article configuration: flat keys passed through directly
-        $articleKeys = [
-            'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle',
-            'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showRelated',
-            'articles_relatedCount',
-        ];
-        foreach ($articleKeys as $key) {
+        foreach (self::ARTICLE_KEYS as $key) {
             if (isset($tokens[$key])) {
                 $data[$key] = $tokens[$key];
             }
@@ -687,14 +695,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
 
         // Article configuration: flat keys stored directly in tokens
-        $articleKeys = [
-            'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle',
-            'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showRelated',
-            'articles_relatedCount',
-        ];
-        foreach ($articleKeys as $key) {
+        foreach (self::ARTICLE_KEYS as $key) {
             if (\array_key_exists($key, $data)) {
                 $tokens[$key] = $data[$key];
             }

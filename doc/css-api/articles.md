@@ -120,9 +120,11 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-page__header` | Title + subtitle block above the article body |
 | `.iw-article-page__title` | `<h1>` of the article |
 | `.iw-article-page__subtitle` | Optional `<p>` subtitle |
-| `.iw-article-page__body` | Wrapper around the rendered content blocks |
-| `.iw-article-page__body--dropcap` | Modifier on the body — drops a large first letter on the first inner block (used by the blog editorial style) |
+| `.iw-article-page__body--dropcap` | Bare wrapper around the blocks — drops a large first letter on the first inner block (blog editorial style) without constraining the blocks' layout |
 | `.iw-article-page__footer` | Below-content footer (tags, share buttons) |
+| `.iw-article-page__breadcrumb` | Container of the default breadcrumb placement, before the `<article>` landmark |
+
+> **Content blocks behave exactly as on regular pages.** Article templates dispatch their blocks through the shared `components/_blocks.html.twig` dispatcher, outside any page container — each block template owns its own layout and width. Only the column layouts (blog *sidebar*, event *timeline*) constrain the blocks to their main column.
 
 | Variable | Purpose |
 |----------|---------|
@@ -144,12 +146,19 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-hero--editorial` | Oversized hero with overlay text + background-image (used by the blog editorial style) |
 | `.iw-article-hero__inner` | Inner wrapper, only present in `--contained` mode. Carries the `overflow: hidden` and the radius for the contained variant |
 | `.iw-article-hero__image` | The `<img>` element inside the hero. Its own radius is forced to `0` — the wrapper (or `__inner`) does the clipping |
+| `.iw-article-hero__breadcrumb` | Bottom overlay hosting the breadcrumb trail over a dark gradient (fullwidth-hero styles: news/blog classic, event card info). Forces light breadcrumb colors |
 
 | Variable | Purpose |
 |----------|---------|
 | `--iw-article-hero-max-height` | Max height of the hero (default `500px`). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
 | `--iw-article-hero-radius` | Image radius in `contained` mode (default falls back to `--border-imageRadius`) |
 | `--iw-article-hero-contained-max-width` | Max-width of the centered container in `contained` mode (default `1280px`) |
+| `--iw-article-hero-margin-bottom` | Bottom spacing of the `fullwidth` hero (default `1.5rem`) |
+| `--iw-article-hero-breadcrumb-padding` | Overlay padding — the top value sizes the gradient fade (default `2.5rem 0 1rem`) |
+| `--iw-article-hero-breadcrumb-gradient` | Overlay background (default `linear-gradient(to top, rgba(0,0,0,.6), transparent)`) |
+| `--iw-article-hero-breadcrumb-color` / `-current-color` / `-link-hover` | Trail colors on top of the image (default white tones) |
+
+The breadcrumb of article pages is rendered by `_article_base.html.twig` **before the `<article>` landmark** (it is site navigation, not article content) inside a `.iw-article-page__breadcrumb` container (`--iw-article-page-breadcrumb-margin-top`, default `1.5rem`). Fullwidth-hero styles relocate it as a hero overlay and fall back to the default placement when the article has no hero image. Custom styles can override the `article_breadcrumb` block.
 
 ---
 

@@ -131,5 +131,69 @@
                 </property>
             </properties>
         </section>
+
+        <!-- Reading components section: article-page helpers rendered by
+             _article_base.html.twig. Opt-in (off by default). -->
+        <section name="articleReadingComponents">
+            <meta>
+                <title>iw_sulu_tailwind_theme.articles_section_reading_components</title>
+            </meta>
+            <properties>
+                <property name="articles_shareEnabled" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_sharePosition" type="single_select" colspan="6"
+                          visibleCondition="articles_shareEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_share_position</title></meta>
+                    <params>
+                        <param name="default_value" value="footer"/>
+                        <param name="values" type="collection">
+                            <param name="header"><meta><title>iw_sulu_tailwind_theme.articles_share_position_header</title></meta></param>
+                            <param name="footer"><meta><title>iw_sulu_tailwind_theme.articles_share_position_footer</title></meta></param>
+                            <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_share_position_both</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Share actions: each button can be toggled individually. The
+                     native button falls back to copying the link when the Web
+                     Share API is unavailable. -->
+                <property name="articles_shareNative" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_native</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_shareCopy" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_copy</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_shareEmail" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_email</title></meta></param>
+                    </params>
+                </property>
+
+                <!-- Empty = neutral surface style; otherwise the chosen theme
+                     button variant owns the colors (same pattern as the sidebar buttons). -->
+                <property name="articles_shareButtonStyle" type="iw_theme_button_style_picker" colspan="6"
+                          visibleCondition="articles_shareEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_share_button_style</title></meta>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>

@@ -392,6 +392,21 @@ The bundle's `base.html.twig` renders it automatically when enabled. **If you us
 {% endif %}
 ```
 
+#### Reading components (article pages)
+
+Optional helpers rendered on article pages by the bundle's article layout, enabled under **Articles > Reading components** (off by default).
+
+- **Share buttons** — a row of share actions for the current article: **native share** (the device's share sheet via the Web Share API — when the API is unavailable it falls back to copying the link), **copy link** (with a "Link copied!" confirmation) and **email** (a `mailto:` link with the article title and URL pre-filled). Each button can be toggled individually, and the row's **position** is configurable: below the header, at the end of the article, or both. Each article style places the header row where it belongs in its layout (e.g. the news *magazine* style renders it inside the inline hero content, *minimal* inside its centered header) — custom styles can do the same by overriding the `article_share_header` block to empty and including `components/_article_share.html.twig` where the row should sit. The buttons have their own **button-style picker** in the admin: leave it empty for the neutral surface style (derived from the semantic surface tokens, so it adapts to light/dark themes), or pick a theme button variant (primary / secondary / accent). Fine-tune further via the `--iw-share-*` custom properties (gap, padding, border, hover). This is progressive enhancement: without JavaScript the email link still works, and the JS-powered buttons stay hidden.
+
+The share row is a reusable partial — include it in your own templates to share any URL:
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/components/_share.html.twig' with {
+    url: 'https://example.org/some-page',
+    title: 'Some page',
+} only %}
+```
+
 ## Usage
 
 ### Admin interface
