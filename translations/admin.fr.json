@@ -660,6 +660,7 @@
     "iw_sulu_tailwind_theme.articles_show_dates": "Afficher les dates",
     "iw_sulu_tailwind_theme.articles_show_authors": "Afficher les auteurs",
     "iw_sulu_tailwind_theme.articles_show_categories": "Afficher les catégories (badges)",
+    "iw_sulu_tailwind_theme.articles_show_tags": "Tags",
     "iw_sulu_tailwind_theme.articles_show_excerpts": "Afficher les extraits",
     "iw_sulu_tailwind_theme.articles_show_related": "Afficher les articles liés",
     "iw_sulu_tailwind_theme.articles_related_count": "Nombre d'articles liés",

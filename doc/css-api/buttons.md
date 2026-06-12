@@ -16,24 +16,24 @@ Shared by every variant.
 
 | Variable | Description |
 |----------|-------------|
-| `--btn-padding-x` | Horizontal padding shared by every button variant |
-| `--btn-padding-y` | Vertical padding shared by every button variant |
+| `--iw-button-padding-x` | Horizontal padding shared by every button variant |
+| `--iw-button-padding-y` | Vertical padding shared by every button variant |
 
 ### Per-variant
 
 | Variable pattern | Description |
 |-----------------|-------------|
-| `--btn-{variant}-bg` | Background color |
-| `--btn-{variant}-text` | Text color |
-| `--btn-{variant}-border` | Full border shorthand (`{width} {style} {color}`) or `none` |
-| `--btn-{variant}-radius` | Border radius |
-| `--btn-{variant}-hoverBg` | Background on hover |
-| `--btn-{variant}-hoverText` | Text color on hover |
-| `--btn-{variant}-hoverBorder` | Border shorthand on hover (or `none`) |
+| `--iw-button-{variant}-bg` | Background color |
+| `--iw-button-{variant}-text` | Text color |
+| `--iw-button-{variant}-border` | Full border shorthand (`{width} {style} {color}`) or `none` |
+| `--iw-button-{variant}-radius` | Border radius |
+| `--iw-button-{variant}-hover-bg` | Background on hover |
+| `--iw-button-{variant}-hover-text` | Text color on hover |
+| `--iw-button-{variant}-hover-border` | Border shorthand on hover (or `none`) |
 
 Where `{variant}` is `primary`, `secondary`, or `accent`.
 
-> Border `width` and `style` are configured per variant in the admin and folded directly into the `--btn-{variant}-border` shorthand. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{variant}` rules and do not produce standalone CSS variables.
+> Border `width` and `style` are configured per variant in the admin and folded directly into the `--iw-button-{variant}-border` shorthand. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{variant}` rules and do not produce standalone CSS variables.
 
 ---
 
@@ -64,14 +64,14 @@ Each variant rule includes `background-color`, `color`, `border`, `border-radius
 
 ```css
 .my-custom-button {
-    background-color: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-    border-radius: var(--btn-primary-radius);
-    padding: var(--btn-padding-y) var(--btn-padding-x);
+    background-color: var(--iw-button-primary-bg);
+    color: var(--iw-button-primary-text);
+    border-radius: var(--iw-button-primary-radius);
+    padding: var(--iw-button-padding-y) var(--iw-button-padding-x);
 }
 .my-custom-button:hover {
-    background-color: var(--btn-primary-hoverBg);
-    color: var(--btn-primary-hoverText);
+    background-color: var(--iw-button-primary-hover-bg);
+    color: var(--iw-button-primary-hover-text);
 }
 ```
 

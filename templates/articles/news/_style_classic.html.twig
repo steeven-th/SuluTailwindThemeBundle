@@ -32,6 +32,11 @@
                 {{ content.subtitle }}
             </p>
         {% endif %}
+
+        {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+        {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+            <p class="iw-article-page__excerpt">{{ articleExcerpt }}</p>
+        {% endif %}
     </header>
 {% endblock %}
 
@@ -39,18 +44,18 @@
     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
         date: authored|default(null),
         authors: articleAuthors|default([]),
-        categories: content.excerptCategories|default([]),
+        categories: extension.excerpt.categories|default([]),
         showDate: articleConfig.showDates|iw_article_visible('page'),
         showAuthors: articleConfig.showAuthors|iw_article_visible('page'),
         showCategories: articleConfig.showCategories|iw_article_visible('page'),
     } only %}
+
+    {% if articleConfig.showTags|iw_article_visible('page') %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
+            tags: extension.excerpt.tags|default([]),
+            size: 'sm',
+        } only %}
+    {% endif %}
     <hr class="iw-article-page__separator">
 {% endblock %}
 
-{% block article_footer %}
-    <footer class="iw-article-page__footer">
-        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-            tags: content.excerptTags|default([]),
-        } only %}
-    </footer>
-{% endblock %}

@@ -258,6 +258,7 @@ class ArticleExtension extends AbstractExtension
             'showDates' => $tokens['articles_showDates'] ?? 'both',
             'showAuthors' => $tokens['articles_showAuthors'] ?? 'both',
             'showCategories' => $tokens['articles_showCategories'] ?? 'both',
+            'showTags' => $tokens['articles_showTags'] ?? 'page',
             'showExcerpts' => $tokens['articles_showExcerpts'] ?? 'listing',
             'showRelated' => $tokens['articles_showRelated'] ?? 'page',
             'relatedCount' => (int) ($tokens['articles_relatedCount'] ?? 3),

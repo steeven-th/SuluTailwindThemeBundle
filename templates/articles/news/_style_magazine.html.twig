@@ -35,7 +35,7 @@
             <div class="iw-article-page__hero-inline-content">
                 {% if articleConfig.showCategories|iw_article_visible('page') %}
                     {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
-                        categories: content.excerptCategories|default([]),
+                        categories: extension.excerpt.categories|default([]),
                     } only %}
                 {% endif %}
 
@@ -49,6 +49,11 @@
                     </p>
                 {% endif %}
 
+                {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+                {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+                    <p class="iw-article-page__excerpt">{{ articleExcerpt }}</p>
+                {% endif %}
+
                 {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
                     date: authored|default(null),
                     authors: articleAuthors|default([]),
@@ -56,6 +61,13 @@
                     showAuthors: articleConfig.showAuthors|iw_article_visible('page'),
                     showCategories: false,
                 } only %}
+
+                {% if articleConfig.showTags|iw_article_visible('page') %}
+                    {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
+                        tags: extension.excerpt.tags|default([]),
+                        size: 'sm',
+                    } only %}
+                {% endif %}
 
                 {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
                     articleConfig: articleConfig,
@@ -73,10 +85,3 @@
 {# The header share row lives inside the inline-hero content (above). #}
 {% block article_share_header %}{% endblock %}
 
-{% block article_footer %}
-    <footer class="iw-article-page__footer">
-        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-            tags: content.excerptTags|default([]),
-        } only %}
-    </footer>
-{% endblock %}

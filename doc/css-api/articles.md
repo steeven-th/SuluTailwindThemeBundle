@@ -120,8 +120,9 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-page__header` | Title + subtitle block above the article body |
 | `.iw-article-page__title` | `<h1>` of the article |
 | `.iw-article-page__subtitle` | Optional `<p>` subtitle |
+| `.iw-article-page__excerpt` | Lead paragraph — the excerpt description shown in the header when enabled (`--light` variant on dark heros) |
 | `.iw-article-page__body--dropcap` | Bare wrapper around the blocks — drops a large first letter on the first inner block (blog editorial style) without constraining the blocks' layout |
-| `.iw-article-page__footer` | Below-content footer (tags, share buttons) |
+| `.iw-article-page__footer` | Below-content footer (empty by default — excerpt, categories and tags live in the article header) |
 | `.iw-article-page__breadcrumb` | Container of the default breadcrumb placement, before the `<article>` landmark |
 
 > **Content blocks behave exactly as on regular pages.** Article templates dispatch their blocks through the shared `components/_blocks.html.twig` dispatcher, outside any page container — each block template owns its own layout and width. Only the column layouts (blog *sidebar*, event *timeline*) constrain the blocks to their main column.

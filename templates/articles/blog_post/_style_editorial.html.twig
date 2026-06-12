@@ -35,13 +35,18 @@
         <div class="container mx-auto">
             {% if articleConfig.showCategories|iw_article_visible('page') %}
                 {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
-                    categories: content.excerptCategories|default([]),
+                    categories: extension.excerpt.categories|default([]),
                 } only %}
             {% endif %}
 
             <h1 class="font-[var(--font-family-heading)] text-4xl md:text-5xl lg:text-6xl font-[var(--font-h1-weight)] leading-tight text-white mt-4 mb-4" itemprop="headline">
                 {{ content.title }}
             </h1>
+
+            {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+            {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+                <p class="iw-article-page__excerpt iw-article-page__excerpt--light">{{ articleExcerpt }}</p>
+            {% endif %}
 
             <div class="flex flex-wrap items-center gap-4 text-white/80 text-sm">
                 {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}
@@ -58,6 +63,13 @@
                     <span>{{ content.readingTime }}</span>
                 {% endif %}
             </div>
+
+            {% if articleConfig.showTags|iw_article_visible('page') %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
+                    tags: extension.excerpt.tags|default([]),
+                    size: 'sm',
+                } only %}
+            {% endif %}
 
             {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
                 articleConfig: articleConfig,
@@ -99,13 +111,6 @@
     </div>
 {% endblock %}
 
-{% block article_footer %}
-    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
-        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-            tags: content.excerptTags|default([]),
-        } only %}
-    </footer>
-{% endblock %}
 
 {% block article_related %}
     {% if articleConfig.showRelated|iw_article_visible('page') and content.relatedArticles is defined and content.relatedArticles is iterable %}

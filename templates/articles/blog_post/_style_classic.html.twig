@@ -43,24 +43,29 @@
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {
             date: authored|default(null),
             readingTime: content.readingTime|default(null),
-            categories: content.excerptCategories|default([]),
+            categories: extension.excerpt.categories|default([]),
             showDate: articleConfig.showDates|iw_article_visible('page'),
             showAuthors: false,
             showCategories: articleConfig.showCategories|iw_article_visible('page'),
         } only %}
+
+        {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+        {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+            <p class="iw-article-page__excerpt">{{ articleExcerpt }}</p>
+        {% endif %}
+
+        {% if articleConfig.showTags|iw_article_visible('page') %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
+                tags: extension.excerpt.tags|default([]),
+                size: 'sm',
+            } only %}
+        {% endif %}
     </header>
     <hr class="mb-8 border-[var(--color-border)]">
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
 
-{% block article_footer %}
-    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
-        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-            tags: content.excerptTags|default([]),
-        } only %}
-    </footer>
-{% endblock %}
 
 {% block article_related %}
     {% if articleConfig.showRelated|iw_article_visible('page') and content.relatedArticles is defined and content.relatedArticles is iterable %}

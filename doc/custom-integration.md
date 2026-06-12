@@ -48,27 +48,27 @@ The theme compiles all design tokens into CSS custom properties on `:root`. You 
 
 ### Buttons
 
-Use the pre-generated `.btn-primary`, `.btn-secondary`, `.btn-accent` classes, or reference the variables for custom styling. The `.btn-*` classes already pick up the configured padding, border (with width/style), and the five-axis hover effects — see [Button hover effects](button-effects.md).
+Use the pre-generated `.iw-button--primary`, `.iw-button--secondary`, `.iw-button--accent` classes, or reference the variables for custom styling. The `.iw-button--*` classes already pick up the configured padding, border (with width/style), and the five-axis hover effects — see [Button hover effects](button-effects.md).
+
+```html
+<!-- Use the built-in classes (recommended) -->
+<a href="/contact" class="iw-button--primary">Contact us</a>
+```
 
 ```css
-/* Use the built-in classes (recommended) */
-.my-cta a {
-    @apply btn-primary;
-}
-
 /* Or build your own using the CSS variables */
 .my-custom-btn {
-    background-color: var(--btn-primary-bg);
-    color: var(--btn-primary-text);
-    border-radius: var(--btn-primary-radius);
-    /* --btn-primary-border holds a full shorthand (width style color), so drop it directly */
-    border: var(--btn-primary-border);
-    padding: var(--btn-padding-y) var(--btn-padding-x);
+    background-color: var(--iw-button-primary-bg);
+    color: var(--iw-button-primary-text);
+    border-radius: var(--iw-button-primary-radius);
+    /* --iw-button-primary-border holds a full shorthand (width style color), so drop it directly */
+    border: var(--iw-button-primary-border);
+    padding: var(--iw-button-padding-y) var(--iw-button-padding-x);
     transition: all 0.3s ease;
 }
 .my-custom-btn:hover {
-    background-color: var(--btn-primary-hoverBg);
-    color: var(--btn-primary-hoverText);
+    background-color: var(--iw-button-primary-hover-bg);
+    color: var(--iw-button-primary-hover-text);
 }
 ```
 
@@ -155,7 +155,7 @@ Apply a variant class to your own sections for automatic color theming:
 Key points:
 - `.iw-variant--{index}` applies all variant colors (headings, paragraphs, links, etc.)
 - `data-has-bg="true"` enables the variant background color
-- `.btn-variant` picks the button style defined in the variant (primary, secondary, or accent)
+- `.iw-button--variant` picks the button style defined in the variant (primary, secondary, or accent)
 
 ### Using Twig functions
 

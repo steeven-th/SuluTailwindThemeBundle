@@ -4,9 +4,11 @@
 
     Parameters:
     - tags: array of tag objects (each with a `name`, or a plain string)
+    - size: 'sm' for the compact variant (e.g. article headers)
 
     Public CSS API:
     - .iw-tags (block — flex row wrapper)
+    - .iw-tags--sm (compact modifier — smaller pills)
     - .iw-tag (single tag pill with hover state)
     - .iw-tag--variant-{primary|secondary|accent} (color variants)
 
@@ -14,7 +16,7 @@
     and --iw-tags-gap. See doc/css-api/transverse.md.
 #}
 {% if tags is defined and tags is iterable and tags|length > 0 %}
-    <div class="iw-tags">
+    <div class="iw-tags{% if size|default('') == 'sm' %} iw-tags--sm{% endif %}">
         {% for tag in tags %}
             <span class="iw-tag">
                 {{ tag.name|default(tag) }}

@@ -95,6 +95,7 @@ Generic bordered pills with a hover state. Rendered by `templates/components/_ta
 | Class | Role |
 |-------|------|
 | `.iw-tags` | Flex-row wrapper. |
+| `.iw-tags--sm` | Compact modifier — smaller pills (used in the article headers). |
 | `.iw-tag` | A single tag pill (bordered, hover state). |
 | `.iw-tag--variant-primary` | Primary-palette color variant. |
 | `.iw-tag--variant-secondary` | Secondary-palette color variant. |

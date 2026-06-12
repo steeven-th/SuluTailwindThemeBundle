@@ -26,6 +26,11 @@
             showCategories: false,
             compact: true,
         } only %}
+
+        {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+        {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+            <p class="iw-article-page__excerpt">{{ articleExcerpt }}</p>
+        {% endif %}
     </header>
 {% endblock %}
 
@@ -84,25 +89,25 @@
                 {% endif %}
 
                 {# Categories #}
-                {% if articleConfig.showCategories|iw_article_visible('page') and content.excerptCategories is defined and content.excerptCategories|length > 0 %}
+                {% if articleConfig.showCategories|iw_article_visible('page') and extension.excerpt.categories is defined and extension.excerpt.categories|length > 0 %}
                     <div>
                         <h3 class="text-xs uppercase tracking-wide text-[var(--color-secondary-500)] font-semibold mb-3">
                             {{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}
                         </h3>
                         {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
-                            categories: content.excerptCategories,
+                            categories: extension.excerpt.categories,
                         } only %}
                     </div>
                 {% endif %}
 
                 {# Tags #}
-                {% if content.excerptTags is defined and content.excerptTags|length > 0 %}
+                {% if articleConfig.showTags|iw_article_visible('page') and extension.excerpt.tags is defined and extension.excerpt.tags|length > 0 %}
                     <div>
                         <h3 class="text-xs uppercase tracking-wide text-[var(--color-secondary-500)] font-semibold mb-3">
                             {{ 'iw_sulu_tailwind_theme.article.sidebar_tags'|trans }}
                         </h3>
                         {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-                            tags: content.excerptTags,
+                            tags: extension.excerpt.tags,
                         } only %}
                     </div>
                 {% endif %}
