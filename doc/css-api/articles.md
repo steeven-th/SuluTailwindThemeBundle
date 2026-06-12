@@ -162,6 +162,25 @@ The breadcrumb of article pages is rendered by `_article_base.html.twig` **befor
 
 ---
 
+## Reading progress bar
+
+Thin viewport-fixed bar filled by the `reading-progress` Stimulus controller as the visitor scrolls the article (enabled under **Articles > Reading components**). Decorative (`aria-hidden`), pointer-transparent, honors `prefers-reduced-motion`.
+
+| Class | Role |
+|-------|------|
+| `.iw-reading-progress` | Fixed track at the top of the viewport |
+| `.iw-reading-progress__bar` | The fill, scaled by `--iw-reading-progress-value` (0..1, set by the controller) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-reading-progress-height` | Bar thickness — generated from the admin config (`2px`/`4px`/`6px`, default `4px`) |
+| `--iw-reading-progress-color` | Fill color — generated from the admin config (default `--color-surface-accent`) |
+| `--iw-reading-progress-track` | Track background (default `transparent`) |
+| `--iw-reading-progress-z` | Stacking context (default `60`, above the sticky menu) |
+| `--iw-reading-progress-transition` | Fill transition (default `0.08s linear`) |
+
+---
+
 ## Article meta
 
 Inline strip of meta entries (date, authors, categories, reading time).

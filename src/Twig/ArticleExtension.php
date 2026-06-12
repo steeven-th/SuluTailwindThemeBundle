@@ -268,6 +268,7 @@ class ArticleExtension extends AbstractExtension
             'shareCopy' => (bool) ($tokens['articles_shareCopy'] ?? true),
             'shareEmail' => (bool) ($tokens['articles_shareEmail'] ?? true),
             'shareButtonStyle' => (string) ($tokens['articles_shareButtonStyle'] ?? ''),
+            'readingProgressEnabled' => (bool) ($tokens['articles_readingProgressEnabled'] ?? false),
         ];
     }
 

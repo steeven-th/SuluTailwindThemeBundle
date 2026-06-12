@@ -103,10 +103,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
         'articles_showExcerpts', 'articles_showRelated',
         'articles_relatedCount',
-        // Reading components (article pages): share buttons.
+        // Reading components (article pages): share buttons, reading progress.
         'articles_shareEnabled', 'articles_sharePosition',
         'articles_shareNative', 'articles_shareCopy', 'articles_shareEmail',
         'articles_shareButtonStyle',
+        'articles_readingProgressEnabled', 'articles_readingProgressSize',
+        'articles_readingProgressColor',
     ];
 
     /**

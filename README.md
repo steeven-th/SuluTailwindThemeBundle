@@ -407,6 +407,8 @@ The share row is a reusable partial — include it in your own templates to shar
 } only %}
 ```
 
+- **Reading progress bar** — a thin bar fixed at the top of the viewport that fills as the visitor scrolls through the article content. Its **thickness** (thin / medium / thick) and **color** are configurable in the admin; an empty color derives from the surface accent token, so it adapts to the theme. Fine-tune further via the `--iw-reading-progress-*` custom properties (z-index, track background, transition). Progressive enhancement: nothing shows without JavaScript, and the fill transition honors `prefers-reduced-motion`. The partial is reusable too — include `components/_reading_progress.html.twig` with a `selector` parameter to track any content element.
+
 ## Usage
 
 ### Admin interface

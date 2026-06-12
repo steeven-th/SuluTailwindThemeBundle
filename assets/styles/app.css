@@ -3709,6 +3709,36 @@ span.iw-breadcrumbs__separator {
     }
 }
 
+/* ─── Reading progress bar (F5 reading component) ────────────────────────── */
+/* Thin bar fixed at the top of the viewport, filled by the reading-progress
+   controller through --iw-reading-progress-value (0..1). Thickness and color
+   come from the theme (--iw-reading-progress-{height,color}); everything is
+   overridable. Decorative: it never catches pointer events. */
+.iw-reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--iw-reading-progress-z, 60);
+    height: var(--iw-reading-progress-height, 4px);
+    background: var(--iw-reading-progress-track, transparent);
+    pointer-events: none;
+}
+
+.iw-reading-progress__bar {
+    height: 100%;
+    background: var(--iw-reading-progress-color, var(--color-surface-accent));
+    transform: scaleX(var(--iw-reading-progress-value, 0));
+    transform-origin: left;
+    transition: transform var(--iw-reading-progress-transition, 0.08s linear);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-reading-progress__bar {
+        transition: none;
+    }
+}
+
 /* ─── Share buttons (F5 reading component) ───────────────────────────────── */
 /* Row of share actions (native share, copy link, email) rendered on article
    pages. Everything routes through --iw-share-* for restyling. The native and

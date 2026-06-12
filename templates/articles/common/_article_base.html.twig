@@ -5,6 +5,7 @@
     Blocks available for override:
     - article_breadcrumb: site breadcrumb rendered before the <article> landmark
       (override when the style hosts the trail elsewhere, e.g. as a hero overlay)
+    - article_reading_progress: viewport-fixed reading progress bar
     - article_hero: hero image area
     - article_header: title + subtitle
     - article_meta: date, authors, categories, reading time
@@ -56,6 +57,14 @@
 {% endblock %}
 
 <article class="iw-article-page" itemscope itemtype="https://schema.org/Article">
+    {# Reading progress bar (Articles > Reading components) — fixed to the
+       viewport, so its DOM position here is only logical. #}
+    {% block article_reading_progress %}
+        {% if articleConfig.readingProgressEnabled %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_reading_progress.html.twig' only %}
+        {% endif %}
+    {% endblock %}
+
     {% block article_hero %}{% endblock %}
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -204,6 +204,7 @@ class ThemeCompiler
         $css .= $this->generateArticleVariables($tokens);
         $css .= $this->generateArticleCardVariables($tokens);
         $css .= $this->generateBackToTopVariables($tokens);
+        $css .= $this->generateReadingProgressVariables($tokens);
         $css .= "}\n\n";
 
         // Per-component surface overrides (scoped redefinitions of the surface tokens)
@@ -328,6 +329,43 @@ class ThemeCompiler
         $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
         $css .= "  --iw-back-to-top-bg: {$bg};\n";
         $css .= "  --iw-back-to-top-color: {$color};\n";
+
+        return $css . "\n";
+    }
+
+    /**
+     * Bar heights for the reading progress component, keyed by the admin
+     * size option.
+     *
+     * @var array<string, string>
+     */
+    private const READING_PROGRESS_SIZES = [
+        'sm' => '2px',
+        'md' => '4px',
+        'lg' => '6px',
+    ];
+
+    /**
+     * Generate CSS custom properties for the article reading progress bar.
+     *
+     * Emits --iw-reading-progress-* from the admin config (thickness, color).
+     * An empty color falls back to the surface-accent token, which already
+     * adapts to light/dark themes.
+     *
+     * @param array<string, mixed> $tokens Theme token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateReadingProgressVariables(array $tokens): string
+    {
+        $size = (string) ($tokens['articles_readingProgressSize'] ?? 'md');
+        $height = self::READING_PROGRESS_SIZES[$size] ?? self::READING_PROGRESS_SIZES['md'];
+
+        $color = $this->surfaceValue($tokens['articles_readingProgressColor'] ?? '', 'var(--color-surface-accent)');
+
+        $css = "  /* Reading progress bar (article pages) */\n";
+        $css .= "  --iw-reading-progress-height: {$height};\n";
+        $css .= "  --iw-reading-progress-color: {$color};\n";
 
         return $css . "\n";
     }

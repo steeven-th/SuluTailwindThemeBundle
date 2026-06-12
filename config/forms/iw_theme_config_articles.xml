@@ -193,6 +193,33 @@
                           visibleCondition="articles_shareEnabled == true">
                     <meta><title>iw_sulu_tailwind_theme.articles_share_button_style</title></meta>
                 </property>
+
+                <!-- Reading progress: a thin bar fixed at the top of the
+                     viewport, filling as the visitor scrolls the article. -->
+                <property name="articles_readingProgressEnabled" type="checkbox" colspan="12">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_readingProgressSize" type="single_select" colspan="6"
+                          visibleCondition="articles_readingProgressEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size</title></meta>
+                    <params>
+                        <param name="default_value" value="md"/>
+                        <param name="values" type="collection">
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_lg</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="articles_readingProgressColor" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="articles_readingProgressEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_reading_progress_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
             </properties>
         </section>
     </properties>
