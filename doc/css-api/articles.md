@@ -120,9 +120,11 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-page__header` | Title + subtitle block above the article body |
 | `.iw-article-page__title` | `<h1>` of the article |
 | `.iw-article-page__subtitle` | Optional `<p>` subtitle |
-| `.iw-article-page__body` | Wrapper around the rendered content blocks |
-| `.iw-article-page__body--dropcap` | Modifier on the body — drops a large first letter on the first inner block (used by the blog editorial style) |
+| `.iw-article-page__body--dropcap` | Bare wrapper around the blocks — drops a large first letter on the first inner block (blog editorial style) without constraining the blocks' layout |
 | `.iw-article-page__footer` | Below-content footer (tags, share buttons) |
+| `.iw-article-page__breadcrumb` | Container of the default breadcrumb placement, before the `<article>` landmark |
+
+> **Content blocks behave exactly as on regular pages.** Article templates dispatch their blocks through the shared `components/_blocks.html.twig` dispatcher, outside any page container — each block template owns its own layout and width. Only the column layouts (blog *sidebar*, event *timeline*) constrain the blocks to their main column.
 
 | Variable | Purpose |
 |----------|---------|
@@ -144,12 +146,67 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-hero--editorial` | Oversized hero with overlay text + background-image (used by the blog editorial style) |
 | `.iw-article-hero__inner` | Inner wrapper, only present in `--contained` mode. Carries the `overflow: hidden` and the radius for the contained variant |
 | `.iw-article-hero__image` | The `<img>` element inside the hero. Its own radius is forced to `0` — the wrapper (or `__inner`) does the clipping |
+| `.iw-article-hero__breadcrumb` | Bottom overlay hosting the breadcrumb trail over a dark gradient (fullwidth-hero styles: news/blog classic, event card info). Forces light breadcrumb colors |
 
 | Variable | Purpose |
 |----------|---------|
 | `--iw-article-hero-max-height` | Max height of the hero (default `500px`). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
 | `--iw-article-hero-radius` | Image radius in `contained` mode (default falls back to `--border-imageRadius`) |
 | `--iw-article-hero-contained-max-width` | Max-width of the centered container in `contained` mode (default `1280px`) |
+| `--iw-article-hero-margin-bottom` | Bottom spacing of the `fullwidth` hero (default `1.5rem`) |
+| `--iw-article-hero-breadcrumb-padding` | Overlay padding — the top value sizes the gradient fade (default `2.5rem 0 1rem`) |
+| `--iw-article-hero-breadcrumb-gradient` | Overlay background (default `linear-gradient(to top, rgba(0,0,0,.6), transparent)`) |
+| `--iw-article-hero-breadcrumb-color` / `-current-color` / `-link-hover` | Trail colors on top of the image (default white tones) |
+
+The breadcrumb of article pages is rendered by `_article_base.html.twig` **before the `<article>` landmark** (it is site navigation, not article content) inside a `.iw-article-page__breadcrumb` container (`--iw-article-page-breadcrumb-margin-top`, default `1.5rem`). Fullwidth-hero styles relocate it as a hero overlay and fall back to the default placement when the article has no hero image. Custom styles can override the `article_breadcrumb` block.
+
+---
+
+## Table of contents
+
+Collapsible panel filled by the `toc` Stimulus controller from the article headings (enabled under **Articles > Reading components**). Anchors are slugified and deduplicated, `<aside>` headings are skipped, and the panel stays hidden with fewer than two headings.
+
+| Class | Role |
+|-------|------|
+| `.iw-toc` | Root `<nav>` (max-width, margins) |
+| `.iw-toc--inline` / `.iw-toc--sticky` | Position modifiers — sticky pins the panel on the right from `1280px` (xl) up; below, the panel slides off-canvas behind a floating edge button. Column layouts (blog sidebar, event timeline) never float it: they render the TOC inside their own sticky side column |
+| `.iw-toc__toggle` / `.iw-toc__toggle-icon` | Floating edge button opening the off-canvas panel (sticky mode below xl only) |
+| `.iw-toc--open` | Set by the controller — slides the off-canvas panel in |
+| `.iw-toc__panel` | The `<details>` surface panel |
+| `.iw-toc__summary` | The collapsible "Table of contents" toggle |
+| `.iw-toc__list` / `.iw-toc__item` / `.iw-toc__item--h3` | Entry list — `--h3` entries are indented |
+| `.iw-toc__link` / `.iw-toc__link--active` | Anchor links — `--active` marks the section being read (scroll-spy, `aria-current`) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-toc-max-width` | Panel width in inline mode (default `28rem`) |
+| `--iw-toc-bg` / `--iw-toc-color` / `--iw-toc-border` | Panel skin (defaults derive from the surface tokens; the **Articles > Filter sidebar & table of contents** colors apply to both side panels) |
+| `--iw-toc-link-color` / `-hover` / `-active` | Link colors (active defaults to the surface accent) |
+| `--iw-toc-indent` | Sub-heading indentation (default `1rem`) |
+| `--iw-toc-sticky-top` / `-right` / `-width` / `-z` | Pinned panel geometry (sticky mode, xl and up) |
+| `--iw-toc-toggle-top` / `-size` / `-bg` / `-color` / `-border` / `-radius` / `-shadow` | Floating edge button (sticky mode below xl) — colors default to the panel skin |
+| `--iw-toc-drawer-top` / `-width` / `-z` / `-shadow` | Off-canvas panel geometry (sticky mode below xl) — `top` defaults to the pinned panel offset (`--iw-toc-sticky-top`) |
+
+The article content is wrapped in a bare `.iw-article-page__content` div (no layout impact) that scopes the heading scan — point the `selector` parameter elsewhere to index custom markup.
+
+---
+
+## Reading progress bar
+
+Thin viewport-fixed bar filled by the `reading-progress` Stimulus controller as the visitor scrolls the article (enabled under **Articles > Reading components**). Decorative (`aria-hidden`), pointer-transparent, honors `prefers-reduced-motion`.
+
+| Class | Role |
+|-------|------|
+| `.iw-reading-progress` | Fixed track at the top of the viewport |
+| `.iw-reading-progress__bar` | The fill, scaled by `--iw-reading-progress-value` (0..1, set by the controller) |
+
+| Variable | Purpose |
+|----------|---------|
+| `--iw-reading-progress-height` | Bar thickness — generated from the admin config (`2px`/`4px`/`6px`, default `4px`) |
+| `--iw-reading-progress-color` | Fill color — generated from the admin config (default `--color-surface-accent`) |
+| `--iw-reading-progress-track` | Track background (default `transparent`) |
+| `--iw-reading-progress-z` | Stacking context (default `60`, above the sticky menu) |
+| `--iw-reading-progress-transition` | Fill transition (default `0.08s linear`) |
 
 ---
 

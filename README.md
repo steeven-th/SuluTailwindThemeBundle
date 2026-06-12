@@ -48,7 +48,9 @@
 * **Menu configuration**: Configurable menu type, colors, animation, and display options
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
-* **Customizable article cards**: configure surface, border (width + style), padding, and composable hover effects (card transform, image effect, shadow, border color, duration, easing) for the listing card, grid and list styles via the admin Articles tab
+* **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
+* **Site-wide cards**: configure surface, title/text/badge colors, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
+* **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
 * **CLI commands**: Install preset themes, assign to webspaces, recompile CSS, and run integration diagnostics from the command line
 * **Auto-recompile**: Doctrine listener recompiles CSS on theme save
 
@@ -161,6 +163,26 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
                 "fetch": "lazy"
             },
             "fileinput": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "article_filters": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "back_to_top": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "share": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "reading_progress": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "toc": {
                 "enabled": true,
                 "fetch": "lazy"
             }
@@ -335,6 +357,79 @@ Article templates extend the project's `base.html.twig` — your menu, footer, a
 >         enabled: true
 >         types: ['news', 'event']  # blog_post will not be registered
 > ```
+
+#### Article listing page (server-side filtering)
+
+The `iw_article_listing` page template renders a filtered, paginated article list. Create a page with this template (e.g. `/news`, `/blog`) and the articles are filtered **server-side** from the URL query string:
+
+| Query param | Example | Description |
+|-------------|---------|-------------|
+| `category` | `?category=news` | Filter by category key (slug). Multiple values comma-separated (`news,blog`), OR-combined. |
+| `tag` | `?tag=featured` | Filter by tag name. Multiple values comma-separated, OR-combined. |
+| `q` | `?q=release` | Full-text search on title and content (uses the Sulu search index). |
+| `sort` | `?sort=title` | Sort order: `recent` (default, newest first), `oldest`, `title` (A→Z). |
+| `page` | `?page=2` | Page number (12 articles per page). |
+
+Filters combine (`/news?category=news&q=release&sort=title&page=2`) and pagination links preserve the active filters. URLs are shareable and SEO-friendly; filtering works without JavaScript.
+
+**Editorial scope vs visitor filters.** The page's smart_content defines the **editorial scope** — the admin picks the article types (news/event/blog), optional base categories/tags, default sort and a result cap. The visitor filters **refine within that scope**: the chosen type is always enforced, and the sidebar/URL filters narrow the list further (a search for "blog" on a News page returns nothing — it never escapes the news scope). The visitor sort overrides the admin default.
+
+**Filter sidebar.** A left sidebar exposes a search box, a sort dropdown (most recent / oldest / title) and category/tag checkboxes. The checkboxes are **contextual**: only the categories and tags actually used by the articles in the page's editorial scope are listed (a category with no article on this page is not shown), so visitors never land on an empty filter. The list reflects the scope, not the visitor's active selection, so options stay stable while filtering. It is a plain GET form — filtering works without JavaScript. Restyle it with the `--iw-article-filters-*` and `--iw-article-layout-*` custom properties; no Twig override needed.
+
+**Layout & enabled controls.** Under **Articles > Filter sidebar & table of contents** you can pick the **sidebar layout** — *left column* (default), *right column*, *top bar* (a full-width horizontal bar above the results, controls flowing in a wrapping row), or *drawer* (a permanent offcanvas behind a **Filters** button at every screen size) — and toggle each control on/off (*search*, *sort*, *categories*, *tags*; all on by default). Left/right/top-bar collapse into the drawer on small screens; the drawer style is offcanvas everywhere. Tune the top bar via the `--iw-article-filters-topbar-*` custom properties.
+
+**Mobile drawer.** On small screens (< 768px) the left/right sidebar collapses behind a **Filters** button and slides in as an offcanvas drawer (backdrop, close button, `Escape` to dismiss). The button carries a badge with the active-filter count. This is progressive enhancement: with JavaScript disabled the sidebar simply stays stacked above the results and keeps working. Tune the drawer with the `--iw-article-filters-drawer-*` (panel width, background, shadow, transition, z-index), `--iw-article-filters-toggle-*` (the Filters button + count badge) and `--iw-article-filters-backdrop-*` (overlay) custom properties. The motion is disabled automatically under `prefers-reduced-motion`.
+
+The **Filters** button has its own button-style picker under **Articles > Filter sidebar & table of contents** (separate from the "Apply" button, since it sits on the page background): leave it empty for the neutral surface style, or pick a theme button variant (primary / secondary / accent) — the count badge stays legible whichever you choose.
+
+**AJAX filtering.** With JavaScript on, filtering happens over AJAX: the form submit, the in-page filter links (pagination, active-filter chips, "clear all") and — when auto-submit is enabled — the sidebar changes fetch the filtered URL, swap only the results region and update the address bar (`history.pushState`), with no full page reload. Browser back/forward re-fetch the results and re-sync the sidebar. The results dim while loading (override `--iw-article-layout-loading-*`). This is progressive enhancement: with JavaScript disabled the plain GET form reloads the page as usual, and any fetch failure falls back to a normal navigation.
+
+**Auto-submit (optional).** Enable **Auto-submit filters** under **Articles > Filter sidebar & table of contents** to filter as soon as the visitor ticks a category/tag or changes the sort (the search field filters after a short debounce), hiding the redundant "Apply" button. With it off (the default), the visitor batches their choices and clicks "Apply" — either way the request goes over AJAX. With JavaScript disabled the "Apply" button stays and the form behaves normally.
+
+> **Full-text search requires a search index.** The `q` parameter queries Sulu's website search index. After installing the bundle (or importing existing articles) run an initial reindex so articles become searchable:
+>
+> ```bash
+> php bin/console cmsig:seal:reindex
+> ```
+>
+> The index then stays up to date automatically as articles are published/unpublished. Category and tag filtering work without reindexing (they query the database directly).
+>
+> _Single-webspace note:_ article filtering targets the database directly and does not constrain by webspace. In a multi-webspace setup sharing the same articles, the listing is not scoped per webspace.
+
+#### Site-wide components
+
+Optional floating helpers shown across the whole site, enabled under **Components > Site-wide components** (off by default). They are progressive enhancement — nothing shows without JavaScript.
+
+- **Back to top** — a floating button that fades in once the visitor scrolls past a configurable threshold (px) and smoothly scrolls back up. Its **shape** (round → square), **size** (S/M/L), **background** and **icon colors**, and **icon** are all configurable in the admin. The icon is a preset (arrow / chevron / double chevron / thin arrow) or a **custom image from the media library** (SVG recommended) which overrides the preset. Fine-tune further via the `--iw-back-to-top-*` custom properties (offset, shadow, hover). It honors `prefers-reduced-motion`.
+
+The bundle's `base.html.twig` renders it automatically when enabled. **If you use your own base template** (the bundle's `base.html.twig` is only an example), copy the include into it, before the closing `</body>`:
+
+```twig
+{% if iw_sulu_tailwind_theme.components_backToTopEnabled|default(false) %}
+    {% include '@ItechWorldSuluTailwindTheme/components/_back_to_top.html.twig' with {
+        threshold: iw_sulu_tailwind_theme.components_backToTopThreshold|default(400),
+    } only %}
+{% endif %}
+```
+
+#### Reading components (article pages)
+
+Optional helpers rendered on article pages by the bundle's article layout, enabled under **Articles > Reading components** (off by default).
+
+- **Share buttons** — a row of share actions for the current article: **native share** (the device's share sheet via the Web Share API — when the API is unavailable it falls back to copying the link), **copy link** (with a "Link copied!" confirmation) and **email** (a `mailto:` link with the article title and URL pre-filled). Each button can be toggled individually, and the row's **position** is configurable: below the header, at the end of the article, or both. Each article style places the header row where it belongs in its layout (e.g. the news *magazine* style renders it inside the inline hero content, *minimal* inside its centered header) — custom styles can do the same by overriding the `article_share_header` block to empty and including `components/_article_share.html.twig` where the row should sit. The buttons have their own **button-style picker** in the admin: leave it empty for the neutral surface style (derived from the semantic surface tokens, so it adapts to light/dark themes), or pick a theme button variant (primary / secondary / accent). Fine-tune further via the `--iw-share-*` custom properties (gap, padding, border, hover). This is progressive enhancement: without JavaScript the email link still works, and the JS-powered buttons stay hidden.
+
+The share row is a reusable partial — include it in your own templates to share any URL:
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/components/_share.html.twig' with {
+    url: 'https://example.org/some-page',
+    title: 'Some page',
+} only %}
+```
+
+- **Table of contents** — a collapsible "Table of contents" panel built automatically from the article's `h2`/`h3` headings: anchors are generated (slugified, deduplicated), the entry of the section being read is highlighted (scroll-spy), and anchor clicks scroll smoothly (honoring `prefers-reduced-motion`) while keeping the URL shareable. The **position** is configurable — top of the article, or **floating**: pinned on the right from the `xl` breakpoint up, and below that the panel slides off-canvas behind a floating edge button (closing on Escape or after navigating; on column layouts like the blog *sidebar* style the floating mode renders inside the sticky side column instead) — as well as the **depth** (main headings only, or with subheadings indented). Headings inside `<aside>` elements are ignored, and the panel stays hidden when fewer than two headings are found. Restyle it via the `--iw-toc-*` custom properties. The partial is reusable: include `components/_toc.html.twig` with a `selector` parameter to index any content element.
+
+- **Reading progress bar** — a thin bar fixed at the top of the viewport that fills as the visitor scrolls through the article content. Its **thickness** (thin / medium / thick) and **color** are configurable in the admin; an empty color derives from the surface accent token, so it adapts to the theme. Fine-tune further via the `--iw-reading-progress-*` custom properties (z-index, track background, transition). Progressive enhancement: nothing shows without JavaScript, and the fill transition honors `prefers-reduced-motion`. The partial is reusable too — include `components/_reading_progress.html.twig` with a `selector` parameter to track any content element.
 
 ## Usage
 

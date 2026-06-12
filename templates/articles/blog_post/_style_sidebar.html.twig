@@ -14,12 +14,6 @@
 
 {% block article_header %}
     <header class="iw-article-page__header mb-6">
-        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-            context: 'article',
-            pageUuid: view.url.page.uuid|default(null),
-            currentTitle: content.title|default(''),
-        } only %}
-
         <h1 class="font-[var(--font-family-heading)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-4" itemprop="headline">
             {{ content.title }}
         </h1>
@@ -37,28 +31,43 @@
 
 {% block article_meta %}{% endblock %}
 
+{# A floating TOC would overlap the side column — when "sticky" is chosen it
+   is rendered at the top of the sticky column instead (see below); the
+   inline placement keeps the default behavior. #}
+{% block article_toc %}
+    {% if articleConfig.tocPosition|default('inline') == 'inline' %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{# Sidebar layout exception: the blocks stay constrained to the main column.
+   article_content sits outside the page container in _article_base, so this
+   style brings its own container around the two-column grid. #}
 {% block article_content %}
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 lg:grid-cols-10 gap-10 mt-8">
         {# Main content (70%) #}
         <div class="lg:col-span-7">
-            {% if content.blocks is defined and content.blocks is iterable %}
-                {% for contentBlock in content.blocks %}
-                    {% set blockType = contentBlock.type|default('text') %}
-                    {% set blockStyle = contentBlock.style|default('') %}
-                    {% set defaultStyles = {'text': 'one_column', 'text_images': 'classic', 'gallery': 'grid', 'cta': 'centered', 'testimonial': 'default', 'document': 'default', 'separator': 'default'} %}
-                    {% if blockStyle is empty %}
-                        {% set blockStyle = defaultStyles[blockType]|default('default') %}
-                    {% endif %}
-                    {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-                    {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-                    {% include [templatePath, fallbackPath] ignore missing with contentBlock %}
-                {% endfor %}
-            {% endif %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+                blocks: content.blocks|default([]),
+            } %}
         </div>
 
         {# Sidebar (30%) #}
         <aside class="lg:col-span-3">
-            <div class="lg:sticky lg:top-24 space-y-8">
+            {# flex+gap (not space-y): the gap spaces the widgets regardless of
+               their own margins (the TOC resets its margin inside an aside). #}
+            <div class="lg:sticky lg:top-24 flex flex-col gap-8">
+                {# Table of contents — the "sticky" position materializes here,
+                   inside the sticky column (a viewport-pinned panel would
+                   overlap it). #}
+                {% if articleConfig.tocEnabled and articleConfig.tocPosition == 'sticky' %}
+                    {% include '@ItechWorldSuluTailwindTheme/components/_toc.html.twig' with {
+                        position: 'inline',
+                        depth: articleConfig.tocDepth,
+                    } only %}
+                {% endif %}
+
                 {# Author card #}
                 {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}
                     <div class="p-5 rounded-[var(--border-radius)] bg-[var(--color-background-100)]">
@@ -119,6 +128,7 @@
                 {% endif %}
             </div>
         </aside>
+    </div>
     </div>
 {% endblock %}
 

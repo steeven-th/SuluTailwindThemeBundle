@@ -1,0 +1,67 @@
+{#
+    Article results header (F4-A): result count + active filter chips.
+    100% server-side. Each chip links back to the listing with that single filter
+    removed (all other filters/sort preserved); "clear all" drops every filter.
+
+    Parameters:
+    - total: int (filtered result count)
+    - active: { categories: string[], tags: string[], q: string, sort: string }
+    - facets: { categories: [{id, key, name}], tags: [{id, name}] }
+    - baseUrl: listing page path
+#}
+{% macro remove_url(baseUrl, active, removeType, removeValue) %}
+{%- set cats = removeType == 'category' ? active.categories|filter(c => c != removeValue) : active.categories -%}
+{%- set tags = removeType == 'tag' ? active.tags|filter(t => t != removeValue) : active.tags -%}
+{%- set q = removeType == 'q' ? '' : active.q|default('') -%}
+{%- set params = {} -%}
+{%- if cats|length %}{% set params = params|merge({category: cats}) %}{% endif -%}
+{%- if tags|length %}{% set params = params|merge({tag: tags}) %}{% endif -%}
+{%- if q is not empty %}{% set params = params|merge({q: q}) %}{% endif -%}
+{%- if active.sort|default('') is not empty %}{% set params = params|merge({sort: active.sort}) %}{% endif -%}
+{{- baseUrl }}{% if params|length %}?{{ params|url_encode }}{% endif -%}
+{% endmacro %}
+{% import _self as helper %}
+
+{% set categories = active.categories|default([]) %}
+{% set tags = active.tags|default([]) %}
+{% set q = active.q|default('') %}
+{% set hasActive = categories|length > 0 or tags|length > 0 or q is not empty %}
+
+<div class="iw-article-results">
+    <p class="iw-article-results__count">
+        {{ (total == 1
+            ? 'iw_sulu_tailwind_theme.article.results_count_one'
+            : 'iw_sulu_tailwind_theme.article.results_count')|trans({'%count%': total}) }}
+    </p>
+
+    {% if hasActive %}
+        <div class="iw-article-active-filters">
+            {% for key in categories %}
+                {# Match by slug (key) or id: categories without a slug are filtered by id. #}
+                {% set cat = facets.categories|default([])|filter(c => (c.key|default('')) == key or c.id == key)|first %}
+                <a class="iw-article-active-filters__chip" href="{{ helper.remove_url(baseUrl, active, 'category', key) }}">
+                    <span class="iw-article-active-filters__label">{{ cat.name|default(key) }}</span>
+                    <span class="iw-article-active-filters__remove" aria-hidden="true">&times;</span>
+                </a>
+            {% endfor %}
+
+            {% for name in tags %}
+                <a class="iw-article-active-filters__chip" href="{{ helper.remove_url(baseUrl, active, 'tag', name) }}">
+                    <span class="iw-article-active-filters__label">{{ name }}</span>
+                    <span class="iw-article-active-filters__remove" aria-hidden="true">&times;</span>
+                </a>
+            {% endfor %}
+
+            {% if q is not empty %}
+                <a class="iw-article-active-filters__chip" href="{{ helper.remove_url(baseUrl, active, 'q', '') }}">
+                    <span class="iw-article-active-filters__label">{{ 'iw_sulu_tailwind_theme.article.filter_search_label'|trans({'%query%': q}) }}</span>
+                    <span class="iw-article-active-filters__remove" aria-hidden="true">&times;</span>
+                </a>
+            {% endif %}
+
+            <a class="iw-article-active-filters__clear" href="{{ baseUrl }}">
+                {{ 'iw_sulu_tailwind_theme.article.filters_clear'|trans }}
+            </a>
+        </div>
+    {% endif %}
+</div>

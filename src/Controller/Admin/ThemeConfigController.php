@@ -95,11 +95,51 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const FONT_ROLES = ['heading', 'body', 'accent'];
 
     /**
+     * Article config keys (Articles tab), stored flat in tokens.
+     */
+    private const ARTICLE_KEYS = [
+        'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
+        'articles_listingStyle',
+        'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
+        'articles_showExcerpts', 'articles_showRelated',
+        'articles_relatedCount',
+        // Reading components (article pages): share buttons, reading
+        // progress, table of contents.
+        'articles_shareEnabled', 'articles_sharePosition',
+        'articles_shareNative', 'articles_shareCopy', 'articles_shareEmail',
+        'articles_shareButtonStyle',
+        'articles_readingProgressEnabled', 'articles_readingProgressSize',
+        'articles_readingProgressColor',
+        'articles_tocEnabled', 'articles_tocPosition', 'articles_tocDepth',
+    ];
+
+    /**
      * Site-wide transverse component config keys (Components tab), stored flat in tokens.
      */
     private const COMPONENT_KEYS = [
         'breadcrumbs_enabled', 'breadcrumbs_separator', 'breadcrumbs_align',
         'breadcrumbs_homeLink', 'breadcrumbs_homeLabel',
+        // Semantic surfaces shared by all transverse components (sidebar,
+        // pagination, breadcrumb, badges). Empty = derived from the theme.
+        'components_surfaceBg', 'components_surfaceText', 'components_surfaceMuted',
+        'components_surfaceBorder', 'components_surfaceAccent', 'components_surfaceOnAccent',
+        // Per-component surface overrides (empty = inherit the global surfaces).
+        'components_sidebarBg', 'components_sidebarText', 'components_sidebarMuted',
+        'components_sidebarBorder', 'components_sidebarAccent', 'components_sidebarButtonStyle',
+        'components_filtersToggleStyle', 'components_filtersAutoSubmit',
+        'components_sidebarStyle', 'components_filtersShowSearch', 'components_filtersShowSort',
+        'components_filtersShowCategories', 'components_filtersShowTags',
+        'components_backToTopEnabled', 'components_backToTopThreshold',
+        'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg',
+        'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
+        'components_paginationText', 'components_paginationAccent',
+        'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
+        // Site-wide card appearance (moved from the Articles tab in 3.0).
+        'cardImageRatio', 'cardSurface', 'cardPadding', 'cardImagePadded',
+        'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
+        'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
+        'cardHoverDuration', 'cardHoverEasing',
+        'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
     ];
 
     /**
@@ -490,18 +530,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $this->flattenMenuConfig($data, $menuConfig);
 
         // Article configuration: flat keys passed through directly
-        $articleKeys = [
-            'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle', 'articles_cardImageRatio',
-            'articles_cardSurface', 'articles_cardPadding', 'articles_cardImagePadded',
-            'articles_cardBorder', 'articles_cardBorderWidth', 'articles_cardBorderStyle',
-            'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
-            'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
-            'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showRelated',
-            'articles_relatedCount',
-        ];
-        foreach ($articleKeys as $key) {
+        foreach (self::ARTICLE_KEYS as $key) {
             if (isset($tokens[$key])) {
                 $data[$key] = $tokens[$key];
             }
@@ -670,18 +699,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
 
         // Article configuration: flat keys stored directly in tokens
-        $articleKeys = [
-            'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
-            'articles_listingStyle', 'articles_cardImageRatio',
-            'articles_cardSurface', 'articles_cardPadding', 'articles_cardImagePadded',
-            'articles_cardBorder', 'articles_cardBorderWidth', 'articles_cardBorderStyle',
-            'articles_cardHoverTransform', 'articles_cardHoverImage', 'articles_cardHoverShadow',
-            'articles_cardHoverBorder', 'articles_cardHoverDuration', 'articles_cardHoverEasing',
-            'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-            'articles_showExcerpts', 'articles_showRelated',
-            'articles_relatedCount',
-        ];
-        foreach ($articleKeys as $key) {
+        foreach (self::ARTICLE_KEYS as $key) {
             if (\array_key_exists($key, $data)) {
                 $tokens[$key] = $data[$key];
             }

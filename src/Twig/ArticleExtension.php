@@ -228,7 +228,7 @@ class ArticleExtension extends AbstractExtension
     {
         $tokens = $this->themeExtension->getTokens();
 
-        $cardImageRatio = (string) ($tokens['articles_cardImageRatio'] ?? '16:9');
+        $cardImageRatio = (string) ($tokens['cardImageRatio'] ?? '16:9');
         $ratioParts = explode(':', $cardImageRatio);
         // A portrait ratio has its width < its height (e.g. 3:4, 9:16).
         // Defaults to landscape when the ratio is malformed.
@@ -243,24 +243,35 @@ class ArticleExtension extends AbstractExtension
             'listingStyle' => $tokens['articles_listingStyle'] ?? 'grid',
             'cardImageRatio' => $cardImageRatio,
             'cardOrientation' => $isPortrait ? 'portrait' : 'landscape',
-            'cardSurface' => $tokens['articles_cardSurface'] ?? 'none',
-            'cardPadding' => $tokens['articles_cardPadding'] ?? '1rem',
-            'cardImagePadded' => (bool) ($tokens['articles_cardImagePadded'] ?? true),
-            'cardBorder' => $tokens['articles_cardBorder'] ?? 'none',
-            'cardBorderWidth' => $tokens['articles_cardBorderWidth'] ?? '1px',
-            'cardBorderStyle' => $tokens['articles_cardBorderStyle'] ?? 'solid',
-            'cardHoverTransform' => $tokens['articles_cardHoverTransform'] ?? 'none',
-            'cardHoverImage' => $tokens['articles_cardHoverImage'] ?? 'zoom',
-            'cardHoverShadow' => $tokens['articles_cardHoverShadow'] ?? 'none',
-            'cardHoverBorder' => $tokens['articles_cardHoverBorder'] ?? 'none',
-            'cardHoverDuration' => $tokens['articles_cardHoverDuration'] ?? '300ms',
-            'cardHoverEasing' => $tokens['articles_cardHoverEasing'] ?? 'ease-out',
+            'cardSurface' => $tokens['cardSurface'] ?? 'none',
+            'cardPadding' => $tokens['cardPadding'] ?? '1rem',
+            'cardImagePadded' => (bool) ($tokens['cardImagePadded'] ?? true),
+            'cardBorder' => $tokens['cardBorder'] ?? 'none',
+            'cardBorderWidth' => $tokens['cardBorderWidth'] ?? '1px',
+            'cardBorderStyle' => $tokens['cardBorderStyle'] ?? 'solid',
+            'cardHoverTransform' => $tokens['cardHoverTransform'] ?? 'none',
+            'cardHoverImage' => $tokens['cardHoverImage'] ?? 'zoom',
+            'cardHoverShadow' => $tokens['cardHoverShadow'] ?? 'none',
+            'cardHoverBorder' => $tokens['cardHoverBorder'] ?? 'none',
+            'cardHoverDuration' => $tokens['cardHoverDuration'] ?? '300ms',
+            'cardHoverEasing' => $tokens['cardHoverEasing'] ?? 'ease-out',
             'showDates' => $tokens['articles_showDates'] ?? 'both',
             'showAuthors' => $tokens['articles_showAuthors'] ?? 'both',
             'showCategories' => $tokens['articles_showCategories'] ?? 'both',
             'showExcerpts' => $tokens['articles_showExcerpts'] ?? 'listing',
             'showRelated' => $tokens['articles_showRelated'] ?? 'page',
             'relatedCount' => (int) ($tokens['articles_relatedCount'] ?? 3),
+            // Reading components: share buttons (opt-in, off by default).
+            'shareEnabled' => (bool) ($tokens['articles_shareEnabled'] ?? false),
+            'sharePosition' => (string) ($tokens['articles_sharePosition'] ?? 'footer'),
+            'shareNative' => (bool) ($tokens['articles_shareNative'] ?? true),
+            'shareCopy' => (bool) ($tokens['articles_shareCopy'] ?? true),
+            'shareEmail' => (bool) ($tokens['articles_shareEmail'] ?? true),
+            'shareButtonStyle' => (string) ($tokens['articles_shareButtonStyle'] ?? ''),
+            'readingProgressEnabled' => (bool) ($tokens['articles_readingProgressEnabled'] ?? false),
+            'tocEnabled' => (bool) ($tokens['articles_tocEnabled'] ?? false),
+            'tocPosition' => (string) ($tokens['articles_tocPosition'] ?? 'inline'),
+            'tocDepth' => (string) ($tokens['articles_tocDepth'] ?? 'h3'),
         ];
     }
 

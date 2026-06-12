@@ -64,6 +64,14 @@
         {% block footer %}{% endblock %}
     </footer>
 
+    {# Site-wide back-to-top button, opt-in via Components > Site-wide. If you use
+       your own base template, copy this include into it. #}
+    {% if iw_sulu_tailwind_theme.components_backToTopEnabled|default(false) %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_back_to_top.html.twig' with {
+            threshold: iw_sulu_tailwind_theme.components_backToTopThreshold|default(400),
+        } only %}
+    {% endif %}
+
     {% block javascripts %}{% endblock %}
     {{ encore_entry_script_tags('app') }}
 </body>

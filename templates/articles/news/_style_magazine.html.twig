@@ -56,6 +56,12 @@
                     showAuthors: articleConfig.showAuthors|iw_article_visible('page'),
                     showCategories: false,
                 } only %}
+
+                {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
+                    articleConfig: articleConfig,
+                    content: content,
+                    position: 'header',
+                } only %}
             </div>
         </div>
     </header>
@@ -63,6 +69,9 @@
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
+
+{# The header share row lives inside the inline-hero content (above). #}
+{% block article_share_header %}{% endblock %}
 
 {% block article_footer %}
     <footer class="iw-article-page__footer">

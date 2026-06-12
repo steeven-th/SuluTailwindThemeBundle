@@ -1,5 +1,5 @@
 {# Default page template — renders content blocks using the block dispatcher pattern #}
-{% extends '@ItechWorldSuluTailwindTheme/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block content %}
     {# Site-wide breadcrumb (pages) — gated by the Components config #}
@@ -12,36 +12,7 @@
         </div>
     {% endif %}
 
-    {% if content.blocks is defined and content.blocks is iterable %}
-        {% for block in content.blocks %}
-            {% set blockType = block.type|default('text') %}
-            {% set blockStyle = block.style|default('') %}
-
-            {# Use the style value directly — it matches the template file name.
-               Fallback to defaults when style is empty or template does not exist
-               (e.g. legacy values like "standard" from previous config). #}
-            {% set defaultStyles = {
-                'text': 'one_column',
-                'text_images': 'classic',
-                'gallery': 'grid',
-                'key_figures': 'inline',
-                'linked_pages': 'cards',
-                'location': 'map_with_info',
-                'form': 'centered',
-                'document': 'default',
-                'cta': 'centered',
-                'testimonial': 'cards',
-                'separator': 'line'
-            } %}
-
-            {% if blockStyle is empty %}
-                {% set blockStyle = defaultStyles[blockType]|default('default') %}
-            {% endif %}
-
-            {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-            {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-
-            {% include [templatePath, fallbackPath] with block %}
-        {% endfor %}
-    {% endif %}
+    {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+        blocks: content.blocks|default([]),
+    } %}
 {% endblock %}

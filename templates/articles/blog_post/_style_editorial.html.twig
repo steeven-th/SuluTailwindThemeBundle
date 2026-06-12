@@ -28,7 +28,11 @@
         {# Dark overlay for text readability #}
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-12 pt-32">
+        {# Same structure as the content-block wrappers (px-5 outside, container
+           inside): the text never touches the window edge on narrow viewports,
+           and stays aligned with the blocks' container on desktop. #}
+        <div class="relative z-10 w-full px-5 pb-12 pt-32">
+        <div class="container mx-auto">
             {% if articleConfig.showCategories|iw_article_visible('page') %}
                 {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
                     categories: content.excerptCategories|default([]),
@@ -54,42 +58,44 @@
                     <span>{{ content.readingTime }}</span>
                 {% endif %}
             </div>
+
+            {% include '@ItechWorldSuluTailwindTheme/components/_article_share.html.twig' with {
+                articleConfig: articleConfig,
+                content: content,
+                position: 'header',
+            } only %}
+
+            {# Breadcrumb inside the hero flow — the hero's own overlay already
+               darkens the image, so the inline variant drops the gradient. #}
+            {% if iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
+                <div class="iw-article-hero__breadcrumb iw-article-hero__breadcrumb--inline">
+                    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                        context: 'article',
+                        pageUuid: view.url.page.uuid|default(null),
+                        currentTitle: content.title|default(''),
+                    } only %}
+                </div>
+            {% endif %}
+        </div>
         </div>
     </div>
 {% endblock %}
+
+{# Breadcrumb and header share row live inside the hero (above) — the hero is
+   always rendered (dark background without an image), so no fallback needed. #}
+{% block article_breadcrumb %}{% endblock %}
+{% block article_share_header %}{% endblock %}
 
 {% block article_header %}{% endblock %}
 {% block article_meta %}{% endblock %}
 
 {% block article_content %}
-    <div class="iw-article-page__body mt-10 max-w-3xl mx-auto">
-        {# Drop cap styling via first-letter pseudo-element #}
-        <style>
-            .iw-article-page__body--dropcap > *:first-child::first-letter {
-                float: left;
-                font-size: 3.5em;
-                line-height: 0.8;
-                padding-right: 0.1em;
-                font-family: var(--font-family-heading);
-                font-weight: 700;
-                color: var(--color-primary);
-            }
-        </style>
-        <div class="iw-article-page__body--dropcap">
-            {% if content.blocks is defined and content.blocks is iterable %}
-                {% for contentBlock in content.blocks %}
-                    {% set blockType = contentBlock.type|default('text') %}
-                    {% set blockStyle = contentBlock.style|default('') %}
-                    {% set defaultStyles = {'text': 'one_column', 'text_images': 'classic', 'gallery': 'grid', 'cta': 'centered', 'testimonial': 'default', 'document': 'default', 'separator': 'default'} %}
-                    {% if blockStyle is empty %}
-                        {% set blockStyle = defaultStyles[blockType]|default('default') %}
-                    {% endif %}
-                    {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-                    {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-                    {% include [templatePath, fallbackPath] ignore missing with contentBlock %}
-                {% endfor %}
-            {% endif %}
-        </div>
+    {# Bare wrapper: carries only the drop cap on the first block (style in
+       app.css), without constraining the blocks' own layout/width. #}
+    <div class="iw-article-page__body--dropcap">
+        {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+            blocks: content.blocks|default([]),
+        } %}
     </div>
 {% endblock %}
 

@@ -51,175 +51,111 @@
                         <param name="article_type" value="listing"/>
                     </params>
                 </property>
-
-                <property name="articles_cardImageRatio" type="single_select" colspan="4">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_image_ratio</title></meta>
-                    <params>
-                        <param name="default_value" value="16:9"/>
-                        <param name="values" type="collection">
-                            <param name="16:9"><meta><title>16:9</title></meta></param>
-                            <param name="4:3"><meta><title>4:3</title></meta></param>
-                            <param name="1:1"><meta><title>1:1</title></meta></param>
-                            <param name="3:4"><meta><title>3:4 (portrait)</title></meta></param>
-                        </param>
-                    </params>
-                </property>
             </properties>
         </section>
 
-        <!-- Card appearance section -->
-        <section name="articleCardAppearance">
+        <!-- Filter sidebar & table of contents: layout/controls of the
+             listing sidebar, plus the surface colors shared by both side
+             panels (empty = inherit the global surfaces). Keys keep their
+             components_* prefix for backward compatibility. -->
+        <section name="articleFiltersSidebar">
             <meta>
-                <title>iw_sulu_tailwind_theme.articles_section_card_appearance</title>
+                <title>iw_sulu_tailwind_theme.components_section_sidebar</title>
             </meta>
             <properties>
-                <!-- Surface -->
-                <property name="articles_cardSurface" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
+                <property name="components_sidebarBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarText" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarMuted" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_muted</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarBorder" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_sidebarAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="articles_cardPadding" type="single_select" colspan="3">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_padding</title></meta>
-                    <params>
-                        <param name="default_value" value="1rem"/>
-                        <param name="values" type="collection">
-                            <param name="0"><meta><title>iw_sulu_tailwind_theme.articles_card_padding_none</title></meta></param>
-                            <param name="0.5rem"><meta><title>XS (p-2)</title></meta></param>
-                            <param name="1rem"><meta><title>S (p-4)</title></meta></param>
-                            <param name="1.5rem"><meta><title>M (p-6)</title></meta></param>
-                            <param name="2rem"><meta><title>L (p-8)</title></meta></param>
-                        </param>
-                    </params>
+                <property name="components_sidebarButtonStyle" type="iw_theme_button_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_sidebar_button_style</title></meta>
                 </property>
 
-                <property name="articles_cardImagePadded" type="checkbox" colspan="3">
+                <!-- Mobile "Filters" toggle button. Empty = neutral surface style;
+                     it sits on the page background, so it has its own picker. -->
+                <property name="components_filtersToggleStyle" type="iw_theme_button_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_filters_toggle_style</title></meta>
+                </property>
+
+                <!-- Auto-submit the filter form on change (JS enhancement). When on,
+                     the controller submits on checkbox/sort change and after a
+                     short search debounce, and hides the "Apply" button. Without
+                     JS the button stays and the form works as usual. -->
+                <property name="components_filtersAutoSubmit" type="checkbox" colspan="6">
+                    <meta>
+                        <info_text>iw_sulu_tailwind_theme.components_filters_auto_submit_info</info_text>
+                    </meta>
                     <params>
                         <param name="type" value="toggler"/>
-                        <param name="default_value" value="true"/>
+                        <param name="default_value" value="false"/>
                         <param name="label">
                             <meta>
-                                <title>iw_sulu_tailwind_theme.articles_card_image_padded</title>
+                                <title>iw_sulu_tailwind_theme.components_filters_auto_submit</title>
                             </meta>
                         </param>
                     </params>
                 </property>
 
-                <!-- Border -->
-                <property name="articles_cardBorder" type="iw_theme_color_token_editor" colspan="4">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_border</title></meta>
+                <!-- Sidebar layout: left/right column, or a permanent offcanvas
+                     drawer (behind a "Filters" button at every screen size). On
+                     small screens left/right collapse to the drawer anyway. -->
+                <property name="components_sidebarStyle" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_sidebar_style</title></meta>
                     <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-
-                <property name="articles_cardBorderWidth" type="single_select" colspan="4"
-                          visibleCondition="articles_cardBorder != 'none'">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_border_width</title></meta>
-                    <params>
-                        <param name="default_value" value="1px"/>
+                        <param name="default_value" value="left"/>
                         <param name="values" type="collection">
-                            <param name="1px"><meta><title>1px</title></meta></param>
-                            <param name="2px"><meta><title>2px</title></meta></param>
-                            <param name="3px"><meta><title>3px</title></meta></param>
-                            <param name="4px"><meta><title>4px</title></meta></param>
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_left</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_right</title></meta></param>
+                            <param name="topbar"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_topbar</title></meta></param>
+                            <param name="offcanvas"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_offcanvas</title></meta></param>
                         </param>
                     </params>
                 </property>
 
-                <property name="articles_cardBorderStyle" type="single_select" colspan="4"
-                          visibleCondition="articles_cardBorder != 'none'">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_border_style</title></meta>
+                <!-- Which filter controls to expose in the sidebar (all on by default). -->
+                <property name="components_filtersShowSearch" type="checkbox" colspan="6">
                     <params>
-                        <param name="default_value" value="solid"/>
-                        <param name="values" type="collection">
-                            <param name="solid"><meta><title>Solid</title></meta></param>
-                            <param name="dashed"><meta><title>Dashed</title></meta></param>
-                            <param name="dotted"><meta><title>Dotted</title></meta></param>
-                            <param name="double"><meta><title>Double</title></meta></param>
-                        </param>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_search</title></meta></param>
                     </params>
                 </property>
-
-                <!-- Hover effects -->
-                <property name="articles_cardHoverTransform" type="single_select" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform</title></meta>
+                <property name="components_filtersShowSort" type="checkbox" colspan="6">
                     <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_none</title></meta></param>
-                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift</title></meta></param>
-                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift_strong</title></meta></param>
-                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_up</title></meta></param>
-                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_down</title></meta></param>
-                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_tilt</title></meta></param>
-                        </param>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_sort</title></meta></param>
                     </params>
                 </property>
-
-                <property name="articles_cardHoverImage" type="single_select" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_image</title></meta>
+                <property name="components_filtersShowCategories" type="checkbox" colspan="6">
                     <params>
-                        <param name="default_value" value="zoom"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_none</title></meta></param>
-                            <param name="zoom"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom</title></meta></param>
-                            <param name="zoom-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom_strong</title></meta></param>
-                            <param name="grayscale"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_grayscale</title></meta></param>
-                            <param name="brightness"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_brightness</title></meta></param>
-                        </param>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_categories</title></meta></param>
                     </params>
                 </property>
-
-                <property name="articles_cardHoverShadow" type="single_select" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow</title></meta>
+                <property name="components_filtersShowTags" type="checkbox" colspan="6">
                     <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_none</title></meta></param>
-                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_sm</title></meta></param>
-                            <param name="md"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_md</title></meta></param>
-                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_lg</title></meta></param>
-                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_xl</title></meta></param>
-                            <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_glow_primary</title></meta></param>
-                            <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_shadow_glow_accent</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-
-                <property name="articles_cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
-                          visibleCondition="articles_cardBorder != 'none'">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-
-                <property name="articles_cardHoverDuration" type="single_select" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_duration</title></meta>
-                    <params>
-                        <param name="default_value" value="300ms"/>
-                        <param name="values" type="collection">
-                            <param name="150ms"><meta><title>150ms</title></meta></param>
-                            <param name="300ms"><meta><title>300ms</title></meta></param>
-                            <param name="500ms"><meta><title>500ms</title></meta></param>
-                            <param name="700ms"><meta><title>700ms</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-
-                <property name="articles_cardHoverEasing" type="single_select" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing</title></meta>
-                    <params>
-                        <param name="default_value" value="ease-out"/>
-                        <param name="values" type="collection">
-                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_linear</title></meta></param>
-                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_out</title></meta></param>
-                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_in_out</title></meta></param>
-                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_bounce</title></meta></param>
-                        </param>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.components_filters_show_tags</title></meta></param>
                     </params>
                 </property>
             </properties>
@@ -298,6 +234,129 @@
                     <meta><title>iw_sulu_tailwind_theme.articles_related_count</title></meta>
                     <params>
                         <param name="default_value" value="3"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Reading components section: article-page helpers rendered by
+             _article_base.html.twig. Opt-in (off by default). -->
+        <section name="articleReadingComponents">
+            <meta>
+                <title>iw_sulu_tailwind_theme.articles_section_reading_components</title>
+            </meta>
+            <properties>
+                <property name="articles_shareEnabled" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_sharePosition" type="single_select" colspan="6"
+                          visibleCondition="articles_shareEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_share_position</title></meta>
+                    <params>
+                        <param name="default_value" value="footer"/>
+                        <param name="values" type="collection">
+                            <param name="header"><meta><title>iw_sulu_tailwind_theme.articles_share_position_header</title></meta></param>
+                            <param name="footer"><meta><title>iw_sulu_tailwind_theme.articles_share_position_footer</title></meta></param>
+                            <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_share_position_both</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Share actions: each button can be toggled individually. The
+                     native button falls back to copying the link when the Web
+                     Share API is unavailable. -->
+                <property name="articles_shareNative" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_native</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_shareCopy" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_copy</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_shareEmail" type="checkbox" colspan="4"
+                          visibleCondition="articles_shareEnabled == true">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_share_email</title></meta></param>
+                    </params>
+                </property>
+
+                <!-- Empty = neutral surface style; otherwise the chosen theme
+                     button variant owns the colors (same pattern as the sidebar buttons). -->
+                <property name="articles_shareButtonStyle" type="iw_theme_button_style_picker" colspan="6"
+                          visibleCondition="articles_shareEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_share_button_style</title></meta>
+                </property>
+
+                <!-- Reading progress: a thin bar fixed at the top of the
+                     viewport, filling as the visitor scrolls the article. -->
+                <property name="articles_readingProgressEnabled" type="checkbox" colspan="12">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_readingProgressSize" type="single_select" colspan="6"
+                          visibleCondition="articles_readingProgressEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size</title></meta>
+                    <params>
+                        <param name="default_value" value="md"/>
+                        <param name="values" type="collection">
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.articles_reading_progress_size_lg</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="articles_readingProgressColor" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="articles_readingProgressEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_reading_progress_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <!-- Table of contents: built client-side from the article's
+                     h2/h3 headings, with anchors and scroll-spy. -->
+                <property name="articles_tocEnabled" type="checkbox" colspan="12">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.articles_toc_enabled</title></meta></param>
+                    </params>
+                </property>
+                <property name="articles_tocPosition" type="single_select" colspan="6"
+                          visibleCondition="articles_tocEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_toc_position</title></meta>
+                    <params>
+                        <param name="default_value" value="inline"/>
+                        <param name="values" type="collection">
+                            <param name="inline"><meta><title>iw_sulu_tailwind_theme.articles_toc_position_inline</title></meta></param>
+                            <param name="sticky"><meta><title>iw_sulu_tailwind_theme.articles_toc_position_sticky</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="articles_tocDepth" type="single_select" colspan="6"
+                          visibleCondition="articles_tocEnabled == true">
+                    <meta><title>iw_sulu_tailwind_theme.articles_toc_depth</title></meta>
+                    <params>
+                        <param name="default_value" value="h3"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.articles_toc_depth_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.articles_toc_depth_h3</title></meta></param>
+                        </param>
                     </params>
                 </property>
             </properties>

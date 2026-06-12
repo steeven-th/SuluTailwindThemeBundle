@@ -1,9 +1,11 @@
 <?xml version="1.0" ?>
 <!--
     Page template: Article listing.
-    Provides a configurable article listing page with smart_content filtering,
-    pagination, and multiple display styles (grid/list/cards).
-    Uses Sulu's native smart_content provider for articles.
+    Provides a configurable article listing page with server-side filtering
+    (?category=&tag=&q=&sort=&page=), pagination, and multiple display styles
+    (grid/list/cards). The custom ArticleListingController injects the filtered
+    list, pagination, facets and active filters on top of the resolved page;
+    the smart_content property below stays as an editorial fallback/source.
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,7 +13,7 @@
 
     <key>iw_article_listing</key>
     <view>@ItechWorldSuluTailwindTheme/pages/article_listing</view>
-    <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleListingController::indexAction</controller>
     <cacheLifetime>3600</cacheLifetime>
 
     <meta>

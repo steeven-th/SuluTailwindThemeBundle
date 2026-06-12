@@ -1311,7 +1311,7 @@ img.object-cover {
 
    Within an article block the inner .iw-article-card cards follow the
    block's Color variant (the editor's choice), not the theme-level
-   `articles_card_*` configuration — those tokens are intended for standalone
+   `card_*` configuration — those tokens are intended for standalone
    article listings driven by the page templates.
 
    Element rules are scoped via the block selector (specificity 0,2,0). */
@@ -1325,7 +1325,7 @@ img.object-cover {
        for article-list/carousel, `.iw-featured-article-card` for featured).
        This guarantees:
        1. The block's Color variant drives the surface (not the global
-          `articles_card_*` theme tokens which target standalone listings).
+          `card_*` theme tokens which target standalone listings).
        2. The `paragraphImageRadius` choice is honored per block by simply
           applying the Tailwind class on the wrapper.
        3. The image-bleed behavior is controlled at the wrapper level. */
@@ -2673,6 +2673,13 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-article-page-subtitle-color-lg, var(--color-secondary-500));
 }
 
+/* Default placement of the article breadcrumb: before the <article> landmark
+   (rendered by _article_base.html.twig; fullwidth-hero styles host it as a
+   hero overlay instead — see .iw-article-hero__breadcrumb). */
+.iw-article-page__breadcrumb {
+    margin-top: var(--iw-article-page-breadcrumb-margin-top, 1.5rem);
+}
+
 /* Header layout modifiers — used by article styles */
 .iw-article-page__header--centered {
     max-width: var(--iw-article-page-header-max-width-centered, 48rem);
@@ -2741,11 +2748,8 @@ section.block:has([data-slider-fullbleed-value]) {
     margin-inline: auto;
 }
 
-.iw-article-page__body {
-    margin-top: var(--iw-article-page-body-margin-top, 2rem);
-}
-
-/* Dropcap modifier on the body — large first letter on the first inner block */
+/* Dropcap wrapper — large first letter on the first inner block (blog
+   editorial). Bare wrapper: it must not constrain the blocks' own layout. */
 .iw-article-page__body--dropcap > *:first-child::first-letter {
     float: left;
     font-size: 3.5em;
@@ -2773,9 +2777,34 @@ section.block:has([data-slider-fullbleed-value]) {
    The global `img { border-radius: var(--radius-img); }` rule of app.css
    is overridden to 0 on the hero image so only the wrapper applies it. */
 .iw-article-hero {
+    position: relative; /* anchors the breadcrumb overlay */
     width: 100%;
     overflow: hidden;
     max-height: var(--iw-article-hero-max-height, 500px);
+}
+
+/* Breadcrumb overlay pinned to the bottom of the hero image, over a dark
+   gradient so the trail stays readable on any picture. The colors are forced
+   light here (the theme breadcrumb colors target a page background) — all
+   overridable via --iw-article-hero-breadcrumb-* / --iw-breadcrumbs-*. */
+.iw-article-hero__breadcrumb {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: var(--iw-article-hero-breadcrumb-padding, 2.5rem 0 1rem);
+    background: var(--iw-article-hero-breadcrumb-gradient, linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent));
+    --iw-breadcrumbs-color: var(--iw-article-hero-breadcrumb-color, rgba(255, 255, 255, 0.85));
+    --iw-breadcrumbs-current-color: var(--iw-article-hero-breadcrumb-current-color, #fff);
+    --iw-breadcrumbs-link-hover: var(--iw-article-hero-breadcrumb-link-hover, #fff);
+    --iw-breadcrumbs-margin-bottom: 0;
+}
+
+/* Inline variant: sits in the hero content flow (blog editorial) where the
+   hero's own overlay already darkens the image — no gradient, no pinning. */
+.iw-article-hero__breadcrumb--inline {
+    position: static;
+    padding: var(--iw-article-hero-breadcrumb-inline-padding, 1rem 0 0);
+    background: none;
 }
 
 .iw-article-hero__image {
@@ -2787,7 +2816,11 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 /* Fullwidth: image spans the viewport, no radius (default behavior of
-   .iw-article-hero already provides overflow:hidden + max-height). */
+   .iw-article-hero already provides overflow:hidden + max-height). The bottom
+   margin keeps the header below (e.g. its breadcrumb) from hugging the image. */
+.iw-article-hero--fullwidth {
+    margin-bottom: var(--iw-article-hero-margin-bottom, 1.5rem);
+}
 
 /* Contained: the outer wrapper becomes a layout helper that centers the
    hero inside the page container. The inner wrapper does the actual
@@ -3079,7 +3112,7 @@ section.block:has([data-slider-fullbleed-value]) {
     padding: 0;
     list-style: none;
     font-size: var(--iw-breadcrumbs-font-size, 0.875rem);
-    color: var(--iw-breadcrumbs-color, var(--color-secondary-500));
+    color: var(--iw-breadcrumbs-color, var(--color-surface-muted));
 }
 
 .iw-breadcrumbs__item {
@@ -3095,7 +3128,7 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-breadcrumbs__link:hover {
-    color: var(--iw-breadcrumbs-link-hover, var(--color-primary));
+    color: var(--iw-breadcrumbs-link-hover, var(--color-surface-accent));
 }
 
 .iw-breadcrumbs__separator {
@@ -3127,7 +3160,7 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-breadcrumbs__current {
-    color: var(--iw-breadcrumbs-current-color, var(--color-text));
+    color: var(--iw-breadcrumbs-current-color, var(--color-surface-foreground));
     font-weight: var(--iw-breadcrumbs-current-weight, 500);
 }
 
@@ -3149,22 +3182,22 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
     font-size: 0.875rem;
-    color: var(--iw-pagination-color, var(--color-secondary-600));
+    color: var(--iw-pagination-color, var(--color-surface-muted));
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .iw-pagination__link:hover,
 .iw-pagination__arrow:hover {
-    background-color: var(--iw-pagination-hover-bg, var(--color-primary-50));
-    color: var(--iw-pagination-hover-color, var(--color-primary));
+    background-color: var(--iw-pagination-hover-bg, color-mix(in srgb, var(--color-surface-accent) 12%, transparent));
+    color: var(--iw-pagination-hover-color, var(--color-surface-accent));
 }
 
 .iw-pagination__link--current,
 .iw-pagination__link--current:hover {
     font-weight: 600;
-    background-color: var(--iw-pagination-current-bg, var(--color-primary));
-    color: var(--iw-pagination-current-color, #fff);
+    background-color: var(--iw-pagination-current-bg, var(--color-surface-accent));
+    color: var(--iw-pagination-current-color, var(--color-surface-on-accent, #fff));
 }
 
 .iw-pagination__arrow svg {
@@ -3174,14 +3207,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-pagination__ellipsis {
     padding: 0 0.25rem;
-    color: var(--iw-pagination-ellipsis-color, var(--color-secondary-400));
-}
-
-.iw-pagination__info {
-    margin-top: 0.75rem;
-    text-align: center;
-    font-size: 0.875rem;
-    color: var(--iw-pagination-info-color, var(--color-secondary-500));
+    color: var(--iw-pagination-ellipsis-color, var(--color-surface-muted));
 }
 
 /* ─── Transverse: tags ──────────────────────────────────────────────────── */
@@ -3198,16 +3224,16 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-tag-padding, 0.25rem 0.75rem);
     font-size: var(--iw-tag-font-size, 0.75rem);
     font-weight: var(--iw-tag-font-weight, 500);
-    border: 1px solid var(--iw-tag-border, var(--color-border));
+    border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
-    color: var(--iw-tag-text, var(--color-secondary-600));
+    color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .iw-tag:hover {
-    background-color: var(--iw-tag-hover-bg, var(--color-primary-50));
-    color: var(--iw-tag-hover-text, var(--color-primary-700));
-    border-color: var(--iw-tag-hover-border, var(--color-primary-200));
+    background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--color-surface-accent) 10%, transparent));
+    color: var(--iw-tag-hover-text, var(--color-surface-accent));
+    border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--color-surface-accent) 30%, transparent));
 }
 
 .iw-tag--variant-primary {
@@ -3253,8 +3279,780 @@ span.iw-breadcrumbs__separator {
     color: var(--iw-category-badge-text, var(--color-primary-700));
 }
 
-/* Card context — spacing above the title */
+/* Card context — spacing above the title + configurable badge colors
+   (from the Components > Cards admin section, default = primary tint). */
 .iw-article-card__category {
     margin-bottom: 0.5rem;
     --iw-category-badge-padding: 0.125rem 0.5rem;
+    --iw-category-badge-bg: var(--iw-article-card-badge-bg, var(--color-primary-100));
+    --iw-category-badge-text: var(--iw-article-card-badge-text, var(--color-primary-700));
+}
+
+/* ─── Article discovery: listing layout + filters sidebar (F3) ───────────── */
+/* Two-column listing: a left filter sidebar and the results column. Collapses
+   to a single column on small screens. Override --iw-article-layout-* to retune
+   the sidebar width and gap, or the whole grid to relocate the sidebar. */
+.iw-article-layout {
+    display: grid;
+    grid-template-columns: var(--iw-article-layout-sidebar-width, 16rem) 1fr;
+    gap: var(--iw-article-layout-gap, 2rem);
+    align-items: start;
+}
+
+/* Below the side-by-side breakpoint the sidebar stacks on top of the results. */
+@media (max-width: 767.98px) {
+    .iw-article-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Right sidebar style: results first, sidebar second. Desktop only — below the
+   breakpoint it collapses / becomes a drawer just like the left style. */
+@media (min-width: 768px) {
+    .iw-article-layout--right {
+        grid-template-columns: 1fr var(--iw-article-layout-sidebar-width, 16rem);
+    }
+    .iw-article-layout--right .iw-article-layout__results {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .iw-article-layout--right .iw-article-filters {
+        grid-column: 2;
+        grid-row: 1;
+    }
+}
+
+/* Offcanvas sidebar style: the sidebar is always a drawer (armed by JS at every
+   size), so the layout is a single full-width column — just the "Filters" toggle
+   and the results. */
+.iw-article-layout--offcanvas {
+    grid-template-columns: 1fr;
+}
+
+/* Topbar style: the filters sit above the results as a full-width horizontal
+   bar; controls flow in a wrapping row. Scoped :not(--drawer-armed) so the
+   mobile drawer keeps the vertical panel layout (the controller arms the
+   drawer below 768px exactly like the left/right styles). */
+.iw-article-layout--topbar {
+    grid-template-columns: 1fr;
+}
+
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__form {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--iw-article-filters-topbar-gap, 1rem 2rem);
+}
+
+/* Title + clear span the full bar width, above the controls. */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__header {
+    flex-basis: 100%;
+    justify-content: flex-start;
+}
+
+/* Checkbox lists flow horizontally and wrap. */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--iw-article-filters-topbar-options-gap, 0.5rem 1rem);
+}
+
+/* The submit button aligns with the controls (labels sit above them). */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply,
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply-btn {
+    align-self: flex-end;
+}
+
+.iw-article-layout__results {
+    min-width: 0; /* allow the grid/list inside to shrink instead of overflowing */
+}
+
+/* AJAX loading state: dim and disable the results while a fetch is in flight.
+   Override --iw-article-layout-loading-* to retune. */
+.iw-article-layout--loading .iw-article-layout__results {
+    opacity: var(--iw-article-layout-loading-opacity, 0.5);
+    pointer-events: none;
+    transition: opacity var(--iw-article-layout-loading-transition, 0.15s ease);
+}
+
+/* The listing grids (in the theme CSS) switch columns on the *viewport* width.
+   Inside the sidebar layout the results column is ~16rem narrower than the
+   viewport, so those breakpoints pack too many cards — worst in portrait, which
+   reaches 4 columns. While the sidebar sits beside the results (>=768px), drop
+   one column so cards keep a comfortable size. These descendant selectors win
+   over the theme rules by specificity, regardless of stylesheet order. */
+@media (min-width: 768px) {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* On 2xl screens the results column is wide enough (~1180px, the container caps
+   at 1536px) that the sidebar no longer costs a column: restore the full-width
+   counts. Same specificity as the 1024 block above, placed after, so it wins. */
+@media (min-width: 1536px) {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Filters sidebar. All visual properties are routed through --iw-article-filters-*
+   custom properties so the whole component can be restyled without touching Twig. */
+.iw-article-filters {
+    font-size: var(--iw-article-filters-font-size, 0.875rem);
+}
+
+.iw-article-filters__form {
+    position: var(--iw-article-filters-position, sticky);
+    top: var(--iw-article-filters-top, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-article-filters-group-gap, 1.5rem);
+    padding: var(--iw-article-filters-padding, 1.25rem);
+    background-color: var(--iw-article-filters-bg, var(--color-surface));
+    border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
+    border-radius: var(--iw-article-filters-radius, var(--border-radius));
+}
+
+.iw-article-filters__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.iw-article-filters__title {
+    font-size: var(--iw-article-filters-title-size, 1rem);
+    font-weight: var(--iw-article-filters-title-weight, 600);
+    color: var(--iw-article-filters-title-color, var(--color-surface-foreground));
+    margin: 0;
+}
+
+.iw-article-filters__clear {
+    font-size: 0.75rem;
+    color: var(--iw-article-filters-clear-color, var(--color-surface-muted));
+    text-decoration: underline;
+}
+
+.iw-article-filters__clear:hover {
+    color: var(--iw-article-filters-clear-hover, var(--color-surface-accent));
+}
+
+.iw-article-filters__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Checkbox list inside a fieldset — vertical by default, switched to a
+   wrapping row by the topbar layout. */
+.iw-article-filters__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.iw-article-filters__fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.iw-article-filters__label,
+.iw-article-filters__legend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--iw-article-filters-label-color, var(--color-surface-muted));
+    padding: 0;
+}
+
+.iw-article-filters__search,
+.iw-article-filters__select {
+    width: 100%;
+    padding: var(--iw-article-filters-control-padding, 0.5rem 0.75rem);
+    font-size: 0.875rem;
+    color: var(--iw-article-filters-control-color, var(--color-surface-foreground));
+    background-color: var(--iw-article-filters-control-bg, var(--color-background));
+    border: 1px solid var(--iw-article-filters-control-border, var(--color-surface-border));
+    border-radius: var(--iw-article-filters-control-radius, var(--border-radius));
+}
+
+.iw-article-filters__search:focus,
+.iw-article-filters__select:focus {
+    outline: none;
+    border-color: var(--iw-article-filters-control-focus, var(--color-surface-accent));
+}
+
+.iw-article-filters__option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    line-height: 1.3;
+}
+
+.iw-article-filters__checkbox {
+    accent-color: var(--iw-article-filters-accent, var(--color-surface-accent));
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.iw-article-filters__option-label {
+    color: var(--iw-article-filters-option-color, var(--color-surface-foreground));
+}
+
+.iw-article-filters__option:hover .iw-article-filters__option-label {
+    color: var(--iw-article-filters-option-hover, var(--color-surface-accent));
+}
+
+.iw-article-filters__apply {
+    padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--iw-article-filters-apply-color, var(--color-surface-on-accent, #fff));
+    background-color: var(--iw-article-filters-apply-bg, var(--color-surface-accent));
+    border: 0;
+    border-radius: var(--iw-article-filters-apply-radius, var(--border-radius));
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.iw-article-filters__apply:hover {
+    background-color: var(--iw-article-filters-apply-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+}
+
+/* Layout-only wrapper when a theme button style (iw-button--*) owns the colors:
+   never sets background/color so the chosen button variant shows through. */
+.iw-article-filters__apply-btn {
+    display: inline-flex;
+    justify-content: center;
+    padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--iw-article-filters-apply-radius, var(--border-radius));
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ─── Article filters: offcanvas drawer (progressive enhancement) ─────────── */
+/* The drawer is "armed" by the article-filters Stimulus controller, which adds
+   .iw-article-layout--drawer-armed when the sidebar should be a drawer — below
+   the mobile breakpoint for the left/right styles, and at every size for the
+   offcanvas style. Without JS the class is never added, so the sidebar stays in
+   flow and the GET form keeps working. Every drawer visual routes through
+   --iw-article-filters-drawer-* / --iw-article-filters-toggle-* for restyling. */
+
+/* Drawer-only chrome is inert until the drawer is armed. */
+.iw-article-filters__toggle,
+.iw-article-filters__close,
+.iw-article-filters__backdrop {
+    display: none;
+}
+
+/* The "Filters" button that opens the drawer — layout for both the default and
+   the themed (iw-button--*) variants. */
+.iw-article-layout--drawer-armed .iw-article-filters__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: start;
+    padding: var(--iw-article-filters-toggle-padding, 0.5rem 1rem);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--iw-article-filters-toggle-radius, var(--border-radius));
+    cursor: pointer;
+}
+
+/* Neutral surface skin — applied only when no theme button variant
+   (iw-button--*) owns the colors, so a configured variant shows through. */
+.iw-article-layout--drawer-armed .iw-article-filters__toggle:not([class*="iw-button--"]) {
+    color: var(--iw-article-filters-toggle-color, var(--color-surface-foreground));
+    background-color: var(--iw-article-filters-toggle-bg, var(--color-surface));
+    border: 1px solid var(--iw-article-filters-toggle-border, var(--color-surface-border));
+}
+
+/* Active-filter count badge on the toggle (default surface-accent look). */
+.iw-article-layout--drawer-armed .iw-article-filters__toggle-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    color: var(--iw-article-filters-toggle-count-color, var(--color-surface-on-accent, #fff));
+    background-color: var(--iw-article-filters-toggle-count-bg, var(--color-surface-accent));
+    border-radius: 999px;
+}
+
+/* On a themed toggle the badge contrasts via currentColor, so it stays legible
+   whatever the chosen button variant's background is. */
+.iw-article-layout--drawer-armed .iw-article-filters__toggle--themed .iw-article-filters__toggle-count {
+    color: currentColor;
+    background-color: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+/* The sidebar becomes a fixed offcanvas panel sliding in from the left. */
+.iw-article-layout--drawer-armed .iw-article-filters {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--iw-article-filters-drawer-z, 60);
+    width: var(--iw-article-filters-drawer-width, min(20rem, 85vw));
+    max-width: 85vw;
+    overflow-y: auto;
+    padding: var(--iw-article-filters-drawer-padding, 1.25rem);
+    background-color: var(--iw-article-filters-drawer-bg, var(--color-surface));
+    box-shadow: var(--iw-article-filters-drawer-shadow, 0 0 2.5rem rgba(0, 0, 0, 0.25));
+    transform: translateX(-100%);
+    transition: transform var(--iw-article-filters-drawer-transition, 0.3s ease);
+}
+
+/* In drawer mode the inner form drops its own card chrome — the panel owns it. */
+.iw-article-layout--drawer-armed .iw-article-filters__form {
+    position: static;
+    top: auto;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+/* Open state: slide the panel into view. */
+.iw-article-layout--drawer-armed.iw-article-layout--drawer-open .iw-article-filters {
+    transform: translateX(0);
+}
+
+/* Close (×) button, pinned to the panel's top-right corner. */
+.iw-article-layout--drawer-armed .iw-article-filters__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--iw-article-filters-close-color, var(--color-surface-muted));
+    background: transparent;
+    border: 0;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.iw-article-layout--drawer-armed .iw-article-filters__close:hover {
+    color: var(--iw-article-filters-close-hover, var(--color-surface-accent));
+}
+
+/* Reserve room so the close button never overlaps the filters title. */
+.iw-article-layout--drawer-armed .iw-article-filters__header {
+    padding-right: 2rem;
+}
+
+/* Backdrop behind the open drawer. */
+.iw-article-layout--drawer-armed .iw-article-filters__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: var(--iw-article-filters-backdrop-z, 59);
+    background-color: var(--iw-article-filters-backdrop-bg, rgba(0, 0, 0, 0.5));
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--iw-article-filters-drawer-transition, 0.3s ease),
+                visibility var(--iw-article-filters-drawer-transition, 0.3s ease);
+}
+
+.iw-article-layout--drawer-armed.iw-article-layout--drawer-open .iw-article-filters__backdrop {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Honor reduced-motion: no slide/fade (matches the drawer rules' specificity). */
+@media (prefers-reduced-motion: reduce) {
+    .iw-article-layout--drawer-armed .iw-article-filters,
+    .iw-article-layout--drawer-armed .iw-article-filters__backdrop {
+        transition: none;
+    }
+}
+
+/* ─── Back-to-top button (F5 reading component) ──────────────────────────── */
+/* Floating button revealed by the back-to-top controller past a scroll
+   threshold. Everything routes through --iw-back-to-top-* for restyling. */
+.iw-back-to-top {
+    position: fixed;
+    right: var(--iw-back-to-top-offset, 1.5rem);
+    bottom: var(--iw-back-to-top-offset, 1.5rem);
+    z-index: var(--iw-back-to-top-z, 50);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--iw-back-to-top-size, 2.75rem);
+    height: var(--iw-back-to-top-size, 2.75rem);
+    color: var(--iw-back-to-top-color, var(--color-surface-on-accent, #fff));
+    background-color: var(--iw-back-to-top-bg, var(--color-surface-accent));
+    border: 0;
+    border-radius: var(--iw-back-to-top-radius, 999px);
+    box-shadow: var(--iw-back-to-top-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
+    cursor: pointer;
+    /* Hidden until the controller adds --visible (and absent without JS). */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(var(--iw-back-to-top-travel, 0.75rem));
+    transition: opacity var(--iw-back-to-top-transition, 0.25s ease),
+                visibility var(--iw-back-to-top-transition, 0.25s ease),
+                transform var(--iw-back-to-top-transition, 0.25s ease);
+}
+
+.iw-back-to-top--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.iw-back-to-top:hover {
+    background-color: var(--iw-back-to-top-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+}
+
+.iw-back-to-top__icon {
+    width: var(--iw-back-to-top-icon-size, 1.25rem);
+    height: var(--iw-back-to-top-icon-size, 1.25rem);
+    object-fit: contain; /* keep a custom media icon within the button */
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-back-to-top,
+    .iw-back-to-top--visible {
+        transform: none;
+    }
+}
+
+/* ─── Table of contents (F5 reading component) ───────────────────────────── */
+/* Collapsible panel filled by the toc controller from the article headings.
+   Neutral surface skin (adapts to light/dark themes); everything routes
+   through --iw-toc-* for restyling. Hidden until the controller finds at
+   least two headings. */
+.iw-toc {
+    max-width: var(--iw-toc-max-width, 28rem);
+    margin: var(--iw-toc-margin, 1.5rem 0);
+    font-size: var(--iw-toc-font-size, 0.875rem);
+}
+
+.iw-toc__panel {
+    padding: var(--iw-toc-padding, 1rem 1.25rem);
+    color: var(--iw-toc-color, var(--color-surface-foreground));
+    background-color: var(--iw-toc-bg, var(--color-surface));
+    border: var(--iw-toc-border, 1px solid var(--color-surface-border));
+    border-radius: var(--iw-toc-radius, var(--border-radius));
+}
+
+.iw-toc__summary {
+    font-weight: var(--iw-toc-title-weight, 600);
+    cursor: pointer;
+    user-select: none;
+}
+
+.iw-toc__list {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-toc-gap, 0.375rem);
+}
+
+/* Sub-headings (h3) are indented one step. */
+.iw-toc__item--h3 {
+    padding-left: var(--iw-toc-indent, 1rem);
+}
+
+.iw-toc__link {
+    color: var(--iw-toc-link-color, var(--color-surface-muted));
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.iw-toc__link:hover {
+    color: var(--iw-toc-link-hover, var(--color-surface-foreground));
+}
+
+/* Scroll-spy marker: the section currently being read. */
+.iw-toc__link--active {
+    color: var(--iw-toc-link-active, var(--color-surface-accent));
+    font-weight: var(--iw-toc-link-active-weight, 600);
+}
+
+/* Sticky variant — the "floating" mode. From the xl breakpoint up the panel
+   is pinned on the right of the viewport; below, it slides off-canvas behind
+   a floating edge button (opened by the toc controller). Column layouts
+   (blog sidebar, event timeline) never use it: they render the TOC inside
+   their own sticky side column instead. */
+.iw-toc__toggle {
+    display: none;
+}
+
+@media (min-width: 1280px) {
+    .iw-toc--sticky {
+        position: fixed;
+        top: var(--iw-toc-sticky-top, 6rem);
+        right: var(--iw-toc-sticky-right, 1.5rem);
+        width: var(--iw-toc-sticky-width, 17rem);
+        max-height: calc(100vh - var(--iw-toc-sticky-top, 6rem) - 2rem);
+        overflow-y: auto;
+        margin: 0;
+        z-index: var(--iw-toc-sticky-z, 30);
+    }
+}
+
+@media (max-width: 1279.98px) {
+    /* The nav is a neutral wrapper below xl — the panel itself becomes the
+       off-canvas drawer and the edge button appears. */
+    .iw-toc--sticky {
+        margin: 0;
+    }
+
+    /* The edge button wears the panel colors (incl. the admin "Filter
+       sidebar & table of contents" overrides, inherited from .iw-toc). */
+    .iw-toc--sticky .iw-toc__toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: var(--iw-toc-toggle-top, 35%);
+        right: 0;
+        z-index: var(--iw-toc-drawer-z, 55);
+        width: var(--iw-toc-toggle-size, 2.5rem);
+        height: var(--iw-toc-toggle-size, 2.5rem);
+        color: var(--iw-toc-toggle-color, var(--iw-toc-color, var(--color-surface-foreground)));
+        background-color: var(--iw-toc-toggle-bg, var(--iw-toc-bg, var(--color-surface)));
+        border: var(--iw-toc-toggle-border, var(--iw-toc-border, 1px solid var(--color-surface-border)));
+        border-right: 0;
+        border-radius: var(--iw-toc-toggle-radius, 999px) 0 0 var(--iw-toc-toggle-radius, 999px);
+        box-shadow: var(--iw-toc-toggle-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
+        cursor: pointer;
+    }
+
+    .iw-toc__toggle-icon {
+        width: var(--iw-toc-toggle-icon-size, 1.25rem);
+        height: var(--iw-toc-toggle-icon-size, 1.25rem);
+    }
+
+    /* The open drawer sits exactly where the pinned panel lives on wide
+       screens (same top offset). */
+    .iw-toc--sticky .iw-toc__panel {
+        position: fixed;
+        top: var(--iw-toc-drawer-top, var(--iw-toc-sticky-top, 6rem));
+        right: 0;
+        width: var(--iw-toc-drawer-width, 18rem);
+        max-width: 85vw;
+        max-height: calc(100vh - var(--iw-toc-drawer-top, var(--iw-toc-sticky-top, 6rem)) - 2rem);
+        overflow-y: auto;
+        z-index: var(--iw-toc-drawer-z, 55);
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        box-shadow: var(--iw-toc-drawer-shadow, 0 0.5rem 2rem rgba(0, 0, 0, 0.25));
+        /* Hidden off-screen until the controller adds --open. */
+        transform: translateX(100%);
+        visibility: hidden;
+        transition: transform 0.25s ease, visibility 0.25s ease;
+    }
+
+    .iw-toc--sticky.iw-toc--open .iw-toc__panel {
+        transform: translateX(0);
+        visibility: visible;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-toc--sticky .iw-toc__panel {
+        transition: none;
+    }
+}
+
+/* Inside a side column (blog sidebar, event timeline) the column owns the
+   spacing and width — the panel just fills it. */
+aside .iw-toc {
+    max-width: none;
+    margin: 0;
+}
+
+/* ─── Reading progress bar (F5 reading component) ────────────────────────── */
+/* Thin bar fixed at the top of the viewport, filled by the reading-progress
+   controller through --iw-reading-progress-value (0..1). Thickness and color
+   come from the theme (--iw-reading-progress-{height,color}); everything is
+   overridable. Decorative: it never catches pointer events. */
+.iw-reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--iw-reading-progress-z, 60);
+    height: var(--iw-reading-progress-height, 4px);
+    background: var(--iw-reading-progress-track, transparent);
+    pointer-events: none;
+}
+
+.iw-reading-progress__bar {
+    height: 100%;
+    background: var(--iw-reading-progress-color, var(--color-surface-accent));
+    transform: scaleX(var(--iw-reading-progress-value, 0));
+    transform-origin: left;
+    transition: transform var(--iw-reading-progress-transition, 0.08s linear);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-reading-progress__bar {
+        transition: none;
+    }
+}
+
+/* ─── Share buttons (F5 reading component) ───────────────────────────────── */
+/* Row of share actions (native share, copy link, email) rendered on article
+   pages. Everything routes through --iw-share-* for restyling. The native and
+   copy buttons are [hidden] until the share controller reveals them. */
+.iw-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--iw-share-gap, 0.5rem);
+    margin: var(--iw-share-margin, 1.5rem 0);
+}
+
+/* Inside an article header (e.g. news magazine inline hero, news minimal
+   centered header) the row only needs a top gap — the header already
+   provides the bottom spacing. */
+.iw-article-page__header .iw-share {
+    margin: var(--iw-share-margin-in-header, 1rem 0 0);
+}
+
+.iw-share__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--iw-share-button-gap, 0.5rem);
+    padding: var(--iw-share-button-padding, 0.5rem 1rem);
+    font-size: var(--iw-share-font-size, 0.875rem);
+    font-weight: var(--iw-share-font-weight, 500);
+    line-height: 1;
+    text-decoration: none;
+    border-radius: var(--iw-share-radius, 999px);
+    cursor: pointer;
+    transition: background-color var(--iw-share-transition, 0.15s ease);
+}
+
+/* Neutral surface skin — applied only when no theme button variant
+   (iw-button--*) owns the colors, so a configured variant shows through. */
+.iw-share__button:not([class*="iw-button--"]) {
+    color: var(--iw-share-color, var(--color-surface-foreground));
+    background-color: var(--iw-share-bg, var(--color-surface));
+    border: var(--iw-share-border, 1px solid var(--color-surface-border));
+}
+
+.iw-share__button:not([class*="iw-button--"]):hover {
+    background-color: var(--iw-share-hover-bg, color-mix(in srgb, var(--iw-share-bg, var(--color-surface)), var(--color-text) 8%));
+}
+
+.iw-share__button[hidden] {
+    display: none;
+}
+
+.iw-share__icon {
+    width: var(--iw-share-icon-size, 1rem);
+    height: var(--iw-share-icon-size, 1rem);
+    flex-shrink: 0;
+}
+
+.iw-share__feedback {
+    font-size: var(--iw-share-font-size, 0.875rem);
+    color: var(--iw-share-feedback-color, var(--color-surface-foreground));
+}
+
+/* ─── Article results header: count + active filter chips (F4-A) ─────────── */
+.iw-article-results {
+    margin-bottom: var(--iw-article-results-gap, 1.5rem);
+}
+
+.iw-article-results__count {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-surface-foreground);
+}
+
+.iw-article-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.iw-article-active-filters__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--color-surface-foreground);
+    background-color: color-mix(in srgb, var(--color-surface-accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-surface-accent) 25%, transparent);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.iw-article-active-filters__chip:hover {
+    background-color: color-mix(in srgb, var(--color-surface-accent) 18%, transparent);
+}
+
+.iw-article-active-filters__remove {
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-surface-muted);
+}
+
+.iw-article-active-filters__chip:hover .iw-article-active-filters__remove {
+    color: var(--color-surface-accent);
+}
+
+.iw-article-active-filters__clear {
+    margin-left: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--color-surface-muted);
+    text-decoration: underline;
+}
+
+.iw-article-active-filters__clear:hover {
+    color: var(--color-surface-accent);
+}
+
+/* Empty state — clear-filters call to action (the base .iw-article-listing__empty
+   layout/color comes from the theme CSS). */
+.iw-article-listing__empty-action {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--color-surface-accent);
+    text-decoration: underline;
 }

@@ -196,13 +196,19 @@ class ThemeCompiler
         $css .= ":root {\n";
         $css .= $this->generateColorVariables($tokens['colors'] ?? []);
         $css .= $this->generatePaletteVariables($tokens['colors'] ?? []);
+        $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
         $css .= $this->generateButtonVariables($tokens['buttons'] ?? []);
         $css .= $this->generateMenuVariables($menuConfig);
         $css .= $this->generateArticleVariables($tokens);
         $css .= $this->generateArticleCardVariables($tokens);
+        $css .= $this->generateBackToTopVariables($tokens);
+        $css .= $this->generateReadingProgressVariables($tokens);
         $css .= "}\n\n";
+
+        // Per-component surface overrides (scoped redefinitions of the surface tokens)
+        $css .= $this->generateComponentSurfaceOverrides($tokens);
 
         // Button classes
         $css .= $this->generateButtonClasses($tokens['buttons'] ?? []);
@@ -245,7 +251,7 @@ class ThemeCompiler
             'articles_eventStyle' => 'event-style',
             'articles_blogStyle' => 'blog-style',
             'articles_listingStyle' => 'listing-style',
-            'articles_cardImageRatio' => 'card-image-ratio',
+            'cardImageRatio' => 'card-image-ratio',
         ];
 
         $hasAny = false;
@@ -283,16 +289,98 @@ class ThemeCompiler
      *
      * @return string CSS variable declarations
      */
+    /**
+     * Button + icon sizes for the back-to-top component, keyed by the admin
+     * size option: [button diameter, icon size].
+     *
+     * @var array<string, array{0: string, 1: string}>
+     */
+    private const BACK_TO_TOP_SIZES = [
+        'sm' => ['2.25rem', '1rem'],
+        'md' => ['2.75rem', '1.25rem'],
+        'lg' => ['3.25rem', '1.5rem'],
+    ];
+
+    /**
+     * Generate CSS custom properties for the site-wide back-to-top button.
+     *
+     * Emits --iw-back-to-top-* from the admin config (shape, size, colors).
+     * Empty colors fall back to the surface-accent tokens, which already adapt
+     * to light/dark themes.
+     *
+     * @param array<string, mixed> $tokens Theme token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateBackToTopVariables(array $tokens): string
+    {
+        $shape = (string) ($tokens['components_backToTopShape'] ?? 'rounded-full');
+        $radius = str_starts_with($shape, 'rounded-') ? $this->resolveRadius($shape) : $shape;
+
+        $size = (string) ($tokens['components_backToTopSize'] ?? 'md');
+        [$button, $icon] = self::BACK_TO_TOP_SIZES[$size] ?? self::BACK_TO_TOP_SIZES['md'];
+
+        $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
+        $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
+
+        $css = "  /* Back-to-top (site-wide) */\n";
+        $css .= "  --iw-back-to-top-radius: {$radius};\n";
+        $css .= "  --iw-back-to-top-size: {$button};\n";
+        $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
+        $css .= "  --iw-back-to-top-bg: {$bg};\n";
+        $css .= "  --iw-back-to-top-color: {$color};\n";
+
+        return $css . "\n";
+    }
+
+    /**
+     * Bar heights for the reading progress component, keyed by the admin
+     * size option.
+     *
+     * @var array<string, string>
+     */
+    private const READING_PROGRESS_SIZES = [
+        'sm' => '2px',
+        'md' => '4px',
+        'lg' => '6px',
+    ];
+
+    /**
+     * Generate CSS custom properties for the article reading progress bar.
+     *
+     * Emits --iw-reading-progress-* from the admin config (thickness, color).
+     * An empty color falls back to the surface-accent token, which already
+     * adapts to light/dark themes.
+     *
+     * @param array<string, mixed> $tokens Theme token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateReadingProgressVariables(array $tokens): string
+    {
+        $size = (string) ($tokens['articles_readingProgressSize'] ?? 'md');
+        $height = self::READING_PROGRESS_SIZES[$size] ?? self::READING_PROGRESS_SIZES['md'];
+
+        $color = $this->surfaceValue($tokens['articles_readingProgressColor'] ?? '', 'var(--color-surface-accent)');
+
+        $css = "  /* Reading progress bar (article pages) */\n";
+        $css .= "  --iw-reading-progress-height: {$height};\n";
+        $css .= "  --iw-reading-progress-color: {$color};\n";
+
+        return $css . "\n";
+    }
+
+
     private function generateArticleCardVariables(array $tokens): string
     {
-        $surface = (string) ($tokens['articles_cardSurface'] ?? 'none');
-        $padding = (string) ($tokens['articles_cardPadding'] ?? '1rem');
-        $border = (string) ($tokens['articles_cardBorder'] ?? 'none');
-        $borderWidth = (string) ($tokens['articles_cardBorderWidth'] ?? '1px');
-        $borderStyle = (string) ($tokens['articles_cardBorderStyle'] ?? 'solid');
-        $hoverBorder = (string) ($tokens['articles_cardHoverBorder'] ?? 'none');
-        $hoverDuration = ButtonEffectCatalog::resolveDuration((string) ($tokens['articles_cardHoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
-        $hoverEasing = ButtonEffectCatalog::resolveEasing((string) ($tokens['articles_cardHoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
+        $surface = (string) ($tokens['cardSurface'] ?? 'none');
+        $padding = (string) ($tokens['cardPadding'] ?? '1rem');
+        $border = (string) ($tokens['cardBorder'] ?? 'none');
+        $borderWidth = (string) ($tokens['cardBorderWidth'] ?? '1px');
+        $borderStyle = (string) ($tokens['cardBorderStyle'] ?? 'solid');
+        $hoverBorder = (string) ($tokens['cardHoverBorder'] ?? 'none');
+        $hoverDuration = ButtonEffectCatalog::resolveDuration((string) ($tokens['cardHoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
+        $hoverEasing = ButtonEffectCatalog::resolveEasing((string) ($tokens['cardHoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
 
         $surfaceValue = ('none' === $surface) ? 'transparent' : $this->resolveColorValue($surface);
         $borderValue = ('none' === $border)
@@ -302,13 +390,23 @@ class ThemeCompiler
             ? 'transparent'
             : $this->resolveColorValue($hoverBorder);
 
-        $css = "  /* Article card */\n";
+        // Content colors (empty = page-level defaults, which already adapt to the theme).
+        $titleColor = $this->surfaceValue($tokens['cardTitleColor'] ?? '', 'var(--color-text)');
+        $textColor = $this->surfaceValue($tokens['cardTextColor'] ?? '', 'var(--color-secondary-600)');
+        $badgeBg = $this->surfaceValue($tokens['cardBadgeBg'] ?? '', 'var(--color-primary-100)');
+        $badgeText = $this->surfaceValue($tokens['cardBadgeText'] ?? '', 'var(--color-primary-700)');
+
+        $css = "  /* Card (site-wide) */\n";
         $css .= "  --iw-article-card-surface: {$surfaceValue};\n";
         $css .= "  --iw-article-card-padding: {$padding};\n";
         $css .= "  --iw-article-card-border: {$borderValue};\n";
         $css .= "  --iw-article-card-hover-border-color: {$hoverBorderValue};\n";
         $css .= "  --iw-article-card-hover-duration: {$hoverDuration};\n";
         $css .= "  --iw-article-card-hover-easing: {$hoverEasing};\n";
+        $css .= "  --iw-article-card-title-color: {$titleColor};\n";
+        $css .= "  --iw-article-card-text-color: {$textColor};\n";
+        $css .= "  --iw-article-card-badge-bg: {$badgeBg};\n";
+        $css .= "  --iw-article-card-badge-text: {$badgeText};\n";
 
         return $css . "\n";
     }
@@ -353,6 +451,7 @@ class ThemeCompiler
         // between the image and the body — same value horizontally and
         // vertically so the rhythm stays consistent with the inner padding.
         $css .= ".iw-article-card {\n";
+        $css .= "  position: relative;\n"; // anchors the stretched title link
         $css .= "  display: flex;\n";
         $css .= "  flex-direction: column;\n";
         $css .= "  gap: var(--iw-article-card-padding, 1rem);\n";
@@ -407,22 +506,30 @@ class ThemeCompiler
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__title a {\n";
-        $css .= "  color: var(--color-text);\n";
+        $css .= "  color: var(--iw-article-card-title-color, var(--color-text));\n";
         $css .= "  text-decoration: none;\n";
         $css .= "  transition: color 0.2s ease;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__title a:hover {\n";
-        $css .= "  color: var(--color-primary);\n";
+        $css .= "  color: var(--iw-article-card-title-hover-color, var(--color-primary));\n";
+        $css .= "}\n";
+        // Stretched link: the title link covers the whole card so it is fully
+        // clickable (listings, related articles) without wrapping the markup
+        // in an anchor.
+        $css .= ".iw-article-card__title a::after {\n";
+        $css .= "  content: \"\";\n";
+        $css .= "  position: absolute;\n";
+        $css .= "  inset: 0;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__date {\n";
         $css .= "  display: block;\n";
         $css .= "  font-size: 0.875rem;\n";
-        $css .= "  color: var(--color-secondary-500);\n";
+        $css .= "  color: var(--iw-article-card-text-color, var(--color-secondary-500));\n";
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__excerpt {\n";
         $css .= "  font-size: 0.875rem;\n";
-        $css .= "  color: var(--color-secondary-600);\n";
+        $css .= "  color: var(--iw-article-card-text-color, var(--color-secondary-600));\n";
         $css .= "  display: -webkit-box;\n";
         $css .= "  -webkit-line-clamp: 2;\n";
         $css .= "  -webkit-box-orient: vertical;\n";
@@ -538,7 +645,7 @@ class ThemeCompiler
         $css .= ".iw-article-listing__empty {\n";
         $css .= "  text-align: center;\n";
         $css .= "  padding: 3rem 0;\n";
-        $css .= "  color: var(--color-secondary-500);\n";
+        $css .= "  color: var(--color-surface-muted, var(--color-secondary-500));\n";
         $css .= "}\n\n";
 
         return $css;
@@ -587,6 +694,139 @@ class ThemeCompiler
         }
 
         return $this->resolvedPalettes[$colorName][(int) $shade] ?? '#000000';
+    }
+
+    /**
+     * Generate the semantic "surface" tokens shared by every transverse
+     * component (filter sidebar, pagination, breadcrumb, badges, generic cards).
+     *
+     * Each value comes from the Components > Surfaces admin config when set,
+     * otherwise it is derived from the theme's background/text so neutral panels
+     * stay readable on light AND dark themes out of the box — no per-theme
+     * configuration required. Components reference these as the *default* behind
+     * their own `--iw-*` override variables, so everything remains restylable.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateSurfaceVariables(array $tokens): string
+    {
+        // Derived defaults: mix the page background toward the text colour. This
+        // works in both directions — a light theme yields a slightly darker
+        // panel, a dark theme a slightly lighter one — keeping contrast with the
+        // text whatever the theme's overall lightness.
+        $surface = $this->surfaceValue(
+            $tokens['components_surfaceBg'] ?? '',
+            'color-mix(in srgb, var(--color-background), var(--color-text) 6%)',
+        );
+        $foreground = $this->surfaceValue(
+            $tokens['components_surfaceText'] ?? '',
+            'var(--color-text)',
+        );
+        $muted = $this->surfaceValue(
+            $tokens['components_surfaceMuted'] ?? '',
+            'color-mix(in srgb, var(--color-text) 60%, var(--color-background))',
+        );
+        $border = $this->surfaceValue(
+            $tokens['components_surfaceBorder'] ?? '',
+            'var(--color-border, color-mix(in srgb, var(--color-text) 18%, var(--color-background)))',
+        );
+        $accent = $this->surfaceValue(
+            $tokens['components_surfaceAccent'] ?? '',
+            'var(--color-primary)',
+        );
+        // Text drawn on top of the accent (e.g. the sidebar "Apply" button).
+        // White suits most brand colours; overridable for light accents.
+        $onAccent = $this->surfaceValue(
+            $tokens['components_surfaceOnAccent'] ?? '',
+            '#ffffff',
+        );
+
+        $css = "  /* Semantic surfaces (transverse components) */\n";
+        $css .= "  --color-surface: {$surface};\n";
+        $css .= "  --color-surface-foreground: {$foreground};\n";
+        $css .= "  --color-surface-muted: {$muted};\n";
+        $css .= "  --color-surface-border: {$border};\n";
+        $css .= "  --color-surface-accent: {$accent};\n";
+        $css .= "  --color-surface-on-accent: {$onAccent};\n";
+
+        return $css . "\n";
+    }
+
+    /**
+     * Per-component selector => [config key => surface token] map driving the
+     * Components-tab per-component colour overrides.
+     */
+    private const COMPONENT_SURFACE_OVERRIDES = [
+        // The sidebar colors are shared with the table of contents: both are
+        // article side panels and wear the same skin (one admin section).
+        '.iw-article-filters, .iw-toc' => [
+            'components_sidebarBg' => '--color-surface',
+            'components_sidebarText' => '--color-surface-foreground',
+            'components_sidebarMuted' => '--color-surface-muted',
+            'components_sidebarBorder' => '--color-surface-border',
+            'components_sidebarAccent' => '--color-surface-accent',
+        ],
+        '.iw-pagination' => [
+            'components_paginationText' => '--color-surface-muted',
+            'components_paginationAccent' => '--color-surface-accent',
+        ],
+        '.iw-breadcrumbs' => [
+            'components_breadcrumbText' => '--color-surface-muted',
+            'components_breadcrumbCurrent' => '--color-surface-foreground',
+            'components_breadcrumbAccent' => '--color-surface-accent',
+        ],
+    ];
+
+    /**
+     * Generate per-component surface overrides. Each configured override
+     * redefines the relevant `--color-surface*` token *scoped to that
+     * component's root selector*. Because every transverse component reads
+     * `var(--iw-*, var(--color-surface-*))`, redefining the token locally
+     * restyles the whole component without mapping each individual variable.
+     * Unset overrides emit nothing — the component keeps inheriting the global
+     * surface tokens.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentSurfaceOverrides(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $token) {
+                $value = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $value || 'none' === $value) {
+                    continue;
+                }
+                $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Resolve a surface colour config value, falling back to a derived default
+     * when empty or "none".
+     *
+     * @param mixed  $value   Raw config value (may be a ref:, a colour, or empty)
+     * @param string $default CSS expression used when no value is configured
+     */
+    private function surfaceValue(mixed $value, string $default): string
+    {
+        $value = trim((string) $value);
+        if ('' === $value || 'none' === $value) {
+            return $default;
+        }
+
+        return $this->resolveColorValue($value);
     }
 
     /**

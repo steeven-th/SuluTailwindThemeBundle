@@ -35,6 +35,7 @@
         currentPage: currentPage|default(1),
         totalPages: totalPages|default(1),
         baseUrl: baseUrl|default(''),
+        queryParams: filterQuery|default({}),
     } only %}
 {% else %}
     <p class="iw-article-listing__empty">

@@ -55,6 +55,36 @@
                 "name": "fileinput",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "article_filters": {
+                "main": "controllers/article_filters_controller.js",
+                "name": "article-filters",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "back_to_top": {
+                "main": "controllers/back_to_top_controller.js",
+                "name": "back-to-top",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "share": {
+                "main": "controllers/share_controller.js",
+                "name": "share",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "reading_progress": {
+                "main": "controllers/reading_progress_controller.js",
+                "name": "reading-progress",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "toc": {
+                "main": "controllers/toc_controller.js",
+                "name": "toc",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {
