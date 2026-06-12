@@ -569,6 +569,7 @@
     "iw_sulu_tailwind_theme.articles_show_dates": "Show dates",
     "iw_sulu_tailwind_theme.articles_show_authors": "Show authors",
     "iw_sulu_tailwind_theme.articles_show_categories": "Show categories (badges)",
+    "iw_sulu_tailwind_theme.articles_show_tags": "Tags",
     "iw_sulu_tailwind_theme.articles_show_excerpts": "Show excerpts",
     "iw_sulu_tailwind_theme.articles_show_related": "Show related articles",
     "iw_sulu_tailwind_theme.articles_related_count": "Number of related articles",

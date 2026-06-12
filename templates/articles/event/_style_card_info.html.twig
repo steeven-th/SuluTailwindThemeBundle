@@ -43,7 +43,7 @@
     <header class="iw-article-page__header mt-8 mb-6">
         {% if articleConfig.showCategories|iw_article_visible('page') %}
             {% include '@ItechWorldSuluTailwindTheme/components/_categories.html.twig' with {
-                categories: content.excerptCategories|default([]),
+                categories: extension.excerpt.categories|default([]),
             } only %}
         {% endif %}
 
@@ -56,15 +56,20 @@
                 {{ content.subtitle }}
             </p>
         {% endif %}
+
+        {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
+        {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
+            <p class="iw-article-page__excerpt">{{ articleExcerpt }}</p>
+        {% endif %}
+
+        {% if articleConfig.showTags|iw_article_visible('page') %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
+                tags: extension.excerpt.tags|default([]),
+                size: 'sm',
+            } only %}
+        {% endif %}
     </header>
 {% endblock %}
 
 {% block article_meta %}{% endblock %}
 
-{% block article_footer %}
-    <footer class="iw-article-page__footer mt-10 pt-6 border-t border-[var(--color-border)]">
-        {% include '@ItechWorldSuluTailwindTheme/components/_tags.html.twig' with {
-            tags: content.excerptTags|default([]),
-        } only %}
-    </footer>
-{% endblock %}

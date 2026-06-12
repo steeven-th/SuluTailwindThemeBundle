@@ -562,6 +562,7 @@
     "iw_sulu_tailwind_theme.articles_show_dates": "Datum anzeigen",
     "iw_sulu_tailwind_theme.articles_show_authors": "Autoren anzeigen",
     "iw_sulu_tailwind_theme.articles_show_categories": "Kategorien anzeigen (Badges)",
+    "iw_sulu_tailwind_theme.articles_show_tags": "Tags",
     "iw_sulu_tailwind_theme.articles_show_excerpts": "Auszüge anzeigen",
     "iw_sulu_tailwind_theme.articles_show_related": "Verwandte Artikel anzeigen",
     "iw_sulu_tailwind_theme.articles_related_count": "Anzahl verwandter Artikel",

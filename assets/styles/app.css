@@ -2652,6 +2652,34 @@ section.block:has([data-slider-fullbleed-value]) {
     line-height: 1.5;
 }
 
+/* Lead paragraph — the excerpt description rendered in the article header
+   (Articles > Display elements > Excerpts: "both"). */
+.iw-article-page__excerpt {
+    margin-top: var(--iw-article-page-excerpt-gap, 0.75rem);
+    font-size: var(--iw-article-page-excerpt-size, 1.0625rem);
+    line-height: var(--iw-article-page-excerpt-line-height, 1.6);
+    color: var(--iw-article-page-excerpt-color, var(--color-secondary-600));
+}
+
+/* Light variant for dark heros (e.g. blog editorial). */
+.iw-article-page__excerpt--light {
+    --iw-article-page-excerpt-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Header tags: small pills need a breath above, wherever the style puts
+   them (header block, meta row, editorial hero). */
+.iw-article-page__header .iw-tags,
+.iw-article-meta + .iw-tags,
+.iw-article-hero .iw-tags {
+    margin-top: var(--iw-article-page-header-tags-gap, 0.75rem);
+}
+
+/* On a dark hero (blog editorial) the pills switch to light tones. */
+.iw-article-hero .iw-tags {
+    --iw-tag-text: rgba(255, 255, 255, 0.85);
+    --iw-tag-border: rgba(255, 255, 255, 0.35);
+}
+
 /* Size modifiers — used by article styles (e.g. news magazine, news minimal) */
 .iw-article-page__title--minimal {
     font-size: var(--iw-article-page-title-size-minimal, 2.25rem);
@@ -3217,6 +3245,12 @@ span.iw-breadcrumbs__separator {
     display: flex;
     flex-wrap: wrap;
     gap: var(--iw-tags-gap, 0.5rem);
+}
+
+/* Compact variant — smaller pills, e.g. inside article headers. */
+.iw-tags--sm {
+    --iw-tag-padding: 0.125rem 0.5rem;
+    --iw-tag-font-size: 0.6875rem;
 }
 
 .iw-tag {

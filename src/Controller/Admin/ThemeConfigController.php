@@ -101,7 +101,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'articles_newsStyle', 'articles_eventStyle', 'articles_blogStyle',
         'articles_listingStyle',
         'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
-        'articles_showExcerpts', 'articles_showRelated',
+        'articles_showTags', 'articles_showExcerpts', 'articles_showRelated',
         'articles_relatedCount',
         // Reading components (article pages): share buttons, reading
         // progress, table of contents.
