@@ -123,6 +123,28 @@ Returns the Twig template path for a specific block style.
 
 ---
 
+### `iw_sulu_tailwind_theme_location_address(location)`
+
+Formats the structured address of a Sulu `location` value as a multi-line string
+(`number street\ncode town\ncountry`), skipping the empty parts. Used by the
+location block styles, the CTA location accessory and the form location widget
+for both the displayed address and the map POI popup.
+
+```twig
+{% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
+
+{% if formattedAddress is not empty %}
+    <p class="whitespace-pre-line">{{ formattedAddress }}</p>
+{% endif %}
+```
+
+**Parameters:**
+- `location` (`array|null`) — The Sulu location value (`lat`, `long`, `street`, `number`, `code`, `town`, `country`)
+
+**Returns:** `string` — The formatted address, or an empty string when no address field is filled.
+
+---
+
 ### `iw_sulu_tailwind_theme_article_config()`
 
 Returns the article display configuration of the active theme. The result is an

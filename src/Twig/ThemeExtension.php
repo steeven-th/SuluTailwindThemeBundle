@@ -45,7 +45,49 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_tokens', $this->getTokens(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_styles', $this->getBlockStyles(...)),
             new TwigFunction('iw_sulu_tailwind_theme_upload_max_size', $this->getUploadMaxSize(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_location_address', $this->getLocationAddress(...)),
         ];
+    }
+
+    /**
+     * Format the structured address of a Sulu location value as a multi-line string.
+     *
+     * Builds "number street\ncode town\ncountry" from the available fields,
+     * skipping empty parts. Used by the location block styles, the CTA
+     * location accessory and the form location widget (display + map popup).
+     *
+     * @param array<string, mixed>|null $location The Sulu location value (lat, long, street, number, code, town, country)
+     *
+     * @return string The formatted address, or an empty string when no address fields are filled
+     */
+    public function getLocationAddress(?array $location): string
+    {
+        if (null === $location) {
+            return '';
+        }
+
+        $parts = [];
+
+        $street = trim((string) ($location['street'] ?? ''));
+        if ('' !== $street) {
+            $number = trim((string) ($location['number'] ?? ''));
+            $parts[] = '' !== $number ? $number . ' ' . $street : $street;
+        }
+
+        $cityLine = trim(implode(' ', array_filter([
+            trim((string) ($location['code'] ?? '')),
+            trim((string) ($location['town'] ?? '')),
+        ], static fn (string $value): bool => '' !== $value)));
+        if ('' !== $cityLine) {
+            $parts[] = $cityLine;
+        }
+
+        $country = trim((string) ($location['country'] ?? ''));
+        if ('' !== $country) {
+            $parts[] = $country;
+        }
+
+        return implode("\n", $parts);
     }
 
     /**

@@ -1,0 +1,78 @@
+{# Location map — interactive Leaflet map for a Sulu location field.
+   Single shared partial used by the location block styles, the CTA location
+   accessory and the form location widget (replaces the legacy OSM iframes).
+
+   Tile provider, scroll-zoom behavior and colors come from the theme config
+   (Components tab, components_maps* keys). Attribution is always displayed
+   (OSM/Carto tile usage policies require it).
+
+   Expected variables:
+     - location: Sulu location object (.lat, .long, .zoom) — required
+     - title: optional label used for the popup title and the aria-label
+     - address: optional formatted (multi-line) address shown in the popup
+     - mapClass: optional sizing classes (height / aspect-ratio utilities)
+     - popup: optional, set false to disable the POI popup (default: true)
+#}
+{% if location is defined and location.lat is defined and location.long is defined %}
+    {# Tile presets — keyless providers only. The custom provider lets users
+       plug any tile server (Mapbox, MapTiler…) with the key in the URL. #}
+    {% set osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors' %}
+    {% set cartoAttribution = osmAttribution ~ ' &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>' %}
+    {% set tilePresets = {
+        'osm': { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: osmAttribution },
+        'carto_voyager': { url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', attribution: cartoAttribution },
+        'carto_positron': { url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: cartoAttribution },
+        'carto_dark': { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', attribution: cartoAttribution },
+    } %}
+
+    {% set mapsProvider = iw_sulu_tailwind_theme.components_mapsTileProvider|default('osm') %}
+    {% if mapsProvider == 'custom' and iw_sulu_tailwind_theme.components_mapsCustomTileUrl|default('') is not empty %}
+        {% set tileUrl = iw_sulu_tailwind_theme.components_mapsCustomTileUrl %}
+        {% set tileAttribution = iw_sulu_tailwind_theme.components_mapsCustomAttribution|default(osmAttribution) %}
+    {% else %}
+        {% set tilePreset = tilePresets[mapsProvider]|default(tilePresets.osm) %}
+        {% set tileUrl = tilePreset.url %}
+        {% set tileAttribution = tilePreset.attribution %}
+    {% endif %}
+
+    {% set zoom = location.zoom|default(15) %}
+    {% set externalUrl = 'https://www.openstreetmap.org/?mlat=' ~ location.lat ~ '&mlon=' ~ location.long ~ '#map=' ~ zoom ~ '/' ~ location.lat ~ '/' ~ location.long %}
+    {% set mapLabel = title|default('') is not empty ? title : 'iw_sulu_tailwind_theme.map'|trans %}
+
+    {# Custom marker image from the media library (replaces the themed SVG pin) #}
+    {% set markerMedia = iw_sulu_tailwind_theme.components_mapsMarkerMedia|default(null) %}
+    {% set markerUrl = null %}
+    {% if markerMedia is not null and markerMedia.id|default(null) is not null %}
+        {% set resolvedMarker = sulu_resolve_media(markerMedia.id, app.request.locale) %}
+        {% if resolvedMarker is not null %}
+            {% set markerUrl = resolvedMarker.url|default(null) %}
+        {% endif %}
+    {% endif %}
+
+    <div class="iw-location-map {{ mapClass|default('') }}"
+         role="region"
+         aria-label="{{ mapLabel }}"
+         data-controller="location-map"
+         data-location-map-lat-value="{{ location.lat }}"
+         data-location-map-lng-value="{{ location.long }}"
+         data-location-map-zoom-value="{{ zoom }}"
+         data-location-map-tile-url-value="{{ tileUrl }}"
+         data-location-map-attribution-value="{{ tileAttribution }}"
+         data-location-map-scroll-zoom-value="{{ iw_sulu_tailwind_theme.components_mapsScrollZoom|default('ctrl') }}"
+         data-location-map-marker-url-value="{{ markerUrl ?? '' }}"
+         data-location-map-popup-value="{{ (popup ?? true) ? 'true' : 'false' }}"
+         data-location-map-popup-title-value="{{ title|default('') }}"
+         data-location-map-popup-address-value="{{ address|default('') }}"
+         data-location-map-external-url-value="{{ externalUrl }}"
+         data-location-map-external-label-value="{{ 'iw_sulu_tailwind_theme.open_map'|trans }}"
+         data-location-map-hint-scroll-value="{{ 'iw_sulu_tailwind_theme.map_hint_scroll'|trans }}"
+         data-location-map-hint-scroll-mac-value="{{ 'iw_sulu_tailwind_theme.map_hint_scroll_mac'|trans }}"
+         data-location-map-hint-touch-value="{{ 'iw_sulu_tailwind_theme.map_hint_touch'|trans }}"
+    >
+        <noscript>
+            <a href="{{ externalUrl }}" target="_blank" rel="noopener noreferrer" class="iw-location-map__noscript">
+                {{ 'iw_sulu_tailwind_theme.open_map'|trans }} &#8599;
+            </a>
+        </noscript>
+    </div>
+{% endif %}

@@ -1,8 +1,8 @@
 # Block: location — CSS API
 
-Map block backed by the native Sulu `location` field. Renders an OpenStreetMap iframe centered on the chosen coordinates, with four layout styles selectable from the admin:
+Map block backed by the native Sulu `location` field. Renders an interactive **Leaflet** map centered on the chosen coordinates (shared [location map component](../transverse.md#location-map-leaflet) — tile provider, scroll-zoom behavior and colors are configured in **Theme > Components > Maps**), with four layout styles selectable from the admin:
 
-- `--map-only`: just the iframe.
+- `--map-only`: just the map.
 - `--fullwidth`: map + info column stacked below (title, address card, optional rich text, "open in maps" link).
 - `--map-with-info`: map (2 columns) + info column (1 column) side by side on `lg+`.
 - `--overlay`: map full width with a floating collapsible info card on desktop, full-width bottom sheet on mobile. Driven by the `location-overlay` Stimulus controller.
@@ -20,7 +20,7 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 | Class | Role |
 |-------|------|
 | `.iw-block-location` | Root wrapper. |
-| `.iw-block-location--map-only` | Just the iframe (no info column, no overlay). |
+| `.iw-block-location--map-only` | Just the map (no info column, no overlay). |
 | `.iw-block-location--fullwidth` | Map followed by an info column (title, address card, optional text, "open in maps" link). |
 | `.iw-block-location--map-with-info` | Map column (2/3) + info sidebar (1/3) on `lg+`; stacks on mobile. |
 | `.iw-block-location--overlay` | Map full width with a floating collapsible info card on top (desktop) or below (mobile). |
@@ -29,8 +29,8 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 
 | Class | Role |
 |-------|------|
-| `.iw-block-location__map-wrap` | Wrapper around the OSM iframe. Carries `paragraphImageRadius + overflow-hidden` when set. |
-| `.iw-block-location__map` | The OSM `<iframe>` itself. |
+| `.iw-block-location__map-wrap` | Wrapper around the Leaflet map. Carries `paragraphImageRadius + overflow-hidden` when set. |
+| `.iw-block-location__map` | The map container (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-location__info` | Info column wrapper (rendered in `--fullwidth` and `--map-with-info`). |
 | `.iw-block-location__address` | Address card with the bordered + tinted-bg layout. Border + background come from `--iw-block-location-info-*` custom properties. |
 | `.iw-block-location__address-label` | The "Address" label above the address text (with pin icon). |
@@ -99,7 +99,7 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 
 ### Tighter map height (`--map-only`)
 
-The map iframe's height is fixed via Tailwind utility classes (`h-[400px] md:h-[500px]`) on the `<iframe>` itself. To customise it without editing the template, target the iframe directly:
+The map's height is fixed via Tailwind utility classes (`h-[400px] md:h-[500px]`) on the map container itself. To customise it without editing the template, target the container directly:
 
 ```css
 .iw-block-location--map-only .iw-block-location__map {

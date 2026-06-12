@@ -45,5 +45,9 @@
     "iw_sulu_tailwind_theme.article.no_results_filtered": "No article matches your filters.",
     "iw_sulu_tailwind_theme.accessory_video": "Video",
     "iw_sulu_tailwind_theme.accessory_location": "Map",
-    "iw_sulu_tailwind_theme.widget_location": "Map"
+    "iw_sulu_tailwind_theme.widget_location": "Map",
+    "iw_sulu_tailwind_theme.map": "Map",
+    "iw_sulu_tailwind_theme.map_hint_scroll": "Use Ctrl + scroll to zoom the map",
+    "iw_sulu_tailwind_theme.map_hint_scroll_mac": "Use ⌘ + scroll to zoom the map",
+    "iw_sulu_tailwind_theme.map_hint_touch": "Use two fingers to move the map"
 }

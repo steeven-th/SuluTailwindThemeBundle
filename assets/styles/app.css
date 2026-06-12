@@ -8,7 +8,7 @@
    Dynamic classes generated at runtime (MarginSelector, Twig expressions)
    that Tailwind cannot detect from static source scanning.
    ──────────────────────────────────────────────────────────────────────── */
-@source inline("mt-0 mt-1 mt-2 mt-3 mt-4 mt-5 mt-6 mt-7 mt-8 mt-9 mt-10 mt-12 mt-16 mt-20 mt-24 mt-32 mb-0 mb-1 mb-2 mb-3 mb-4 mb-5 mb-6 mb-7 mb-8 mb-9 mb-10 mb-12 mb-16 mb-20 mb-24 mb-32 mx-0 mx-1 mx-2 mx-3 mx-4 mx-5 mx-6 mx-7 mx-8 mx-9 mx-10 mx-12 mx-16 mx-20 mx-24 mx-32 pt-0 pt-1 pt-2 pt-3 pt-4 pt-5 pt-6 pt-7 pt-8 pt-9 pt-10 pt-12 pt-16 pt-20 pt-24 pt-32 pb-0 pb-1 pb-2 pb-3 pb-4 pb-5 pb-6 pb-7 pb-8 pb-9 pb-10 pb-12 pb-16 pb-20 pb-24 pb-32 pl-0 pl-1 pl-2 pl-3 pl-4 pl-5 pl-6 pl-7 pl-8 pl-9 pl-10 pl-12 pl-16 pl-20 pl-24 pl-32 pr-0 pr-1 pr-2 pr-3 pr-4 pr-5 pr-6 pr-7 pr-8 pr-9 pr-10 pr-12 pr-16 pr-20 pr-24 pr-32 grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 sm:grid-cols-2 sm:grid-cols-3 sm:grid-cols-4 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 md:grid-cols-5 lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 col-span-1 col-span-2 col-span-3 col-span-4 col-span-5 md:col-span-1 md:col-span-2 md:col-span-3 md:col-span-4 md:col-span-5 lg:col-span-1 lg:col-span-2 lg:col-span-3 gap-1 gap-2 gap-3 gap-4 gap-5 gap-6 gap-8 gap-10 gap-12 sm:gap-1 sm:gap-2 sm:gap-3 sm:gap-4 sm:gap-5 sm:gap-6 sm:gap-8 sm:gap-10 sm:gap-12 md:gap-1 md:gap-2 md:gap-3 md:gap-4 md:gap-5 md:gap-6 md:gap-8 md:gap-10 md:gap-12 md:order-1 md:order-2 lg:order-1 lg:order-2 flex-row-reverse md:flex-row-reverse text-center text-left text-right text-justify rounded rounded-xs rounded-sm rounded-md rounded-lg rounded-xl rounded-2xl rounded-3xl rounded-4xl rounded-full rounded-none sm:rounded sm:rounded-xs sm:rounded-sm sm:rounded-md sm:rounded-lg sm:rounded-xl sm:rounded-2xl sm:rounded-3xl sm:rounded-4xl sm:rounded-full sm:rounded-none sm:overflow-hidden sm:mx-0 sm:mx-1 sm:mx-2 sm:mx-3 sm:mx-4 sm:mx-5 sm:mx-6 sm:mx-7 sm:mx-8 sm:mx-9 sm:mx-10 sm:mx-12 sm:mx-16 sm:mx-20 sm:mx-24 sm:mx-32 sm:mb-0 sm:mb-1 sm:mb-2 sm:mb-3 sm:mb-4 sm:mb-5 sm:mb-6 sm:mb-7 sm:mb-8 sm:mb-9 sm:mb-10 sm:mb-12 sm:mb-16 sm:mb-20 sm:mb-24 sm:mb-32 sm:pb-0 sm:pb-1 sm:pb-2 sm:pb-3 sm:pb-4 sm:pb-5 sm:pb-6 sm:pb-7 sm:pb-8 sm:pb-9 sm:pb-10 sm:pb-12 sm:pb-16 sm:pb-20 sm:pb-24 sm:pb-32 h-8 h-16 h-24 h-32 h-48 border-t border-t-2 border-t-4 border-solid border-dashed border-dotted container sticky md:sticky md:top-4 md:self-start aspect-square aspect-video aspect-[9/16]");
+@source inline("mt-0 mt-1 mt-2 mt-3 mt-4 mt-5 mt-6 mt-7 mt-8 mt-9 mt-10 mt-12 mt-16 mt-20 mt-24 mt-32 mb-0 mb-1 mb-2 mb-3 mb-4 mb-5 mb-6 mb-7 mb-8 mb-9 mb-10 mb-12 mb-16 mb-20 mb-24 mb-32 mx-0 mx-1 mx-2 mx-3 mx-4 mx-5 mx-6 mx-7 mx-8 mx-9 mx-10 mx-12 mx-16 mx-20 mx-24 mx-32 pt-0 pt-1 pt-2 pt-3 pt-4 pt-5 pt-6 pt-7 pt-8 pt-9 pt-10 pt-12 pt-16 pt-20 pt-24 pt-32 pb-0 pb-1 pb-2 pb-3 pb-4 pb-5 pb-6 pb-7 pb-8 pb-9 pb-10 pb-12 pb-16 pb-20 pb-24 pb-32 pl-0 pl-1 pl-2 pl-3 pl-4 pl-5 pl-6 pl-7 pl-8 pl-9 pl-10 pl-12 pl-16 pl-20 pl-24 pl-32 pr-0 pr-1 pr-2 pr-3 pr-4 pr-5 pr-6 pr-7 pr-8 pr-9 pr-10 pr-12 pr-16 pr-20 pr-24 pr-32 grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 sm:grid-cols-2 sm:grid-cols-3 sm:grid-cols-4 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 md:grid-cols-5 lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 col-span-1 col-span-2 col-span-3 col-span-4 col-span-5 md:col-span-1 md:col-span-2 md:col-span-3 md:col-span-4 md:col-span-5 lg:col-span-1 lg:col-span-2 lg:col-span-3 gap-1 gap-2 gap-3 gap-4 gap-5 gap-6 gap-8 gap-10 gap-12 sm:gap-1 sm:gap-2 sm:gap-3 sm:gap-4 sm:gap-5 sm:gap-6 sm:gap-8 sm:gap-10 sm:gap-12 md:gap-1 md:gap-2 md:gap-3 md:gap-4 md:gap-5 md:gap-6 md:gap-8 md:gap-10 md:gap-12 md:order-1 md:order-2 lg:order-1 lg:order-2 flex-row-reverse md:flex-row-reverse text-center text-left text-right text-justify rounded rounded-xs rounded-sm rounded-md rounded-lg rounded-xl rounded-2xl rounded-3xl rounded-4xl rounded-full rounded-none sm:rounded sm:rounded-xs sm:rounded-sm sm:rounded-md sm:rounded-lg sm:rounded-xl sm:rounded-2xl sm:rounded-3xl sm:rounded-4xl sm:rounded-full sm:rounded-none sm:overflow-hidden sm:mx-0 sm:mx-1 sm:mx-2 sm:mx-3 sm:mx-4 sm:mx-5 sm:mx-6 sm:mx-7 sm:mx-8 sm:mx-9 sm:mx-10 sm:mx-12 sm:mx-16 sm:mx-20 sm:mx-24 sm:mx-32 sm:mb-0 sm:mb-1 sm:mb-2 sm:mb-3 sm:mb-4 sm:mb-5 sm:mb-6 sm:mb-7 sm:mb-8 sm:mb-9 sm:mb-10 sm:mb-12 sm:mb-16 sm:mb-20 sm:mb-24 sm:mb-32 sm:pb-0 sm:pb-1 sm:pb-2 sm:pb-3 sm:pb-4 sm:pb-5 sm:pb-6 sm:pb-7 sm:pb-8 sm:pb-9 sm:pb-10 sm:pb-12 sm:pb-16 sm:pb-20 sm:pb-24 sm:pb-32 h-8 h-16 h-24 h-32 h-48 border-t border-t-2 border-t-4 border-solid border-dashed border-dotted container sticky md:sticky md:top-4 md:self-start aspect-square aspect-video aspect-[9/16] aspect-[4/3]");
 
 /* ─── Reset & Defaults ──────────────────────────────────────────────────── */
 *,
@@ -4088,5 +4088,173 @@ aside .iw-toc {
     display: inline-block;
     margin-top: 1rem;
     color: var(--color-surface-accent);
+    text-decoration: underline;
+}
+
+/* ─── Location map (Leaflet — L13 maps refactoring) ──────────────────────── */
+/* Interactive map rendered by the location-map controller (location block,
+   CTA location accessory, form location widget). Everything routes through
+   --iw-location-map-* for restyling; the marker/popup/controls colors are
+   compiled from the admin Components > Maps config with theme-aware defaults. */
+.iw-location-map {
+    position: relative;
+    /* Own stacking context: keeps Leaflet panes and controls (z-index up to
+       ~1000) below the site header, modals and lightboxes. */
+    z-index: 0;
+    isolation: isolate;
+}
+
+.iw-location-map__canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.iw-location-map .leaflet-container {
+    font: inherit;
+    background: var(--iw-location-map-tile-bg, #e8e8e8);
+}
+
+/* Cooperative gestures: let one-finger touch scrolling pass through to the
+   page (Leaflet's own CSS sets touch-action: none on draggable containers;
+   the controller toggles dragging per gesture). */
+.iw-location-map--cooperative .leaflet-container {
+    touch-action: pan-x pan-y !important;
+}
+
+/* Themed SVG marker (DivIcon — avoids Leaflet's image-path bundling issue). */
+.iw-location-map__marker {
+    color: var(--iw-location-map-marker-color, var(--color-primary));
+    background: none;
+    border: 0;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+
+.iw-location-map__marker svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Custom marker image (media library) — same box as the SVG pin. */
+.iw-location-map__marker img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom;
+}
+
+/* POI popup */
+.iw-location-map__popup .leaflet-popup-content-wrapper {
+    color: var(--iw-location-map-popup-color, var(--color-surface-foreground, var(--color-text)));
+    background: var(--iw-location-map-popup-bg, var(--color-surface, #fff));
+    border-radius: var(--iw-location-map-popup-radius, var(--border-radius, 0.5rem));
+    box-shadow: var(--iw-location-map-popup-shadow, 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2));
+}
+
+.iw-location-map__popup .leaflet-popup-tip {
+    background: var(--iw-location-map-popup-bg, var(--color-surface, #fff));
+}
+
+.iw-location-map__popup .leaflet-popup-close-button {
+    color: var(--iw-location-map-popup-color, var(--color-surface-foreground, var(--color-text)));
+}
+
+.iw-location-map__popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    min-width: 10rem;
+}
+
+.iw-location-map__popup-title {
+    font-weight: var(--iw-location-map-popup-title-weight, 600);
+}
+
+.iw-location-map__popup-address {
+    margin: 0;
+    font-size: 0.8125rem;
+    white-space: pre-line;
+    opacity: 0.8;
+}
+
+.iw-location-map__popup-link {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+/* Force the popup colors on text children — the per-variant rules emitted by
+   the ThemeCompiler (.iw-variant--* p / a) otherwise win over inheritance
+   (same trick as the location overlay card; app.css loads after the theme
+   CSS, so equal-specificity rules resolve in our favor). */
+.iw-location-map__popup p,
+.iw-location-map__popup strong,
+.iw-location-map__popup span {
+    color: var(--iw-location-map-popup-color, var(--color-surface-foreground, var(--color-text)));
+}
+
+.iw-location-map__popup a:not([class*="iw-button--"]) {
+    color: var(--iw-location-map-popup-link-color, var(--iw-location-map-popup-color, var(--color-primary)));
+}
+
+/* Zoom controls */
+.iw-location-map .leaflet-bar {
+    border: 0;
+    border-radius: var(--iw-location-map-controls-radius, 0.375rem);
+    overflow: hidden;
+    box-shadow: var(--iw-location-map-controls-shadow, 0 1px 4px rgba(0, 0, 0, 0.25));
+}
+
+.iw-location-map .leaflet-control-zoom a {
+    color: var(--iw-location-map-controls-color, var(--color-surface-foreground, var(--color-text)));
+    background-color: var(--iw-location-map-controls-bg, var(--color-surface, #fff));
+    border-bottom-color: color-mix(in srgb, var(--iw-location-map-controls-color, #000) 15%, transparent);
+}
+
+.iw-location-map .leaflet-control-zoom a:hover {
+    background-color: color-mix(in srgb, var(--iw-location-map-controls-bg, #fff), var(--iw-location-map-controls-color, #000) 8%);
+}
+
+/* Attribution — always visible (OSM/Carto tile usage policies). */
+.iw-location-map .leaflet-control-attribution {
+    font-size: var(--iw-location-map-attribution-size, 0.6875rem);
+    color: var(--iw-location-map-controls-color, var(--color-surface-foreground, var(--color-text)));
+    background: color-mix(in srgb, var(--iw-location-map-controls-bg, #fff) 80%, transparent);
+}
+
+.iw-location-map .leaflet-control-attribution a {
+    color: inherit;
+}
+
+/* Gesture hint overlay (cooperative scroll/touch mode) */
+.iw-location-map__hint {
+    position: absolute;
+    inset: 0;
+    z-index: 1001; /* above every Leaflet pane and control */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    color: var(--iw-location-map-hint-color, #fff);
+    background: var(--iw-location-map-hint-bg, rgba(0, 0, 0, 0.45));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--iw-location-map-hint-transition, 0.25s ease);
+}
+
+.iw-location-map__hint--visible {
+    opacity: 1;
+}
+
+.iw-location-map__hint-text {
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+/* No-JS fallback link */
+.iw-location-map__noscript {
+    display: inline-block;
+    padding: 1rem;
     text-decoration: underline;
 }

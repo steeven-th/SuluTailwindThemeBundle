@@ -1,42 +1,21 @@
-{# CTA accessory — embedded OpenStreetMap iframe centered on a Sulu location
-   field, with the formatted address displayed below for context.
-   Same bbox/marker logic as templates/blocks/location/_style_map_with_info.html.twig.
+{# CTA accessory — interactive Leaflet map centered on a Sulu location field,
+   with the formatted address displayed below for context.
+   Rendered through the shared components/_location_map.html.twig partial.
    Expected variables:
      - accessoryLocation: Sulu location object (.lat, .long, .zoom, .street, .number, .code, .town, .country)
      - paragraphImageRadius: optional Tailwind radius class
 #}
 {% if accessoryLocation is defined and accessoryLocation.lat is defined and accessoryLocation.long is defined %}
-    {% set zoom = accessoryLocation.zoom|default(15) %}
-    {% set offset = 0.01 * (2 ** (15 - zoom)) %}
-
-    {# Build formatted address from structured location fields #}
-    {% set addressParts = [] %}
-    {% if accessoryLocation.street is defined and accessoryLocation.street is not empty %}
-        {% set streetLine = accessoryLocation.street %}
-        {% if accessoryLocation.number is defined and accessoryLocation.number is not empty %}
-            {% set streetLine = accessoryLocation.number ~ ' ' ~ streetLine %}
-        {% endif %}
-        {% set addressParts = addressParts|merge([streetLine]) %}
-    {% endif %}
-    {% set cityLine = [accessoryLocation.code|default(''), accessoryLocation.town|default('')]|filter(v => v is not empty)|join(' ') %}
-    {% if cityLine is not empty %}
-        {% set addressParts = addressParts|merge([cityLine]) %}
-    {% endif %}
-    {% if accessoryLocation.country is defined and accessoryLocation.country is not empty %}
-        {% set addressParts = addressParts|merge([accessoryLocation.country]) %}
-    {% endif %}
-    {% set formattedAddress = addressParts|join("\n") %}
+    {% set formattedAddress = iw_sulu_tailwind_theme_location_address(accessoryLocation) %}
 
     <div class="iw-block-cta__accessory iw-block-cta__accessory--location">
         <div class="iw-block-cta__map-wrap{% if paragraphImageRadius %} {{ paragraphImageRadius }} overflow-hidden{% endif %}">
-            <iframe
-                src="https://www.openstreetmap.org/export/embed.html?bbox={{ accessoryLocation.long - offset }}%2C{{ accessoryLocation.lat - offset }}%2C{{ accessoryLocation.long + offset }}%2C{{ accessoryLocation.lat + offset }}&amp;layer=mapnik&amp;marker={{ accessoryLocation.lat }}%2C{{ accessoryLocation.long }}"
-                class="iw-block-cta__map w-full border-0"
-                style="aspect-ratio: 4/3;"
-                loading="lazy"
-                title="{{ 'iw_sulu_tailwind_theme.accessory_location'|trans }}"
-                allowfullscreen
-            ></iframe>
+            {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
+                location: accessoryLocation,
+                title: 'iw_sulu_tailwind_theme.accessory_location'|trans,
+                address: formattedAddress,
+                mapClass: 'iw-block-cta__map w-full aspect-[4/3]'
+            } only %}
         </div>
 
         {% if formattedAddress is not empty %}

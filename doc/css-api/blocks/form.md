@@ -39,10 +39,10 @@ The info column renders one of three partials depending on the `widgetType` admi
 | `.iw-block-form__widget` | Stable hook on the widget wrapper. Always present in `--split`. |
 | `.iw-block-form__widget--text` | Modifier when `widgetType=text`. Wraps a `prose max-w-none` rich-text block fed by the `widgetText` text_editor field. |
 | `.iw-block-form__widget--image` | Modifier when `widgetType=image`. Wraps an `<img>` (`object-fit: cover`, height fills the info column). |
-| `.iw-block-form__widget--location` | Modifier when `widgetType=location`. Wraps the OpenStreetMap iframe + the formatted address row. |
+| `.iw-block-form__widget--location` | Modifier when `widgetType=location`. Wraps the Leaflet map + the formatted address row. |
 | `.iw-block-form__image` | The `<img>` inside `--image`. |
-| `.iw-block-form__map-wrap` | Wrapper around the OSM iframe (carries `paragraphImageRadius + overflow-hidden` when set). |
-| `.iw-block-form__map` | The OSM `<iframe>` inside `--location`. |
+| `.iw-block-form__map-wrap` | Wrapper around the Leaflet map (carries `paragraphImageRadius + overflow-hidden` when set). |
+| `.iw-block-form__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-form__map-address` | Row rendered below the map with a pin icon + formatted address. |
 | `.iw-block-form__map-address-icon` | The pin SVG. |
 | `.iw-block-form__map-address-text` | The `<p>` holding the multi-line address. |
