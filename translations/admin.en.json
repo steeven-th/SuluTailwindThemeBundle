@@ -628,6 +628,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_style": "Filter bar layout",
     "iw_sulu_tailwind_theme.components_sidebar_style_left": "Left column",
     "iw_sulu_tailwind_theme.components_sidebar_style_right": "Right column",
+    "iw_sulu_tailwind_theme.components_sidebar_style_topbar": "Top bar (above the results)",
     "iw_sulu_tailwind_theme.components_sidebar_style_offcanvas": "Drawer (\"Filters\" button)",
     "iw_sulu_tailwind_theme.components_filters_show_search": "Show search",
     "iw_sulu_tailwind_theme.components_filters_show_sort": "Show sort",

@@ -3329,6 +3329,41 @@ span.iw-breadcrumbs__separator {
     grid-template-columns: 1fr;
 }
 
+/* Topbar style: the filters sit above the results as a full-width horizontal
+   bar; controls flow in a wrapping row. Scoped :not(--drawer-armed) so the
+   mobile drawer keeps the vertical panel layout (the controller arms the
+   drawer below 768px exactly like the left/right styles). */
+.iw-article-layout--topbar {
+    grid-template-columns: 1fr;
+}
+
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__form {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--iw-article-filters-topbar-gap, 1rem 2rem);
+}
+
+/* Title + clear span the full bar width, above the controls. */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__header {
+    flex-basis: 100%;
+    justify-content: flex-start;
+}
+
+/* Checkbox lists flow horizontally and wrap. */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--iw-article-filters-topbar-options-gap, 0.5rem 1rem);
+}
+
+/* The submit button aligns with the controls (labels sit above them). */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply,
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply-btn {
+    align-self: flex-end;
+}
+
 .iw-article-layout__results {
     min-width: 0; /* allow the grid/list inside to shrink instead of overflowing */
 }
@@ -3348,19 +3383,19 @@ span.iw-breadcrumbs__separator {
    one column so cards keep a comfortable size. These descendant selectors win
    over the theme rules by specificity, regardless of stylesheet order. */
 @media (min-width: 768px) {
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 1024px) {
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--grid {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -3369,13 +3404,13 @@ span.iw-breadcrumbs__separator {
    at 1536px) that the sidebar no longer costs a column: restore the full-width
    counts. Same specificity as the 1024 block above, placed after, so it wins. */
 @media (min-width: 1536px) {
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--grid {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    .iw-article-layout:not(.iw-article-layout--offcanvas) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
+    .iw-article-layout:not(.iw-article-layout--offcanvas):not(.iw-article-layout--topbar) .iw-article-layout__results .iw-article-listing--portrait.iw-article-listing--cards {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
@@ -3423,6 +3458,14 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-article-filters__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Checkbox list inside a fieldset — vertical by default, switched to a
+   wrapping row by the topbar layout. */
+.iw-article-filters__options {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

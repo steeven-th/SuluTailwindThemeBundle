@@ -719,6 +719,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_style": "Disposition de la barre de filtres",
     "iw_sulu_tailwind_theme.components_sidebar_style_left": "Colonne à gauche",
     "iw_sulu_tailwind_theme.components_sidebar_style_right": "Colonne à droite",
+    "iw_sulu_tailwind_theme.components_sidebar_style_topbar": "Barre horizontale (au-dessus des résultats)",
     "iw_sulu_tailwind_theme.components_sidebar_style_offcanvas": "Tiroir (bouton « Filtres »)",
     "iw_sulu_tailwind_theme.components_filters_show_search": "Afficher la recherche",
     "iw_sulu_tailwind_theme.components_filters_show_sort": "Afficher le tri",

@@ -82,15 +82,17 @@
         {% if showCategories and facets.categories is defined and facets.categories|length > 0 %}
             <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
                 <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}</legend>
-                {% for category in facets.categories %}
-                    {% set value = category.key is not empty ? category.key : category.id %}
-                    <label class="iw-article-filters__option">
-                        <input type="checkbox" name="category[]" value="{{ value }}"
-                               class="iw-article-filters__checkbox"
-                               {{ value|trim in activeCategories ? 'checked' }}>
-                        <span class="iw-article-filters__option-label">{{ category.name }}</span>
-                    </label>
-                {% endfor %}
+                <div class="iw-article-filters__options">
+                    {% for category in facets.categories %}
+                        {% set value = category.key is not empty ? category.key : category.id %}
+                        <label class="iw-article-filters__option">
+                            <input type="checkbox" name="category[]" value="{{ value }}"
+                                   class="iw-article-filters__checkbox"
+                                   {{ value|trim in activeCategories ? 'checked' }}>
+                            <span class="iw-article-filters__option-label">{{ category.name }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
             </fieldset>
         {% endif %}
 
@@ -98,14 +100,16 @@
         {% if showTags and facets.tags is defined and facets.tags|length > 0 %}
             <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
                 <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_tags'|trans }}</legend>
-                {% for tag in facets.tags %}
-                    <label class="iw-article-filters__option">
-                        <input type="checkbox" name="tag[]" value="{{ tag.name }}"
-                               class="iw-article-filters__checkbox"
-                               {{ tag.name in activeTags ? 'checked' }}>
-                        <span class="iw-article-filters__option-label">{{ tag.name }}</span>
-                    </label>
-                {% endfor %}
+                <div class="iw-article-filters__options">
+                    {% for tag in facets.tags %}
+                        <label class="iw-article-filters__option">
+                            <input type="checkbox" name="tag[]" value="{{ tag.name }}"
+                                   class="iw-article-filters__checkbox"
+                                   {{ tag.name in activeTags ? 'checked' }}>
+                            <span class="iw-article-filters__option-label">{{ tag.name }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
             </fieldset>
         {% endif %}
 

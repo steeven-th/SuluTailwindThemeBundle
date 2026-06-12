@@ -621,6 +621,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_style": "Layout der Filterleiste",
     "iw_sulu_tailwind_theme.components_sidebar_style_left": "Linke Spalte",
     "iw_sulu_tailwind_theme.components_sidebar_style_right": "Rechte Spalte",
+    "iw_sulu_tailwind_theme.components_sidebar_style_topbar": "Obere Leiste (über den Ergebnissen)",
     "iw_sulu_tailwind_theme.components_sidebar_style_offcanvas": "Schublade („Filter“-Schaltfläche)",
     "iw_sulu_tailwind_theme.components_filters_show_search": "Suche anzeigen",
     "iw_sulu_tailwind_theme.components_filters_show_sort": "Sortierung anzeigen",

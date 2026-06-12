@@ -123,6 +123,7 @@
                         <param name="values" type="collection">
                             <param name="left"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_left</title></meta></param>
                             <param name="right"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_right</title></meta></param>
+                            <param name="topbar"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_topbar</title></meta></param>
                             <param name="offcanvas"><meta><title>iw_sulu_tailwind_theme.components_sidebar_style_offcanvas</title></meta></param>
                         </param>
                     </params>
