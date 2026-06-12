@@ -18,11 +18,13 @@
 {% set activeSort = active.sort|default('') %}
 {% set hasActiveFilters = activeQ is not empty or activeSort is not empty or activeCategories|length > 0 or activeTags|length > 0 %}
 
-{# Which controls the admin enabled (Components > Filter sidebar) — all on by default. #}
-{% set showSearch = iw_sulu_tailwind_theme.components_filtersShowSearch|default(true) %}
-{% set showSort = iw_sulu_tailwind_theme.components_filtersShowSort|default(true) %}
-{% set showCategories = iw_sulu_tailwind_theme.components_filtersShowCategories|default(true) %}
-{% set showTags = iw_sulu_tailwind_theme.components_filtersShowTags|default(true) %}
+{# Which controls the admin enabled (Components > Filter sidebar) — all on by default.
+   `?? true` and not `|default(true)`: default() treats false as empty and would
+   turn an unchecked toggle back into true. #}
+{% set showSearch = iw_sulu_tailwind_theme.components_filtersShowSearch ?? true %}
+{% set showSort = iw_sulu_tailwind_theme.components_filtersShowSort ?? true %}
+{% set showCategories = iw_sulu_tailwind_theme.components_filtersShowCategories ?? true %}
+{% set showTags = iw_sulu_tailwind_theme.components_filtersShowTags ?? true %}
 
 <aside class="iw-article-filters"
        id="iw-article-filters-panel"
