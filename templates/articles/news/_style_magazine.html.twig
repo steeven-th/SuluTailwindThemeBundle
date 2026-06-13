@@ -11,12 +11,7 @@
         <div class="iw-article-page__hero-inline">
             {# Image left (40%) #}
             {% if content.heroImage is defined and content.heroImage is not empty %}
-                {% set heroIds = content.heroImage %}
-                {% if heroIds is iterable %}
-                    {% set heroId = heroIds|first %}
-                {% else %}
-                    {% set heroId = heroIds %}
-                {% endif %}
+                {% set heroId = content.heroImage %}
                 {% if heroId %}
                     {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
                     <div class="iw-article-page__hero-inline-image">

@@ -32,8 +32,9 @@
     <div class="iw-article-author iw-article-author--{{ size }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
         {% if showAvatar %}
             {% set avatarMedia = null %}
-            {% if authorType == 'custom' and author.avatar is defined and author.avatar is iterable and author.avatar|length > 0 %}
-                {% set avatarMedia = sulu_resolve_media(author.avatar|first, app.request.locale) %}
+            {% if authorType == 'custom' and author.avatar is defined and author.avatar is not empty %}
+                {# single_media_selection stores a scalar media id #}
+                {% set avatarMedia = sulu_resolve_media(author.avatar, app.request.locale) %}
             {% endif %}
 
             {% if avatarMedia %}

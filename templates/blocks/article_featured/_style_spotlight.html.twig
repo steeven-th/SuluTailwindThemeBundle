@@ -30,11 +30,14 @@
             <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--main iw-featured-article-card--lg {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                 {% if articleImage is not empty %}
                     {% set imgMedia = null %}
+                    {% set imgId = null %}
                     {% if articleImage is iterable and articleImage|length > 0 %}
                         {% set imgId = articleImage.ids|default(articleImage)|first %}
-                        {% if imgId %}
-                            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-                        {% endif %}
+                    {% else %}
+                        {% set imgId = articleImage %}
+                    {% endif %}
+                    {% if imgId %}
+                        {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
                     {% endif %}
 
                     {% if imgMedia %}
@@ -96,11 +99,14 @@
                             {# Image left — fills card height #}
                             {% if secImage is not empty %}
                                 {% set secImgMedia = null %}
+                                {% set secImgId = null %}
                                 {% if secImage is iterable and secImage|length > 0 %}
                                     {% set secImgId = secImage.ids|default(secImage)|first %}
-                                    {% if secImgId %}
-                                        {% set secImgMedia = sulu_resolve_media(secImgId, app.request.locale) %}
-                                    {% endif %}
+                                {% else %}
+                                    {% set secImgId = secImage %}
+                                {% endif %}
+                                {% if secImgId %}
+                                    {% set secImgMedia = sulu_resolve_media(secImgId, app.request.locale) %}
                                 {% endif %}
 
                                 {% if secImgMedia %}

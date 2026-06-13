@@ -11,12 +11,7 @@
     {% set twitterMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
     {% set twitterImageUrl = twitterMedia.thumbnails['iw_og_image']|default(twitterMedia.thumbnails['sulu-400x400']|default(twitterMedia.url)) %}
 {% elseif content.heroImage is defined and content.heroImage is not empty %}
-    {% set heroIds = content.heroImage %}
-    {% if heroIds is iterable %}
-        {% set heroId = heroIds|first %}
-    {% else %}
-        {% set heroId = heroIds %}
-    {% endif %}
+    {% set heroId = content.heroImage %}
     {% if heroId %}
         {% set twitterMedia = sulu_resolve_media(heroId, app.request.locale) %}
         {% set twitterImageUrl = twitterMedia.thumbnails['iw_og_image']|default(twitterMedia.thumbnails['sulu-400x400']|default(twitterMedia.url)) %}

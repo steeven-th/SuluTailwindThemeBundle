@@ -32,13 +32,8 @@
     {% if image is iterable and image.url is defined %}
         {% set media = image %}
     {% else %}
-        {% set mediaIds = image %}
-        {% if mediaIds is iterable %}
-            {% set mediaId = mediaIds|first %}
-        {% else %}
-            {% set mediaId = mediaIds %}
-        {% endif %}
-        {% set media = mediaId ? sulu_resolve_media(mediaId, app.request.locale) : null %}
+        {# single_media_selection stores a scalar media id #}
+        {% set media = sulu_resolve_media(image, app.request.locale) %}
     {% endif %}
 
     {% if media is not null %}

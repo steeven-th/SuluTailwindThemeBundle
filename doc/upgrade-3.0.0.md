@@ -93,3 +93,35 @@ when building custom blocks — see [Twig reference](twig-reference.md):
   (block override or `iw-radius--*` theme utility)
 - `iw_sulu_tailwind_theme_effective_radius(context, blockValue)` — resolved
   Tailwind class for structural decisions
+
+## Article hero image & author avatar → single selection
+
+The article **hero image** (`heroImage`, `article-hero.xml`) and the custom
+**author avatar** (`avatar`, `article-authors.xml`) move from
+`media_selection` to `single_media_selection`. Both now store a single scalar
+media id instead of a `{ids: […]}` collection.
+
+### Existing content (breaking)
+
+No data migration is provided. After upgrading, articles that had a hero image
+or a custom author avatar selected with the 2.x multi-selection will show the
+field empty — **re-select the image in the admin** (Article > Hero, and the
+custom author's avatar). The initials fallback keeps rendering for authors
+without an avatar.
+
+### Twig
+
+Resolution is simplified accordingly — the `is iterable` / `|first` legacy
+handling is gone. Custom templates reading these fields should resolve the id
+directly:
+
+```twig
+{# before #}
+{% set id = content.heroImage is iterable ? content.heroImage|first : content.heroImage %}
+{# after #}
+{% set media = sulu_resolve_media(content.heroImage, app.request.locale) %}
+```
+
+Article listings (cards, featured) still accept both shapes for their image
+fallback chain (`excerptImages` stays a `media_selection`), so no change is
+needed there beyond re-selecting the hero where it is the only source.
