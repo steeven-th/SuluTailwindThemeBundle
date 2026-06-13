@@ -46,6 +46,8 @@
     data-controller="menu"
     data-menu-animation-value="none"
     data-menu-slide-direction-value="top"
+    data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
+    data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
     {# ─── Desktop navbar ─── #}

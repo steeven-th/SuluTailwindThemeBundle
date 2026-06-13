@@ -1309,12 +1309,25 @@ class ThemeCompiler
     {
         $css = "/* Menu component */\n";
 
-        // Base: navbar header + overlay background/text
-        $css .= ".iw-menu { background-color: var(--iw-menu-bg); color: var(--iw-menu-text); }\n";
+        // Base: navbar header + overlay background/text.
+        // Transition background + transform so the scroll-bg fade and the
+        // smart-hide slide animate smoothly (L16).
+        $css .= ".iw-menu { background-color: var(--iw-menu-bg); color: var(--iw-menu-text);\n";
+        $css .= "  transition: background-color var(--iw-menu-scroll-duration, 300ms) ease,\n";
+        $css .= "    transform var(--iw-menu-scroll-duration, 300ms) ease,\n";
+        $css .= "    box-shadow 0.2s ease;\n";
+        $css .= "  will-change: transform; }\n";
         $css .= ".iw-menu > nav { background-color: inherit; }\n";
 
         // Transparent navbar modifier
         $css .= ".iw-menu.iw-menu--transparent { background-color: transparent; }\n";
+
+        // Scroll behavior (L16): a transparent navbar takes its background once
+        // scrolled; the smart-hide modifier slides it out of view.
+        $css .= ".iw-menu.iw-menu--transparent.iw-menu--scrolled { background-color: var(--iw-menu-bg); }\n";
+        $css .= ".iw-menu.iw-menu--hidden { transform: translateY(-100%); }\n";
+        // Respect reduced-motion: no slide/fade animation, instant state change
+        $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu { transition: none; } }\n";
 
         // Text colors per navigation level (with hover transition)
         $css .= ".iw-menu__text { color: var(--iw-menu-text); transition: color 0.2s ease; }\n";
