@@ -1,11 +1,11 @@
 {# Form widget — single image rendered in the info column of `--split`.
    Expected variables:
      - image: Sulu media object (with .id)
-     - paragraphImageRadius: optional Tailwind radius class
+     - imageRadius: optional Tailwind radius class
 #}
 {% if image is defined and image.id is defined %}
     {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
-    <div class="iw-block-form__widget iw-block-form__widget--image{% if paragraphImageRadius %} {{ paragraphImageRadius }} overflow-hidden{% endif %}">
+    <div class="iw-block-form__widget iw-block-form__widget--image{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
         <img
             src="{{ resolvedImage.thumbnails['iw_theme_4_3']|default(resolvedImage.url) }}"
             alt="{{ resolvedImage.title|default('') }}"

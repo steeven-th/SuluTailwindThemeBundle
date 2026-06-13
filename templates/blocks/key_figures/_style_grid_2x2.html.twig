@@ -5,7 +5,7 @@
     {% if figures is defined and figures is iterable %}
         <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--grid-2x2">
             {% for figure in figures %}
-                <div class="iw-key-figure iw-key-figure--card {{ paragraphImageRadius|default('') }}">
+                <div class="iw-key-figure iw-key-figure--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {# Icon / Image #}
                     {% if figure.image is defined and figure.image.id is defined %}
                         {% set media = sulu_resolve_media(figure.image.id, app.request.locale) %}

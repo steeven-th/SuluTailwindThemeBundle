@@ -42,7 +42,7 @@
                         href="{{ linkUrl }}"
                         {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
                         {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
-                        class="iw-linked-page-card {{ paragraphImageRadius|default('') }}"
+                        class="iw-linked-page-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
                     >
                         <span class="iw-linked-page-card__title">{{ linkLabel }}</span>
                         {% if linkExcerpt is not empty %}

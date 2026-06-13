@@ -8,6 +8,8 @@
     {% set titleAlignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
     {% set isContentRight = contentRight|default(false) %}
     {% set accessoryKind = accessoryType|default('image') %}
+    {# Media accessories (image, video, map) follow the image radius context #}
+    {% set accessoryRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
     {# HTML order determines mobile order:
        contentRight=false → text first, accessory below (mobile) / accessory right (desktop)
@@ -24,7 +26,7 @@
                 posterImage: accessoryVideoPoster|default(null),
                 accessoryLocation: accessoryLocation|default(null),
                 counters: accessoryCounters|default([]),
-                paragraphImageRadius: resolvedParagraphRadius|default('')
+                imageRadius: accessoryRadiusClass
             } only %}
 
             <div class="iw-block-cta__content">
@@ -64,7 +66,7 @@
                 posterImage: accessoryVideoPoster|default(null),
                 accessoryLocation: accessoryLocation|default(null),
                 counters: accessoryCounters|default([]),
-                paragraphImageRadius: resolvedParagraphRadius|default('')
+                imageRadius: accessoryRadiusClass
             } only %}
         {% endif %}
     </div>

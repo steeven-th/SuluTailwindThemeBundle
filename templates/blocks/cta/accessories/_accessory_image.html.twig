@@ -1,9 +1,9 @@
 {# CTA accessory — single image (split layout).
    Expected variables:
      - accessoryImage: Sulu media object (with .id)
-     - paragraphImageRadius: optional Tailwind radius class
+     - imageRadius: optional Tailwind radius class
 #}
-<div class="iw-block-cta__accessory iw-block-cta__accessory--image{% if paragraphImageRadius %} {{ paragraphImageRadius }} overflow-hidden{% endif %}">
+<div class="iw-block-cta__accessory iw-block-cta__accessory--image{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
     {% if accessoryImage is defined and accessoryImage.id is defined %}
         {% set resolvedImage = sulu_resolve_media(accessoryImage.id, app.request.locale) %}
         <img

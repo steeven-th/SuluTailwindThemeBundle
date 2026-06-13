@@ -137,8 +137,9 @@
 
     "iw_sulu_tailwind_theme.borders": "Bordures",
     "iw_sulu_tailwind_theme.borders_radii": "Rayons de bordure",
-    "iw_sulu_tailwind_theme.borders_radius": "Rayon par défaut",
+    "iw_sulu_tailwind_theme.borders_cardRadius": "Rayon des cards",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Rayon des images",
+    "iw_sulu_tailwind_theme.borders_paragraphRadius": "Rayon des paragraphes",
 
     "iw_sulu_tailwind_theme.variants": "Variantes",
     "iw_sulu_tailwind_theme.variants_info": "Définissez des variantes de couleur pour les blocs de contenu",
@@ -311,7 +312,10 @@
     "iw_sulu_tailwind_theme.padding_bottom": "Padding bas",
     "iw_sulu_tailwind_theme.padding_lateral": "Padding latéral",
     "iw_sulu_tailwind_theme.block_radius": "Arrondi du bloc",
-    "iw_sulu_tailwind_theme.paragraph_image_radius": "Arrondi paragraphe / image",
+    "iw_sulu_tailwind_theme.paragraph_radius": "Arrondi du paragraphe",
+    "iw_sulu_tailwind_theme.card_radius": "Arrondi de la card",
+    "iw_sulu_tailwind_theme.image_radius": "Arrondi des images",
+    "iw_sulu_tailwind_theme.radius_theme_default": "Défaut (thème)",
     "iw_sulu_tailwind_theme.show_background": "Couleur de fond",
 
     "iw_sulu_tailwind_theme.block.text": "Texte",

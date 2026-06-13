@@ -1,6 +1,6 @@
 {# Paragraph — renders text_editor content with proper prose styling #}
 {% if text is defined and text is not empty %}
-    <div class="iw-block__text prose max-w-none {% if paragraphImageRadius is defined and paragraphImageRadius %}{{ paragraphImageRadius }}{% endif %}">
+    <div class="iw-block__text prose max-w-none {% if paragraphRadius is defined and paragraphRadius %}{{ paragraphRadius }}{% endif %}">
         {{ text|raw }}
     </div>
 {% endif %}

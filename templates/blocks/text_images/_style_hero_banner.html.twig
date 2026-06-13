@@ -16,10 +16,12 @@
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: applied from sm: breakpoint only (edge-to-edge on mobile). #}
-{% set blockRadiusVal = blockRadius|default('') %}
-{% set radiusClasses = blockRadiusVal ? ('sm:' ~ blockRadiusVal ~ ' sm:overflow-hidden') : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClasses = hasBlockRadius ? ('sm:' ~ blockRadiusClass ~ ' sm:overflow-hidden') : '' %}
 
-{% set radius = paragraphImageRadius|default('') %}
+{% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 
 {# Fixed hero format — 12/5 aspect ratio #}
 {% set format = 'iw_theme_hero' %}
@@ -80,7 +82,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert prose-lg max-w-2xl mx-auto{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert prose-lg max-w-2xl mx-auto {{ paragraphRadiusClass }}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

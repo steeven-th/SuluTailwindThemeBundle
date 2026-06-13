@@ -446,7 +446,7 @@ Navigate to **Settings > Themes** in the Sulu admin panel. From there you can:
 2. **Configure colors**: Set primary, secondary, accent, and background colors + text, link, and link hover colors
 3. **Configure typography**: Select fonts for headings/body/accent via the Font Picker (Google Fonts autocomplete, system fonts, or free text)
 4. **Configure buttons**: Set global padding plus primary/secondary/accent button styles — colors, hover states, radius, border width/style, and five composable hover effects (shadow, transform, opacity, duration, easing). See [Button hover effects](doc/button-effects.md) for the full catalog.
-5. **Configure borders**: Set border radius values (default, small, large, full, image)
+5. **Configure borders**: Set the three radius values (cards, images, paragraphs) — blocks follow them by default and can override each one individually
 6. **Configure block variants**: Define color schemes (e.g., light, accent, dark) for content blocks
 7. **Configure menu**: Choose menu type, colors, animation, and display options
 

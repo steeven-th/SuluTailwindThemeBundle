@@ -24,7 +24,10 @@
     {% set lateralMode = 'interior' %}
 {% endif %}
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
-{% set radiusClass = (lateralMode == 'exterior' and blockRadius|default('') is not empty) ? 'sm:' ~ blockRadius : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClass = (lateralMode == 'exterior' and hasBlockRadius) ? 'sm:' ~ blockRadiusClass : '' %}
 {# `?? true` keeps the default-on-undefined behavior while letting an explicit
    `false` from the admin toggle disable the background. Twig's `|default(true)`
    would wrongly treat `false` as empty and reapply the default. #}
@@ -40,15 +43,14 @@
     {% set hasLatPad = true %}
 {% endif %}
 
-{# Compute conditional paragraph radius: only when lateral space exists (edges don't touch viewport) #}
-{% set rawParagraphRadius = paragraphImageRadius|default('') %}
+{# Compute conditional paragraph radius: only when lateral space exists (edges don't touch viewport).
+   An empty value means "follow the theme" via the iw-radius--paragraph utility. #}
+{% set rawParagraphRadius = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 {% set resolvedParagraphRadius = '' %}
-{% if rawParagraphRadius %}
-    {% if hasLatPad %}
-        {% set resolvedParagraphRadius = rawParagraphRadius %}
-    {% elseif lateralMode == 'interior' %}
-        {% set resolvedParagraphRadius = 'sm:' ~ rawParagraphRadius %}
-    {% endif %}
+{% if hasLatPad %}
+    {% set resolvedParagraphRadius = rawParagraphRadius %}
+{% elseif lateralMode == 'interior' %}
+    {% set resolvedParagraphRadius = 'sm:' ~ rawParagraphRadius %}
 {% endif %}
 
 <section

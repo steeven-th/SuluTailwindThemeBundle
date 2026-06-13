@@ -29,7 +29,7 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 
 | Class | Role |
 |-------|------|
-| `.iw-block-location__map-wrap` | Wrapper around the Leaflet map. Carries `paragraphImageRadius + overflow-hidden` when set. |
+| `.iw-block-location__map-wrap` | Wrapper around the Leaflet map. Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-location__map` | The map container (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-location__info` | Info column wrapper (rendered in `--fullwidth` and `--map-with-info`). |
 | `.iw-block-location__address` | Address card with the bordered + tinted-bg layout. Border + background come from `--iw-block-location-info-*` custom properties. |

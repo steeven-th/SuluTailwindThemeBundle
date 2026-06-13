@@ -5,9 +5,9 @@
      - vimeoId: Vimeo video ID (provider = vimeo)
      - videoFile: Sulu media object (provider = file)
      - posterImage: Sulu media object (optional, used as <video poster> when file)
-     - paragraphImageRadius: optional Tailwind radius class
+     - imageRadius: optional Tailwind radius class
 #}
-<div class="iw-block-cta__accessory iw-block-cta__accessory--video{% if paragraphImageRadius %} {{ paragraphImageRadius }} overflow-hidden{% endif %}">
+<div class="iw-block-cta__accessory iw-block-cta__accessory--video{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
     {% if provider == 'youtube' and youtubeId is defined and youtubeId is not empty %}
         <iframe
             src="https://www.youtube.com/embed/{{ youtubeId }}"

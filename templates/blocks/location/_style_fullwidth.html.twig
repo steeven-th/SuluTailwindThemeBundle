@@ -8,7 +8,7 @@
 
         <div class="iw-block-location iw-block-location--fullwidth">
             {# Map #}
-            <div class="iw-block-location__map-wrap {{ paragraphImageRadius|default('') }} overflow-hidden">
+            <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                     location: location,
                     title: title|default(''),
@@ -28,7 +28,7 @@
                     } only %}
 
                     {% if formattedAddress is not empty %}
-                        <div class="iw-block-location__address {{ paragraphImageRadius|default('') }} p-5">
+                        <div class="iw-block-location__address {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} p-5">
                             <span class="iw-block-location__address-label block font-semibold mb-2 flex items-center gap-2 text-[var(--iw-variant-title-color,inherit)]">
                                 <svg class="iw-block-location__address-icon w-5 h-5 text-[var(--iw-variant-link-color,var(--color-primary))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 {{ 'iw_sulu_tailwind_theme.address'|trans|default('Address') }}
@@ -38,7 +38,7 @@
                     {% endif %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-location__text prose max-w-none text-[var(--iw-variant-paragraph-color,inherit)] {{ paragraphImageRadius|default('') }} overflow-hidden">
+                        <div class="iw-block__text iw-block-location__text prose max-w-none text-[var(--iw-variant-paragraph-color,inherit)] {{ iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) }} overflow-hidden">
                             {{ text|raw }}
                         </div>
                     {% endif %}

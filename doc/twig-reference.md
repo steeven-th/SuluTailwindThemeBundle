@@ -145,6 +145,50 @@ for both the displayed address and the map POI popup.
 
 ---
 
+### `iw_sulu_tailwind_theme_radius_class(context, blockValue)`
+
+Returns the CSS class to emit for a radius context. When the block field holds
+a value (e.g. `rounded-md`), it is returned as-is; when the field is empty
+("Theme default" in the admin), the matching theme-default utility class
+(`iw-radius--paragraph` / `iw-radius--card` / `iw-radius--image`) is returned,
+which resolves to the theme borders config via CSS custom properties without
+baking the value into the rendered HTML.
+
+```twig
+{% set cardRadiusClass = iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) %}
+<div class="iw-my-card {{ cardRadiusClass }}">…</div>
+```
+
+**Parameters:**
+- `context` (`string`) — The radius context: `paragraph`, `card` or `image`
+- `blockValue` (`string|null`) — The per-block Tailwind class override, if any
+
+**Returns:** `string` — The CSS class to emit.
+
+---
+
+### `iw_sulu_tailwind_theme_effective_radius(context, blockValue)`
+
+Resolves the **effective** Tailwind radius class for a radius context: the
+block value when set, otherwise the actual value from the theme borders
+config (`paragraphRadius`, `cardRadius`, `imageRadius` — image falls back to
+card). Use it for structural decisions that depend on whether a real radius
+is in effect (wrap an image, switch a card to image-bleed…). The result is
+baked into the rendered HTML at render time.
+
+```twig
+{% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
+{% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
+```
+
+**Parameters:**
+- `context` (`string`) — The radius context: `paragraph`, `card` or `image`
+- `blockValue` (`string|null`) — The per-block Tailwind class override, if any
+
+**Returns:** `string` — The effective Tailwind class (e.g. `rounded-lg`), or an empty string when none.
+
+---
+
 ### `iw_sulu_tailwind_theme_article_config()`
 
 Returns the article display configuration of the active theme. The result is an

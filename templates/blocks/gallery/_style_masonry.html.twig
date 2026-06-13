@@ -3,7 +3,7 @@
 
 {% block block_content %}
     {# Resolve lateral mode and image radius #}
-    {% set imageRadius = paragraphImageRadius|default('') %}
+    {% set imageRadiusVal = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
     {% set lateralMode = lateralMargins|default('interior') %}
     {% if lateralMode is same as(true) or lateralMode == '1' %}
         {% set lateralMode = 'exterior' %}
@@ -15,7 +15,7 @@
     {% set pxVal = paddingLateral|default('') %}
     {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
     {% if noGap %}
-        {% set imageRadius = '' %}
+        {% set imageRadiusVal = '' %}
         {% set gapClass = 'gap-0' %}
         {% set mbClass = 'mb-0' %}
     {% else %}
@@ -24,10 +24,10 @@
     {% endif %}
 
     {# In interior mode, apply radius from sm: breakpoint only #}
-    {% if lateralMode == 'interior' and imageRadius %}
-        {% set imageRadiusClass = 'sm:' ~ imageRadius ~ ' sm:overflow-hidden' %}
-    {% elseif imageRadius %}
-        {% set imageRadiusClass = imageRadius ~ ' overflow-hidden' %}
+    {% if lateralMode == 'interior' and imageRadiusVal %}
+        {% set imageRadiusClass = 'sm:' ~ imageRadiusVal ~ ' sm:overflow-hidden' %}
+    {% elseif imageRadiusVal %}
+        {% set imageRadiusClass = imageRadiusVal ~ ' overflow-hidden' %}
     {% else %}
         {% set imageRadiusClass = '' %}
     {% endif %}

@@ -15,7 +15,8 @@
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}
-    {% set hasImageRadius = paragraphImageRadius|default('') is not empty and paragraphImageRadius != 'rounded-none' %}
+    {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
+    {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
 
     {# Resolve the variant's button style so the carousel arrows use the same
        color as the buttons configured for this variant. #}
@@ -66,14 +67,14 @@
             >
                 {% for article in displayedArticles %}
                     <div class="iw-block-article-carousel__slide">
-                        <div class="iw-block-article-carousel__item {{ paragraphImageRadius|default('') }}">
+                        <div class="iw-block-article-carousel__item {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                                 article: article,
                                 imageRatio: '16/9',
                                 showDate: true,
                                 showExcerpt: true,
                                 showCategory: true,
-                                cardImagePadded: hasImageRadius,
+                                cardImagePadded: hasCardRadius,
                             } only %}
                         </div>
                     </div>

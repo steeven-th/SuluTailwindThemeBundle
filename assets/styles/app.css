@@ -1326,8 +1326,8 @@ img.object-cover {
        This guarantees:
        1. The block's Color variant drives the surface (not the global
           `card_*` theme tokens which target standalone listings).
-       2. The `paragraphImageRadius` choice is honored per block by simply
-          applying the Tailwind class on the wrapper.
+       2. The `cardRadius` choice is honored per block by simply
+          applying the radius class on the wrapper.
        3. The image-bleed behavior is controlled at the wrapper level. */
     --iw-article-card-surface: transparent;
     --iw-article-card-border: none;
@@ -1345,7 +1345,7 @@ img.object-cover {
 
 /* The L4 article-card applies `border-radius: var(--border-radius)` at its
    own level. Inside our article blocks the radius is owned by the wrapper
-   (`__item` via the Tailwind `paragraphImageRadius` class), so we strip the
+   (`__item` via the per-block `cardRadius` class), so we strip the
    inner radius — otherwise the bleeded image would clip to the L4 radius
    instead of the wrapper's. */
 .iw-block-article-list .iw-article-card,
@@ -1528,8 +1528,8 @@ img.object-cover {
 
 /* Featured article card — shared subcomponent. Surface (bg/border) follows
    the block's Color variant (`--variant-*`). The radius is driven by the
-   `paragraphImageRadius` Tailwind class applied per-template, so a missing /
-   `rounded-none` setting really yields squared corners. */
+   `cardRadius` class applied per-template, so an explicit `rounded-none`
+   setting really yields squared corners. */
 .iw-block-article-featured .iw-featured-article-card {
     display: block;
     background-color: var(--iw-featured-article-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
@@ -1794,7 +1794,7 @@ img.object-cover {
    Layout / sizing / aspect-ratios / responsive radius / overflow rules are
    all driven by Tailwind utility classes emitted by the templates because
    they depend on the admin's lateralMargins / paddingLateral / paddingTop /
-   paddingBottom / paragraphImageRadius / imageFilter settings. The rules
+   paddingBottom / paragraphRadius / imageRadius / imageFilter settings. The rules
    below are hooks meant for downstream theming only. */
 
 .iw-block-text-images {
@@ -1849,7 +1849,7 @@ img.object-cover {
 
 /* Neutralise the global `img { border-radius: var(--radius-img) }` rule for
    gallery images: the radius is owned by the wrapping `.iw-block-gallery__item`
-   (with `overflow-hidden`) so it tracks the admin's `paragraphImageRadius`
+   (with `overflow-hidden`) so it tracks the admin's `imageRadius`
    setting. Without this override, masonry images would inherit a default
    radius from the theme token even when no radius is configured. */
 .iw-block-gallery .iw-block-gallery__img {

@@ -170,18 +170,28 @@ Generated from **Settings > Themes > Borders** tab.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `--border-radius` | Default border radius | `0.5rem` |
+| `--border-paragraphRadius` | Paragraph / prose border radius | `0.5rem` |
+| `--border-cardRadius` | Card / visual item border radius | `0.5rem` |
+| `--border-imageRadius` | Image border radius (used by the `--radius-img` Tailwind utility and `img { border-radius }` global rule; falls back to `--border-cardRadius`) | `0.5rem` |
+| `--border-radius` | **Deprecated** alias of `--border-cardRadius`, kept for buttons / forms / menus during the 3.x cycle | `0.5rem` |
 | `--border-width` | Default border width | `1px` |
 | `--border-color` | Default border color | `#e5e7eb` |
-| `--border-imageRadius` | Image border radius (used by the `--radius-img` Tailwind utility and `img { border-radius }` global rule) | `0.5rem` |
+
+The compiler also emits theme-default utility classes (plus `sm:` variants) that block templates apply when a radius field is left on "Theme default":
+
+```css
+.iw-radius--paragraph { border-radius: var(--border-paragraphRadius, 0); }
+.iw-radius--card { border-radius: var(--border-cardRadius, 0); }
+.iw-radius--image { border-radius: var(--border-imageRadius, var(--border-cardRadius, 0)); }
+```
 
 **Usage example:**
 ```css
 .my-card {
     border: var(--border-width) solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-cardRadius);
 }
 .my-img {
-    border-radius: var(--border-imageRadius, var(--border-radius));
+    border-radius: var(--border-imageRadius, var(--border-cardRadius));
 }
 ```

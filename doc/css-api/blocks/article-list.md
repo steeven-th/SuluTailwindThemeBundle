@@ -16,7 +16,7 @@ Each item is rendered via the shared `_article_card.html.twig` helper (article c
 | `.iw-block-article-list--cards` | 2-column grid (1 column on mobile). |
 | `.iw-block-article-list--grid` | Responsive grid (1/2/3 columns mobile/tablet/desktop). |
 | `.iw-block-article-list--list` | Vertical stack of full-width rows (horizontal article cards inside). |
-| `.iw-block-article-list__item` | Surface wrapper around a single `.iw-article-card` — owns the background, border, radius (via Tailwind `paragraphImageRadius` class applied in the template) and `overflow: hidden`. Stretches to `height: 100%` so cards align to the row height. |
+| `.iw-block-article-list__item` | Surface wrapper around a single `.iw-article-card` — owns the background, border, radius (via the per-block `cardRadius` class applied in the template — empty value falls back to the theme via `iw-radius--card`) and `overflow: hidden`. Stretches to `height: 100%` so cards align to the row height. |
 | `.iw-block-article-list__empty` | Centered "no articles" message — also reused by `article_carousel` and `article_featured`. |
 
 ---
@@ -34,20 +34,20 @@ Each item is rendered via the shared `_article_card.html.twig` helper (article c
 
 ### Surface
 
-The visual surface (background, border, `overflow: hidden`) is owned by `__item`. The radius is applied via the Twig `paragraphImageRadius` class set per block in the admin (`rounded-none`, `rounded-md`, etc.).
+The visual surface (background, border, `overflow: hidden`) is owned by `__item`. The radius is applied via the per-block `cardRadius` admin field (`rounded-none`, `rounded-md`, etc.); when left on "Theme default" the `iw-radius--card` utility follows the theme borders config.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-block-article-item-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Background of each item — derives from the block's **Color variant** (not the global `articles_card_*` theme tokens). |
 | `--iw-block-article-item-border` | `1px solid var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Border shorthand. Set to `none` to remove. |
 
-The inner L4 `.iw-article-card` is rendered as transparent inside an article block (its surface/border vars are overridden) so there is no double surface. The L4 card still drives its body padding and its `--image-bleed` behavior (toggled automatically when `paragraphImageRadius` is empty / `rounded-none`).
+The inner L4 `.iw-article-card` is rendered as transparent inside an article block (its surface/border vars are overridden) so there is no double surface. The L4 card still drives its body padding and its `--image-bleed` behavior (toggled automatically when the effective `cardRadius` resolves to `rounded-none`).
 
 ### Image bleed behavior
 
-| `paragraphImageRadius` setting | Effect |
+| `cardRadius` setting (effective value, theme-resolved) | Effect |
 |---|---|
-| `rounded-none` (default) or empty | The card image touches the item edges (`iw-article-card--image-bleed`). The image follows the item's border-radius via `overflow: hidden`. |
+| `rounded-none` | The card image touches the item edges (`iw-article-card--image-bleed`). The image follows the item's border-radius via `overflow: hidden`. |
 | Any other value (`rounded-md`, `rounded-lg`, etc.) | The image keeps its own inner padding and radius inside the item. |
 
 ### Empty state

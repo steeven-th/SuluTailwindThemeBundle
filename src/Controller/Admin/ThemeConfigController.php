@@ -515,8 +515,15 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         // Flatten colors (depth 1): tokens.colors.primary → colors_primary
         $this->flattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
 
-        // Flatten borders (depth 1): tokens.borders.radius → borders_radius
-        $this->flattenDepth1($data, self::PREFIX_BORDERS, $tokens['borders'] ?? []);
+        // Flatten borders (depth 1): tokens.borders.cardRadius → borders_cardRadius.
+        // The legacy `radius` key (pre-3.0.0) pre-fills the new cardRadius field
+        // so existing themes keep their value; it is rewritten on next save.
+        $borders = $tokens['borders'] ?? [];
+        if (!isset($borders['cardRadius']) && isset($borders['radius'])) {
+            $borders['cardRadius'] = $borders['radius'];
+        }
+        unset($borders['radius']);
+        $this->flattenDepth1($data, self::PREFIX_BORDERS, $borders);
 
         // Flatten buttons: variants are depth 2 (tokens.buttons.primary.bg → buttons_primary_bg);
         // global props are flat (tokens.buttons.global.paddingX → buttons_paddingX).
@@ -699,6 +706,10 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $tokens = $theme->getTokens();
         $tokens['colors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
         $tokens['borders'] = $this->unflattenDepth1($data, self::PREFIX_BORDERS, $tokens['borders'] ?? []);
+        // Data migration: once cardRadius is saved, drop the legacy pre-3.0.0 key
+        if (isset($tokens['borders']['cardRadius'])) {
+            unset($tokens['borders']['radius']);
+        }
         $tokens['buttons'] = $this->unflattenButtons($data, $tokens['buttons'] ?? []);
         $tokens['typography'] = $this->unflattenTypography($data, $tokens['typography'] ?? []);
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);

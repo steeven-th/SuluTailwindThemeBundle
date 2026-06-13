@@ -220,6 +220,10 @@ class ThemeCompiler
         // Form field utility class
         $css .= $this->generateFormFieldClass();
 
+        // Theme-default radius utility classes (blocks without a per-block
+        // radius override fall back to these)
+        $css .= $this->generateRadiusUtilityClasses();
+
         // Article card classes (base + BEM modifiers for hover effects)
         $css .= $this->generateArticleCardClasses();
 
@@ -1037,6 +1041,16 @@ class ThemeCompiler
     /**
      * Generate CSS custom properties for border tokens.
      *
+     * Emits the three radius variables introduced in 3.0.0:
+     *   - --border-paragraphRadius (prose / text wrappers)
+     *   - --border-cardRadius (cards / visual items — formerly --border-radius)
+     *   - --border-imageRadius (images, falls back to cardRadius)
+     * plus --border-radius kept as a deprecated alias of --border-cardRadius
+     * (still consumed by buttons, forms, menus, etc.).
+     *
+     * The legacy `radius` token key is read as a fallback for `cardRadius`
+     * so themes saved before the 3.0.0 split keep compiling correctly.
+     *
      * @param array<string, mixed> $borders Border token values
      *
      * @return string CSS variable declarations
@@ -1045,22 +1059,95 @@ class ThemeCompiler
     {
         $css = "  /* Borders */\n";
 
-        foreach ($borders as $key => $value) {
-            if (is_array($value)) {
-                foreach ($value as $subKey => $subValue) {
-                    $resolved = str_starts_with((string) $subValue, 'rounded-') ? $this->resolveRadius((string) $subValue) : $subValue;
-                    $css .= "  --border-{$key}-{$subKey}: {$resolved};\n";
-                }
-            } else {
-                $resolved = str_starts_with((string) $value, 'rounded-') ? $this->resolveRadius((string) $value) : $value;
+        // Radius family — handled explicitly (legacy fallback + deprecated alias)
+        $cardRadius = $borders['cardRadius'] ?? $borders['radius'] ?? null;
+        $radiusVars = [
+            'paragraphRadius' => $borders['paragraphRadius'] ?? null,
+            'cardRadius' => $cardRadius,
+            'imageRadius' => $borders['imageRadius'] ?? null,
+        ];
+
+        foreach ($radiusVars as $key => $value) {
+            if (null !== $value && '' !== $value) {
+                $resolved = $this->resolveRadiusToken($value);
                 $css .= "  --border-{$key}: {$resolved};\n";
             }
         }
 
+        // Deprecated alias kept for buttons/forms/menus — mirrors cardRadius
+        if (null !== $cardRadius && '' !== $cardRadius) {
+            $css .= "  --border-radius: {$this->resolveRadiusToken($cardRadius)}; /* deprecated alias of --border-cardRadius */\n";
+        }
+
+        // Any other border tokens are emitted generically
+        foreach ($borders as $key => $value) {
+            if (in_array($key, ['radius', 'cardRadius', 'paragraphRadius', 'imageRadius'], true)) {
+                continue;
+            }
+            if (is_array($value)) {
+                foreach ($value as $subKey => $subValue) {
+                    $css .= "  --border-{$key}-{$subKey}: {$this->resolveRadiusToken($subValue)};\n";
+                }
+            } else {
+                $css .= "  --border-{$key}: {$this->resolveRadiusToken($value)};\n";
+            }
+        }
+
         // Alias for app.css compatibility (img global rule uses --radius-img)
-        $css .= "  --radius-img: var(--border-imageRadius, var(--border-radius));\n";
+        $css .= "  --radius-img: var(--border-imageRadius, var(--border-cardRadius));\n";
 
         return $css . "\n";
+    }
+
+    /**
+     * Generate the theme-default radius utility classes.
+     *
+     * Twig block templates emit these classes when the editor leaves a radius
+     * field empty ("theme default"): the element then follows the theme
+     * borders config and updates automatically when the theme changes.
+     *
+     * @return string CSS class declarations
+     */
+    private function generateRadiusUtilityClasses(): string
+    {
+        $variants = [
+            'paragraph' => 'var(--border-paragraphRadius, 0)',
+            'card' => 'var(--border-cardRadius, 0)',
+            'image' => 'var(--border-imageRadius, var(--border-cardRadius, 0))',
+        ];
+
+        $css = "/* Theme-default radius utilities */\n";
+        foreach ($variants as $name => $value) {
+            $css .= ".iw-radius--{$name} { border-radius: {$value}; }\n";
+        }
+
+        // Responsive sm: variants — templates prefix the radius class with
+        // `sm:` when the block edges touch the viewport on mobile (same
+        // convention as the Tailwind rounded-* classes they replace)
+        $css .= "@media (min-width: 640px) {\n";
+        foreach ($variants as $name => $value) {
+            $css .= "  .sm\\:iw-radius--{$name} { border-radius: {$value}; }\n";
+        }
+        $css .= "}\n\n";
+
+        return $css;
+    }
+
+    /**
+     * Resolve a border token value to a CSS value.
+     *
+     * Tailwind rounded-* classes are converted to their CSS radius value,
+     * any other value is passed through as-is.
+     *
+     * @param mixed $value The raw token value
+     *
+     * @return string The resolved CSS value
+     */
+    private function resolveRadiusToken(mixed $value): string
+    {
+        $stringValue = (string) $value;
+
+        return str_starts_with($stringValue, 'rounded-') ? $this->resolveRadius($stringValue) : $stringValue;
     }
 
     /**

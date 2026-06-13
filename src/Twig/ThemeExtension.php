@@ -46,7 +46,63 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_block_styles', $this->getBlockStyles(...)),
             new TwigFunction('iw_sulu_tailwind_theme_upload_max_size', $this->getUploadMaxSize(...)),
             new TwigFunction('iw_sulu_tailwind_theme_location_address', $this->getLocationAddress(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
         ];
+    }
+
+    /**
+     * Get the CSS class to apply for a radius context.
+     *
+     * Returns the per-block override when set, otherwise the theme-default
+     * utility class (`iw-radius--paragraph|card|image`) compiled by the
+     * ThemeCompiler, which follows the active theme borders config without
+     * baking the value into the rendered HTML.
+     *
+     * @param string      $context    The radius context: "paragraph", "card" or "image"
+     * @param string|null $blockValue The per-block Tailwind class override, if any
+     *
+     * @return string The CSS class to emit
+     */
+    public function getRadiusClass(string $context, ?string $blockValue = null): string
+    {
+        if (null !== $blockValue && '' !== $blockValue) {
+            return $blockValue;
+        }
+
+        return 'iw-radius--' . $context;
+    }
+
+    /**
+     * Resolve the effective Tailwind radius class for a radius context.
+     *
+     * Unlike getRadiusClass() this resolves the theme borders config down to
+     * the actual Tailwind class (e.g. "rounded-md"). Templates use it for
+     * structural decisions (wrap an image or not, add spacing…) that depend
+     * on whether a real radius is in effect. The result is baked into the
+     * rendered HTML, so such structure follows the theme value at render
+     * time (same caching caveat as block variants).
+     *
+     * @param string      $context    The radius context: "paragraph", "card" or "image"
+     * @param string|null $blockValue The per-block Tailwind class override, if any
+     *
+     * @return string The effective Tailwind class, or an empty string when none
+     */
+    public function getEffectiveRadius(string $context, ?string $blockValue = null): string
+    {
+        if (null !== $blockValue && '' !== $blockValue) {
+            return $blockValue;
+        }
+
+        $borders = $this->themeProvider->getTokens()['borders'] ?? [];
+        // Legacy pre-3.0.0 `radius` key read as cardRadius fallback
+        $card = (string) ($borders['cardRadius'] ?? $borders['radius'] ?? '');
+
+        return match ($context) {
+            'paragraph' => (string) ($borders['paragraphRadius'] ?? ''),
+            'image' => (string) ($borders['imageRadius'] ?? $card),
+            default => $card,
+        };
     }
 
     /**

@@ -25,8 +25,10 @@
 
 {# Block radius: only in exterior mode (interior = image fills full width, no radius).
    Applied from sm: breakpoint only (edge-to-edge on mobile). #}
-{% set blockRadiusVal = blockRadius|default('') %}
-{% set radiusClasses = (lateralMode == 'exterior' and blockRadiusVal) ? ('sm:' ~ blockRadiusVal ~ ' sm:overflow-hidden') : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClasses = (lateralMode == 'exterior' and hasBlockRadius) ? ('sm:' ~ blockRadiusClass ~ ' sm:overflow-hidden') : '' %}
 
 {# Fix: XML stores values with underscores (16_9, 4_3…), not colons #}
 {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
@@ -36,7 +38,9 @@
 {% set ratioMap = {'iw_theme_16_9': '16/9', 'iw_theme_4_3': '4/3', 'iw_theme_1_1': '1/1', 'iw_theme_3_4': '3/4', 'iw_theme_hero': '12/5'} %}
 {% set ratio = ratioMap[format]|default('16/9') %}
 
-{% set radius = paragraphImageRadius|default('') %}
+{# Split radius contexts — empty value means "follow the theme" via iw-radius--* utilities #}
+{% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
+{% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
 {# Image position: top (default) or bottom #}
 {% set isBottom = imageBottom|default(false) %}
@@ -74,18 +78,16 @@
 
 {# Image wrap: by default the fullwidth image is edge-to-edge. It gets a
    margin (lateral + matching top/bottom according to imageBottom) in two cases:
-     - the admin configured a real paragraphImageRadius (anything other than
-       `rounded-none` — otherwise the rounded corners wouldn't be visible
-       against the section edges);
+     - a real image radius is in effect (anything other than `rounded-none`
+       — otherwise the rounded corners wouldn't be visible against the
+       section edges); the theme borders config is resolved when the block
+       leaves the field empty;
      - the admin enabled the `imagePadding` toggle manually.
    When both conditions are off, the wrap is skipped and the image stays
    edge-to-edge. Lateral margin reuses paddingLateral (fallback mx-4),
-   vertical margin reuses paddingTop / paddingBottom (fallback mt-4 / mb-4).
-
-   NOTE: `paragraphImageRadius` defaults to the literal string `rounded-none`
-   from the XML radius selector (it's not empty), so a plain `radius is not
-   empty` check would always wrap. We explicitly exclude `rounded-none`. #}
-{% set hasRealRadius = radius is not empty and radius != 'rounded-none' %}
+   vertical margin reuses paddingTop / paddingBottom (fallback mt-4 / mb-4). #}
+{% set effectiveImageRadius = iw_sulu_tailwind_theme_effective_radius('image', imageRadius|default('')) %}
+{% set hasRealRadius = effectiveImageRadius is not empty and effectiveImageRadius != 'rounded-none' %}
 {% set hasImagePadding = imagePadding|default(false) %}
 {% set applyImageWrap = hasRealRadius or hasImagePadding %}
 {% if applyImageWrap %}
@@ -95,7 +97,7 @@
     {% else %}
         {% set imgMarginV = hasTopPad ? paddingTop|replace({'pt-': 'mt-'}) : 'mt-4' %}
     {% endif %}
-    {% set imageWrapClass = imgMarginX ~ ' ' ~ imgMarginV ~ (hasRealRadius ? ' ' ~ radius ~ ' overflow-hidden' : '') %}
+    {% set imageWrapClass = imgMarginX ~ ' ' ~ imgMarginV ~ (hasRealRadius ? ' ' ~ imageRadiusClass ~ ' overflow-hidden' : '') %}
 {% else %}
     {% set imageWrapClass = '' %}
 {% endif %}
@@ -110,7 +112,7 @@
 >
     {% if not isBottom %}
         {# Image first — edge-to-edge by default, framed with margin + radius
-           when paragraphImageRadius is configured. #}
+           when a real image radius is in effect. #}
         {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
             images: images|default([]),
@@ -140,13 +142,13 @@
                 <div class="{{ paraMargin }}{% if lateralMode == 'interior' %} sm:mx-0{% endif %}">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                         text: text|default(''),
-                        paragraphImageRadius: radius
+                        paragraphRadius: paragraphRadiusClass
                     } only %}
                 </div>
             {% else %}
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                     text: text|default(''),
-                    paragraphImageRadius: radius
+                    paragraphRadius: paragraphRadiusClass
                 } only %}
             {% endif %}
 
@@ -157,7 +159,7 @@
 
     {% if isBottom %}
         {# Image last — edge-to-edge by default, framed with margin + radius
-           when paragraphImageRadius is configured. #}
+           when a real image radius is in effect. #}
         {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
             images: images|default([]),

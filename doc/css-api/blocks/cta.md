@@ -20,7 +20,7 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 |-------|------|
 | `.iw-block-cta` | Root wrapper. Posed on the first `<div>` inside the block section. |
 | `.iw-block-cta--centered` | Default layout: title + subtitle + text + actions, all aligned per `titleAlignment`. |
-| `.iw-block-cta--banner` | Fullbleed hero banner that breaks out of the section padding and container to span the full viewport width. Uses XXL typography (`text-4xl` → `text-7xl`), generous vertical padding (`py-16` → `py-24`), centered content (`max-w-2xl mx-auto`), and white text on a dark background. Background color inherits from the active variant (`--iw-variant-block-bg`) with `--color-primary` as fallback; an optional background image with dark overlay sits on top. The `lateralMargins` / `paddingLateral` / `paddingTop` / `paddingBottom` / `blockRadius` / `paragraphImageRadius` admin fields are hidden in this mode because the hero owns its layout. |
+| `.iw-block-cta--banner` | Fullbleed hero banner that breaks out of the section padding and container to span the full viewport width. Uses XXL typography (`text-4xl` → `text-7xl`), generous vertical padding (`py-16` → `py-24`), centered content (`max-w-2xl mx-auto`), and white text on a dark background. Background color inherits from the active variant (`--iw-variant-block-bg`) with `--color-primary` as fallback; an optional background image with dark overlay sits on top. The `lateralMargins` / `paddingLateral` / `paddingTop` / `paddingBottom` / `blockRadius` / `paragraphRadius` / `imageRadius` admin fields are hidden in this mode because the hero owns its layout. |
 | `.iw-block-cta--split` | Two-column grid (`grid-cols-1 lg:grid-cols-2`): content + accessory widget. The `contentRight` block setting flips the columns on desktop. The accessory widget is chosen via the `accessoryType` admin field (`image`, `video`, `location`, `counter`). |
 
 ### Elements
@@ -43,13 +43,13 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 | Class | Role |
 |-------|------|
 | `.iw-block-cta__accessory` | Wrapper around the accessory widget. Always present in `--split`. |
-| `.iw-block-cta__accessory--image` | Modifier when the chosen widget is an image. Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
+| `.iw-block-cta__accessory--image` | Modifier when the chosen widget is an image. Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-cta__accessory--video` | Modifier when the chosen widget is a video (YouTube, Vimeo or `<video>`). |
 | `.iw-block-cta__accessory--location` | Modifier when the chosen widget is a Leaflet map. |
 | `.iw-block-cta__accessory--counter` | Modifier when the chosen widget is a vertical stack of 1–3 animated counters. Animation is driven by the shared `key-figures` Stimulus controller. |
 | `.iw-block-cta__image` | The `<img>` inside `--image`. |
 | `.iw-block-cta__video` | The `<iframe>` (YouTube/Vimeo) or `<video>` (file) inside `--video`. |
-| `.iw-block-cta__map-wrap` | Wrapper around the Leaflet map. Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
+| `.iw-block-cta__map-wrap` | Wrapper around the Leaflet map. Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-cta__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-cta__map-address` | Row rendered below the map with a pin icon + formatted address (street, postal code, town, country) built from the structured `location` field. Rendered only when at least one address field is filled. |
 | `.iw-block-cta__map-address-icon` | The pin SVG. |
