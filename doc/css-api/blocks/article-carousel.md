@@ -42,7 +42,7 @@ The card surface reuses the same variables as `article_list` (`--iw-block-articl
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-article-carousel-track-gap` | `1.5rem` | Gap between slides. |
+| `--iw-block-article-carousel-track-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between slides. |
 | `--iw-block-article-carousel-slide-width-mobile` | `85%` | Slide width below `640px`. |
 | `--iw-block-article-carousel-cols` | `3` | Number of visible cards on `>=1024px`. Tablet (`>=640px`) is always 2. |
 

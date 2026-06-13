@@ -379,7 +379,7 @@ img.object-cover {
 .iw-block-document--grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-document-grid-gap, 1rem);
+    gap: var(--iw-block-document-grid-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -514,7 +514,7 @@ img.object-cover {
 .iw-block-linked-pages--cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-linked-pages-cards-gap, 1.5rem);
+    gap: var(--iw-block-linked-pages-cards-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -757,7 +757,7 @@ img.object-cover {
 .iw-block-testimonial--cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-testimonial-cards-gap, 1.5rem);
+    gap: var(--iw-block-testimonial-cards-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -1072,7 +1072,7 @@ img.object-cover {
 .iw-block-key-figures--grid-2x2 {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-key-figures-gap, 1.5rem);
+    gap: var(--iw-block-key-figures-gap, var(--iw-cards-gap, 1.5rem));
     max-width: var(--iw-block-key-figures-grid-2x2-max-width, 48rem);
     margin-inline: auto;
 }
@@ -1356,7 +1356,7 @@ img.object-cover {
 .iw-block-article-list--cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-article-list-cards-gap, 2.5rem);
+    gap: var(--iw-block-article-list-cards-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 768px) {
@@ -1368,7 +1368,7 @@ img.object-cover {
 .iw-block-article-list--grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-article-list-grid-gap, 2rem);
+    gap: var(--iw-block-article-list-grid-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -1386,7 +1386,7 @@ img.object-cover {
 .iw-block-article-list--list {
     display: flex;
     flex-direction: column;
-    gap: var(--iw-block-article-list-list-gap, 1.5rem);
+    gap: var(--iw-block-article-list-list-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 /* Stretch the inner card to fill the row height so every card has the same
@@ -1461,7 +1461,7 @@ img.object-cover {
     overflow-x: auto;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
-    gap: var(--iw-block-article-carousel-track-gap, 1.5rem);
+    gap: var(--iw-block-article-carousel-track-gap, var(--iw-cards-gap, 1.5rem));
     padding-bottom: 0.5rem;
 }
 
@@ -1473,13 +1473,13 @@ img.object-cover {
 
 @media (min-width: 640px) {
     .iw-block-article-carousel__slide {
-        width: calc((100% - var(--iw-block-article-carousel-track-gap, 1.5rem)) / 2);
+        width: calc((100% - var(--iw-block-article-carousel-track-gap, var(--iw-cards-gap, 1.5rem))) / 2);
     }
 }
 
 @media (min-width: 1024px) {
     .iw-block-article-carousel__slide {
-        width: calc((100% - var(--iw-block-article-carousel-track-gap, 1.5rem) * 2) / var(--iw-block-article-carousel-cols, 3));
+        width: calc((100% - var(--iw-block-article-carousel-track-gap, var(--iw-cards-gap, 1.5rem)) * 2) / var(--iw-block-article-carousel-cols, 3));
     }
 }
 
@@ -1499,7 +1499,7 @@ img.object-cover {
 .iw-block-article-featured--side-by-side {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-article-featured-side-by-side-gap, 2rem);
+    gap: var(--iw-block-article-featured-side-by-side-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 768px) {
@@ -1511,7 +1511,7 @@ img.object-cover {
 .iw-block-article-featured--spotlight {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-article-featured-spotlight-gap, 2rem);
+    gap: var(--iw-block-article-featured-spotlight-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 @media (min-width: 1024px) {
@@ -1523,7 +1523,7 @@ img.object-cover {
 .iw-block-article-featured__secondary-list {
     display: flex;
     flex-direction: column;
-    gap: var(--iw-block-article-featured-secondary-gap, 2rem);
+    gap: var(--iw-block-article-featured-secondary-gap, var(--iw-cards-gap, 1.5rem));
 }
 
 /* Featured article card — shared subcomponent. Surface (bg/border) follows
@@ -1845,6 +1845,44 @@ img.object-cover {
 
 .iw-block-gallery {
     /* Hook only — no default styling. */
+}
+
+/* Card gap (L14): gallery grids/columns/slider follow the global
+   `--iw-cards-gap` token, overridable per gallery via the dedicated vars.
+   The seamless ("no gap") and interior-responsive states are explicit
+   modifiers set by the templates. */
+.iw-block-gallery--grid {
+    gap: var(--iw-block-gallery-grid-gap, var(--iw-cards-gap, 1.5rem));
+}
+
+.iw-block-gallery--masonry {
+    column-gap: var(--iw-block-gallery-masonry-gap, var(--iw-cards-gap, 1.5rem));
+}
+
+/* Masonry vertical rhythm (CSS columns ignore row-gap, so the items carry it). */
+.iw-block-gallery--masonry .iw-block-gallery__item {
+    margin-bottom: var(--iw-block-gallery-masonry-gap, var(--iw-cards-gap, 1.5rem));
+}
+
+.iw-block-gallery--slider .iw-block-gallery__track {
+    gap: var(--iw-block-gallery-slider-gap, var(--iw-cards-gap, 1.5rem));
+}
+
+/* Seamless layout — images edge-to-edge, no gap (explicit opt-in). */
+.iw-block-gallery--gap-none {
+    gap: 0 !important;
+    column-gap: 0 !important;
+}
+
+.iw-block-gallery--gap-none .iw-block-gallery__item {
+    margin-bottom: 0;
+}
+
+/* Interior mode: edge-to-edge on mobile, gap restored from the sm breakpoint. */
+@media (max-width: 639px) {
+    .iw-block-gallery--gap-from-sm {
+        gap: 0;
+    }
 }
 
 /* Neutralise the global `img { border-radius: var(--radius-img) }` rule for

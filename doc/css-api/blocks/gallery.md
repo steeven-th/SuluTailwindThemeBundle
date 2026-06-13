@@ -9,7 +9,7 @@ Image gallery block with six layout styles selectable from the admin. All six us
 - `--wide-carousel`: fullbleed autoplay carousel with a centered title overlay. The overlay card uses the admin's `paragraphRadius` setting (theme default via `iw-radius--paragraph` when empty). Optional sub-modifier `--wide-carousel-parallax` enables a vertical parallax scroll effect; the strength of the effect is configured by the `parallaxIntensity` admin select (`subtle` / `medium` / `strong` / `extreme`).
 - `--carousel`: 3D carousel with parallax tilt and blurred backgrounds (driven by the `carousel3d` Stimulus controller). The inner anatomy uses the `.iw-carousel-3d__*` classes documented in [`../transverse.md`](../transverse.md).
 
-Sizing, gaps, radius and aspect ratios are all driven by Tailwind utility classes emitted by the Twig templates because they depend on the admin's `lateralMargins` / `paddingLateral` / image filter settings. The classes documented here are stable **hooks** for downstream theming.
+Sizing, radius and aspect ratios are driven by Tailwind utility classes emitted by the Twig templates because they depend on the admin's `lateralMargins` / `paddingLateral` / image filter settings. The gap between images follows the global `--iw-cards-gap` token (see [Card grid spacing](../transverse.md)); the seamless and interior-responsive states are explicit BEM modifiers. The classes documented here are stable **hooks** for downstream theming.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md). Navigation arrows are shared with all the other sliders/carousels in the bundle: see [`../transverse.md#gallery-nav`](../transverse.md) for the `.iw-gallery-nav` API.
 
@@ -30,6 +30,8 @@ Sizing, gaps, radius and aspect ratios are all driven by Tailwind utility classe
 | `.iw-block-gallery--wide-carousel` | Fullbleed autoplay carousel with title overlay. |
 | `.iw-block-gallery--wide-carousel-parallax` | Sub-modifier of `--wide-carousel`: enables parallax. |
 | `.iw-block-gallery--carousel` | 3D carousel (driven by `carousel3d` Stimulus controller). |
+| `.iw-block-gallery--gap-none` | Seamless state — images edge-to-edge, no gap (set when `paddingLateral` is 0/empty). |
+| `.iw-block-gallery--gap-from-sm` | Interior mode — edge-to-edge on mobile, gap restored from the `sm` breakpoint. |
 
 ### Common elements (all modes)
 
@@ -63,7 +65,15 @@ Sizing, gaps, radius and aspect ratios are all driven by Tailwind utility classe
 
 ## CSS variables
 
-Navigation arrows and dot indicators are **only rendered when there is more than one image** in the block (single-image galleries get a clean static layout). The thumbnail strip in `--filmstrip` follows the same rule. The Gallery block exposes very few custom properties of its own because layout / sizing / spacing are driven by Tailwind utilities composed in Twig. Theming is mostly done by:
+The gap between images is exposed as dedicated variables, each falling back to the global `--iw-cards-gap` token (default `1.5rem`):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-block-gallery-grid-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap in `--grid`. |
+| `--iw-block-gallery-masonry-gap` | `var(--iw-cards-gap, 1.5rem)` | Column gap + item vertical rhythm in `--masonry`. |
+| `--iw-block-gallery-slider-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between slides in the default `--slider` track. |
+
+Navigation arrows and dot indicators are **only rendered when there is more than one image** in the block (single-image galleries get a clean static layout). The thumbnail strip in `--filmstrip` follows the same rule. Beyond the gap variables above, the Gallery block exposes very few custom properties of its own because layout / sizing are driven by Tailwind utilities composed in Twig. Theming is mostly done by:
 
 - Targeting the BEM hooks above with custom CSS,
 - Overriding the [shared `--iw-gallery-nav-*` variables](../transverse.md) to theme all navigation arrows at once,

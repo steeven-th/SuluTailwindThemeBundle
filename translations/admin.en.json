@@ -535,6 +535,13 @@
     "iw_sulu_tailwind_theme.articles_listing_style": "Listing style",
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Card image ratio",
+    "iw_sulu_tailwind_theme.card_gap": "Card spacing",
+    "iw_sulu_tailwind_theme.card_gap_very_compact": "Very compact (gap-2)",
+    "iw_sulu_tailwind_theme.card_gap_compact": "Compact (gap-4)",
+    "iw_sulu_tailwind_theme.card_gap_compact_plus": "Compact + (gap-5)",
+    "iw_sulu_tailwind_theme.card_gap_normal": "Normal (gap-6)",
+    "iw_sulu_tailwind_theme.card_gap_spacious": "Spacious (gap-8)",
+    "iw_sulu_tailwind_theme.card_gap_large": "Large (gap-10)",
     "iw_sulu_tailwind_theme.articles_card_surface": "Background color",
     "iw_sulu_tailwind_theme.articles_card_padding": "Inner padding",
     "iw_sulu_tailwind_theme.articles_card_padding_none": "None",

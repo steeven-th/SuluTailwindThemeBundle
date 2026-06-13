@@ -626,6 +626,13 @@
     "iw_sulu_tailwind_theme.articles_listing_style": "Style du listing",
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Ratio image des cartes",
+    "iw_sulu_tailwind_theme.card_gap": "Espacement entre cartes",
+    "iw_sulu_tailwind_theme.card_gap_very_compact": "Très compact (gap-2)",
+    "iw_sulu_tailwind_theme.card_gap_compact": "Compact (gap-4)",
+    "iw_sulu_tailwind_theme.card_gap_compact_plus": "Compact + (gap-5)",
+    "iw_sulu_tailwind_theme.card_gap_normal": "Normal (gap-6)",
+    "iw_sulu_tailwind_theme.card_gap_spacious": "Spacieux (gap-8)",
+    "iw_sulu_tailwind_theme.card_gap_large": "Large (gap-10)",
     "iw_sulu_tailwind_theme.articles_card_surface": "Couleur de fond",
     "iw_sulu_tailwind_theme.articles_card_padding": "Espacement intérieur",
     "iw_sulu_tailwind_theme.articles_card_padding_none": "Aucun",

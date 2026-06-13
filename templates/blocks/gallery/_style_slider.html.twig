@@ -14,7 +14,7 @@
     {# If paddingLateral is 0 or empty: seamless layout — no gap #}
     {% set pxVal = paddingLateral|default('') %}
     {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
-    {% set gapClass = noGap ? 'gap-0' : 'gap-4' %}
+    {% set gapClass = noGap ? 'iw-block-gallery--gap-none' : '' %}
 
     {# Interior mode: always apply image radius from sm: breakpoint.
        Other modes: radius only when there is a gap (padding). #}

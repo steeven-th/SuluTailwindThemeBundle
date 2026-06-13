@@ -58,7 +58,7 @@ The `.iw-testimonial` subcomponent is shared by the three modes.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-testimonial-cards-gap` | `1.5rem` | Gap between cards in `--cards`. |
+| `--iw-block-testimonial-cards-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--cards`. |
 | `--iw-block-testimonial-cards-cols` | `3` | Number of desktop columns in `--cards` (mobile/tablet: 1/2). |
 | `--iw-block-testimonial-minimal-padding-y` | `1.5rem` | Vertical padding per item in `--minimal`. |
 | `--iw-block-testimonial-minimal-quote-size` | `1.125rem` | Quote font-size in `--minimal`. |

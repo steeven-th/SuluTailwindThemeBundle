@@ -528,6 +528,13 @@
     "iw_sulu_tailwind_theme.articles_listing_style": "Listenstil",
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Bild-Verhältnis der Karten",
+    "iw_sulu_tailwind_theme.card_gap": "Kartenabstand",
+    "iw_sulu_tailwind_theme.card_gap_very_compact": "Sehr kompakt (gap-2)",
+    "iw_sulu_tailwind_theme.card_gap_compact": "Kompakt (gap-4)",
+    "iw_sulu_tailwind_theme.card_gap_compact_plus": "Kompakt + (gap-5)",
+    "iw_sulu_tailwind_theme.card_gap_normal": "Normal (gap-6)",
+    "iw_sulu_tailwind_theme.card_gap_spacious": "Großzügig (gap-8)",
+    "iw_sulu_tailwind_theme.card_gap_large": "Groß (gap-10)",
     "iw_sulu_tailwind_theme.articles_card_surface": "Hintergrundfarbe",
     "iw_sulu_tailwind_theme.articles_card_padding": "Innenabstand",
     "iw_sulu_tailwind_theme.articles_card_padding_none": "Keiner",

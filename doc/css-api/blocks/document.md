@@ -39,7 +39,7 @@ Each document is rendered as an `<a>` element (the `.iw-document-card`) that dow
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-block-document-gap` | `0.75rem` | Gap between cards in `--default` mode. |
-| `--iw-block-document-grid-gap` | `1rem` | Gap between cards in `--grid` mode. |
+| `--iw-block-document-grid-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--grid` mode. |
 | `--iw-block-document-grid-cols` | `3` | Number of columns on desktop (`>=1024px`) in `--grid` mode. Mobile/tablet are 1/2. |
 
 ### Card surface and spacing

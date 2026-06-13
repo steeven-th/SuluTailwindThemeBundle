@@ -167,6 +167,22 @@
                     </params>
                 </property>
 
+                <!-- Global gap between cards in every card grid/list/carousel -->
+                <property name="cardGap" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.card_gap</title></meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.card_gap_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.card_gap_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.card_gap_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.card_gap_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.card_gap_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.card_gap_large</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- Surface -->
                 <property name="cardSurface" type="iw_theme_color_token_editor" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>

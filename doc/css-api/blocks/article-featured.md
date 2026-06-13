@@ -105,9 +105,9 @@ The card surface **falls back to the L4 `--iw-article-card-*` variables** when t
 
 | Variable | Default |
 |----------|---------|
-| `--iw-block-article-featured-side-by-side-gap` | `2rem` |
-| `--iw-block-article-featured-spotlight-gap` | `2rem` |
-| `--iw-block-article-featured-secondary-gap` | `2rem` |
+| `--iw-block-article-featured-side-by-side-gap` | `var(--iw-cards-gap, 1.5rem)` |
+| `--iw-block-article-featured-spotlight-gap` | `var(--iw-cards-gap, 1.5rem)` |
+| `--iw-block-article-featured-secondary-gap` | `var(--iw-cards-gap, 1.5rem)` |
 
 ---
 

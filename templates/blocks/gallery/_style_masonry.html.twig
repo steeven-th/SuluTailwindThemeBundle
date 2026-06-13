@@ -16,11 +16,9 @@
     {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
     {% if noGap %}
         {% set imageRadiusVal = '' %}
-        {% set gapClass = 'gap-0' %}
-        {% set mbClass = 'mb-0' %}
+        {% set gapClass = 'iw-block-gallery--gap-none' %}
     {% else %}
-        {% set gapClass = 'gap-4' %}
-        {% set mbClass = 'mb-4' %}
+        {% set gapClass = '' %}
     {% endif %}
 
     {# In interior mode, apply radius from sm: breakpoint only #}
@@ -43,7 +41,7 @@
         <div class="iw-block-gallery iw-block-gallery--masonry columns-1 sm:columns-2 lg:columns-3 xl:columns-4 {{ gapClass }}">
             {% for mediaId in images %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
-                <figure class="iw-block__image iw-block-gallery__item break-inside-avoid {{ mbClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
+                <figure class="iw-block__image iw-block-gallery__item break-inside-avoid{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
                     <a
                         href="{{ media.url }}"
                         class="iw-block-gallery__link glightbox"

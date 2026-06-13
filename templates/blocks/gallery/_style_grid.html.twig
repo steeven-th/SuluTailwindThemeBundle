@@ -26,11 +26,11 @@
         {% set pxVal = paddingLateral|default('') %}
         {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
         {% if noGap and lateralMode == 'interior' %}
-            {% set gapClass = 'gap-0 sm:gap-4' %}
+            {% set gapClass = 'iw-block-gallery--gap-from-sm' %}
         {% elseif noGap %}
-            {% set gapClass = 'gap-0' %}
+            {% set gapClass = 'iw-block-gallery--gap-none' %}
         {% else %}
-            {% set gapClass = 'gap-4' %}
+            {% set gapClass = '' %}
         {% endif %}
 
         {# Interior mode: always apply image radius from sm: breakpoint.

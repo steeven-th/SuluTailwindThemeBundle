@@ -69,7 +69,7 @@ The `.iw-linked-page-card` subcomponent is shared by `--cards` and `--carousel`.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-linked-pages-cards-gap` | `1.5rem` | Gap between cards in `--cards`. |
+| `--iw-block-linked-pages-cards-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--cards`. |
 | `--iw-block-linked-pages-cards-cols` | `3` | Number of columns on desktop (`>=1024px`). Mobile/tablet are `1`/`2`. |
 | `--iw-block-linked-pages-nav-color` | `var(--iw-variant-hr-color, var(--color-primary))` | Color used for carousel arrows and dots. |
 | `--iw-block-linked-pages-list-divider` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Color of the divider rule between list items. |

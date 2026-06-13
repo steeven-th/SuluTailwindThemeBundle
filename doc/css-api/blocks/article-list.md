@@ -27,10 +27,10 @@ Each item is rendered via the shared `_article_card.html.twig` helper (article c
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-article-list-cards-gap` | `2.5rem` | Gap between cards in `--cards`. |
-| `--iw-block-article-list-grid-gap` | `2rem` | Gap between cards in `--grid`. |
+| `--iw-block-article-list-cards-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--cards`. |
+| `--iw-block-article-list-grid-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--grid`. |
 | `--iw-block-article-list-grid-cols` | `3` | Number of columns on `>=1024px` for `--grid`. |
-| `--iw-block-article-list-list-gap` | `1.5rem` | Gap between rows in `--list`. |
+| `--iw-block-article-list-list-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between rows in `--list`. |
 
 ### Surface
 
