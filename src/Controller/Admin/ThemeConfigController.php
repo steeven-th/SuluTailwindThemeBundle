@@ -140,7 +140,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'components_mapsPopupBg', 'components_mapsPopupText',
         'components_mapsControlsBg', 'components_mapsControlsText',
         // Site-wide card appearance (moved from the Articles tab in 3.0).
-        'cardImageRatio', 'cardSurface', 'cardPadding', 'cardImagePadded',
+        'cardImageRatio', 'cardGap', 'cardSurface', 'cardPadding', 'cardImagePadded',
         'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
         'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',

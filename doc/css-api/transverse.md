@@ -8,6 +8,54 @@ Components used across multiple blocks, templates or pages — not tied to a sin
 
 ---
 
+## Card grid spacing
+
+A single global token harmonizes the gap between cards across every card grid, list and carousel. It is set in the admin under **Settings > Themes > Components > Cards > Card spacing** (`cardGap`) and compiled to `--iw-cards-gap`.
+
+| Level (admin) | Tailwind | Value |
+|---|---|---|
+| Very compact | `gap-2` | `0.5rem` |
+| Compact | `gap-4` | `1rem` |
+| Compact + | `gap-5` | `1.25rem` |
+| Normal (default) | `gap-6` | `1.5rem` |
+| Spacious | `gap-8` | `2rem` |
+| Large | `gap-10` | `2.5rem` |
+
+Every card grid keeps a dedicated per-block variable that **falls back** to the global token, so you can override one block without losing the global harmonization:
+
+```css
+gap: var(--iw-block-<name>-gap, var(--iw-cards-gap, 1.5rem));
+```
+
+| Block / layout | Per-block variable |
+|---|---|
+| Document (grid) | `--iw-block-document-grid-gap` |
+| Gallery (grid) | `--iw-block-gallery-grid-gap` |
+| Gallery (masonry — column & row) | `--iw-block-gallery-masonry-gap` |
+| Gallery (slider track) | `--iw-block-gallery-slider-gap` |
+| Linked pages (cards) | `--iw-block-linked-pages-cards-gap` |
+| Testimonial (cards) | `--iw-block-testimonial-cards-gap` |
+| Key figures (2×2 grid) | `--iw-block-key-figures-gap` |
+| Article list (cards) | `--iw-block-article-list-cards-gap` |
+| Article list (grid) | `--iw-block-article-list-grid-gap` |
+| Article list (list) | `--iw-block-article-list-list-gap` |
+| Article carousel (track) | `--iw-block-article-carousel-track-gap` |
+| Article featured (side-by-side / spotlight / secondary) | `--iw-block-article-featured-*-gap` |
+
+The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery--gap-none` (seamless, edge-to-edge) and `.iw-block-gallery--gap-from-sm` (edge-to-edge on mobile, gap from the `sm` breakpoint, used in interior mode).
+
+**Override examples:**
+
+```css
+/* Tighten one block only */
+.my-page .iw-block-article-list--cards { --iw-block-article-list-cards-gap: 1rem; }
+
+/* Change the site-wide default for a specific theme scope */
+.theme-dense { --iw-cards-gap: 1rem; }
+```
+
+---
+
 ## Breadcrumbs
 
 Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Reusable on any page, not article-specific.

@@ -410,6 +410,7 @@ class ThemeCompiler
     {
         $surface = (string) ($tokens['cardSurface'] ?? 'none');
         $padding = (string) ($tokens['cardPadding'] ?? '1rem');
+        $gap = (string) ($tokens['cardGap'] ?? '1.5rem');
         $border = (string) ($tokens['cardBorder'] ?? 'none');
         $borderWidth = (string) ($tokens['cardBorderWidth'] ?? '1px');
         $borderStyle = (string) ($tokens['cardBorderStyle'] ?? 'solid');
@@ -432,6 +433,9 @@ class ThemeCompiler
         $badgeText = $this->surfaceValue($tokens['cardBadgeText'] ?? '', 'var(--color-primary-700)');
 
         $css = "  /* Card (site-wide) */\n";
+        // Global card grid gap — every card grid/list/carousel falls back to this
+        // token so a single admin setting harmonizes spacing across blocks.
+        $css .= "  --iw-cards-gap: {$gap};\n";
         $css .= "  --iw-article-card-surface: {$surfaceValue};\n";
         $css .= "  --iw-article-card-padding: {$padding};\n";
         $css .= "  --iw-article-card-border: {$borderValue};\n";

@@ -97,7 +97,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-key-figures-gap` | `1.5rem` | Gap between cards. |
+| `--iw-block-key-figures-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards. |
 | `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Max-width of the grid (centered). |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |
 | `--iw-key-figure-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border. |
