@@ -1,5 +1,14 @@
 import { Controller } from '@hotwired/stimulus';
 
+/** Scroll past this many px before a transparent navbar takes its background. */
+const SCROLL_BG_THRESHOLD = 50;
+
+/** Below this scroll position the navbar never hides (top-of-page safe zone). */
+const SCROLL_HIDE_MIN = 80;
+
+/** Minimum scroll delta to switch hide/reveal — avoids flicker (hysteresis). */
+const SCROLL_HIDE_HYSTERESIS = 8;
+
 /**
  * Menu controller — handles mobile fullscreen overlay, desktop dropdowns (click + hover),
  * level-3 sub-dropdowns with smart repositioning, and scroll behavior.
@@ -7,6 +16,8 @@ import { Controller } from '@hotwired/stimulus';
  * Values:
  *   - animation: The animation type ("none", "slide", "fade")
  *   - slideDirection: The slide direction ("top", "right", "bottom", "left")
+ *   - scrollBg: Transparent navbar takes its background once scrolled (boolean)
+ *   - scrollHide: Hide navbar on scroll down, reveal on scroll up (boolean)
  *
  * Targets:
  *   - panel: The mobile fullscreen overlay panel
@@ -37,7 +48,12 @@ export default class extends Controller {
     static values = {
         animation: { type: String, default: 'none' },
         slideDirection: { type: String, default: 'top' },
+        scrollBg: { type: Boolean, default: false },
+        scrollHide: { type: Boolean, default: false },
     };
+
+    /** @type {number} Last known scroll position, for scroll-direction detection */
+    _lastScrollY = 0;
 
     /** @type {boolean} Whether the mobile menu is currently open */
     isOpen = false;
@@ -358,13 +374,37 @@ export default class extends Controller {
     }
 
     /**
-     * Add shadow to the header when scrolled past threshold.
+     * Handle scroll: shadow on scroll, optional background-on-scroll for a
+     * transparent navbar, and optional smart hide/reveal by scroll direction.
      *
      * @private
      */
     _handleScroll() {
-        const scrolled = window.scrollY > 10;
-        this.element.classList.toggle('shadow-md', scrolled);
+        const y = window.scrollY;
+
+        // Shadow once scrolled away from the very top
+        this.element.classList.toggle('shadow-md', y > 10);
+
+        // Background on scroll: a transparent navbar becomes solid past the
+        // threshold and turns transparent again at the top of the page.
+        if (this.scrollBgValue) {
+            this.element.classList.toggle('iw-menu--scrolled', y > SCROLL_BG_THRESHOLD);
+        }
+
+        // Smart hide: slide the navbar away on scroll down, reveal on scroll up.
+        // A small hysteresis avoids flicker on jittery scrolls; the navbar never
+        // hides near the top of the page nor while the mobile menu is open.
+        if (this.scrollHideValue) {
+            const delta = y - this._lastScrollY;
+
+            if (y < SCROLL_HIDE_MIN || this.isOpen) {
+                this.element.classList.remove('iw-menu--hidden');
+            } else if (Math.abs(delta) > SCROLL_HIDE_HYSTERESIS) {
+                this.element.classList.toggle('iw-menu--hidden', delta > 0);
+            }
+        }
+
+        this._lastScrollY = y;
     }
 
     /**

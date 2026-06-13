@@ -256,6 +256,23 @@
                         <info_text>iw_sulu_tailwind_theme.menu_transparentNavbar_info</info_text>
                     </meta>
                 </property>
+
+                <!-- Background on scroll: only relevant for a transparent navbar -->
+                <property name="menuConfig_scrollBg" type="checkbox" colspan="6"
+                          visibleCondition="menuConfig_transparentNavbar == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_scrollBg</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_scrollBg_info</info_text>
+                    </meta>
+                </property>
+
+                <!-- Smart hide on scroll down, reveal on scroll up (any background) -->
+                <property name="menuConfig_scrollHide" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_scrollHide</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_scrollHide_info</info_text>
+                    </meta>
+                </property>
             </properties>
         </section>
 

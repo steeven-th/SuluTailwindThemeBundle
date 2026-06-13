@@ -160,7 +160,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
         'logoDesktop', 'logoMobile',
         'fullscreenImage', 'twoColumns',
-        'sidebarPosition', 'transparentNavbar',
+        'sidebarPosition', 'transparentNavbar', 'scrollBg', 'scrollHide',
         'clickParentPageNavbar',
         'megamenuSource',
     ];

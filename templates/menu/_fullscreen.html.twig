@@ -47,6 +47,8 @@
     data-controller="menu"
     data-menu-animation-value="{{ animation }}"
     data-menu-slide-direction-value="right"
+    data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
+    data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
     {# Navbar — z-30 so the fullscreen panel (z-50) covers it when open #}
