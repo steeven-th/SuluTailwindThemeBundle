@@ -6,7 +6,7 @@ Image gallery block with six layout styles selectable from the admin. All six us
 - `--masonry`: CSS columns layout (1/2/3/4 columns) for ragged-row walls.
 - `--slider`: horizontal scroll track with snap, prev/next arrows. Optional sub-modifier `--slider-single` switches to a single-image autoplay carousel with dot indicators.
 - `--filmstrip`: large main image + scrollable thumbnail strip (with prev/next arrows on both).
-- `--wide-carousel`: fullbleed autoplay carousel with a centered title overlay. The overlay card uses the admin's `paragraphImageRadius` setting. Optional sub-modifier `--wide-carousel-parallax` enables a vertical parallax scroll effect; the strength of the effect is configured by the `parallaxIntensity` admin select (`subtle` / `medium` / `strong` / `extreme`).
+- `--wide-carousel`: fullbleed autoplay carousel with a centered title overlay. The overlay card uses the admin's `paragraphRadius` setting (theme default via `iw-radius--paragraph` when empty). Optional sub-modifier `--wide-carousel-parallax` enables a vertical parallax scroll effect; the strength of the effect is configured by the `parallaxIntensity` admin select (`subtle` / `medium` / `strong` / `extreme`).
 - `--carousel`: 3D carousel with parallax tilt and blurred backgrounds (driven by the `carousel3d` Stimulus controller). The inner anatomy uses the `.iw-carousel-3d__*` classes documented in [`../transverse.md`](../transverse.md).
 
 Sizing, gaps, radius and aspect ratios are all driven by Tailwind utility classes emitted by the Twig templates because they depend on the admin's `lateralMargins` / `paddingLateral` / image filter settings. The classes documented here are stable **hooks** for downstream theming.

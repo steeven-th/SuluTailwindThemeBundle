@@ -13,12 +13,13 @@
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}
-    {% set hasImageRadius = paragraphImageRadius|default('') is not empty and paragraphImageRadius != 'rounded-none' %}
+    {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
+    {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         <div class="iw-block-article-list iw-block-article-list--list">
             {% for article in articleItems %}
-                <div class="iw-block-article-list__item {{ paragraphImageRadius|default('') }}">
+                <div class="iw-block-article-list__item {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
                         layout: 'horizontal',
@@ -26,7 +27,7 @@
                         showDate: true,
                         showExcerpt: true,
                         showCategory: true,
-                        cardImagePadded: hasImageRadius,
+                        cardImagePadded: hasCardRadius,
                     } only %}
                 </div>
             {% endfor %}

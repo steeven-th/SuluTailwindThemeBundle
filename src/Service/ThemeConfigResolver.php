@@ -7,11 +7,13 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
- * Resolves theme config data (variants, buttons, palette) for the admin JS.
+ * Resolves theme config data (variants, buttons, palette, borders) for the admin JS.
  *
  * Generates OKLCH palettes and resolves all ref: values to hex colors
  * so that VariantPicker, ButtonStylePicker, and ColorTokenEditor
- * receive directly usable CSS color values.
+ * receive directly usable CSS color values. Border tokens are exposed
+ * as raw Tailwind classes (e.g. "rounded-md") for the RadiusSelector
+ * theme-default option.
  */
 class ThemeConfigResolver
 {
@@ -25,13 +27,14 @@ class ThemeConfigResolver
      *
      * @param ThemeConfig|null $theme The theme to resolve, or null for empty defaults
      *
-     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>}
+     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, borders: array<string, mixed>}
      */
     public function resolve(?ThemeConfig $theme): array
     {
         $variants = [];
         $buttons = [];
         $palette = [];
+        $borders = [];
 
         if (null !== $theme) {
             $tokens = $theme->getTokens();
@@ -46,6 +49,14 @@ class ThemeConfigResolver
             }
 
             $buttons = $tokens['buttons'] ?? [];
+
+            // Border tokens, normalized: the legacy `radius` key (pre-3.0.0)
+            // is read as a fallback for `cardRadius`
+            $borders = $tokens['borders'] ?? [];
+            if (!isset($borders['cardRadius']) && isset($borders['radius'])) {
+                $borders['cardRadius'] = $borders['radius'];
+            }
+            unset($borders['radius']);
 
             // Generate OKLCH palettes for the 4 main colors
             $paletteColors = ['primary', 'secondary', 'accent', 'background'];
@@ -83,6 +94,7 @@ class ThemeConfigResolver
             'variants' => $variants,
             'buttons' => $buttons,
             'palette' => $palette,
+            'borders' => $borders,
         ];
     }
 

@@ -24,10 +24,12 @@
 
 {# Block radius: only in exterior mode.
    Applied from sm: breakpoint only (edge-to-edge on mobile). #}
-{% set blockRadiusVal = blockRadius|default('') %}
-{% set radiusClasses = (lateralMode == 'exterior' and blockRadiusVal) ? ('sm:' ~ blockRadiusVal ~ ' sm:overflow-hidden') : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClasses = (lateralMode == 'exterior' and hasBlockRadius) ? ('sm:' ~ blockRadiusClass ~ ' sm:overflow-hidden') : '' %}
 
-{% set radius = paragraphImageRadius|default('') %}
+{% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 
 {# Fix: XML stores values with underscores (16_9, 4_3…), not colons #}
 {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
@@ -170,7 +172,7 @@
                 } only %}
 
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                    <div class="iw-block__text iw-block-text-images__text prose max-w-none {{ paragraphRadiusClass }}" style="margin-block: 0;">
                         {{ text|raw }}
                     </div>
                 {% endif %}

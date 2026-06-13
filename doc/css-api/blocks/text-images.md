@@ -1,6 +1,6 @@
 # Block: text_images — CSS API
 
-Text + image block with seven layout styles selectable from the admin. The block combines a rich-text content area (title, subtitle, prose) with one or several images arranged differently in each style. Sizing, gaps, padding, radius, container behavior, prose-invert and the responsive layout are all driven by Tailwind utility classes emitted by the Twig templates because they depend on the admin's `lateralMargins` / `paddingLateral` / `paddingTop` / `paddingBottom` / `paragraphImageRadius` / `imageFilter` settings. The classes documented here are stable **hooks** for downstream theming.
+Text + image block with seven layout styles selectable from the admin. The block combines a rich-text content area (title, subtitle, prose) with one or several images arranged differently in each style. Sizing, gaps, padding, radius, container behavior, prose-invert and the responsive layout are all driven by Tailwind utility classes emitted by the Twig templates because they depend on the admin's `lateralMargins` / `paddingLateral` / `paddingTop` / `paddingBottom` / `paragraphRadius` / `imageRadius` / `imageFilter` settings. The classes documented here are stable **hooks** for downstream theming.
 
 - `--classic`: positional layout (`imagePosition` = left / right / top / bottom / background). Encodes the position in the secondary modifier `--position-{value}`.
 - `--fullwidth`: image edge-to-edge with content padded below or above (`--position-{top|bottom}`).
@@ -41,7 +41,7 @@ Text + image block with seven layout styles selectable from the admin. The block
 | `.iw-block-text-images__content` | Inner content wrapper (titles + paragraph + actions). Present on every style with appropriate semantics. |
 | `.iw-block-text-images__text` | Wrapper around the rich-text content (admin `text` field). Also carries `.iw-block__text` so variant rules apply. |
 | `.iw-block-text-images__grid` | The CSS grid container that holds text + image columns (`--sidebar`, `--mosaic`, `--split-screen`). |
-| `.iw-block-text-images__image-wrap` | Wrapper around the image slider (`--sidebar`, sometimes the image column elsewhere). Carries `paragraphImageRadius + overflow-hidden` when a radius is configured. |
+| `.iw-block-text-images__image-wrap` | Wrapper around the image slider (`--sidebar`, sometimes the image column elsewhere). Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-text-images__image-column` | The grid cell holding the sticky image strip (`--sidebar`). |
 | `.iw-block-text-images__image-side` | The grid cell holding the full-height image (`--split-screen`). |
 | `.iw-block-text-images__mosaic-grid` | The 2-column grid of image tiles inside `--mosaic`. |

@@ -13,7 +13,7 @@
         <div class="iw-block-testimonial iw-block-testimonial--minimal">
             {% for item in testimonials %}
                 {% if item.type|default('testimonial') == 'testimonial' %}
-                    <div class="iw-testimonial {{ paragraphImageRadius|default('') }}">
+                    <div class="iw-testimonial {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                         {% if item.quote is defined and item.quote is not empty %}
                             <p class="iw-testimonial__quote">"{{ item.quote }}"</p>
                         {% endif %}

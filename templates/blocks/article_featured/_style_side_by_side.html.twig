@@ -28,7 +28,7 @@
                 {% set articleImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
                 {% set articleCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
-                <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--main {{ paragraphImageRadius|default('') }}">
+                <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--main {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {# Image — no radius here, the card overflow-hidden handles corners #}
                     {% if articleImage is not empty %}
                         {% set imgMedia = null %}

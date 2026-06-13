@@ -207,8 +207,10 @@
   --line-height-base: 1.5;
 
   /* ─── Borders ─────────────────────────────────────────────────────────── */
-  --border-radius: 0.375rem;
+  --border-paragraphRadius: 0;
+  --border-cardRadius: 0.375rem;
   --border-imageRadius: 0.5rem;
+  --border-radius: var(--border-cardRadius); /* deprecated alias of --border-cardRadius */
   --border-width: 1px;
   --border-color: #e5e5e5;
 

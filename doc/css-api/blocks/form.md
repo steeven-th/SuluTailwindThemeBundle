@@ -41,7 +41,7 @@ The info column renders one of three partials depending on the `widgetType` admi
 | `.iw-block-form__widget--image` | Modifier when `widgetType=image`. Wraps an `<img>` (`object-fit: cover`, height fills the info column). |
 | `.iw-block-form__widget--location` | Modifier when `widgetType=location`. Wraps the Leaflet map + the formatted address row. |
 | `.iw-block-form__image` | The `<img>` inside `--image`. |
-| `.iw-block-form__map-wrap` | Wrapper around the Leaflet map (carries `paragraphImageRadius + overflow-hidden` when set). |
+| `.iw-block-form__map-wrap` | Wrapper around the Leaflet map (carries the `imageRadius` class + `overflow-hidden`; theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-form__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-form__map-address` | Row rendered below the map with a pin icon + formatted address. |
 | `.iw-block-form__map-address-icon` | The pin SVG. |

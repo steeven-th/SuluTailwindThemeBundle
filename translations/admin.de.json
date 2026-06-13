@@ -137,8 +137,9 @@
 
     "iw_sulu_tailwind_theme.borders": "Rahmen",
     "iw_sulu_tailwind_theme.borders_radii": "Eckenradien",
-    "iw_sulu_tailwind_theme.borders_radius": "Standard-Radius",
+    "iw_sulu_tailwind_theme.borders_cardRadius": "Karten-Radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Bild-Radius",
+    "iw_sulu_tailwind_theme.borders_paragraphRadius": "Absatz-Radius",
 
     "iw_sulu_tailwind_theme.variants": "Varianten",
     "iw_sulu_tailwind_theme.variants_info": "Farbvarianten für Inhaltsblöcke definieren",
@@ -311,7 +312,10 @@
     "iw_sulu_tailwind_theme.padding_bottom": "Unterer Innenabstand",
     "iw_sulu_tailwind_theme.padding_lateral": "Seitlicher Innenabstand",
     "iw_sulu_tailwind_theme.block_radius": "Block-Radius",
-    "iw_sulu_tailwind_theme.paragraph_image_radius": "Absatz-/Bild-Radius",
+    "iw_sulu_tailwind_theme.paragraph_radius": "Absatz-Radius",
+    "iw_sulu_tailwind_theme.card_radius": "Karten-Radius",
+    "iw_sulu_tailwind_theme.image_radius": "Bild-Radius",
+    "iw_sulu_tailwind_theme.radius_theme_default": "Standard (Theme)",
     "iw_sulu_tailwind_theme.show_background": "Hintergrundfarbe",
 
     "iw_sulu_tailwind_theme.block.text": "Text",

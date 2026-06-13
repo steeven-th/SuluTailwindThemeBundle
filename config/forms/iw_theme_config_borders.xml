@@ -11,18 +11,27 @@
                 <title>iw_sulu_tailwind_theme.borders_radii</title>
             </meta>
             <properties>
-                <property name="borders_radius" type="iw_theme_radius_selector">
+                <property name="borders_cardRadius" type="iw_theme_radius_selector" colspan="4">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.borders_radius</title>
+                        <title>iw_sulu_tailwind_theme.borders_cardRadius</title>
                     </meta>
                     <params>
                         <param name="default_value" value="rounded-none"/>
                     </params>
                 </property>
 
-                <property name="borders_imageRadius" type="iw_theme_radius_selector">
+                <property name="borders_imageRadius" type="iw_theme_radius_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.borders_imageRadius</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="rounded-none"/>
+                    </params>
+                </property>
+
+                <property name="borders_paragraphRadius" type="iw_theme_radius_selector" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.borders_paragraphRadius</title>
                     </meta>
                     <params>
                         <param name="default_value" value="rounded-none"/>

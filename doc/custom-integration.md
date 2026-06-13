@@ -273,7 +273,7 @@ Use the block wrapper `embed` to benefit from all variant/margin/padding logic:
     lateralMargins: block.lateralMargins|default('exterior'),
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
-    paragraphImageRadius: block.paragraphImageRadius|default(''),
+    paragraphRadius: block.paragraphRadius|default(''),
 } %}
     {% block block_content %}
         <h2 class="text-3xl font-bold mb-4">{{ block.headline }}</h2>

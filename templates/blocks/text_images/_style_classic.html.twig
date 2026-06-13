@@ -18,7 +18,9 @@
     {# Map image format to CSS aspect-ratio for consistent slider sizing #}
     {% set ratioMap = {'iw_theme_16_9': '16/9', 'iw_theme_4_3': '4/3', 'iw_theme_1_1': '1/1', 'iw_theme_3_4': '3/4', 'iw_theme_hero': '12/5'} %}
     {% set ratio = ratioMap[format]|default('4/3') %}
-    {% set radius = paragraphImageRadius|default('') %}
+    {# Split radius contexts — empty value means "follow the theme" via iw-radius--* utilities #}
+    {% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
+    {% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
     {# Detect effective block padding per axis: defined + not empty + not zero = has padding #}
     {% set hasTopPad = paddingTop is defined and paddingTop is not empty and paddingTop != 'pt-0' %}
@@ -48,17 +50,15 @@
             {% set bgClasses = bgClasses|merge(['mb-' ~ pxVal]) %}
         {% endif %}
 
-        {# Radius when any spacing exists #}
-        {% if radius and (hasLatPad or hasBotPad or hasTopPad) %}
-            {% set bgClasses = bgClasses|merge([radius]) %}
+        {# Radius when any spacing exists — the bg panel is the paragraph surface #}
+        {% if hasLatPad or hasBotPad or hasTopPad %}
+            {% set bgClasses = bgClasses|merge([paragraphRadiusClass]) %}
         {% endif %}
 
         {# Interior mode: responsive radius + bottom space from sm #}
         {% set bgWrapperClass = '' %}
         {% if lateralMode == 'interior' and not hasLatPad %}
-            {% if radius %}
-                {% set bgClasses = bgClasses|merge(['sm:' ~ radius]) %}
-            {% endif %}
+            {% set bgClasses = bgClasses|merge(['sm:' ~ paragraphRadiusClass]) %}
             {# Use padding on a wrapper instead of margin to avoid collapse #}
             {% set smPbVal = hasBotPad ? (paddingBottom is defined ? paddingBottom|split('-')|last : '4') : '4' %}
             {% set bgWrapperClass = 'sm:pb-' ~ smPbVal %}
@@ -83,7 +83,7 @@
 
             <div class="relative z-10 w-full">
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text prose prose-invert max-w-none{% if radius %} {{ radius }}{% endif %}">
+                    <div class="iw-block__text prose prose-invert max-w-none {{ paragraphRadiusClass }}">
                         {{ text|raw }}
                     </div>
                 {% endif %}
@@ -127,22 +127,20 @@
         {% endif %}
 
         {# Radius: TOP only when lateral padding, BOTTOM when any spacing #}
-        {% if radius %}
-            {% if position == 'top' and hasLatPad %}
-                {% set imgClasses = imgClasses|merge([radius, 'overflow-hidden']) %}
-            {% elseif position == 'bottom' and (imgClasses|length > 0 or hasLatPad or hasBotPad or hasTopPad) %}
-                {% set imgClasses = imgClasses|merge([radius, 'overflow-hidden']) %}
-            {% endif %}
+        {% if position == 'top' and hasLatPad %}
+            {% set imgClasses = imgClasses|merge([imageRadiusClass, 'overflow-hidden']) %}
+        {% elseif position == 'bottom' and (imgClasses|length > 0 or hasLatPad or hasBotPad or hasTopPad) %}
+            {% set imgClasses = imgClasses|merge([imageRadiusClass, 'overflow-hidden']) %}
         {% endif %}
 
         {# Interior mode: container adds lateral space from sm breakpoint.
            When no explicit lateral padding, add responsive radius + alignment. #}
         {% set lateralMode = lateralMargins|default('interior') %}
-        {% if lateralMode == 'interior' and not hasLatPad and radius %}
+        {% if lateralMode == 'interior' and not hasLatPad %}
             {% if position == 'top' %}
-                {% set imgClasses = imgClasses|merge(['sm:' ~ radius, 'sm:overflow-hidden']) %}
+                {% set imgClasses = imgClasses|merge(['sm:' ~ imageRadiusClass, 'sm:overflow-hidden']) %}
             {% elseif position == 'bottom' %}
-                {% set imgClasses = imgClasses|merge(['sm:' ~ radius, 'sm:overflow-hidden']) %}
+                {% set imgClasses = imgClasses|merge(['sm:' ~ imageRadiusClass, 'sm:overflow-hidden']) %}
                 {% if paraMargin %}
                     {% set imgClasses = imgClasses|merge(['sm:' ~ paraMargin|replace({'mx-': 'mb-'})]) %}
                 {% endif %}
@@ -177,13 +175,13 @@
                     <div class="{{ paraMargin }}{% if lateralMode == 'interior' %} sm:mx-0{% endif %}">
                         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                             text: text|default(''),
-                            paragraphImageRadius: radius
+                            paragraphRadius: paragraphRadiusClass
                         } only %}
                     </div>
                 {% else %}
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                         text: text|default(''),
-                        paragraphImageRadius: radius
+                        paragraphRadius: paragraphRadiusClass
                     } only %}
                 {% endif %}
             {% else %}
@@ -192,13 +190,13 @@
                     <div class="{{ paraMargin }}{% if lateralMode == 'interior' %} sm:mx-0{% endif %}">
                         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                             text: text|default(''),
-                            paragraphImageRadius: radius
+                            paragraphRadius: paragraphRadiusClass
                         } only %}
                     </div>
                 {% else %}
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                         text: text|default(''),
-                        paragraphImageRadius: radius
+                        paragraphRadius: paragraphRadiusClass
                     } only %}
                 {% endif %}
 
@@ -246,12 +244,12 @@
             <div class="{{ textMobileOrder }} {{ position == 'left' ? 'md:order-2' : 'md:order-1' }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
                     text: text|default(''),
-                    paragraphImageRadius: radius
+                    paragraphRadius: paragraphRadiusClass
                 } only %}
             </div>
 
             {# Images column: always has radius (never edge-to-edge in grid) #}
-            <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }}{% if radius %} {{ radius }} overflow-hidden{% endif %}">
+            <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }} {{ imageRadiusClass }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
                     images: images|default([]),
                     imageFormat: format,

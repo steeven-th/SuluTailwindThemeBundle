@@ -11,7 +11,7 @@
 
     {% if location is defined and location.lat is defined and location.long is defined %}
         <div class="iw-block-location iw-block-location--map-only">
-            <div class="iw-block-location__map-wrap {{ paragraphImageRadius|default('') }} overflow-hidden">
+            <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                     location: location,
                     title: title|default(''),

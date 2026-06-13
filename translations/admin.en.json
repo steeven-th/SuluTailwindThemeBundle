@@ -137,8 +137,9 @@
 
     "iw_sulu_tailwind_theme.borders": "Borders",
     "iw_sulu_tailwind_theme.borders_radii": "Border radii",
-    "iw_sulu_tailwind_theme.borders_radius": "Default radius",
+    "iw_sulu_tailwind_theme.borders_cardRadius": "Card radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Image radius",
+    "iw_sulu_tailwind_theme.borders_paragraphRadius": "Paragraph radius",
 
     "iw_sulu_tailwind_theme.variants": "Variants",
     "iw_sulu_tailwind_theme.variants_info": "Define color variants for content blocks",
@@ -311,7 +312,10 @@
     "iw_sulu_tailwind_theme.padding_bottom": "Padding bottom",
     "iw_sulu_tailwind_theme.padding_lateral": "Lateral padding",
     "iw_sulu_tailwind_theme.block_radius": "Block radius",
-    "iw_sulu_tailwind_theme.paragraph_image_radius": "Paragraph / Image radius",
+    "iw_sulu_tailwind_theme.paragraph_radius": "Paragraph radius",
+    "iw_sulu_tailwind_theme.card_radius": "Card radius",
+    "iw_sulu_tailwind_theme.image_radius": "Image radius",
+    "iw_sulu_tailwind_theme.radius_theme_default": "Theme default",
     "iw_sulu_tailwind_theme.show_background": "Background color",
 
     "iw_sulu_tailwind_theme.block.text": "Text",

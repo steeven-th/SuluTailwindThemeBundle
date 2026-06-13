@@ -39,7 +39,7 @@
 {% elseif resolvedImages|length > 1 %}
     {# Multiple images — carousel slider with lightbox on each slide.
        The radius is owned by the wrapping element in the consuming template
-       (via `paragraphImageRadius`) so we don't apply one here. #}
+       (via `imageRadius`) so we don't apply one here. #}
     <div
         class="relative overflow-hidden"
         data-controller="slider"

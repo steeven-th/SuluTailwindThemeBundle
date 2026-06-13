@@ -24,7 +24,7 @@
                     {% if item.type|default('testimonial') == 'testimonial' %}
                         <div
                             data-slider-target="slide"
-                            class="iw-testimonial iw-testimonial--slider {{ paragraphImageRadius|default('') }} {{ loop.first ? '' : 'invisible pointer-events-none' }}"
+                            class="iw-testimonial iw-testimonial--slider {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} {{ loop.first ? '' : 'invisible pointer-events-none' }}"
                         >
                             {# Large quote mark #}
                             <svg class="iw-testimonial__quote-icon iw-testimonial__quote-icon--lg" fill="currentColor" viewBox="0 0 24 24">

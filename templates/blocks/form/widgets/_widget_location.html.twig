@@ -3,13 +3,13 @@
    Rendered through the shared components/_location_map.html.twig partial.
    Expected variables:
      - location: Sulu location object (.lat, .long, .zoom, .street, .number, .code, .town, .country)
-     - paragraphImageRadius: optional Tailwind radius class
+     - imageRadius: optional Tailwind radius class
 #}
 {% if location is defined and location.lat is defined and location.long is defined %}
     {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
     <div class="iw-block-form__widget iw-block-form__widget--location">
-        <div class="iw-block-form__map-wrap{% if paragraphImageRadius %} {{ paragraphImageRadius }} overflow-hidden{% endif %}">
+        <div class="iw-block-form__map-wrap{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
             {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                 location: location,
                 title: 'iw_sulu_tailwind_theme.widget_location'|trans,

@@ -12,7 +12,7 @@
                     {% if item.type|default('figure') == 'figure' %}
                         <div class="iw-key-figure iw-key-figure--timeline">
                             <div class="iw-key-figure__timeline-dot"></div>
-                            <div class="iw-key-figure__timeline-card {{ paragraphImageRadius|default('') }}">
+                            <div class="iw-key-figure__timeline-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                                 {% if item.number is defined and item.number is not empty %}
                                     <span
                                         data-key-figures-target="counter"

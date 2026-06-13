@@ -38,10 +38,13 @@
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: only in exterior mode. #}
-{% set blockRadiusVal = blockRadius|default('') %}
-{% set radiusClass = (lateralMode == 'exterior' and blockRadiusVal) ? blockRadiusVal : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClass = (lateralMode == 'exterior' and hasBlockRadius) ? blockRadiusClass : '' %}
 
-{% set radius = paragraphImageRadius|default('') %}
+{% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
+{% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
 {# Mosaic uses two different formats: 16:9 for the hero image, user-selected for the rest #}
 {# Fix: XML stores values with underscores (16_9, 4_3…), not colons #}
@@ -78,7 +81,7 @@
             {# Text area — full width when stacked, 1 column when side-by-side #}
             <div class="iw-block-text-images__content {{ isSideBySide ? 'lg:col-span-1' : '' }} {{ imageFirst ? 'order-2' : 'order-1' }} {{ isSideBySide ? (imageFirst ? 'lg:order-2' : 'lg:order-1') : '' }}">
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                    <div class="iw-block__text iw-block-text-images__text prose max-w-none {{ paragraphRadiusClass }}" style="margin-block: 0;">
                         {{ text|raw }}
                     </div>
                 {% endif %}
@@ -92,7 +95,7 @@
                         {# First image spans full width in 16:9, others use selected format #}
                         {% set isHero = loop.first %}
                         {% set imgFormat = isHero ? 'iw_theme_16_9' : baseFormat %}
-                        <figure class="iw-block__image {{ isHero ? 'col-span-2' : '' }}{% if radius %} {{ radius }} overflow-hidden{% endif %}">
+                        <figure class="iw-block__image {{ isHero ? 'col-span-2' : '' }} {{ imageRadiusClass }} overflow-hidden">
                             <a
                                 href="{{ media.url }}"
                                 class="glightbox"

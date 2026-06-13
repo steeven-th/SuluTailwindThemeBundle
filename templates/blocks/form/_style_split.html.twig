@@ -26,7 +26,7 @@
                     text: widgetText|default(''),
                     image: widgetImage|default(null),
                     location: widgetLocation|default(null),
-                    paragraphImageRadius: resolvedParagraphRadius|default('')
+                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
                 } only %}
             </div>
 
@@ -52,7 +52,7 @@
                     text: widgetText|default(''),
                     image: widgetImage|default(null),
                     location: widgetLocation|default(null),
-                    paragraphImageRadius: resolvedParagraphRadius|default('')
+                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
                 } only %}
             </div>
         {% endif %}

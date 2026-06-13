@@ -41,11 +41,13 @@
 
 {# Block radius: only in exterior mode (interior = image fills full width, no radius).
    Applied from sm: breakpoint only (edge-to-edge on mobile). #}
-{% set blockRadiusVal = blockRadius|default('') %}
-{% set radiusClasses = (lateralMode == 'exterior' and blockRadiusVal) ? ('sm:' ~ blockRadiusVal ~ ' sm:overflow-hidden') : '' %}
+{% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
+{% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
+{% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
+{% set radiusClasses = (lateralMode == 'exterior' and hasBlockRadius) ? ('sm:' ~ blockRadiusClass ~ ' sm:overflow-hidden') : '' %}
 
 {# Paragraph radius: only when variant has visible paragraphBg #}
-{% set radius = paragraphImageRadius|default('') %}
+{% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 {% set variantConfig = allVariants[variantIndex]|default({}) %}
 {% set pgBg = variantConfig.paragraphBg|default('') %}
 {% set hasParagraphBg = pgBg is not empty and pgBg|lower != 'transparent' %}
@@ -107,7 +109,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg and radius %} {{ radius }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

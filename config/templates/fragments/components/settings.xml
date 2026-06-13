@@ -4,7 +4,13 @@
     Each block picks individual properties from this file.
 
     Base properties (all blocks): marginTop, marginBottom, paddingTop, paddingBottom, paddingLateral
-    Optional properties per block: lateralMargins, blockRadius, paragraphImageRadius, showBackground
+    Optional properties per block: lateralMargins, blockRadius, paragraphRadius, cardRadius,
+    imageRadius, showBackground
+
+    Radius fields: each block only declares the radius properties that have a
+    real effect on its rendering (e.g. text → paragraphRadius only, gallery →
+    imageRadius only). An empty value means "follow the theme borders config"
+    (resolved by the iw-radius--* utility classes at render time).
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
     <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
@@ -58,18 +64,35 @@
     <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
         <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
         <params>
-            <param name="default_value" value="rounded-none"/>
+            <param name="theme_key" value="cardRadius"/>
         </params>
     </property>
 
-    <property name="paragraphImageRadius" type="iw_theme_radius_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.paragraph_image_radius</title></meta>
+    <property name="paragraphRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.paragraph_radius</title></meta>
         <params>
-            <param name="default_value" value="rounded-none"/>
+            <param name="theme_key" value="paragraphRadius"/>
+        </params>
+    </property>
+
+    <property name="cardRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.card_radius</title></meta>
+        <params>
+            <param name="theme_key" value="cardRadius"/>
+        </params>
+    </property>
+
+    <property name="imageRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.image_radius</title></meta>
+        <params>
+            <param name="theme_key" value="imageRadius"/>
         </params>
     </property>
 
     <property name="showBackground" type="checkbox">
         <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
+        <params>
+            <param name="default_value" value="true"/>
+        </params>
     </property>
 </properties>

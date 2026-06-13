@@ -196,7 +196,7 @@ The bundle provides `@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.h
     lateralMargins: block.lateralMargins|default('exterior'),
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
-    paragraphImageRadius: block.paragraphImageRadius|default(''),
+    paragraphRadius: block.paragraphRadius|default(''),
 } %}
     {% block block_content %}
         {# Your custom block content here #}
