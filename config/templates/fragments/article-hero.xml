@@ -6,7 +6,7 @@
     natively by Sulu's Excerpt tab.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="heroImage" type="media_selection" colspan="12">
+    <property name="heroImage" type="single_media_selection" colspan="12">
         <meta>
             <title>iw_sulu_tailwind_theme.article.hero_image</title>
             <info_text>iw_sulu_tailwind_theme.article.hero_image_info</info_text>

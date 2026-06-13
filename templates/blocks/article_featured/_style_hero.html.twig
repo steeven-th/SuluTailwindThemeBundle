@@ -31,11 +31,15 @@
 
         {# Resolve image #}
         {% set imgMedia = null %}
-        {% if articleImage is not empty and articleImage is iterable and articleImage|length > 0 %}
+        {% set imgId = null %}
+        {% if articleImage is iterable and articleImage|length > 0 %}
             {% set imgId = articleImage.ids|default(articleImage)|first %}
-            {% if imgId %}
-                {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-            {% endif %}
+        {% elseif articleImage is not empty %}
+            {# single_media_selection scalar (heroImage fallback) #}
+            {% set imgId = articleImage %}
+        {% endif %}
+        {% if imgId %}
+            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
         {% endif %}
 
         <div class="iw-block-article-featured iw-block-article-featured--hero">

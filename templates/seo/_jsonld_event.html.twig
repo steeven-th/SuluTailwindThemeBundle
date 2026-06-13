@@ -9,8 +9,7 @@
     {% set imgMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
     {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
 {% elseif content.heroImage is defined and content.heroImage is not empty %}
-    {% set heroIds = content.heroImage %}
-    {% set heroId = heroIds is iterable ? heroIds|first : heroIds %}
+    {% set heroId = content.heroImage %}
     {% if heroId %}
         {% set imgMedia = sulu_resolve_media(heroId, app.request.locale) %}
         {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}

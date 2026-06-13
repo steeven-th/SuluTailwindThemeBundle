@@ -32,11 +32,14 @@
                     {# Image — no radius here, the card overflow-hidden handles corners #}
                     {% if articleImage is not empty %}
                         {% set imgMedia = null %}
+                        {% set imgId = null %}
                         {% if articleImage is iterable and articleImage|length > 0 %}
                             {% set imgId = articleImage.ids|default(articleImage)|first %}
-                            {% if imgId %}
-                                {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-                            {% endif %}
+                        {% else %}
+                            {% set imgId = articleImage %}
+                        {% endif %}
+                        {% if imgId %}
+                            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
                         {% endif %}
 
                         {% if imgMedia %}

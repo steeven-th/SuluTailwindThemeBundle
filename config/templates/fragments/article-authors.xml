@@ -21,7 +21,7 @@
                     <property name="role" type="text_line" colspan="6">
                         <meta><title>iw_sulu_tailwind_theme.article.author_role</title></meta>
                     </property>
-                    <property name="avatar" type="media_selection" colspan="12">
+                    <property name="avatar" type="single_media_selection" colspan="12">
                         <meta><title>iw_sulu_tailwind_theme.article.author_avatar</title></meta>
                         <params>
                             <param name="types" value="image"/>
