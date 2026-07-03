@@ -30,11 +30,7 @@
     {# ── Background mode: first image replaces paragraph background ── #}
     {# Image wrapper follows same logic as BOTTOM position for radius/margins. #}
     {% if position == 'background' %}
-        {% set bgImageUrl = '' %}
-        {% if images is defined and images is iterable and images|length > 0 %}
-            {% set firstMedia = sulu_resolve_media(images[0], app.request.locale) %}
-            {% set bgImageUrl = firstMedia.thumbnails[format]|default(firstMedia.url) %}
-        {% endif %}
+        {% set bgMediaId = (images is defined and images is iterable and images|length > 0) ? images[0] : null %}
 
         {% set lateralMode = lateralMargins|default('interior') %}
 
@@ -70,13 +66,14 @@
         <div class="{{ bgWrapperClass }}">
         {% endif %}
         <div class="{{ bgClasses|join(' ') }}">
-            {% if bgImageUrl is not empty %}
-                <img
-                    src="{{ bgImageUrl }}"
-                    alt=""
-                    loading="lazy"
-                    class="absolute inset-0 w-full h-full object-cover"
-                >
+            {% if bgMediaId %}
+                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                    mediaId: bgMediaId,
+                    format: format,
+                    cover: true,
+                    alt: '',
+                    pictureClasses: 'absolute inset-0 w-full h-full',
+                }) }}
                 {# Dark overlay for text readability — hidden when paragraph has its own bg #}
                 <div class="iw-block-text-images__bg-overlay absolute inset-0 bg-black/60"></div>
             {% endif %}

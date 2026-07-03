@@ -7,11 +7,7 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% set bgImageUrl = '' %}
-    {% if bannerImage is defined and bannerImage.id is defined %}
-        {% set resolvedImage = sulu_resolve_media(bannerImage.id, app.request.locale) %}
-        {% set bgImageUrl = resolvedImage.thumbnails['iw_theme_16_9']|default(resolvedImage.url) %}
-    {% endif %}
+    {% set bannerMediaId = (bannerImage is defined and bannerImage.id is defined) ? bannerImage.id : null %}
 
     {# Neutralise the wrapper's pt-*/pb-* via negative margins so the banner
        fills the section edge-to-edge vertically. The Hero owns its own padding. #}
@@ -23,8 +19,16 @@
        wrappers too, unlike the older `margin-inline: calc(-50vw + 50%)` trick. #}
     <div class="iw-block-cta iw-block-cta--banner relative overflow-hidden"
          style="margin-top: -{{ spacingMap[ptNum]|default('0px') }}; margin-bottom: -{{ spacingMap[pbNum]|default('0px') }}; position: relative; left: 50%; margin-left: -50vw; width: 100vw;">
-        {% if bgImageUrl is not empty %}
-            <img src="{{ bgImageUrl }}" alt="" loading="lazy" class="iw-block-cta__background absolute inset-0 w-full h-full object-cover">
+        {% if bannerMediaId %}
+            {# Background image — cropped around the media focus point. #}
+            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                mediaId: bannerMediaId,
+                format: 'iw_theme_16_9',
+                cover: true,
+                alt: '',
+                classes: 'iw-block-cta__background',
+                pictureClasses: 'absolute inset-0 w-full h-full',
+            }) }}
             <div class="iw-block-cta__overlay absolute inset-0 bg-black/50"></div>
         {% endif %}
 

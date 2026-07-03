@@ -48,7 +48,43 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_location_address', $this->getLocationAddress(...)),
             new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
         ];
+    }
+
+    /**
+     * Build the CSS focus class for a media focus point.
+     *
+     * Sulu stores the focus point on a 3×3 grid (X and Y each in 0..2, where
+     * 0 = left/top, 1 = center, 2 = right/bottom). When the point is set this
+     * returns a static positioning class — `focus-img-X-Y` (object-position on
+     * an <img>) or `focus-bg-X-Y` (background-position on a CSS background) —
+     * defined in app.css. It is only a client-side safety net: Sulu already
+     * applies the focus point server-side when cropping outbound formats, so an
+     * unset point (null) needs no class and returns an empty string.
+     *
+     * @param int|string|null $focusPointX The media focus point X (0..2), or null when unset
+     * @param int|string|null $focusPointY The media focus point Y (0..2), or null when unset
+     * @param string          $mode        The positioning target: "img" (object-position) or "bg" (background-position)
+     *
+     * @return string The focus class to emit, or an empty string when the point is unset or invalid
+     */
+    public function getFocusClass(int|string|null $focusPointX, int|string|null $focusPointY, string $mode = 'img'): string
+    {
+        if (!is_numeric($focusPointX) || !is_numeric($focusPointY)) {
+            return '';
+        }
+
+        $x = (int) $focusPointX;
+        $y = (int) $focusPointY;
+
+        if ($x < 0 || $x > 2 || $y < 0 || $y > 2) {
+            return '';
+        }
+
+        $prefix = 'bg' === $mode ? 'focus-bg' : 'focus-img';
+
+        return sprintf('%s-%d-%d', $prefix, $x, $y);
     }
 
     /**

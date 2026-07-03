@@ -15,13 +15,16 @@
                 {% if heroId %}
                     {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
                     <div class="iw-article-page__hero-inline-image">
-                        <img
-                            src="{{ heroMedia.thumbnails['iw_hero_md']|default(heroMedia.thumbnails['iw_theme_16_9']|default(heroMedia.url)) }}"
-                            alt="{{ heroMedia.title|default(content.title) }}"
-                            class="iw-article-page__hero-inline-image-img"
-                            loading="eager"
-                            itemprop="image"
-                        >
+                        {# `iw_hero_md` is not a defined format → the effective format is iw_theme_16_9 (focus-aware, avif/webp). #}
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: heroMedia,
+                            format: 'iw_theme_16_9',
+                            alt: heroMedia.title|default(content.title),
+                            raw: true,
+                            loading: 'eager',
+                            itemprop: 'image',
+                            classes: 'iw-article-page__hero-inline-image-img',
+                        }) }}
                     </div>
                 {% endif %}
             {% endif %}

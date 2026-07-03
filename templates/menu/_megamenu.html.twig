@@ -234,10 +234,14 @@
                                                     {% if card.image is defined and card.image.id|default(null) is not null %}
                                                         {% set cardMedia = sulu_resolve_media(card.image.id, app.request.locale) %}
                                                         {% if cardMedia is not null %}
-                                                            <img src="{{ cardMedia.thumbnails['iw_theme_mega_card']|default(cardMedia.url) }}"
-                                                                 alt="{{ card.title }}"
-                                                                 loading="lazy"
-                                                                 class="{{ cardRatioClass }}">
+                                                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                                                media: cardMedia,
+                                                                format: 'iw_theme_mega_card',
+                                                                alt: card.title,
+                                                                raw: true,
+                                                                loading: 'lazy',
+                                                                classes: cardRatioClass,
+                                                            }) }}
                                                         {% endif %}
                                                     {% endif %}
                                                     <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
@@ -261,10 +265,14 @@
                                         {% if column.image is defined and column.image.id|default(null) is not null %}
                                             {% set featMedia = sulu_resolve_media(column.image.id, app.request.locale) %}
                                             {% if featMedia is not null %}
-                                                <img src="{{ featMedia.thumbnails['iw_theme_mega_card']|default(featMedia.url) }}"
-                                                     alt="{{ column.title }}"
-                                                     class="{{ featLayout == 'vertical' ? 'mb-4' : '' }} {{ featRatioClass }}"
-                                                     loading="lazy">
+                                                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                                    media: featMedia,
+                                                    format: 'iw_theme_mega_card',
+                                                    alt: column.title,
+                                                    raw: true,
+                                                    loading: 'lazy',
+                                                    classes: (featLayout == 'vertical' ? 'mb-4 ' : '') ~ featRatioClass,
+                                                }) }}
                                             {% endif %}
                                         {% endif %}
                                         <div class="{{ featLayout == 'horizontal' ? 'iw-mega-menu__featured-body' : '' }}">

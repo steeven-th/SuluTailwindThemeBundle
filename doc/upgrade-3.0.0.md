@@ -125,3 +125,74 @@ directly:
 Article listings (cards, featured) still accept both shapes for their image
 fallback chain (`excerptImages` stays a `media_selection`), so no change is
 needed there beyond re-selecting the hero where it is the only source.
+
+## Unified image pipeline (`<picture>` avif/webp + focus point)
+
+Every content image now renders through a single partial,
+`blocks/common/_image.html.twig`, which emits a `<picture>` with progressive
+`avif`/`webp` sources, a fallback `<img>`, and the media **focus point** applied
+automatically. Blocks, galleries, article cards/heroes, avatars and the mega
+menu were migrated to it. See [`twig-reference.md`](twig-reference.md#partial-blockscommon_imagehtmltwig)
+for the full parameter list and [`css-api/images.md`](css-api/images.md) for the
+CSS surface.
+
+### Template overrides (breaking)
+
+If you override any bundle template that renders an image, the markup changed
+from a bare `<img src="{{ media.thumbnails[...] }}">` to a partial include.
+Re-base your override on the new structure:
+
+```twig
+{# before #}
+<img src="{{ media.thumbnails['iw_theme_16_9']|default(media.url) }}" alt="…" loading="lazy" class="w-full object-cover" style="aspect-ratio: 16/9">
+
+{# after #}
+{{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+    media: media,
+    format: 'iw_theme_16_9',
+    ratio: '16/9',
+}) }}
+```
+
+Inline `style="aspect-ratio: …"` is gone everywhere: ratios are now enumerated
+CSS classes (`.iw-ratio--16-9`, `--4-3`, `--1-1`, `--3-4`, `--9-16`, `--21-9`,
+…). Add a new `.iw-ratio--X-Y` rule if you need a ratio outside the shipped set.
+
+### New CSS classes
+
+Static, hand-written in `app.css` (no Tailwind safelist needed):
+
+- `focus-img-X-Y` (object-position) and `focus-bg-X-Y` (background-position),
+  `X`/`Y` ∈ `{0,1,2}` — applied from the media focus point.
+- `.iw-ratio--X-Y` — aspect-ratio boxes.
+- `.iw-parallax` / `.iw-parallax--{subtle,medium,strong,extreme}` — wide-carousel
+  parallax headroom.
+
+### AVIF toggle
+
+The avif `<source>` is emitted unconditionally by Sulu (it always exposes the
+`.avif` thumbnail key). A new theme setting **Components → Images → “Serve images
+as AVIF”** (`imageAvif`, default **on**) lets you disable it on a server whose
+imagine driver (GD/Imagick) cannot encode AVIF — otherwise the browser would
+pick an avif source that fails to load. WebP and the original stay served.
+Imagick is recommended in production; GD works when built with WebP + AVIF.
+
+### Dead image formats fixed
+
+Templates referenced `iw_hero_lg` / `iw_hero_md`, which were **never defined** —
+they silently fell back to the full-size original. They now use the defined
+`iw_theme_16_9` / `iw_theme_hero` formats (properly sized + focus-aware). If your
+theme defined these format keys, the previous behavior is preserved; otherwise
+hero images are now correctly downscaled. (`iw_og_image`, used by the SEO/OpenGraph
+templates, has the same latent issue and is addressed separately.)
+
+### Article hero crop (breaking, visual)
+
+For the focus point to actually crop the hero, `.iw-article-hero` variants now
+have a **definite height** via `aspect-ratio: var(--iw-article-hero-ratio, 16/9)`
+(capped by `--iw-article-hero-max-height`). Previously the image was shown at its
+natural height and clipped by `overflow`, so `object-fit: cover` / the focus
+point had no effect. Consequence: on wide viewports heroes now crop around the
+**focus point** (or the **center** when none is set) instead of showing the
+**top** of the image. Override `--iw-article-hero-ratio` (e.g. `21 / 9`) per theme
+for a more panoramic hero.

@@ -38,9 +38,13 @@
             {% endif %}
 
             {% if avatarMedia %}
-                <img src="{{ avatarMedia.thumbnails['sulu-100x100']|default(avatarMedia.url) }}"
-                     alt="{{ authorName }}"
-                     class="iw-article-author__avatar">
+                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                    media: avatarMedia,
+                    format: 'sulu-100x100',
+                    alt: authorName,
+                    raw: true,
+                    classes: 'iw-article-author__avatar',
+                }) }}
             {% else %}
                 {# Initials fallback #}
                 {% set initials = authorName|split(' ')|map(w => w|first|upper)|join('')|slice(0, 2) %}

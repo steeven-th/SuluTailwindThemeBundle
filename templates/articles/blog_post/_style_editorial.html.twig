@@ -6,19 +6,39 @@
 {% extends '@ItechWorldSuluTailwindTheme/articles/common/_article_base.html.twig' %}
 
 {% block article_hero %}
-    {# Resolve hero image for background #}
+    {# Resolve hero image for background (iw_theme_hero — `iw_hero_lg` is not a
+       defined format; the avif/webp keys only exist when the driver supports them). #}
+    {% set heroFormat = 'iw_theme_hero' %}
     {% set heroBgUrl = null %}
+    {% set heroBgAvif = null %}
+    {% set heroBgWebp = null %}
+    {% set heroFocus = '' %}
     {% if content.heroImage is defined and content.heroImage is not empty %}
         {% set heroId = content.heroImage %}
         {% if heroId %}
             {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
-            {% set heroBgUrl = heroMedia.thumbnails['iw_hero_lg']|default(heroMedia.url) %}
+            {% set avifEnabled = iw_sulu_tailwind_theme.imageAvif is defined ? iw_sulu_tailwind_theme.imageAvif : true %}
+            {% set heroBgUrl = heroMedia.thumbnails[heroFormat]|default(heroMedia.url) %}
+            {% set heroBgAvif = avifEnabled ? heroMedia.thumbnails[heroFormat ~ '.avif']|default(null) : null %}
+            {% set heroBgWebp = heroMedia.thumbnails[heroFormat ~ '.webp']|default(null) %}
+            {% set heroFocus = iw_sulu_tailwind_theme_focus_class(heroMedia.focusPointX|default(null), heroMedia.focusPointY|default(null), 'bg') %}
         {% endif %}
     {% endif %}
 
-    <div class="iw-article-hero iw-article-hero--editorial relative flex items-end min-h-[60vh] {{ heroBgUrl ? 'bg-cover bg-center' : 'bg-[var(--color-primary-900)]' }}" itemprop="image" content="{{ heroBgUrl|default('') }}">
+    <div class="iw-article-hero iw-article-hero--editorial relative flex items-end min-h-[60vh] {{ heroBgUrl ? ('bg-cover ' ~ (heroFocus ?: 'bg-center')) : 'bg-[var(--color-primary-900)]' }}" itemprop="image" content="{{ heroBgUrl|default('') }}">
         {% if heroBgUrl %}
-            <style>.iw-article-hero--editorial { background-image: url('{{ heroBgUrl }}'); }</style>
+            {# Background image; avif/webp offered via image-set() with the base url as fallback. #}
+            <style>
+                .iw-article-hero--editorial { background-image: url('{{ heroBgUrl }}'); }
+                {% if heroBgAvif or heroBgWebp %}
+                .iw-article-hero--editorial {
+                    background-image: image-set(
+                        {%- if heroBgAvif %} url('{{ heroBgAvif }}') type('image/avif'),{% endif %}
+                        {%- if heroBgWebp %} url('{{ heroBgWebp }}') type('image/webp'),{% endif %}
+                        url('{{ heroBgUrl }}'));
+                }
+                {% endif %}
+            </style>
         {% endif %}
         {# Dark overlay for text readability #}
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>

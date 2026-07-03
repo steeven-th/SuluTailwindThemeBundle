@@ -39,6 +39,7 @@
         {% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
         {% set ratioMap = {'iw_theme_16_9': '16/9', 'iw_theme_4_3': '4/3', 'iw_theme_1_1': '1/1', 'iw_theme_3_4': '3/4'} %}
         {% set aspectRatio = ratioMap[format]|default('16/9') %}
+        {% set ratioClass = 'iw-ratio--' ~ (aspectRatio|replace({'/': '-', ':': '-'})) %}
 
         {% set isSingleImage = singleImage|default(false) %}
 
@@ -49,8 +50,7 @@
                 data-slider-autoplay-value="true"
                 data-slider-interval-value="5000"
                 data-slider-mode-value="carousel"
-                class="iw-block-gallery iw-block-gallery--slider iw-block-gallery--slider-single relative overflow-hidden{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}"
-                style="aspect-ratio: {{ aspectRatio }};"
+                class="iw-block-gallery iw-block-gallery--slider iw-block-gallery--slider-single relative overflow-hidden {{ ratioClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}"
             >
                 {# Carousel slides #}
                 {% for mediaId in images %}
@@ -64,12 +64,13 @@
                             class="iw-block-gallery__link glightbox relative block w-full h-full"
                             data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                         >
-                            <img
-                                src="{{ media.thumbnails[format]|default(media.url) }}"
-                                alt="{{ media.title|default('') }}"
-                                loading="lazy"
-                                class="iw-block-gallery__img absolute inset-0 w-full h-full object-cover cursor-pointer"
-                            >
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: media,
+                                format: format,
+                                cover: true,
+                                classes: 'iw-block-gallery__img cursor-pointer',
+                                pictureClasses: 'absolute inset-0 w-full h-full',
+                            }) }}
                         </a>
                     </div>
                 {% endfor %}
@@ -127,13 +128,12 @@
                                 class="iw-block-gallery__link glightbox"
                                 data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                             >
-                                <img
-                                    src="{{ media.thumbnails[format]|default(media.url) }}"
-                                    alt="{{ media.title|default('') }}"
-                                    loading="lazy"
-                                    class="iw-block-gallery__img w-full object-cover cursor-pointer"
-                                    style="aspect-ratio: {{ aspectRatio }};"
-                                >
+                                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                    media: media,
+                                    format: format,
+                                    ratio: aspectRatio,
+                                    classes: 'iw-block-gallery__img cursor-pointer',
+                                }) }}
                             </a>
                         </figure>
                     {% endfor %}

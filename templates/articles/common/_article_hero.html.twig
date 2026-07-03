@@ -24,7 +24,8 @@
     - .iw-article-hero__image (the rendered <img>)
     - .iw-article-hero__breadcrumb (bottom overlay hosting the breadcrumb trail)
 
-    Override via --iw-article-hero-max-height / --iw-article-hero-radius /
+    Override via --iw-article-hero-ratio (crop ratio, default 16/9) /
+    --iw-article-hero-max-height / --iw-article-hero-radius /
     --iw-article-hero-contained-max-width / --iw-article-hero-breadcrumb-*.
 #}
 
@@ -37,7 +38,8 @@
     {% endif %}
 
     {% if media is not null %}
-        {% set imgUrl = media.thumbnails['iw_hero_lg']|default(media.thumbnails['iw_theme_16_9']|default(media.url)) %}
+        {# `iw_hero_lg` is not a defined format → the effective format is iw_theme_16_9 (focus-aware, avif/webp). #}
+        {% set heroFormat = 'iw_theme_16_9' %}
         {% set imgAlt = media.title|default('') %}
 
         {# Whitelist the modifier so legacy values fall back to fullwidth #}
@@ -51,12 +53,21 @@
             and iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
 
         <div class="iw-article-hero iw-article-hero--{{ modifier }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
+            {% set heroImageParams = {
+                media: media,
+                format: heroFormat,
+                alt: imgAlt,
+                raw: true,
+                loading: 'eager',
+                itemprop: 'image',
+                classes: imgClass,
+            } %}
             {% if modifier == 'contained' %}
                 <div class="iw-article-hero__inner">
-                    <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="{{ imgClass }}" loading="eager" itemprop="image">
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', heroImageParams) }}
                 </div>
             {% else %}
-                <img src="{{ imgUrl }}" alt="{{ imgAlt }}" class="{{ imgClass }}" loading="eager" itemprop="image">
+                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', heroImageParams) }}
             {% endif %}
 
             {% if showBreadcrumb %}

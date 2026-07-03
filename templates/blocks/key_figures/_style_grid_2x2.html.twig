@@ -10,12 +10,11 @@
                     {% if figure.image is defined and figure.image.id is defined %}
                         {% set media = sulu_resolve_media(figure.image.id, app.request.locale) %}
                         <div class="iw-key-figure__icon">
-                            <img
-                                src="{{ media.thumbnails['iw_theme_1_1']|default(media.url) }}"
-                                alt="{{ media.title|default('') }}"
-                                loading="lazy"
-                                class="iw-key-figure__icon-img"
-                            >
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: media,
+                                format: 'iw_theme_1_1',
+                                classes: 'iw-key-figure__icon-img',
+                            }) }}
                         </div>
                     {% endif %}
 

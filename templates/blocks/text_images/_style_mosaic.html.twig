@@ -101,13 +101,12 @@
                                 class="glightbox"
                                 data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                             >
-                                <img
-                                    src="{{ media.thumbnails[imgFormat]|default(media.url) }}"
-                                    alt="{{ media.title|default('') }}"
-                                    loading="lazy"
-                                    class="w-full object-cover cursor-pointer"
-                                    style="aspect-ratio: {{ isHero ? '16/9' : '1/1' }};"
-                                >
+                                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                    media: media,
+                                    format: imgFormat,
+                                    ratio: isHero ? '16/9' : '1/1',
+                                    classes: 'cursor-pointer',
+                                }) }}
                             </a>
                         </figure>
                     {% endfor %}

@@ -6,15 +6,15 @@
         {% set isParallax = enableParallax|default(false) %}
         {% set overlayRadius = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 
-        {# Parallax intensity: maps a 4-level admin select to a numeric percentage.
-           The slider Stimulus controller multiplies its `maxShift` by this value
-           (passed via `data-slider-parallax-intensity-value`) and the image
-           wrapper sizes (height/top) follow the same scale so the image always
-           stays large enough to cover its container at extreme offsets. #}
+        {# Parallax intensity: a 4-level admin select. The slider Stimulus
+           controller multiplies its `maxShift` by this value (passed via
+           `data-slider-parallax-intensity-value`); the image height/top offset
+           follows the same scale via the enumerated `.iw-parallax--{level}`
+           classes (app.css) so the image always covers its box at extremes. #}
         {% set parallaxLevels = {'subtle': 7.5, 'medium': 15, 'strong': 22.5, 'extreme': 30} %}
-        {% set parallaxN = parallaxLevels[parallaxIntensity|default('medium')]|default(15) %}
-        {% set parallaxHeight = 100 + 2 * parallaxN %}
-        {% set parallaxTop = -parallaxN %}
+        {% set parallaxKey = parallaxIntensity|default('medium') %}
+        {% set parallaxKey = parallaxKey in ['subtle', 'medium', 'strong', 'extreme'] ? parallaxKey : 'medium' %}
+        {% set parallaxN = parallaxLevels[parallaxKey] %}
 
         {# Map imageFilter value to Sulu thumbnail name and CSS aspect-ratio #}
         {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
@@ -31,8 +31,8 @@
             {% if isParallax %}data-slider-parallax-value="true" data-slider-parallax-intensity-value="{{ parallaxN / 15 }}"{% endif %}
             class="iw-block-gallery iw-block-gallery--wide-carousel{{ isParallax ? ' iw-block-gallery--wide-carousel-parallax' : '' }}"
         >
-            {# Height spacer — aspect-ratio by default, fixed height for parallax #}
-            <div style="{{ isParallax ? 'height: clamp(300px, 60vh, 700px);' : 'aspect-ratio: ' ~ aspectRatio ~ ';' }}"></div>
+            {# Height spacer — aspect-ratio box by default, fixed height for parallax #}
+            <div class="{{ isParallax ? 'iw-wide-carousel-spacer--parallax' : ('iw-ratio--' ~ (aspectRatio|replace({'/': '-', ':': '-'}))) }}"></div>
 
             {# Fullbleed slides — absolute to the section (via fullbleed mode).
                All images use eager loading since carousel can show any slide at any time. #}
@@ -47,13 +47,18 @@
                         class="iw-block-gallery__link glightbox block w-full h-full"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                     >
-                        <img
-                            src="{{ media.thumbnails[format]|default(media.url) }}"
-                            alt="{{ media.title|default('') }}"
-                            loading="eager"
-                            class="iw-block-gallery__img absolute w-full object-cover cursor-pointer {{ isParallax ? 'inset-x-0' : 'inset-0 h-full' }}"
-                            {% if isParallax %}style="height: {{ parallaxHeight }}%; top: {{ parallaxTop }}%; will-change: transform;"{% endif %}
-                        >
+                        {# Parallax: the image is taller than its box (iw-parallax--{level})
+                           and the slider controller translates it on scroll. #}
+                        {% set wideImgClasses = isParallax
+                            ? ('iw-block-gallery__img cursor-pointer absolute w-full object-cover iw-parallax iw-parallax--' ~ parallaxKey)
+                            : 'iw-block-gallery__img cursor-pointer absolute inset-0 w-full h-full object-cover' %}
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: media,
+                            format: format,
+                            raw: true,
+                            loading: 'eager',
+                            classes: wideImgClasses,
+                        }) }}
                     </a>
                 </div>
             {% endfor %}

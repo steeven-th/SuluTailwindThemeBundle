@@ -44,12 +44,14 @@
 
                         {% if imgMedia %}
                             <div class="iw-featured-article-card__image-wrap">
-                                <img
-                                    src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
-                                    alt="{{ imgMedia.title|default(articleTitle) }}"
-                                    class="iw-featured-article-card__image"
-                                    loading="lazy"
-                                >
+                                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                    media: imgMedia,
+                                    format: 'iw_theme_16_9',
+                                    alt: imgMedia.title|default(articleTitle),
+                                    raw: true,
+                                    loading: 'lazy',
+                                    classes: 'iw-featured-article-card__image',
+                                }) }}
                             </div>
                         {% endif %}
                     {% endif %}
