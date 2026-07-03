@@ -517,5 +517,25 @@
                 </property>
             </properties>
         </section>
+
+        <!-- Images / delivery — site-wide image output settings. -->
+        <section name="componentsImages">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_images</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_images_info</info_text>
+            </meta>
+            <properties>
+                <!-- AVIF <source> in the <picture> pipeline. Default on; turn it off
+                     when the server's imagine driver (GD/Imagick) cannot encode AVIF
+                     (WebP + original stay served regardless). -->
+                <property name="imageAvif" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.image_avif</title></meta></param>
+                    </params>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>
