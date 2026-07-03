@@ -13,12 +13,12 @@
             <span class="iw-block-separator__label">{{ text }}</span>
         {% elseif icon is defined and icon.id is defined %}
             {% set iconMedia = sulu_resolve_media(icon.id, app.request.locale) %}
-            <img
-                src="{{ iconMedia.thumbnails['iw_theme_avatar']|default(iconMedia.url) }}"
-                alt=""
-                loading="lazy"
-                class="iw-block-separator__icon {{ iconModifier }}"
-            >
+            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                media: iconMedia,
+                format: 'iw_theme_avatar',
+                alt: '',
+                classes: 'iw-block-separator__icon ' ~ iconModifier,
+            }) }}
         {% else %}
             <span class="iw-block-separator__icon-fallback">&#9670;</span>
         {% endif %}

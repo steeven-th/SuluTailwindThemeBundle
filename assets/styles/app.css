@@ -186,6 +186,48 @@ img.object-cover {
     border-radius: 0;
 }
 
+/* ─── Aspect-ratio boxes ────────────────────────────────────────────────────
+   Enumerated ratio classes used by the unified image partial and any block that
+   crops an image to a fixed ratio. Enumerated (not inline `style="aspect-ratio"`)
+   so they stay overridable in one place and never depend on the Tailwind safelist.
+   The admin ratio pickers only expose this fixed set of values.
+   ──────────────────────────────────────────────────────────────────────── */
+.iw-ratio--16-9 { aspect-ratio: 16 / 9; }
+.iw-ratio--4-3  { aspect-ratio: 4 / 3; }
+.iw-ratio--3-2  { aspect-ratio: 3 / 2; }
+.iw-ratio--1-1  { aspect-ratio: 1 / 1; }
+.iw-ratio--3-4  { aspect-ratio: 3 / 4; }
+.iw-ratio--2-3  { aspect-ratio: 2 / 3; }
+.iw-ratio--9-16 { aspect-ratio: 9 / 16; }
+.iw-ratio--21-9 { aspect-ratio: 21 / 9; }
+
+/* ─── Focus point ───────────────────────────────────────────────────────────
+   Client-side safety net for the media focus point. Sulu already applies the
+   focus point server-side when cropping outbound formats, so these classes only
+   matter when an image is cropped client-side (object-cover / background-image).
+   Emitted by iw_sulu_tailwind_theme_focus_class() from `media.focusPointX/Y`
+   (Sulu 3×3 grid: 0 = left/top, 1 = center, 2 = right/bottom).
+   ──────────────────────────────────────────────────────────────────────── */
+.focus-img-0-0 { object-position: left top; }
+.focus-img-1-0 { object-position: center top; }
+.focus-img-2-0 { object-position: right top; }
+.focus-img-0-1 { object-position: left center; }
+.focus-img-1-1 { object-position: center center; }
+.focus-img-2-1 { object-position: right center; }
+.focus-img-0-2 { object-position: left bottom; }
+.focus-img-1-2 { object-position: center bottom; }
+.focus-img-2-2 { object-position: right bottom; }
+
+.focus-bg-0-0 { background-position: left top; }
+.focus-bg-1-0 { background-position: center top; }
+.focus-bg-2-0 { background-position: right top; }
+.focus-bg-0-1 { background-position: left center; }
+.focus-bg-1-1 { background-position: center center; }
+.focus-bg-2-1 { background-position: right center; }
+.focus-bg-0-2 { background-position: left bottom; }
+.focus-bg-1-2 { background-position: center bottom; }
+.focus-bg-2-2 { background-position: right bottom; }
+
 /* ─── Prose (rich text) Overrides ───────────────────────────────────────── */
 .prose a {
     color: var(--iw-variant-link-color, var(--color-link, inherit));
@@ -2218,6 +2260,27 @@ img.object-cover {
     transition: transform 0.1s linear;
 }
 
+/* Wide-carousel parallax headroom, one class per admin intensity level. The
+   slider controller scales its scroll transform by the same intensity, so the
+   image height / top offset must follow suit to keep the image covering its
+   box at extreme offsets. Enumerated (not inline style) since the admin exposes
+   exactly these four levels. */
+.iw-parallax {
+    inset-inline: 0;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+/* Two-class selectors (0,2,0) so the parallax height beats `img.object-cover`
+   (0,1,1), which otherwise forces height:100% and kills the parallax headroom.
+   The image always carries both `iw-parallax` and `iw-parallax--{level}`. */
+.iw-parallax.iw-parallax--subtle { height: 115%; top: -7.5%; }
+.iw-parallax.iw-parallax--medium { height: 130%; top: -15%; }
+.iw-parallax.iw-parallax--strong { height: 145%; top: -22.5%; }
+.iw-parallax.iw-parallax--extreme { height: 160%; top: -30%; }
+
+/* Wide-carousel height spacer in parallax mode (fixed viewport-based height). */
+.iw-wide-carousel-spacer--parallax { height: clamp(300px, 60vh, 700px); }
+
 /* ── Fullbleed baseline (CSS-only, no JS required) ──
    When a slider has fullbleed enabled, the parent <section> must be the
    positioned ancestor so absolute slides fill it edge-to-edge, ignoring
@@ -2253,10 +2316,6 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-block-cta--banner .iw-block-cta__overlay {
     background-color: var(--iw-block-cta-overlay-color, rgb(0 0 0 / 0.5));
-}
-
-.iw-block-cta--banner .iw-block-cta__background {
-    object-position: var(--iw-block-cta-background-position, center);
 }
 
 /* Actions row (primary + optional secondary button). The Twig template
@@ -2885,6 +2944,10 @@ section.block:has([data-slider-fullbleed-value]) {
    .iw-article-hero already provides overflow:hidden + max-height). The bottom
    margin keeps the header below (e.g. its breadcrumb) from hugging the image. */
 .iw-article-hero--fullwidth {
+    /* A definite height (from the ratio) is required for object-fit: cover — and
+       thus the focus point (object-position) — to actually crop the image.
+       max-height caps it on wide viewports; overflow (base) clips the excess. */
+    aspect-ratio: var(--iw-article-hero-ratio, 16 / 9);
     margin-bottom: var(--iw-article-hero-margin-bottom, 1.5rem);
 }
 
@@ -2902,6 +2965,8 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-article-hero--contained .iw-article-hero__inner {
+    /* Definite height (ratio) so object-fit: cover + focus point crop the image. */
+    aspect-ratio: var(--iw-article-hero-ratio, 16 / 9);
     overflow: hidden;
     max-height: var(--iw-article-hero-max-height, 500px);
     border-radius: var(--iw-article-hero-radius, var(--border-imageRadius));
@@ -2924,6 +2989,9 @@ section.block:has([data-slider-fullbleed-value]) {
    — the image spans the viewport. */
 .iw-article-hero--parallax {
     position: relative;
+    /* Definite height (ratio) so the 130%-tall parallax image resolves and
+       object-fit: cover + focus point crop it. max-height (base) caps it. */
+    aspect-ratio: var(--iw-article-hero-ratio, 16 / 9);
 }
 
 /* Editorial: oversized hero with background-image and overlay text. The

@@ -29,11 +29,10 @@
 {% set hoverShadow = cardHoverShadow|default('none') %}
 {% set hasHoverBorder = hasBorder and (cardHoverBorder|default('none')) != 'none' %}
 {% set imagePadded = cardImagePadded is defined ? cardImagePadded : true %}
-{# The aspect-ratio is always applied so every card in a listing keeps the
-   same image height. Dropping it (previous behavior in horizontal+bleed
-   mode) let the native image size push the card, producing inconsistent
-   row heights with portrait sources. #}
-{% set keepAspectRatio = true %}
+{# The image is always cropped to `imageRatio` (passed to the _image partial)
+   so every card in a listing keeps the same image height. Without it the
+   native image size would push the card, producing inconsistent row heights
+   with portrait sources. #}
 
 {% set articleTitle = article.title|default('') %}
 {% set articleUrl = article.routePath|default(article.url|default('#')) %}
@@ -69,10 +68,12 @@
 
         {% if imgMedia %}
             <a href="{{ articleUrl }}" class="iw-article-card__image">
-                <img src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
-                     alt="{{ imgMedia.title|default(articleTitle) }}"
-                     {% if keepAspectRatio %}style="aspect-ratio: {{ imageRatio }}"{% endif %}
-                     loading="lazy">
+                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                    media: imgMedia,
+                    format: 'iw_theme_16_9',
+                    ratio: imageRatio,
+                    alt: imgMedia.title|default(articleTitle),
+                }) }}
             </a>
         {% endif %}
     {% endif %}

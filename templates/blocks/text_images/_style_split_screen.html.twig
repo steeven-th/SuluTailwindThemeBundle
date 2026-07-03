@@ -94,12 +94,13 @@
                     class="glightbox absolute inset-0 block w-full h-full"
                     data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                 >
-                    <img
-                        src="{{ media.thumbnails[format]|default(media.url) }}"
-                        alt="{{ media.title|default('') }}"
-                        loading="lazy"
-                        class="absolute inset-0 w-full h-full object-cover cursor-pointer"
-                    >
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                        media: media,
+                        format: format,
+                        cover: true,
+                        classes: 'cursor-pointer',
+                        pictureClasses: 'absolute inset-0 w-full h-full',
+                    }) }}
                 </a>
 
             {% elseif resolvedImages|length > 1 %}
@@ -114,12 +115,13 @@
                             class="glightbox block w-full h-full"
                             data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                         >
-                            <img
-                                src="{{ media.thumbnails[format]|default(media.url) }}"
-                                alt="{{ media.title|default('') }}"
-                                loading="lazy"
-                                class="absolute inset-0 w-full h-full object-cover cursor-pointer"
-                            >
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: media,
+                                format: format,
+                                cover: true,
+                                classes: 'cursor-pointer',
+                                pictureClasses: 'absolute inset-0 w-full h-full',
+                            }) }}
                         </a>
                     </div>
                 {% endfor %}

@@ -88,12 +88,12 @@
                                             class="glightbox block w-full h-full"
                                             data-title="{{ showNames and media.title is defined ? media.title : '' }}"
                                         >
-                                            <img
-                                                src="{{ media.thumbnails[format]|default(media.url) }}"
-                                                alt="{{ media.title|default('') }}"
-                                                loading="lazy"
-                                                class="w-full h-full object-cover"
-                                            >
+                                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                                media: media,
+                                                format: format,
+                                                cover: true,
+                                                pictureClasses: 'w-full h-full',
+                                            }) }}
                                         </a>
                                     </div>
                                 </div>

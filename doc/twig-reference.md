@@ -189,6 +189,81 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_focus_class(focusPointX, focusPointY, mode)`
+
+Builds the CSS focus class for a media focus point. Sulu stores the focus point
+on a 3×3 grid (X and Y each in `0..2`, where `0` = left/top, `1` = center,
+`2` = right/bottom). Returns `focus-img-X-Y` (`object-position` on an `<img>`) or
+`focus-bg-X-Y` (`background-position` on a CSS background) — both defined in
+`app.css`. When the point is unset (`null`) or out of range it returns an empty
+string, because Sulu already applies the focus point server-side when cropping
+outbound formats: the class is only a client-side safety net for images cropped
+in the browser (`object-cover` / `background-image`).
+
+The unified image partial applies this automatically. Call it directly only for
+CSS backgrounds:
+
+```twig
+{% set bgFocus = iw_sulu_tailwind_theme_focus_class(media.focusPointX, media.focusPointY, 'bg') %}
+<div class="iw-hero__bg {{ bgFocus }}">…</div>
+```
+
+**Parameters:**
+- `focusPointX` (`int|string|null`) — Media focus point X (`0..2`), or `null` when unset
+- `focusPointY` (`int|string|null`) — Media focus point Y (`0..2`), or `null` when unset
+- `mode` (`string`) — Positioning target: `img` (object-position) or `bg` (background-position)
+
+**Returns:** `string` — The focus class, or an empty string when the point is unset or invalid.
+
+---
+
+## Partial: `blocks/common/_image.html.twig`
+
+The single rendering point for every content image. Emits a `<picture>` with
+progressive `avif`/`webp` `<source>` elements and a fallback `<img>`. The
+`avif`/`webp` thumbnail keys only exist when the server imagine driver can encode
+them, so each `<source>` is conditional and degrades cleanly to the original
+format — no broken URLs. The focus point is applied automatically from the media.
+
+```twig
+{# Cropped to a ratio, lazy, with lightbox #}
+{{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+    media: media,
+    format: 'iw_theme_16_9',
+    ratio: '16/9',
+    lightbox: true,
+    radiusClass: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
+}) %}
+
+{# Hero (LCP) rendered eagerly, natural height #}
+{{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+    mediaId: heroImageId,
+    format: 'iw_theme_hero',
+    loading: 'eager',
+}) %}
+```
+
+**Parameters:**
+- `media` (`object`) — Resolved media object (preferred).
+- `mediaId` (`int`) — Media id, resolved via `sulu_resolve_media` when `media` is absent.
+- `format` (`string`, default `iw_theme_16_9`) — Sulu format key.
+- `alt` (`string`) — Alt text override (defaults to the media title). Pass `''` for purely decorative backgrounds.
+- `ratio` (`string`) — Aspect-ratio token (`16/9`, `4-3`, `1:1`…). When set the image is cropped (`object-cover`) inside an `iw-ratio--X-Y` box; when omitted it keeps its natural height. `/` and `:` are normalised to `-`.
+- `cover` (`bool`, default `false`) — Fill the parent with `object-cover` instead of natural height (backgrounds, carousel slides). Pass the sizing via `pictureClasses` (e.g. `absolute inset-0 w-full h-full`). Ignored when `ratio` is set.
+- `lightbox` (`bool`, default `false`) — Wrap in a glightbox link.
+- `showName` (`bool`, default `false`) — Use the media title as the lightbox caption.
+- `loading` (`string`, default `lazy`) — `lazy` or `eager` (heroes / LCP images).
+- `focusMode` (`string`, default `img`) — `img` applies the focus class on the `<img>`; `none` disables it.
+- `raw` (`bool`, default `false`) — Component-owned mode: the `<picture>` is transparent (`display:contents`) and the `<img>` gets **no** sizing utilities, so the caller's own CSS classes fully control layout. Only the avif/webp sources and the focus class are injected. Use for heroes / components that already have dedicated CSS (and JS) targeting the `<img>`. Ignores `ratio`/`cover`.
+- `itemprop` (`string`) — Schema.org `itemprop` emitted on the `<img>` (e.g. `image` for article heroes).
+- `radiusClass` (`string`) — Radius class applied on the `<picture>` wrapper (adds `overflow-hidden`).
+- `classes` (`string`) — Extra classes on the `<img>`.
+- `pictureClasses` (`string`) — Extra classes on the `<picture>`.
+
+See [`doc/css-api/images.md`](css-api/images.md) for the `iw-ratio--*` and `focus-*` CSS classes.
+
+---
+
 ### `iw_sulu_tailwind_theme_article_config()`
 
 Returns the article display configuration of the active theme. The result is an

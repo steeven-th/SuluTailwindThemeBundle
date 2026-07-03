@@ -1,9 +1,11 @@
 {# Image slider with lightbox — displays a single image or a carousel when multiple images.
+   Each image is rendered through the unified `_image.html.twig` partial (picture
+   avif/webp + focus point); this template only owns the carousel structure.
    Expected variables:
      - images: array of media IDs
      - imageFormat: string (image format key, e.g. 'iw_theme_16_9')
      - showName: boolean (shows caption in lightbox only)
-     - aspectRatio: string (CSS aspect-ratio value, e.g. '16/9', '4/3', '3/4')
+     - aspectRatio: string (aspect-ratio token, e.g. '16/9', '4/3', '3/4')
      - autoplay: boolean (optional, default false)
      - interval: number (optional, autoplay interval in ms, default 5000)
 #}
@@ -16,24 +18,19 @@
 {% endif %}
 
 {% set ratio = aspectRatio|default('4/3') %}
+{% set ratioClass = 'iw-ratio--' ~ (ratio|replace({'/': '-', ':': '-'})) %}
+{% set slideFormat = imageFormat|default('iw_theme_4_3') %}
 
 {% if resolvedImages|length == 1 %}
-    {# Single image with lightbox #}
-    {% set media = resolvedImages[0] %}
+    {# Single image with lightbox — a ratio box cropped with object-cover #}
     <figure class="iw-block__image">
-        <a
-            href="{{ media.url }}"
-            class="glightbox"
-            data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
-        >
-            <img
-                src="{{ media.thumbnails[imageFormat|default('iw_theme_4_3')]|default(media.url) }}"
-                alt="{{ media.title|default('') }}"
-                loading="lazy"
-                class="w-full object-cover cursor-pointer"
-                style="aspect-ratio: {{ ratio }};"
-            >
-        </a>
+        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+            media: resolvedImages[0],
+            format: slideFormat,
+            ratio: ratio,
+            lightbox: true,
+            showName: showName|default(false),
+        }) }}
     </figure>
 
 {% elseif resolvedImages|length > 1 %}
@@ -41,12 +38,11 @@
        The radius is owned by the wrapping element in the consuming template
        (via `imageRadius`) so we don't apply one here. #}
     <div
-        class="relative overflow-hidden"
+        class="relative overflow-hidden {{ ratioClass }}"
         data-controller="slider"
         data-slider-mode-value="carousel"
         data-slider-autoplay-value="{{ autoplay|default(false) ? 'true' : 'false' }}"
         data-slider-interval-value="{{ interval|default(5000) }}"
-        style="aspect-ratio: {{ ratio }};"
     >
         {# Slides #}
         {% for media in resolvedImages %}
@@ -56,15 +52,15 @@
             >
                 <a
                     href="{{ media.url }}"
-                    class="glightbox relative block w-full h-full"
+                    class="glightbox relative block w-full h-full cursor-pointer"
                     data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
                 >
-                    <img
-                        src="{{ media.thumbnails[imageFormat|default('iw_theme_4_3')]|default(media.url) }}"
-                        alt="{{ media.title|default('') }}"
-                        loading="lazy"
-                        class="absolute inset-0 w-full h-full object-cover cursor-pointer"
-                    >
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                        media: media,
+                        format: slideFormat,
+                        cover: true,
+                        pictureClasses: 'absolute inset-0 w-full h-full',
+                    }) }}
                 </a>
             </div>
         {% endfor %}

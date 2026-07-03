@@ -58,13 +58,12 @@
                         class="iw-block-gallery__link glightbox"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                     >
-                        <img
-                            src="{{ media.thumbnails[format]|default(media.url) }}"
-                            alt="{{ media.title|default('') }}"
-                            loading="lazy"
-                            class="iw-block-gallery__img w-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
-                            style="aspect-ratio: {{ aspectRatio }};"
-                        >
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: media,
+                            format: format,
+                            ratio: aspectRatio,
+                            classes: 'iw-block-gallery__img transition-transform duration-300 group-hover:scale-105 cursor-pointer',
+                        }) }}
                     </a>
                 </figure>
             {% endfor %}

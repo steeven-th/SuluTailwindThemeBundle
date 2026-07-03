@@ -11,8 +11,7 @@
     {% if provider == 'youtube' and youtubeId is defined and youtubeId is not empty %}
         <iframe
             src="https://www.youtube.com/embed/{{ youtubeId }}"
-            class="iw-block-cta__video w-full border-0"
-            style="aspect-ratio: 16/9;"
+            class="iw-block-cta__video w-full border-0 iw-ratio--16-9"
             loading="lazy"
             title="{{ 'iw_sulu_tailwind_theme.accessory_video'|trans }}"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -21,8 +20,7 @@
     {% elseif provider == 'vimeo' and vimeoId is defined and vimeoId is not empty %}
         <iframe
             src="https://player.vimeo.com/video/{{ vimeoId }}"
-            class="iw-block-cta__video w-full border-0"
-            style="aspect-ratio: 16/9;"
+            class="iw-block-cta__video w-full border-0 iw-ratio--16-9"
             loading="lazy"
             title="{{ 'iw_sulu_tailwind_theme.accessory_video'|trans }}"
             allow="autoplay; fullscreen; picture-in-picture"
@@ -37,8 +35,7 @@
         {% endif %}
         <video
             src="{{ resolvedVideo.url }}"
-            class="iw-block-cta__video w-full"
-            style="aspect-ratio: 16/9;"
+            class="iw-block-cta__video w-full iw-ratio--16-9"
             controls
             preload="metadata"
             {% if posterUrl %}poster="{{ posterUrl }}"{% endif %}

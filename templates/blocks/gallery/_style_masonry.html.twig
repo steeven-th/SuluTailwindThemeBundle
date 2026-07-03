@@ -47,12 +47,11 @@
                         class="iw-block-gallery__link glightbox"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
                     >
-                        <img
-                            src="{{ media.thumbnails['iw_theme_gallery_thumb']|default(media.url) }}"
-                            alt="{{ media.title|default('') }}"
-                            loading="lazy"
-                            class="iw-block-gallery__img w-full h-auto cursor-pointer"
-                        >
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: media,
+                            format: 'iw_theme_gallery_thumb',
+                            classes: 'iw-block-gallery__img cursor-pointer',
+                        }) }}
                     </a>
                 </figure>
             {% endfor %}

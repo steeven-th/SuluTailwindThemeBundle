@@ -23,17 +23,8 @@
 
 {% set paragraphRadiusClass = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
 
-{# Fixed hero format — 12/5 aspect ratio #}
-{% set format = 'iw_theme_hero' %}
-
 {# Resolve single image (single_media_selection) #}
-{% set heroImageUrl = '' %}
-{% set heroImageAlt = '' %}
-{% if image is defined and image.id is defined %}
-    {% set media = sulu_resolve_media(image.id, app.request.locale) %}
-    {% set heroImageUrl = media.thumbnails[format]|default(media.url) %}
-    {% set heroImageAlt = media.title|default('') %}
-{% endif %}
+{% set heroImageId = (image is defined and image.id is defined) ? image.id : null %}
 
 {# ── Padding for content overlay ──────────────────────────────────────────── #}
 {# Content must ALWAYS have padding so text never touches the edges.
@@ -56,14 +47,15 @@
     class="block iw-block-text-images iw-block-text-images--hero-banner {{ variantClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
     {{ bgAttr|raw }}
 >
-    {# Background image — covers the entire section #}
-    {% if heroImageUrl is not empty %}
-        <img
-            src="{{ heroImageUrl }}"
-            alt="{{ heroImageAlt }}"
-            loading="lazy"
-            class="iw-block-text-images__image absolute inset-0 w-full h-full object-cover"
-        >
+    {# Background image — covers the entire section (focus-point aware) #}
+    {% if heroImageId %}
+        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+            mediaId: heroImageId,
+            format: 'iw_theme_hero',
+            cover: true,
+            classes: 'iw-block-text-images__image',
+            pictureClasses: 'absolute inset-0 w-full h-full',
+        }) }}
     {% endif %}
 
     {# Uniform dark overlay for text readability (content is always centered) #}

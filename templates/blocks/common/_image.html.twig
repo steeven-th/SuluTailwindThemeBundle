@@ -1,32 +1,99 @@
-{# Responsive image with lightbox support.
-   Expected variables:
-     - media: single resolved media object
-     - imageFormat: string (optional, default 'iw_theme_16_9')
-     - showName: boolean (optional, shows caption in lightbox only)
-     - lightbox: boolean (optional, default true)
-#}
-{% if media is defined and media is not empty %}
-    {% set format = imageFormat|default('iw_theme_16_9') %}
-    {% set enableLightbox = lightbox ?? true %}
+{# ─────────────────────────────────────────────────────────────────────────
+   Unified image partial — the single rendering point for every content image.
 
-    <figure class="iw-block__image">
-        {% if enableLightbox %}
-            <a
-                href="{{ media.url }}"
-                class="glightbox"
-                data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
-            >
-        {% endif %}
+   Emits a <picture> with progressive avif/webp <source> elements and a fallback
+   <img>. The avif/webp keys are only present in `media.thumbnails` when the
+   server imagine driver can encode them, so the <source> is conditional and
+   degrades cleanly to the original format (no broken URLs).
 
-        <img
-            src="{{ media.thumbnails[format]|default(media.url) }}"
-            alt="{{ media.title|default('') }}"
-            loading="lazy"
-            class="w-full h-auto rounded-[var(--radius-img)]{{ enableLightbox ? ' cursor-pointer' : '' }}"
+   Parameters:
+     - media          : resolved media object (preferred). If omitted, `mediaId`
+                        is resolved via sulu_resolve_media.
+     - mediaId        : int media id (used only when `media` is not provided)
+     - format         : Sulu format key (default 'iw_theme_16_9')
+     - alt            : alt text override. Defaults to the media title. Pass ''
+                        for purely decorative backgrounds.
+     - ratio          : aspect-ratio token (e.g. '16/9', '4-3', '1:1'). When set
+                        the image is cropped to that ratio (object-cover) inside
+                        an `iw-ratio--X-Y` box; when omitted it keeps its natural
+                        height. '/' and ':' are normalised to '-'.
+     - cover          : bool (default false) — fill the parent with object-cover
+                        instead of natural height. Use for backgrounds and
+                        carousel slides where the parent already sets the size;
+                        pass the sizing via `pictureClasses` (e.g. 'absolute
+                        inset-0 w-full h-full'). Ignored when `ratio` is set
+                        (a ratio already implies cover).
+     - lightbox       : bool (default false) — wrap in a glightbox link
+     - showName       : bool (default false) — use the media title as lightbox caption
+     - loading        : 'lazy' (default) | 'eager' (heroes / LCP images)
+     - focusMode      : 'img' (default) | 'none' — apply the focus-point class on
+                        the <img> (object-position). Background callers use the
+                        iw_sulu_tailwind_theme_focus_class(..., 'bg') function directly.
+     - radiusClass    : optional radius class applied on the <picture> wrapper
+                        (e.g. from iw_sulu_tailwind_theme_radius_class('image', ...))
+     - classes        : extra classes on the <img>
+     - pictureClasses : extra classes on the <picture>
+   ───────────────────────────────────────────────────────────────────────── #}
+
+{% set media = media|default(null) %}
+{% if media is null and mediaId is defined and mediaId %}
+    {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+{% endif %}
+
+{% if media is not null and media is not empty %}
+    {% set format = format|default('iw_theme_16_9') %}
+    {% set enableLightbox = lightbox|default(false) %}
+    {% set hasRatio = ratio is defined and ratio %}
+    {% set ratioClass = hasRatio ? 'iw-ratio--' ~ (ratio|replace({'/': '-', ':': '-'})) : '' %}
+    {% set focusClass = (focusMode|default('img')) != 'none'
+        ? iw_sulu_tailwind_theme_focus_class(media.focusPointX|default(null), media.focusPointY|default(null), 'img')
+        : '' %}
+
+    {# Source URLs. Sulu always exposes the `.avif`/`.webp` keys, so avif is gated
+       on the theme toggle (default on): disable it when the server imagine driver
+       cannot encode AVIF. WebP is safe on any modern GD/Imagick and stays on.
+       `is defined` (not |default) so an explicit `false` is honoured. #}
+    {% set avifEnabled = iw_sulu_tailwind_theme.imageAvif is defined ? iw_sulu_tailwind_theme.imageAvif : true %}
+    {% set baseUrl = media.thumbnails[format]|default(media.url) %}
+    {% set avifUrl = avifEnabled ? media.thumbnails[format ~ '.avif']|default(null) : null %}
+    {% set webpUrl = media.thumbnails[format ~ '.webp']|default(null) %}
+
+    {% if raw|default(false) %}
+        {# Component-owned image: the <picture> is transparent (display:contents)
+           so the caller's own CSS classes on the <img> fully drive the layout;
+           the partial only injects the avif/webp sources and the focus class. #}
+        {% set imgClasses = (focusClass ~ ' ' ~ (classes|default('')))|trim %}
+        {% set pictureClass = ('contents ' ~ (pictureClasses|default('')))|trim %}
+    {% else %}
+        {% set coverFit = hasRatio or (cover|default(false)) %}
+        {% set imgClasses = coverFit
+            ? ('w-full h-full object-cover ' ~ focusClass ~ ' ' ~ (classes|default('')))|trim
+            : ('w-full h-auto ' ~ (classes|default('')))|trim %}
+        {% set hasRadius = (radiusClass|default('')) is not empty %}
+        {% set pictureClass = ('block ' ~ ratioClass ~ ' ' ~ (radiusClass|default('')) ~ (hasRadius ? ' overflow-hidden' : '') ~ ' ' ~ (pictureClasses|default('')) ~ (enableLightbox ? ' cursor-pointer' : ''))|trim %}
+    {% endif %}
+
+    {% if enableLightbox %}
+        <a
+            href="{{ media.url }}"
+            class="glightbox"
+            data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
         >
+    {% endif %}
 
-        {% if enableLightbox %}
-            </a>
-        {% endif %}
-    </figure>
+    <picture class="{{ pictureClass }}">
+        {% if avifUrl %}<source srcset="{{ avifUrl }}" type="image/avif">{% endif %}
+        {% if webpUrl %}<source srcset="{{ webpUrl }}" type="image/webp">{% endif %}
+        <img
+            src="{{ baseUrl }}"
+            alt="{{ alt is defined ? alt : media.title|default('') }}"
+            loading="{{ loading|default('lazy') }}"
+            class="{{ imgClasses }}"
+            {%- if itemprop is defined and itemprop %} itemprop="{{ itemprop }}"{% endif %}
+        >
+    </picture>
+
+    {% if enableLightbox %}
+        </a>
+    {% endif %}
 {% endif %}

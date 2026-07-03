@@ -42,12 +42,14 @@
 
                     {% if imgMedia %}
                         <div class="iw-featured-article-card__image-wrap">
-                            <img
-                                src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
-                                alt="{{ imgMedia.title|default(articleTitle) }}"
-                                class="iw-featured-article-card__image"
-                                loading="lazy"
-                            >
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: imgMedia,
+                                format: 'iw_theme_16_9',
+                                alt: imgMedia.title|default(articleTitle),
+                                raw: true,
+                                loading: 'lazy',
+                                classes: 'iw-featured-article-card__image',
+                            }) }}
                         </div>
                     {% endif %}
                 {% endif %}
@@ -111,12 +113,14 @@
 
                                 {% if secImgMedia %}
                                     <div class="iw-featured-article-card__image-wrap iw-featured-article-card__image-wrap--horizontal">
-                                        <img
-                                            src="{{ secImgMedia.thumbnails['iw_theme_4_3']|default(secImgMedia.url) }}"
-                                            alt="{{ secImgMedia.title|default(secTitle) }}"
-                                            class="iw-featured-article-card__image iw-featured-article-card__image--horizontal"
-                                            loading="lazy"
-                                        >
+                                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                            media: secImgMedia,
+                                            format: 'iw_theme_4_3',
+                                            alt: secImgMedia.title|default(secTitle),
+                                            raw: true,
+                                            loading: 'lazy',
+                                            classes: 'iw-featured-article-card__image iw-featured-article-card__image--horizontal',
+                                        }) }}
                                     </div>
                                 {% endif %}
                             {% endif %}

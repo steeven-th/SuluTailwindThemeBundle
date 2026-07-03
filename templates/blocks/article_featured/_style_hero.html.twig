@@ -46,12 +46,14 @@
             <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--hero {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                 {# Image with aspect-ratio — gives height to the card #}
                 {% if imgMedia %}
-                    <img
-                        src="{{ imgMedia.thumbnails['iw_theme_16_9']|default(imgMedia.url) }}"
-                        alt="{{ imgMedia.title|default(articleTitle) }}"
-                        class="iw-featured-article-card__image iw-featured-article-card__image--hero"
-                        loading="lazy"
-                    >
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                        media: imgMedia,
+                        format: 'iw_theme_16_9',
+                        alt: imgMedia.title|default(articleTitle),
+                        raw: true,
+                        loading: 'lazy',
+                        classes: 'iw-featured-article-card__image iw-featured-article-card__image--hero',
+                    }) }}
                 {% else %}
                     {# Fallback when no image: colored placeholder #}
                     <div class="iw-featured-article-card__image-placeholder iw-featured-article-card__image-placeholder--hero"></div>

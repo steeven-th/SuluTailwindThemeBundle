@@ -57,13 +57,11 @@
 {% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
 
 {# Resolve background image — single media (overlay) or first from collection (backward compat) #}
-{% set bgImageUrl = '' %}
+{% set bgMediaId = null %}
 {% if image is defined and image.id is defined %}
-    {% set firstMedia = sulu_resolve_media(image.id, app.request.locale) %}
-    {% set bgImageUrl = firstMedia.thumbnails[format]|default(firstMedia.url) %}
+    {% set bgMediaId = image.id %}
 {% elseif images is defined and images is iterable and images|length > 0 %}
-    {% set firstMedia = sulu_resolve_media(images[0], app.request.locale) %}
-    {% set bgImageUrl = firstMedia.thumbnails[format]|default(firstMedia.url) %}
+    {% set bgMediaId = images[0] %}
 {% endif %}
 
 {# ── Section: no padding, image fills edge-to-edge ────────────────────────── #}
@@ -72,14 +70,16 @@
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    {# Background image — covers the entire section #}
-    {% if bgImageUrl is not empty %}
-        <img
-            src="{{ bgImageUrl }}"
-            alt=""
-            loading="lazy"
-            class="iw-block-text-images__image absolute inset-0 w-full h-full object-cover"
-        >
+    {# Background image — covers the entire section (focus-point aware) #}
+    {% if bgMediaId %}
+        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+            mediaId: bgMediaId,
+            format: format,
+            cover: true,
+            alt: '',
+            classes: 'iw-block-text-images__image',
+            pictureClasses: 'absolute inset-0 w-full h-full',
+        }) }}
     {% endif %}
 
     {# Content position: left (default) or right #}

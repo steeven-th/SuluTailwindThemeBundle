@@ -11,12 +11,16 @@
 }[size|default('md')]|default('w-12 h-12 text-sm') %}
 
 {% if avatar is defined and avatar is not empty and avatar.thumbnails is defined %}
-    <img
-        src="{{ avatar.thumbnails['iw_theme_avatar']|default(avatar.thumbnails['iw_theme_1_1']|default(avatar.url)) }}"
-        alt="{{ name|default('') }}"
-        loading="lazy"
-        class="{{ sizeClass }} rounded-full object-cover"
-    >
+    {# raw: the <picture> is transparent so the avatar keeps its exact size /
+       rounded-full / object-cover classes; the focus point still anchors the
+       crop when the source isn't square. #}
+    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+        media: avatar,
+        format: 'iw_theme_avatar',
+        alt: name|default(''),
+        raw: true,
+        classes: sizeClass ~ ' rounded-full object-cover',
+    }) }}
 {% else %}
     {# Fallback: initials circle #}
     {% set initials = '' %}

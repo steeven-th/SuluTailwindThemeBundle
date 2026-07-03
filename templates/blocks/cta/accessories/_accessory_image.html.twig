@@ -5,13 +5,11 @@
 #}
 <div class="iw-block-cta__accessory iw-block-cta__accessory--image{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
     {% if accessoryImage is defined and accessoryImage.id is defined %}
-        {% set resolvedImage = sulu_resolve_media(accessoryImage.id, app.request.locale) %}
-        <img
-            src="{{ resolvedImage.thumbnails['iw_theme_4_3']|default(resolvedImage.url) }}"
-            alt="{{ resolvedImage.title|default('') }}"
-            loading="lazy"
-            class="iw-block-cta__image w-full object-cover"
-            style="aspect-ratio: 4/3;"
-        >
+        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+            mediaId: accessoryImage.id,
+            format: 'iw_theme_4_3',
+            ratio: '4/3',
+            classes: 'iw-block-cta__image',
+        }) }}
     {% endif %}
 </div>

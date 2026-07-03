@@ -145,6 +145,8 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
+        // Site-wide image delivery (picture avif/webp pipeline).
+        'imageAvif',
     ];
 
     /**
