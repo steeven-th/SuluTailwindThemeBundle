@@ -147,6 +147,10 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
+        // Site-wide page hero (banner) appearance. Per-page content lives in
+        // the page's Hero section; these drive how it is displayed everywhere.
+        'pageHero_height', 'pageHero_parallax', 'pageHero_titleDisplay',
+        'pageHero_alignX', 'pageHero_alignY', 'pageHero_shade', 'pageHero_breadcrumb',
     ];
 
     /**

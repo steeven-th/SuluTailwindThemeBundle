@@ -3002,6 +3002,148 @@ section.block:has([data-slider-fullbleed-value]) {
     max-height: none;
 }
 
+/* ─── Page hero ─────────────────────────────────────────────────────────── */
+/* Full-width banner at the top of a page. The header (title + subtitle +
+   breadcrumb) can be overlaid on the image (with a readability veil and
+   free X/Y positioning) or placed below it. A definite height (from the ratio)
+   is required for object-fit: cover — and thus the focus point — to crop the
+   image; max-height caps it on wide viewports and overflow clips the excess. */
+.iw-page-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    aspect-ratio: var(--iw-page-hero-ratio, 16 / 9);
+    height: var(--iw-page-hero-height, auto);
+    max-height: var(--iw-page-hero-max-height, 560px);
+    /* No bottom margin on purpose: control the gap via the top margin of the
+       first content block instead. */
+}
+
+/* Heights — each level just sets the ratio / cap the base rule reads. */
+.iw-page-hero--h-sm { --iw-page-hero-ratio: 16 / 5; --iw-page-hero-max-height: 340px; }
+.iw-page-hero--h-md { --iw-page-hero-ratio: 16 / 9; --iw-page-hero-max-height: 560px; }
+.iw-page-hero--h-lg { --iw-page-hero-ratio: 16 / 11; --iw-page-hero-max-height: 720px; }
+.iw-page-hero--h-full { --iw-page-hero-ratio: auto; --iw-page-hero-height: 100svh; --iw-page-hero-max-height: none; }
+
+.iw-page-hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* The wrapper owns the layout; drop the global image radius. */
+    border-radius: 0;
+}
+
+/* Parallax: the image is taller than the box; the hero-parallax controller
+   translates it vertically on scroll (falls back to a static offset without JS). */
+.iw-page-hero__image--parallax {
+    position: absolute;
+    inset-inline: 0;
+    top: -15%;
+    height: 130%;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
+/* Overlay: fills the banner and positions the header vertically. */
+.iw-page-hero__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--iw-page-hero-overlay-padding-block, 2rem);
+    pointer-events: none; /* let clicks reach the page; links re-enable below */
+}
+.iw-page-hero__overlay > * { pointer-events: auto; }
+
+/* Vertical position of the header inside the overlay. */
+.iw-page-hero--y-top { justify-content: flex-start; }
+.iw-page-hero--y-middle { justify-content: center; }
+.iw-page-hero--y-bottom { justify-content: flex-end; }
+
+/* Readability veil (overlay only). Opacity scales with the chosen level; a
+   full custom veil/gradient can be dropped in via --iw-page-hero-shade. */
+.iw-page-hero--shade-light::before,
+.iw-page-hero--shade-medium::before,
+.iw-page-hero--shade-strong::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--iw-page-hero-shade, rgba(0, 0, 0, var(--iw-page-hero-shade-opacity, 0.4)));
+}
+.iw-page-hero--shade-light { --iw-page-hero-shade-opacity: 0.2; }
+.iw-page-hero--shade-medium { --iw-page-hero-shade-opacity: 0.4; }
+.iw-page-hero--shade-strong { --iw-page-hero-shade-opacity: 0.6; }
+
+/* Horizontal alignment of the header text (overlay + below). */
+.iw-page-hero--x-left { text-align: left; }
+.iw-page-hero--x-center { text-align: center; }
+.iw-page-hero--x-right { text-align: right; }
+
+.iw-page-hero__inner {
+    position: relative; /* sit above the shade veil */
+    z-index: 1;
+    width: 100%;
+}
+
+.iw-page-hero__title {
+    margin: 0;
+    color: var(--iw-page-hero-title-color, #fff);
+    font-size: var(--iw-page-hero-title-size, clamp(1.75rem, 4vw, 3rem));
+    font-weight: var(--iw-page-hero-title-weight, 700);
+    line-height: var(--iw-page-hero-title-line-height, 1.15);
+    text-shadow: var(--iw-page-hero-title-shadow, 0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.iw-page-hero__subtitle {
+    margin: var(--iw-page-hero-subtitle-margin, 0.5rem 0 0);
+    color: var(--iw-page-hero-subtitle-color, rgba(255, 255, 255, 0.9));
+    font-size: var(--iw-page-hero-subtitle-size, clamp(1rem, 2vw, 1.25rem));
+    text-shadow: var(--iw-page-hero-subtitle-shadow, 0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* Overlay: the breadcrumb sits below the text → top margin. A light text
+   shadow keeps it legible over the image (matches the title/subtitle). */
+.iw-page-hero__breadcrumb {
+    margin-top: var(--iw-page-hero-breadcrumb-gap, 0.75rem);
+    text-shadow: var(--iw-page-hero-breadcrumb-shadow, 0 1px 2px rgba(0, 0, 0, 0.35));
+    --iw-breadcrumbs-color: var(--iw-page-hero-breadcrumb-color, rgba(255, 255, 255, 0.85));
+    --iw-breadcrumbs-current-color: var(--iw-page-hero-breadcrumb-current-color, #fff);
+    --iw-breadcrumbs-link-hover: var(--iw-page-hero-breadcrumb-link-hover, #fff);
+    --iw-breadcrumbs-margin-bottom: 0;
+}
+
+/* Below: header in the normal flow under the image, with theme text colors. */
+.iw-page-hero__caption {
+    padding-block: var(--iw-page-hero-caption-padding-block, 1.25rem);
+}
+.iw-page-hero__title--below {
+    color: var(--iw-page-hero-title-below-color, inherit);
+    text-shadow: none;
+}
+.iw-page-hero__subtitle--below {
+    color: var(--iw-page-hero-subtitle-below-color, var(--color-secondary-600));
+    text-shadow: none;
+}
+/* Below the image: the breadcrumb sits above the text → bottom margin, and
+   uses the theme text colors instead of the light overlay ones. */
+.iw-page-hero__breadcrumb--below {
+    margin-top: 0;
+    margin-bottom: var(--iw-page-hero-breadcrumb-gap, 0.75rem);
+    text-shadow: none;
+    --iw-breadcrumbs-color: initial;
+    --iw-breadcrumbs-current-color: initial;
+    --iw-breadcrumbs-link-hover: initial;
+}
+
+/* Headline rendered without a banner image (heroTitle set, heroImage empty). */
+.iw-page-title {
+    margin: 0;
+    font-size: var(--iw-page-title-size, clamp(1.75rem, 4vw, 3rem));
+    font-weight: var(--iw-page-title-weight, 700);
+    line-height: var(--iw-page-title-line-height, 1.15);
+}
+
 /* ─── Article meta ──────────────────────────────────────────────────────── */
 /* Inline strip of meta entries below the article title: date, authors,
    categories, reading time, separated by a vertical pipe. */

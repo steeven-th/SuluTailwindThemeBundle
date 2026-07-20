@@ -27,6 +27,12 @@
                 "fetch": "lazy",
                 "enabled": true
             },
+            "hero_parallax": {
+                "main": "controllers/hero_parallax_controller.js",
+                "name": "hero-parallax",
+                "fetch": "lazy",
+                "enabled": true
+            },
             "carousel3d": {
                 "main": "controllers/carousel3d_controller.js",
                 "name": "carousel3d",

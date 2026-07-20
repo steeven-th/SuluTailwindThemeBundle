@@ -1,0 +1,112 @@
+{#
+    Page hero component — optional full-width banner used at the top of page
+    templates. Configurable via the page-hero.xml fragment.
+
+    Parameters:
+    - image: media ID or resolved media object (required to render the banner)
+    - title: H1 text. Overrides the page title when the editor set heroTitle.
+    - subtitle: optional tagline below the H1
+    - display: 'overlay' (title over the image) | 'below' (title under the
+               image) | 'hidden' (image only). Default 'overlay'.
+    - alignX: 'left' | 'center' | 'right' — horizontal text alignment (both modes)
+    - alignY: 'top' | 'middle' | 'bottom' — vertical position (overlay only)
+    - shade: 'none' | 'light' | 'medium' | 'strong' — readability veil (overlay)
+    - height: 'sm' | 'md' | 'lg' | 'full' — banner height
+    - parallax: bool — vertical parallax scroll on the image
+    - breadcrumb: bool — render the breadcrumb next to the title (already gated
+                  by the admin breadcrumbs setting by the caller)
+    - breadcrumbPageUuid / breadcrumbCurrentTitle: breadcrumb context
+
+    Public CSS API:
+    - .iw-page-hero (block) + .iw-page-hero--h-{sm|md|lg|full} + .iw-page-hero--parallax
+    - .iw-page-hero__image (the rendered <img>)
+    - .iw-page-hero__overlay (+ .iw-page-hero--y-{top|middle|bottom} + .iw-page-hero--shade-{…})
+    - .iw-page-hero__caption (the "below" wrapper)
+    - .iw-page-hero__inner (+ .iw-page-hero--x-{left|center|right})
+    - .iw-page-hero__breadcrumb / __title / __subtitle
+    Overridable via --iw-page-hero-* (see app.css).
+#}
+
+{% if image is defined and image is not empty %}
+    {% if image is iterable and image.url is defined %}
+        {% set media = image %}
+    {% else %}
+        {# single_media_selection stores a scalar media id #}
+        {% set media = sulu_resolve_media(image, app.request.locale) %}
+    {% endif %}
+
+    {% if media is not null %}
+        {# Whitelist every option so unexpected values fall back to a sane default. #}
+        {% set heroTitle = title|default('') %}
+        {% set heroSubtitle = subtitle|default('') %}
+        {% set display = display|default('overlay') in ['overlay', 'below', 'hidden'] ? display : 'overlay' %}
+        {% set alignX = alignX|default('left') in ['left', 'center', 'right'] ? alignX : 'left' %}
+        {% set alignY = alignY|default('bottom') in ['top', 'middle', 'bottom'] ? alignY : 'bottom' %}
+        {% set shade = shade|default('medium') in ['none', 'light', 'medium', 'strong'] ? shade : 'medium' %}
+        {% set height = height|default('md') in ['sm', 'md', 'lg', 'full'] ? height : 'md' %}
+        {% set parallax = parallax|default(false) %}
+        {% set showBreadcrumb = breadcrumb|default(false) %}
+
+        {% set hasHeader = heroTitle is not empty or heroSubtitle is not empty or showBreadcrumb %}
+        {% set imgClasses = 'iw-page-hero__image' ~ (parallax ? ' iw-page-hero__image--parallax' : '') %}
+
+        <section class="iw-page-hero iw-page-hero--h-{{ height }}{{ parallax ? ' iw-page-hero--parallax' : '' }}"
+                 {%- if parallax %} data-controller="hero-parallax"{% endif %}>
+            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                media: media,
+                format: 'iw_theme_hero',
+                alt: media.title|default(''),
+                raw: true,
+                loading: 'eager',
+                itemprop: 'image',
+                classes: imgClasses,
+            }) }}
+
+            {% if display == 'overlay' and hasHeader %}
+                <div class="iw-page-hero__overlay iw-page-hero--y-{{ alignY }} iw-page-hero--shade-{{ shade }}">
+                    <div class="iw-page-hero__inner iw-page-hero--x-{{ alignX }} container mx-auto px-4 sm:px-6 lg:px-8">
+                        {% if heroTitle is not empty %}
+                            <h1 class="iw-page-hero__title">{{ heroTitle }}</h1>
+                        {% endif %}
+                        {% if heroSubtitle is not empty %}
+                            <p class="iw-page-hero__subtitle">{{ heroSubtitle }}</p>
+                        {% endif %}
+                        {# Overlay: breadcrumb sits below the text, aligned with it. #}
+                        {% if showBreadcrumb %}
+                            <div class="iw-page-hero__breadcrumb">
+                                {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                                    context: 'page',
+                                    pageUuid: breadcrumbPageUuid|default(null),
+                                    currentTitle: breadcrumbCurrentTitle|default(''),
+                                    align: alignX,
+                                } only %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+        {% if display == 'below' and hasHeader %}
+            <div class="iw-page-hero__caption iw-page-hero--x-{{ alignX }} container mx-auto px-4 sm:px-6 lg:px-8">
+                {# Below the image: breadcrumb sits above the text, aligned with it. #}
+                {% if showBreadcrumb %}
+                    <div class="iw-page-hero__breadcrumb iw-page-hero__breadcrumb--below">
+                        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                            context: 'page',
+                            pageUuid: breadcrumbPageUuid|default(null),
+                            currentTitle: breadcrumbCurrentTitle|default(''),
+                            align: alignX,
+                        } only %}
+                    </div>
+                {% endif %}
+                {% if heroTitle is not empty %}
+                    <h1 class="iw-page-hero__title iw-page-hero__title--below">{{ heroTitle }}</h1>
+                {% endif %}
+                {% if heroSubtitle is not empty %}
+                    <p class="iw-page-hero__subtitle iw-page-hero__subtitle--below">{{ heroSubtitle }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}

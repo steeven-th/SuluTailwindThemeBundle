@@ -8,6 +8,7 @@
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
     <key>iw_theme_default</key>
@@ -32,6 +33,15 @@
             <meta><title>iw_sulu_tailwind_theme.url</title></meta>
             <tag name="sulu.rlp"/>
         </property>
+
+        <!-- Hero section: optional full-width banner image + overriding H1 title -->
+        <section name="hero">
+            <meta><title>iw_sulu_tailwind_theme.page.section_hero</title></meta>
+            <properties>
+                <xi:include href="../fragments/page-hero.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+            </properties>
+        </section>
 
         <block name="blocks" default-type="text" minOccurs="0">
             <meta>

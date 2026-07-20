@@ -147,6 +147,10 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
                 "enabled": true,
                 "fetch": "lazy"
             },
+            "hero_parallax": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
             "carousel3d": {
                 "enabled": true,
                 "fetch": "lazy"
@@ -467,6 +471,8 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **14 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
+
+The default template also exposes an optional **Hero** section per page — a full-width banner image (`heroImage`, focus-aware), a `heroTitle` that, when set, overrides the page title as the H1 (keep a short page name for menus and a longer editorial headline on the page), and a `heroSubtitle`. Its **appearance** (height, parallax, title/breadcrumb placement, positioning, readability veil) is configured **site-wide** in the theme admin under **Components → Page hero**, so every page shares one consistent banner style. See **[Page Templates → Page hero](doc/page-templates.md#page-hero-optional-banner)**.
 
 The template system uses a **modular architecture** with global block types registered via `sulu_admin.templates.block.directories`. You can create your own page templates referencing any subset of blocks, use XInclude fragments to reuse shared properties, and exclude the default template from specific webspaces.
 

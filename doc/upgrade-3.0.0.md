@@ -183,8 +183,17 @@ Templates referenced `iw_hero_lg` / `iw_hero_md`, which were **never defined** �
 they silently fell back to the full-size original. They now use the defined
 `iw_theme_16_9` / `iw_theme_hero` formats (properly sized + focus-aware). If your
 theme defined these format keys, the previous behavior is preserved; otherwise
-hero images are now correctly downscaled. (`iw_og_image`, used by the SEO/OpenGraph
-templates, has the same latent issue and is addressed separately.)
+hero images are now correctly downscaled.
+
+`iw_og_image` — referenced by the SEO templates (`_opengraph`, `_twitter_card`,
+`_jsonld_article`, `_jsonld_event`) for `og:image` / `twitter:image` / JSON-LD —
+had the same latent issue: it was never defined, so social crawlers received the
+full-size original (or a 400×400 fallback). It is now defined as **1200×630
+`outbound`** (the 1.91:1 ratio recommended by Open Graph and Twitter
+`summary_large_image`). When this thumbnail is served, `_opengraph` also emits
+`og:image:width` / `og:image:height` so Facebook/LinkedIn render the preview
+immediately at the right ratio. Existing media generate the new thumbnail on next
+access (or run `sulu:media:regenerate` to prebuild them).
 
 ### Article hero crop (breaking, visual)
 
@@ -196,3 +205,30 @@ point had no effect. Consequence: on wide viewports heroes now crop around the
 **focus point** (or the **center** when none is set) instead of showing the
 **top** of the image. Override `--iw-article-hero-ratio` (e.g. `21 / 9`) per theme
 for a more panoramic hero.
+
+## Page hero banner + overriding H1 (new)
+
+Page templates gain an optional **Hero** section (`page-hero.xml` fragment) with
+the per-page content: `heroImage` renders a full-width, focus-aware banner at the
+top of the page (reusing the unified `<picture>` pipeline), `heroTitle` — when
+set — becomes the page **H1**, overriding the page title (keep a short page name
+for menus/breadcrumb and a longer editorial headline on the page), and
+`heroSubtitle` adds a tagline.
+
+The banner **appearance** is configured site-wide in the theme admin
+(**Components → Page hero**) and applies to every page: height
+(`sm`/`md`/`lg`/`full`), optional parallax, title placement (over / below /
+hidden) with free horizontal + vertical positioning, a readability veil, and
+breadcrumb placement (with the title / top bar / hidden). These are exposed to
+Twig as `iw_sulu_tailwind_theme.pageHero_*`.
+
+Additive change: existing pages render unchanged until an editor fills these
+fields. New public CSS API `.iw-page-hero*` / `.iw-page-title`, overridable via
+`--iw-page-hero-*` / `--iw-page-title-*`. See
+[page-templates.md](page-templates.md#page-hero-optional-banner).
+
+**New Stimulus controller** `hero_parallax` — register it in your
+`controllers.json` (see the README) to enable the parallax option; without it
+the banner still works, just without the scroll effect. If you use a **custom
+page template**, include the fragment via XInclude and add the `_page_hero`
+include to your Twig to opt in.
