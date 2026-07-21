@@ -1312,11 +1312,16 @@ class ThemeCompiler
         // Base: navbar header + overlay background/text.
         // Transition background + transform so the scroll-bg fade and the
         // smart-hide slide animate smoothly (L16).
+        // NOTE: no `will-change: transform` here. It would make .iw-menu a
+        // containing block for its `position: fixed` descendants (the fullscreen
+        // overlay, burger panel and desktop sidebar), pinning them to the ~80px
+        // header instead of the viewport. The transform of .iw-menu--hidden only
+        // applies transiently while smart-hiding, and the controller drops that
+        // class whenever an overlay/sidebar is open.
         $css .= ".iw-menu { background-color: var(--iw-menu-bg); color: var(--iw-menu-text);\n";
         $css .= "  transition: background-color var(--iw-menu-scroll-duration, 300ms) ease,\n";
         $css .= "    transform var(--iw-menu-scroll-duration, 300ms) ease,\n";
-        $css .= "    box-shadow 0.2s ease;\n";
-        $css .= "  will-change: transform; }\n";
+        $css .= "    box-shadow 0.2s ease; }\n";
         $css .= ".iw-menu > nav { background-color: inherit; }\n";
 
         // Transparent navbar modifier

@@ -393,11 +393,13 @@ export default class extends Controller {
 
         // Smart hide: slide the navbar away on scroll down, reveal on scroll up.
         // A small hysteresis avoids flicker on jittery scrolls; the navbar never
-        // hides near the top of the page nor while the mobile menu is open.
+        // hides near the top of the page nor while a menu is open. Keeping it
+        // revealed while an overlay/sidebar is open also avoids re-introducing a
+        // transform (containing block) on the header that hosts those fixed panels.
         if (this.scrollHideValue) {
             const delta = y - this._lastScrollY;
 
-            if (y < SCROLL_HIDE_MIN || this.isOpen) {
+            if (y < SCROLL_HIDE_MIN || this.isOpen || this.isSidebarOpen) {
                 this.element.classList.remove('iw-menu--hidden');
             } else if (Math.abs(delta) > SCROLL_HIDE_HYSTERESIS) {
                 this.element.classList.toggle('iw-menu--hidden', delta > 0);
