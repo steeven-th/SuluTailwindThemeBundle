@@ -1384,6 +1384,48 @@ class ThemeCompiler
         // Backdrop overlay
         $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); }\n";
 
+        // ─── Drill-down panels (burger "panels" mode) ────────────────────────
+        // The root panel scrolls in place; each sub-panel is an absolute overlay
+        // that slides in from the menu's own direction over the current one.
+        $css .= ".iw-menu__panels { position: relative; height: 100%; overflow: hidden; }\n";
+        $css .= ".iw-menu__panel { height: 100%; overflow-y: auto; }\n";
+        $css .= ".iw-menu__panel-body { display: flex; flex-direction: column; }\n";
+        // Sub-panel: top padding clears the navbar (which stays above the overlay),
+        // header stays put, body scrolls.
+        $css .= ".iw-menu__subpanel {\n";
+        $css .= "  position: absolute; inset: 0;\n";
+        $css .= "  display: flex; flex-direction: column;\n";
+        $css .= "  padding-top: var(--iw-menu-panels-offset, 4rem);\n";
+        $css .= "  background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));\n";
+        $css .= "  transition: transform 0.3s ease, opacity 0.3s ease;\n";
+        $css .= "}\n";
+        $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 1.5rem 1rem; }\n";
+        $css .= "@media (min-width: 640px) { .iw-menu__subpanel .iw-menu__panel-body { padding-left: 2rem; padding-right: 2rem; } }\n";
+        // Motion — enter side matches the menu slide direction; --active rests at 0.
+        $css .= ".iw-menu__panels--from-right .iw-menu__subpanel { transform: translateX(100%); }\n";
+        $css .= ".iw-menu__panels--from-left .iw-menu__subpanel { transform: translateX(-100%); }\n";
+        $css .= ".iw-menu__panels--from-top .iw-menu__subpanel { transform: translateY(-100%); }\n";
+        $css .= ".iw-menu__panels--from-bottom .iw-menu__subpanel { transform: translateY(100%); }\n";
+        $css .= ".iw-menu__panels--from-right .iw-menu__subpanel--active,\n";
+        $css .= ".iw-menu__panels--from-left .iw-menu__subpanel--active,\n";
+        $css .= ".iw-menu__panels--from-top .iw-menu__subpanel--active,\n";
+        $css .= ".iw-menu__panels--from-bottom .iw-menu__subpanel--active { transform: translate(0, 0); }\n";
+        // Fade variant.
+        $css .= ".iw-menu__panels--fade .iw-menu__subpanel { opacity: 0; visibility: hidden; }\n";
+        $css .= ".iw-menu__panels--fade .iw-menu__subpanel--active { opacity: 1; visibility: visible; }\n";
+        // No animation.
+        $css .= ".iw-menu__panels--none .iw-menu__subpanel { transition: none; transform: translateX(100%); }\n";
+        $css .= ".iw-menu__panels--none .iw-menu__subpanel--active { transform: translate(0, 0); }\n";
+        // Header: back button + (optionally linked) section title, one size up.
+        $css .= ".iw-menu__panel-header { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
+        $css .= "@media (min-width: 640px) { .iw-menu__panel-header { padding-left: 2rem; padding-right: 2rem; } }\n";
+        $css .= ".iw-menu__panel-back { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0.25rem; cursor: pointer; }\n";
+        // Base color without hover; a linkable title also carries .iw-menu__text,
+        // whose :hover (higher specificity) still wins to signal the link.
+        $css .= ".iw-menu__panel-title { color: var(--iw-menu-text); font-size: 1.25rem; font-weight: 700; line-height: 1.2; }\n";
+        // Rows: title on the left, chevron pushed to the right.
+        $css .= ".iw-menu__panel-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0.75rem 0; text-align: left; cursor: pointer; }\n";
+
         // Social media icons — mask-image technique for SVG coloring
         $css .= ".iw-social-icon {\n";
         $css .= "  display: inline-block;\n";

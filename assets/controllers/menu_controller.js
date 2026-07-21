@@ -43,7 +43,11 @@ export default class extends Controller {
         'backdrop',
         'sidebar', 'sidebarBurger',
         'megaParent', 'megaDropdown',
+        'panels', 'subPanel',
     ];
+
+    /** @type {Array<Element>} Open drill-down panels, innermost last (a navigation stack) */
+    _panelStack = [];
 
     static values = {
         animation: { type: String, default: 'none' },
@@ -98,7 +102,49 @@ export default class extends Controller {
             this.burgerTarget.classList.toggle('iw-menu__burger--open', this.isOpen);
         }
 
+        // Reset the drill-down stack so the menu reopens on the root panel.
+        if (!this.isOpen) {
+            this._resetPanels();
+        }
+
         this._updateOverlayState();
+    }
+
+    /**
+     * Drill-down panels: open the sub-panel referenced by the clicked row.
+     *
+     * @param {Event} event - Action event carrying params.panelId
+     */
+    openPanel(event) {
+        const id = event.params.panelId;
+        const panel = this.subPanelTargets.find((p) => p.dataset.panelId === id);
+        if (!panel || this._panelStack.includes(panel)) return;
+
+        panel.classList.add('iw-menu__subpanel--active');
+        panel.removeAttribute('inert');
+        this._panelStack.push(panel);
+    }
+
+    /** Drill-down panels: close the top-most sub-panel (go one level back). */
+    closePanel() {
+        const panel = this._panelStack.pop();
+        if (!panel) return;
+
+        panel.classList.remove('iw-menu__subpanel--active');
+        panel.setAttribute('inert', '');
+    }
+
+    /**
+     * Collapse every open sub-panel back to the root (called on menu close).
+     *
+     * @private
+     */
+    _resetPanels() {
+        this._panelStack.forEach((panel) => {
+            panel.classList.remove('iw-menu__subpanel--active');
+            panel.setAttribute('inert', '');
+        });
+        this._panelStack = [];
     }
 
     /**

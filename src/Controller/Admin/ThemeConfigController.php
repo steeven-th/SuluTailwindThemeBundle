@@ -169,6 +169,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'sidebarPosition', 'transparentNavbar', 'scrollBg', 'scrollHide',
         'clickParentPageNavbar',
         'megamenuSource',
+        'burgerPanels', 'clickParentPagePanels',
     ];
 
     public function __construct(
