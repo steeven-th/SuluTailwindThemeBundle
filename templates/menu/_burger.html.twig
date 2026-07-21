@@ -112,7 +112,7 @@
         data-menu-target="panel"
         class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0"
     >
-        {% if config.burgerPanels|default(false) %}
+        {% if config.subMenuPanels|default(false) %}
         {# Drill-down panels mode (opt-in) — separate partial for maintainability. #}
         {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
             navItems: navItems,

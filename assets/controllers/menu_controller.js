@@ -202,7 +202,7 @@ export default class extends Controller {
         }
     }
 
-    /** Toggle desktop sidebar open/close. */
+    /** Toggle the sidebar open/close (same behavior on every breakpoint). */
     toggleSidebar() {
         if (!this.hasSidebarTarget) return;
 
@@ -219,9 +219,20 @@ export default class extends Controller {
             sidebar.classList.add(hiddenClass);
         }
 
-        // Toggle burger → X on desktop
+        // Burger → X
         if (this.hasSidebarBurgerTarget) {
             this.sidebarBurgerTarget.classList.toggle('iw-menu__burger--open', this.isSidebarOpen);
+        }
+
+        // Backdrop fade (CSS-driven) + body scroll lock.
+        if (this.hasBackdropTarget) {
+            this.backdropTarget.classList.toggle('iw-menu__backdrop--visible', this.isSidebarOpen);
+        }
+        document.body.style.overflow = this.isSidebarOpen ? 'hidden' : '';
+
+        // Collapse any open drill-down panels when the sidebar closes.
+        if (!this.isSidebarOpen) {
+            this._resetPanels();
         }
     }
 

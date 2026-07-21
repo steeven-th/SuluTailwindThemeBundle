@@ -161,32 +161,6 @@
     {% endfor %}
 {% endmacro %}
 
-{# Macro: social media icons #}
-{% macro render_social_links(socialLinks) %}
-    {% if socialLinks|length > 0 %}
-        <div class="flex items-center gap-3 py-4">
-            {% for link in socialLinks %}
-                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                   class="inline-flex items-center">
-                    {% if link.icon is defined and link.icon.id is defined %}
-                        {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                        {% if iconMedia is not null and iconMedia.url is defined %}
-                            {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                            <span class="iw-social-icon w-5 h-5"
-                                  style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                  aria-label="{{ link.name|default('') }}"></span>
-                        {% else %}
-                            <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                        {% endif %}
-                    {% else %}
-                        <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                    {% endif %}
-                </a>
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
 {# Macro: logo display #}
 {% macro render_logo(displayDesktop, logoDesktopUrl, displayMobile, logoMobileUrl, displaySiteName, siteName) %}
     <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
@@ -212,7 +186,7 @@
         class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }}">
 
     {# ═══ NAVBAR: always visible (mobile + desktop) ═══ #}
-    <nav class="sticky top-0 z-40 w-full transition-shadow">
+    <nav class="sticky top-0 z-50 w-full transition-shadow">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 md:h-20">
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
@@ -225,9 +199,9 @@
 
             {# RIGHT — Social media + Burger #}
             <div class="flex items-center gap-3">
-                {# Social media icons (desktop only) #}
+                {# Social media icons — shown on every breakpoint #}
                 {% if socialLinks|length > 0 %}
-                    <div class="hidden md:flex items-center gap-2">
+                    <div class="flex items-center gap-2">
                         {% for link in socialLinks %}
                             <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
                                class="inline-flex items-center">
@@ -249,20 +223,11 @@
                     </div>
                 {% endif %}
 
-                {# Burger — mobile: opens overlay, desktop: toggles sidebar #}
-                <button type="button"
-                        data-action="menu#toggle"
-                        data-menu-target="burger"
-                        class="lg:hidden iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                        aria-label="Menu">
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                </button>
+                {# Burger — toggles the sidebar on every breakpoint, animates into an X #}
                 <button type="button"
                         data-action="menu#toggleSidebar"
                         data-menu-target="sidebarBurger"
-                        class="hidden lg:flex iw-menu__burger w-10 h-10 flex-col items-center justify-center gap-1.5"
+                        class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                         aria-label="Menu">
                     <span class="iw-menu__burger-line"></span>
                     <span class="iw-menu__burger-line"></span>
@@ -272,68 +237,41 @@
         </div>
     </nav>
 
-    {# ═══ MOBILE: overlay panel (slide from left/right) ═══ #}
-    <div data-menu-target="panel"
-         class="lg:hidden fixed inset-0 z-50 invisible opacity-0">
-        {# Backdrop #}
-        <div data-menu-target="backdrop"
-             data-action="click->menu#toggle"
-             class="iw-menu__backdrop absolute inset-0"></div>
-        {# Side panel #}
-        <div class="iw-menu__sidebar relative z-10 h-full w-72 max-w-[80vw] flex flex-col overflow-y-auto
-                    {{ isLeft ? '' : 'ml-auto' }}">
-            {# Close button #}
-            <div class="flex items-center {{ isLeft ? 'justify-end' : 'justify-start' }} h-16 px-4">
-                <button type="button"
-                        data-action="menu#toggle"
-                        class="iw-menu__burger iw-menu__burger--open w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                        aria-label="Close">
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                </button>
-            </div>
-            {# Navigation L1/L2/L3 #}
+    {# Backdrop — dims the page behind the sidebar (below the navbar + sidebar),
+       click to close. Visibility driven by the .iw-menu__backdrop--visible class. #}
+    <div data-menu-target="backdrop"
+         data-action="click->menu#toggleSidebar"
+         class="iw-menu__backdrop fixed inset-0 z-30"></div>
+
+    {# ═══ Sidebar — slides in from the configured side on every breakpoint ═══ #}
+    {# Full width on mobile, 288px on desktop (where the backdrop dims the rest of
+       the page). Stack: navbar (z-50) > sidebar (z-40) > backdrop (z-30) > page. #}
+    <aside data-menu-target="sidebar"
+           class="fixed top-0 {{ isLeft ? 'left-0' : 'right-0' }} h-screen z-40
+                  iw-menu__sidebar w-full lg:w-72 flex flex-col transition-transform duration-300
+                  {{ isLeft ? '-translate-x-full' : 'translate-x-full' }}">
+
+        {% if config.subMenuPanels|default(false) %}
+            {# Drill-down panels mode — the partial fills the aside and clears the
+               navbar itself (like the burger), so no spacer here. #}
             {% if navItems is not empty %}
-                <nav class="flex-1 px-4 py-2 space-y-1">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
+                    navItems: navItems,
+                    parentLinkable: config.clickParentPagePanels|default(false),
+                    direction: position,
+                    animation: 'slide',
+                    socialLinks: [],
+                    context: 'sidebar',
+                } only %}
+            {% endif %}
+        {% else %}
+            {# Accordion mode: a spacer clears the navbar, then the nav. #}
+            <div class="h-16 md:h-20 flex-shrink-0"></div>
+            {% if navItems is not empty %}
+                <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
                     {{ _self.render_nav_items(navItems, clickMode) }}
                 </nav>
             {% endif %}
-            {# Logo + Social links at the bottom #}
-            <div class="mt-auto px-4 py-4">
-                {% if (config.displayLogoDesktop|default(false) and logoDesktopUrl) or (config.displayLogoMobile|default(false) and logoMobileUrl) %}
-                    <div class="pb-3">
-                        {{ _self.render_logo(
-                            config.displayLogoDesktop|default(false), logoDesktopUrl,
-                            config.displayLogoMobile|default(false), logoMobileUrl,
-                            false, ''
-                        ) }}
-                    </div>
-                {% endif %}
-                {{ _self.render_social_links(socialLinks) }}
-            </div>
-        </div>
-    </div>
-
-    {# ═══ DESKTOP: Sidebar fixe (starts closed, toggled via navbar burger) ═══ #}
-    <aside data-menu-target="sidebar"
-           class="hidden lg:flex fixed top-0 {{ isLeft ? 'left-0' : 'right-0' }} h-screen z-30
-                  iw-menu__sidebar w-72 flex-col transition-transform duration-300
-                  {{ isLeft ? '-translate-x-full' : 'translate-x-full' }}">
-
-        {# Top spacer matching navbar height #}
-        <div class="h-20 flex-shrink-0"></div>
-
-        {# Navigation L1/L2/L3 #}
-        {% if navItems is not empty %}
-            <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
-                {{ _self.render_nav_items(navItems, clickMode) }}
-            </nav>
         {% endif %}
-
-        {# Social links at the bottom #}
-        <div class="mt-auto px-4 py-4">
-            {{ _self.render_social_links(socialLinks) }}
-        </div>
     </aside>
 </header>

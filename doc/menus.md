@@ -57,10 +57,13 @@ These options are available regardless of the menu type:
 
 ### Sidebar
 
+Same behavior on every breakpoint: the navbar (logo + social + burger) stays visible, and the sidebar slides in from the configured side over a backdrop (click to close). Full width on mobile, 288px on desktop. Social icons live in the navbar only.
+
 | Setting | Description |
 |---------|-------------|
 | **Position** | Panel side: `left` or `right`. |
-| **Parent page access** | Same as burger: `none`, `split`, or `selflink`. |
+| **Parent page access** | In accordion mode: `none`, `split`, or `selflink`. In panels mode: a simple on/off toggle. |
+| **Sub-menus as panels** | Same as the burger (see below): drill-down sliding panels instead of inline accordions. |
 
 ### Mega Menu
 

@@ -6,8 +6,8 @@
     and the section title sit at the top of each sub-panel; the title links to the
     parent page when parentLinkable is true.
 
-    Included by _burger.html.twig when config.burgerPanels is on. Requires the
-    menu Stimulus controller (openPanel / closePanel).
+    Included by _burger.html.twig and _sidebar.html.twig when config.subMenuPanels
+    is on. Requires the menu Stimulus controller (openPanel / closePanel).
 
     Params:
     - navItems:  the resolved navigation tree (L1 → L3)
@@ -16,6 +16,9 @@
     - direction: menu slide direction ('top' | 'right' | 'bottom' | 'left')
     - animation: 'none' | 'slide' | 'fade'
     - socialLinks: resolved social media links (rendered at the bottom of the root)
+    - context: 'burger' (default) | 'sidebar'. Both fill their container and push
+      the panels below the navbar via --iw-menu-panels-offset; 'sidebar' uses a
+      responsive offset (the sidebar navbar is taller on desktop, h-16 md:h-20).
 
     Public CSS API:
     - .iw-menu__panels (+ --from-{dir} / --fade / --none) — the stack + its motion
@@ -27,6 +30,7 @@
 {# Sub-panels reuse the overlay motion. fade / none skip the slide; otherwise the
    panel enters from the menu's own direction. #}
 {% set panelsModifier = animation == 'fade' ? 'fade' : (animation == 'none' ? 'none' : 'from-' ~ (direction|default('right'))) %}
+{% set isSidebar = context|default('burger') == 'sidebar' %}
 
 {# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
    shares the same absolute positioning context. #}
@@ -73,10 +77,10 @@
     {% endfor %}
 {% endmacro %}
 
-<div class="iw-menu__panels iw-menu__panels--{{ panelsModifier }}" data-menu-target="panels">
+<div class="iw-menu__panels iw-menu__panels--{{ panelsModifier }}{{ isSidebar ? ' iw-menu__panels--sidebar' : '' }}" data-menu-target="panels">
     {# Root panel — first level, always visible below the sub-panels. #}
     <div class="iw-menu__panel" data-panel-id="root">
-        <nav class="iw-menu__panel-body pt-16 px-6 sm:px-8">
+        <nav class="iw-menu__panel-body iw-menu__panel-body--root px-6 sm:px-8">
             {% for item in navItems %}
                 {% if item.children is defined and item.children|length > 0 %}
                     <button type="button"

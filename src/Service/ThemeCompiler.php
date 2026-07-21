@@ -1381,15 +1381,22 @@ class ThemeCompiler
         // Sidebar panel
         $css .= ".iw-menu__sidebar { background-color: var(--iw-menu-bg); }\n";
 
-        // Backdrop overlay
-        $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); }\n";
+        // Backdrop overlay — hidden by default, faded in via --visible (sidebar).
+        $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }\n";
+        $css .= ".iw-menu__backdrop--visible { opacity: 1; pointer-events: auto; }\n";
 
         // ─── Drill-down panels (burger "panels" mode) ────────────────────────
         // The root panel scrolls in place; each sub-panel is an absolute overlay
         // that slides in from the menu's own direction over the current one.
         $css .= ".iw-menu__panels { position: relative; height: 100%; overflow: hidden; }\n";
+        // Sidebar: its navbar is taller on desktop (h-16 md:h-20) than the burger's
+        // (h-16), so the panels clear a responsive offset.
+        $css .= ".iw-menu__panels--sidebar { --iw-menu-panels-offset: 4rem; }\n";
+        $css .= "@media (min-width: 768px) { .iw-menu__panels--sidebar { --iw-menu-panels-offset: 5rem; } }\n";
         $css .= ".iw-menu__panel { height: 100%; overflow-y: auto; }\n";
         $css .= ".iw-menu__panel-body { display: flex; flex-direction: column; }\n";
+        // Root panel body clears the navbar with the same offset the sub-panels use.
+        $css .= ".iw-menu__panel-body--root { padding-top: var(--iw-menu-panels-offset, 4rem); }\n";
         // Sub-panel: top padding clears the navbar (which stays above the overlay),
         // header stays put, body scrolls.
         $css .= ".iw-menu__subpanel {\n";
