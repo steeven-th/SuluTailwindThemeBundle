@@ -15,32 +15,16 @@
 {% if blocks is defined and blocks is iterable %}
     {% for contentBlock in blocks %}
         {% set blockType = contentBlock.type|default('text') %}
-        {% set blockStyle = contentBlock.style|default('') %}
 
-        {# Use the style value directly — it matches the template file name.
-           Fallback to defaults when style is empty or template does not exist
-           (e.g. legacy values like "standard" from previous config). #}
-        {% set defaultStyles = {
-            'text': 'one_column',
-            'text_images': 'classic',
-            'gallery': 'grid',
-            'key_figures': 'inline',
-            'linked_pages': 'cards',
-            'location': 'map_with_info',
-            'form': 'centered',
-            'document': 'default',
-            'cta': 'centered',
-            'testimonial': 'cards',
-            'separator': 'line'
-        } %}
+        {# Resolve to a guaranteed-existing style template: explicit style →
+           curated per-type default → first available style on disk. Returns
+           null only when the block type has no renderable style at all, so a
+           block without a style (imports, programmatic/AI-generated content)
+           or with a legacy value never breaks the whole page. #}
+        {% set templatePath = iw_sulu_tailwind_theme_block_template(blockType, contentBlock.style|default('')) %}
 
-        {% if blockStyle is empty %}
-            {% set blockStyle = defaultStyles[blockType]|default('default') %}
+        {% if templatePath is not null %}
+            {% include templatePath with contentBlock %}
         {% endif %}
-
-        {% set templatePath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ blockStyle ~ '.html.twig' %}
-        {% set fallbackPath = '@ItechWorldSuluTailwindTheme/blocks/' ~ blockType ~ '/_style_' ~ defaultStyles[blockType]|default('default') ~ '.html.twig' %}
-
-        {% include [templatePath, fallbackPath] with contentBlock %}
     {% endfor %}
 {% endif %}
