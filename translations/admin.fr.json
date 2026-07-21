@@ -297,6 +297,7 @@
     "iw_sulu_tailwind_theme.content_blocks": "Blocs de contenu",
 
     "iw_sulu_tailwind_theme.title": "Titre",
+    "iw_sulu_tailwind_theme.title_info": "Titre de section du bloc, rendu par défaut en H2. Évitez de remettre un titre de même niveau dans l'éditeur de texte ci-dessous.",
     "iw_sulu_tailwind_theme.subtitle": "Sous-titre",
     "iw_sulu_tailwind_theme.url": "URL",
     "iw_sulu_tailwind_theme.text": "Texte",
@@ -305,6 +306,12 @@
     "iw_sulu_tailwind_theme.align_left": "Gauche",
     "iw_sulu_tailwind_theme.align_center": "Centré",
     "iw_sulu_tailwind_theme.align_right": "Droite",
+
+    "iw_sulu_tailwind_theme.title_level": "Niveau du titre",
+    "iw_sulu_tailwind_theme.title_level_info": "Niveau sémantique HTML du titre. Laissez H2 sauf si un autre bloc porte déjà le titre principal de la section (SEO / accessibilité).",
+    "iw_sulu_tailwind_theme.title_level_h2": "Titre H2 (par défaut)",
+    "iw_sulu_tailwind_theme.title_level_h3": "Titre H3",
+    "iw_sulu_tailwind_theme.title_level_h4": "Titre H4",
 
     "iw_sulu_tailwind_theme.color_variant": "Variante de couleur",
     "iw_sulu_tailwind_theme.layout_style": "Style d'agencement",

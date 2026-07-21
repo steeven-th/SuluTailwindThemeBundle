@@ -1,6 +1,10 @@
-{# Block titles — renders h2 title, h3 subtitle, and optional separator #}
+{# Block titles — renders a configurable-level title, a paragraph subtitle,
+   and an optional separator. The title tag is editor-configurable (h2 by
+   default) so a block can fit the page outline; the subtitle is a <p> (a
+   tagline is not a heading, which avoids an orphan h3 in the document outline). #}
 {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
 {% set alignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
+{% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
 
 {# Resolve separator config from the variant index #}
 {% set variantIndex = variant|default(0) %}
@@ -14,10 +18,10 @@
 {% if (title is defined and title is not empty) or (subTitle is defined and subTitle is not empty) %}
 <div class="{{ alignClass }}">
     {% if title is defined and title is not empty %}
-        <h2 class="iw-block__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ alignClass }}">{{ title }}</h2>
+        <{{ titleTag }} class="iw-block__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ alignClass }}">{{ title }}</{{ titleTag }}>
     {% endif %}
     {% if subTitle is defined and subTitle is not empty %}
-        <h3 class="iw-block__subtitle text-lg md:text-xl mt-2 {{ alignClass }}">{{ subTitle }}</h3>
+        <p class="iw-block__subtitle text-lg md:text-xl mt-2 {{ alignClass }}">{{ subTitle }}</p>
     {% endif %}
 
     {# Separator: style mode → CSS handles rendering via .iw-variant--* hr rules #}

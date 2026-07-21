@@ -8,6 +8,7 @@
     {% set titleAlignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
     {% set isContentRight = contentRight|default(false) %}
     {% set accessoryKind = accessoryType|default('image') %}
+    {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
     {# Media accessories (image, video, map) follow the image radius context #}
     {% set accessoryRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
@@ -34,10 +35,10 @@
             <div class="iw-block-cta__content">
         {% endif %}
             {% if title is defined and title is not empty %}
-                <h2 class="iw-block__title iw-block-cta__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ titleAlignClass }}">{{ title }}</h2>
+                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ titleAlignClass }}">{{ title }}</{{ titleTag }}>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="iw-block__subtitle iw-block-cta__subtitle text-lg md:text-xl mt-2 opacity-75 {{ titleAlignClass }}">{{ subTitle }}</h3>
+                <p class="iw-block__subtitle iw-block-cta__subtitle text-lg md:text-xl mt-2 opacity-75 {{ titleAlignClass }}">{{ subTitle }}</p>
             {% endif %}
             {% if text is defined and text is not empty %}
                 <div class="iw-block__text iw-block-cta__text prose max-w-none mt-6 {{ resolvedParagraphRadius|default('') }}">

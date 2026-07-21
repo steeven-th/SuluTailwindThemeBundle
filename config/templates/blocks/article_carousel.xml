@@ -15,10 +15,27 @@
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
                 <property name="title" type="text_line">
-                    <meta><title>iw_sulu_tailwind_theme.title</title></meta>
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title</title>
+                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+                    </meta>
                 </property>
                 <property name="subTitle" type="text_line">
                     <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                </property>
+                <property name="titleTag" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h2"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                        </param>
+                    </params>
                 </property>
                 <property name="titleAlignment" type="single_select">
                     <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>

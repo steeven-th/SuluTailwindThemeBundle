@@ -259,6 +259,31 @@ CSS backgrounds:
 
 ---
 
+### `iw_sulu_tailwind_theme_heading_tag(tag, default)`
+
+Sanitizes a configurable heading tag to a safe HTML heading element. Block
+titles expose an editor-configurable level (`titleTag`: h2/h3/h4, h2 by
+default) so a block can fit the page outline; the value may also come from
+imported or programmatic content, so anything outside `h1..h6` falls back to
+`default`. Used when rendering a dynamic `<{{ tag }}>` element.
+
+```twig
+{% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
+<{{ titleTag }} class="iw-block__title">{{ title }}</{{ titleTag }}>
+```
+
+Block subtitles are intentionally rendered as `<p class="iw-block__subtitle">`
+(a tagline is not a heading, which keeps the document outline clean); the
+heading typography is restored via CSS.
+
+**Parameters:**
+- `tag` (`string|null`) — The requested tag (e.g. `h3`)
+- `default` (`string`) — Fallback tag when `tag` is empty or invalid (default `h2`)
+
+**Returns:** `string` — A safe heading tag name (`h1`..`h6`).
+
+---
+
 ## Partial: `blocks/common/_image.html.twig`
 
 The single rendering point for every content image. Emits a `<picture>` with

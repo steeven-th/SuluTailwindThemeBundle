@@ -4,10 +4,11 @@
 {% block block_content %}
     {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
     {% set titleAlignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
+    {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
 
     <div class="iw-block-text iw-block-text--quote">
         {% if title is defined and title is not empty %}
-            <h2 class="iw-block__title text-2xl md:text-3xl font-[var(--font-h2-weight)] mb-6 {{ titleAlignClass }}">{{ title }}</h2>
+            <{{ titleTag }} class="iw-block__title text-2xl md:text-3xl font-[var(--font-h2-weight)] mb-6 {{ titleAlignClass }}">{{ title }}</{{ titleTag }}>
         {% endif %}
 
         {% if text is defined and text is not empty %}
