@@ -148,6 +148,18 @@ a:hover {
     color: var(--color-heading, inherit);
 }
 
+.iw-block__subtitle,
+.iw-block-gallery__overlay-subtitle {
+    /* Subtitles render as <p> (a tagline is not a heading, which keeps the
+       document outline clean). Restore the heading typography they used to
+       inherit from the <h3> tag rule; the font-size stays on the inline
+       Tailwind utilities. */
+    margin: 0;
+    font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));
+    font-weight: var(--font-h3-weight, 600);
+    line-height: var(--line-height-h3, 1.3);
+}
+
 .iw-block__subtitle {
     color: var(--color-heading, inherit);
     opacity: 0.8;

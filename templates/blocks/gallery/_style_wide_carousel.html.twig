@@ -5,6 +5,7 @@
     {% if images is defined and images is iterable %}
         {% set isParallax = enableParallax|default(false) %}
         {% set overlayRadius = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
+        {% set overlayTitleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
 
         {# Parallax intensity: a 4-level admin select. The slider Stimulus
            controller multiplies its `maxShift` by this value (passed via
@@ -68,10 +69,10 @@
                 <div class="iw-block-gallery__overlay absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                     <div class="iw-block-gallery__overlay-content text-center px-8 py-6 bg-black/50 backdrop-blur-sm max-w-2xl {{ overlayRadius }}">
                         {% if title is defined and title is not empty %}
-                            <h2 class="iw-block-gallery__overlay-title text-white text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">{{ title }}</h2>
+                            <{{ overlayTitleTag }} class="iw-block-gallery__overlay-title text-white text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">{{ title }}</{{ overlayTitleTag }}>
                         {% endif %}
                         {% if subTitle is defined and subTitle is not empty %}
-                            <h3 class="iw-block-gallery__overlay-subtitle text-white/80 text-lg md:text-xl mt-3">{{ subTitle }}</h3>
+                            <p class="iw-block-gallery__overlay-subtitle text-white/80 text-lg md:text-xl mt-3">{{ subTitle }}</p>
                         {% endif %}
                     </div>
                 </div>

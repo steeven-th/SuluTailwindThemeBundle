@@ -52,7 +52,28 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
         ];
+    }
+
+    /**
+     * Sanitize a configurable heading tag to a safe HTML heading element.
+     *
+     * Block titles expose a configurable heading level (h2/h3/h4) so editors
+     * can fit a block into the page outline. The value may also come from
+     * imported or programmatic content, so anything outside h1..h6 falls back
+     * to the given default. Used when rendering a dynamic `<{{ tag }}>` element.
+     *
+     * @param string|null $tag     The requested tag (e.g. "h3")
+     * @param string      $default The fallback tag when $tag is empty or invalid
+     *
+     * @return string A safe heading tag name (h1..h6)
+     */
+    public function getHeadingTag(?string $tag, string $default = 'h2'): string
+    {
+        $tag = strtolower(trim((string) $tag));
+
+        return \in_array($tag, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], true) ? $tag : $default;
     }
 
     /**

@@ -297,6 +297,7 @@
     "iw_sulu_tailwind_theme.content_blocks": "Inhaltsblöcke",
 
     "iw_sulu_tailwind_theme.title": "Titel",
+    "iw_sulu_tailwind_theme.title_info": "Abschnittstitel des Blocks, standardmäßig als H2 gerendert. Vermeiden Sie eine weitere Überschrift derselben Ebene im Texteditor unten.",
     "iw_sulu_tailwind_theme.subtitle": "Untertitel",
     "iw_sulu_tailwind_theme.url": "URL",
     "iw_sulu_tailwind_theme.text": "Text",
@@ -305,6 +306,12 @@
     "iw_sulu_tailwind_theme.align_left": "Links",
     "iw_sulu_tailwind_theme.align_center": "Zentriert",
     "iw_sulu_tailwind_theme.align_right": "Rechts",
+
+    "iw_sulu_tailwind_theme.title_level": "Titelebene",
+    "iw_sulu_tailwind_theme.title_level_info": "Semantische HTML-Ebene des Titels. Behalten Sie H2 bei, es sei denn, ein anderer Block trägt bereits den Haupttitel des Abschnitts (SEO / Barrierefreiheit).",
+    "iw_sulu_tailwind_theme.title_level_h2": "Überschrift H2 (Standard)",
+    "iw_sulu_tailwind_theme.title_level_h3": "Überschrift H3",
+    "iw_sulu_tailwind_theme.title_level_h4": "Überschrift H4",
 
     "iw_sulu_tailwind_theme.color_variant": "Farbvariante",
     "iw_sulu_tailwind_theme.layout_style": "Layoutstil",

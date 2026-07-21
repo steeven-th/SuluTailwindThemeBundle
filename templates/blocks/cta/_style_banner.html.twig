@@ -7,6 +7,7 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
+    {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
     {% set bannerMediaId = (bannerImage is defined and bannerImage.id is defined) ? bannerImage.id : null %}
 
     {# Neutralise the wrapper's pt-*/pb-* via negative margins so the banner
@@ -34,10 +35,10 @@
 
         <div class="iw-block-cta__content relative z-10 container mx-auto py-16 md:py-20 lg:py-24 px-6 md:px-8 text-center text-white">
             {% if title is defined and title is not empty %}
-                <h2 class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] text-white">{{ title }}</h2>
+                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] text-white">{{ title }}</{{ titleTag }}>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <h3 class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 text-white/80">{{ subTitle }}</h3>
+                <p class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 text-white/80">{{ subTitle }}</p>
             {% endif %}
             {% if text is defined and text is not empty %}
                 <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-2xl mx-auto mt-8">

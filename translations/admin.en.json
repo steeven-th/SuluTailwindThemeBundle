@@ -297,6 +297,7 @@
     "iw_sulu_tailwind_theme.content_blocks": "Content blocks",
 
     "iw_sulu_tailwind_theme.title": "Title",
+    "iw_sulu_tailwind_theme.title_info": "Section title of the block, rendered as an H2 by default. Avoid adding another heading of the same level in the text editor below.",
     "iw_sulu_tailwind_theme.subtitle": "Subtitle",
     "iw_sulu_tailwind_theme.url": "URL",
     "iw_sulu_tailwind_theme.text": "Text",
@@ -305,6 +306,12 @@
     "iw_sulu_tailwind_theme.align_left": "Left",
     "iw_sulu_tailwind_theme.align_center": "Center",
     "iw_sulu_tailwind_theme.align_right": "Right",
+
+    "iw_sulu_tailwind_theme.title_level": "Title level",
+    "iw_sulu_tailwind_theme.title_level_info": "HTML semantic level of the title. Keep H2 unless another block already carries the section's main title (SEO / accessibility).",
+    "iw_sulu_tailwind_theme.title_level_h2": "Heading H2 (default)",
+    "iw_sulu_tailwind_theme.title_level_h3": "Heading H3",
+    "iw_sulu_tailwind_theme.title_level_h4": "Heading H4",
 
     "iw_sulu_tailwind_theme.color_variant": "Color variant",
     "iw_sulu_tailwind_theme.layout_style": "Layout style",
