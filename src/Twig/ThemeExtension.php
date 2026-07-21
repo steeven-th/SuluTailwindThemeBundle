@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
+use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -24,6 +25,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly ThemeProvider $themeProvider,
         private readonly ThemeCompiler $compiler,
         private readonly GoogleFontsResolver $fontsResolver,
+        private readonly BlockTemplateResolver $blockTemplateResolver,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -41,6 +43,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
                 'is_safe' => ['html'],
             ]),
             new TwigFunction('iw_sulu_block_style_template', $this->getBlockStyleTemplate(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_block_template', $this->getBlockTemplate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_menu_config', $this->getMenuConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_tokens', $this->getTokens(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_styles', $this->getBlockStyles(...)),
@@ -232,6 +235,26 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             . "\n"
             . '<link rel="stylesheet" href="' . $escapedUrl . '">';
+    }
+
+    /**
+     * Resolve the style template of a content block to an existing template.
+     *
+     * Used by the shared block dispatcher to render any block through a
+     * guaranteed-existing style template: the explicit style when valid, the
+     * curated per-type default otherwise, and the first available style as a
+     * last-resort safety net. Returns null only when the block type has no
+     * renderable style at all, letting the dispatcher skip it instead of
+     * crashing on a missing template.
+     *
+     * @param string      $blockType The block type identifier (e.g. "text_images")
+     * @param string|null $style     The selected style, if any (e.g. "overlay")
+     *
+     * @return string|null The namespaced Twig template name, or null when none
+     */
+    public function getBlockTemplate(string $blockType, ?string $style = null): ?string
+    {
+        return $this->blockTemplateResolver->resolve($blockType, $style);
     }
 
     /**

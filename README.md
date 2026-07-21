@@ -523,7 +523,8 @@ Add the theme functions to your `templates/base.html.twig`:
 | `iw_sulu_tailwind_theme_menu_config()` | Menu configuration array |
 | `iw_sulu_tailwind_theme_tokens()` | Full design tokens array |
 | `iw_sulu_tailwind_theme_block_styles()` | Block style configuration |
-| `iw_sulu_block_style_template(type, style)` | Resolved template path for a block style |
+| `iw_sulu_block_style_template(type, style)` | Resolved template path for a block style (from config) |
+| `iw_sulu_tailwind_theme_block_template(type, style)` | Guaranteed-existing block style template (from disk, with fallbacks) |
 | `iw_sulu_tailwind_theme_format_date(date, format?)` | Localized date string (ICU formatting) |
 | `iw_sulu_tailwind_theme_reading_time(content)` | Estimated reading time in minutes |
 | `iw_sulu_tailwind_theme_author_name(authorBlock)` | Resolved author name (custom/contact/organization) |

@@ -121,6 +121,48 @@ Returns the Twig template path for a specific block style.
 
 **Returns:** `string|null` — Twig template path, or `null` if not found.
 
+> **Note:** this reads the stored block-styles **configuration**. For rendering
+> a block, prefer `iw_sulu_tailwind_theme_block_template()` below, which resolves
+> against the **actual template files on disk** and always returns an existing
+> template.
+
+---
+
+### `iw_sulu_tailwind_theme_block_template(blockType, style)`
+
+Resolves a block type and style to a **guaranteed-existing** style template,
+used by the shared block dispatcher (`components/_blocks.html.twig`). Unlike
+`iw_sulu_block_style_template()` (which reads the stored configuration, and can
+drift from the shipped templates), this checks the real files under
+`templates/blocks/<type>/` and never points to a missing template.
+
+Resolution order:
+1. The explicit `style`, when its `_style_<style>.html.twig` exists.
+2. The curated per-type default (a good-looking baseline).
+3. The first style available on disk (safety net for unknown or newly added
+   blocks).
+
+```twig
+{% for contentBlock in blocks %}
+    {% set templatePath = iw_sulu_tailwind_theme_block_template(blockType, contentBlock.style|default('')) %}
+    {% if templatePath is not null %}
+        {% include templatePath with contentBlock %}
+    {% endif %}
+{% endfor %}
+```
+
+This makes blocks created **without a style** (imports, programmatic content,
+AI-generated pages via SuluContentAiBundle) or carrying a **legacy/unknown**
+style value render safely instead of breaking the whole page with
+`Unable to find one of the following templates: …/_style_default.html.twig`.
+
+**Parameters:**
+- `blockType` (`string`) — Block type identifier (e.g. `text`, `article_carousel`)
+- `style` (`string|null`) — Selected style, or empty/`null` when the block has none
+
+**Returns:** `string|null` — Namespaced Twig template name, or `null` only when
+the block type has no renderable style at all (dispatcher then skips it).
+
 ---
 
 ### `iw_sulu_tailwind_theme_location_address(location)`
