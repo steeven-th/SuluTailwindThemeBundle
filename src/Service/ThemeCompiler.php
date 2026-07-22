@@ -2120,10 +2120,14 @@ class ThemeCompiler
             'paragraphBg' => '--iw-variant-paragraph-bg',
         ];
 
-        foreach ($blockVariants as $index => $props) {
+        // Variants are keyed by a stable slug (not the positional index).
+        // Normalize so every variant has a unique slug, then use it as the
+        // `.iw-variant--<slug>` class id throughout.
+        foreach (VariantResolver::normalizeVariants($blockVariants) as $props) {
             if (!is_array($props)) {
                 continue;
             }
+            $index = $props['slug'];
             $css .= ".iw-variant--{$index} {\n";
 
             foreach ($propertyMap as $tokenKey => $cssProperty) {

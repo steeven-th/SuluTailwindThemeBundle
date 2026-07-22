@@ -72,13 +72,11 @@ class ThemeConfigResolver
 
         if (null !== $theme) {
             $tokens = $theme->getTokens();
-            $blockVariants = $tokens['blockVariants'] ?? [];
+            // Normalize so every variant exposes a stable, unique slug to the
+            // admin JS (VariantPicker selects by slug, not the positional index).
+            $blockVariants = VariantResolver::normalizeVariants($tokens['blockVariants'] ?? []);
 
             foreach ($blockVariants as $index => $props) {
-                if (!is_array($props)) {
-                    continue;
-                }
-
                 $variants[] = array_merge(['index' => $index], $props);
             }
 

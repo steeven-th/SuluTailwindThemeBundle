@@ -10,6 +10,34 @@ import {getSuluPrimaryColor, getSuluPrimaryAlpha} from '../../utils/suluColors';
 const DEFAULT_COLOR = '#cccccc';
 
 /**
+ * Resolve the stored variant value to the currently selected slug (best-effort).
+ * Mirrors the PHP VariantResolver: a known slug is used as-is, a numeric legacy
+ * index maps to the variant at that position, otherwise the first variant.
+ *
+ * @param {*} value The stored variant value (slug or legacy index)
+ * @param {Array<Object>} variants The available variants (each with a slug)
+ * @returns {string} The selected slug, or '' when there is no variant
+ */
+function selectedVariantSlug(value, variants) {
+    if (!variants || variants.length === 0) {
+        return '';
+    }
+
+    const slugs = variants.map((variant) => variant.slug);
+    const asString = value === null || value === undefined ? '' : String(value);
+
+    if (asString !== '' && !/^[0-9]+$/.test(asString) && slugs.includes(asString)) {
+        return asString;
+    }
+
+    if (/^[0-9]+$/.test(asString) && variants[parseInt(asString, 10)]) {
+        return variants[parseInt(asString, 10)].slug;
+    }
+
+    return slugs[0];
+}
+
+/**
  * VariantPicker field component for the Sulu admin.
  *
  * Displays block variants as colorful wireframe previews. Each wireframe shows
@@ -44,7 +72,8 @@ export default class VariantPicker extends React.Component {
         if ((value === null || value === undefined || value === '') && onChange) {
             const variants = themeConfigStore.variants;
             if (variants.length > 0) {
-                setTimeout(() => onChange(0), 0);
+                const firstSlug = variants[0].slug;
+                setTimeout(() => onChange(firstSlug), 0);
             }
         }
     }
@@ -68,12 +97,12 @@ export default class VariantPicker extends React.Component {
     /**
      * Handle variant selection.
      *
-     * @param {number} variantIndex - The index of the selected variant
+     * @param {string} variantSlug - The slug of the selected variant
      */
-    handleSelect = (variantIndex) => {
+    handleSelect = (variantSlug) => {
         const {onChange} = this.props;
         if (onChange) {
-            onChange(variantIndex);
+            onChange(variantSlug);
         }
     };
 
@@ -149,14 +178,14 @@ export default class VariantPicker extends React.Component {
 
         return (
             <div
-                key={variant.index}
+                key={variant.slug}
                 style={containerStyle}
-                onClick={() => this.handleSelect(variant.index)}
+                onClick={() => this.handleSelect(variant.slug)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                        this.handleSelect(variant.index);
+                        this.handleSelect(variant.slug);
                     }
                 }}
             >
@@ -184,7 +213,7 @@ export default class VariantPicker extends React.Component {
                     <div style={barStyle(linkColor, '5px', '30%', '0')} />
                 </div>
                 <div style={labelStyle}>
-                    {variant.label || `Variant ${variant.index}`}
+                    {variant.label || variant.slug}
                 </div>
                 <div style={swatchContainerStyle}>
                     <div style={swatchStyle(titleColor)} title="Title" />
@@ -202,6 +231,7 @@ export default class VariantPicker extends React.Component {
     render() {
         const {value} = this.props;
         const variants = themeConfigStore.variants;
+        const selectedSlug = selectedVariantSlug(value, variants);
 
         if (variants.length === 0) {
             return (
@@ -219,7 +249,7 @@ export default class VariantPicker extends React.Component {
                 padding: '8px',
             }}>
                 {variants.map((variant) =>
-                    this.renderWireframe(variant, String(value) === String(variant.index))
+                    this.renderWireframe(variant, variant.slug === selectedSlug)
                 )}
             </div>
         );
