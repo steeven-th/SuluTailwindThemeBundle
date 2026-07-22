@@ -11,27 +11,10 @@
                 <title>iw_sulu_tailwind_theme.colors_section_main</title>
             </meta>
             <properties>
-                <property name="colors_primary" type="iw_theme_color_token_editor" colspan="3">
+                <property name="palette" type="iw_theme_palette_editor" colspan="12">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.colors_primary</title>
-                    </meta>
-                </property>
-
-                <property name="colors_secondary" type="iw_theme_color_token_editor" colspan="3">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.colors_secondary</title>
-                    </meta>
-                </property>
-
-                <property name="colors_accent" type="iw_theme_color_token_editor" colspan="3">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.colors_accent</title>
-                    </meta>
-                </property>
-
-                <property name="colors_background" type="iw_theme_color_token_editor" colspan="3">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.colors_background</title>
+                        <title>iw_sulu_tailwind_theme.colors_section_main</title>
+                        <info_text>iw_sulu_tailwind_theme.palette_info</info_text>
                     </meta>
                 </property>
             </properties>

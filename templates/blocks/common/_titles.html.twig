@@ -6,13 +6,9 @@
 {% set alignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
 {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
 
-{# Resolve separator config from the variant index #}
-{% set variantIndex = variant|default(0) %}
+{# Resolve separator config from the variant slug (best-effort for legacy index) #}
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% if variantIndex >= allVariants|length %}
-    {% set variantIndex = 0 %}
-{% endif %}
-{% set variantConfig = allVariants[variantIndex]|default({}) %}
+{% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), allVariants) %}
 {% set separatorMode = variantConfig.separatorMode|default('style') %}
 
 {% if (title is defined and title is not empty) or (subTitle is defined and subTitle is not empty) %}

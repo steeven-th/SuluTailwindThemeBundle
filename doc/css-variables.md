@@ -86,4 +86,4 @@ Override example:
 
 ## Block variants
 
-See [`css-api/block-variants.md`](./css-api/block-variants.md) for the full reference on `.iw-variant--{N}` classes and their `--iw-variant-*` variables.
+See [`css-api/block-variants.md`](./css-api/block-variants.md) for the full reference on `.iw-variant--{slug}` classes and their `--iw-variant-*` variables.

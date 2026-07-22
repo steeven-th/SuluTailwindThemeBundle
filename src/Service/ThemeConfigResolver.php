@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
@@ -27,28 +29,60 @@ class ThemeConfigResolver
      *
      * @param ThemeConfig|null $theme The theme to resolve, or null for empty defaults
      *
-     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, borders: array<string, mixed>}
+     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, borders: array<string, mixed>}
      */
     public function resolve(?ThemeConfig $theme): array
     {
         $variants = [];
         $buttons = [];
         $palette = [];
+        $baseHexes = [];
         $borders = [];
+
+        // Palette colors are always resolved (even without a theme) so the admin
+        // pickers get the 10 base roles at their defaults. ColorSet normalizes
+        // the stored shape and guarantees the roles in canonical order.
+        $colorSet = ColorSet::fromTokens(null !== $theme ? $theme->getTokens() : []);
+        $colors = [];
+        foreach ($colorSet->getColors() as $color) {
+            $role = $color['role'];
+            $colors[] = [
+                'role' => $role,
+                'slug' => $color['slug'],
+                'value' => $color['value'],
+                'labelKey' => null !== $role ? ColorRoles::labelKey($role) : null,
+                'category' => null !== $role ? ColorRoles::category($role) : 'brand',
+            ];
+
+            $value = $color['value'];
+            if (!is_string($value) || 1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value)) {
+                continue;
+            }
+            // Key OKLCH shades by BOTH the role (stable) and the slug, so refs
+            // resolve either way.
+            $shades = $this->paletteGenerator->generatePalette($value);
+            foreach ([$role, $color['slug']] as $name) {
+                if (null === $name) {
+                    continue;
+                }
+                $palette[$name] = $shades;
+                $baseHexes[$name] = $value;
+            }
+        }
 
         if (null !== $theme) {
             $tokens = $theme->getTokens();
-            $blockVariants = $tokens['blockVariants'] ?? [];
+            // Normalize so every variant exposes a stable, unique slug to the
+            // admin JS (VariantPicker selects by slug, not the positional index).
+            $blockVariants = VariantResolver::normalizeVariants($tokens['blockVariants'] ?? []);
 
             foreach ($blockVariants as $index => $props) {
-                if (!is_array($props)) {
-                    continue;
-                }
-
                 $variants[] = array_merge(['index' => $index], $props);
             }
 
-            $buttons = $tokens['buttons'] ?? [];
+            // Normalize buttons to a slug-keyed list for the admin JS
+            // (ButtonStylePicker selects by button slug).
+            $buttons = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
 
             // Border tokens, normalized: the legacy `radius` key (pre-3.0.0)
             // is read as a fallback for `cardRadius`
@@ -57,16 +91,6 @@ class ThemeConfigResolver
                 $borders['cardRadius'] = $borders['radius'];
             }
             unset($borders['radius']);
-
-            // Generate OKLCH palettes for the 4 main colors
-            $paletteColors = ['primary', 'secondary', 'accent', 'background'];
-            $colors = $tokens['colors'] ?? [];
-            foreach ($paletteColors as $colorName) {
-                $hex = $colors[$colorName] ?? null;
-                if (is_string($hex) && $hex !== '') {
-                    $palette[$colorName] = $this->paletteGenerator->generatePalette($hex);
-                }
-            }
         }
 
         // Resolve ref: values in buttons
@@ -75,7 +99,7 @@ class ThemeConfigResolver
                 continue;
             }
             foreach ($btnProps as $prop => &$val) {
-                $this->resolveRef($val, $palette);
+                $this->resolveRef($val, $palette, $baseHexes);
             }
             unset($val);
         }
@@ -84,7 +108,7 @@ class ThemeConfigResolver
         // Resolve ref: values in variants
         foreach ($variants as &$variantProps) {
             foreach ($variantProps as $prop => &$val) {
-                $this->resolveRef($val, $palette);
+                $this->resolveRef($val, $palette, $baseHexes);
             }
             unset($val);
         }
@@ -94,23 +118,42 @@ class ThemeConfigResolver
             'variants' => $variants,
             'buttons' => $buttons,
             'palette' => $palette,
+            'colors' => $colors,
             'borders' => $borders,
         ];
     }
 
     /**
-     * Resolve a single ref: value to its hex color from the palette.
+     * Resolve a single ref: value (by role or slug) to its hex color.
      *
-     * @param mixed                                          $val     The value to resolve (mutated in place)
-     * @param array<string, array<int|string, string>> $palette The generated palette
+     * Handles both `ref:<name>-<shade>` (a shade) and `ref:<name>` (the base
+     * color), with slugs that may contain dashes.
+     *
+     * @param mixed                                     $val       The value to resolve (mutated in place)
+     * @param array<string, array<int, string>>        $palette   Generated shades keyed by role/slug
+     * @param array<string, string>                     $baseHexes Base hex values keyed by role/slug
      */
-    private function resolveRef(mixed &$val, array $palette): void
+    private function resolveRef(mixed &$val, array $palette, array $baseHexes): void
     {
-        if (is_string($val) && str_starts_with($val, 'ref:')) {
-            $parts = explode('-', substr($val, 4), 2);
-            if (count($parts) === 2 && isset($palette[$parts[0]][(int) $parts[1]])) {
-                $val = $palette[$parts[0]][(int) $parts[1]];
+        if (!is_string($val)) {
+            return;
+        }
+
+        $parsed = ColorSet::parseRef($val);
+        if (null === $parsed) {
+            return;
+        }
+
+        if (null === $parsed['shade']) {
+            if (isset($baseHexes[$parsed['name']])) {
+                $val = $baseHexes[$parsed['name']];
             }
+
+            return;
+        }
+
+        if (isset($palette[$parsed['name']][$parsed['shade']])) {
+            $val = $palette[$parsed['name']][$parsed['shade']];
         }
     }
 }

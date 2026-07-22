@@ -25,14 +25,26 @@ const EYEDROPPER_SUPPORTED = typeof window !== 'undefined' && 'EyeDropper' in wi
 const SHADE_LEVELS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
 /**
- * Palette color names and their translation keys.
+ * The stable id (role for base colors, slug for brand colors) used to build
+ * ref: values, so a ref survives a slug rename of a base role.
+ *
+ * @param {Object} color A store color entry {role, slug, value, labelKey}
+ * @returns {string} The reference key
  */
-const PALETTE_COLORS = [
-    {key: 'primary', label: 'iw_sulu_tailwind_theme.colors_primary'},
-    {key: 'secondary', label: 'iw_sulu_tailwind_theme.colors_secondary'},
-    {key: 'accent', label: 'iw_sulu_tailwind_theme.colors_accent'},
-    {key: 'background', label: 'iw_sulu_tailwind_theme.colors_background'},
-];
+function colorRefKey(color) {
+    return color.role || color.slug;
+}
+
+/**
+ * The human-facing label of a palette color: translated role label, or the
+ * slug for brand colors.
+ *
+ * @param {Object} color A store color entry {role, slug, value, labelKey}
+ * @returns {string} The display label
+ */
+function colorLabel(color) {
+    return color.labelKey ? translate(color.labelKey) : color.slug;
+}
 
 /**
  * Inline CSS injected once for the ChromePicker overrides inside the popover.
@@ -203,34 +215,38 @@ export default class ColorTokenEditor extends React.Component {
     }
 
     /**
-     * Load palette from the current form data via API if we are inside
-     * a theme edit form (detected by the presence of colors_primary field).
-     * Falls back to the global themePalette if not in a theme form.
+     * Load palette from the current form data via API if we are inside a theme
+     * edit form (detected by the presence of the `palette` PaletteEditor field).
+     * This gives a live preview of unsaved color edits. Falls back to the store
+     * palette (saved state) when not in a theme form.
      */
     _loadPaletteFromForm() {
         const {formInspector} = this.props;
         if (!formInspector || !this.showPalette) return;
 
-        // Check if we are editing a theme (has colors_primary in form data)
-        const primary = formInspector.getValueByPath('/colors_primary');
-        if (!primary) return;
-
-        const secondary = formInspector.getValueByPath('/colors_secondary') || '';
-        const accent = formInspector.getValueByPath('/colors_accent') || '';
-        const background = formInspector.getValueByPath('/colors_background') || '';
+        // The PaletteEditor holds the base colors as a list [{role, slug, value}].
+        // getValueByPath may return a MobX observable array (fails Array.isArray).
+        const raw = formInspector.getValueByPath('/palette');
+        if (!raw || !raw.length) return;
+        const colors = Array.from(raw);
 
         const params = new URLSearchParams();
-        if (primary) params.set('primary', primary);
-        if (secondary) params.set('secondary', secondary);
-        if (accent) params.set('accent', accent);
-        if (background) params.set('background', background);
+        colors.forEach((color) => {
+            const key = color && (color.role || color.slug);
+            const value = color && color.value;
+            if (key && typeof value === 'string' && value) {
+                params.set(key, value);
+            }
+        });
+
+        if (params.toString() === '') return;
 
         Requester.get('/admin/api/iw-theme-palette?' + params.toString())
             .then((palette) => {
                 this.setState({localPalette: palette});
             })
             .catch(() => {
-                // Fallback to global palette on error
+                // Fallback to store palette on error
             });
     }
 
@@ -408,6 +424,9 @@ export default class ColorTokenEditor extends React.Component {
 
     /**
      * Render palette rows with swatches for each color.
+     *
+     * Colors are derived dynamically from the theme config store (all 10 base
+     * roles + unlimited brand colors), not a hard-coded list.
      */
     renderPaletteTab() {
         const palette = this.state.localPalette || themeConfigStore.palette;
@@ -416,16 +435,19 @@ export default class ColorTokenEditor extends React.Component {
 
         return (
             <div style={{padding: '6px 0', maxHeight: '280px', overflowY: 'auto'}}>
-                {PALETTE_COLORS.map(({key, label}) => {
+                {themeConfigStore.colors.map((color) => {
+                    const key = colorRefKey(color);
                     const shades = palette[key];
                     if (!shades || Object.keys(shades).length === 0) {
                         return null;
                     }
 
+                    const label = colorLabel(color);
+
                     return (
                         <div key={key} className="iw-palette-row">
                             <div className="iw-palette-row-label">
-                                {translate(label)}
+                                {label}
                             </div>
                             <div className="iw-palette-swatches">
                                 {SHADE_LEVELS.map((shade) => {
@@ -447,7 +469,7 @@ export default class ColorTokenEditor extends React.Component {
                                             title={`${key}-${shade}`}
                                         >
                                             <span className="iw-palette-tooltip">
-                                                {key.charAt(0).toUpperCase() + key.slice(1)} {shade}
+                                                {label} {shade}
                                             </span>
                                         </div>
                                     );

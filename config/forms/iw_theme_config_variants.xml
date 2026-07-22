@@ -17,9 +17,16 @@
                         <title>iw_sulu_tailwind_theme.variant</title>
                     </meta>
                     <properties>
-                        <property name="label" type="text_line" mandatory="true">
+                        <property name="label" type="text_line" colspan="6" mandatory="true">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.variant_label</title>
+                            </meta>
+                        </property>
+
+                        <property name="slug" type="text_line" colspan="6" mandatory="true">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_slug</title>
+                                <info_text>iw_sulu_tailwind_theme.variant_slug_info</info_text>
                             </meta>
                         </property>
 

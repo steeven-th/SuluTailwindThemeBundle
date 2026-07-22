@@ -40,11 +40,12 @@
 * **Design tokens**: Store all theme settings as structured JSON, compiled to CSS custom properties
 * **Admin interface**: Full CRUD with 7 tabs (details, colors, typography, buttons, borders, block variants, menu)
 * **Multi-webspace support**: Assign different themes to different webspaces (sites) in a multi-site Sulu installation
-* **Multiple themes**: Create and switch between 7 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu)
-* **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--*` classes, `.iw-button--*` styles
+* **Multiple themes**: Create and switch between 8 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu, asmt)
+* **Named palette**: 10 base color roles + unlimited brand colors, each named by slug and expanded to OKLCH shades under a stable `--color-<role>` alias and a `--color-<slug>` alias
+* **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--<slug>` classes, `.iw-button--<slug>` styles
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
-* **Block variants**: Per-block color schemes (light, accent, dark) applied via CSS custom properties
+* **Block variants**: Slug-named per-block color schemes applied via CSS custom properties
 * **Menu configuration**: Configurable menu type, colors, animation, and display options
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
@@ -443,11 +444,11 @@ The share row is a reusable partial — include it in your own templates to shar
 Navigate to **Settings > Themes** in the Sulu admin panel. From there you can:
 
 1. **Create a theme**: Click "Add", fill in the name and label
-2. **Configure colors**: Set primary, secondary, accent, and background colors + text, link, and link hover colors
+2. **Configure the palette**: Rename the 10 base color roles (primary, secondary, accent, background, black, white, neutral, error, warning, success) and add unlimited brand colors — each named by a unique slug and expanded to 11 OKLCH shades. Text/link/link-hover colors are set alongside.
 3. **Configure typography**: Select fonts for headings/body/accent via the Font Picker (Google Fonts autocomplete, system fonts, or free text)
-4. **Configure buttons**: Set global padding plus primary/secondary/accent button styles — colors, hover states, radius, border width/style, and five composable hover effects (shadow, transform, opacity, duration, easing). See [Button hover effects](doc/button-effects.md) for the full catalog.
+4. **Configure buttons**: Define unlimited button styles (named by slug) plus shared padding — colors, hover states, radius, border width/style, and five composable hover effects (shadow, transform, opacity, duration, easing). See [Button hover effects](doc/button-effects.md) for the full catalog.
 5. **Configure borders**: Set the three radius values (cards, images, paragraphs) — blocks follow them by default and can override each one individually
-6. **Configure block variants**: Define color schemes (e.g., light, accent, dark) for content blocks
+6. **Configure block variants**: Define named color schemes (slug-based) for content blocks, each referencing a button style by slug
 7. **Configure menu**: Choose menu type, colors, animation, and display options
 
 ### Multi-site setup

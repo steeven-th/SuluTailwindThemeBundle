@@ -3,12 +3,9 @@
    not the section, so the image always fills its half edge-to-edge. #}
 
 {# ── Wrapper logic (replicated from _block_wrapper) ───────────────────────── #}
-{% set variantIndex = variant|default(0) %}
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% if variantIndex >= allVariants|length %}
-    {% set variantIndex = 0 %}
-{% endif %}
-{% set variantClass = 'iw-variant--' ~ variantIndex %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(variant|default(null), allVariants) %}
+{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
 

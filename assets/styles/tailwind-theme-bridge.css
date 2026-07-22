@@ -72,7 +72,8 @@
   --color-background-900: #171717;
   --color-background-950: #0a0a0a;
 
-  /* ─── Colors: Neutral palette ─────────────────────────────────────────── */
+  /* ─── Colors: Neutral palette (default — overridden by the compiled theme) ─ */
+  --color-neutral: #737373;
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #e5e5e5;
@@ -85,7 +86,7 @@
   --color-neutral-900: #171717;
   --color-neutral-950: #0a0a0a;
 
-  /* ─── Colors: Error palette (hardcoded — not admin-configurable) ─────── */
+  /* ─── Colors: Error palette (default — overridden by the compiled theme) ── */
   --color-error: #ef4444;
   --color-error-50: #fef2f2;
   --color-error-100: #fee2e2;
@@ -99,7 +100,7 @@
   --color-error-900: #7f1d1d;
   --color-error-950: #450a0a;
 
-  /* ─── Colors: Warning palette (hardcoded — not admin-configurable) ───── */
+  /* ─── Colors: Warning palette (default — overridden by the compiled theme) ─ */
   --color-warning: #f97316;
   --color-warning-50: #fff7ed;
   --color-warning-100: #ffedd5;
@@ -113,7 +114,7 @@
   --color-warning-900: #7c2d12;
   --color-warning-950: #431407;
 
-  /* ─── Colors: Success palette (hardcoded — not admin-configurable) ───── */
+  /* ─── Colors: Success palette (default — overridden by the compiled theme) ─ */
   --color-success: #10b981;
   --color-success-50: #ecfdf5;
   --color-success-100: #d1fae5;
@@ -126,6 +127,34 @@
   --color-success-800: #065f46;
   --color-success-900: #064e3b;
   --color-success-950: #022c22;
+
+  /* ─── Colors: Black palette (default — overridden by the compiled theme) ── */
+  --color-black: #0a0a0a;
+  --color-black-50: #f5f5f5;
+  --color-black-100: #ececec;
+  --color-black-200: #dddddd;
+  --color-black-300: #c7c7c7;
+  --color-black-400: #a9a9a9;
+  --color-black-500: #929292;
+  --color-black-600: #7b7b7b;
+  --color-black-700: #656565;
+  --color-black-800: #525252;
+  --color-black-900: #454545;
+  --color-black-950: #262626;
+
+  /* ─── Colors: White palette (default — overridden by the compiled theme) ── */
+  --color-white: #ffffff;
+  --color-white-50: #f5f5f5;
+  --color-white-100: #ececec;
+  --color-white-200: #dddddd;
+  --color-white-300: #c7c7c7;
+  --color-white-400: #a9a9a9;
+  --color-white-500: #929292;
+  --color-white-600: #7b7b7b;
+  --color-white-700: #656565;
+  --color-white-800: #525252;
+  --color-white-900: #454545;
+  --color-white-950: #262626;
 
   /* ─── Colors: Semantic ────────────────────────────────────────────────── */
   --color-text: #171717;
@@ -225,33 +254,8 @@
   --radius-sm: var(--border-radiusSm);
   --radius-lg: var(--border-radiusLg);
 
-  /* ─── Buttons ─────────────────────────────────────────────────────────── */
-  /* Primary button */
-  --iw-button-primary-bg: var(--color-primary, #6366f1);
-  --iw-button-primary-text: #ffffff;
-  --iw-button-primary-border: none;
-  --iw-button-primary-hover-bg: var(--color-primary-700, #4338ca);
-  --iw-button-primary-hover-text: #ffffff;
-  --iw-button-primary-hover-border: none;
-  --iw-button-primary-radius: var(--border-radius, 0.375rem);
-
-  /* Secondary button */
-  --iw-button-secondary-bg: transparent;
-  --iw-button-secondary-text: var(--color-primary, #6366f1);
-  --iw-button-secondary-border: currentColor;
-  --iw-button-secondary-hover-bg: transparent;
-  --iw-button-secondary-hover-text: var(--color-primary-700, #4338ca);
-  --iw-button-secondary-hover-border: currentColor;
-  --iw-button-secondary-radius: var(--border-radius, 0.375rem);
-
-  /* Accent button */
-  --iw-button-accent-bg: var(--color-accent, #f59e0b);
-  --iw-button-accent-text: #ffffff;
-  --iw-button-accent-border: none;
-  --iw-button-accent-hover-bg: var(--color-accent-600, #d97706);
-  --iw-button-accent-hover-text: #ffffff;
-  --iw-button-accent-hover-border: none;
-  --iw-button-accent-radius: var(--border-radius, 0.375rem);
+  /* Button variables (--iw-button-<slug>-*) are generated per theme by the
+     ThemeCompiler for each configured button, so no static defaults live here. */
 
   /* ─── Menu ────────────────────────────────────────────────────────────── */
   --iw-menu-bg: #ffffff;

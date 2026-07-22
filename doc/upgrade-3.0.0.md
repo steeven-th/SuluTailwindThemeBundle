@@ -4,6 +4,64 @@
 compatibility layer is shipped**. This document lists what changes for
 existing content and themes, section by section.
 
+## Color system overhaul: named palette, slug-based variants & buttons
+
+The color system is rebuilt around unique slugs. The 4 fixed roles become an
+open, named palette, and variants and buttons are no longer identified by a
+fixed index/role.
+
+### Palette: `tokens.colors` map → ordered list, plus `tokens.textColors`
+
+`tokens.colors` changes from a role→hex map to an **ordered list** of
+`{role, slug, value}`:
+
+```jsonc
+// before (2.x)
+"colors": { "primary": "#1a56db", "secondary": "#475569", "accent": "#F59E0B",
+            "background": "#ffffff", "text": "ref:secondary-950", ... }
+
+// after (3.0.0)
+"colors": [
+  { "role": "primary", "slug": "marine", "value": "#1a56db" },
+  { "role": null,      "slug": "rose",   "value": "#ef599a" }   // unlimited brand colors
+],
+"textColors": { "text": "ref:secondary-950", "link": "ref:primary-700", "linkHover": "ref:primary-800" }
+```
+
+- **10 base roles** now exist: `primary, secondary, accent, background, black,
+  white, neutral, error, warning, success`. The state roles (`neutral`, `error`,
+  `warning`, `success`) are **now admin-configurable** (they were hard-coded).
+- Each role is renamable via its `slug`; **brand colors** (unlimited, `role: null`)
+  are named by slug only.
+- The compiler emits, per color, the stable `--color-<role>` alias **and** the
+  `--color-<slug>` alias, each with 11 OKLCH shades. **Always reference
+  `--color-<role>` in your own theme CSS** (the slug alias is for readable custom
+  CSS and changes when renamed).
+- The semantic text assignments (`text`, `link`, `linkHover`) move out of
+  `colors` into `tokens.textColors`.
+
+### Block variants: `.iw-variant--<index>` → `.iw-variant--<slug>`
+
+Variants are identified by a stable `slug` instead of their array position.
+Custom CSS targeting `.iw-variant--0` must be updated to `.iw-variant--<slug>`.
+Existing block content storing a numeric variant index is resolved best-effort
+to the variant at that position at render time (no data migration).
+
+### Buttons: 3 fixed roles → unlimited, slug-based
+
+`.iw-button--primary|secondary|accent` become `.iw-button--<slug>`, with any
+number of named buttons. `tokens.buttons` changes from a role-keyed map to a
+**list** of `{slug, label, ...}`; the shared padding moves to
+`tokens.buttonsGlobal`. A block/variant's `buttonStyle` now references a **button
+slug** (a legacy `primary`/`secondary`/`accent` value still resolves when a
+button keeps that slug).
+
+### Renaming a slug is breaking
+
+A slug is the stable identifier stored in content and refs. Renaming a brand
+color, variant or button slug **breaks** the content and `ref:` values that
+point to it. Rename deliberately.
+
 ## Radius split: `paragraphImageRadius` → `paragraphRadius` / `cardRadius` / `imageRadius`
 
 The single per-block "Paragraph / Image radius" field coupled three different

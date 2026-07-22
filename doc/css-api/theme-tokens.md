@@ -17,22 +17,47 @@
 
 ## Color variables
 
-Generated from **Settings > Themes > Colors** tab.
+Generated from **Settings > Themes > Colors** tab. The palette is an open list
+of named colors: **10 base roles** (always present) plus unlimited **brand
+colors**. Each color is emitted under its stable role alias **and** its
+human-facing slug alias.
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `--color-primary` | Primary brand color | `#1a73e8` |
-| `--color-secondary` | Secondary color | `#34a853` |
-| `--color-accent` | Accent / highlight color | `#fbbc04` |
-| `--color-background` | Page background | `#ffffff` |
-| `--color-text` | Default text color | `#202124` |
-| `--color-link` | Link color | `#1a73e8` |
-| `--color-linkHover` | Link hover color | `#0d47a1` |
-| `--color-border` | Default border color | `#e5e7eb` |
+**Base roles** (`--color-<role>`, always available):
+
+| Role | Description |
+|------|-------------|
+| `primary` | Primary brand color |
+| `secondary` | Secondary color |
+| `accent` | Accent / highlight color |
+| `background` | Page background |
+| `black` | Semantic black (tinted gray ramp) |
+| `white` | Semantic white |
+| `neutral` | Neutral gray (configurable) |
+| `error` | Error / danger (configurable) |
+| `warning` | Warning (configurable) |
+| `success` | Success (configurable) |
+
+Each role also has a renamable **slug**. When a role's slug differs from the
+role name, the compiler emits both aliases (e.g. `--color-primary` **and**
+`--color-marine`) with identical values. **Brand colors** (unlimited) are named
+by slug only (`--color-<slug>`, `role: null`).
+
+> Always reference `--color-<role>` in theme CSS (stable). The `--color-<slug>`
+> alias is for readable custom CSS and changes if the slug is renamed.
+
+**Semantic text colors** (from `tokens.textColors`, resolved from the palette):
+
+| Variable | Description |
+|----------|-------------|
+| `--color-text` | Default text color |
+| `--color-link` | Link color |
+| `--color-linkHover` | Link hover color |
+| `--color-border` | Default border color |
 
 ### Color palettes (OKLCH)
 
-For each of the 4 main colors (`primary`, `secondary`, `accent`, `background`), 11 shades are generated using the OKLCH color space:
+For **every** palette color (each role and each brand color), 11 shades are
+generated using the OKLCH color space, under both the role and slug aliases:
 
 ```css
 --color-primary-50:  #eff6ff;
@@ -48,7 +73,9 @@ For each of the 4 main colors (`primary`, `secondary`, `accent`, `background`), 
 --color-primary-950: #172554;
 ```
 
-Same pattern for `--color-secondary-*`, `--color-accent-*`, `--color-background-*`.
+Same pattern for every role (`--color-secondary-*`, `--color-accent-*`, …,
+`--color-neutral-*`, `--color-error-*`) and every brand color
+(`--color-<slug>-*`), plus the matching slug aliases.
 
 **Usage example:**
 ```css

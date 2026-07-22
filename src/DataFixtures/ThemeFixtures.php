@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\DataFixtures;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
+
 /**
- * Provides preset theme data for the 6 built-in themes.
+ * Provides preset theme data for the built-in themes (3.0.0 color model).
  *
- * Each preset contains complete design tokens (colors, typography, borders,
- * buttons, block variants), menu configuration, and block styles for all
- * 8 block types.
+ * Each preset contains complete design tokens (colors, textColors, typography,
+ * borders, buttons, buttonsGlobal, blockVariants), menu configuration, and
+ * block styles for all block types.
  *
- * Button property names match the admin form fields:
- *   bg, text, border, hoverBg, hoverText, hoverBorder, radius
+ * Colors are an ordered list of {role, slug, value}. The 10 base roles
+ * (primary, secondary, accent, background, black, white, neutral, error,
+ * warning, success) are always present; unlimited brand colors follow with
+ * role = null. The colors() helper builds this list from a compact themed map.
+ * Semantic text colors (text, link, linkHover) live in `textColors`.
  *
- * Border/button radius values use Tailwind class names (e.g. "rounded-lg")
- * which are resolved to CSS values by the ThemeCompiler.
+ * Buttons are an ordered list of {slug, label, ...15 props}; the shared padding
+ * lives in `buttonsGlobal`. The buttons() helper wraps a slug-keyed map into
+ * the list. Button property names: bg, text, border, hoverBg, hoverText,
+ * hoverBorder, radius, borderWidth, borderStyle, hoverShadow, hoverTransform,
+ * hoverOpacity, hoverDuration, hoverBgEffect, hoverEasing.
  *
- * Typography families use internal names:
- *   name, role, source, fallback
+ * Block variants are a list, each with a stable `slug` (+ label + colors).
+ * A variant's `buttonStyle` references a button slug.
  *
- * Typography assignments use 5 properties per element:
- *   family, weight, size, style, lineHeight
- *
- * Block variants use indexed arrays (position 0, 1, 2) with properties:
- *   label, title, subtitle, paragraph, link, list, hr, paragraphBg, blockBg,
- *   buttonStyle, formBg, formText, formLabel, formPlaceholder, formBorder,
- *   formBorderFocus, formBorderError
+ * Border/radius values use Tailwind class names (e.g. "rounded-lg"), resolved
+ * by the ThemeCompiler. Typography families use: name, role, source, fallback.
+ * Typography assignments use: family, weight, size, style, lineHeight.
  */
 class ThemeFixtures
 {
@@ -45,7 +49,53 @@ class ThemeFixtures
             'halloween' => self::getHalloweenPreset(),
             'christmas' => self::getChristmasPreset(),
             'megamenu' => self::getMegamenuPreset(),
+            'asmt' => self::getAsmtPreset(),
         ];
+    }
+
+    /**
+     * Build the palette color list (the 10 base roles) from a compact themed
+     * map, followed by optional brand colors. Roles absent from $themed keep
+     * their default value; the slug defaults to the role name.
+     *
+     * @param array<string, string>                      $themed role => hex overrides
+     * @param list<array{slug: string, value: string}>   $brand  brand colors (role = null)
+     *
+     * @return list<array{role: string|null, slug: string, value: string}>
+     */
+    private static function colors(array $themed, array $brand = []): array
+    {
+        $list = [];
+        foreach (ColorRoles::all() as $role) {
+            $list[] = [
+                'role' => $role,
+                'slug' => $role,
+                'value' => $themed[$role] ?? ColorRoles::defaultValue($role),
+            ];
+        }
+        foreach ($brand as $brandColor) {
+            $list[] = ['role' => null, 'slug' => $brandColor['slug'], 'value' => $brandColor['value']];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Wrap a slug-keyed button map into the ordered button list, adding a
+     * capitalized label derived from the slug.
+     *
+     * @param array<string, array<string, mixed>> $bySlug slug => button props
+     *
+     * @return list<array<string, mixed>>
+     */
+    private static function buttons(array $bySlug): array
+    {
+        $list = [];
+        foreach ($bySlug as $slug => $props) {
+            $list[] = array_merge(['slug' => (string) $slug, 'label' => ucfirst((string) $slug)], $props);
+        }
+
+        return $list;
     }
 
     /**
@@ -59,11 +109,13 @@ class ThemeFixtures
             'name' => 'corporate',
             'label' => 'Corporate Professional',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#1a56db',
                     'secondary' => '#475569',
                     'accent' => '#F59E0B',
                     'background' => '#ffffff',
+                ]),
+                'textColors' => [
                     'text' => 'ref:secondary-950',
                     'link' => 'ref:primary-700',
                     'linkHover' => 'ref:primary-800',
@@ -112,11 +164,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-lg',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1.5rem',
-                        'paddingY' => '0.75rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1.5rem',
+                    'paddingY' => '0.75rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-700',
                         'text' => 'ref:secondary-50',
@@ -165,9 +217,10 @@ class ThemeFixtures
                         'hoverDuration' => '300ms',
                         'hoverEasing' => 'ease-out',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'clair',
                         'label' => 'Clair',
                         'title' => 'ref:secondary-950',
                         'subtitle' => 'ref:secondary-800',
@@ -187,6 +240,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-400',
                     ],
                     [
+                        'slug' => 'accent-primaire',
                         'label' => 'Accent primaire',
                         'title' => 'ref:secondary-50',
                         'subtitle' => 'ref:primary-100',
@@ -206,6 +260,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-300',
                     ],
                     [
+                        'slug' => 'sombre',
                         'label' => 'Sombre',
                         'title' => 'ref:secondary-50',
                         'subtitle' => 'ref:secondary-200',
@@ -267,11 +322,13 @@ class ThemeFixtures
             'name' => 'creative',
             'label' => 'Creative Bold',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#ec4899',
                     'secondary' => '#f59e0b',
                     'accent' => '#EC4899',
                     'background' => '#fffbeb',
+                ]),
+                'textColors' => [
                     'text' => 'ref:background-950',
                     'link' => 'ref:primary-500',
                     'linkHover' => 'ref:primary-600',
@@ -320,11 +377,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-2xl',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '2rem',
-                        'paddingY' => '1rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '2rem',
+                    'paddingY' => '1rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-500',
                         'text' => 'ref:primary-50',
@@ -376,9 +433,10 @@ class ThemeFixtures
                         'hoverEasing' => 'bounce',
                         'hoverBgEffect' => 'slide-up',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'clair',
                         'label' => 'Clair',
                         'title' => 'ref:background-950',
                         'subtitle' => 'ref:background-600',
@@ -398,6 +456,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-600',
                     ],
                     [
+                        'slug' => 'accent-rose',
                         'label' => 'Accent rose',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:primary-100',
@@ -417,6 +476,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-300',
                     ],
                     [
+                        'slug' => 'sombre',
                         'label' => 'Sombre',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:background-200',
@@ -478,11 +538,13 @@ class ThemeFixtures
             'name' => 'minimal',
             'label' => 'Minimal Clean',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#000000',
                     'secondary' => '#6b7280',
                     'accent' => '#6366F1',
                     'background' => '#ffffff',
+                ]),
+                'textColors' => [
                     'text' => 'ref:primary-950',
                     'link' => 'ref:primary-950',
                     'linkHover' => 'ref:secondary-900',
@@ -531,11 +593,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-none',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1rem',
-                        'paddingY' => '0.5rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1rem',
+                    'paddingY' => '0.5rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-950',
                         'text' => 'ref:accent-50',
@@ -584,9 +646,10 @@ class ThemeFixtures
                         'hoverDuration' => '300ms',
                         'hoverEasing' => 'ease-out',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'clair',
                         'label' => 'Clair',
                         'title' => 'ref:primary-950',
                         'subtitle' => 'ref:primary-600',
@@ -606,6 +669,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-600',
                     ],
                     [
+                        'slug' => 'gris-neutre',
                         'label' => 'Gris neutre',
                         'title' => 'ref:primary-950',
                         'subtitle' => 'ref:background-800',
@@ -625,6 +689,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-600',
                     ],
                     [
+                        'slug' => 'sombre',
                         'label' => 'Sombre',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:primary-400',
@@ -686,11 +751,13 @@ class ThemeFixtures
             'name' => 'nature',
             'label' => 'Nature Organic',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#065f46',
                     'secondary' => '#d97706',
                     'accent' => '#F97316',
                     'background' => '#fefdf8',
+                ]),
+                'textColors' => [
                     'text' => 'ref:primary-950',
                     'link' => 'ref:primary-800',
                     'linkHover' => 'ref:primary-700',
@@ -739,11 +806,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1.5rem',
-                        'paddingY' => '0.75rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1.5rem',
+                    'paddingY' => '0.75rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-800',
                         'text' => 'ref:background-50',
@@ -792,9 +859,10 @@ class ThemeFixtures
                         'hoverDuration' => '500ms',
                         'hoverEasing' => 'ease-in-out',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'clair-nature',
                         'label' => 'Clair nature',
                         'title' => 'ref:primary-950',
                         'subtitle' => 'ref:primary-700',
@@ -814,6 +882,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-500',
                     ],
                     [
+                        'slug' => 'accent-vert',
                         'label' => 'Accent vert',
                         'title' => 'ref:background-50',
                         'subtitle' => 'ref:primary-300',
@@ -833,6 +902,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-300',
                     ],
                     [
+                        'slug' => 'sombre-foret',
                         'label' => 'Sombre foret',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:primary-300',
@@ -894,11 +964,13 @@ class ThemeFixtures
             'name' => 'halloween',
             'label' => 'Halloween Spooky',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#f97316',
                     'secondary' => '#7c3aed',
                     'accent' => '#eab308',
                     'background' => '#1c1917',
+                ]),
+                'textColors' => [
                     'text' => 'ref:background-50',
                     'link' => 'ref:primary-500',
                     'linkHover' => 'ref:primary-400',
@@ -947,11 +1019,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1.5rem',
-                        'paddingY' => '0.75rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1.5rem',
+                    'paddingY' => '0.75rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-500',
                         'text' => 'ref:background-950',
@@ -1003,9 +1075,10 @@ class ThemeFixtures
                         'hoverEasing' => 'bounce',
                         'hoverBgEffect' => 'none',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'nuit-noire',
                         'label' => 'Nuit noire',
                         'title' => 'ref:primary-500',
                         'subtitle' => 'ref:background-400',
@@ -1025,6 +1098,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-400',
                     ],
                     [
+                        'slug' => 'citrouille',
                         'label' => 'Citrouille',
                         'title' => 'ref:background-950',
                         'subtitle' => 'ref:primary-950',
@@ -1044,6 +1118,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-300',
                     ],
                     [
+                        'slug' => 'violet-sorcier',
                         'label' => 'Violet sorcier',
                         'title' => 'ref:secondary-50',
                         'subtitle' => 'ref:secondary-300',
@@ -1105,11 +1180,13 @@ class ThemeFixtures
             'name' => 'christmas',
             'label' => 'Christmas Festive',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#dc2626',
                     'secondary' => '#15803d',
                     'accent' => '#d97706',
                     'background' => '#fef2f2',
+                ]),
+                'textColors' => [
                     'text' => 'ref:background-950',
                     'link' => 'ref:primary-600',
                     'linkHover' => 'ref:primary-700',
@@ -1158,11 +1235,11 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1.5rem',
-                        'paddingY' => '0.75rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1.5rem',
+                    'paddingY' => '0.75rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-600',
                         'text' => 'ref:background-50',
@@ -1214,9 +1291,10 @@ class ThemeFixtures
                         'hoverEasing' => 'ease-out',
                         'hoverBgEffect' => 'pulse-bg',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'neige',
                         'label' => 'Neige',
                         'title' => 'ref:primary-800',
                         'subtitle' => 'ref:background-800',
@@ -1236,6 +1314,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-500',
                     ],
                     [
+                        'slug' => 'sapin',
                         'label' => 'Sapin',
                         'title' => 'ref:background-50',
                         'subtitle' => 'ref:secondary-200',
@@ -1255,6 +1334,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:primary-300',
                     ],
                     [
+                        'slug' => 'rouge-festif',
                         'label' => 'Rouge festif',
                         'title' => 'ref:background-50',
                         'subtitle' => 'ref:primary-200',
@@ -1396,11 +1476,13 @@ class ThemeFixtures
             'name' => 'megamenu',
             'label' => 'Mega Menu Professional',
             'tokens' => [
-                'colors' => [
+                'colors' => self::colors([
                     'primary' => '#6366f1',
                     'secondary' => '#475569',
                     'accent' => '#f59e0b',
                     'background' => '#ffffff',
+                ]),
+                'textColors' => [
                     'text' => 'ref:secondary-950',
                     'link' => 'ref:primary-600',
                     'linkHover' => 'ref:primary-700',
@@ -1446,11 +1528,11 @@ class ThemeFixtures
                     'radius' => 'rounded-lg',
                     'imageRadius' => 'rounded-lg',
                 ],
-                'buttons' => [
-                    'global' => [
-                        'paddingX' => '1.5rem',
-                        'paddingY' => '0.75rem',
-                    ],
+                'buttonsGlobal' => [
+                    'paddingX' => '1.5rem',
+                    'paddingY' => '0.75rem',
+                ],
+                'buttons' => self::buttons([
                     'primary' => [
                         'bg' => 'ref:primary-600',
                         'text' => 'ref:primary-50',
@@ -1499,9 +1581,10 @@ class ThemeFixtures
                         'hoverDuration' => '300ms',
                         'hoverEasing' => 'ease-out',
                     ],
-                ],
+                ]),
                 'blockVariants' => [
                     [
+                        'slug' => 'light',
                         'label' => 'Light',
                         'title' => 'ref:secondary-950',
                         'subtitle' => 'ref:secondary-800',
@@ -1522,6 +1605,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-400',
                     ],
                     [
+                        'slug' => 'accent',
                         'label' => 'Accent',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:primary-100',
@@ -1542,6 +1626,7 @@ class ThemeFixtures
                         'formBorderError' => 'ref:accent-300',
                     ],
                     [
+                        'slug' => 'dark',
                         'label' => 'Dark',
                         'title' => 'ref:primary-50',
                         'subtitle' => 'ref:secondary-400',
@@ -1590,6 +1675,157 @@ class ThemeFixtures
                     'burgerClose' => '#e2e8f0',
                     'socialMedia' => '#94a3b8',
                     'socialMediaHover' => '#ffffff',
+                ],
+            ],
+            'blockStyles' => self::getDefaultBlockStyles(),
+        ];
+    }
+
+    /**
+     * ASMT theme: multi-universe brand palette (blue base, pink/green brand
+     * colors) for the Employeur / Salarié / Indépendant audiences.
+     *
+     * @return array<string, mixed>
+     */
+    private static function getAsmtPreset(): array
+    {
+        return [
+            'name' => 'asmt',
+            'label' => 'ASMT Multi-univers',
+            'tokens' => [
+                'colors' => self::colors([
+                    'primary' => '#2091D0',
+                    'secondary' => '#172F57',
+                    'accent' => '#F37537',
+                    'background' => '#ffffff',
+                    'black' => '#393839',
+                    'white' => '#ffffff',
+                ], [
+                    ['slug' => 'pink', 'value' => '#EF599A'],
+                    ['slug' => 'green', 'value' => '#60BB46'],
+                    ['slug' => 'gray-blue', 'value' => '#F1F5F9'],
+                ]),
+                'textColors' => [
+                    'text' => 'ref:secondary-900',
+                    'link' => 'ref:primary-700',
+                    'linkHover' => 'ref:primary-800',
+                ],
+                'typography' => [
+                    'families' => [
+                        [
+                            'name' => 'Inter',
+                            'role' => 'heading',
+                            'source' => 'google',
+                            'fallback' => 'system-ui, sans-serif',
+                        ],
+                        [
+                            'name' => 'Inter',
+                            'role' => 'body',
+                            'source' => 'google',
+                            'fallback' => 'system-ui, sans-serif',
+                        ],
+                    ],
+                    'scale' => [
+                        'xs' => '0.75rem',
+                        'sm' => '0.875rem',
+                        'base' => '1rem',
+                        'lg' => '1.125rem',
+                        'xl' => '1.25rem',
+                        '2xl' => '1.5rem',
+                        '3xl' => '1.875rem',
+                        '4xl' => '2.25rem',
+                        '5xl' => '3rem',
+                    ],
+                    'assignments' => [
+                        'h1' => ['family' => 'heading', 'weight' => '700', 'size' => '2.5rem', 'style' => 'normal', 'lineHeight' => '1.2'],
+                        'h2' => ['family' => 'heading', 'weight' => '600', 'size' => '2rem', 'style' => 'normal', 'lineHeight' => '1.25'],
+                        'h3' => ['family' => 'heading', 'weight' => '600', 'size' => '1.5rem', 'style' => 'normal', 'lineHeight' => '1.3'],
+                        'h4' => ['family' => 'heading', 'weight' => '500', 'size' => '1.25rem', 'style' => 'normal', 'lineHeight' => '1.35'],
+                        'h5' => ['family' => 'heading', 'weight' => '500', 'size' => '1.125rem', 'style' => 'normal', 'lineHeight' => '1.4'],
+                        'h6' => ['family' => 'heading', 'weight' => '500', 'size' => '1rem', 'style' => 'normal', 'lineHeight' => '1.4'],
+                        'body' => ['family' => 'body', 'weight' => '400', 'size' => '1rem', 'style' => 'normal', 'lineHeight' => '1.6'],
+                        'link' => ['family' => 'body', 'weight' => '500', 'size' => '1rem', 'style' => 'normal', 'lineHeight' => '1.6'],
+                    ],
+                ],
+                'borders' => [
+                    'radius' => 'rounded-lg',
+                    'radiusSm' => 'rounded-sm',
+                    'radiusLg' => 'rounded-xl',
+                    'radiusFull' => 'rounded-full',
+                    'imageRadius' => 'rounded-lg',
+                ],
+                'buttonsGlobal' => ['paddingX' => '1.5rem', 'paddingY' => '0.75rem'],
+                'buttons' => self::buttons([
+                    'primary' => [
+                        'bg' => 'ref:primary-500', 'text' => '#ffffff', 'border' => 'none',
+                        'hoverBg' => 'ref:primary-700', 'hoverText' => '#ffffff', 'hoverBorder' => 'none',
+                        'radius' => 'rounded-lg', 'borderWidth' => '1px', 'borderStyle' => 'solid',
+                        'hoverShadow' => 'md', 'hoverTransform' => 'lift', 'hoverOpacity' => '1',
+                        'hoverDuration' => '300ms', 'hoverBgEffect' => 'none', 'hoverEasing' => 'ease-out',
+                    ],
+                    'employeur' => [
+                        'bg' => 'ref:pink-500', 'text' => '#ffffff', 'border' => 'none',
+                        'hoverBg' => 'ref:pink-700', 'hoverText' => '#ffffff', 'hoverBorder' => 'none',
+                        'radius' => 'rounded-lg', 'borderWidth' => '1px', 'borderStyle' => 'solid',
+                        'hoverShadow' => 'md', 'hoverTransform' => 'lift', 'hoverOpacity' => '1',
+                        'hoverDuration' => '300ms', 'hoverBgEffect' => 'none', 'hoverEasing' => 'ease-out',
+                    ],
+                    'salarie' => [
+                        'bg' => 'ref:green-500', 'text' => '#ffffff', 'border' => 'none',
+                        'hoverBg' => 'ref:green-700', 'hoverText' => '#ffffff', 'hoverBorder' => 'none',
+                        'radius' => 'rounded-lg', 'borderWidth' => '1px', 'borderStyle' => 'solid',
+                        'hoverShadow' => 'md', 'hoverTransform' => 'lift', 'hoverOpacity' => '1',
+                        'hoverDuration' => '300ms', 'hoverBgEffect' => 'none', 'hoverEasing' => 'ease-out',
+                    ],
+                ]),
+                'blockVariants' => [
+                    [
+                        'slug' => 'employeur', 'label' => 'Employeur',
+                        'title' => 'ref:pink-700', 'subtitle' => 'ref:pink-600', 'paragraph' => 'ref:secondary-800',
+                        'link' => 'ref:pink-600', 'linkHover' => 'ref:pink-800', 'list' => 'ref:secondary-800',
+                        'hr' => 'ref:pink-200', 'paragraphBg' => '', 'blockBg' => 'ref:pink-50',
+                        'buttonStyle' => 'employeur',
+                    ],
+                    [
+                        'slug' => 'salarie', 'label' => 'Salarié',
+                        'title' => 'ref:green-700', 'subtitle' => 'ref:green-600', 'paragraph' => 'ref:secondary-800',
+                        'link' => 'ref:green-700', 'linkHover' => 'ref:green-800', 'list' => 'ref:secondary-800',
+                        'hr' => 'ref:green-200', 'paragraphBg' => '', 'blockBg' => 'ref:green-50',
+                        'buttonStyle' => 'salarie',
+                    ],
+                    [
+                        'slug' => 'independant', 'label' => 'Indépendant',
+                        'title' => 'ref:secondary-900', 'subtitle' => 'ref:secondary-700', 'paragraph' => 'ref:secondary-800',
+                        'link' => 'ref:primary-700', 'linkHover' => 'ref:primary-800', 'list' => 'ref:secondary-800',
+                        'hr' => 'ref:gray-blue-300', 'paragraphBg' => '', 'blockBg' => 'ref:gray-blue',
+                        'buttonStyle' => 'primary',
+                    ],
+                ],
+            ],
+            'menuConfig' => [
+                'type' => 'navbar',
+                'animation' => 'none',
+                'clickParentPage' => 'none',
+                'clickParentPageNavbar' => true,
+                'childLevels' => 3,
+                'displayLogoDesktop' => true,
+                'displayLogoMobile' => true,
+                'displaySiteName' => false,
+                'displaySocialMedia' => false,
+                'colors' => [
+                    'bg' => '#ffffff',
+                    'text' => 'ref:secondary-950',
+                    'textHover' => '#1a56db',
+                    'secondBg' => '#f8fafc',
+                    'secondText' => '#475569',
+                    'secondTextHover' => '#1a56db',
+                    'thirdBg' => '#f1f5f9',
+                    'thirdText' => '#64748b',
+                    'divider' => '#e2e8f0',
+                    'burgerOpen' => '#1e293b',
+                    'burgerClose' => '#ffffff',
+                    'socialMedia' => '#94a3b8',
+                    'socialMediaHover' => '#1a56db',
                 ],
             ],
             'blockStyles' => self::getDefaultBlockStyles(),

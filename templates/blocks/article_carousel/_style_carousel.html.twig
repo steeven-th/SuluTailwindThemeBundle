@@ -21,10 +21,8 @@
 
     {# Resolve the variant's button style so the carousel arrows use the same
        color as the buttons configured for this variant. #}
-    {% set variantIndex = variant|default(0) %}
     {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-    {% if variantIndex >= allVariants|length %}{% set variantIndex = 0 %}{% endif %}
-    {% set variantConfig = allVariants[variantIndex]|default({}) %}
+    {% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), allVariants) %}
     {% set carouselButtonStyle = variantConfig.buttonStyle|default('primary') %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}

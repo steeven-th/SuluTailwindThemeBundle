@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
+
 /**
  * Generates Tailwind-style color palettes (50→950) using the OKLCH color space.
  *
@@ -21,13 +23,6 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
  */
 class OklchPaletteGenerator
 {
-    /**
-     * Available shade levels matching Tailwind CSS v4.
-     *
-     * @var list<int>
-     */
-    private const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-
     /**
      * Target OKLCH lightness for each shade level.
      *
@@ -72,6 +67,16 @@ class OklchPaletteGenerator
     private const GAMUT_CLAMP_ITERATIONS = 50;
 
     /**
+     * Get the shade levels this generator produces (50→950).
+     *
+     * @return list<int>
+     */
+    public function getShades(): array
+    {
+        return ColorShades::all();
+    }
+
+    /**
      * Generate an 11-shade palette from a hex color.
      *
      * @param string $hex Hex color with # prefix (e.g. "#3B82F6")
@@ -89,7 +94,7 @@ class OklchPaletteGenerator
 
         $palette = [];
 
-        foreach (self::SHADES as $shade) {
+        foreach (ColorShades::ALL as $shade) {
             $targetL = self::LIGHTNESS_TARGETS[$shade];
             $targetC = $sourceChroma * self::CHROMA_FACTORS[$shade];
 

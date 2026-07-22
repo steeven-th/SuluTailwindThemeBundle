@@ -2,7 +2,7 @@
 
 Each of the three button variants (`primary`, `secondary`, `accent`) exposes six composable hover axes in addition to the existing color tokens. Combined with the new global padding and per-variant border width/style, this lets the admin design distinctive button styles without writing a single line of CSS.
 
-The six axes are catalogued in [`ButtonEffectCatalog`](../src/Service/ButtonEffectCatalog.php) and consumed by [`ThemeCompiler`](../src/Service/ThemeCompiler.php) when generating `.iw-button--{variant}` and `.iw-variant--{key} .iw-button--variant` classes.
+The six axes are catalogued in [`ButtonEffectCatalog`](../src/Service/ButtonEffectCatalog.php) and consumed by [`ThemeCompiler`](../src/Service/ThemeCompiler.php) when generating `.iw-button--{slug}` and `.iw-variant--{key} .iw-button--variant` classes.
 
 ---
 
@@ -98,7 +98,7 @@ Shared `transition-timing-function`.
 
 ## How the compiler emits the rules
 
-For each variant, the compiler emits a `.iw-button--{variant}` rule with a `transition` listing every animated property (`background-color`, `color`, `border-color`, `box-shadow`, `transform`, `opacity`) using the resolved duration/easing. The corresponding `.iw-button--{variant}:hover` rule sets the hover values, but **only when the axis is not at its default**: e.g. selecting `hoverShadow=none` skips the `box-shadow` declaration entirely instead of emitting `box-shadow: none`.
+For each variant, the compiler emits a `.iw-button--{slug}` rule with a `transition` listing every animated property (`background-color`, `color`, `border-color`, `box-shadow`, `transform`, `opacity`) using the resolved duration/easing. The corresponding `.iw-button--{slug}:hover` rule sets the hover values, but **only when the axis is not at its default**: e.g. selecting `hoverShadow=none` skips the `box-shadow` declaration entirely instead of emitting `box-shadow: none`.
 
 Example output for a button configured with `hoverShadow=glow-primary`, `hoverTransform=lift`, `hoverDuration=300ms`, `hoverEasing=ease-out`:
 

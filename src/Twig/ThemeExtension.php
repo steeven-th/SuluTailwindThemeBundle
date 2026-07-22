@@ -8,6 +8,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
@@ -53,7 +54,39 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
         ];
+    }
+
+    /**
+     * Resolve a stored block-variant value to its effective slug.
+     *
+     * Handles the migration from the legacy positional index to stable slugs:
+     * a known slug is returned as-is, a numeric legacy index is mapped to the
+     * variant at that position, otherwise the first variant is used.
+     *
+     * @param mixed             $variant  The stored variant value (slug or legacy index)
+     * @param array<int, mixed> $variants The theme's block variants
+     *
+     * @return string The effective `.iw-variant--<slug>` slug, or '' if there is none
+     */
+    public function getVariantSlug(mixed $variant, array $variants): string
+    {
+        return VariantResolver::resolveSlug($variant, $variants);
+    }
+
+    /**
+     * Resolve a stored block-variant value to its full config array.
+     *
+     * @param mixed             $variant  The stored variant value (slug or legacy index)
+     * @param array<int, mixed> $variants The theme's block variants
+     *
+     * @return array<string, mixed> The matched variant config, or [] if none
+     */
+    public function getVariantConfig(mixed $variant, array $variants): array
+    {
+        return VariantResolver::resolveConfig($variant, $variants);
     }
 
     /**

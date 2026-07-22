@@ -48,7 +48,7 @@ The theme compiles all design tokens into CSS custom properties on `:root`. You 
 
 ### Buttons
 
-Use the pre-generated `.iw-button--primary`, `.iw-button--secondary`, `.iw-button--accent` classes, or reference the variables for custom styling. The `.iw-button--*` classes already pick up the configured padding, border (with width/style), and the five-axis hover effects — see [Button hover effects](button-effects.md).
+Use the pre-generated `.iw-button--<slug>` classes (one per button defined in the admin, e.g. `.iw-button--primary`, `.iw-button--cta`), or reference the variables for custom styling. The `.iw-button--<slug>` classes already pick up the configured padding, border (with width/style), and the five-axis hover effects — see [Button hover effects](button-effects.md).
 
 ```html
 <!-- Use the built-in classes (recommended) -->
@@ -104,8 +104,8 @@ The `iw_sulu_tailwind_theme` global variable is available in every Twig template
 ```twig
 {# templates/components/footer.html.twig #}
 
-{# Read colors #}
-{% set primaryColor = iw_sulu_tailwind_theme.colors.primary|default('#333') %}
+{# Colors are best consumed via their CSS variables (stable role aliases),
+   e.g. color: var(--color-primary); — tokens.colors is an ordered list now. #}
 
 {# Read typography families #}
 {% set bodyFont = iw_sulu_tailwind_theme.typography.families|default([])|filter(f => f.role == 'body')|first %}
@@ -134,14 +134,11 @@ Apply a variant class to your own sections for automatic color theming:
 ```twig
 {# templates/components/hero.html.twig #}
 
-{# variantIndex would come from a Sulu property or be hardcoded #}
-{% set variantIndex = heroVariant|default(0) %}
+{# heroVariant is a slug (or a legacy index) from a Sulu property #}
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% if variantIndex >= allVariants|length %}
-    {% set variantIndex = 0 %}
-{% endif %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(heroVariant|default(null), allVariants) %}
 
-<section class="iw-variant--{{ variantIndex }}" data-has-bg="true">
+<section class="iw-variant--{{ variantSlug }}" data-has-bg="true">
     <div class="container mx-auto py-16 text-center">
         <h1 class="text-4xl font-bold mb-4">{{ title }}</h1>
         <p class="text-xl mb-8">{{ subtitle }}</p>
@@ -153,9 +150,9 @@ Apply a variant class to your own sections for automatic color theming:
 ```
 
 Key points:
-- `.iw-variant--{index}` applies all variant colors (headings, paragraphs, links, etc.)
+- `.iw-variant--{slug}` applies all variant colors (headings, paragraphs, links, etc.)
 - `data-has-bg="true"` enables the variant background color
-- `.iw-button--variant` picks the button style defined in the variant (primary, secondary, or accent)
+- `.iw-button--variant` picks the button style referenced by the variant (a button slug)
 
 ### Using Twig functions
 
@@ -285,7 +282,7 @@ Use the block wrapper `embed` to benefit from all variant/margin/padding logic:
 ```
 
 The wrapper handles:
-- Variant CSS class (`.iw-variant--{index}`) with fallback to index 0
+- Variant CSS class (`.iw-variant--{slug}`) with fallback to index 0
 - Margin top/bottom (Tailwind classes: `mt-*`, `mb-*`)
 - Padding top/bottom/lateral (`pt-*`, `pb-*`, `pl-*`, `pr-*`)
 - Lateral margins mode (exterior container, interior container, or none)
@@ -309,13 +306,10 @@ The wrapper handles:
 If you only need variant colors without the full wrapper:
 
 ```twig
-{% set variantIndex = block.variant|default(0) %}
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% if variantIndex >= allVariants|length %}
-    {% set variantIndex = 0 %}
-{% endif %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(block.variant|default(null), allVariants) %}
 
-<section class="iw-variant--{{ variantIndex }}">
+<section class="iw-variant--{{ variantSlug }}">
     {# All h1-h6, p, a, ul, ol, table, code, blockquote elements
        inside this section are automatically styled by the variant CSS #}
     <h2>{{ block.headline }}</h2>
@@ -359,12 +353,16 @@ class MyThemeAwareService
 
     /**
      * Get the primary color from the active theme.
+     *
+     * tokens.colors is an ordered list of {role, slug, value}; ColorSet
+     * normalizes it and resolves a color by role or slug.
      */
     public function getPrimaryColor(): string
     {
         $tokens = $this->themeProvider->getTokens();
 
-        return $tokens['colors']['primary'] ?? '#000000';
+        return \ItechWorld\SuluTailwindThemeBundle\Color\ColorSet::fromTokens($tokens)
+            ->baseHexFor('primary') ?? '#000000';
     }
 
     /**

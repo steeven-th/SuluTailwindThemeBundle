@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Controller\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Entity\WebspaceTheme;
+use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\Metadata\FieldDescriptorFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\PaginatedRepresentation;
 use Sulu\Component\Rest\RestHelperInterface;
+use Sulu\Component\Security\Authentication\UserInterface as SuluUserInterface;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Admin REST controller for theme configuration CRUD operations.
@@ -72,15 +79,10 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const PREFIX_MENU_COLORS = 'menuConfig_colors_';
 
     /**
-     * Button variant names expected in the form.
-     */
-    private const BUTTON_VARIANTS = ['primary', 'secondary', 'accent'];
-
-    /**
-     * Button-level global properties (shared across all variants).
+     * Button-level global properties (shared across all buttons).
      *
-     * These are stored under tokens.buttons.global.<prop> but exposed in the
-     * form as flat keys without the "global" segment (e.g. buttons_paddingX).
+     * These are stored under tokens.buttonsGlobal.<prop> but exposed in the
+     * form as flat keys without a group segment (e.g. buttons_paddingX).
      */
     private const BUTTON_GLOBAL_PROPS = ['paddingX', 'paddingY'];
 
@@ -177,6 +179,8 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         private readonly GoogleFontsCatalog $googleFontsCatalog,
         private readonly OklchPaletteGenerator $paletteGenerator,
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
+        private readonly SlugValidator $slugValidator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -268,7 +272,11 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $theme = new ThemeConfig();
-        $this->mapDataToEntity($data, $theme);
+        try {
+            $this->mapDataToEntity($data, $theme);
+        } catch (SlugValidationException $e) {
+            return $this->slugValidationResponse($e);
+        }
 
         $this->entityManager->persist($theme);
         $this->entityManager->flush();
@@ -303,7 +311,11 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         /** @var array<string, mixed> $data */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        $this->mapDataToEntity($data, $theme);
+        try {
+            $this->mapDataToEntity($data, $theme);
+        } catch (SlugValidationException $e) {
+            return $this->slugValidationResponse($e);
+        }
 
         $this->entityManager->flush();
 
@@ -343,27 +355,30 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     }
 
     /**
-     * Generate OKLCH palette from hex color values.
+     * Generate OKLCH palettes from hex color values.
      *
-     * Accepts color hex values as query parameters and returns the computed
-     * palette shades. Used by the ColorTokenEditor to display the palette
-     * for the theme being edited (which may not be the active theme).
+     * Accepts an arbitrary set of `<name>=<hex>` query parameters (any role or
+     * slug, not a fixed list) and returns the computed palette shades keyed by
+     * the same names. Used by the ColorTokenEditor to display the palette for
+     * the theme being edited (which may not be the active theme).
      *
-     * @param Request $request Query params: primary, secondary, accent, background (hex)
+     * @param Request $request Query params: <colorName>=<hex> pairs
      *
-     * @return JsonResponse The palette data
+     * @return JsonResponse The palette data, keyed by color name
      */
     #[Route('/admin/api/iw-theme-palette', name: 'iw_sulu_tailwind_theme.palette', methods: ['GET'])]
     public function paletteAction(Request $request): JsonResponse
     {
         $palette = [];
-        $colorNames = ['primary', 'secondary', 'accent', 'background'];
 
-        foreach ($colorNames as $name) {
-            $hex = $request->query->getString($name);
-            if ('' !== $hex) {
-                $palette[$name] = $this->paletteGenerator->generatePalette($hex);
+        foreach ($request->query->all() as $name => $hex) {
+            if (!is_string($name) || '' === $name || !is_string($hex) || '' === $hex) {
+                continue;
             }
+            if (1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $hex)) {
+                continue;
+            }
+            $palette[$name] = $this->paletteGenerator->generatePalette($hex);
         }
 
         return new JsonResponse($palette);
@@ -514,8 +529,13 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             'changedBy' => $theme->getChangedBy(),
         ];
 
-        // Flatten colors (depth 1): tokens.colors.primary → colors_primary
-        $this->flattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
+        // Palette: ordered list [{role, slug, value}] for the PaletteEditor field.
+        // ColorSet normalizes the stored shape (new list or legacy map) and
+        // guarantees the 10 base roles in canonical order.
+        $colorSet = ColorSet::fromTokens($tokens);
+        $data['palette'] = $colorSet->getColors();
+        // Text colors stay as flat colors_* fields, sourced from tokens.textColors.
+        $this->flattenDepth1($data, self::PREFIX_COLORS, $colorSet->getTextColors());
 
         // Flatten borders (depth 1): tokens.borders.cardRadius → borders_cardRadius.
         // The legacy `radius` key (pre-3.0.0) pre-fills the new cardRadius field
@@ -527,9 +547,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         unset($borders['radius']);
         $this->flattenDepth1($data, self::PREFIX_BORDERS, $borders);
 
-        // Flatten buttons: variants are depth 2 (tokens.buttons.primary.bg → buttons_primary_bg);
-        // global props are flat (tokens.buttons.global.paddingX → buttons_paddingX).
-        $this->flattenButtons($data, $tokens['buttons'] ?? []);
+        // Buttons: repeatable block (tokens.buttons list → data.buttons) + flat
+        // global padding (tokens.buttonsGlobal.paddingX → buttons_paddingX).
+        $this->flattenButtons($data, $tokens['buttons'] ?? [], $tokens['buttonsGlobal'] ?? []);
 
         // Typography: 3 fixed font family slots
         $this->serializeFontFamilySlots($data, $tokens['typography']['families'] ?? []);
@@ -670,10 +690,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private function serializeBlockVariants(array $variants): array
     {
         $result = [];
-        foreach ($variants as $props) {
-            if (!is_array($props)) {
-                continue;
-            }
+        // Normalize so every variant carries a stable, unique slug (derived from
+        // the label for legacy variants) before the admin edits it.
+        foreach (VariantResolver::normalizeVariants($variants) as $props) {
             $result[] = array_merge(['type' => 'variant'], $props);
         }
 
@@ -690,6 +709,37 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * @param array<string, mixed> $data  The request data with flat form keys
      * @param ThemeConfig          $theme The entity to populate
      */
+    /**
+     * Build a 422 response for a slug validation error.
+     *
+     * Sulu's form store parses the response body and shows `detail` in its
+     * native error snackbar. The message is translated server-side into the
+     * admin user's locale (domain "admin", same JSON catalog as the JS), with
+     * the offending slug interpolated.
+     *
+     * @param SlugValidationException $exception The validation failure
+     *
+     * @return JsonResponse The 422 response
+     */
+    private function slugValidationResponse(SlugValidationException $exception): JsonResponse
+    {
+        $user = $this->getUser();
+        $locale = ($user instanceof SuluUserInterface && '' !== (string) $user->getLocale())
+            ? $user->getLocale()
+            : 'en';
+
+        $message = str_replace(
+            '{slug}',
+            $exception->slug,
+            $this->translator->trans($exception->messageKey, [], 'admin', $locale),
+        );
+
+        return new JsonResponse([
+            'code' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            'detail' => $message,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     private function mapDataToEntity(array $data, ThemeConfig $theme): void
     {
         if (isset($data['name'])) {
@@ -706,15 +756,29 @@ class ThemeConfigController extends AbstractController implements SecuredControl
 
         // Reconstruct tokens from flat keys, falling back to current DB state
         $tokens = $theme->getTokens();
-        $tokens['colors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
+        // Palette: the PaletteEditor field sends an ordered list of
+        // {role, slug, value}. ColorSet re-guarantees the base roles/order;
+        // SlugValidator enforces unique, well-formed, non-reserved slugs.
+        $paletteInput = is_array($data['palette'] ?? null) ? $data['palette'] : [];
+        $normalizedColors = ColorSet::fromTokens(['colors' => $paletteInput])->getColors();
+        $this->slugValidator->validate($normalizedColors);
+        $tokens['colors'] = $normalizedColors;
+        // Text colors are stored separately from the palette (no shades).
+        $tokens['textColors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['textColors'] ?? []);
         $tokens['borders'] = $this->unflattenDepth1($data, self::PREFIX_BORDERS, $tokens['borders'] ?? []);
         // Data migration: once cardRadius is saved, drop the legacy pre-3.0.0 key
         if (isset($tokens['borders']['cardRadius'])) {
             unset($tokens['borders']['radius']);
         }
-        $tokens['buttons'] = $this->unflattenButtons($data, $tokens['buttons'] ?? []);
+        // Buttons: repeatable list of {slug, label, ...} + separate global padding.
+        // Validate slug uniqueness at save (collision rejected, not deduplicated).
+        $legacyGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
+        $tokens['buttons'] = $this->unflattenButtons($data);
+        $this->slugValidator->validateSlugs(array_column($tokens['buttons'], 'slug'));
+        $tokens['buttonsGlobal'] = $this->unflattenButtonsGlobal($data, $legacyGlobal);
         $tokens['typography'] = $this->unflattenTypography($data, $tokens['typography'] ?? []);
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
+        $this->slugValidator->validateSlugs(array_column($tokens['blockVariants'], 'slug'));
 
         // Article configuration: flat keys stored directly in tokens
         foreach (self::ARTICLE_KEYS as $key) {
@@ -766,66 +830,84 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     /**
      * Flatten button tokens for the admin form.
      *
-     * Variants are flattened depth 2 (buttons_primary_bg). Global props are
-     * flattened depth 1 without the "global" segment (buttons_paddingX),
-     * because they are exposed as standalone fields in the admin section.
+     * Buttons become a Sulu block array under `data.buttons` (repeatable), and
+     * the shared padding is flattened depth 1 without a group segment
+     * (buttons_paddingX), because it is exposed as a standalone field.
      *
-     * @param array<string, mixed> $data    Target array (mutated)
-     * @param array<string, mixed> $buttons Source buttons tokens (variants + global)
+     * @param array<string, mixed> $data          Target array (mutated)
+     * @param array<string, mixed> $buttons        Source buttons tokens (list or legacy map)
+     * @param array<string, mixed> $buttonsGlobal  Source global padding tokens
      */
-    private function flattenButtons(array &$data, array $buttons): void
+    private function flattenButtons(array &$data, array $buttons, array $buttonsGlobal): void
     {
-        // Variants (primary/secondary/accent) — depth 2
-        foreach (self::BUTTON_VARIANTS as $variant) {
-            $variantData = $buttons[$variant] ?? [];
-            if (!is_array($variantData)) {
-                continue;
-            }
-            foreach ($variantData as $prop => $value) {
-                if (!is_array($value)) {
-                    $data[self::PREFIX_BUTTONS . $variant . '_' . $prop] = $value;
-                }
-            }
+        // Buttons as a repeatable Sulu block: [{type:'button', slug, label, ...}].
+        // ButtonResolver normalizes the stored shape (new list or legacy map) and
+        // guarantees a unique slug on each button.
+        $data['buttons'] = [];
+        foreach (ButtonResolver::normalizeButtons($buttons) as $props) {
+            $data['buttons'][] = array_merge(['type' => 'button'], $props);
         }
 
-        // Global props — flat (no group segment in the form key)
-        $globalData = $buttons['global'] ?? [];
-        if (is_array($globalData)) {
-            foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
-                if (isset($globalData[$prop]) && !is_array($globalData[$prop])) {
-                    $data[self::PREFIX_BUTTONS . $prop] = $globalData[$prop];
-                }
+        // Global padding — flat form keys (no group segment), sourced from
+        // tokens.buttonsGlobal (or the legacy buttons.global for old themes).
+        $global = [] !== $buttonsGlobal ? $buttonsGlobal : ButtonResolver::extractLegacyGlobal($buttons);
+        foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
+            if (isset($global[$prop]) && !is_array($global[$prop])) {
+                $data[self::PREFIX_BUTTONS . $prop] = $global[$prop];
             }
         }
     }
 
     /**
-     * Unflatten button form keys into nested buttons structure.
+     * Rebuild the buttons list from the Sulu block array.
      *
-     * buttons_primary_bg → ['primary']['bg'], buttons_paddingX → ['global']['paddingX']
+     * Strips block metadata and derives a slug from the label when the field is
+     * empty (defensive; the form makes it mandatory). Does NOT deduplicate: a
+     * slug collision is rejected at save by the SlugValidator.
      *
-     * @param array<string, mixed>                     $data     Source flat data
-     * @param array<string, array<string, mixed>> $existing Existing button config
+     * @param array<string, mixed> $data Source form data
      *
-     * @return array<string, array<string, mixed>> Reconstructed buttons
+     * @return list<array<string, mixed>> Reconstructed buttons
      */
-    private function unflattenButtons(array $data, array $existing): array
+    private function unflattenButtons(array $data): array
     {
-        foreach (self::BUTTON_VARIANTS as $variant) {
-            $variantPrefix = self::PREFIX_BUTTONS . $variant . '_';
-            foreach ($data as $key => $value) {
-                if (str_starts_with($key, $variantPrefix) && !is_array($value)) {
-                    $prop = substr($key, strlen($variantPrefix));
-                    $existing[$variant][$prop] = $value;
-                }
-            }
+        if (!isset($data['buttons']) || !is_array($data['buttons'])) {
+            return [];
         }
 
-        // Global props live under 'global' but come from flat form keys
+        $result = [];
+        foreach ($data['buttons'] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $props = $item;
+            unset($props['type']);
+            $slug = (isset($props['slug']) && is_string($props['slug'])) ? trim($props['slug']) : '';
+            if ('' === $slug) {
+                $label = (isset($props['label']) && is_string($props['label'])) ? $props['label'] : '';
+                $slug = ButtonResolver::slugify($label);
+            }
+            $props['slug'] = $slug;
+            $result[] = $props;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Rebuild the global button padding from the flat form keys.
+     *
+     * @param array<string, mixed> $data     Source form data
+     * @param array<string, mixed> $existing Existing global values (fallback)
+     *
+     * @return array<string, mixed> Reconstructed global padding
+     */
+    private function unflattenButtonsGlobal(array $data, array $existing): array
+    {
         foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
             $formKey = self::PREFIX_BUTTONS . $prop;
             if (isset($data[$formKey]) && !is_array($data[$formKey])) {
-                $existing['global'][$prop] = $data[$formKey];
+                $existing[$prop] = $data[$formKey];
             }
         }
 
@@ -987,10 +1069,20 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             $props = $blockItem;
             // Remove Sulu block metadata
             unset($props['type']);
+            // Derive a slug from the label only when empty (defensive; the form
+            // makes it mandatory). Do NOT deduplicate here: a slug collision must
+            // be REJECTED at save by the SlugValidator, not silently renamed
+            // (which would break the other variant that already owned the slug).
+            $slug = (isset($props['slug']) && is_string($props['slug'])) ? trim($props['slug']) : '';
+            if ('' === $slug) {
+                $label = (isset($props['label']) && is_string($props['label'])) ? $props['label'] : '';
+                $slug = VariantResolver::slugify($label);
+            }
+            $props['slug'] = $slug;
             $result[] = $props;
         }
 
-        // Allow saving empty variants (don't fallback to existing)
+        // Allow saving empty variants (don't fallback to existing).
         return $result;
     }
 
