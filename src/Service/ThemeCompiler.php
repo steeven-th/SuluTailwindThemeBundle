@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
@@ -19,17 +21,15 @@ use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 class ThemeCompiler
 {
     /**
-     * Base colors currently being compiled, set at the start of compile().
-     * Used by resolveColorValue() to resolve ref: values without threading
-     * $colors through every method signature.
-     *
-     * @var array<string, string>
+     * Normalized color set currently being compiled, set at the start of
+     * generateCss(). Used by resolveColorValue() to resolve ref: values
+     * (by role or slug) without threading colors through every method signature.
      */
-    private array $currentColors = [];
+    private ?ColorSet $colorSet = null;
 
     /**
-     * Cache of generated OKLCH palettes per color name during a compile() call.
-     * Avoids regenerating the same palette multiple times.
+     * Cache of generated OKLCH palettes keyed by base hex value during a
+     * compile() call. Avoids regenerating the same palette multiple times.
      *
      * @var array<string, array<int, string>>
      */
@@ -181,7 +181,7 @@ class ThemeCompiler
         $menuConfig = $theme->getMenuConfig();
 
         // Initialize class-level state for ref: resolution
-        $this->currentColors = $tokens['colors'] ?? [];
+        $this->colorSet = ColorSet::fromTokens($tokens);
         $this->resolvedPalettes = [];
         $css = "/* Theme: {$theme->getLabel()} — Auto-generated, do not edit */\n\n";
 
@@ -194,8 +194,8 @@ class ThemeCompiler
 
         // :root CSS custom properties
         $css .= ":root {\n";
-        $css .= $this->generateColorVariables($tokens['colors'] ?? []);
-        $css .= $this->generatePaletteVariables($tokens['colors'] ?? []);
+        $css .= $this->generateColorVariables();
+        $css .= $this->generatePaletteVariables();
         $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
@@ -231,7 +231,7 @@ class ThemeCompiler
         $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $tokens['buttons'] ?? []);
 
         // Reset class-level state after compilation
-        $this->currentColors = [];
+        $this->colorSet = null;
         $this->resolvedPalettes = [];
 
         return $css;
@@ -693,9 +693,10 @@ class ThemeCompiler
     /**
      * Resolve a color value that may be a ref: reference.
      *
-     * If the value starts with "ref:", parses the color name and shade level,
-     * generates (or retrieves from cache) the OKLCH palette for that color,
-     * and returns the corresponding hex value.
+     * If the value starts with "ref:", parses the color name (a role OR a slug)
+     * and optional shade level, generates (or retrieves from cache) the OKLCH
+     * palette for that color, and returns the corresponding hex value. A ref
+     * without a shade (e.g. "ref:primary") resolves to the base color.
      *
      * Returns the value unchanged if it is not a ref.
      * Returns #000000 as a safe CSS fallback for invalid/unresolvable refs.
@@ -706,33 +707,53 @@ class ThemeCompiler
      */
     private function resolveColorValue(string $value): string
     {
-        if (!str_starts_with($value, 'ref:')) {
+        $parsed = ColorSet::parseRef($value);
+        if (null === $parsed) {
             return $value;
         }
 
-        $parts = explode('-', substr($value, 4), 2);
-        if (count($parts) !== 2) {
+        if (null === $this->colorSet) {
             return '#000000';
         }
 
-        [$colorName, $shade] = $parts;
-        $validColors = ['primary', 'secondary', 'accent', 'background'];
-        $validShades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-
-        if (!in_array($colorName, $validColors, true) || !in_array((int) $shade, $validShades, true)) {
+        $baseHex = $this->colorSet->baseHexFor($parsed['name']);
+        if (null === $baseHex || !$this->isHexColor($baseHex)) {
             return '#000000';
         }
 
-        $baseHex = $this->currentColors[$colorName] ?? null;
-        if (!is_string($baseHex) || $baseHex === '') {
+        if (null === $parsed['shade']) {
+            return $baseHex;
+        }
+
+        if (!ColorShades::isValid($parsed['shade'])) {
             return '#000000';
         }
 
-        if (!isset($this->resolvedPalettes[$colorName])) {
-            $this->resolvedPalettes[$colorName] = $this->paletteGenerator->generatePalette($baseHex);
-        }
+        return $this->paletteFor($baseHex)[$parsed['shade']] ?? '#000000';
+    }
 
-        return $this->resolvedPalettes[$colorName][(int) $shade] ?? '#000000';
+    /**
+     * Get the OKLCH palette for a base hex value, cached per compile() call.
+     *
+     * @param string $hex The base hex color
+     *
+     * @return array<int, string> Shade level => hex
+     */
+    private function paletteFor(string $hex): array
+    {
+        return $this->resolvedPalettes[$hex] ??= $this->paletteGenerator->generatePalette($hex);
+    }
+
+    /**
+     * Check whether a value is a valid 3/6/8-digit hex color.
+     *
+     * @param string $value The value to test
+     *
+     * @return bool True if the value is a hex color
+     */
+    private function isHexColor(string $value): bool
+    {
+        return 1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value);
     }
 
     /**
@@ -869,28 +890,39 @@ class ThemeCompiler
     }
 
     /**
-     * Generate CSS custom properties for color tokens.
+     * Generate CSS custom properties for the base color tokens.
      *
-     * @param array<string, mixed> $colors Color token values
+     * For each palette color, emits the stable `--color-<role>` alias (when the
+     * color is a base role) AND the human-facing `--color-<slug>`. Brand colors
+     * (no role) emit their slug only. Palette values are the source of truth and
+     * are emitted verbatim; the semantic text assignments (text/link/linkHover)
+     * may be ref: values and are resolved.
      *
      * @return string CSS variable declarations
      */
-    private function generateColorVariables(array $colors): string
+    private function generateColorVariables(): string
     {
-        $css = "  /* Colors */\n";
-        // Base color keys are the source of truth — never resolve refs on them
-        $baseColorKeys = ['primary', 'secondary', 'accent', 'background'];
+        if (null === $this->colorSet) {
+            return '';
+        }
 
-        foreach ($colors as $key => $value) {
-            if (is_array($value)) {
-                foreach ($value as $subKey => $subValue) {
-                    $resolved = in_array($key, $baseColorKeys, true) ? $subValue : $this->resolveColorValue((string) $subValue);
-                    $css .= "  --color-{$key}-{$subKey}: {$resolved};\n";
-                }
-            } else {
-                $resolved = in_array($key, $baseColorKeys, true) ? $value : $this->resolveColorValue((string) $value);
-                $css .= "  --color-{$key}: {$resolved};\n";
+        $css = "  /* Colors */\n";
+
+        foreach ($this->colorSet->getColors() as $color) {
+            $value = $color['value'];
+            $role = $color['role'];
+            $slug = $color['slug'];
+
+            if (null !== $role) {
+                $css .= "  --color-{$role}: {$value};\n";
             }
+            if ($slug !== $role) {
+                $css .= "  --color-{$slug}: {$value};\n";
+            }
+        }
+
+        foreach ($this->colorSet->getTextColors() as $key => $value) {
+            $css .= "  --color-{$key}: " . $this->resolveColorValue($value) . ";\n";
         }
 
         return $css . "\n";
@@ -899,32 +931,39 @@ class ThemeCompiler
     /**
      * Generate CSS custom properties for OKLCH color palettes.
      *
-     * For each of the 4 main colors (primary, secondary, accent, background),
-     * generates 11 shades (50→950) as CSS custom properties using the OKLCH
-     * color space for perceptually uniform results.
-     *
-     * @param array<string, mixed> $colors Color token values
+     * For every palette color, generates 11 shades (50→950) using the OKLCH
+     * color space and emits them under BOTH the role alias (when present) and
+     * the slug, e.g. `--color-primary-500` and `--color-marine-500`.
      *
      * @return string CSS variable declarations (e.g. --color-primary-50: #eff6ff;)
      */
-    private function generatePaletteVariables(array $colors): string
+    private function generatePaletteVariables(): string
     {
-        $paletteColors = ['primary', 'secondary', 'accent', 'background'];
+        if (null === $this->colorSet) {
+            return '';
+        }
+
         $css = "  /* Color palettes (OKLCH) */\n";
         $hasAny = false;
 
-        foreach ($paletteColors as $colorName) {
-            $hex = $colors[$colorName] ?? null;
-            if (!is_string($hex) || $hex === '') {
+        foreach ($this->colorSet->getColors() as $color) {
+            $value = $color['value'];
+            if (!$this->isHexColor($value)) {
                 continue;
             }
 
-            $hasAny = true;
-            $palette = $this->paletteGenerator->generatePalette($hex);
+            $role = $color['role'];
+            $slug = $color['slug'];
 
-            foreach ($palette as $shade => $shadeHex) {
-                $css .= "  --color-{$colorName}-{$shade}: {$shadeHex};\n";
+            foreach ($this->paletteFor($value) as $shade => $shadeHex) {
+                if (null !== $role) {
+                    $css .= "  --color-{$role}-{$shade}: {$shadeHex};\n";
+                }
+                if ($slug !== $role) {
+                    $css .= "  --color-{$slug}-{$shade}: {$shadeHex};\n";
+                }
             }
+            $hasAny = true;
         }
 
         if (!$hasAny) {

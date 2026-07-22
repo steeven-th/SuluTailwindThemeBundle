@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
@@ -34,6 +35,7 @@ class ThemeConfigResolver
         $variants = [];
         $buttons = [];
         $palette = [];
+        $baseHexes = [];
         $borders = [];
 
         if (null !== $theme) {
@@ -58,13 +60,21 @@ class ThemeConfigResolver
             }
             unset($borders['radius']);
 
-            // Generate OKLCH palettes for the 4 main colors
-            $paletteColors = ['primary', 'secondary', 'accent', 'background'];
-            $colors = $tokens['colors'] ?? [];
-            foreach ($paletteColors as $colorName) {
-                $hex = $colors[$colorName] ?? null;
-                if (is_string($hex) && $hex !== '') {
-                    $palette[$colorName] = $this->paletteGenerator->generatePalette($hex);
+            // Generate OKLCH palettes for every palette color, keyed by BOTH the
+            // role (stable) and the slug, so refs resolve either way.
+            $colorSet = ColorSet::fromTokens($tokens);
+            foreach ($colorSet->getColors() as $color) {
+                $value = $color['value'];
+                if (!is_string($value) || 1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value)) {
+                    continue;
+                }
+                $shades = $this->paletteGenerator->generatePalette($value);
+                foreach ([$color['role'], $color['slug']] as $name) {
+                    if (null === $name) {
+                        continue;
+                    }
+                    $palette[$name] = $shades;
+                    $baseHexes[$name] = $value;
                 }
             }
         }
@@ -75,7 +85,7 @@ class ThemeConfigResolver
                 continue;
             }
             foreach ($btnProps as $prop => &$val) {
-                $this->resolveRef($val, $palette);
+                $this->resolveRef($val, $palette, $baseHexes);
             }
             unset($val);
         }
@@ -84,7 +94,7 @@ class ThemeConfigResolver
         // Resolve ref: values in variants
         foreach ($variants as &$variantProps) {
             foreach ($variantProps as $prop => &$val) {
-                $this->resolveRef($val, $palette);
+                $this->resolveRef($val, $palette, $baseHexes);
             }
             unset($val);
         }
@@ -99,18 +109,36 @@ class ThemeConfigResolver
     }
 
     /**
-     * Resolve a single ref: value to its hex color from the palette.
+     * Resolve a single ref: value (by role or slug) to its hex color.
      *
-     * @param mixed                                          $val     The value to resolve (mutated in place)
-     * @param array<string, array<int|string, string>> $palette The generated palette
+     * Handles both `ref:<name>-<shade>` (a shade) and `ref:<name>` (the base
+     * color), with slugs that may contain dashes.
+     *
+     * @param mixed                                     $val       The value to resolve (mutated in place)
+     * @param array<string, array<int, string>>        $palette   Generated shades keyed by role/slug
+     * @param array<string, string>                     $baseHexes Base hex values keyed by role/slug
      */
-    private function resolveRef(mixed &$val, array $palette): void
+    private function resolveRef(mixed &$val, array $palette, array $baseHexes): void
     {
-        if (is_string($val) && str_starts_with($val, 'ref:')) {
-            $parts = explode('-', substr($val, 4), 2);
-            if (count($parts) === 2 && isset($palette[$parts[0]][(int) $parts[1]])) {
-                $val = $palette[$parts[0]][(int) $parts[1]];
+        if (!is_string($val)) {
+            return;
+        }
+
+        $parsed = ColorSet::parseRef($val);
+        if (null === $parsed) {
+            return;
+        }
+
+        if (null === $parsed['shade']) {
+            if (isset($baseHexes[$parsed['name']])) {
+                $val = $baseHexes[$parsed['name']];
             }
+
+            return;
+        }
+
+        if (isset($palette[$parsed['name']][$parsed['shade']])) {
+            $val = $palette[$parsed['name']][$parsed['shade']];
         }
     }
 }

@@ -343,27 +343,30 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     }
 
     /**
-     * Generate OKLCH palette from hex color values.
+     * Generate OKLCH palettes from hex color values.
      *
-     * Accepts color hex values as query parameters and returns the computed
-     * palette shades. Used by the ColorTokenEditor to display the palette
-     * for the theme being edited (which may not be the active theme).
+     * Accepts an arbitrary set of `<name>=<hex>` query parameters (any role or
+     * slug, not a fixed list) and returns the computed palette shades keyed by
+     * the same names. Used by the ColorTokenEditor to display the palette for
+     * the theme being edited (which may not be the active theme).
      *
-     * @param Request $request Query params: primary, secondary, accent, background (hex)
+     * @param Request $request Query params: <colorName>=<hex> pairs
      *
-     * @return JsonResponse The palette data
+     * @return JsonResponse The palette data, keyed by color name
      */
     #[Route('/admin/api/iw-theme-palette', name: 'iw_sulu_tailwind_theme.palette', methods: ['GET'])]
     public function paletteAction(Request $request): JsonResponse
     {
         $palette = [];
-        $colorNames = ['primary', 'secondary', 'accent', 'background'];
 
-        foreach ($colorNames as $name) {
-            $hex = $request->query->getString($name);
-            if ('' !== $hex) {
-                $palette[$name] = $this->paletteGenerator->generatePalette($hex);
+        foreach ($request->query->all() as $name => $hex) {
+            if (!is_string($name) || '' === $name || !is_string($hex) || '' === $hex) {
+                continue;
             }
+            if (1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $hex)) {
+                continue;
+            }
+            $palette[$name] = $this->paletteGenerator->generatePalette($hex);
         }
 
         return new JsonResponse($palette);
