@@ -31,9 +31,10 @@ Shared by every variant.
 | `--iw-button-{variant}-hover-text` | Text color on hover |
 | `--iw-button-{variant}-hover-border` | Border shorthand on hover (or `none`) |
 
-Where `{variant}` is `primary`, `secondary`, or `accent`.
+Where `{variant}` is the **slug** of any button you defined in the admin
+(buttons are unlimited and named by slug — no longer the 3 fixed roles).
 
-> Border `width` and `style` are configured per variant in the admin and folded directly into the `--iw-button-{variant}-border` shorthand. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{variant}` rules and do not produce standalone CSS variables.
+> Border `width` and `style` are configured per button in the admin and folded directly into the `--iw-button-{slug}-border` shorthand. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{slug}` rules and do not produce standalone CSS variables.
 
 ---
 
@@ -43,12 +44,10 @@ Ready-to-use button classes with hover transitions. They follow the strict BEM c
 
 | Class | Description |
 |-------|-------------|
-| `.iw-button` | Base button (rarely used alone — apply a variant) |
-| `.iw-button--primary` | Primary button style |
-| `.iw-button--secondary` | Secondary button style |
-| `.iw-button--accent` | Accent button style |
+| `.iw-button` | Base button (rarely used alone — apply a style) |
+| `.iw-button--<slug>` | One class per button defined in the admin (e.g. `.iw-button--primary`, `.iw-button--cta`, `.iw-button--employeur`) |
 
-Each variant rule includes `background-color`, `color`, `border`, `border-radius`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
+Each button rule includes `background-color`, `color`, `border`, `border-radius`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
 
 **Usage in Twig:**
 ```twig

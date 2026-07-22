@@ -1,6 +1,6 @@
 # Block variants — CSS API
 
-Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Block variants**. They are stored as an indexed array — the array position (0, 1, 2…) is the identifier, making variants interchangeable across themes.
+Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Block variants**. Each variant has a stable **slug** (its identifier), separate from its user-facing label.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../css-conventions.md`](../css-conventions.md).
 
@@ -8,12 +8,12 @@ Block variants are per-section color schemes (e.g., light, accent, dark) defined
 
 ## How it works
 
-1. Each variant is compiled into a `.iw-variant--{index}` CSS class.
+1. Each variant is compiled into a `.iw-variant--{slug}` CSS class.
 2. When editing a page, the admin user picks a variant for each block.
-3. The chosen variant index is saved with the block data.
+3. The chosen variant slug is saved with the block data.
 4. On the frontend, the block wrapper applies the matching CSS class.
 
-The variant index is **numeric** on purpose: a variant's user-facing label can change in the admin without breaking any custom CSS targeted at `.iw-variant--{index}`.
+The **slug is stable** on purpose: a variant's user-facing label can change without breaking custom CSS targeted at `.iw-variant--{slug}` (rename the slug only when you intend to break its references). Legacy content that stored a numeric index is resolved best-effort to the variant at that position.
 
 ---
 
@@ -21,14 +21,14 @@ The variant index is **numeric** on purpose: a variant's user-facing label can c
 
 | Class | Role |
 |-------|------|
-| `.iw-variant--{index}` | Root selector applied to every block using this variant. Sets the per-variant custom properties listed below. |
-| `.iw-variant--{index}[data-has-bg="true"]` | Applies the variant background color when the block's "Show background" toggle is on. |
+| `.iw-variant--{slug}` | Root selector applied to every block using this variant. Sets the per-variant custom properties listed below. |
+| `.iw-variant--{slug}[data-has-bg="true"]` | Applies the variant background color when the block's "Show background" toggle is on. |
 
 ---
 
 ## CSS custom properties
 
-Each `.iw-variant--{index}` class sets the following custom properties from the variant configuration:
+Each `.iw-variant--{slug}` class sets the following custom properties from the variant configuration:
 
 | Variable | Token key | Purpose |
 |----------|-----------|---------|
@@ -53,7 +53,7 @@ The compiler also injects per-variant form variables (`--form-bg`, `--form-text`
 
 ## Auto-styled elements inside a variant
 
-The compiled CSS automatically styles these HTML elements inside any `.iw-variant--{index}`:
+The compiled CSS automatically styles these HTML elements inside any `.iw-variant--{slug}`:
 
 | Element | Styling |
 |---------|---------|
@@ -70,23 +70,23 @@ The compiled CSS automatically styles these HTML elements inside any `.iw-varian
 | `.todo-list` | Checkbox accent color from `--iw-variant-link-color` |
 | `hr` | Styled based on `separatorMode` / `separatorStyle` (solid, dashed, dotted, double, gradient, wave, zigzag, dots, diamond) |
 
-All rules are scoped via the `.iw-variant--{index}` selector and therefore sit at specificity 0,2,0. They can be overridden with a single custom property without rewriting selectors.
+All rules are scoped via the `.iw-variant--{slug}` selector and therefore sit at specificity 0,2,0. They can be overridden with a single custom property without rewriting selectors.
 
 ---
 
 ## Variant-scoped buttons
 
-Each variant has a `buttonStyle` setting (`primary`, `secondary`, or `accent`). The compiler generates a `.iw-button--variant` class scoped to the variant:
+Each variant has a `buttonStyle` setting that references a **button slug**. The compiler generates a `.iw-button--variant` class scoped to the variant:
 
 ```css
-.iw-variant--0 .iw-button--variant { /* uses the chosen button style's colors */ }
-.iw-variant--0 .iw-button--variant:hover { /* hover state */ }
+.iw-variant--dark .iw-button--variant { /* uses the referenced button's colors */ }
+.iw-variant--dark .iw-button--variant:hover { /* hover state */ }
 ```
 
 Use `.iw-button--variant` inside a block to automatically match the variant's button style:
 
 ```twig
-<section class="iw-variant--0">
+<section class="iw-variant--dark">
     <a href="/cta" class="iw-button--variant px-6 py-3">Call to action</a>
 </section>
 ```
@@ -100,14 +100,14 @@ See [`buttons.md`](./buttons.md) for the full button API and hover effects.
 When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`), the `.iw-block__text` element inside that variant gets:
 
 ```css
-.iw-variant--0 .iw-block__text {
+.iw-variant--dark .iw-block__text {
     background-color: var(--iw-variant-paragraph-bg);
     padding: 1rem 1.5rem;
     margin-block: 1rem;
     overflow: hidden;
 }
 
-.iw-variant--0 .iw-block__text:last-child {
+.iw-variant--dark .iw-block__text:last-child {
     margin-bottom: 0; /* prevents stacking with section padding */
 }
 ```
@@ -121,7 +121,7 @@ The dark overlay on background images (`.iw-block__bg-overlay`) is hidden when a
 ### Tweak one property on one variant
 
 ```css
-.iw-variant--2 {
+.iw-variant--dark {
     --iw-variant-title-color: #ff6b35;
     --iw-variant-link-color: #ff6b35;
 }
@@ -139,7 +139,7 @@ The dark overlay on background images (`.iw-block__bg-overlay`) is hidden when a
 ### Override the variant-scoped button on a specific variant
 
 ```css
-.iw-variant--1 .iw-button--variant {
+.iw-variant--accent .iw-button--variant {
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -152,14 +152,11 @@ The dark overlay on background images (`.iw-block__bg-overlay`) is hidden when a
 ### Basic usage
 
 ```twig
-{# Resolve variant index with fallback #}
-{% set variantIndex = variant|default(0) %}
+{# Resolve the stored variant value (slug, or legacy index) to a slug #}
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% if variantIndex >= allVariants|length %}
-    {% set variantIndex = 0 %}
-{% endif %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(variant|default(null), allVariants) %}
 
-<section class="iw-variant--{{ variantIndex }}">
+<section class="iw-variant--{{ variantSlug }}">
     <h2>This heading adapts to the variant colors</h2>
     <p>This paragraph too.</p>
     <a href="/link">And this link.</a>
@@ -171,7 +168,8 @@ The dark overlay on background images (`.iw-block__bg-overlay`) is hidden when a
 You can access individual variant properties for custom logic:
 
 ```twig
-{% set variantConfig = iw_sulu_tailwind_theme.blockVariants[variantIndex]|default({}) %}
+{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
+{% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), allVariants) %}
 
 {# Read specific values #}
 {% set titleColor = variantConfig.title|default('#000') %}
