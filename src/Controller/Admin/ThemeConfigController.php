@@ -8,16 +8,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Entity\WebspaceTheme;
+use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
 use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\Metadata\FieldDescriptorFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\PaginatedRepresentation;
 use Sulu\Component\Rest\RestHelperInterface;
+use Sulu\Component\Security\Authentication\UserInterface as SuluUserInterface;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Admin REST controller for theme configuration CRUD operations.
@@ -180,6 +184,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         private readonly OklchPaletteGenerator $paletteGenerator,
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly SlugValidator $slugValidator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -271,7 +276,11 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $theme = new ThemeConfig();
-        $this->mapDataToEntity($data, $theme);
+        try {
+            $this->mapDataToEntity($data, $theme);
+        } catch (SlugValidationException $e) {
+            return $this->slugValidationResponse($e);
+        }
 
         $this->entityManager->persist($theme);
         $this->entityManager->flush();
@@ -306,7 +315,11 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         /** @var array<string, mixed> $data */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        $this->mapDataToEntity($data, $theme);
+        try {
+            $this->mapDataToEntity($data, $theme);
+        } catch (SlugValidationException $e) {
+            return $this->slugValidationResponse($e);
+        }
 
         $this->entityManager->flush();
 
@@ -681,10 +694,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private function serializeBlockVariants(array $variants): array
     {
         $result = [];
-        foreach ($variants as $props) {
-            if (!is_array($props)) {
-                continue;
-            }
+        // Normalize so every variant carries a stable, unique slug (derived from
+        // the label for legacy variants) before the admin edits it.
+        foreach (VariantResolver::normalizeVariants($variants) as $props) {
             $result[] = array_merge(['type' => 'variant'], $props);
         }
 
@@ -701,6 +713,37 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * @param array<string, mixed> $data  The request data with flat form keys
      * @param ThemeConfig          $theme The entity to populate
      */
+    /**
+     * Build a 422 response for a slug validation error.
+     *
+     * Sulu's form store parses the response body and shows `detail` in its
+     * native error snackbar. The message is translated server-side into the
+     * admin user's locale (domain "admin", same JSON catalog as the JS), with
+     * the offending slug interpolated.
+     *
+     * @param SlugValidationException $exception The validation failure
+     *
+     * @return JsonResponse The 422 response
+     */
+    private function slugValidationResponse(SlugValidationException $exception): JsonResponse
+    {
+        $user = $this->getUser();
+        $locale = ($user instanceof SuluUserInterface && '' !== (string) $user->getLocale())
+            ? $user->getLocale()
+            : 'en';
+
+        $message = str_replace(
+            '{slug}',
+            $exception->slug,
+            $this->translator->trans($exception->messageKey, [], 'admin', $locale),
+        );
+
+        return new JsonResponse([
+            'code' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            'detail' => $message,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     private function mapDataToEntity(array $data, ThemeConfig $theme): void
     {
         if (isset($data['name'])) {
@@ -734,6 +777,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         $tokens['buttons'] = $this->unflattenButtons($data, $tokens['buttons'] ?? []);
         $tokens['typography'] = $this->unflattenTypography($data, $tokens['typography'] ?? []);
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
+        $this->slugValidator->validateSlugs(array_column($tokens['blockVariants'], 'slug'));
 
         // Article configuration: flat keys stored directly in tokens
         foreach (self::ARTICLE_KEYS as $key) {
@@ -1006,10 +1050,20 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             $props = $blockItem;
             // Remove Sulu block metadata
             unset($props['type']);
+            // Derive a slug from the label only when empty (defensive; the form
+            // makes it mandatory). Do NOT deduplicate here: a slug collision must
+            // be REJECTED at save by the SlugValidator, not silently renamed
+            // (which would break the other variant that already owned the slug).
+            $slug = (isset($props['slug']) && is_string($props['slug'])) ? trim($props['slug']) : '';
+            if ('' === $slug) {
+                $label = (isset($props['label']) && is_string($props['label'])) ? $props['label'] : '';
+                $slug = VariantResolver::slugify($label);
+            }
+            $props['slug'] = $slug;
             $result[] = $props;
         }
 
-        // Allow saving empty variants (don't fallback to existing)
+        // Allow saving empty variants (don't fallback to existing).
         return $result;
     }
 

@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 
 /**
- * Validates palette color slugs at save time (uniqueness, format, reserved).
+ * Validates slugs (palette colors, variants, buttons) at save time.
  *
- * This is the authoritative, server-side guard for direct API calls or a JS
- * bypass. The admin PaletteEditor reproduces the same checks for immediate,
- * translated feedback, but this class has the final word.
- *
- * Note: error messages are intentionally plain English developer messages —
- * they are a safety net surfaced only when the client-side (translated)
- * validation was bypassed, not part of the normal user-facing flow.
+ * This is the authoritative, server-side guard. On failure it throws a
+ * SlugValidationException carrying a translation key + the offending slug; the
+ * admin controller turns that into a 422 whose message is translated and shown
+ * in Sulu's native form error snackbar.
  */
 class SlugValidator
 {
@@ -30,11 +27,10 @@ class SlugValidator
      *
      * @param list<array{role: string|null, slug: string, value: string}> $colors The palette colors
      *
-     * @throws UnprocessableEntityHttpException If any slug is malformed, duplicated or reserved
+     * @throws SlugValidationException On the first malformed, duplicated or reserved slug
      */
     public function validate(array $colors): void
     {
-        $errors = [];
         $seen = [];
         $reserved = ColorRoles::reservedSlugs();
 
@@ -42,26 +38,70 @@ class SlugValidator
             $slug = \is_string($color['slug'] ?? null) ? $color['slug'] : '';
             $role = $color['role'] ?? null;
 
-            if (1 !== preg_match(self::SLUG_PATTERN, $slug)) {
-                $errors[] = sprintf('Invalid color slug "%s": use lowercase letters, digits and single dashes.', $slug);
-
-                continue;
-            }
+            $this->assertFormat($slug);
 
             if (isset($seen[$slug])) {
-                $errors[] = sprintf('Duplicate color slug "%s": each color must have a unique name.', $slug);
+                throw new SlugValidationException(
+                    'iw_sulu_tailwind_theme.error_slug_duplicate',
+                    $slug,
+                    sprintf('Duplicate color slug "%s".', $slug),
+                );
             }
             $seen[$slug] = true;
 
             // A reserved name may only be used by the role that owns it (a role
             // keeping its default slug). Brand colors and renamed roles may not.
             if (\in_array($slug, $reserved, true) && $slug !== $role) {
-                $errors[] = sprintf('Color slug "%s" is reserved and cannot be used as a custom name.', $slug);
+                throw new SlugValidationException(
+                    'iw_sulu_tailwind_theme.error_slug_reserved',
+                    $slug,
+                    sprintf('Reserved color slug "%s".', $slug),
+                );
             }
         }
+    }
 
-        if ([] !== $errors) {
-            throw new UnprocessableEntityHttpException(implode(' ', array_values(array_unique($errors))));
+    /**
+     * Validate a plain list of slugs (format + uniqueness), e.g. for variants
+     * or buttons. No reserved-word check.
+     *
+     * @param array<int, mixed> $slugs The slugs to validate
+     *
+     * @throws SlugValidationException On the first malformed or duplicated slug
+     */
+    public function validateSlugs(array $slugs): void
+    {
+        $seen = [];
+
+        foreach ($slugs as $slug) {
+            $slug = \is_string($slug) ? $slug : '';
+
+            $this->assertFormat($slug);
+
+            if (isset($seen[$slug])) {
+                throw new SlugValidationException(
+                    'iw_sulu_tailwind_theme.error_slug_duplicate',
+                    $slug,
+                    sprintf('Duplicate slug "%s".', $slug),
+                );
+            }
+            $seen[$slug] = true;
+        }
+    }
+
+    /**
+     * Assert that a slug is well-formed kebab-case.
+     *
+     * @throws SlugValidationException If the slug is malformed
+     */
+    private function assertFormat(string $slug): void
+    {
+        if (1 !== preg_match(self::SLUG_PATTERN, $slug)) {
+            throw new SlugValidationException(
+                'iw_sulu_tailwind_theme.error_slug_format',
+                $slug,
+                sprintf('Invalid slug "%s".', $slug),
+            );
         }
     }
 }
