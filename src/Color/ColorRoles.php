@@ -49,16 +49,16 @@ final class ColorRoles
      * @var array<string, array{category: string, default: string, label: string}>
      */
     private const META = [
-        self::PRIMARY => ['category' => self::CATEGORY_PRIMARY, 'default' => '#6366f1', 'label' => 'iw_sulu_tailwind_theme.color_primary'],
-        self::SECONDARY => ['category' => self::CATEGORY_PRIMARY, 'default' => '#64748b', 'label' => 'iw_sulu_tailwind_theme.color_secondary'],
-        self::ACCENT => ['category' => self::CATEGORY_PRIMARY, 'default' => '#f59e0b', 'label' => 'iw_sulu_tailwind_theme.color_accent'],
-        self::BACKGROUND => ['category' => self::CATEGORY_PRIMARY, 'default' => '#ffffff', 'label' => 'iw_sulu_tailwind_theme.color_background'],
-        self::BLACK => ['category' => self::CATEGORY_PRIMARY, 'default' => '#0a0a0a', 'label' => 'iw_sulu_tailwind_theme.color_black'],
-        self::WHITE => ['category' => self::CATEGORY_PRIMARY, 'default' => '#ffffff', 'label' => 'iw_sulu_tailwind_theme.color_white'],
-        self::NEUTRAL => ['category' => self::CATEGORY_STATE, 'default' => '#737373', 'label' => 'iw_sulu_tailwind_theme.color_neutral'],
-        self::ERROR => ['category' => self::CATEGORY_STATE, 'default' => '#ef4444', 'label' => 'iw_sulu_tailwind_theme.color_error'],
-        self::WARNING => ['category' => self::CATEGORY_STATE, 'default' => '#f97316', 'label' => 'iw_sulu_tailwind_theme.color_warning'],
-        self::SUCCESS => ['category' => self::CATEGORY_STATE, 'default' => '#10b981', 'label' => 'iw_sulu_tailwind_theme.color_success'],
+        self::PRIMARY => ['category' => self::CATEGORY_PRIMARY, 'default' => '#6366f1', 'label' => 'iw_sulu_tailwind_theme.colors_primary'],
+        self::SECONDARY => ['category' => self::CATEGORY_PRIMARY, 'default' => '#64748b', 'label' => 'iw_sulu_tailwind_theme.colors_secondary'],
+        self::ACCENT => ['category' => self::CATEGORY_PRIMARY, 'default' => '#f59e0b', 'label' => 'iw_sulu_tailwind_theme.colors_accent'],
+        self::BACKGROUND => ['category' => self::CATEGORY_PRIMARY, 'default' => '#ffffff', 'label' => 'iw_sulu_tailwind_theme.colors_background'],
+        self::BLACK => ['category' => self::CATEGORY_PRIMARY, 'default' => '#0a0a0a', 'label' => 'iw_sulu_tailwind_theme.colors_black'],
+        self::WHITE => ['category' => self::CATEGORY_PRIMARY, 'default' => '#ffffff', 'label' => 'iw_sulu_tailwind_theme.colors_white'],
+        self::NEUTRAL => ['category' => self::CATEGORY_STATE, 'default' => '#737373', 'label' => 'iw_sulu_tailwind_theme.colors_neutral'],
+        self::ERROR => ['category' => self::CATEGORY_STATE, 'default' => '#ef4444', 'label' => 'iw_sulu_tailwind_theme.colors_error'],
+        self::WARNING => ['category' => self::CATEGORY_STATE, 'default' => '#f97316', 'label' => 'iw_sulu_tailwind_theme.colors_warning'],
+        self::SUCCESS => ['category' => self::CATEGORY_STATE, 'default' => '#10b981', 'label' => 'iw_sulu_tailwind_theme.colors_success'],
     ];
 
     /**

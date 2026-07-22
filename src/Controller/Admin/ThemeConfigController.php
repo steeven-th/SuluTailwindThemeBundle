@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Controller\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Entity\WebspaceTheme;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\Metadata\FieldDescriptorFactoryInterface;
@@ -177,6 +179,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         private readonly GoogleFontsCatalog $googleFontsCatalog,
         private readonly OklchPaletteGenerator $paletteGenerator,
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
+        private readonly SlugValidator $slugValidator,
     ) {
     }
 
@@ -517,8 +520,13 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             'changedBy' => $theme->getChangedBy(),
         ];
 
-        // Flatten colors (depth 1): tokens.colors.primary → colors_primary
-        $this->flattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
+        // Palette: ordered list [{role, slug, value}] for the PaletteEditor field.
+        // ColorSet normalizes the stored shape (new list or legacy map) and
+        // guarantees the 10 base roles in canonical order.
+        $colorSet = ColorSet::fromTokens($tokens);
+        $data['palette'] = $colorSet->getColors();
+        // Text colors stay as flat colors_* fields, sourced from tokens.textColors.
+        $this->flattenDepth1($data, self::PREFIX_COLORS, $colorSet->getTextColors());
 
         // Flatten borders (depth 1): tokens.borders.cardRadius → borders_cardRadius.
         // The legacy `radius` key (pre-3.0.0) pre-fills the new cardRadius field
@@ -709,7 +717,15 @@ class ThemeConfigController extends AbstractController implements SecuredControl
 
         // Reconstruct tokens from flat keys, falling back to current DB state
         $tokens = $theme->getTokens();
-        $tokens['colors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['colors'] ?? []);
+        // Palette: the PaletteEditor field sends an ordered list of
+        // {role, slug, value}. ColorSet re-guarantees the base roles/order;
+        // SlugValidator enforces unique, well-formed, non-reserved slugs.
+        $paletteInput = is_array($data['palette'] ?? null) ? $data['palette'] : [];
+        $normalizedColors = ColorSet::fromTokens(['colors' => $paletteInput])->getColors();
+        $this->slugValidator->validate($normalizedColors);
+        $tokens['colors'] = $normalizedColors;
+        // Text colors are stored separately from the palette (no shades).
+        $tokens['textColors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['textColors'] ?? []);
         $tokens['borders'] = $this->unflattenDepth1($data, self::PREFIX_BORDERS, $tokens['borders'] ?? []);
         // Data migration: once cardRadius is saved, drop the legacy pre-3.0.0 key
         if (isset($tokens['borders']['cardRadius'])) {

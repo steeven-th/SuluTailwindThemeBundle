@@ -9,6 +9,7 @@ import VariantPicker from './components/VariantPicker/VariantPicker';
 import StylePicker from './components/StylePicker/StylePicker';
 import MarginSelector from './components/MarginSelector/MarginSelector';
 import ColorTokenEditor from './components/ColorTokenEditor/ColorTokenEditor';
+import PaletteEditor from './components/PaletteEditor/PaletteEditor';
 import FontPicker from './components/FontPicker/FontPicker';
 import RadiusSelector from './components/RadiusSelector/RadiusSelector';
 import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker';
@@ -44,6 +45,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_style_picker', StylePicker);
     fieldRegistry.add('iw_theme_margin_selector', MarginSelector);
     fieldRegistry.add('iw_theme_color_token_editor', ColorTokenEditor);
+    fieldRegistry.add('iw_theme_palette_editor', PaletteEditor);
     fieldRegistry.add('iw_theme_font_picker', FontPicker);
     fieldRegistry.add('iw_theme_radius_selector', RadiusSelector);
     fieldRegistry.add('iw_theme_button_style_picker', ButtonStylePicker);

@@ -13,6 +13,8 @@ class ThemeConfigStore {
     @observable variants: Array<Object> = [];
     @observable buttons: Object = {};
     @observable palette: Object = {};
+    /** Ordered palette colors: [{role, slug, value, labelKey}] */
+    @observable colors: Array<Object> = [];
     @observable borders: Object = {};
 
     /** Track the currently loaded webspace to avoid redundant fetches */
@@ -25,6 +27,7 @@ class ThemeConfigStore {
         this.variants = data.variants || [];
         this.buttons = data.buttons || {};
         this.palette = data.palette || {};
+        this.colors = data.colors || [];
         this.borders = data.borders || {};
     }
 

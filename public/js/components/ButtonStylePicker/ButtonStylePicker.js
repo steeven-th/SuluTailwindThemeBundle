@@ -48,19 +48,29 @@ export default class ButtonStylePicker extends React.Component {
     /**
      * Load OKLCH palette from the current form data via API.
      * Used to resolve ref: values in button properties read from formInspector.
+     *
+     * Reads the base colors from the PaletteEditor field (`palette`, a list of
+     * {role, slug, value}) so button previews reflect unsaved color edits.
      */
     _loadPalette() {
         const {formInspector} = this.props;
         if (!formInspector) return;
 
-        const primary = formInspector.getValueByPath('/colors_primary');
-        if (!primary) return;
+        // getValueByPath may return a MobX observable array (fails Array.isArray).
+        const raw = formInspector.getValueByPath('/palette');
+        if (!raw || !raw.length) return;
+        const colors = Array.from(raw);
 
         const params = new URLSearchParams();
-        ['primary', 'secondary', 'accent', 'background'].forEach((name) => {
-            const val = formInspector.getValueByPath(`/colors_${name}`);
-            if (val) params.set(name, val);
+        colors.forEach((color) => {
+            const key = color && (color.role || color.slug);
+            const val = color && color.value;
+            if (key && typeof val === 'string' && val) {
+                params.set(key, val);
+            }
         });
+
+        if (params.toString() === '') return;
 
         Requester.get('/admin/api/iw-theme-palette?' + params.toString())
             .then((palette) => {

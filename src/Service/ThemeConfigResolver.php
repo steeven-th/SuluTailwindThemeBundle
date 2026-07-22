@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
@@ -28,7 +29,7 @@ class ThemeConfigResolver
      *
      * @param ThemeConfig|null $theme The theme to resolve, or null for empty defaults
      *
-     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, borders: array<string, mixed>}
+     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, borders: array<string, mixed>}
      */
     public function resolve(?ThemeConfig $theme): array
     {
@@ -37,6 +38,37 @@ class ThemeConfigResolver
         $palette = [];
         $baseHexes = [];
         $borders = [];
+
+        // Palette colors are always resolved (even without a theme) so the admin
+        // pickers get the 10 base roles at their defaults. ColorSet normalizes
+        // the stored shape and guarantees the roles in canonical order.
+        $colorSet = ColorSet::fromTokens(null !== $theme ? $theme->getTokens() : []);
+        $colors = [];
+        foreach ($colorSet->getColors() as $color) {
+            $role = $color['role'];
+            $colors[] = [
+                'role' => $role,
+                'slug' => $color['slug'],
+                'value' => $color['value'],
+                'labelKey' => null !== $role ? ColorRoles::labelKey($role) : null,
+                'category' => null !== $role ? ColorRoles::category($role) : 'brand',
+            ];
+
+            $value = $color['value'];
+            if (!is_string($value) || 1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value)) {
+                continue;
+            }
+            // Key OKLCH shades by BOTH the role (stable) and the slug, so refs
+            // resolve either way.
+            $shades = $this->paletteGenerator->generatePalette($value);
+            foreach ([$role, $color['slug']] as $name) {
+                if (null === $name) {
+                    continue;
+                }
+                $palette[$name] = $shades;
+                $baseHexes[$name] = $value;
+            }
+        }
 
         if (null !== $theme) {
             $tokens = $theme->getTokens();
@@ -59,24 +91,6 @@ class ThemeConfigResolver
                 $borders['cardRadius'] = $borders['radius'];
             }
             unset($borders['radius']);
-
-            // Generate OKLCH palettes for every palette color, keyed by BOTH the
-            // role (stable) and the slug, so refs resolve either way.
-            $colorSet = ColorSet::fromTokens($tokens);
-            foreach ($colorSet->getColors() as $color) {
-                $value = $color['value'];
-                if (!is_string($value) || 1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value)) {
-                    continue;
-                }
-                $shades = $this->paletteGenerator->generatePalette($value);
-                foreach ([$color['role'], $color['slug']] as $name) {
-                    if (null === $name) {
-                        continue;
-                    }
-                    $palette[$name] = $shades;
-                    $baseHexes[$name] = $value;
-                }
-            }
         }
 
         // Resolve ref: values in buttons
@@ -104,6 +118,7 @@ class ThemeConfigResolver
             'variants' => $variants,
             'buttons' => $buttons,
             'palette' => $palette,
+            'colors' => $colors,
             'borders' => $borders,
         ];
     }
