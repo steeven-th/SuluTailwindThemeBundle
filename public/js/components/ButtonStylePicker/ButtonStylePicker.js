@@ -7,37 +7,22 @@ import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
 
 /**
- * Available button style options.
- * Each maps to a button variant defined in the theme's buttons config.
- */
-const BUTTON_OPTIONS = [
-    {key: 'primary', label: 'Primary'},
-    {key: 'secondary', label: 'Secondary'},
-    {key: 'accent', label: 'Accent'},
-];
-
-/**
  * ButtonStylePicker field component for the Sulu admin.
  *
- * Displays a horizontal row of radio-like cards, each rendering a real
- * button preview using the active theme's button colors (bg, text, border,
- * radius). The selected card is highlighted with the Sulu primary accent.
+ * Displays a horizontal row of radio-like cards, one per button style defined
+ * in the theme (unlimited, named by slug), each rendering a real button preview
+ * using that button's colors (bg, text, border, radius). The selected card is
+ * highlighted with the Sulu primary accent.
  *
- * Stored value is the button variant key: "primary", "secondary", or "accent".
- *
- * Theme button data is injected via the static `themeButtons` property,
- * populated by the initializer config hook in index.js.
+ * Stored value is the selected button's slug.
  *
  * @param {Object} props - Component props from Sulu form field
- * @param {string} props.value - Currently selected button style key
+ * @param {string} props.value - Currently selected button slug
  * @param {Function} props.onChange - Callback when a value is selected
  * @param {boolean} props.disabled - Whether the field is disabled
  */
 @observer
 export default class ButtonStylePicker extends React.Component {
-    /** @type {Object} Button variant data from the active theme */
-    static themeButtons = {};
-
     /** @type {Object|null} Cached palette for ref resolution */
     _palette = null;
 
@@ -91,41 +76,30 @@ export default class ButtonStylePicker extends React.Component {
     };
 
     /**
-     * Read button data from formInspector if we are inside a theme edit form.
-     * Falls back to the global themeButtons otherwise.
+     * Read the list of buttons (each {slug, label, bg, text, border, radius}).
+     * Prefers the live theme form (the repeatable `buttons` block, refs resolved
+     * against the loaded palette) so unsaved edits preview; falls back to the
+     * store (resolved by ThemeConfigResolver).
+     *
+     * @returns {Array<Object>} The buttons list
      */
     _getButtons() {
         const {formInspector} = this.props;
 
-        // Detect if we're in a theme form by checking for a button field
         if (formInspector) {
-            const primaryBg = formInspector.getValueByPath('/buttons_primary_bg');
-            if (primaryBg !== undefined && primaryBg !== null) {
-                const result = {};
-                for (const variant of ['primary', 'secondary', 'accent']) {
-                    result[variant] = {
-                        bg: formInspector.getValueByPath(`/buttons_${variant}_bg`) || '',
-                        text: formInspector.getValueByPath(`/buttons_${variant}_text`) || '',
-                        border: formInspector.getValueByPath(`/buttons_${variant}_border`) || '',
-                        radius: formInspector.getValueByPath(`/buttons_${variant}_radius`) || '',
-                    };
-                }
-
-                // Resolve any ref: values using the loaded palette
+            // getValueByPath may return a MobX observable array (fails Array.isArray).
+            const raw = formInspector.getValueByPath('/buttons');
+            if (raw && raw.length) {
+                const buttons = Array.from(raw).map((button) => ({...button}));
                 if (this._palette) {
-                    for (const variant of ['primary', 'secondary', 'accent']) {
-                        if (result[variant]) {
-                            result[variant] = resolveAllRefs(result[variant], this._palette);
-                        }
-                    }
+                    return buttons.map((button) => resolveAllRefs(button, this._palette));
                 }
-
-                return result;
+                return buttons;
             }
         }
 
-        // Read from observable store (resolved by ThemeConfigResolver)
-        return themeConfigStore.buttons;
+        // Read from observable store (a list resolved by ThemeConfigResolver).
+        return Array.from(themeConfigStore.buttons || []);
     }
 
     render() {
@@ -141,11 +115,20 @@ export default class ButtonStylePicker extends React.Component {
             padding: '4px',
         };
 
+        if (buttons.length === 0) {
+            return (
+                <div style={{padding: '12px', color: '#999', fontStyle: 'italic'}}>
+                    No buttons configured. Add buttons in the Buttons tab.
+                </div>
+            );
+        }
+
         return (
             <div style={containerStyle}>
-                {BUTTON_OPTIONS.map((option) => {
-                    const isSelected = value === option.key;
-                    const btnData = buttons[option.key];
+                {buttons.map((btnData) => {
+                    const slug = btnData.slug;
+                    const label = btnData.label || slug;
+                    const isSelected = value === slug;
                     const hasData = btnData && typeof btnData === 'object';
 
                     const cardStyle = {
@@ -204,17 +187,17 @@ export default class ButtonStylePicker extends React.Component {
 
                     return (
                         <button
-                            key={option.key}
+                            key={slug}
                             type="button"
                             style={cardStyle}
-                            onClick={() => this.handleSelect(option.key)}
-                            title={hasData ? option.label : `${option.label} (not configured)`}
+                            onClick={() => this.handleSelect(slug)}
+                            title={label}
                             disabled={disabled}
                         >
                             <span style={btnPreviewStyle}>
                                 {hasData ? 'Button' : '—'}
                             </span>
-                            <span style={labelStyle}>{option.label}</span>
+                            <span style={labelStyle}>{label}</span>
                         </button>
                     );
                 })}

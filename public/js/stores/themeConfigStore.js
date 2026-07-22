@@ -11,7 +11,8 @@ import {Requester} from 'sulu-admin-bundle/services';
  */
 class ThemeConfigStore {
     @observable variants: Array<Object> = [];
-    @observable buttons: Object = {};
+    /** Ordered button styles: [{slug, label, bg, text, border, radius, ...}] */
+    @observable buttons: Array<Object> = [];
     @observable palette: Object = {};
     /** Ordered palette colors: [{role, slug, value, labelKey}] */
     @observable colors: Array<Object> = [];
@@ -25,7 +26,7 @@ class ThemeConfigStore {
 
     @action update(data: Object) {
         this.variants = data.variants || [];
-        this.buttons = data.buttons || {};
+        this.buttons = data.buttons || [];
         this.palette = data.palette || {};
         this.colors = data.colors || [];
         this.borders = data.borders || {};

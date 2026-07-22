@@ -6,7 +6,7 @@
     <key>iw_theme_config_buttons</key>
 
     <properties>
-        <!-- Global button settings (shared across all variants) -->
+        <!-- Global button settings (shared across all buttons) -->
         <section name="buttonsGlobal">
             <meta>
                 <title>iw_sulu_tailwind_theme.buttons_global</title>
@@ -45,576 +45,216 @@
             </properties>
         </section>
 
-        <!-- Primary Button -->
-        <section name="primaryButton">
+        <!-- Buttons — unlimited, named by slug (repeatable block) -->
+        <block name="buttons" default-type="button" minOccurs="0">
             <meta>
-                <title>iw_sulu_tailwind_theme.buttons_primary</title>
+                <title>iw_sulu_tailwind_theme.buttons</title>
+                <info_text>iw_sulu_tailwind_theme.buttons_info</info_text>
             </meta>
-            <properties>
-                <property name="buttons_primary_bg" type="iw_theme_color_token_editor" colspan="4">
+            <types>
+                <type name="button">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_bg</title>
+                        <title>iw_sulu_tailwind_theme.button</title>
                     </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_text" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_text</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_border" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_border</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverBg" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBg</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverText" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverText</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverBorder" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBorder</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_primary_radius" type="iw_theme_radius_selector">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_radius</title>
-                    </meta>
-                </property>
-                <property name="buttons_primary_borderWidth" type="single_select" colspan="3"
-                          visibleCondition="buttons_primary_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderWidth</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1px"/>
-                        <param name="values" type="collection">
-                            <param name="0px"><meta><title>0</title></meta></param>
-                            <param name="1px"><meta><title>1px</title></meta></param>
-                            <param name="2px"><meta><title>2px</title></meta></param>
-                            <param name="3px"><meta><title>3px</title></meta></param>
-                            <param name="4px"><meta><title>4px</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_borderStyle" type="single_select" colspan="3"
-                          visibleCondition="buttons_primary_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderStyle</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="solid"/>
-                        <param name="values" type="collection">
-                            <param name="solid"><meta><title>Solid</title></meta></param>
-                            <param name="dashed"><meta><title>Dashed</title></meta></param>
-                            <param name="dotted"><meta><title>Dotted</title></meta></param>
-                            <param name="double"><meta><title>Double</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverShadow" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverShadow</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_none</title></meta></param>
-                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_sm</title></meta></param>
-                            <param name="md"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_md</title></meta></param>
-                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_lg</title></meta></param>
-                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_xl</title></meta></param>
-                            <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_primary</title></meta></param>
-                            <param name="glow-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_secondary</title></meta></param>
-                            <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_accent</title></meta></param>
-                            <param name="inset"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_inset</title></meta></param>
-                            <param name="glow-pulse-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_primary</title></meta></param>
-                            <param name="glow-pulse-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_secondary</title></meta></param>
-                            <param name="glow-pulse-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_accent</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverTransform" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverTransform</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_none</title></meta></param>
-                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift</title></meta></param>
-                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift_strong</title></meta></param>
-                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_up</title></meta></param>
-                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_down</title></meta></param>
-                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_tilt</title></meta></param>
-                            <param name="skew"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_skew</title></meta></param>
-                            <param name="pop"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_pop</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverOpacity" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverOpacity</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1"/>
-                        <param name="values" type="collection">
-                            <param name="1"><meta><title>100%</title></meta></param>
-                            <param name="0.95"><meta><title>95%</title></meta></param>
-                            <param name="0.9"><meta><title>90%</title></meta></param>
-                            <param name="0.8"><meta><title>80%</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverDuration" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverDuration</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="300ms"/>
-                        <param name="values" type="collection">
-                            <param name="150ms"><meta><title>150ms</title></meta></param>
-                            <param name="300ms"><meta><title>300ms</title></meta></param>
-                            <param name="500ms"><meta><title>500ms</title></meta></param>
-                            <param name="700ms"><meta><title>700ms</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverBgEffect" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBgEffect</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_none</title></meta></param>
-                            <param name="slide-right"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right</title></meta></param>
-                            <param name="slide-left"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left</title></meta></param>
-                            <param name="slide-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_up</title></meta></param>
-                            <param name="gradient-shift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_gradient_shift</title></meta></param>
-                            <param name="pulse-bg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_pulse_bg</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_primary_hoverEasing" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverEasing</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="ease-out"/>
-                        <param name="values" type="collection">
-                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_linear</title></meta></param>
-                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out</title></meta></param>
-                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out</title></meta></param>
-                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_bounce</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-            </properties>
-        </section>
+                    <properties>
+                        <property name="label" type="text_line" colspan="6" mandatory="true">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.button_label</title>
+                            </meta>
+                        </property>
 
-        <!-- Secondary Button -->
-        <section name="secondaryButton">
-            <meta>
-                <title>iw_sulu_tailwind_theme.buttons_secondary</title>
-            </meta>
-            <properties>
-                <property name="buttons_secondary_bg" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_bg</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_text" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_text</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_border" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_border</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverBg" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBg</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverText" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverText</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverBorder" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBorder</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_secondary_radius" type="iw_theme_radius_selector">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_radius</title>
-                    </meta>
-                </property>
-                <property name="buttons_secondary_borderWidth" type="single_select" colspan="3"
-                          visibleCondition="buttons_secondary_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderWidth</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1px"/>
-                        <param name="values" type="collection">
-                            <param name="0px"><meta><title>0</title></meta></param>
-                            <param name="1px"><meta><title>1px</title></meta></param>
-                            <param name="2px"><meta><title>2px</title></meta></param>
-                            <param name="3px"><meta><title>3px</title></meta></param>
-                            <param name="4px"><meta><title>4px</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_borderStyle" type="single_select" colspan="3"
-                          visibleCondition="buttons_secondary_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderStyle</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="solid"/>
-                        <param name="values" type="collection">
-                            <param name="solid"><meta><title>Solid</title></meta></param>
-                            <param name="dashed"><meta><title>Dashed</title></meta></param>
-                            <param name="dotted"><meta><title>Dotted</title></meta></param>
-                            <param name="double"><meta><title>Double</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverShadow" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverShadow</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_none</title></meta></param>
-                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_sm</title></meta></param>
-                            <param name="md"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_md</title></meta></param>
-                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_lg</title></meta></param>
-                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_xl</title></meta></param>
-                            <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_primary</title></meta></param>
-                            <param name="glow-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_secondary</title></meta></param>
-                            <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_accent</title></meta></param>
-                            <param name="inset"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_inset</title></meta></param>
-                            <param name="glow-pulse-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_primary</title></meta></param>
-                            <param name="glow-pulse-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_secondary</title></meta></param>
-                            <param name="glow-pulse-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_accent</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverTransform" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverTransform</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_none</title></meta></param>
-                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift</title></meta></param>
-                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift_strong</title></meta></param>
-                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_up</title></meta></param>
-                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_down</title></meta></param>
-                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_tilt</title></meta></param>
-                            <param name="skew"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_skew</title></meta></param>
-                            <param name="pop"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_pop</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverOpacity" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverOpacity</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1"/>
-                        <param name="values" type="collection">
-                            <param name="1"><meta><title>100%</title></meta></param>
-                            <param name="0.95"><meta><title>95%</title></meta></param>
-                            <param name="0.9"><meta><title>90%</title></meta></param>
-                            <param name="0.8"><meta><title>80%</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverDuration" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverDuration</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="300ms"/>
-                        <param name="values" type="collection">
-                            <param name="150ms"><meta><title>150ms</title></meta></param>
-                            <param name="300ms"><meta><title>300ms</title></meta></param>
-                            <param name="500ms"><meta><title>500ms</title></meta></param>
-                            <param name="700ms"><meta><title>700ms</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverBgEffect" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBgEffect</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_none</title></meta></param>
-                            <param name="slide-right"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right</title></meta></param>
-                            <param name="slide-left"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left</title></meta></param>
-                            <param name="slide-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_up</title></meta></param>
-                            <param name="gradient-shift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_gradient_shift</title></meta></param>
-                            <param name="pulse-bg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_pulse_bg</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_secondary_hoverEasing" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverEasing</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="ease-out"/>
-                        <param name="values" type="collection">
-                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_linear</title></meta></param>
-                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out</title></meta></param>
-                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out</title></meta></param>
-                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_bounce</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-            </properties>
-        </section>
-        <!-- Accent Button -->
-        <section name="accentButton">
-            <meta>
-                <title>iw_sulu_tailwind_theme.buttons_accent</title>
-            </meta>
-            <properties>
-                <property name="buttons_accent_bg" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_bg</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_text" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_text</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_border" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_border</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverBg" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBg</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverText" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverText</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverBorder" type="iw_theme_color_token_editor" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBorder</title>
-                    </meta>
-                    <params>
-                        <param name="show_palette" value="true"/>
-                    </params>
-                </property>
-                <property name="buttons_accent_radius" type="iw_theme_radius_selector">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_radius</title>
-                    </meta>
-                </property>
-                <property name="buttons_accent_borderWidth" type="single_select" colspan="3"
-                          visibleCondition="buttons_accent_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderWidth</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1px"/>
-                        <param name="values" type="collection">
-                            <param name="0px"><meta><title>0</title></meta></param>
-                            <param name="1px"><meta><title>1px</title></meta></param>
-                            <param name="2px"><meta><title>2px</title></meta></param>
-                            <param name="3px"><meta><title>3px</title></meta></param>
-                            <param name="4px"><meta><title>4px</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_borderStyle" type="single_select" colspan="3"
-                          visibleCondition="buttons_accent_border != 'none'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_borderStyle</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="solid"/>
-                        <param name="values" type="collection">
-                            <param name="solid"><meta><title>Solid</title></meta></param>
-                            <param name="dashed"><meta><title>Dashed</title></meta></param>
-                            <param name="dotted"><meta><title>Dotted</title></meta></param>
-                            <param name="double"><meta><title>Double</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverShadow" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverShadow</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_none</title></meta></param>
-                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_sm</title></meta></param>
-                            <param name="md"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_md</title></meta></param>
-                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_lg</title></meta></param>
-                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_xl</title></meta></param>
-                            <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_primary</title></meta></param>
-                            <param name="glow-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_secondary</title></meta></param>
-                            <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_accent</title></meta></param>
-                            <param name="inset"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_inset</title></meta></param>
-                            <param name="glow-pulse-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_primary</title></meta></param>
-                            <param name="glow-pulse-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_secondary</title></meta></param>
-                            <param name="glow-pulse-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_accent</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverTransform" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverTransform</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_none</title></meta></param>
-                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift</title></meta></param>
-                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift_strong</title></meta></param>
-                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_up</title></meta></param>
-                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_down</title></meta></param>
-                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_tilt</title></meta></param>
-                            <param name="skew"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_skew</title></meta></param>
-                            <param name="pop"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_pop</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverOpacity" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverOpacity</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="1"/>
-                        <param name="values" type="collection">
-                            <param name="1"><meta><title>100%</title></meta></param>
-                            <param name="0.95"><meta><title>95%</title></meta></param>
-                            <param name="0.9"><meta><title>90%</title></meta></param>
-                            <param name="0.8"><meta><title>80%</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverDuration" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverDuration</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="300ms"/>
-                        <param name="values" type="collection">
-                            <param name="150ms"><meta><title>150ms</title></meta></param>
-                            <param name="300ms"><meta><title>300ms</title></meta></param>
-                            <param name="500ms"><meta><title>500ms</title></meta></param>
-                            <param name="700ms"><meta><title>700ms</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverBgEffect" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverBgEffect</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="none"/>
-                        <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_none</title></meta></param>
-                            <param name="slide-right"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right</title></meta></param>
-                            <param name="slide-left"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left</title></meta></param>
-                            <param name="slide-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_up</title></meta></param>
-                            <param name="gradient-shift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_gradient_shift</title></meta></param>
-                            <param name="pulse-bg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_pulse_bg</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="buttons_accent_hoverEasing" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.buttons_hoverEasing</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="ease-out"/>
-                        <param name="values" type="collection">
-                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_linear</title></meta></param>
-                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out</title></meta></param>
-                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out</title></meta></param>
-                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_bounce</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-            </properties>
-        </section>
+                        <property name="slug" type="text_line" colspan="6" mandatory="true">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.button_slug</title>
+                                <info_text>iw_sulu_tailwind_theme.button_slug_info</info_text>
+                            </meta>
+                        </property>
+
+                        <property name="bg" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_bg</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="text" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_text</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="border" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_border</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="hoverBg" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverBg</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="hoverText" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverText</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="hoverBorder" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverBorder</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+                        <property name="radius" type="iw_theme_radius_selector">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_radius</title>
+                            </meta>
+                        </property>
+                        <property name="borderWidth" type="single_select" colspan="3"
+                                  visibleCondition="__parent.border != 'none'">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_borderWidth</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="1px"/>
+                                <param name="values" type="collection">
+                                    <param name="0px"><meta><title>0</title></meta></param>
+                                    <param name="1px"><meta><title>1px</title></meta></param>
+                                    <param name="2px"><meta><title>2px</title></meta></param>
+                                    <param name="3px"><meta><title>3px</title></meta></param>
+                                    <param name="4px"><meta><title>4px</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="borderStyle" type="single_select" colspan="3"
+                                  visibleCondition="__parent.border != 'none'">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_borderStyle</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="solid"/>
+                                <param name="values" type="collection">
+                                    <param name="solid"><meta><title>Solid</title></meta></param>
+                                    <param name="dashed"><meta><title>Dashed</title></meta></param>
+                                    <param name="dotted"><meta><title>Dotted</title></meta></param>
+                                    <param name="double"><meta><title>Double</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverShadow" type="single_select" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverShadow</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="none"/>
+                                <param name="values" type="collection">
+                                    <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_none</title></meta></param>
+                                    <param name="sm"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_sm</title></meta></param>
+                                    <param name="md"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_md</title></meta></param>
+                                    <param name="lg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_lg</title></meta></param>
+                                    <param name="xl"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_xl</title></meta></param>
+                                    <param name="glow-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_primary</title></meta></param>
+                                    <param name="glow-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_secondary</title></meta></param>
+                                    <param name="glow-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_accent</title></meta></param>
+                                    <param name="inset"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_inset</title></meta></param>
+                                    <param name="glow-pulse-primary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_primary</title></meta></param>
+                                    <param name="glow-pulse-secondary"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_secondary</title></meta></param>
+                                    <param name="glow-pulse-accent"><meta><title>iw_sulu_tailwind_theme.buttons_hoverShadow_glow_pulse_accent</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverTransform" type="single_select" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverTransform</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="none"/>
+                                <param name="values" type="collection">
+                                    <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_none</title></meta></param>
+                                    <param name="lift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift</title></meta></param>
+                                    <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_lift_strong</title></meta></param>
+                                    <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_up</title></meta></param>
+                                    <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_scale_down</title></meta></param>
+                                    <param name="tilt"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_tilt</title></meta></param>
+                                    <param name="skew"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_skew</title></meta></param>
+                                    <param name="pop"><meta><title>iw_sulu_tailwind_theme.buttons_hoverTransform_pop</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverOpacity" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverOpacity</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="1"/>
+                                <param name="values" type="collection">
+                                    <param name="1"><meta><title>100%</title></meta></param>
+                                    <param name="0.95"><meta><title>95%</title></meta></param>
+                                    <param name="0.9"><meta><title>90%</title></meta></param>
+                                    <param name="0.8"><meta><title>80%</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverDuration" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverDuration</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="300ms"/>
+                                <param name="values" type="collection">
+                                    <param name="150ms"><meta><title>150ms</title></meta></param>
+                                    <param name="300ms"><meta><title>300ms</title></meta></param>
+                                    <param name="500ms"><meta><title>500ms</title></meta></param>
+                                    <param name="700ms"><meta><title>700ms</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverBgEffect" type="single_select" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverBgEffect</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="none"/>
+                                <param name="values" type="collection">
+                                    <param name="none"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_none</title></meta></param>
+                                    <param name="slide-right"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right</title></meta></param>
+                                    <param name="slide-left"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left</title></meta></param>
+                                    <param name="slide-up"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_up</title></meta></param>
+                                    <param name="gradient-shift"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_gradient_shift</title></meta></param>
+                                    <param name="pulse-bg"><meta><title>iw_sulu_tailwind_theme.buttons_hoverBgEffect_pulse_bg</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                        <property name="hoverEasing" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.buttons_hoverEasing</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="ease-out"/>
+                                <param name="values" type="collection">
+                                    <param name="linear"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_linear</title></meta></param>
+                                    <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out</title></meta></param>
+                                    <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out</title></meta></param>
+                                    <param name="bounce"><meta><title>iw_sulu_tailwind_theme.buttons_hoverEasing_bounce</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                    </properties>
+                </type>
+            </types>
+        </block>
     </properties>
 </form>

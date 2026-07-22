@@ -36,6 +36,15 @@ class ThemeCompiler
     private array $resolvedPalettes = [];
 
     /**
+     * Global button padding (paddingX/paddingY) for the current compile() call.
+     * Buttons are now a slug-keyed list, so the shared padding lives here rather
+     * than inside the buttons collection.
+     *
+     * @var array<string, mixed>
+     */
+    private array $buttonsGlobal = [];
+
+    /**
      * Mapping from Tailwind rounded-* class suffixes to CSS border-radius values.
      */
     private const RADIUS_MAP = [
@@ -183,6 +192,9 @@ class ThemeCompiler
         // Initialize class-level state for ref: resolution
         $this->colorSet = ColorSet::fromTokens($tokens);
         $this->resolvedPalettes = [];
+        // Buttons are a slug-keyed list; the shared padding is separate.
+        $buttonList = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
+        $this->buttonsGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
         $css = "/* Theme: {$theme->getLabel()} — Auto-generated, do not edit */\n\n";
 
         // Google Fonts import
@@ -199,7 +211,7 @@ class ThemeCompiler
         $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
-        $css .= $this->generateButtonVariables($tokens['buttons'] ?? []);
+        $css .= $this->generateButtonVariables($buttonList);
         $css .= $this->generateMenuVariables($menuConfig);
         $css .= $this->generateArticleVariables($tokens);
         $css .= $this->generateArticleCardVariables($tokens);
@@ -212,7 +224,7 @@ class ThemeCompiler
         $css .= $this->generateComponentSurfaceOverrides($tokens);
 
         // Button classes
-        $css .= $this->generateButtonClasses($tokens['buttons'] ?? []);
+        $css .= $this->generateButtonClasses($buttonList);
 
         // Menu utility classes (navbar, dropdowns, overlay, social icons)
         $css .= $this->generateMenuClasses();
@@ -228,11 +240,12 @@ class ThemeCompiler
         $css .= $this->generateArticleCardClasses();
 
         // Block variant classes
-        $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $tokens['buttons'] ?? []);
+        $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $buttonList);
 
         // Reset class-level state after compilation
         $this->colorSet = null;
         $this->resolvedPalettes = [];
+        $this->buttonsGlobal = [];
 
         return $css;
     }
@@ -1226,21 +1239,20 @@ class ThemeCompiler
     {
         $css = "  /* Buttons */\n";
 
-        // Global button padding (shared across every variant)
-        $global = $buttons['global'] ?? [];
-        if (is_array($global)) {
-            $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
-            $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
-            $css .= "  --iw-button-padding-x: {$paddingX};\n";
-            $css .= "  --iw-button-padding-y: {$paddingY};\n";
-        }
+        // Global button padding (shared across every button)
+        $global = $this->buttonsGlobal;
+        $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
+        $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
+        $css .= "  --iw-button-padding-x: {$paddingX};\n";
+        $css .= "  --iw-button-padding-y: {$paddingY};\n";
 
-        foreach ($buttons as $variant => $props) {
-            if ('global' === $variant || !is_array($props)) {
+        foreach ($buttons as $props) {
+            if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
+            $variant = $props['slug'];
 
-            // Border shorthand uses the variant's own width/style settings
+            // Border shorthand uses the button's own width/style settings
             $borderWidth = isset($props['borderWidth']) ? (string) $props['borderWidth'] : '1px';
             $borderStyle = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
 
@@ -1512,11 +1524,12 @@ class ThemeCompiler
         // glow shadow (small footprint, harmless when unused).
         $css .= ButtonEffectCatalog::buildSharedKeyframes();
 
-        // Per-variant @keyframes emitted only when bg-pulse is configured.
-        foreach ($buttons as $variant => $props) {
-            if ('global' === $variant || !is_array($props)) {
+        // Per-button @keyframes emitted only when bg-pulse is configured.
+        foreach ($buttons as $props) {
+            if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
+            $variant = $props['slug'];
             $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
             if (ButtonEffectCatalog::bgEffectNeedsKeyframes($bgEffectKey)) {
                 $css .= ButtonEffectCatalog::buildBgPulseKeyframes($variant);
@@ -1524,15 +1537,16 @@ class ThemeCompiler
         }
         $css .= "\n";
 
-        // Global padding fallback (used when the variant compiles before vars apply)
-        $global = is_array($buttons['global'] ?? null) ? $buttons['global'] : [];
+        // Global padding fallback (used when the button compiles before vars apply)
+        $global = $this->buttonsGlobal;
         $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
         $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
 
-        foreach ($buttons as $variant => $props) {
-            if ('global' === $variant || !is_array($props)) {
+        foreach ($buttons as $props) {
+            if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
+            $variant = $props['slug'];
 
             $borderWidth = isset($props['borderWidth']) ? (string) $props['borderWidth'] : '1px';
             $borderStyle = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
@@ -2434,18 +2448,25 @@ class ThemeCompiler
      */
     private function generateVariantButtonCss(string $variantName, array $props, array $buttons): string
     {
-        $buttonStyle = $props['buttonStyle'] ?? 'primary';
-        $allowed = ['primary', 'secondary', 'accent'];
-        if (!in_array($buttonStyle, $allowed, true)) {
-            $buttonStyle = 'primary';
-        }
-
-        $btnData = $buttons[$buttonStyle] ?? [];
-        if (empty($btnData) || !is_array($btnData)) {
+        // Resolve the variant's buttonStyle reference to an actual button slug,
+        // then look that button up in the (slug-keyed) list.
+        $buttonStyle = ButtonResolver::resolveSlug($props['buttonStyle'] ?? null, $buttons);
+        if ('' === $buttonStyle) {
             return '';
         }
 
-        $global = is_array($buttons['global'] ?? null) ? $buttons['global'] : [];
+        $btnData = [];
+        foreach ($buttons as $candidate) {
+            if (is_array($candidate) && ($candidate['slug'] ?? null) === $buttonStyle) {
+                $btnData = $candidate;
+                break;
+            }
+        }
+        if (empty($btnData)) {
+            return '';
+        }
+
+        $global = $this->buttonsGlobal;
         $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
         $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
 

@@ -80,7 +80,9 @@ class ThemeConfigResolver
                 $variants[] = array_merge(['index' => $index], $props);
             }
 
-            $buttons = $tokens['buttons'] ?? [];
+            // Normalize buttons to a slug-keyed list for the admin JS
+            // (ButtonStylePicker selects by button slug).
+            $buttons = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
 
             // Border tokens, normalized: the legacy `radius` key (pre-3.0.0)
             // is read as a fallback for `cardRadius`

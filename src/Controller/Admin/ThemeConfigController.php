@@ -9,6 +9,7 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Entity\WebspaceTheme;
 use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
@@ -78,15 +79,10 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     private const PREFIX_MENU_COLORS = 'menuConfig_colors_';
 
     /**
-     * Button variant names expected in the form.
-     */
-    private const BUTTON_VARIANTS = ['primary', 'secondary', 'accent'];
-
-    /**
-     * Button-level global properties (shared across all variants).
+     * Button-level global properties (shared across all buttons).
      *
-     * These are stored under tokens.buttons.global.<prop> but exposed in the
-     * form as flat keys without the "global" segment (e.g. buttons_paddingX).
+     * These are stored under tokens.buttonsGlobal.<prop> but exposed in the
+     * form as flat keys without a group segment (e.g. buttons_paddingX).
      */
     private const BUTTON_GLOBAL_PROPS = ['paddingX', 'paddingY'];
 
@@ -551,9 +547,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         unset($borders['radius']);
         $this->flattenDepth1($data, self::PREFIX_BORDERS, $borders);
 
-        // Flatten buttons: variants are depth 2 (tokens.buttons.primary.bg → buttons_primary_bg);
-        // global props are flat (tokens.buttons.global.paddingX → buttons_paddingX).
-        $this->flattenButtons($data, $tokens['buttons'] ?? []);
+        // Buttons: repeatable block (tokens.buttons list → data.buttons) + flat
+        // global padding (tokens.buttonsGlobal.paddingX → buttons_paddingX).
+        $this->flattenButtons($data, $tokens['buttons'] ?? [], $tokens['buttonsGlobal'] ?? []);
 
         // Typography: 3 fixed font family slots
         $this->serializeFontFamilySlots($data, $tokens['typography']['families'] ?? []);
@@ -774,7 +770,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         if (isset($tokens['borders']['cardRadius'])) {
             unset($tokens['borders']['radius']);
         }
-        $tokens['buttons'] = $this->unflattenButtons($data, $tokens['buttons'] ?? []);
+        // Buttons: repeatable list of {slug, label, ...} + separate global padding.
+        // Validate slug uniqueness at save (collision rejected, not deduplicated).
+        $legacyGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
+        $tokens['buttons'] = $this->unflattenButtons($data);
+        $this->slugValidator->validateSlugs(array_column($tokens['buttons'], 'slug'));
+        $tokens['buttonsGlobal'] = $this->unflattenButtonsGlobal($data, $legacyGlobal);
         $tokens['typography'] = $this->unflattenTypography($data, $tokens['typography'] ?? []);
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
         $this->slugValidator->validateSlugs(array_column($tokens['blockVariants'], 'slug'));
@@ -829,66 +830,84 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     /**
      * Flatten button tokens for the admin form.
      *
-     * Variants are flattened depth 2 (buttons_primary_bg). Global props are
-     * flattened depth 1 without the "global" segment (buttons_paddingX),
-     * because they are exposed as standalone fields in the admin section.
+     * Buttons become a Sulu block array under `data.buttons` (repeatable), and
+     * the shared padding is flattened depth 1 without a group segment
+     * (buttons_paddingX), because it is exposed as a standalone field.
      *
-     * @param array<string, mixed> $data    Target array (mutated)
-     * @param array<string, mixed> $buttons Source buttons tokens (variants + global)
+     * @param array<string, mixed> $data          Target array (mutated)
+     * @param array<string, mixed> $buttons        Source buttons tokens (list or legacy map)
+     * @param array<string, mixed> $buttonsGlobal  Source global padding tokens
      */
-    private function flattenButtons(array &$data, array $buttons): void
+    private function flattenButtons(array &$data, array $buttons, array $buttonsGlobal): void
     {
-        // Variants (primary/secondary/accent) — depth 2
-        foreach (self::BUTTON_VARIANTS as $variant) {
-            $variantData = $buttons[$variant] ?? [];
-            if (!is_array($variantData)) {
-                continue;
-            }
-            foreach ($variantData as $prop => $value) {
-                if (!is_array($value)) {
-                    $data[self::PREFIX_BUTTONS . $variant . '_' . $prop] = $value;
-                }
-            }
+        // Buttons as a repeatable Sulu block: [{type:'button', slug, label, ...}].
+        // ButtonResolver normalizes the stored shape (new list or legacy map) and
+        // guarantees a unique slug on each button.
+        $data['buttons'] = [];
+        foreach (ButtonResolver::normalizeButtons($buttons) as $props) {
+            $data['buttons'][] = array_merge(['type' => 'button'], $props);
         }
 
-        // Global props — flat (no group segment in the form key)
-        $globalData = $buttons['global'] ?? [];
-        if (is_array($globalData)) {
-            foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
-                if (isset($globalData[$prop]) && !is_array($globalData[$prop])) {
-                    $data[self::PREFIX_BUTTONS . $prop] = $globalData[$prop];
-                }
+        // Global padding — flat form keys (no group segment), sourced from
+        // tokens.buttonsGlobal (or the legacy buttons.global for old themes).
+        $global = [] !== $buttonsGlobal ? $buttonsGlobal : ButtonResolver::extractLegacyGlobal($buttons);
+        foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
+            if (isset($global[$prop]) && !is_array($global[$prop])) {
+                $data[self::PREFIX_BUTTONS . $prop] = $global[$prop];
             }
         }
     }
 
     /**
-     * Unflatten button form keys into nested buttons structure.
+     * Rebuild the buttons list from the Sulu block array.
      *
-     * buttons_primary_bg → ['primary']['bg'], buttons_paddingX → ['global']['paddingX']
+     * Strips block metadata and derives a slug from the label when the field is
+     * empty (defensive; the form makes it mandatory). Does NOT deduplicate: a
+     * slug collision is rejected at save by the SlugValidator.
      *
-     * @param array<string, mixed>                     $data     Source flat data
-     * @param array<string, array<string, mixed>> $existing Existing button config
+     * @param array<string, mixed> $data Source form data
      *
-     * @return array<string, array<string, mixed>> Reconstructed buttons
+     * @return list<array<string, mixed>> Reconstructed buttons
      */
-    private function unflattenButtons(array $data, array $existing): array
+    private function unflattenButtons(array $data): array
     {
-        foreach (self::BUTTON_VARIANTS as $variant) {
-            $variantPrefix = self::PREFIX_BUTTONS . $variant . '_';
-            foreach ($data as $key => $value) {
-                if (str_starts_with($key, $variantPrefix) && !is_array($value)) {
-                    $prop = substr($key, strlen($variantPrefix));
-                    $existing[$variant][$prop] = $value;
-                }
-            }
+        if (!isset($data['buttons']) || !is_array($data['buttons'])) {
+            return [];
         }
 
-        // Global props live under 'global' but come from flat form keys
+        $result = [];
+        foreach ($data['buttons'] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $props = $item;
+            unset($props['type']);
+            $slug = (isset($props['slug']) && is_string($props['slug'])) ? trim($props['slug']) : '';
+            if ('' === $slug) {
+                $label = (isset($props['label']) && is_string($props['label'])) ? $props['label'] : '';
+                $slug = ButtonResolver::slugify($label);
+            }
+            $props['slug'] = $slug;
+            $result[] = $props;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Rebuild the global button padding from the flat form keys.
+     *
+     * @param array<string, mixed> $data     Source form data
+     * @param array<string, mixed> $existing Existing global values (fallback)
+     *
+     * @return array<string, mixed> Reconstructed global padding
+     */
+    private function unflattenButtonsGlobal(array $data, array $existing): array
+    {
         foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
             $formKey = self::PREFIX_BUTTONS . $prop;
             if (isset($data[$formKey]) && !is_array($data[$formKey])) {
-                $existing['global'][$prop] = $data[$formKey];
+                $existing[$prop] = $data[$formKey];
             }
         }
 

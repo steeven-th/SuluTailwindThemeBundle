@@ -97,6 +97,54 @@ final class ThemeCompilerTest extends TestCase
     }
 
     #[Test]
+    public function itGeneratesButtonClassesBySlugWithSeparateGlobalPadding(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'buttons' => [
+                ['slug' => 'cta', 'label' => 'CTA', 'bg' => 'ref:primary-500', 'text' => '#ffffff'],
+                ['slug' => 'ghost', 'label' => 'Ghost', 'bg' => 'transparent', 'text' => 'ref:primary-700'],
+            ],
+            'buttonsGlobal' => ['paddingX' => '2rem', 'paddingY' => '1rem'],
+        ]);
+
+        self::assertStringContainsString('.iw-button--cta {', $css);
+        self::assertStringContainsString('.iw-button--ghost {', $css);
+        self::assertStringNotContainsString('.iw-button--primary {', $css);
+        self::assertStringContainsString('--iw-button-padding-x: 2rem;', $css);
+        self::assertStringContainsString('--iw-button-padding-y: 1rem;', $css);
+    }
+
+    #[Test]
+    public function itWiresAVariantToAButtonBySlug(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'buttons' => [['slug' => 'ghost', 'label' => 'Ghost', 'bg' => 'transparent', 'text' => '#111111']],
+            'blockVariants' => [['slug' => 'dark', 'label' => 'Dark', 'buttonStyle' => 'ghost', 'title' => '#ffffff']],
+        ]);
+
+        self::assertStringContainsString('.iw-variant--dark .iw-button--variant', $css);
+    }
+
+    #[Test]
+    public function itCompilesLegacyButtonMapShape(): void
+    {
+        // A pre-3.0.0 theme stores buttons as a role-keyed map with a `global`
+        // entry; the compiler must still render it by slug (= role name).
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'buttons' => [
+                'primary' => ['bg' => '#1a3a6b', 'text' => '#ffffff'],
+                'global' => ['paddingX' => '1.5rem', 'paddingY' => '0.75rem'],
+            ],
+        ]);
+
+        self::assertStringContainsString('.iw-button--primary {', $css);
+        self::assertStringContainsString('--iw-button-padding-x: 1.5rem;', $css);
+    }
+
+    #[Test]
     public function itLeavesNoUnresolvedRefInTheOutput(): void
     {
         $css = $this->compileCss([
