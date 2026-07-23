@@ -67,6 +67,27 @@ class OklchPaletteGenerator
     private const GAMUT_CLAMP_ITERATIONS = 50;
 
     /**
+     * Chroma below which a color is treated as achromatic (pure white/black/gray).
+     *
+     * The fixed chromatic lightness ramp keeps only the input hue+chroma and
+     * ignores its lightness, which is meaningless for near-gray inputs: white
+     * and black would both collapse to the same gray scale that never reaches a
+     * true endpoint. Below this threshold the ramp is anchored to the input
+     * lightness instead. Kept low so lightly tinted roles (e.g. a slate neutral)
+     * still get the full chromatic ramp.
+     */
+    private const ACHROMATIC_CHROMA = 0.02;
+
+    /**
+     * Total OKLCH lightness span of an anchored (achromatic) ramp.
+     *
+     * A light input pins the light end to itself (pure white stays white), a
+     * dark input pins the dark end (pure black stays black), a mid input centers
+     * the ramp — so white and black occupy distinct lightness ranges.
+     */
+    private const ACHROMATIC_RANGE = 0.62;
+
+    /**
      * Get the shade levels this generator produces (50→950).
      *
      * @return list<int>
@@ -89,13 +110,20 @@ class OklchPaletteGenerator
         $oklab = $this->srgbToOklab($rgb);
         $oklch = $this->oklabToOklch($oklab);
 
+        $sourceL = $oklch[0];
         $sourceChroma = $oklch[1];
         $hue = $oklch[2];
+
+        // Achromatic inputs (white/black/gray) anchor the lightness ramp to the
+        // input lightness so the true endpoints are preserved and white != black.
+        $lightnessTargets = $sourceChroma < self::ACHROMATIC_CHROMA
+            ? $this->anchoredLightnessTargets($sourceL)
+            : self::LIGHTNESS_TARGETS;
 
         $palette = [];
 
         foreach (ColorShades::ALL as $shade) {
-            $targetL = self::LIGHTNESS_TARGETS[$shade];
+            $targetL = $lightnessTargets[$shade];
             $targetC = $sourceChroma * self::CHROMA_FACTORS[$shade];
 
             $clampedC = $this->gamutClamp($targetL, $targetC, $hue);
@@ -106,6 +134,39 @@ class OklchPaletteGenerator
         }
 
         return $palette;
+    }
+
+    /**
+     * Build lightness targets for an achromatic ramp, anchored to the input.
+     *
+     * Light inputs pin the light end to their own lightness (pure white -> the
+     * lightest shade is true white), dark inputs pin the dark end (pure black ->
+     * the darkest shade is true black), mid inputs center the ramp. The
+     * perceptual distribution of the chromatic targets (denser at the light end)
+     * is reused, remapped into the anchored [lMin, lMax] range.
+     *
+     * @param float $sourceL Input OKLCH lightness (0-1)
+     *
+     * @return array<int, float> Shade number => target lightness
+     */
+    private function anchoredLightnessTargets(float $sourceL): array
+    {
+        $range = self::ACHROMATIC_RANGE;
+        $lMax = min(1.0, $sourceL + $range * (1.0 - $sourceL));
+        $lMin = max(0.0, $sourceL - $range * $sourceL);
+
+        $tMax = self::LIGHTNESS_TARGETS[ColorShades::ALL[0]];
+        $tMin = self::LIGHTNESS_TARGETS[ColorShades::ALL[count(ColorShades::ALL) - 1]];
+        $spread = $tMax - $tMin;
+
+        $targets = [];
+        foreach (self::LIGHTNESS_TARGETS as $shade => $target) {
+            // Normalized position 1.0 (lightest) .. 0.0 (darkest), then remapped.
+            $position = $spread > 0 ? ($target - $tMin) / $spread : 0.0;
+            $targets[$shade] = $lMin + $position * ($lMax - $lMin);
+        }
+
+        return $targets;
     }
 
     /**
