@@ -9,12 +9,15 @@
         · articles: view.url.page.uuid (parent page of a page_tree_route article)
     - currentTitle: appended as the current (non-link) item — used for articles
         whose own title is not part of the page trail.
+    - align: override the global horizontal alignment (left | center | right).
+        Defaults to the theme config; used by the page hero to follow the title.
 
     Config (theme tokens, Components tab):
     - breadcrumbs_enabled: off | pages | articles | both (default both)
     - breadcrumbs_homeLink: prepend a Home link (default true)
     - breadcrumbs_homeLabel: custom Home label (falls back to a translation)
     - breadcrumbs_separator: chevron | slash | dot (default chevron)
+    - breadcrumbs_align: left | center | right (default left)
 #}
 {% set cfg = iw_sulu_tailwind_theme|default({}) %}
 {% set enabled = cfg.breadcrumbs_enabled|default('both') %}
@@ -57,6 +60,6 @@
     {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
         items: items,
         separator: cfg.breadcrumbs_separator|default('chevron'),
-        align: cfg.breadcrumbs_align|default('left'),
+        align: align|default(cfg.breadcrumbs_align|default('left')),
     } only %}
 {% endif %}

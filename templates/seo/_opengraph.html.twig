@@ -14,16 +14,29 @@
 {% set ogUrl = app.request.uri %}
 {% set ogSiteName = sulu_page_navigation_root_tree('main', 0)|length > 0 ? '' : '' %}
 
-{# Resolve OG image: excerpt image → hero image #}
+{# Resolve OG image: excerpt image → hero image.
+   ogImageSized is true only when the dedicated 1200x630 iw_og_image thumbnail is served,
+   so og:image:width/height are never advertised for a smaller fallback. #}
 {% set ogImageUrl = null %}
+{% set ogImageSized = false %}
 {% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
     {% set ogMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
-    {% set ogImageUrl = ogMedia.thumbnails['iw_og_image']|default(ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url)) %}
+    {% if ogMedia.thumbnails['iw_og_image'] is defined %}
+        {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
+        {% set ogImageSized = true %}
+    {% else %}
+        {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
+    {% endif %}
 {% elseif content.heroImage is defined and content.heroImage is not empty %}
     {% set heroId = content.heroImage %}
     {% if heroId %}
         {% set ogMedia = sulu_resolve_media(heroId, app.request.locale) %}
-        {% set ogImageUrl = ogMedia.thumbnails['iw_og_image']|default(ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url)) %}
+        {% if ogMedia.thumbnails['iw_og_image'] is defined %}
+            {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
+            {% set ogImageSized = true %}
+        {% else %}
+            {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
+        {% endif %}
     {% endif %}
 {% endif %}
 
@@ -43,6 +56,10 @@
 <meta property="og:type" content="{{ ogType }}">
 {% if ogImageUrl %}
     <meta property="og:image" content="{{ absolute_url(ogImageUrl) }}">
+    {% if ogImageSized %}
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+    {% endif %}
 {% endif %}
 
 {# Article-specific OG tags #}

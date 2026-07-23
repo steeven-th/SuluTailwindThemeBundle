@@ -518,6 +518,113 @@
             </properties>
         </section>
 
+        <!-- Page hero: site-wide appearance of the optional page banner. The
+             per-page content (image, title, subtitle) lives in the page's Hero
+             section; these settings drive how it is displayed everywhere. -->
+        <section name="componentsPageHero">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_page_hero</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_page_hero_info</info_text>
+            </meta>
+            <properties>
+                <property name="pageHero_height" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.page.hero_height</title></meta>
+                    <params>
+                        <param name="default_value" value="md"/>
+                        <param name="values" type="collection">
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.page.hero_height_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.page.hero_height_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.page.hero_height_lg</title></meta></param>
+                            <param name="full"><meta><title>iw_sulu_tailwind_theme.page.hero_height_full</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_parallax" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_parallax</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_parallax_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+
+                <property name="pageHero_titleDisplay" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_title_display</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_title_display_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="overlay"/>
+                        <param name="values" type="collection">
+                            <param name="overlay"><meta><title>iw_sulu_tailwind_theme.page.hero_display_overlay</title></meta></param>
+                            <param name="below"><meta><title>iw_sulu_tailwind_theme.page.hero_display_below</title></meta></param>
+                            <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_display_hidden</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_breadcrumb" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_breadcrumb</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_breadcrumb_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="with_title"/>
+                        <param name="values" type="collection">
+                            <param name="with_title"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_with_title</title></meta></param>
+                            <param name="top_bar"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_top_bar</title></meta></param>
+                            <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_hidden</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_alignX" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.page.hero_align_x</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_alignY" type="single_select" colspan="4"
+                          visibleCondition="pageHero_titleDisplay == 'overlay'">
+                    <meta><title>iw_sulu_tailwind_theme.page.hero_align_y</title></meta>
+                    <params>
+                        <param name="default_value" value="bottom"/>
+                        <param name="values" type="collection">
+                            <param name="top"><meta><title>iw_sulu_tailwind_theme.page.hero_align_top</title></meta></param>
+                            <param name="middle"><meta><title>iw_sulu_tailwind_theme.page.hero_align_middle</title></meta></param>
+                            <param name="bottom"><meta><title>iw_sulu_tailwind_theme.page.hero_align_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_shade" type="single_select" colspan="4"
+                          visibleCondition="pageHero_titleDisplay == 'overlay'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_shade</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_shade_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="medium"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.page.hero_shade_none</title></meta></param>
+                            <param name="light"><meta><title>iw_sulu_tailwind_theme.page.hero_shade_light</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.page.hero_shade_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.page.hero_shade_strong</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
         <!-- Images / delivery — site-wide image output settings. -->
         <section name="componentsImages">
             <meta>

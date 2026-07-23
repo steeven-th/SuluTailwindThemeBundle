@@ -51,8 +51,10 @@
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
 >
-    {# Navbar — z-30 so the fullscreen panel (z-50) covers it when open #}
-    <nav class="relative z-30 container mx-auto px-4 sm:px-6 lg:px-8">
+    {# Navbar — z-50 so it stays ABOVE the fullscreen panel (z-30): the single
+       burger button stays visible and animates into the X (like the burger menu),
+       instead of being covered by the panel and needing a separate close button. #}
+    <nav class="relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
 
             {# LEFT — Logo + Site Name #}
@@ -116,24 +118,10 @@
         </div>
     </nav>
 
-    {# Fullscreen overlay — covers full viewport, passes IN FRONT of navbar (z-50 > z-30) #}
+    {# Fullscreen overlay — sits BELOW the navbar (z-30 < z-50) so the navbar's
+       burger stays visible and animates into the X (single button, no separate
+       close). #}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
-
-    {# Macro: close button — same visual as the burger in its X state #}
-    {% macro render_close_button() %}
-        <div class="absolute top-0 right-0 h-16 md:h-20 flex items-center px-4 sm:px-6 lg:px-8">
-            <button
-                type="button"
-                data-action="menu#toggle"
-                class="iw-menu__burger iw-menu__burger--open w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                aria-label="Close"
-            >
-                <span class="iw-menu__burger-line"></span>
-                <span class="iw-menu__burger-line"></span>
-                <span class="iw-menu__burger-line"></span>
-            </button>
-        </div>
-    {% endmacro %}
 
     {# Macro: navigation items (L1 / L2 / L3) #}
     {% macro render_nav_items(navItems, twoColumns, clickMode) %}
@@ -274,7 +262,7 @@
         {# Panel is transparent (no bg), each volet carries its own content #}
         <div
             data-menu-target="panel"
-            class="fixed inset-0 z-50 invisible opacity-0"
+            class="fixed inset-0 z-30 invisible opacity-0"
         >
             <div class="flex h-full">
                 {# Left volet — image, slides from the left, full height #}
@@ -283,7 +271,6 @@
                 </div>
                 {# Right volet — nav + background, slides from the right #}
                 <div data-menu-target="curtainRight" class="iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
-                    {{ _self.render_close_button() }}
                     {% if navItems is not empty %}
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
@@ -297,9 +284,8 @@
         {# Panel has iw-menu__overlay background, slides as one block #}
         <div
             data-menu-target="panel"
-            class="iw-menu__overlay fixed inset-0 z-50 invisible opacity-0 flex flex-col items-center justify-center"
+            class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0 flex flex-col items-center justify-center"
         >
-            {{ _self.render_close_button() }}
             {% if navItems is not empty %}
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
             {% endif %}

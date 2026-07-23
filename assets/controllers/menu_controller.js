@@ -43,7 +43,11 @@ export default class extends Controller {
         'backdrop',
         'sidebar', 'sidebarBurger',
         'megaParent', 'megaDropdown',
+        'panels', 'subPanel',
     ];
+
+    /** @type {Array<Element>} Open drill-down panels, innermost last (a navigation stack) */
+    _panelStack = [];
 
     static values = {
         animation: { type: String, default: 'none' },
@@ -98,7 +102,49 @@ export default class extends Controller {
             this.burgerTarget.classList.toggle('iw-menu__burger--open', this.isOpen);
         }
 
+        // Reset the drill-down stack so the menu reopens on the root panel.
+        if (!this.isOpen) {
+            this._resetPanels();
+        }
+
         this._updateOverlayState();
+    }
+
+    /**
+     * Drill-down panels: open the sub-panel referenced by the clicked row.
+     *
+     * @param {Event} event - Action event carrying params.panelId
+     */
+    openPanel(event) {
+        const id = event.params.panelId;
+        const panel = this.subPanelTargets.find((p) => p.dataset.panelId === id);
+        if (!panel || this._panelStack.includes(panel)) return;
+
+        panel.classList.add('iw-menu__subpanel--active');
+        panel.removeAttribute('inert');
+        this._panelStack.push(panel);
+    }
+
+    /** Drill-down panels: close the top-most sub-panel (go one level back). */
+    closePanel() {
+        const panel = this._panelStack.pop();
+        if (!panel) return;
+
+        panel.classList.remove('iw-menu__subpanel--active');
+        panel.setAttribute('inert', '');
+    }
+
+    /**
+     * Collapse every open sub-panel back to the root (called on menu close).
+     *
+     * @private
+     */
+    _resetPanels() {
+        this._panelStack.forEach((panel) => {
+            panel.classList.remove('iw-menu__subpanel--active');
+            panel.setAttribute('inert', '');
+        });
+        this._panelStack = [];
     }
 
     /**
@@ -156,7 +202,7 @@ export default class extends Controller {
         }
     }
 
-    /** Toggle desktop sidebar open/close. */
+    /** Toggle the sidebar open/close (same behavior on every breakpoint). */
     toggleSidebar() {
         if (!this.hasSidebarTarget) return;
 
@@ -173,9 +219,20 @@ export default class extends Controller {
             sidebar.classList.add(hiddenClass);
         }
 
-        // Toggle burger → X on desktop
+        // Burger → X
         if (this.hasSidebarBurgerTarget) {
             this.sidebarBurgerTarget.classList.toggle('iw-menu__burger--open', this.isSidebarOpen);
+        }
+
+        // Backdrop fade (CSS-driven) + body scroll lock.
+        if (this.hasBackdropTarget) {
+            this.backdropTarget.classList.toggle('iw-menu__backdrop--visible', this.isSidebarOpen);
+        }
+        document.body.style.overflow = this.isSidebarOpen ? 'hidden' : '';
+
+        // Collapse any open drill-down panels when the sidebar closes.
+        if (!this.isSidebarOpen) {
+            this._resetPanels();
         }
     }
 
@@ -393,11 +450,13 @@ export default class extends Controller {
 
         // Smart hide: slide the navbar away on scroll down, reveal on scroll up.
         // A small hysteresis avoids flicker on jittery scrolls; the navbar never
-        // hides near the top of the page nor while the mobile menu is open.
+        // hides near the top of the page nor while a menu is open. Keeping it
+        // revealed while an overlay/sidebar is open also avoids re-introducing a
+        // transform (containing block) on the header that hosts those fixed panels.
         if (this.scrollHideValue) {
             const delta = y - this._lastScrollY;
 
-            if (y < SCROLL_HIDE_MIN || this.isOpen) {
+            if (y < SCROLL_HIDE_MIN || this.isOpen || this.isSidebarOpen) {
                 this.element.classList.remove('iw-menu--hidden');
             } else if (Math.abs(delta) > SCROLL_HIDE_HYSTERESIS) {
                 this.element.classList.toggle('iw-menu--hidden', delta > 0);

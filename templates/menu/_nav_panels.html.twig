@@ -1,0 +1,132 @@
+{#
+    Burger menu — drill-down "panels" navigation.
+
+    Sub-menus open as stacked panels that slide in over the current one, reusing
+    the menu's own animation and direction (from the theme config). A back button
+    and the section title sit at the top of each sub-panel; the title links to the
+    parent page when parentLinkable is true.
+
+    Included by _burger.html.twig and _sidebar.html.twig when config.subMenuPanels
+    is on. Requires the menu Stimulus controller (openPanel / closePanel).
+
+    Params:
+    - navItems:  the resolved navigation tree (L1 → L3)
+    - parentLinkable: bool — whether the section title links to the parent page
+                      (panels mode has no split/selflink distinction, just on/off)
+    - direction: menu slide direction ('top' | 'right' | 'bottom' | 'left')
+    - animation: 'none' | 'slide' | 'fade'
+    - socialLinks: resolved social media links (rendered at the bottom of the root)
+    - context: 'burger' (default) | 'sidebar'. Both fill their container and push
+      the panels below the navbar via --iw-menu-panels-offset; 'sidebar' uses a
+      responsive offset (the sidebar navbar is taller on desktop, h-16 md:h-20).
+
+    Public CSS API:
+    - .iw-menu__panels (+ --from-{dir} / --fade / --none) — the stack + its motion
+    - .iw-menu__panel / .iw-menu__subpanel (+ --active) — a level / an overlay level
+    - .iw-menu__panel-header / __panel-back / __panel-title — the sub-panel header
+    - .iw-menu__panel-body / __panel-item — the scrollable list / a row
+#}
+
+{# Sub-panels reuse the overlay motion. fade / none skip the slide; otherwise the
+   panel enters from the menu's own direction. #}
+{% set panelsModifier = animation == 'fade' ? 'fade' : (animation == 'none' ? 'none' : 'from-' ~ (direction|default('right'))) %}
+{% set isSidebar = context|default('burger') == 'sidebar' %}
+
+{# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
+   shares the same absolute positioning context. #}
+{% macro render_subpanel(item, panelId, parentLinkable) %}
+    <section class="iw-menu__subpanel" data-panel-id="{{ panelId }}" data-menu-target="subPanel" inert>
+        <div class="iw-menu__panel-header">
+            <button type="button"
+                    data-action="menu#closePanel"
+                    class="iw-menu__panel-back iw-menu__text"
+                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            {% if parentLinkable %}
+                {# Linkable → iw-menu__text carries the hover feedback of a link. #}
+                <a href="{{ sulu_content_path(item.url) }}" class="iw-menu__panel-title iw-menu__text no-underline">{{ item.title }}</a>
+            {% else %}
+                {# Not a link → plain title, no hover effect. #}
+                <span class="iw-menu__panel-title">{{ item.title }}</span>
+            {% endif %}
+        </div>
+        <nav class="iw-menu__panel-body">
+            {% for child in item.children %}
+                {% if child.children is defined and child.children|length > 0 %}
+                    <button type="button"
+                            data-action="menu#openPanel"
+                            data-menu-panel-id-param="{{ panelId }}-{{ loop.index }}"
+                            class="iw-menu__panel-item iw-menu__text--level-2">
+                        <span>{{ child.title }}</span>
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                {% else %}
+                    <a href="{{ sulu_content_path(child.url) }}" class="iw-menu__panel-item iw-menu__text--level-2 no-underline">
+                        <span>{{ child.title }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </nav>
+    </section>
+    {# Deeper panels, emitted as siblings (flattened). #}
+    {% for child in item.children %}
+        {% if child.children is defined and child.children|length > 0 %}
+            {{ _self.render_subpanel(child, panelId ~ '-' ~ loop.index, parentLinkable) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+<div class="iw-menu__panels iw-menu__panels--{{ panelsModifier }}{{ isSidebar ? ' iw-menu__panels--sidebar' : '' }}" data-menu-target="panels">
+    {# Root panel — first level, always visible below the sub-panels. #}
+    <div class="iw-menu__panel" data-panel-id="root">
+        <nav class="iw-menu__panel-body iw-menu__panel-body--root px-6 sm:px-8">
+            {% for item in navItems %}
+                {% if item.children is defined and item.children|length > 0 %}
+                    <button type="button"
+                            data-action="menu#openPanel"
+                            data-menu-panel-id-param="p-{{ loop.index }}"
+                            class="iw-menu__panel-item iw-menu__text iw-menu__divider border-b">
+                        <span class="text-lg font-medium">{{ item.title }}</span>
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                {% else %}
+                    <a href="{{ sulu_content_path(item.url) }}"
+                       class="iw-menu__panel-item iw-menu__text iw-menu__divider border-b no-underline">
+                        <span class="text-lg font-medium">{{ item.title }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {# Social media icons, at the bottom of the root panel. #}
+            {% if socialLinks|length > 0 %}
+                <div class="flex items-center gap-3 pt-6 pb-4">
+                    {% for link in socialLinks %}
+                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center">
+                            {% if link.icon is defined and link.icon.id is defined %}
+                                {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
+                                {% if iconMedia is not null and iconMedia.url is defined %}
+                                    {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
+                                    <span class="iw-social-icon w-6 h-6"
+                                          style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
+                                          aria-label="{{ link.name|default('') }}"></span>
+                                {% else %}
+                                    <span class="iw-social-text">{{ link.name|default('') }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="iw-social-text">{{ link.name|default('') }}</span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+
+    {# Sub-panels for every branch, flattened as siblings. #}
+    {% for item in navItems %}
+        {% if item.children is defined and item.children|length > 0 %}
+            {{ _self.render_subpanel(item, 'p-' ~ loop.index, parentLinkable) }}
+        {% endif %}
+    {% endfor %}
+</div>

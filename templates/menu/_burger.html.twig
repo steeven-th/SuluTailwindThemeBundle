@@ -112,6 +112,16 @@
         data-menu-target="panel"
         class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0"
     >
+        {% if config.subMenuPanels|default(false) %}
+        {# Drill-down panels mode (opt-in) — separate partial for maintainability. #}
+        {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
+            navItems: navItems,
+            parentLinkable: config.clickParentPagePanels|default(false),
+            direction: slideDirection,
+            animation: animation,
+            socialLinks: socialLinks,
+        } only %}
+        {% else %}
         <nav class="iw-menu__overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
             {% if navItems is not empty %}
                 {% for item in navItems %}
@@ -250,5 +260,6 @@
                 </div>
             {% endif %}
         </nav>
+        {% endif %}
     </div>
 </header>

@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: Page hero section properties (per-page DATA only).
+    The banner content lives here; its appearance (height, title placement,
+    alignment, veil, parallax, breadcrumb) is configured site-wide in the theme
+    admin (Components tab → Page hero), exposed as iw_sulu_tailwind_theme.pageHero_*.
+    Included via XInclude in page templates (see iw_theme_default.xml).
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="heroImage" type="single_media_selection" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.page.hero_image</title>
+            <info_text>iw_sulu_tailwind_theme.page.hero_image_info</info_text>
+        </meta>
+        <params>
+            <param name="types" value="image"/>
+            <param name="formats" type="collection">
+                <param name="iw_theme_hero"/>
+                <param name="iw_theme_16_9"/>
+            </param>
+        </params>
+    </property>
+
+    <property name="heroTitle" type="text_line" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.page.hero_title</title>
+            <info_text>iw_sulu_tailwind_theme.page.hero_title_info</info_text>
+        </meta>
+    </property>
+
+    <property name="heroSubtitle" type="text_line" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.page.hero_subtitle</title>
+            <info_text>iw_sulu_tailwind_theme.page.hero_subtitle_info</info_text>
+        </meta>
+    </property>
+</properties>

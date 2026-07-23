@@ -93,4 +93,13 @@
         <scale x="1920" y="800" mode="outbound"/>
     </format>
 
+    <!-- Open Graph / social share format (1.91:1 ratio, used by og:image, twitter:image and JSON-LD) -->
+    <format key="iw_og_image">
+        <meta>
+            <title lang="en">Open Graph Image</title>
+            <title lang="fr">Image Open Graph</title>
+        </meta>
+        <scale x="1200" y="630" mode="outbound"/>
+    </format>
+
 </formats>

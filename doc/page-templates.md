@@ -8,6 +8,62 @@ The `iw_theme_default` template includes **14 block types**: `text`, `text_image
 
 To use it, select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
+## Page hero (optional banner)
+
+The hero splits into **per-page content** (what to show) and **site-wide appearance** (how to show it), so every page shares one consistent banner style — exactly like the article hero.
+
+### Per-page content — page's "Hero" section
+
+Exposed by the `page-hero.xml` fragment on the page template. Every field is optional; an empty `heroImage` leaves the page unchanged.
+
+| Field | Type | Behavior |
+|-------|------|----------|
+| `heroImage` | `single_media_selection` | Full-width banner at the top of the page. Focus-aware crop, `loading="eager"`, served as `<picture>` avif/webp via the shared `_image` partial (`iw_theme_hero` format, 1920×800). |
+| `heroTitle` | `text_line` | Rendered as the page **H1**. When set, it **overrides the page title** as the H1 — so an editor can keep a short page name (menus, breadcrumb) and a longer editorial headline here. |
+| `heroSubtitle` | `text_line` | Optional tagline shown below the title. |
+
+### Site-wide appearance — admin **Components → Page hero**
+
+Configured once in the theme admin and applied to every page. Exposed to Twig as `iw_sulu_tailwind_theme.pageHero_*`.
+
+| Setting | Key | Values (default) |
+|---------|-----|------------------|
+| Height | `pageHero_height` | `sm` · `md` (default) · `lg` · `full` (full viewport) |
+| Parallax | `pageHero_parallax` | off (default) / on — vertical scroll via the `hero-parallax` controller, respects `prefers-reduced-motion` |
+| Title display | `pageHero_titleDisplay` | `overlay` (default) · `below` · `hidden` |
+| Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |
+| Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
+| Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
+| Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `hidden` |
+
+Rendering rules (see `templates/pages/default.html.twig`):
+
+- **`heroImage` set** → the `_page_hero` component renders the banner with the site-wide appearance. The H1 is `heroTitle` (or the page title as a fallback).
+- **`heroImage` empty, `heroTitle` set** → no banner; the headline is still rendered as an H1 above the content so the input is never silently dropped.
+- **Both empty** → unchanged behavior (top breadcrumb + content blocks).
+
+The breadcrumb also honors the global breadcrumbs setting (Components → Breadcrumb): if breadcrumbs are disabled for pages, none is shown regardless of `pageHero_breadcrumb`.
+
+### CSS API
+
+Public BEM classes (styleable in your theme without touching the Twig):
+
+| Class | Role |
+|-------|------|
+| `.iw-page-hero` + `.iw-page-hero--h-{sm\|md\|lg\|full}` | Banner wrapper / height (`--iw-page-hero-ratio`, `--iw-page-hero-max-height`) |
+| `.iw-page-hero--parallax` / `.iw-page-hero__image--parallax` | Parallax modifier / taller image |
+| `.iw-page-hero__image` | The rendered `<img>` (object-cover, no radius — banner is edge-to-edge) |
+| `.iw-page-hero__overlay` + `.iw-page-hero--y-{top\|middle\|bottom}` | Overlay layer / vertical position (`--iw-page-hero-overlay-padding-block`) |
+| `.iw-page-hero--shade-{none\|light\|medium\|strong}` | Readability veil (`--iw-page-hero-shade`, `--iw-page-hero-shade-opacity`) |
+| `.iw-page-hero--x-{left\|center\|right}` | Horizontal text alignment (overlay + below) |
+| `.iw-page-hero__inner` / `.iw-page-hero__caption` | Overlay content wrapper / below-image wrapper |
+| `.iw-page-hero__title` (+ `--below`) | The H1 (`--iw-page-hero-title-*`) |
+| `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
+| `.iw-page-hero__breadcrumb` (+ `--below`) | Breadcrumb trail (`--iw-page-hero-breadcrumb-*`) |
+| `.iw-page-title` | Headline rendered without a banner (`--iw-page-title-*`) |
+
+> The parallax option requires the `hero_parallax` Stimulus controller to be registered in your `controllers.json` (see the installation section of the README).
+
 ## Modular architecture
 
 The template system is built on a **modular architecture** that separates concerns:
@@ -162,6 +218,7 @@ Instead of manually writing header properties and block lists, you can **include
 | Fragment | Path | Description |
 |----------|------|-------------|
 | Header | `fragments/header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
+| Page hero | `fragments/page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (text_line, overrides the H1) |
 | Blocks | `fragments/blocks.xml` | `<block>` container with all 14 `<type ref="..."/>` |
 | Title group | `fragments/components/title_group.xml` | `title` + `subTitle` + `titleAlignment` (single_select) |
 | Variant | `fragments/components/variant.xml` | `variant` (iw_theme_variant_picker) |
