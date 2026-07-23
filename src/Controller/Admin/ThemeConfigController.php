@@ -45,6 +45,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *   - typography assignments: typography_assignments_{el}_{prop} → tokens.typography.assignments.{el}.{prop}
  *   - blockVariants: blockVariants (block) → tokens.blockVariants
  *   - menu: menuConfig_{key} / menuConfig_colors_{key} → menuConfig.{key} / menuConfig.colors.{key}
+ *   - footer: footerConfig_{key} → footerConfig.{key}
  */
 class ThemeConfigController extends AbstractController implements SecuredControllerInterface
 {
@@ -77,6 +78,11 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * Prefix used for menu color form fields.
      */
     private const PREFIX_MENU_COLORS = 'menuConfig_colors_';
+
+    /**
+     * Prefix used for footer config form fields.
+     */
+    private const PREFIX_FOOTER = 'footerConfig_';
 
     /**
      * Button-level global properties (shared across all buttons).
@@ -172,6 +178,19 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         'clickParentPageNavbar',
         'megamenuSource',
         'subMenuPanels', 'clickParentPagePanels',
+    ];
+
+    /**
+     * Footer config keys, stored in the dedicated footerConfig JSON column.
+     *
+     * The footer is colored through a color `variant` slug (no granular color
+     * fields), so this is a flat list of scalars/media objects — no nested
+     * `colors` sub-object like the menu.
+     */
+    private const FOOTER_SCALAR_KEYS = [
+        'type', 'variant',
+        'displayLogo', 'logo', 'logoHeight', 'displaySiteName', 'siteNamePosition', 'tagline',
+        'displaySocialMedia', 'copyright',
     ];
 
     public function __construct(
@@ -522,6 +541,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
     {
         $tokens = $theme->getTokens();
         $menuConfig = $theme->getMenuConfig();
+        $footerConfig = $theme->getFooterConfig();
 
         $data = [
             'id' => $theme->getId(),
@@ -567,6 +587,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
 
         // Flatten menuConfig scalars and nested colors
         $this->flattenMenuConfig($data, $menuConfig);
+
+        // Flatten footerConfig scalars (footer color is a variant slug)
+        $this->flattenFooterConfig($data, $footerConfig);
 
         // Article configuration: flat keys passed through directly
         foreach (self::ARTICLE_KEYS as $key) {
@@ -642,6 +665,25 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             } elseif (in_array($key, self::MENU_SCALAR_KEYS, true)) {
                 // Pass through known keys (scalars + media objects like {id: X})
                 $data[self::PREFIX_MENU . $key] = $value;
+            }
+        }
+    }
+
+    /**
+     * Flatten footerConfig into prefixed keys.
+     *
+     * All footer keys are flat scalars/media objects (footerConfig_{key}); the
+     * footer color is a variant slug, so there is no nested colors sub-object.
+     *
+     * @param array<string, mixed> $data         Target array (mutated)
+     * @param array<string, mixed> $footerConfig Source footer config
+     */
+    private function flattenFooterConfig(array &$data, array $footerConfig): void
+    {
+        foreach ($footerConfig as $key => $value) {
+            if (in_array($key, self::FOOTER_SCALAR_KEYS, true)) {
+                // Pass through known keys (scalars + media objects like {id: X})
+                $data[self::PREFIX_FOOTER . $key] = $value;
             }
         }
     }
@@ -804,6 +846,10 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         // Reconstruct menuConfig from flat keys
         $menuConfig = $this->unflattenMenuConfig($data, $theme->getMenuConfig());
         $theme->setMenuConfig($menuConfig);
+
+        // Reconstruct footerConfig from flat keys
+        $footerConfig = $this->unflattenFooterConfig($data, $theme->getFooterConfig());
+        $theme->setFooterConfig($footerConfig);
     }
 
     /**
@@ -1119,6 +1165,26 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         }
         if (!empty($colors)) {
             $existing['colors'] = $colors;
+        }
+
+        return $existing;
+    }
+
+    /**
+     * Unflatten footerConfig form keys back into a flat structure.
+     *
+     * @param array<string, mixed> $data     Source flat data
+     * @param array<string, mixed> $existing Existing footer config
+     *
+     * @return array<string, mixed> Reconstructed footer config
+     */
+    private function unflattenFooterConfig(array $data, array $existing): array
+    {
+        foreach (self::FOOTER_SCALAR_KEYS as $key) {
+            $formKey = self::PREFIX_FOOTER . $key;
+            if (array_key_exists($formKey, $data)) {
+                $existing[$key] = $data[$formKey];
+            }
         }
 
         return $existing;

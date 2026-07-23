@@ -1,0 +1,62 @@
+{# Footer — minimal layout: one tidy row. Left: optional compact logo/name +
+   copyright. Right: inline links + social. The inline links use the FIRST
+   column of the Footer snippet (fallback: top-level navigation). Typography
+   from the compiled `.iw-footer*` classes; the <footer> carries the variant. #}
+
+{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(config.variant|default(null), allVariants) %}
+{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+
+{# Inline links: first column of the Footer snippet. No snippet → no links. #}
+{% set navLinks = [] %}
+{% set footerSnippet = sulu_snippet_load_by_area('iw_theme_footer') %}
+{% if footerSnippet is not null and footerSnippet.content.columns is defined and footerSnippet.content.columns|length > 0
+        and footerSnippet.content.columns[0].pages is defined and footerSnippet.content.columns[0].pages|length > 0 %}
+    {% set navLinks = footerSnippet.content.columns[0].pages %}
+{% endif %}
+
+{% set logoUrl = null %}
+{% if config.displayLogo|default(false) and config.logo is defined and config.logo.id|default(null) is not null %}
+    {% set logoMedia = sulu_resolve_media(config.logo.id, app.request.locale) %}
+    {% if logoMedia is not null %}
+        {% set logoUrl = logoMedia.thumbnails['iw_theme_logo_desktop']|default(logoMedia.url)|default(null) %}
+    {% endif %}
+{% endif %}
+{% set showName = config.displaySiteName|default(false) and config.siteName|default('') is not empty %}
+
+<footer class="iw-footer iw-footer--minimal {{ variantClass }}" data-has-bg="true">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        {# Left: brand (optional) + copyright #}
+        <div class="iw-footer__left flex flex-wrap items-center gap-x-4 gap-y-2">
+            {% if logoUrl or showName %}
+                <a href="{{ sulu_content_path('/') }}" class="iw-footer__brand-link inline-flex items-center gap-2 no-underline">
+                    {% if logoUrl %}
+                        <img src="{{ logoUrl }}" alt="" class="iw-footer__logo">
+                    {% endif %}
+                    {% if showName %}
+                        <span class="iw-footer__site-name">{{ config.siteName }}</span>
+                    {% endif %}
+                </a>
+            {% endif %}
+            {% include '@ItechWorldSuluTailwindTheme/footer/_footer_copyright.html.twig' with {config: config} %}
+        </div>
+
+        {# Right: links + social #}
+        <div class="iw-footer__right flex flex-wrap items-center gap-x-5 gap-y-2">
+            {% if navLinks is not empty %}
+                <nav class="iw-footer__nav-wrap">
+                    <ul class="iw-footer__nav-inline">
+                        {% for item in navLinks %}
+                            <li><a href="{{ sulu_content_path(item.url) }}">{{ item.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+            {% if config.displaySocialMedia|default(false) %}
+                {% include '@ItechWorldSuluTailwindTheme/footer/_footer_social.html.twig' with {config: config} %}
+            {% endif %}
+        </div>
+    </div>
+</footer>

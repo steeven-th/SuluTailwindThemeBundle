@@ -126,6 +126,22 @@ class ThemeProvider
     }
 
     /**
+     * Get the footer configuration for the active theme.
+     *
+     * @return array<string, mixed> The footer config, or empty array if no theme is active
+     */
+    public function getFooterConfig(): array
+    {
+        $theme = $this->getActiveTheme();
+
+        if (null === $theme) {
+            return [];
+        }
+
+        return $theme->getFooterConfig();
+    }
+
+    /**
      * Get the block styles for the active theme.
      *
      * @return array<string, mixed> The block styles, or empty array if no theme is active

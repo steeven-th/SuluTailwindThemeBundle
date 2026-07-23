@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 
 /**
- * Represents a theme configuration with design tokens, menu config, and block styles.
+ * Represents a theme configuration with design tokens, menu config, footer config, and block styles.
  *
  * Design tokens are stored as JSON and compiled to CSS custom properties
  * by the ThemeCompiler service.
@@ -56,6 +56,19 @@ class ThemeConfig
      */
     #[ORM\Column(type: Types::JSON)]
     private array $menuConfig = [];
+
+    /**
+     * Footer configuration (layout type, variant, display toggles, copyright).
+     *
+     * Mirrors {@see $menuConfig}: a self-contained config object for the site
+     * footer section. The footer is colored through a color variant slug
+     * (applied as `.iw-variant--<slug>` on the `<footer>`) rather than granular
+     * color fields, so no CSS is compiled for it.
+     *
+     * @var array<string, mixed>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $footerConfig = [];
 
     /**
      * Block styles configuration for each block type.
@@ -144,7 +157,8 @@ class ThemeConfig
      */
     public function getTokens(): array
     {
-        return $this->tokens;
+        // Null-safe against partial hydration / newly-added columns (see getFooterConfig).
+        return $this->tokens ?? [];
     }
 
     /**
@@ -168,7 +182,8 @@ class ThemeConfig
      */
     public function getMenuConfig(): array
     {
-        return $this->menuConfig;
+        // Null-safe against partial hydration / newly-added columns (see getFooterConfig).
+        return $this->menuConfig ?? [];
     }
 
     /**
@@ -186,13 +201,41 @@ class ThemeConfig
     }
 
     /**
+     * Get footer configuration.
+     *
+     * @return array<string, mixed>
+     */
+    public function getFooterConfig(): array
+    {
+        // Null-safe: rows created before this column existed hydrate the typed
+        // property from a NULL DB value, leaving it uninitialized until the
+        // theme is next saved. The `?? []` guard avoids an access error.
+        return $this->footerConfig ?? [];
+    }
+
+    /**
+     * Set footer configuration.
+     *
+     * @param array<string, mixed> $footerConfig
+     *
+     * @return $this
+     */
+    public function setFooterConfig(array $footerConfig): static
+    {
+        $this->footerConfig = $footerConfig;
+
+        return $this;
+    }
+
+    /**
      * Get block styles configuration.
      *
      * @return array<string, mixed>
      */
     public function getBlockStyles(): array
     {
-        return $this->blockStyles;
+        // Null-safe against partial hydration / newly-added columns (see getFooterConfig).
+        return $this->blockStyles ?? [];
     }
 
     /**

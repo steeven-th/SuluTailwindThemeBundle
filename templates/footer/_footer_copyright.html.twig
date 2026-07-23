@@ -1,0 +1,11 @@
+{# Footer copyright line. Expects `config` (footerConfig) in scope.
+   The `{year}` placeholder is replaced with the current year; when no copyright
+   text is set, a sensible default is generated from the site name. #}
+
+{% set copyrightText = config.copyright|default('') %}
+{% if copyrightText is empty %}
+    {% set copyrightText = '© {year} ' ~ (config.siteName|default('')) %}
+{% endif %}
+{% set copyrightText = copyrightText|replace({'{year}': 'now'|date('Y')}) %}
+
+<p class="iw-footer__copyright">{{ copyrightText }}</p>

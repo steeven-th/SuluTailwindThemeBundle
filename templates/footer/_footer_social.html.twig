@@ -1,0 +1,54 @@
+{# Footer social media icons.
+
+   Loaded from the `iw_theme_footer_social_media_links` snippet area (declared in
+   config/templates/snippets/social_media.xml). Reuses the `.iw-social-icon`
+   mask-image technique, but recolors icons from the footer color variant
+   (`--iw-variant-link-color`) instead of the menu social color, so the footer is
+   self-contained and inherits its picked variant. Icon mask URLs are emitted via
+   a <style> block (never an inline style attribute — project convention). #}
+
+{% set socialLinks = [] %}
+{% set socialSnippet = sulu_snippet_load_by_area('iw_theme_footer_social_media_links') %}
+{% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
+    {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+{% endif %}
+
+{% if socialLinks|length > 0 %}
+    {# Resolve icon URLs up front so indices stay aligned between the <style>
+       block and the rendered list. #}
+    {% set resolvedIcons = [] %}
+    {% for link in socialLinks %}
+        {% set iconUrl = null %}
+        {% if link.icon is defined and link.icon.id is defined %}
+            {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
+            {% if iconMedia is not null and iconMedia.url is defined %}
+                {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
+            {% endif %}
+        {% endif %}
+        {% set resolvedIcons = resolvedIcons|merge([{url: link.url, name: link.name|default(''), icon: iconUrl}]) %}
+    {% endfor %}
+
+    <style>
+        {% for item in resolvedIcons %}{% if item.icon %}
+        .iw-footer__social-icon--{{ loop.index }} { -webkit-mask-image: url('{{ item.icon }}'); mask-image: url('{{ item.icon }}'); }
+        {% endif %}{% endfor %}
+        .iw-footer .iw-social-icon { background-color: var(--iw-variant-link-color, currentColor); }
+        .iw-footer a:hover > .iw-social-icon { background-color: var(--iw-variant-link-hover, var(--iw-variant-link-color, currentColor)); }
+        .iw-footer .iw-social-text { color: var(--iw-variant-link-color, currentColor); }
+    </style>
+
+    <ul class="iw-footer__social">
+        {% for item in resolvedIcons %}
+            <li>
+                <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center no-underline" aria-label="{{ item.name }}">
+                    {% if item.icon %}
+                        <span class="iw-social-icon iw-footer__social-icon--{{ loop.index }} w-5 h-5"></span>
+                    {% else %}
+                        <span class="iw-social-text text-sm">{{ item.name }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

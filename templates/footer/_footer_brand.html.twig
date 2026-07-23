@@ -1,0 +1,43 @@
+{# Footer brand block: optional logo, site name and tagline.
+
+   Params:
+   - config: footerConfig
+   - align:  'left' (default) or 'center' — alignment within the block
+
+   Typography/muting is handled by the compiled `.iw-footer*` classes; only
+   layout stays on Tailwind utilities here. #}
+
+{% set align = align|default('left') %}
+{% set namePosition = config.siteNamePosition|default('beside') %}
+
+{% set logoUrl = null %}
+{% if config.displayLogo|default(false) and config.logo is defined and config.logo.id|default(null) is not null %}
+    {% set logoMedia = sulu_resolve_media(config.logo.id, app.request.locale) %}
+    {% if logoMedia is not null %}
+        {% set logoUrl = logoMedia.thumbnails['iw_theme_logo_desktop']|default(logoMedia.url)|default(null) %}
+    {% endif %}
+{% endif %}
+
+{% set showName = config.displaySiteName|default(false) and config.siteName|default('') is not empty %}
+{% set stacked = namePosition == 'below' or not logoUrl %}
+
+{% if logoUrl or showName or config.tagline|default('') is not empty %}
+    <div class="iw-footer__brand flex flex-col gap-4 {{ align == 'center' ? 'items-center text-center' : 'items-start' }}">
+        {% if logoUrl or showName %}
+            <a href="{{ sulu_content_path('/') }}"
+               class="iw-footer__brand-link inline-flex no-underline {{ stacked
+                    ? 'flex-col gap-2 ' ~ (align == 'center' ? 'items-center' : 'items-start')
+                    : 'items-center gap-2.5' }}">
+                {% if logoUrl %}
+                    <img src="{{ logoUrl }}" alt="" class="iw-footer__logo">
+                {% endif %}
+                {% if showName %}
+                    <span class="iw-footer__site-name">{{ config.siteName }}</span>
+                {% endif %}
+            </a>
+        {% endif %}
+        {% if config.tagline|default('') is not empty %}
+            <p class="iw-footer__tagline max-w-xs">{{ config.tagline }}</p>
+        {% endif %}
+    </div>
+{% endif %}

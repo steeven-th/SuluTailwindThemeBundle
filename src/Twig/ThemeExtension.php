@@ -46,6 +46,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_block_style_template', $this->getBlockStyleTemplate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_template', $this->getBlockTemplate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_menu_config', $this->getMenuConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_footer_config', $this->getFooterConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_tokens', $this->getTokens(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_styles', $this->getBlockStyles(...)),
             new TwigFunction('iw_sulu_tailwind_theme_upload_max_size', $this->getUploadMaxSize(...)),
@@ -378,6 +379,28 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
     public function getMenuConfig(): array
     {
         $config = $this->themeProvider->getMenuConfig();
+
+        if (!empty($config) && null !== $this->requestAnalyzer) {
+            $webspace = $this->requestAnalyzer->getWebspace();
+            if (null !== $webspace) {
+                $config['siteName'] = $webspace->getName();
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get the footer configuration for the active theme.
+     *
+     * Injects the webspace name as `siteName` when available (website context),
+     * mirroring {@see getMenuConfig()} so footer partials can display it.
+     *
+     * @return array<string, mixed> The footer configuration
+     */
+    public function getFooterConfig(): array
+    {
+        $config = $this->themeProvider->getFooterConfig();
 
         if (!empty($config) && null !== $this->requestAnalyzer) {
             $webspace = $this->requestAnalyzer->getWebspace();
