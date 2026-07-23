@@ -47,6 +47,7 @@
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
 * **Block variants**: Slug-named per-block color schemes applied via CSS custom properties
 * **Menu configuration**: Configurable menu type, colors, animation, and display options
+* **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
 * **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
@@ -528,6 +529,7 @@ Add the theme functions to your `templates/base.html.twig`:
 | `iw_sulu_tailwind_theme_css_path()` | Web path to the compiled theme CSS |
 | `iw_sulu_tailwind_theme_fonts_link()` | `<link>` tags for Google Fonts |
 | `iw_sulu_tailwind_theme_menu_config()` | Menu configuration array |
+| `iw_sulu_tailwind_theme_footer_config()` | Footer configuration array |
 | `iw_sulu_tailwind_theme_tokens()` | Full design tokens array |
 | `iw_sulu_tailwind_theme_block_styles()` | Block style configuration |
 | `iw_sulu_block_style_template(type, style)` | Resolved template path for a block style (from config) |
@@ -619,6 +621,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
+| [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 
 ## Architecture
 

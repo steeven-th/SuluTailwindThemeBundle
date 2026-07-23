@@ -123,6 +123,7 @@ class ThemeInstallCommand extends Command
             $theme->setLabel($preset['label']);
             $theme->setTokens($preset['tokens']);
             $theme->setMenuConfig($preset['menuConfig']);
+            $theme->setFooterConfig($preset['footerConfig'] ?? []);
             $theme->setBlockStyles($preset['blockStyles']);
 
             $this->entityManager->persist($theme);

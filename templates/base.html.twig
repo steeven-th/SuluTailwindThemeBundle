@@ -60,9 +60,16 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        {% block footer %}{% endblock %}
-    </footer>
+    {# Theme: dynamic footer — ready-made layouts colored by a theme variant.
+       Configure it in the admin (Settings > Themes > Footer). Each partial
+       renders its own <footer>. To disable the bundle footer, simply remove
+       this block from your own base template (like the menu). #}
+    {% block footer %}
+        {% set footerConfig = iw_sulu_tailwind_theme_footer_config() %}
+        {% if footerConfig.type is defined and footerConfig.type is not empty %}
+            {% include '@ItechWorldSuluTailwindTheme/footer/_' ~ footerConfig.type ~ '.html.twig' with {config: footerConfig} %}
+        {% endif %}
+    {% endblock %}
 
     {# Site-wide back-to-top button, opt-in via Components > Site-wide. If you use
        your own base template, copy this include into it. #}

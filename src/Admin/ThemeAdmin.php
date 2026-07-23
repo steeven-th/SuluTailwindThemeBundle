@@ -344,6 +344,16 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
+            // ── Edit form: footer tab ──────────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.footer', '/footer')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_footer')
+                    ->setTabTitle('iw_sulu_tailwind_theme.footer')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+
             // ── Edit form: components tab (site-wide transverse components) ──
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.components', '/components')

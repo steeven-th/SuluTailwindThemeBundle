@@ -307,6 +307,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#1a56db',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -523,6 +524,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#ec4899',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -736,6 +738,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#000000',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -949,6 +952,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#065f46',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -1165,6 +1169,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#f97316',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -1381,6 +1386,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#15803d',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -1393,6 +1399,30 @@ class ThemeFixtures
      *
      * @return array<string, array<string, mixed>>
      */
+    /**
+     * Default footer configuration shared by all presets.
+     *
+     * Enables the "columns" footer colored by the first color variant (empty
+     * `variant` resolves to the first one), so the demo site ships a working
+     * footer out of the box. Copyright is auto-generated from the site name.
+     *
+     * @return array<string, mixed>
+     */
+    private static function getDefaultFooterConfig(): array
+    {
+        return [
+            'type' => 'columns',
+            'variant' => '',
+            'displayLogo' => false,
+            'logoHeight' => 40,
+            'displaySiteName' => true,
+            'siteNamePosition' => 'beside',
+            'tagline' => '',
+            'displaySocialMedia' => true,
+            'copyright' => '',
+        ];
+    }
+
     private static function getDefaultBlockStyles(): array
     {
         return [
@@ -1677,6 +1707,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#ffffff',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }
@@ -1828,6 +1859,7 @@ class ThemeFixtures
                     'socialMediaHover' => '#1a56db',
                 ],
             ],
+            'footerConfig' => self::getDefaultFooterConfig(),
             'blockStyles' => self::getDefaultBlockStyles(),
         ];
     }

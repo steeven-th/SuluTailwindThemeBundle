@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_footer</key>
+
+    <properties>
+        <!-- Footer Layout -->
+        <section name="footerSettings">
+            <meta>
+                <title>iw_sulu_tailwind_theme.footer_settings</title>
+            </meta>
+            <properties>
+                <property name="footerConfig_type" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_type</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_type_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" type="string" value="columns"/>
+                        <param name="values" type="collection">
+                            <param name="columns">
+                                <meta><title>iw_sulu_tailwind_theme.footer_type_columns</title></meta>
+                            </param>
+                            <param name="centered">
+                                <meta><title>iw_sulu_tailwind_theme.footer_type_centered</title></meta>
+                            </param>
+                            <param name="minimal">
+                                <meta><title>iw_sulu_tailwind_theme.footer_type_minimal</title></meta>
+                            </param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Footer color is a named color variant applied on the <footer> -->
+                <property name="footerConfig_variant" type="iw_theme_variant_picker" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_variant</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_variant_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Display Options -->
+        <section name="footerDisplay">
+            <meta>
+                <title>iw_sulu_tailwind_theme.footer_display</title>
+            </meta>
+            <properties>
+                <property name="footerConfig_displayLogo" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_displayLogo</title>
+                    </meta>
+                </property>
+
+                <property name="footerConfig_logo" type="single_media_selection" colspan="6"
+                          visibleCondition="footerConfig_displayLogo == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_logo</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_logo_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="footerConfig_logoHeight" type="number" colspan="6"
+                          visibleCondition="footerConfig_displayLogo == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_logoHeight</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_logoHeight_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="40"/>
+                        <param name="min" value="12"/>
+                        <param name="max" value="200"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_displaySiteName" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_displaySiteName</title>
+                    </meta>
+                </property>
+
+                <property name="footerConfig_siteNamePosition" type="single_select" colspan="6"
+                          visibleCondition="footerConfig_displaySiteName == true AND footerConfig_displayLogo == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_siteNamePosition</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_siteNamePosition_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" type="string" value="beside"/>
+                        <param name="values" type="collection">
+                            <param name="beside">
+                                <meta><title>iw_sulu_tailwind_theme.footer_siteNamePosition_beside</title></meta>
+                            </param>
+                            <param name="below">
+                                <meta><title>iw_sulu_tailwind_theme.footer_siteNamePosition_below</title></meta>
+                            </param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="footerConfig_tagline" type="text_line" colspan="12"
+                          visibleCondition="footerConfig_type == 'columns' OR footerConfig_type == 'centered'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_tagline</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_tagline_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="footerConfig_displaySocialMedia" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_displaySocialMedia</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_displaySocialMedia_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="footerConfig_copyright" type="text_line" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_copyright</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_copyright_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>

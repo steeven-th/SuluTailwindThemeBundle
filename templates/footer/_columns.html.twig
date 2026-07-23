@@ -1,0 +1,59 @@
+{# Footer — columns layout.
+
+   Columns are editorial: they come from the "Footer" snippet (area
+   `iw_theme_footer`). Each column has a label and a smart_content page
+   selection. The number of columns is whatever the editor created. Brand,
+   social and copyright come from the theme's Footer config. Typography/muting
+   is handled by the compiled `.iw-footer*` classes; the <footer> carries the
+   picked color variant (`.iw-variant--<slug>`). #}
+
+{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
+{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(config.variant|default(null), allVariants) %}
+{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+
+{% set columns = [] %}
+{% set footerSnippet = sulu_snippet_load_by_area('iw_theme_footer') %}
+{% if footerSnippet is not null and footerSnippet.content is defined and footerSnippet.content.columns is defined %}
+    {% set columns = footerSnippet.content.columns %}
+{% endif %}
+
+<footer class="iw-footer iw-footer--columns {{ variantClass }}" data-has-bg="true">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
+
+            {# Brand — logo / name / tagline / social #}
+            <div class="iw-footer__brand-col flex flex-col gap-5 lg:max-w-xs">
+                {% include '@ItechWorldSuluTailwindTheme/footer/_footer_brand.html.twig' with {config: config, align: 'left'} %}
+                {% if config.displaySocialMedia|default(false) %}
+                    {% include '@ItechWorldSuluTailwindTheme/footer/_footer_social.html.twig' with {config: config} %}
+                {% endif %}
+            </div>
+
+            {# Editorial link columns from the Footer snippet #}
+            {% if columns is not empty %}
+                <div class="iw-footer__nav lg:flex-1 lg:max-w-2xl">
+                    {% for column in columns %}
+                        <div class="iw-footer__col">
+                            {% if column.column_title|default('') is not empty %}
+                                <div class="iw-footer__col-title">{{ column.column_title }}</div>
+                            {% endif %}
+                            {% if column.pages is defined and column.pages|length > 0 %}
+                                <ul class="iw-footer__links">
+                                    {% for page in column.pages %}
+                                        <li><a href="{{ sulu_content_path(page.url) }}">{{ page.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Bottom bar #}
+        <hr class="iw-footer__divider mt-12 mb-6">
+        <div class="iw-footer__bottom flex flex-col sm:flex-row items-center justify-between gap-4">
+            {% include '@ItechWorldSuluTailwindTheme/footer/_footer_copyright.html.twig' with {config: config} %}
+        </div>
+    </div>
+</footer>

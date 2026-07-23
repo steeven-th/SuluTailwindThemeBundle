@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>iw_theme_footer</key>
+
+    <meta>
+        <title>iw_sulu_tailwind_theme.snippet.footer</title>
+    </meta>
+
+    <areas>
+        <area key="iw_theme_footer">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet.footer_area</title>
+            </meta>
+        </area>
+    </areas>
+
+    <properties>
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet_title</title>
+            </meta>
+            <tag name="sulu.node.name"/>
+        </property>
+
+        <!-- Footer link columns — the editor adds as many as needed; each column
+             has a label and a smart_content page selection (manual or filtered). -->
+        <block name="columns" minOccurs="0">
+            <meta>
+                <title>iw_sulu_tailwind_theme.footer_columns</title>
+                <info_text>iw_sulu_tailwind_theme.footer_columns_info</info_text>
+            </meta>
+            <types>
+                <type name="column">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_column</title>
+                    </meta>
+                    <properties>
+                        <property name="column_title" type="text_line">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.footer_column_title</title>
+                            </meta>
+                        </property>
+
+                        <property name="pages" type="page_selection">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.footer_column_pages</title>
+                                <info_text>iw_sulu_tailwind_theme.footer_column_pages_info</info_text>
+                            </meta>
+                            <params>
+                                <param name="properties" type="collection">
+                                    <param name="title" value="title"/>
+                                    <param name="url" value="url"/>
+                                </param>
+                            </params>
+                        </property>
+                    </properties>
+                </type>
+            </types>
+        </block>
+    </properties>
+</template>

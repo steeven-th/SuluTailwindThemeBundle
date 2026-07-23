@@ -229,6 +229,12 @@ class ThemeCompiler
         // Menu utility classes (navbar, dropdowns, overlay, social icons)
         $css .= $this->generateMenuClasses();
 
+        // Footer component classes (typography/spacing for the footer partials).
+        // Emitted as plain (unlayered) CSS so footer sizing wins over the theme's
+        // unlayered element rules — Tailwind utilities live in @layer utilities
+        // and would otherwise lose the cascade against `h*`/base element styles.
+        $css .= $this->generateFooterClasses($theme->getFooterConfig());
+
         // Form field utility class
         $css .= $this->generateFormFieldClass();
 
@@ -1780,6 +1786,61 @@ class ThemeCompiler
         $css .= "}\n\n";
 
         return $css;
+    }
+
+    /**
+     * Generate the .iw-footer* component classes.
+     *
+     * Emitted as plain (unlayered) CSS. Only properties that would otherwise
+     * lose the cascade against the theme's unlayered element rules live here —
+     * font-size (headings/base), the muted opacity treatment, link hover, the
+     * auto-fit column grid and the divider. Layout (flex/gap/padding/container)
+     * stays on Tailwind utilities in the footer partials. Colors are left to the
+     * active color variant (`.iw-variant--<slug>` on the `<footer>`).
+     *
+     * @param array<string, mixed> $footerConfig The theme's footer configuration
+     *
+     * @return string CSS declarations
+     */
+    private function generateFooterClasses(array $footerConfig = []): string
+    {
+        $css = "\n/* Footer component classes */\n";
+
+        // Brand — logo capped by a configurable max-height (keeps aspect ratio,
+        // never upscales a small logo). Width auto + max-width guard for narrow columns.
+        $logoHeight = (int) ($footerConfig['logoHeight'] ?? 40);
+        if ($logoHeight < 8) {
+            $logoHeight = 40;
+        }
+        $css .= ".iw-footer__logo { max-height: {$logoHeight}px; width: auto; max-width: 100%; }\n";
+        $css .= ".iw-footer__site-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }\n";
+        $css .= ".iw-footer__tagline { font-size: 0.875rem; line-height: 1.6; opacity: 0.7; }\n";
+
+        // Column titles (plain labels) + page links
+        $css .= ".iw-footer__col-title { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.55; margin-bottom: 0.85rem; }\n";
+        $css .= ".iw-footer__links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }\n";
+        $css .= ".iw-footer__links a { font-size: 0.875rem; line-height: 1.4; text-decoration: none; opacity: 0.75; transition: opacity 0.2s ease, color 0.2s ease; }\n";
+        $css .= ".iw-footer__links a:hover { opacity: 1; }\n";
+
+        // Auto-fit column grid — adapts to any number of editor-defined columns
+        $css .= ".iw-footer__nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 2rem; }\n";
+
+        // Inline nav row (centered / minimal layouts)
+        $css .= ".iw-footer__nav-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; list-style: none; margin: 0; padding: 0; }\n";
+        $css .= ".iw-footer__nav-inline a { font-size: 0.875rem; text-decoration: none; opacity: 0.75; transition: opacity 0.2s ease, color 0.2s ease; }\n";
+        $css .= ".iw-footer__nav-inline a:hover { opacity: 1; }\n";
+
+        // Copyright + divider
+        $css .= ".iw-footer__copyright { font-size: 0.8125rem; opacity: 0.55; }\n";
+        $css .= ".iw-footer__divider { border: 0; height: 1px; background-color: currentColor; opacity: 0.12; }\n";
+
+        // Social list. Each <li> is a flex box so the icon is vertically
+        // centered on the row (a list-item <li> keeps a baseline offset that
+        // pushes the icon off-center relative to the text links).
+        $css .= ".iw-footer__social { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }\n";
+        $css .= ".iw-footer__social li { display: flex; }\n";
+
+        return $css . "\n";
     }
 
     /**
