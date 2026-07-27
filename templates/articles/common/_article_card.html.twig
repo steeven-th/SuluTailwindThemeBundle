@@ -63,7 +63,11 @@
             {% set imgId = articleImage %}
         {% endif %}
         {% if imgId %}
-            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
+            {# In the live-editor preview (iw_demo_mode) images resolve to a
+               stable picsum placeholder instead of a real media entity. #}
+            {% set imgMedia = iw_demo_mode|default(false)
+                ? iw_sulu_tailwind_theme_demo_media(imgId, 'iw_theme_16_9')
+                : sulu_resolve_media(imgId, app.request.locale) %}
         {% endif %}
 
         {% if imgMedia %}

@@ -57,6 +57,33 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_demo_media', $this->getDemoMedia(...)),
+        ];
+    }
+
+    /**
+     * Build a placeholder media object for the Live Theme Editor preview.
+     *
+     * Returns a media-like array shaped for the unified image partial
+     * ({@see blocks/common/_image.html.twig}): only `url`/`title` are needed, an
+     * empty `thumbnails` map makes the partial fall back to `url` with no
+     * avif/webp sources. The image comes from picsum.photos, keyed by the demo
+     * seed so the same block always shows the same picture (aspect-ratio
+     * cropping is handled by the partial's `ratio` param, so one size suffices).
+     *
+     * @param int|string  $seed   The demo image seed (a preset's media placeholder)
+     * @param string      $format The Sulu format key (unused; kept for parity)
+     *
+     * @return array<string, mixed> A media-like object for the image partial
+     */
+    public function getDemoMedia(int|string $seed, string $format = 'iw_theme_16_9'): array
+    {
+        return [
+            'url' => \sprintf('https://picsum.photos/seed/iw-%s/1600/900', (string) $seed),
+            'title' => 'Demo image',
+            'thumbnails' => [],
+            'focusPointX' => null,
+            'focusPointY' => null,
         ];
     }
 
