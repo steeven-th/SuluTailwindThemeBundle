@@ -50,6 +50,14 @@ services:
         tags:
             - { name: 'controller.service_arguments' }
 
+    # Live Theme Editor (SPIKE): standalone full-page editor + live preview loop
+    ItechWorld\SuluTailwindThemeBundle\Controller\Admin\LiveThemeEditorController:
+        autowire: true
+        autoconfigure: true
+        public: true
+        tags:
+            - { name: 'controller.service_arguments' }
+
     # Article listing page controller (F2): extends Sulu's ContentController to
     # inject the server-side filtered/paginated article list and filter facets.
     ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleListingController:
@@ -183,6 +191,9 @@ services:
             - '@?sulu.repository.user'
         tags:
             - { name: 'twig.extension' }
+
+    # ─── Live Theme Editor (SPIKE→feature) ───────────────────────────────
+    ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider: ~
 
     # ─── Article discovery services (F2) ─────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService: ~

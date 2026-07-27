@@ -1,0 +1,626 @@
+{#
+  Live Theme Editor — standalone editor shell.
+
+  Opened in a dedicated window (window.open). Customizer-style layout: a left
+  panel drives global theme settings (a root section list → per-section control
+  screens), a live preview iframe fills the rest. Structural section changes
+  reload the iframe (?section=); token changes recompile CSS server-side and are
+  pushed into the iframe via postMessage without reload.
+
+  Buildless on purpose (vanilla JS + Twig) so the UX can be validated fast; the
+  existing React field types get grafted into the section screens later.
+
+  Parameters:
+    - themeId    : the ThemeConfig id
+    - themeLabel : human-readable theme name
+    - colors     : list of {role, label, value} for the Colors screen pickers
+#}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Live Theme Editor — {{ themeLabel }}</title>
+    <style>
+        :root {
+            --le-accent: #4f46e5;
+            --le-accent-hover: #4338ca;
+            --le-border: #e2e8f0;
+            --le-bg: #f8fafc;
+            --le-text: #0f172a;
+            --le-muted: #64748b;
+            --le-panel-w: 340px;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; height: 100%; }
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: var(--le-text);
+            display: grid;
+            grid-template-columns: var(--le-panel-w) 1fr;
+            grid-template-rows: 1fr;
+            height: 100vh;
+        }
+
+        /* ── Left panel ─────────────────────────────────────────────── */
+        .le-panel {
+            border-right: 1px solid var(--le-border);
+            background: var(--le-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .le-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--le-border);
+            background: #fff;
+        }
+        .le-topbar__title { font-size: 13px; font-weight: 600; }
+        .le-topbar__sub { font-size: 11px; color: var(--le-muted); margin-top: 2px; }
+        .le-iconbtn {
+            appearance: none; border: 1px solid var(--le-border); background: #fff;
+            width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+            font-size: 16px; line-height: 1; color: var(--le-muted);
+        }
+        .le-iconbtn:hover { color: var(--le-text); border-color: #cbd5e1; }
+
+        .le-body { flex: 1; overflow-y: auto; min-height: 0; }
+
+        /* Screens: only one visible at a time. */
+        .le-screen { display: none; padding: 16px; }
+        .le-screen.is-active { display: block; }
+
+        /* Root: section list */
+        .le-sectionlist { display: flex; flex-direction: column; gap: 6px; }
+        .le-section {
+            display: flex; align-items: center; gap: 12px; width: 100%;
+            padding: 12px 14px; border: 1px solid var(--le-border); border-radius: 10px;
+            background: #fff; cursor: pointer; text-align: left; font-size: 13px;
+            color: var(--le-text);
+        }
+        .le-section:hover:not(:disabled) { border-color: var(--le-accent); }
+        .le-section:disabled { opacity: .55; cursor: default; }
+        .le-section__icon { font-size: 18px; line-height: 1; }
+        .le-section__label { flex: 1; font-weight: 500; }
+        .le-section__meta { font-size: 11px; color: var(--le-muted); }
+        .le-section__chevron { color: var(--le-muted); }
+
+        /* Section screen header (back) */
+        .le-screenhead {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+        }
+        .le-back {
+            appearance: none; border: 0; background: none; cursor: pointer;
+            color: var(--le-accent); font-size: 13px; font-weight: 600; padding: 0;
+        }
+        .le-screenhead__title { font-size: 13px; font-weight: 600; }
+
+        /* Controls */
+        .le-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .le-label { font-size: 12px; font-weight: 500; color: #334155; }
+        .le-color-row { display: flex; align-items: center; gap: 12px; }
+        .le-color-row input[type="color"] {
+            width: 48px; height: 40px; padding: 0; border: 1px solid #cbd5e1;
+            border-radius: 8px; background: none; cursor: pointer;
+        }
+        .le-color-row output { font-family: ui-monospace, monospace; font-size: 13px; }
+        .le-select {
+            width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px;
+            background: #fff; font-size: 13px; color: var(--le-text); cursor: pointer;
+        }
+        .le-select:focus { outline: 2px solid var(--le-accent); outline-offset: 0; border-color: var(--le-accent); }
+        .le-hint { font-size: 11px; color: var(--le-muted); }
+        .le-hint--lead { margin-top: 0; margin-bottom: 16px; }
+
+        /* Typography screen */
+        .le-subhead {
+            font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+            color: var(--le-muted); margin: 22px 0 12px;
+        }
+        .le-subhead:first-of-type { margin-top: 0; }
+        .le-typo-el {
+            border: 1px solid var(--le-border); border-radius: 10px; background: #fff;
+            padding: 12px 14px; margin-bottom: 12px;
+        }
+        .le-typo-el__title { font-size: 12px; font-weight: 600; margin: 0 0 10px; color: #334155; }
+        .le-typo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .le-typo-cell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+        .le-typo-cell--wide { grid-column: 1 / -1; }
+        .le-typo-cell__label { font-size: 11px; font-weight: 500; color: var(--le-muted); }
+        .le-typo-cell .le-select { padding: 7px 9px; font-size: 12px; }
+
+        /* Palette grid */
+        .le-colorgrid { display: flex; flex-direction: column; gap: 10px; }
+        .le-color-item { display: flex; align-items: center; gap: 12px; }
+        .le-color-item input[type="color"] {
+            width: 40px; height: 34px; padding: 0; border: 1px solid #cbd5e1;
+            border-radius: 8px; background: none; cursor: pointer; flex: none;
+        }
+        .le-color-item__label {
+            display: flex; flex-direction: column; font-size: 13px; font-weight: 500;
+            cursor: pointer;
+        }
+        .le-color-item__val {
+            font-family: ui-monospace, monospace; font-size: 11px; font-weight: 400;
+            color: var(--le-muted); text-transform: uppercase;
+        }
+
+        /* Footer (save) */
+        .le-footer {
+            padding: 14px 16px; border-top: 1px solid var(--le-border); background: #fff;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .le-btn {
+            appearance: none; border: 0; border-radius: 8px; padding: 10px 16px;
+            font-size: 13px; font-weight: 600; color: #fff; background: var(--le-accent);
+            cursor: pointer;
+        }
+        .le-btn:hover:not(:disabled) { background: var(--le-accent-hover); }
+        .le-btn:disabled { opacity: .5; cursor: default; }
+        .le-status { font-size: 12px; min-height: 16px; flex: 1; }
+        .le-status.is-ok { color: #16a34a; }
+        .le-status.is-err { color: #dc2626; }
+        .le-status.is-busy { color: var(--le-muted); }
+
+        /* ── Preview ────────────────────────────────────────────────── */
+        .le-preview { border: 0; width: 100%; height: 100%; min-height: 0; background: #fff; }
+    </style>
+</head>
+<body
+    data-preview-url="{{ path('iw_sulu_tailwind_theme.live_editor_preview', { id: themeId }) }}"
+    data-preview-css-url="{{ path('iw_sulu_tailwind_theme.live_editor_preview_css', { id: themeId }) }}"
+    data-save-url="{{ path('iw_sulu_tailwind_theme.live_editor_save', { id: themeId }) }}"
+>
+    <aside class="le-panel">
+        <div class="le-topbar">
+            <div>
+                <div class="le-topbar__title">Live Theme Editor</div>
+                <div class="le-topbar__sub">{{ themeLabel }}</div>
+            </div>
+            <button type="button" class="le-iconbtn" id="le-close" title="Close" aria-label="Close">×</button>
+        </div>
+
+        <div class="le-body">
+            {# Root screen: list of configurable sections #}
+            <div class="le-screen is-active" data-screen="root">
+                <div class="le-sectionlist">
+                    <button type="button" class="le-section" data-goto="colors" data-section="showcase">
+                        <span class="le-section__icon">🎨</span>
+                        <span class="le-section__label">Colors &amp; variants</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                    <button type="button" class="le-section" data-goto="borders" data-section="showcase">
+                        <span class="le-section__icon">⬜</span>
+                        <span class="le-section__label">Borders &amp; radius</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                    <button type="button" class="le-section" data-goto="typography" data-section="typography">
+                        <span class="le-section__icon">✍️</span>
+                        <span class="le-section__label">Typography</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                    <button type="button" class="le-section" data-goto="cards" data-section="cards">
+                        <span class="le-section__icon">🃏</span>
+                        <span class="le-section__label">Cards</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                    <button type="button" class="le-section" data-goto="hero" data-section="hero">
+                        <span class="le-section__icon">🖼️</span>
+                        <span class="le-section__label">Page hero</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                    <button type="button" class="le-section" disabled>
+                        <span class="le-section__icon">🧭</span>
+                        <span class="le-section__label">Menu</span>
+                        <span class="le-section__meta">Soon</span>
+                    </button>
+                    <button type="button" class="le-section" disabled>
+                        <span class="le-section__icon">📄</span>
+                        <span class="le-section__label">Footer</span>
+                        <span class="le-section__meta">Soon</span>
+                    </button>
+                    <button type="button" class="le-section" data-goto="articles" data-section="articles">
+                        <span class="le-section__icon">📰</span>
+                        <span class="le-section__label">Articles</span>
+                        <span class="le-section__chevron">›</span>
+                    </button>
+                </div>
+            </div>
+
+            {# Colors screen #}
+            <div class="le-screen" data-screen="colors">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Colors &amp; variants</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Applied site-wide. The preview updates live; press Save to persist.</p>
+
+                <div class="le-colorgrid">
+                    {% for color in colors %}
+                        <div class="le-color-item">
+                            <input type="color" class="le-color" data-role="{{ color.role }}"
+                                   id="le-color-{{ color.role }}" value="{{ color.value }}">
+                            <label class="le-color-item__label" for="le-color-{{ color.role }}">
+                                {{ color.label }}
+                                <span class="le-color-item__val" data-val-for="{{ color.role }}">{{ color.value }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Borders & radius screen #}
+            <div class="le-screen" data-screen="borders">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Borders &amp; radius</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Corner rounding per context. Preview updates live; Save persists.</p>
+
+                {% for field in borders %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-token-{{ loop.index }}">{{ field.label }}</label>
+                        <select class="le-select le-token" id="le-token-{{ loop.index }}" data-path="{{ field.path }}">
+                            {% for value, label in radiusOptions %}
+                                <option value="{{ value }}"{{ value == field.value ? ' selected' : '' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Typography screen #}
+            <div class="le-screen" data-screen="typography">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Typography</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Font families and per-element sizing, applied site-wide. Preview updates live; Save persists.</p>
+
+                {# Font families: 3 fixed slots (heading / body / accent) #}
+                <p class="le-subhead">Font families</p>
+                {% for family in typography.families %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-family-{{ family.role }}">{{ family.label }}</label>
+                        <select class="le-select le-family" id="le-family-{{ family.role }}" data-role="{{ family.role }}">
+                            <option value=""{{ family.name == '' ? ' selected' : '' }}>System default</option>
+                            <optgroup label="Google Fonts">
+                                {% for name in fontChoices.google %}
+                                    <option value="{{ name }}"{{ name == family.name ? ' selected' : '' }}>{{ name }}</option>
+                                {% endfor %}
+                            </optgroup>
+                            <optgroup label="System fonts">
+                                {% for name in fontChoices.system %}
+                                    <option value="{{ name }}"{{ name == family.name ? ' selected' : '' }}>{{ name }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+                {% endfor %}
+
+                {# Per-element assignments: family / weight / size / style / line-height #}
+                <p class="le-subhead">Elements</p>
+                {% for el in typography.elements %}
+                    <div class="le-typo-el">
+                        <p class="le-typo-el__title">{{ el.label }}</p>
+                        <div class="le-typo-grid">
+                            <label class="le-typo-cell le-typo-cell--wide">
+                                <span class="le-typo-cell__label">Font</span>
+                                <select class="le-select le-token" data-path="{{ el.path }}.family">
+                                    {% for role, label in familySlots %}
+                                        <option value="{{ role }}"{{ role == el.family ? ' selected' : '' }}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <label class="le-typo-cell le-typo-cell--wide">
+                                <span class="le-typo-cell__label">Weight</span>
+                                <select class="le-select le-token" data-path="{{ el.path }}.weight">
+                                    {% for value, label in typoWeights %}
+                                        <option value="{{ value }}"{{ value == el.weight ? ' selected' : '' }}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <label class="le-typo-cell">
+                                <span class="le-typo-cell__label">Size (rem)</span>
+                                <input type="number" class="le-select le-token" data-path="{{ el.path }}.size"
+                                       min="0.5" max="10" step="0.125" value="{{ el.size }}">
+                            </label>
+                            <label class="le-typo-cell">
+                                <span class="le-typo-cell__label">Line height</span>
+                                <input type="number" class="le-select le-token" data-path="{{ el.path }}.lineHeight"
+                                       min="0.8" max="3" step="0.05" value="{{ el.lineHeight }}">
+                            </label>
+                            <label class="le-typo-cell le-typo-cell--wide">
+                                <span class="le-typo-cell__label">Style</span>
+                                <select class="le-select le-token" data-path="{{ el.path }}.style">
+                                    {% for value, label in typoStyles %}
+                                        <option value="{{ value }}"{{ value == el.style ? ' selected' : '' }}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Cards screen #}
+            <div class="le-screen" data-screen="cards">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Cards</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Global card styling for every article grid. Layout &amp; spacing update live; hover effects and image ratio reload the preview.</p>
+
+                <p class="le-subhead">Layout &amp; spacing</p>
+                {% for field in cards.css %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-card-{{ field.path }}">{{ field.label }}</label>
+                        <select class="le-select le-token" id="le-card-{{ field.path }}" data-path="{{ field.path }}">
+                            {% for value, label in field.options %}
+                                <option value="{{ value }}"{{ value == field.value ? ' selected' : '' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+
+                <p class="le-subhead">Image &amp; hover</p>
+                {% for field in cards.struct %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-card-{{ field.path }}">{{ field.label }}</label>
+                        <select class="le-select le-token" id="le-card-{{ field.path }}" data-path="{{ field.path }}" data-struct="1">
+                            {% for value, label in field.options %}
+                                <option value="{{ value }}"{{ value == field.value ? ' selected' : '' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Page hero screen #}
+            <div class="le-screen" data-screen="hero">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Page hero</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Site-wide appearance of the optional page banner. Every change reloads the preview. Per-page image &amp; title stay on each page.</p>
+
+                {% for field in hero %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-hero-{{ field.path }}">{{ field.label }}</label>
+                        <select class="le-select le-token" id="le-hero-{{ field.path }}" data-path="{{ field.path }}" data-struct="1">
+                            {% for value, label in field.options %}
+                                <option value="{{ value }}"{{ value == field.value ? ' selected' : '' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Articles screen #}
+            <div class="le-screen" data-screen="articles">
+                <div class="le-screenhead">
+                    <button type="button" class="le-back" data-back>‹ Back</button>
+                    <span class="le-screenhead__title">Articles</span>
+                </div>
+
+                <p class="le-hint le-hint--lead">Article listing layout and what shows on each card. Every change reloads the preview.</p>
+
+                {% for field in articles %}
+                    <div class="le-field">
+                        <label class="le-label" for="le-articles-{{ field.path }}">{{ field.label }}</label>
+                        <select class="le-select le-token" id="le-articles-{{ field.path }}" data-path="{{ field.path }}" data-struct="1">
+                            {% for value, label in field.options %}
+                                <option value="{{ value }}"{{ value == field.value ? ' selected' : '' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="le-footer">
+            <span class="le-status" id="le-status" role="status" aria-live="polite"></span>
+            <button type="button" class="le-btn" id="le-save">Save</button>
+        </div>
+    </aside>
+
+    <iframe id="le-preview" class="le-preview" title="Theme preview"></iframe>
+
+    <script>
+        (function () {
+            var body = document.body;
+            var previewUrl = body.dataset.previewUrl;
+            var previewCssUrl = body.dataset.previewCssUrl;
+            var saveUrl = body.dataset.saveUrl;
+            var origin = window.location.origin;
+
+            var iframe = document.getElementById('le-preview');
+            var colorInputs = document.querySelectorAll('.le-color');
+            var tokenInputs = document.querySelectorAll('.le-token');
+            var familyInputs = document.querySelectorAll('.le-family');
+            var saveBtn = document.getElementById('le-save');
+            var status = document.getElementById('le-status');
+            var screens = document.querySelectorAll('.le-screen');
+
+            // Load the default section preview.
+            var currentSection = 'showcase';
+            // Tracks whether any control changed since load, so a section switch
+            // (which reloads the iframe) can re-push the in-progress CSS instead
+            // of reverting to the persisted theme.
+            var dirty = false;
+
+            // Structural tokens (card image ratio/hover, hero layout…) drive Twig
+            // params, not CSS vars, so they ride the preview URL and re-render
+            // the demo on reload instead of a CSS swap. Each section's structural
+            // controls live in its own screen, so the query is scoped by section.
+            function structQuery(section) {
+                var parts = [];
+                document.querySelectorAll('.le-screen[data-screen="' + section + '"] [data-struct]')
+                    .forEach(function (i) {
+                        parts.push(encodeURIComponent(i.dataset.path) + '=' + encodeURIComponent(i.value));
+                    });
+                return parts.join('&');
+            }
+            // Session demo-image seed: picked once on load so demo images vary
+            // between openings yet stay stable across structural reloads.
+            var demoSeed = Math.floor(Math.random() * 100000) + 1;
+
+            function previewSrc(section) {
+                var src = previewUrl + '?section=' + encodeURIComponent(section)
+                    + '&demoSeed=' + demoSeed;
+                var q = structQuery(section);
+                if (q) { src += '&' + q; }
+                return src;
+            }
+
+            iframe.src = previewSrc(currentSection);
+
+            function setStatus(text, kind) {
+                status.textContent = text || '';
+                status.className = 'le-status' + (kind ? ' is-' + kind : '');
+            }
+
+            function showScreen(name) {
+                screens.forEach(function (s) {
+                    s.classList.toggle('is-active', s.dataset.screen === name);
+                });
+            }
+
+            // ── Section navigation ──────────────────────────────────
+            document.querySelectorAll('.le-section[data-goto]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var screen = btn.dataset.goto;
+                    var section = btn.dataset.section;
+                    // Structural change → reload the iframe for the new section.
+                    if (section && section !== currentSection) {
+                        currentSection = section;
+                        iframe.src = previewSrc(section);
+                    }
+                    showScreen(screen);
+                });
+            });
+            document.querySelectorAll('[data-back]').forEach(function (btn) {
+                btn.addEventListener('click', function () { showScreen('root'); });
+            });
+
+            document.getElementById('le-close').addEventListener('click', function () {
+                window.close();
+            });
+
+            // Collect the full desired state. The editor always posts everything:
+            // colors as a { role: hex } map, tokens as a { dotPath: value } patch.
+            function collectColors() {
+                var colors = {};
+                colorInputs.forEach(function (input) { colors[input.dataset.role] = input.value; });
+                return colors;
+            }
+            function collectTokens() {
+                var tokens = {};
+                tokenInputs.forEach(function (input) {
+                    // Skip a cleared number field so it keeps its last value
+                    // rather than emitting an empty (invalid) CSS length.
+                    if (input.type === 'number' && input.value === '') { return; }
+                    tokens[input.dataset.path] = input.value;
+                });
+                return tokens;
+            }
+            function collectFamilies() {
+                var families = {};
+                familyInputs.forEach(function (input) { families[input.dataset.role] = input.value; });
+                return families;
+            }
+            function buildPayload() {
+                return { colors: collectColors(), tokens: collectTokens(), families: collectFamilies() };
+            }
+
+            // ── Live preview: push recompiled CSS into the iframe ───
+            function pushCss(css) {
+                iframe.contentWindow.postMessage({ type: 'iw-live-theme-css', css: css }, origin);
+            }
+
+            function requestPreview() {
+                setStatus('Updating…', 'busy');
+                fetch(previewCssUrl, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildPayload()),
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (data.css === undefined) { throw new Error(data.error || 'No CSS'); }
+                        pushCss(data.css);
+                        setStatus('', '');
+                    })
+                    .catch(function (e) { setStatus('Preview error: ' + e.message, 'err'); });
+            }
+
+            var debounceTimer = null;
+            function schedulePreview() {
+                dirty = true;
+                window.clearTimeout(debounceTimer);
+                debounceTimer = window.setTimeout(requestPreview, 200);
+            }
+
+            // On a section switch the iframe reloads with the persisted theme;
+            // re-apply the in-progress overrides so the preview stays continuous.
+            iframe.addEventListener('load', function () {
+                if (dirty) { requestPreview(); }
+            });
+
+            colorInputs.forEach(function (input) {
+                var valOut = document.querySelector('[data-val-for="' + input.dataset.role + '"]');
+                input.addEventListener('input', function () {
+                    if (valOut) { valOut.textContent = input.value; }
+                    schedulePreview();
+                });
+            });
+            // 'input' covers both selects and number fields so the preview
+            // updates as the value changes, not only on blur. Structural tokens
+            // reload the demo (re-render) instead of a CSS swap.
+            tokenInputs.forEach(function (input) {
+                input.addEventListener('input', function () {
+                    if (input.dataset.struct) {
+                        dirty = true;
+                        iframe.src = previewSrc(currentSection);
+                    } else {
+                        schedulePreview();
+                    }
+                });
+            });
+            familyInputs.forEach(function (input) {
+                input.addEventListener('input', schedulePreview);
+            });
+
+            // ── Save ────────────────────────────────────────────────
+            saveBtn.addEventListener('click', function () {
+                saveBtn.disabled = true;
+                setStatus('Saving…', 'busy');
+                fetch(saveUrl, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(buildPayload()),
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) {
+                        if (!data.success) { throw new Error(data.error || 'Save failed'); }
+                        dirty = false;
+                        setStatus('Saved ✓', 'ok');
+                    })
+                    .catch(function (e) { setStatus('Save error: ' + e.message, 'err'); })
+                    .finally(function () { saveBtn.disabled = false; });
+            });
+        })();
+    </script>
+</body>
+</html>

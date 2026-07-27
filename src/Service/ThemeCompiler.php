@@ -89,6 +89,23 @@ class ThemeCompiler
     }
 
     /**
+     * Compile a theme configuration to a CSS string, without touching the disk.
+     *
+     * Same output as {@see compile()} but returned in-memory instead of being
+     * written to a versioned file. Used by the Live Theme Editor to recompute
+     * the preview CSS on every token change and push it into the preview iframe,
+     * without producing (and later invalidating) throwaway cache files.
+     *
+     * @param ThemeConfig $theme The theme configuration to compile
+     *
+     * @return string The complete CSS content
+     */
+    public function compileToString(ThemeConfig $theme): string
+    {
+        return $this->generateCss($theme);
+    }
+
+    /**
      * Compile a theme configuration into a CSS file.
      *
      * Generates CSS custom properties from design tokens, writes the output

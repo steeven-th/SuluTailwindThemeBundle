@@ -1,0 +1,254 @@
+{#
+  Live Theme Editor — preview iframe content.
+
+  Renders the theme's REAL block Twig (via the shared `_blocks.html.twig`
+  dispatcher) with lorem-ipsum demo blocks, so the preview matches production
+  rendering. The compiled theme CSS is inlined into a swappable
+  <style id="iw-live-theme"> that the editor window replaces via postMessage to
+  restyle live — no reload. Tailwind utilities come from the site's `app` entry,
+  exactly like base.html.twig.
+
+  Image fields resolve to picsum placeholders via the `iw_demo_mode` Twig global
+  (set by the controller on this route) — a global rather than a template var
+  because block templates include image partials with `only`, which strips
+  context vars.
+
+  Parameters:
+    - themeCss   : compiled theme CSS (custom properties + component classes)
+    - demoBlocks : list of demo content blocks ({type, style, ...})
+    - section    : active editor section (drives section-specific chrome)
+#}
+{% set paletteRoles = ['primary', 'secondary', 'accent'] %}
+{% set paletteShades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] %}
+{% set semanticRoles = ['background', 'neutral', 'error', 'warning', 'success'] %}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|split('_')[0] }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Theme preview</title>
+
+    {# Swappable theme layer (custom properties + component classes + font
+       @import): replaced live via postMessage. #}
+    <style id="iw-live-theme">{{ themeCss|raw }}</style>
+
+    {# Tailwind utilities — same entry the front-end uses, for layout fidelity. #}
+    {{ encore_entry_link_tags('app') }}
+
+    {# Palette-panel styles (colors section only). Each swatch reads a theme
+       custom property, so it recolors live when the swappable style is swapped.
+       Generated as classes to avoid inline styles. #}
+    {% if section == 'showcase' %}
+    <style>
+        .iw-pal { max-width: 960px; margin: 0 auto; padding: 32px 24px 8px; }
+        .iw-pal__title { font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin: 0 0 12px; }
+        .iw-pal__row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .iw-pal__label { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 500;
+            width: 90px; flex: none; text-transform: capitalize; color: #334155; }
+        .iw-pal__shades { display: flex; flex: 1; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(0,0,0,.06); }
+        .iw-pal__shade { flex: 1; height: 34px; }
+        .iw-pal__semantic { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+        .iw-pal__chip { display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif;
+            font-size: 12px; color: #334155; }
+        .iw-pal__dot { width: 22px; height: 22px; border-radius: 6px; box-shadow: 0 0 0 1px rgba(0,0,0,.1); }
+        {% for role in paletteRoles %}{% for s in paletteShades %}
+        .iw-pal--{{ role }}-{{ s }} { background: var(--color-{{ role }}-{{ s }}); }{% endfor %}{% endfor %}
+        {% for role in semanticRoles %}
+        .iw-pal--{{ role }} { background: var(--color-{{ role }}); }{% endfor %}
+    </style>
+    {% endif %}
+
+    {# Type-specimen styles (typography section only). Only layout/label chrome
+       lives here — the h1-h6 and body elements inherit the theme's font custom
+       properties from app.css, so they restyle live. The link rule maps the
+       per-element link vars explicitly, since no generic selector consumes them.
+       Generated as classes to avoid inline styles. #}
+    {% if section == 'typography' %}
+    <style>
+        .iw-typo { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+        .iw-typo__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin: 0 0 24px; }
+        .iw-typo__row { display: flex; align-items: baseline; gap: 16px; padding: 12px 0;
+            border-top: 1px solid rgba(0, 0, 0, .07); }
+        .iw-typo__tag { font-family: ui-monospace, monospace; font-size: 11px; color: #94a3b8;
+            width: 46px; flex: none; }
+        .iw-typo__row > :not(.iw-typo__tag) { margin: 0; flex: 1; min-width: 0; }
+        .iw-typo__accent {
+            font-family: var(--font-family-accent, var(--font-family-body, inherit));
+            font-size: 1.75rem; line-height: 1.3;
+        }
+        .iw-typo a {
+            font-family: var(--font-link-family, inherit);
+            font-weight: var(--font-link-weight, 500);
+            font-size: var(--font-size-link, inherit);
+            font-style: var(--font-link-style, normal);
+            line-height: var(--line-height-link, inherit);
+            color: var(--color-link, var(--color-primary, inherit));
+            text-decoration: underline;
+        }
+    </style>
+    {% endif %}
+
+    {# Card-grid demo styles (cards section only). The grid gap reads the global
+       --iw-cards-gap custom property, so it restyles live on swap; the cards
+       themselves are the real _article_card partial. #}
+    {% if section == 'cards' %}
+    <style>
+        .iw-cards-demo { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+        .iw-cards-demo__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin: 0 0 20px; }
+        .iw-cards-demo__grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--iw-cards-gap, 1.5rem);
+        }
+        @media (max-width: 720px) { .iw-cards-demo__grid { grid-template-columns: 1fr; } }
+    </style>
+    {% endif %}
+
+    {# Article-listing demo wrapper (articles section only). The listing layout
+       (columns / list) comes from the real .iw-article-listing--* classes in the
+       theme CSS; only the outer padding lives here. #}
+    {% if section == 'articles' %}
+    <style>
+        .iw-articles-demo { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+    </style>
+    {% endif %}
+</head>
+<body class="bg-[var(--color-background)] text-[var(--color-text)]">
+    {% if section == 'hero' and demoHero is not null %}
+        {# Real _page_hero banner: appearance is fully structural, so every param
+           comes from heroConfig (query-driven). The image is a pre-resolved demo
+           media object, so the partial skips sulu_resolve_media. #}
+        {% include '@ItechWorldSuluTailwindTheme/pages/common/_page_hero.html.twig' with {
+            image: iw_sulu_tailwind_theme_demo_media(demoHero.imageSeed, 'iw_theme_hero'),
+            title: demoHero.title,
+            subtitle: demoHero.subtitle,
+            display: heroConfig.pageHero_titleDisplay,
+            alignX: heroConfig.pageHero_alignX,
+            alignY: heroConfig.pageHero_alignY,
+            shade: heroConfig.pageHero_shade,
+            height: heroConfig.pageHero_height,
+            parallax: false,
+            breadcrumb: false,
+        } only %}
+    {% endif %}
+
+    {% if section == 'showcase' %}
+    <section class="iw-pal">
+        <p class="iw-pal__title">Theme palette</p>
+        {% for role in paletteRoles %}
+            <div class="iw-pal__row">
+                <span class="iw-pal__label">{{ role }}</span>
+                <div class="iw-pal__shades">
+                    {% for s in paletteShades %}
+                        <span class="iw-pal__shade iw-pal--{{ role }}-{{ s }}"></span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="iw-pal__semantic">
+            {% for role in semanticRoles %}
+                <span class="iw-pal__chip">
+                    <span class="iw-pal__dot iw-pal--{{ role }}"></span>{{ role }}
+                </span>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section == 'typography' %}
+    {% set specimenText = 'Almost before we knew it, we had left the ground.' %}
+    <section class="iw-typo">
+        <p class="iw-typo__note">Type specimen</p>
+        {% for tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] %}
+            <div class="iw-typo__row">
+                <span class="iw-typo__tag">{{ tag|upper }}</span>
+                <{{ tag }}>{{ specimenText }}</{{ tag }}>
+            </div>
+        {% endfor %}
+        <div class="iw-typo__row">
+            <span class="iw-typo__tag">Body</span>
+            <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+               minim veniam, quis nostrud exercitation ullamco laboris — here is a
+               <a href="#">sample link</a> — nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+        <div class="iw-typo__row">
+            <span class="iw-typo__tag">Accent</span>
+            <p class="iw-typo__accent">{{ specimenText }}</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section == 'cards' %}
+    <section class="iw-cards-demo">
+        <p class="iw-cards-demo__note">Card grid preview</p>
+        <div class="iw-cards-demo__grid">
+            {% for article in demoArticles|default([]) %}
+                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
+                    article: article,
+                    imageRatio: cardConfig.cardImageRatio,
+                    showDate: true,
+                    showExcerpt: true,
+                    showCategory: true,
+                    cardImagePadded: cardConfig.cardImagePadded,
+                    cardSurface: cardConfig.cardSurface,
+                    cardBorder: cardConfig.cardBorder,
+                    cardHoverTransform: cardConfig.cardHoverTransform,
+                    cardHoverImage: cardConfig.cardHoverImage,
+                    cardHoverShadow: cardConfig.cardHoverShadow,
+                    cardHoverBorder: cardConfig.cardHoverBorder,
+                } only %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section == 'articles' and articlesConfig is not null %}
+    <section class="iw-articles-demo">
+        <div class="iw-article-listing iw-article-listing--{{ articlesConfig.listingStyle }}">
+            {% for article in demoArticles|default([]) %}
+                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
+                    article: article,
+                    imageRatio: cardConfig.cardImageRatio,
+                    layout: articlesConfig.listingStyle == 'list' ? 'horizontal' : 'vertical',
+                    showImage: true,
+                    showDate: articlesConfig.showDate,
+                    showExcerpt: articlesConfig.showExcerpt,
+                    showCategory: articlesConfig.showCategory,
+                    cardImagePadded: cardConfig.cardImagePadded,
+                    cardSurface: cardConfig.cardSurface,
+                    cardBorder: cardConfig.cardBorder,
+                    cardHoverTransform: cardConfig.cardHoverTransform,
+                    cardHoverImage: cardConfig.cardHoverImage,
+                    cardHoverShadow: cardConfig.cardHoverShadow,
+                    cardHoverBorder: cardConfig.cardHoverBorder,
+                } only %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
+        blocks: demoBlocks|default([]),
+    } %}
+
+    <script>
+        (function () {
+            var origin = window.location.origin;
+            var styleEl = document.getElementById('iw-live-theme');
+
+            // Replace the theme layer with freshly compiled CSS from the editor.
+            window.addEventListener('message', function (event) {
+                if (event.origin !== origin) { return; }
+                var data = event.data || {};
+                if (data.type === 'iw-live-theme-css' && typeof data.css === 'string') {
+                    styleEl.textContent = data.css;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
