@@ -8,3 +8,6 @@
 /composer.lock
 /package-lock.json
 PROMPT-CLAUDE-CODE-*.md
+
+# macOS folder metadata
+.DS_Store
