@@ -35,6 +35,7 @@ class ThemeProvider
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
         private readonly ?RequestStack $requestStack = null,
+        private readonly ?ThemeDraftStorage $draftStorage = null,
     ) {
     }
 
@@ -116,10 +117,55 @@ class ThemeProvider
         $themeId = (int) $requested;
 
         if (!array_key_exists($themeId, $this->previewThemeCache)) {
-            $this->previewThemeCache[$themeId] = $this->repository->find($themeId);
+            $theme = $this->repository->find($themeId);
+            $this->previewThemeCache[$themeId] = null === $theme
+                ? null
+                : $this->withDraft($theme, $request->query->all()['themeDraft'] ?? null);
         }
 
         return $this->previewThemeCache[$themeId];
+    }
+
+    /**
+     * Apply the editor's unsaved settings on top of a stored theme.
+     *
+     * The draft lives in a shared cache pool because the preview sub-kernel has
+     * no session; the preview URL carries the opaque key that reads it. An
+     * unknown or expired key simply yields the stored theme, so a stale preview
+     * URL degrades to "the theme as saved" rather than to an error.
+     *
+     * Returns a detached copy: the draft must never reach the managed entity,
+     * or previewing would end up writing unsaved settings to the database on
+     * the next flush.
+     *
+     * @param ThemeConfig $theme The stored theme
+     * @param mixed       $key   The `themeDraft` query value, still untrusted
+     *
+     * @return ThemeConfig The theme to render with
+     */
+    private function withDraft(ThemeConfig $theme, mixed $key): ThemeConfig
+    {
+        if (null === $this->draftStorage || !is_string($key) || '' === $key) {
+            return $theme;
+        }
+
+        $draft = $this->draftStorage->get($key);
+
+        if (null === $draft) {
+            return $theme;
+        }
+
+        // clone, not a fresh entity: the copy keeps the ID, and the compiled
+        // stylesheet is served as /iw-theme/css/theme-<id>-<hash>.css. Built
+        // from scratch it would have no ID, and the page would silently lose
+        // its theme stylesheet. The clone stays outside Doctrine's unit of
+        // work, so the draft still cannot be flushed.
+        $preview = clone $theme;
+        $preview->setTokens(is_array($draft['tokens'] ?? null) ? $draft['tokens'] : $theme->getTokens());
+        $preview->setMenuConfig(is_array($draft['menuConfig'] ?? null) ? $draft['menuConfig'] : $theme->getMenuConfig());
+        $preview->setFooterConfig(is_array($draft['footerConfig'] ?? null) ? $draft['footerConfig'] : $theme->getFooterConfig());
+
+        return $preview;
     }
 
     /**

@@ -416,6 +416,12 @@ class MyThemeAwareService
 > into the sub-kernel request. It is honoured **only** on a preview render
 > (recognised by the `preview` request attribute), so the parameter has no
 > effect on a public website URL.
+>
+> That sub-kernel request also carries no session, so the editor's *unsaved*
+> settings reach it through a shared cache pool (`ThemeDraftStorage`), keyed by
+> an opaque `themeDraft` value in the same query. An unknown or expired key
+> falls back to the theme as stored, so a stale preview URL degrades instead of
+> failing. The draft is applied to a detached clone — it can never be flushed.
 
 ### Usage in a controller
 

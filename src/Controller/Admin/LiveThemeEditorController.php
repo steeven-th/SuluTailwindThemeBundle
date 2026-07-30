@@ -17,6 +17,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\ThemeDraftStorage;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -65,6 +66,7 @@ class LiveThemeEditorController extends AbstractController
         private readonly TranslatorInterface $translator,
         private readonly ThemeConfigController $themeConfigController,
         private readonly ThemeProvider $themeProvider,
+        private readonly ThemeDraftStorage $draftStorage,
     ) {
     }
 
@@ -123,6 +125,7 @@ class LiveThemeEditorController extends AbstractController
         // — only shows up once the page is rendered again, and the render reads
         // the stored theme.
         $this->storeDraft($request, $id, $form);
+        $this->mirrorDraft($id, $transient);
 
         return new JsonResponse(['css' => $this->compiler->compileToString($transient)]);
     }
@@ -190,6 +193,56 @@ class LiveThemeEditorController extends AbstractController
         if ($request->hasSession()) {
             $request->getSession()->remove($this->draftKey($id));
         }
+
+        $key = $this->draftStorageKey($id);
+
+        if (null !== $key) {
+            $this->draftStorage->clear($key);
+        }
+    }
+
+    /**
+     * Mirror the draft where the preview sub-kernel can read it.
+     *
+     * The session draft above only serves our own preview route. Previewing a
+     * real page goes through Sulu's PreviewBundle, which renders in a website
+     * sub-kernel with no session — hence the shared cache. What travels is the
+     * already-mapped theme, so the website side never needs the form mapper.
+     *
+     * @param int         $id        The theme configuration ID
+     * @param ThemeConfig $transient The theme with the draft applied
+     */
+    private function mirrorDraft(int $id, ThemeConfig $transient): void
+    {
+        $key = $this->draftStorageKey($id);
+
+        if (null === $key) {
+            return;
+        }
+
+        $this->draftStorage->store($key, [
+            'tokens' => $transient->getTokens(),
+            'menuConfig' => $transient->getMenuConfig(),
+            'footerConfig' => $transient->getFooterConfig(),
+        ]);
+    }
+
+    /**
+     * Opaque key of the current user's draft for a theme.
+     *
+     * @param int $id The theme configuration ID
+     *
+     * @return string|null The key, or null when there is no identified user
+     */
+    private function draftStorageKey(int $id): ?string
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User || null === $user->getId()) {
+            return null;
+        }
+
+        return $this->draftStorage->keyFor((int) $user->getId(), $id);
     }
 
     /**

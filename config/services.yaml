@@ -81,6 +81,14 @@ services:
             $cssOutputDir: '%itech_world_sulu_tailwind_theme.css_output_dir%'
             $paletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'
 
+    # Shares the live editor draft across the admin kernel and the preview
+    # sub-kernel, which has no session of its own.
+    itech_world.sulu_tailwind_theme.draft_storage:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeDraftStorage
+        arguments:
+            - '@cache.app'
+            - '%kernel.secret%'
+
     itech_world.sulu_tailwind_theme.provider:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider
         arguments:
@@ -89,6 +97,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@?sulu_core.webspace.request_analyzer'
             - '@?request_stack'
+            - '@itech_world.sulu_tailwind_theme.draft_storage'
 
     itech_world.sulu_tailwind_theme.config_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver
@@ -208,6 +217,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler: '@itech_world.sulu_tailwind_theme.compiler'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider: '@itech_world.sulu_tailwind_theme.provider'
+    ItechWorld\SuluTailwindThemeBundle\Service\ThemeDraftStorage: '@itech_world.sulu_tailwind_theme.draft_storage'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver: '@itech_world.sulu_tailwind_theme.config_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator: '@itech_world.sulu_tailwind_theme.slug_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
