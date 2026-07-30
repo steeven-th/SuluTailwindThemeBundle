@@ -63,6 +63,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_demo_navigation', $this->getDemoNavigation(...)),
             new TwigFunction('iw_sulu_tailwind_theme_demo_social_links', $this->getDemoSocialLinks(...)),
             new TwigFunction('iw_sulu_tailwind_theme_demo_footer_snippet', $this->getDemoFooterSnippet(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_demo_breadcrumb', $this->getDemoBreadcrumb(...)),
         ];
     }
 
@@ -134,6 +135,22 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
     public function getDemoFooterSnippet(): array
     {
         return $this->demoContentProvider->getFooterSnippet();
+    }
+
+    /**
+     * Build a demo breadcrumb trail for the Live Theme Editor preview.
+     *
+     * Stands in for sulu_page_breadcrumb() and sulu_content_root_path(), which
+     * respectively return nothing and throw outside a webspace.
+     *
+     * @param bool   $homeLink  Whether to prepend the home item
+     * @param string $homeLabel Custom label for the home item
+     *
+     * @return list<array{title: string, url: string}> The demo trail
+     */
+    public function getDemoBreadcrumb(bool $homeLink = true, string $homeLabel = ''): array
+    {
+        return $this->demoContentProvider->getBreadcrumb($homeLink, $homeLabel);
     }
 
     /**

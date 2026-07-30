@@ -27,12 +27,19 @@
 {% set hasUuid = pageUuid is defined and pageUuid %}
 {% set hasTitle = currentTitle is defined and currentTitle %}
 
-{% if show and (hasUuid or (ctx == 'article' and hasTitle)) %}
+{% set demoMode = iw_demo_mode|default(false) %}
+
+{% if show and (demoMode or hasUuid or (ctx == 'article' and hasTitle)) %}
     {% set items = [] %}
     {% set homeLink = cfg.breadcrumbs_homeLink|default(true) %}
     {% set homeLabel = cfg.breadcrumbs_homeLabel|default('') %}
 
-    {% if hasUuid %}
+    {% if demoMode %}
+        {# Live Theme Editor preview: no page tree and no webspace, so
+           sulu_page_breadcrumb() has nothing to walk and sulu_content_root_path()
+           would throw. A lorem trail stands in, honouring the Home options. #}
+        {% set items = iw_sulu_tailwind_theme_demo_breadcrumb(homeLink, homeLabel) %}
+    {% elseif hasUuid %}
         {# Native Sulu trail (homepage → … → current page). The FIRST item is the
            webspace homepage: the Home toggle keeps/hides it, the label renames it. #}
         {% for item in sulu_page_breadcrumb(pageUuid) %}

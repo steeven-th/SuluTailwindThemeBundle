@@ -281,6 +281,31 @@ class DemoContentProvider
             ]),
 
             $this->withSettings([
+                'type' => 'location',
+                'style' => 'map_with_info',
+                'title' => 'Excepteur sint occaecat',
+                'subTitle' => 'Cupidatat non proident',
+                'titleTag' => 'h2',
+                'titleAlignment' => 'left',
+                // Shape of Sulu's location field type. No media and no webspace
+                // involved, so the block renders as-is in demo mode; the map
+                // itself is drawn by the Stimulus controller, which is why the
+                // preview loads the front-end scripts.
+                'location' => [
+                    'lat' => 43.2327,
+                    'long' => 0.0781,
+                    'zoom' => 14,
+                    'street' => 'Place Jean Jaurès',
+                    'number' => '1',
+                    'code' => '65000',
+                    'town' => 'Tarbes',
+                    'country' => 'FR',
+                ],
+                'text' => '<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem '
+                    . 'accusantium doloremque laudantium.</p>',
+            ]),
+
+            $this->withSettings([
                 'type' => 'cta',
                 'style' => 'banner',
                 'title' => 'Omnis voluptas assumenda est',
@@ -505,5 +530,32 @@ class DemoContentProvider
             'lateralMargins' => 'exterior',
             'showBackground' => true,
         ], $block);
+    }
+
+    /**
+     * Demo breadcrumb trail for the Live Theme Editor preview.
+     *
+     * The preview has neither a page tree nor a webspace, so the native trail
+     * cannot be built and the home path cannot be resolved; this stands in,
+     * honouring the Home options of the Components tab. Urls are "#", which
+     * sulu_content_path() returns untouched.
+     *
+     * @param bool   $homeLink  Whether to prepend the home item
+     * @param string $homeLabel Custom label for the home item
+     *
+     * @return list<array{title: string, url: string}> The demo trail
+     */
+    public function getBreadcrumb(bool $homeLink = true, string $homeLabel = ''): array
+    {
+        $items = [];
+
+        if ($homeLink) {
+            $items[] = ['title' => '' !== $homeLabel ? $homeLabel : 'Lorem', 'url' => '#'];
+        }
+
+        $items[] = ['title' => 'Ipsum dolor', 'url' => '#'];
+        $items[] = ['title' => 'Sit amet consectetur', 'url' => ''];
+
+        return $items;
     }
 }

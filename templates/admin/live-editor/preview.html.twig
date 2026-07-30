@@ -182,6 +182,24 @@
         {# Real _page_hero banner: appearance is fully structural, so every param
            comes from heroConfig (query-driven). The image is a pre-resolved demo
            media object, so the partial skips sulu_resolve_media. #}
+        {% set cfg = iw_sulu_tailwind_theme|default({}) %}
+        {% set pageBreadcrumbsOn = (cfg.breadcrumbs_enabled|default('both')) in ['both', 'pages'] %}
+        {% set heroBreadcrumbMode = (heroConfig.pageHero_titleDisplay == 'hidden'
+            and (cfg.pageHero_breadcrumb|default('with_title')) == 'with_title')
+            ? 'top_bar' : (cfg.pageHero_breadcrumb|default('with_title')) %}
+
+        {% if heroBreadcrumbMode == 'top_bar' and pageBreadcrumbsOn %}
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                    context: 'page',
+                    currentTitle: demoHero.title,
+                } only %}
+            </div>
+        {% endif %}
+
+        {# Breadcrumb gating mirrors pages/default.html.twig: the site-wide
+           toggle, and "with_title" falling back to a top bar when the title is
+           hidden. #}
         {% include '@ItechWorldSuluTailwindTheme/pages/common/_page_hero.html.twig' with {
             image: iw_sulu_tailwind_theme_demo_media(demoHero.imageSeed, 'iw_theme_hero'),
             title: demoHero.title,
@@ -192,7 +210,8 @@
             shade: heroConfig.pageHero_shade,
             height: heroConfig.pageHero_height,
             parallax: false,
-            breadcrumb: false,
+            breadcrumb: heroBreadcrumbMode == 'with_title' and pageBreadcrumbsOn,
+            breadcrumbCurrentTitle: demoHero.title,
         } only %}
     {% endif %}
 
@@ -310,6 +329,16 @@
         {% include '@ItechWorldSuluTailwindTheme/footer/_' ~ footerConfig.type ~ '.html.twig' with {
             config: footerConfig,
         } %}
+    {% endif %}
+
+    {# Site-wide back-to-top button, rendered by base.html.twig on the front-end
+       and repeated here: it is opt-in from Components > Site-wide, so leaving it
+       out made the setting look broken. Like on a real page it only shows up
+       past the scroll threshold. #}
+    {% if iw_sulu_tailwind_theme.components_backToTopEnabled|default(false) %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_back_to_top.html.twig' with {
+            threshold: iw_sulu_tailwind_theme.components_backToTopThreshold|default(400),
+        } only %}
     {% endif %}
 
     {# Site JS (Stimulus controllers) — same entry as base.html.twig. The menu
