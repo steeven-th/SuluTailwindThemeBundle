@@ -124,6 +124,45 @@ class DemoContentProvider
             ]),
 
             $this->withSettings([
+                'type' => 'text_images',
+                'style' => 'overlay',
+                'title' => 'Quis autem vel eum',
+                'subTitle' => 'Iure reprehenderit qui in ea',
+                'titleTag' => 'h2',
+                'titleAlignment' => 'center',
+                'images' => [$imageSeed + 1],
+                'imageFilter' => '16_9',
+                'text' => '<p>Voluptate velit esse quam nihil molestiae consequatur, vel illum qui '
+                    . 'dolorem eum fugiat quo voluptas nulla pariatur.</p>',
+            ]),
+
+            $this->withSettings([
+                'type' => 'text',
+                'style' => 'two_columns',
+                'title' => 'Ut enim ad minima veniam',
+                'subTitle' => 'Quis nostrum exercitationem',
+                'titleTag' => 'h2',
+                'titleAlignment' => 'left',
+                'text' => '<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut '
+                    . 'fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi '
+                    . 'nesciunt.</p>'
+                    . '<p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, '
+                    . 'consectetur, adipisci velit, sed quia non numquam eius modi tempora.</p>',
+            ]),
+
+            $this->withSettings([
+                'type' => 'gallery',
+                'style' => 'grid',
+                'title' => 'Itaque earum rerum',
+                'subTitle' => 'Hic tenetur a sapiente delectus',
+                'titleTag' => 'h2',
+                'titleAlignment' => 'center',
+                // Integer seeds → resolved to stable picsum images in demo mode.
+                'images' => [$imageSeed + 10, $imageSeed + 11, $imageSeed + 12, $imageSeed + 13],
+                'imageFilter' => '4_3',
+            ]),
+
+            $this->withSettings([
                 'type' => 'key_figures',
                 'style' => 'inline',
                 'title' => 'Sed ut perspiciatis',
@@ -144,11 +183,48 @@ class DemoContentProvider
                 'subTitle' => 'Qui dolorem ipsum',
                 'titleTag' => 'h2',
                 'titleAlignment' => 'center',
-                'quote' => 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse '
-                    . 'quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat.',
-                'author' => 'Marcus Aurelius',
-                'role' => 'Consul, SPQR',
-                'rating' => 5,
+                // The partial iterates a `testimonials` list, so flat quote/
+                // author keys render an empty block — title only.
+                'testimonials' => [
+                    [
+                        'type' => 'testimonial',
+                        'quote' => 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit '
+                            . 'esse quam nihil molestiae consequatur.',
+                        'author' => 'Marcus Aurelius',
+                        'role' => 'Consul, SPQR',
+                        'rating' => 5,
+                    ],
+                    [
+                        'type' => 'testimonial',
+                        'quote' => 'Vel illum qui dolorem eum fugiat quo voluptas nulla pariatur, '
+                            . 'at vero eos et accusamus et iusto odio.',
+                        'author' => 'Livia Drusilla',
+                        'role' => 'Praefectus, Ostia',
+                        'rating' => 4,
+                    ],
+                    [
+                        'type' => 'testimonial',
+                        'quote' => 'Et harum quidem rerum facilis est et expedita distinctio, nam '
+                            . 'libero tempore cum soluta nobis est eligendi.',
+                        'author' => 'Gaius Plinius',
+                        'role' => 'Legatus, Comum',
+                        'rating' => 5,
+                    ],
+                ],
+            ]),
+
+            $this->withSettings([
+                'type' => 'key_figures',
+                'style' => 'progress',
+                'title' => 'Temporibus autem quibusdam',
+                'subTitle' => 'Et aut officiis debitis',
+                'titleTag' => 'h2',
+                'titleAlignment' => 'left',
+                'figures' => [
+                    ['number' => '85', 'title' => 'Necessitatibus', 'subTitle' => 'saepe eveniet'],
+                    ['number' => '60', 'title' => 'Voluptates', 'subTitle' => 'repudiandae'],
+                    ['number' => '40', 'title' => 'Molestiae', 'subTitle' => 'non recusandae'],
+                ],
             ]),
 
             $this->withSettings([
@@ -156,6 +232,24 @@ class DemoContentProvider
                 'style' => 'line',
                 'lineStyle' => 'solid',
                 'lineWidth' => 'medium',
+            ]),
+
+            $this->withSettings([
+                'type' => 'testimonial',
+                'style' => 'minimal',
+                'title' => 'Itaque earum rerum',
+                'titleTag' => 'h3',
+                'titleAlignment' => 'center',
+                'testimonials' => [
+                    [
+                        'type' => 'testimonial',
+                        'quote' => 'Nam libero tempore, cum soluta nobis est eligendi optio cumque '
+                            . 'nihil impedit quo minus id quod maxime placeat facere possimus.',
+                        'author' => 'Seneca Minor',
+                        'role' => 'Stoa, Roma',
+                        'rating' => 4,
+                    ],
+                ],
             ]),
 
             $this->withSettings([
@@ -184,6 +278,20 @@ class DemoContentProvider
                 'secondaryButtonLink' => '#',
                 'secondaryButtonView' => ['title' => 'Secondary action'],
                 'secondaryButtonStyle' => 'variant',
+            ]),
+
+            $this->withSettings([
+                'type' => 'cta',
+                'style' => 'banner',
+                'title' => 'Omnis voluptas assumenda est',
+                'subTitle' => 'Omnis dolor repellendus',
+                'titleTag' => 'h3',
+                'titleAlignment' => 'left',
+                'text' => '<p>Temporibus autem quibusdam et aut officiis debitis aut rerum '
+                    . 'necessitatibus saepe eveniet ut et voluptates repudiandae.</p>',
+                'primaryButtonLink' => '#',
+                'primaryButtonView' => ['title' => 'Learn more'],
+                'primaryButtonStyle' => 'primary',
             ]),
         ];
     }

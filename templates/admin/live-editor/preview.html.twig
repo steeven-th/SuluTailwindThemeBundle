@@ -52,6 +52,17 @@
        injected overlay rather than by styling the previewed elements, so the
        rendering stays byte-for-byte what the front-end produces. #}
     <style>
+        /* A full-bleed block sized in `100vw` (the CTA banner) is wider than the
+           visible viewport as soon as a vertical scrollbar shows up, which adds
+           a stray horizontal scrollbar to the preview. `clip` hides the overflow
+           without creating a scroll container, so sticky headers keep working.
+           The same overflow exists on a real site — tracked separately, it is a
+           front-end debt rather than a preview artefact. */
+        html,
+        body {
+            overflow-x: clip;
+        }
+
         .iw-le-overlay {
             position: absolute; z-index: 2147483646; pointer-events: none;
             border: 2px solid #4f46e5; border-radius: 3px;

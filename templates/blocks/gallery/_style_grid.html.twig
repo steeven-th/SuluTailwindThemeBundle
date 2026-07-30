@@ -52,7 +52,11 @@
 
         <div class="iw-block-gallery iw-block-gallery--grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 {{ gapClass }}">
             {% for mediaId in images %}
-                {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                {# Demo mode (Live Theme Editor preview) has no media library:
+                   the id is a seed resolved to a placeholder instead. #}
+                {% set media = iw_demo_mode|default(false)
+                    ? iw_sulu_tailwind_theme_demo_media(mediaId, format)
+                    : sulu_resolve_media(mediaId, app.request.locale) %}
                 <figure class="iw-block__image iw-block-gallery__item group{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
                     <a
                         href="{{ media.url }}"
