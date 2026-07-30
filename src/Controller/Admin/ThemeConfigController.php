@@ -535,9 +535,14 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      *
      * @param ThemeConfig $theme The theme to serialize
      *
+     * Public alongside {@see mapDataToEntity()}: the Live Theme Editor needs
+     * the current state in this shape to merge a partial change into it before
+     * writing back, since mapDataToEntity() expects a complete payload. Both
+     * belong to a dedicated service, tracked separately.
+     *
      * @return array<string, mixed> Flat key-value pairs for admin forms
      */
-    private function serializeTheme(ThemeConfig $theme): array
+    public function serializeTheme(ThemeConfig $theme): array
     {
         $tokens = $theme->getTokens();
         $menuConfig = $theme->getMenuConfig();
@@ -787,7 +792,24 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    private function mapDataToEntity(array $data, ThemeConfig $theme): void
+    /**
+     * Apply the flat data of a theme form onto a theme entity.
+     *
+     * The admin forms are flat by nature — a field is a single property such as
+     * `menuConfig_colors_bg` — while the entity keeps nested JSON columns; this
+     * is that translation, and the counterpart of {@see serializeTheme()}.
+     *
+     * Public because the Live Theme Editor applies the very same payload to a
+     * transient entity to compile a preview without persisting anything. It
+     * belongs to a dedicated service rather than to a controller: extracting it
+     * is tracked separately, and is why nothing here may assume a request.
+     *
+     * @param array<string, mixed> $data  The flat form data
+     * @param ThemeConfig          $theme The entity to write into
+     *
+     * @throws SlugValidationException If a palette, button or variant slug is invalid
+     */
+    public function mapDataToEntity(array $data, ThemeConfig $theme): void
     {
         if (isset($data['name'])) {
             $theme->setName($data['name']);

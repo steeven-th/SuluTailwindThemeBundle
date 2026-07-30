@@ -1037,5 +1037,9 @@
     "iw_sulu_tailwind_theme.live_editor_submenu_drilldown": "Oui (navigation en cascade)",
     "iw_sulu_tailwind_theme.live_editor_variant_group_text": "Texte",
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Liens",
+    "iw_sulu_tailwind_theme.live_editor_screen_components": "Composants",
+    "iw_sulu_tailwind_theme.live_editor_hint_components": "Composants transverses du site : cartes, bandeau, cartes de contenu, boutons de partage. Écran généré depuis le formulaire du thème.",
+    "iw_sulu_tailwind_theme.live_editor_schema_error": "Impossible de charger les réglages de cet écran.",
+    "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Type de champ non pris en charge ({type}).",
     "iw_sulu_tailwind_theme.live_editor_preview_error": "Impossible de mettre à jour l'aperçu."
 }

@@ -939,5 +939,9 @@
     "iw_sulu_tailwind_theme.live_editor_submenu_drilldown": "Ja (Drill-down)",
     "iw_sulu_tailwind_theme.live_editor_variant_group_text": "Text",
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Links",
+    "iw_sulu_tailwind_theme.live_editor_screen_components": "Komponenten",
+    "iw_sulu_tailwind_theme.live_editor_hint_components": "Seitenweite Komponenten: Karten, Banner, Inhaltskarten, Teilen-Buttons. Dieser Bildschirm wird aus dem Theme-Formular erzeugt.",
+    "iw_sulu_tailwind_theme.live_editor_schema_error": "Die Einstellungen dieses Bildschirms konnten nicht geladen werden.",
+    "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Nicht unterstützter Feldtyp ({type}).",
     "iw_sulu_tailwind_theme.live_editor_preview_error": "Die Vorschau konnte nicht aktualisiert werden."
 }

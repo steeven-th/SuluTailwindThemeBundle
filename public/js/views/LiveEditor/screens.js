@@ -18,6 +18,9 @@ export const SCREENS = [
     {key: 'hero', previews: ['page']},
     {key: 'menu', previews: ['page', 'articles']},
     {key: 'articles', previews: ['articles']},
+    // Generated from the theme form schema rather than declared here — the
+    // first screen on the new footing, covering all sixty of its properties.
+    {key: 'components', previews: ['page', 'articles'], formKey: 'iw_theme_config_components'},
 ];
 
 /**

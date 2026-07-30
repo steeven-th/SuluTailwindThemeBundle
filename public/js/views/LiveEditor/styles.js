@@ -118,6 +118,42 @@ function buildCss(primary: string): string {
         margin: 0 0 8px;
         font-weight: 600;
     }
+    /* Collapsible sections: a screen generated from a form schema can carry
+       sixty fields, unreadable as one flat list. */
+    .iw-le__section-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 8px 0;
+        border: 0;
+        border-bottom: 1px solid var(--iw-le-border);
+        background: none;
+        color: var(--iw-le-text);
+        font: inherit;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+    }
+    .iw-le__section-toggle:hover {
+        color: var(--iw-le-primary);
+    }
+    .iw-le__section-chevron {
+        width: 0;
+        height: 0;
+        border-left: 5px solid currentColor;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+        transform: rotate(90deg);
+        transition: transform .15s;
+    }
+    .iw-le__section--closed .iw-le__section-chevron {
+        transform: rotate(0deg);
+    }
+    .iw-le__section-toggle + .iw-le__field,
+    .iw-le__section-toggle + .iw-le__section-hint {
+        margin-top: 12px;
+    }
     .iw-le__section-hint {
         margin: 0 0 10px;
         color: var(--iw-le-muted);

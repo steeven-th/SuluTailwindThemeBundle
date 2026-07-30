@@ -15,6 +15,7 @@ import NumberField from './fields/NumberField';
 import RadiusField from './fields/RadiusField';
 import SelectField from './fields/SelectField';
 import VariantField from './fields/VariantField';
+import SchemaScreen from './SchemaScreen';
 import {SCREENS, buildScreen} from './screens';
 import ensureLiveEditorStyles from './styles';
 
@@ -119,11 +120,29 @@ class LiveEditor extends React.Component<*> {
     /** Structural values, which ride the preview URL instead of the CSS */
     struct: Object = observable.map();
 
+    /**
+     * The theme as the admin forms see it, one flat property per field, used to
+     * seed the screens generated from a form schema.
+     */
+    @observable.ref formData: ?Object = null;
+
+    /**
+     * What those screens actually changed — a patch, never the whole theme.
+     *
+     * The older screens post their entire state on every request, including the
+     * values they were seeded with; sending the full form alongside would make
+     * whichever is applied last win by accident. A patch only ever carries a
+     * deliberate change.
+     */
+    formPatch: Object = observable.map();
+
     @observable screen: string = SCREENS[0].key;
     @observable preview: string = PREVIEWS[0];
     @observable viewport: string = VIEWPORTS[0];
     /** Whether the preview shows overrides that are not persisted yet */
     @observable dirty: boolean = false;
+    /** Bumped to re-render the preview, which then picks up the stored draft */
+    @observable reloadCounter: number = 0;
 
     /** Unsaved-changes guard, mirroring Sulu's Form view */
     @observable showDirtyWarning: boolean = false;
@@ -169,6 +188,7 @@ class LiveEditor extends React.Component<*> {
         return BASE_PATH + this.themeId + '/preview'
             + '?preview=' + encodeURIComponent(this.preview)
             + '&demoSeed=' + this.demoSeed
+            + '&r=' + this.reloadCounter
             + (query ? '&' + query : '');
     }
 
@@ -233,6 +253,15 @@ class LiveEditor extends React.Component<*> {
             this.checkDirtyStateBeforeNavigation,
             DIRTY_ROUTE_HOOK_PRIORITY
         );
+
+        // The theme in its form shape, for the screens generated from a schema.
+        Requester.get('/admin/api/iw-theme-configs/' + this.themeId)
+            .then(action((data) => {
+                this.formData = data;
+            }))
+            .catch(action(() => {
+                this.addError('iw_sulu_tailwind_theme.live_editor_load_error');
+            }));
 
         Requester.get(BASE_PATH + this.themeId + '/state')
             .then(action((data) => {
@@ -365,6 +394,7 @@ class LiveEditor extends React.Component<*> {
      */
     payload(): Object {
         return {
+            form: toJS(this.formPatch),
             colors: toJS(this.values.colors),
             tokens: toJS(this.values.tokens),
             families: toJS(this.values.families),
@@ -372,6 +402,56 @@ class LiveEditor extends React.Component<*> {
             variants: toJS(this.values.variants),
         };
     }
+
+    /**
+     * Recompile from the form data and swap the result into the preview.
+     */
+    pushFormCss = (reload: boolean = false) => {
+        Requester.post(BASE_PATH + this.themeId + '/preview-form-css', {form: toJS(this.formPatch)})
+            .then((response) => {
+                if (reload) {
+                    this.reloadPreview();
+
+                    return;
+                }
+
+                if (response && typeof response.css === 'string') {
+                    this.postToPreview({type: 'iw-live-theme-css', css: response.css});
+                }
+            })
+            .catch(() => {
+                this.addError('iw_sulu_tailwind_theme.live_editor_preview_error');
+            });
+    };
+
+    /**
+     * Field types whose value compiles to a CSS custom property, and therefore
+     * shows up through a stylesheet swap alone. Anything else — a media, a
+     * toggle, a layout choice — drives the Twig, so the page has to be rendered
+     * again to be seen.
+     */
+    static CSS_ONLY_FIELD_TYPES = ['iw_theme_color_token_editor', 'iw_theme_palette_editor'];
+
+    @action handleSchemaChange = (name: string, value: mixed, type: string) => {
+        // The schema screen owns its data while it lives and hands back the
+        // whole set; replaced rather than mutated, as MobX 4 would not notice a
+        // new key on an observable object.
+        this.formPatch.set(name, value);
+        this.dirty = true;
+
+        // The preview reloads once the server knows about the change, since the
+        // render reads the draft it just stored.
+        const reloadAfterPush = !LiveEditor.CSS_ONLY_FIELD_TYPES.includes(type);
+
+        if (this.pushTimeout) {
+            clearTimeout(this.pushTimeout);
+        }
+        this.pushTimeout = setTimeout(() => this.pushFormCss(reloadAfterPush), PUSH_DEBOUNCE);
+    };
+
+    @action reloadPreview = () => {
+        this.reloadCounter += 1;
+    };
 
     @action handleFieldChange = (field: Object, value: ?string) => {
         if (undefined === value || null === value) {
@@ -547,6 +627,7 @@ class LiveEditor extends React.Component<*> {
 
     renderScreen() {
         const hint = translate('iw_sulu_tailwind_theme.live_editor_hint_' + this.screen);
+        const screen = SCREENS.find((candidate) => candidate.key === this.screen);
 
         return (
             <Fragment>
@@ -554,6 +635,15 @@ class LiveEditor extends React.Component<*> {
                     {translate('iw_sulu_tailwind_theme.live_editor_screen_' + this.screen)}
                 </h2>
                 <p className="iw-le__screen-hint">{hint}</p>
+
+                {screen && screen.formKey && this.formData &&
+                    <SchemaScreen
+                        data={this.formData}
+                        formKey={screen.formKey}
+                        onChange={this.handleSchemaChange}
+                        router={this.props.router}
+                    />
+                }
 
                 {this.sections.map((section, index) => (
                     <div className="iw-le__section" key={section.title || index}>

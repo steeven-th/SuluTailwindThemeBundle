@@ -946,5 +946,9 @@
     "iw_sulu_tailwind_theme.live_editor_submenu_drilldown": "Yes (drill-down)",
     "iw_sulu_tailwind_theme.live_editor_variant_group_text": "Text",
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Links",
+    "iw_sulu_tailwind_theme.live_editor_screen_components": "Components",
+    "iw_sulu_tailwind_theme.live_editor_hint_components": "Site-wide components: cards, banner, content cards, share buttons. This screen is generated from the theme form.",
+    "iw_sulu_tailwind_theme.live_editor_schema_error": "The settings of this screen could not be loaded.",
+    "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Unsupported field type ({type}).",
     "iw_sulu_tailwind_theme.live_editor_preview_error": "The preview could not be updated."
 }

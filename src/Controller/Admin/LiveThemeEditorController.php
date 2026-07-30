@@ -9,6 +9,7 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
@@ -61,7 +62,204 @@ class LiveThemeEditorController extends AbstractController
         private readonly GoogleFontsCatalog $fontsCatalog,
         private readonly ThemeConfigResolver $themeConfigResolver,
         private readonly TranslatorInterface $translator,
+        private readonly ThemeConfigController $themeConfigController,
     ) {
+    }
+
+    /**
+     * Compile the CSS of a theme described by raw form data, persisting nothing.
+     *
+     * The screens generated from the form metadata speak the flat shape the
+     * theme forms use, rather than the editor's own channels: the whole payload
+     * is applied to a transient entity and compiled, so a screen never has to
+     * declare how its fields reach the entity.
+     *
+     * @param Request $request The request with a JSON body: {form: {...}}
+     * @param int     $id      The theme configuration ID
+     *
+     * @return JsonResponse {css: "..."} or {error: "..."}
+     *
+     * @throws NotFoundHttpException If the theme is not found
+     */
+    #[Route(
+        '/admin/theme-live-editor/{id}/preview-form-css',
+        name: 'iw_sulu_tailwind_theme.live_editor_preview_form_css',
+        methods: ['POST'],
+        requirements: ['id' => '\d+'],
+    )]
+    public function previewFormCssAction(Request $request, int $id): JsonResponse
+    {
+        $theme = $this->findThemeOrFail($id);
+
+        /** @var array<string, mixed> $data */
+        $data = json_decode($request->getContent(), true) ?? [];
+        $form = is_array($data['form'] ?? null) ? $data['form'] : [];
+
+        if ([] === $form) {
+            return new JsonResponse(['error' => 'No form data'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Transient clone: the persisted entity is never touched. Doctrine only
+        // tracks the managed one, and nothing here flushes.
+        $transient = new ThemeConfig();
+        $transient->setLabel($theme->getLabel());
+        $transient->setTokens($theme->getTokens());
+        $transient->setMenuConfig($theme->getMenuConfig());
+        $transient->setFooterConfig($theme->getFooterConfig());
+
+        try {
+            $this->applyFormPatch($transient, $form);
+        } catch (SlugValidationException) {
+            // A half-typed slug is expected while editing; keep the preview on
+            // the last valid state instead of failing.
+            return new JsonResponse(['error' => 'Invalid slug'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Remember the edit so a re-render shows it too. A setting that compiles
+        // to a custom property is swapped into the preview as CSS, but one that
+        // drives the Twig — a marker image, a toggled component, a layout choice
+        // — only shows up once the page is rendered again, and the render reads
+        // the stored theme.
+        $this->storeDraft($request, $id, $form);
+
+        return new JsonResponse(['css' => $this->compiler->compileToString($transient)]);
+    }
+
+    /**
+     * Apply a partial form change onto a theme.
+     *
+     * mapDataToEntity() expects a full payload: several of its blocks rebuild a
+     * whole section from the data and fall back to defaults when a key is
+     * missing — feeding it a patch would wipe the palette, the buttons and the
+     * variants. The patch is therefore merged into the theme's current state
+     * first.
+     *
+     * @param ThemeConfig          $theme The theme to write into
+     * @param array<string, mixed> $patch The changed properties
+     *
+     * @throws SlugValidationException If a slug in the resulting payload is invalid
+     */
+    private function applyFormPatch(ThemeConfig $theme, array $patch): void
+    {
+        if ([] === $patch) {
+            return;
+        }
+
+        $this->themeConfigController->mapDataToEntity(
+            array_merge($this->themeConfigController->serializeTheme($theme), $patch),
+            $theme,
+        );
+    }
+
+    /**
+     * Session key holding the unsaved state of one theme.
+     *
+     * @param int $id The theme configuration ID
+     *
+     * @return string The session key
+     */
+    private function draftKey(int $id): string
+    {
+        return 'iw_live_theme_editor_draft_' . $id;
+    }
+
+    /**
+     * Keep the in-progress form data for the next preview render.
+     *
+     * @param Request              $request The current request
+     * @param int                  $id      The theme configuration ID
+     * @param array<string, mixed> $form    The flat form data
+     */
+    private function storeDraft(Request $request, int $id, array $form): void
+    {
+        if ($request->hasSession()) {
+            $request->getSession()->set($this->draftKey($id), $form);
+        }
+    }
+
+    /**
+     * Drop the in-progress state: the editor was reopened, or the theme saved.
+     *
+     * @param Request $request The current request
+     * @param int     $id      The theme configuration ID
+     */
+    private function clearDraft(Request $request, int $id): void
+    {
+        if ($request->hasSession()) {
+            $request->getSession()->remove($this->draftKey($id));
+        }
+    }
+
+    /**
+     * Prefix the theme form gives to the menu configuration properties.
+     *
+     * The query string names a menu setting `type`, the form `menuConfig_type`;
+     * comparing the two needs it.
+     */
+    private const MENU_FORM_PREFIX = 'menuConfig_';
+
+    /**
+     * The in-progress form data, or an empty array.
+     *
+     * @param Request $request The current request
+     * @param int     $id      The theme configuration ID
+     *
+     * @return array<string, mixed> The draft
+     */
+    private function draftData(Request $request, int $id): array
+    {
+        if (!$request->hasSession()) {
+            return [];
+        }
+
+        $form = $request->getSession()->get($this->draftKey($id));
+
+        return is_array($form) ? $form : [];
+    }
+
+    /**
+     * Drop the query overrides the draft already covers.
+     *
+     * @param array<string, string> $overrides The overrides read from the query
+     * @param array<string, mixed>  $draft     The in-progress form data
+     * @param string                $prefix    Prefix the form gives those keys
+     *
+     * @return array<string, string> The overrides the draft does not cover
+     */
+    private function withoutDraftKeys(array $overrides, array $draft, string $prefix = ''): array
+    {
+        foreach (array_keys($overrides) as $key) {
+            if (array_key_exists($prefix . $key, $draft)) {
+                unset($overrides[$key]);
+            }
+        }
+
+        return $overrides;
+    }
+
+    /**
+     * Apply the in-progress state onto a theme, if there is one.
+     *
+     * @param Request     $request The current request
+     * @param int         $id      The theme configuration ID
+     * @param ThemeConfig $theme   The theme to patch, expected to be transient
+     */
+    private function applyDraft(Request $request, int $id, ThemeConfig $theme): void
+    {
+        if (!$request->hasSession()) {
+            return;
+        }
+
+        $form = $request->getSession()->get($this->draftKey($id));
+        if (!is_array($form) || [] === $form) {
+            return;
+        }
+
+        try {
+            $this->applyFormPatch($theme, $form);
+        } catch (SlugValidationException) {
+            // Keep rendering the stored theme rather than nothing.
+        }
     }
 
     /**
@@ -243,7 +441,18 @@ class LiveThemeEditorController extends AbstractController
     )]
     public function previewAction(Request $request, int $id): Response
     {
-        $theme = $this->findThemeOrFail($id);
+        $stored = $this->findThemeOrFail($id);
+
+        // Render a transient copy carrying the unsaved edits, so a setting that
+        // drives the Twig rather than a custom property shows up here too. The
+        // managed entity is left untouched: nothing in a preview may end up
+        // persisted by a flush elsewhere.
+        $theme = new ThemeConfig();
+        $theme->setLabel($stored->getLabel());
+        $theme->setTokens($stored->getTokens());
+        $theme->setMenuConfig($stored->getMenuConfig());
+        $theme->setFooterConfig($stored->getFooterConfig());
+        $this->applyDraft($request, $id, $theme);
 
         // Previews are whole pages, not per-setting mock-ups: one page holds the
         // menu, a hero, content blocks and the footer, so most settings can be
@@ -287,19 +496,38 @@ class LiveThemeEditorController extends AbstractController
         // Every structural override rides the query string, whatever screen it
         // belongs to: one page shows several components at once, so they are all
         // resolved regardless of which screen is open in the panel.
-        $menuConfig = $hasChrome ? $this->buildMenuConfig($theme, $this->readMenuStructQuery($request)) : null;
+        // Two mechanisms carry a structural setting: the older screens put it in
+        // the query string, the schema screens in the session draft. The draft
+        // is the newer of the two, so it wins on the keys it holds — otherwise
+        // a value seeded into the URL when the editor opened would keep
+        // overwriting what the user just picked.
+        $draft = $this->draftData($request, $id);
+
+        $menuConfig = $hasChrome
+            ? $this->buildMenuConfig($theme, $this->withoutDraftKeys(
+                $this->readMenuStructQuery($request),
+                $draft,
+                self::MENU_FORM_PREFIX,
+            ))
+            : null;
         $footerConfig = $hasChrome ? $this->buildFooterConfig($theme) : null;
 
         // Blocks carry the variant being edited; the card look (surface, hover,
         // ratio) is shared by every card grid on any page.
         $variantSlug = $this->resolveVariantSlug($tokens, $request->query->getString('variant'));
-        $cardConfig = $this->buildCardConfig($tokens, $this->readCardStructQuery($request));
+        $cardConfig = $this->buildCardConfig(
+            $tokens,
+            $this->withoutDraftKeys($this->readCardStructQuery($request), $draft),
+        );
 
         // Page preview: hero banner on top of the content blocks.
         $heroConfig = null;
         $demoHero = null;
         if ('page' === $preview) {
-            $heroConfig = $this->buildHeroConfig($tokens, $this->readHeroStructQuery($request));
+            $heroConfig = $this->buildHeroConfig(
+                $tokens,
+                $this->withoutDraftKeys($this->readHeroStructQuery($request), $draft),
+            );
             $demoHero = $this->demoContentProvider->getHero($demoSeed);
         }
 
@@ -308,7 +536,10 @@ class LiveThemeEditorController extends AbstractController
         $articlesConfig = null;
         $demoArticles = [];
         if ('articles' === $preview) {
-            $articlesConfig = $this->buildArticlesConfig($tokens, $this->readArticlesStructQuery($request));
+            $articlesConfig = $this->buildArticlesConfig(
+                $tokens,
+                $this->withoutDraftKeys($this->readArticlesStructQuery($request), $draft),
+            );
             $demoArticles = $this->demoContentProvider->getArticles($demoSeed);
         }
 
@@ -394,14 +625,31 @@ class LiveThemeEditorController extends AbstractController
     {
         $theme = $this->findThemeOrFail($id);
 
+        /** @var array<string, mixed> $data */
+        $data = json_decode($request->getContent(), true) ?? [];
+        $form = is_array($data['form'] ?? null) ? $data['form'] : [];
+
         $overrides = $this->readOverrides($request, $theme);
-        if (!$overrides['hasAny']) {
+        if (!$overrides['hasAny'] && [] === $form) {
             return new JsonResponse(['error' => 'No valid overrides'], Response::HTTP_BAD_REQUEST);
         }
 
         $theme->setTokens($this->applyOverrides($theme->getTokens(), $overrides));
         $theme->setMenuConfig($this->applyMenuPatch($theme->getMenuConfig(), $overrides['menu']));
+
+        // The form payload carries only what the user actually changed, and is
+        // applied last so it wins: the older screens post their whole state,
+        // including the values they were seeded with when the editor opened,
+        // which would otherwise overwrite a setting just picked elsewhere.
+        try {
+            $this->applyFormPatch($theme, $form);
+        } catch (SlugValidationException) {
+            return new JsonResponse(['error' => 'Invalid slug'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
         $this->entityManager->flush();
+
+        // The draft is now the stored theme.
+        $this->clearDraft($request, $id);
 
         // Recompile the on-disk CSS only if the theme is live on a webspace,
         // mirroring ThemeConfigController::putAction().
@@ -438,9 +686,13 @@ class LiveThemeEditorController extends AbstractController
         methods: ['GET'],
         requirements: ['id' => '\d+'],
     )]
-    public function stateAction(int $id): JsonResponse
+    public function stateAction(Request $request, int $id): JsonResponse
     {
         $theme = $this->findThemeOrFail($id);
+
+        // Opening the editor starts from what is stored: a draft left behind by
+        // a previous session must not resurface in the preview.
+        $this->clearDraft($request, $id);
         $data = $this->editorData($theme);
 
         foreach ($data['colors'] as $index => $color) {
