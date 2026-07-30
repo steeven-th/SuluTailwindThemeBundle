@@ -18,55 +18,70 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
  * picsum.photos placeholders instead of calling sulu_resolve_media, so the demo
  * needs no fixtures or uploads.
  *
- * Sections map to the Live Editor sidebar. Only block-based, runtime-free
- * sections are implemented here; media-heavy self-resolving loops and
- * Sulu-runtime components (menu, footer, article_*) come with their own
- * sections in later subtasks.
+ * Sections map to the Live Editor sidebar. Beyond content blocks, this provider
+ * also stands in for the Sulu runtime data the preview cannot reach from the
+ * admin context: article listings, page hero content, and the menu's navigation
+ * tree and social links (both resolve to empty outside a webspace).
  */
 class DemoContentProvider
 {
     /**
-     * Default section rendered when none (or an unknown one) is requested.
+     * The available previews. Each is a whole demo page rather than a mock-up of
+     * one setting, so a single preview covers most of the editor's screens:
+     *   - page      : menu + hero + content blocks + footer
+     *   - articles  : menu + article listing + footer
+     *   - reference : type specimen + palette (tools with no page equivalent)
      */
-    public const DEFAULT_SECTION = 'showcase';
+    public const PREVIEWS = ['page', 'articles', 'reference'];
 
     /**
-     * Return the demo content blocks for a preview section.
+     * Preview rendered when none (or an unknown one) is requested.
+     */
+    public const DEFAULT_PREVIEW = 'page';
+
+    /**
+     * Return the demo content blocks for a preview.
      *
-     * @param string $section  The requested section key
-     * @param int    $baseSeed Session image seed (0 = use the fixed defaults);
-     *                         demo media seeds are derived from it so images
-     *                         stay stable within a session but vary between them
+     * @param string      $preview     The requested preview key
+     * @param int         $baseSeed    Session image seed (0 = use the fixed defaults);
+     *                                 demo media seeds are derived from it so images
+     *                                 stay stable within a session but vary between them
+     * @param string|null $variantSlug Block variant stamped on every block
      *
      * @return list<array<string, mixed>> Ordered demo blocks (Sulu-block shape)
      */
-    public function getBlocks(string $section, int $baseSeed = 0): array
+    public function getBlocks(string $preview, int $baseSeed = 0, ?string $variantSlug = null): array
     {
-        return match ($section) {
-            'showcase' => $this->showcaseBlocks($baseSeed),
-            // The typography section renders a type specimen chrome in the
-            // preview template itself (not content blocks), so it needs none.
-            'typography' => [],
-            // The cards and articles sections render a demo article grid (see
-            // getArticles()) as preview chrome, not content blocks.
-            'cards', 'articles' => [],
-            // The hero section renders a demo page banner (see getHero()) above
-            // the showcase blocks, which stand in for the page content below it.
-            'hero' => $this->showcaseBlocks($baseSeed),
-            default => $this->showcaseBlocks($baseSeed),
-        };
+        // Only the page preview carries content blocks: the articles listing and
+        // the reference tools are rendered by the preview template itself.
+        if ('page' !== $preview) {
+            return [];
+        }
+
+        $blocks = $this->pageBlocks($baseSeed);
+
+        // The wrapper resolves `variant` through the theme's variant list, so
+        // the slug travels with each block exactly like editor-picked content.
+        if (null !== $variantSlug && '' !== $variantSlug) {
+            foreach ($blocks as $i => $block) {
+                $blocks[$i]['variant'] = $variantSlug;
+            }
+        }
+
+        return $blocks;
     }
 
     /**
-     * The "showcase" section: a representative spread of colors, typography,
-     * buttons-free text, stats, a testimonial card, an image block and
-     * separators — enough to judge the base color/typography/radius tokens.
+     * The demo page content: a representative spread that exercises every
+     * setting a page can show — headings and body copy, links and lists, an
+     * image, stats, a testimonial, separators, and a call to action whose
+     * buttons follow the block variant.
      *
      * @param int $baseSeed Session image seed (0 = fixed default)
      *
      * @return list<array<string, mixed>> The demo blocks
      */
-    private function showcaseBlocks(int $baseSeed = 0): array
+    private function pageBlocks(int $baseSeed = 0): array
     {
         // Derive a distinct image seed from the session base (offset avoids
         // colliding with the hero/cards seeds); fall back to the fixed default.
@@ -80,11 +95,16 @@ class DemoContentProvider
                 'subTitle' => 'Consectetur adipiscing elit',
                 'titleTag' => 'h2',
                 'titleAlignment' => 'left',
+                // Covers the variant text properties in one go: paragraph, link
+                // (and its hover), list and blockquote.
                 'text' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
                     . 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut '
                     . 'aliquip ex ea commodo consequat. Duis aute irure dolor in '
                     . '<a href="#">reprehenderit in voluptate</a> velit esse cillum dolore eu fugiat '
-                    . 'nulla pariatur.</p>',
+                    . 'nulla pariatur.</p>'
+                    . '<ul><li>Excepteur sint occaecat cupidatat</li><li>Non proident sunt in culpa</li>'
+                    . '<li>Qui officia deserunt mollit anim</li></ul>'
+                    . '<blockquote>Nemo enim ipsam voluptatem quia voluptas sit aspernatur.</blockquote>',
             ]),
 
             $this->withSettings([
@@ -146,6 +166,24 @@ class DemoContentProvider
                 'titleAlignment' => 'left',
                 'text' => '<p>Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis '
                     . 'voluptatibus maiores alias consequatur aut perferendis doloribus.</p>',
+            ]),
+
+            $this->withSettings([
+                'type' => 'cta',
+                'style' => 'centered',
+                'title' => 'Temporibus autem quibusdam',
+                'subTitle' => 'These buttons follow the block variant button style',
+                'titleTag' => 'h3',
+                'titleAlignment' => 'center',
+                'text' => '<p>Et aut officiis debitis aut rerum necessitatibus saepe eveniet.</p>',
+                // The `variant` style resolves to `.iw-button--variant`, the class
+                // the compiler fills from the variant's own buttonStyle choice.
+                'primaryButtonLink' => '#',
+                'primaryButtonView' => ['title' => 'Primary action'],
+                'primaryButtonStyle' => 'variant',
+                'secondaryButtonLink' => '#',
+                'secondaryButtonView' => ['title' => 'Secondary action'],
+                'secondaryButtonStyle' => 'variant',
             ]),
         ];
     }

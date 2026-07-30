@@ -13,10 +13,23 @@
   because block templates include image partials with `only`, which strips
   context vars.
 
+  A preview is a whole demo PAGE — menu, hero, content blocks and footer — not a
+  mock-up of one setting: most settings are visible on any page, so the editor
+  can jump between screens (and click-to-edit can jump between components)
+  without ever swapping what is on screen. Three previews exist: `page`,
+  `articles` (listing + cards) and `reference` (type specimen + palette, the
+  only things no real page can show).
+
   Parameters:
-    - themeCss   : compiled theme CSS (custom properties + component classes)
-    - demoBlocks : list of demo content blocks ({type, style, ...})
-    - section    : active editor section (drives section-specific chrome)
+    - themeCss     : compiled theme CSS (custom properties + component classes)
+    - demoBlocks   : list of demo content blocks ({type, style, ...})
+    - preview      : active preview (page | articles | reference)
+    - menuConfig   : menu configuration, or null on the reference preview
+    - footerConfig : footer configuration, or null on the reference preview
+    - heroConfig / demoHero       : page preview only
+    - articlesConfig / demoArticles : articles preview only
+    - cardConfig   : card look shared by every card grid
+    - variantSlug  : block variant stamped on the demo blocks
 #}
 {% set paletteRoles = ['primary', 'secondary', 'accent'] %}
 {% set paletteShades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] %}
@@ -35,10 +48,38 @@
     {# Tailwind utilities — same entry the front-end uses, for layout fidelity. #}
     {{ encore_entry_link_tags('app') }}
 
+    {# Click-to-edit chrome. Editor tooling only: the highlight is drawn by an
+       injected overlay rather than by styling the previewed elements, so the
+       rendering stays byte-for-byte what the front-end produces. #}
+    <style>
+        .iw-le-overlay {
+            position: absolute; z-index: 2147483646; pointer-events: none;
+            border: 2px solid #4f46e5; border-radius: 3px;
+            background: rgba(79, 70, 229, .08); display: none;
+        }
+        .iw-le-overlay--selected { background: rgba(79, 70, 229, .04); border-style: solid; }
+        .iw-le-overlay__title {
+            position: absolute; top: -23px; left: -2px; white-space: nowrap;
+            background: #4f46e5; color: #fff; border-radius: 5px 5px 0 0;
+            font: 500 11px/1 system-ui, sans-serif; padding: 6px 8px;
+        }
+        .iw-le-inspecting, .iw-le-inspecting * { cursor: crosshair !important; }
+    </style>
+
+    {# Demo-page chrome: the menu is fixed/sticky, so the preview body needs a
+       little breathing room at the top of the showcase content. #}
+    {% if preview != 'reference' %}
+    <style>
+        .iw-menu-demo__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .05em; color: #94a3b8;
+            margin: 0; padding: 24px 24px 0; text-align: center; }
+    </style>
+    {% endif %}
+
     {# Palette-panel styles (colors section only). Each swatch reads a theme
        custom property, so it recolors live when the swappable style is swapped.
        Generated as classes to avoid inline styles. #}
-    {% if section == 'showcase' %}
+    {% if preview == 'reference' %}
     <style>
         .iw-pal { max-width: 960px; margin: 0 auto; padding: 32px 24px 8px; }
         .iw-pal__title { font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600;
@@ -65,7 +106,7 @@
        properties from app.css, so they restyle live. The link rule maps the
        per-element link vars explicitly, since no generic selector consumes them.
        Generated as classes to avoid inline styles. #}
-    {% if section == 'typography' %}
+    {% if preview == 'reference' %}
     <style>
         .iw-typo { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
         .iw-typo__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
@@ -91,34 +132,42 @@
     </style>
     {% endif %}
 
-    {# Card-grid demo styles (cards section only). The grid gap reads the global
-       --iw-cards-gap custom property, so it restyles live on swap; the cards
-       themselves are the real _article_card partial. #}
-    {% if section == 'cards' %}
+    {# Form excerpt styling (variants section only). The variant form colors are
+       emitted against generic selectors (input/textarea/select/label under
+       .iw-variant--*), so a plain form excerpt exercises all of them — the real
+       form block renders nothing without SuluFormBundle. Only the layout lives
+       here; every color comes from the theme CSS. #}
+    {% if preview == 'page' %}
     <style>
-        .iw-cards-demo { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
-        .iw-cards-demo__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin: 0 0 20px; }
-        .iw-cards-demo__grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: var(--iw-cards-gap, 1.5rem);
-        }
-        @media (max-width: 720px) { .iw-cards-demo__grid { grid-template-columns: 1fr; } }
+        .iw-varform { max-width: 640px; margin: 0 auto; padding: 8px 24px 48px; }
+        .iw-varform__note { font-family: system-ui, sans-serif; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .05em; opacity: .6; margin: 0 0 16px; }
+        .iw-varform__row { margin-bottom: 16px; }
+        .iw-varform label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+        .iw-varform__hint { font-size: 11px; opacity: .7; margin: 6px 0 0; }
     </style>
     {% endif %}
 
     {# Article-listing demo wrapper (articles section only). The listing layout
        (columns / list) comes from the real .iw-article-listing--* classes in the
        theme CSS; only the outer padding lives here. #}
-    {% if section == 'articles' %}
+    {% if preview == 'articles' %}
     <style>
         .iw-articles-demo { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
     </style>
     {% endif %}
 </head>
 <body class="bg-[var(--color-background)] text-[var(--color-text)]">
-    {% if section == 'hero' and demoHero is not null %}
+    {% if menuConfig is not null %}
+        {# The real menu partial, exactly like base.html.twig renders it. Its
+           navigation, social links and home link resolve to demo stand-ins
+           (there is no webspace under /admin) via the iw_demo_mode global. #}
+        {% include '@ItechWorldSuluTailwindTheme/menu/_' ~ menuConfig.type ~ '.html.twig' with {
+            config: menuConfig,
+        } %}
+    {% endif %}
+
+    {% if demoHero is not null %}
         {# Real _page_hero banner: appearance is fully structural, so every param
            comes from heroConfig (query-driven). The image is a pre-resolved demo
            media object, so the partial skips sulu_resolve_media. #}
@@ -136,7 +185,7 @@
         } only %}
     {% endif %}
 
-    {% if section == 'showcase' %}
+    {% if preview == 'reference' %}
     <section class="iw-pal">
         <p class="iw-pal__title">Theme palette</p>
         {% for role in paletteRoles %}
@@ -159,7 +208,7 @@
     </section>
     {% endif %}
 
-    {% if section == 'typography' %}
+    {% if preview == 'reference' %}
     {% set specimenText = 'Almost before we knew it, we had left the ground.' %}
     <section class="iw-typo">
         <p class="iw-typo__note">Type specimen</p>
@@ -182,31 +231,7 @@
     </section>
     {% endif %}
 
-    {% if section == 'cards' %}
-    <section class="iw-cards-demo">
-        <p class="iw-cards-demo__note">Card grid preview</p>
-        <div class="iw-cards-demo__grid">
-            {% for article in demoArticles|default([]) %}
-                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
-                    article: article,
-                    imageRatio: cardConfig.cardImageRatio,
-                    showDate: true,
-                    showExcerpt: true,
-                    showCategory: true,
-                    cardImagePadded: cardConfig.cardImagePadded,
-                    cardSurface: cardConfig.cardSurface,
-                    cardBorder: cardConfig.cardBorder,
-                    cardHoverTransform: cardConfig.cardHoverTransform,
-                    cardHoverImage: cardConfig.cardHoverImage,
-                    cardHoverShadow: cardConfig.cardHoverShadow,
-                    cardHoverBorder: cardConfig.cardHoverBorder,
-                } only %}
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    {% if section == 'articles' and articlesConfig is not null %}
+    {% if articlesConfig is not null %}
     <section class="iw-articles-demo">
         <div class="iw-article-listing iw-article-listing--{{ articlesConfig.listingStyle }}">
             {% for article in demoArticles|default([]) %}
@@ -235,18 +260,296 @@
         blocks: demoBlocks|default([]),
     } %}
 
+    {% if preview == 'page' and variantSlug is not empty %}
+        {# Form excerpt, scoped to the edited variant like a real block would be.
+           The focus state is forced through the .iw-form__field--focused hook so
+           the focus border color is visible without interacting. #}
+        <section class="iw-variant--{{ variantSlug }}" data-has-bg="true">
+            <div class="iw-varform">
+                <p class="iw-varform__note">Form fields</p>
+                <div class="iw-varform__row">
+                    <label for="iw-varform-name">Your name</label>
+                    <input class="iw-form__field" id="iw-varform-name" type="text" value="Marcus Aurelius">
+                </div>
+                <div class="iw-varform__row">
+                    <label for="iw-varform-mail">Email (focused)</label>
+                    <input class="iw-form__field iw-form__field--focused" id="iw-varform-mail" type="email"
+                           placeholder="placeholder@example.com">
+                </div>
+                <div class="iw-varform__row">
+                    <label for="iw-varform-topic">Topic</label>
+                    <select class="iw-form__field" id="iw-varform-topic">
+                        <option>Lorem ipsum</option>
+                        <option>Dolor sit amet</option>
+                    </select>
+                </div>
+                <div class="iw-varform__row">
+                    <label for="iw-varform-msg">Message</label>
+                    <textarea class="iw-form__field" id="iw-varform-msg" rows="3"
+                              placeholder="Sed do eiusmod tempor incididunt…"></textarea>
+                    <p class="iw-varform__hint">Consectetur adipiscing elit.</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if footerConfig is not null and footerConfig.type|default('') is not empty %}
+        {# The real footer partial, like base.html.twig renders it. Its link
+           columns, social links and home link resolve to demo stand-ins. #}
+        {% include '@ItechWorldSuluTailwindTheme/footer/_' ~ footerConfig.type ~ '.html.twig' with {
+            config: footerConfig,
+        } %}
+    {% endif %}
+
+    {# Site JS (Stimulus controllers) — same entry as base.html.twig. The menu
+       is the reason it is here (every open state is applied by
+       menu_controller.js at runtime), but loading it everywhere keeps the
+       preview faithful for the other interactive components too. #}
+    {{ encore_entry_script_tags('app') }}
+
     <script>
         (function () {
             var origin = window.location.origin;
             var styleEl = document.getElementById('iw-live-theme');
 
-            // Replace the theme layer with freshly compiled CSS from the editor.
+            // ── Click-to-edit ───────────────────────────────────────
+            // Clicking a component opens a popover listing the setting GROUPS
+            // that restyle it — no icon to decode, no guess about which single
+            // screen "owns" the element.
+            //
+            // Two rules keep that list short and honest:
+            //  1. an ancestor contributes its own groups only when it opts in
+            //     with `inherit: true` (a card really does style its title; a
+            //     menu link does not style the logo sitting inside it);
+            //  2. it STOPS at the enclosing component (`root: true`), which only
+            //     contributes a "all <component> settings" link. Without this,
+            //     `.iw-menu` being everyone's ancestor put "Menu type" on every
+            //     single element of the header.
+            //
+            // Rules are CSS selectors on the real front-end classes: the
+            // previewed templates carry no editor-specific markup. Most
+            // specific first; the first match names the selection.
+            var EDIT_RULES = [
+                // ── Menu ──
+                { match: '.iw-menu__logo--desktop, .iw-menu__logo--mobile', label: 'Logo',
+                  screen: 'menu', groups: ['menu.logos'] },
+                { match: '.iw-menu__burger', label: 'Burger button',
+                  screen: 'menu', groups: ['menu.colors.burger'] },
+                { match: '.iw-social-icon, .iw-social-text', label: 'Social links',
+                  screen: 'menu', groups: ['menu.colors.social', 'menu.social'] },
+                { match: '.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3, .iw-menu__panel, .iw-menu__overlay',
+                  label: 'Sub-menu', screen: 'menu', inherit: true,
+                  groups: ['menu.colors.sub', 'menu.nav'] },
+                { match: '.iw-menu__text--level-2, .iw-menu__text--level-3', label: 'Sub-menu link',
+                  screen: 'menu', groups: ['menu.colors.sub'] },
+                { match: '.iw-menu__divider', label: 'Menu divider',
+                  screen: 'menu', groups: ['menu.colors.divider'] },
+                { match: '.iw-menu__text', label: 'Menu link',
+                  screen: 'menu', groups: ['menu.colors.main'] },
+                // Root of the menu: contributes the link to the full screen only.
+                { match: '.iw-menu', label: 'Menu', screen: 'menu', root: true,
+                  groups: ['menu.type', 'menu.colors.main', 'menu.scroll'] },
+
+                // ── Page hero ──
+                { match: '.iw-page-hero', label: 'Page hero', screen: 'hero', root: true,
+                  groups: ['hero.layout'] },
+
+                // ── Articles ──
+                { match: '.iw-article-card', label: 'Article card', screen: 'cards', inherit: true,
+                  groups: ['cards.image', 'cards.hover', 'cards.spacing'] },
+                { match: '.iw-article-listing', label: 'Article listing', screen: 'articles', root: true,
+                  groups: ['articles.listing', 'articles.display'] },
+
+                // ── Footer ──
+                { match: '.iw-footer', label: 'Footer', screen: 'variants', root: true,
+                  groups: ['variant.surfaces', 'variant.text', 'variant.links'] },
+
+                // ── Content ──
+                { match: '[class*="iw-button--"]', label: 'Button', screen: 'variants',
+                  groups: ['variant.button'] },
+                { match: 'h1, h2, h3, h4, h5, h6, .iw-block__title, .iw-block__subtitle',
+                  label: 'Heading', screen: 'typography',
+                  groups: function (el) {
+                      var tag = el.tagName.toLowerCase();
+                      return ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(tag) !== -1
+                          ? ['typo.' + tag, 'typo.families']
+                          : ['typo.h2', 'typo.families'];
+                  } },
+                { match: 'a', label: 'Link',
+                  screen: 'typography', groups: ['typo.link'] },
+                { match: 'p, li, blockquote, .iw-block__text', label: 'Text',
+                  screen: 'typography', groups: ['typo.body', 'typo.families'] },
+                { match: 'img, picture', label: 'Image',
+                  screen: 'borders', groups: ['borders.image'] },
+                // Root of a content block: its variant drives every color in it.
+                { match: '[class*="iw-variant--"]', label: 'Block', screen: 'variants', root: true,
+                  groups: ['variant.text', 'variant.links', 'variant.surfaces', 'variant.separator', 'variant.button'] },
+            ];
+
+            var inspecting = false;
+            var overlay = null;
+            var overlayTitle = null;
+            var selected = null;
+
+            function ensureOverlay() {
+                if (overlay) { return; }
+                overlay = document.createElement('div');
+                overlay.className = 'iw-le-overlay';
+                overlayTitle = document.createElement('span');
+                overlayTitle.className = 'iw-le-overlay__title';
+                overlay.appendChild(overlayTitle);
+                document.body.appendChild(overlay);
+            }
+
+            // Collect the groups that apply to a node: its own rule first, then
+            // its ancestors', stopping at the enclosing component.
+            function resolve(node) {
+                var element = null;
+                var label = '';
+                var screen = '';
+                var groups = [];
+                var componentLabel = '';
+                var seen = {};
+
+                while (node && node !== document.body) {
+                    for (var i = 0; i < EDIT_RULES.length; i++) {
+                        var rule = EDIT_RULES[i];
+                        if (!node.matches || !node.matches(rule.match)) { continue; }
+
+                        var ruleGroups = typeof rule.groups === 'function' ? rule.groups(node) : rule.groups;
+                        if (!element) {
+                            element = node;
+                            label = rule.label;
+                            screen = rule.screen;
+                        }
+                        // A root only adds its groups when it IS the selection.
+                        if (rule.root && element !== node) {
+                            componentLabel = rule.label.toLowerCase();
+                            return {
+                                element: element, label: label, screen: screen,
+                                groups: groups, componentLabel: componentLabel,
+                                variant: variantOf(element),
+                            };
+                        }
+                        // Only the selection itself, or an ancestor that opted
+                        // in, contributes settings.
+                        if (element === node || rule.inherit) {
+                            ruleGroups.forEach(function (group) {
+                                if (seen[group]) { return; }
+                                seen[group] = true;
+                                groups.push(group);
+                            });
+                        }
+                        if (rule.root) { componentLabel = rule.label.toLowerCase(); }
+                        break; // one rule per node: the most specific one
+                    }
+                    node = node.parentElement;
+                }
+
+                return element ? {
+                    element: element, label: label, screen: screen,
+                    groups: groups, componentLabel: componentLabel || label.toLowerCase(),
+                    variant: variantOf(element),
+                } : null;
+            }
+
+            // The variant a node lives in, so the popover targets that variant's
+            // fields rather than the first one.
+            function variantOf(node) {
+                var host = node.closest('[class*="iw-variant--"]');
+                if (!host) { return ''; }
+                var match = /iw-variant--([a-z0-9-]+)/i.exec(host.className);
+                return match ? match[1] : '';
+            }
+
+            function placeOverlay(element) {
+                var box = element.getBoundingClientRect();
+                overlay.style.display = 'block';
+                overlay.style.top = (box.top + window.scrollY) + 'px';
+                overlay.style.left = (box.left + window.scrollX) + 'px';
+                overlay.style.width = box.width + 'px';
+                overlay.style.height = box.height + 'px';
+            }
+
+            function showOverlay(hit, isSelection) {
+                ensureOverlay();
+                placeOverlay(hit.element);
+                overlay.classList.toggle('iw-le-overlay--selected', !!isSelection);
+                overlayTitle.textContent = hit.label;
+            }
+
+            function hideOverlay() {
+                if (overlay) { overlay.style.display = 'none'; }
+                selected = null;
+            }
+
+            document.addEventListener('mousemove', function (event) {
+                if (!inspecting || selected) { return; }
+                var hit = resolve(event.target);
+                if (!hit) { hideOverlay(); return; }
+                showOverlay(hit, false);
+            });
+
+            // Capture phase: swallow the click before the page acts on it, so
+            // inspecting a link or a burger button does not navigate or toggle.
+            document.addEventListener('click', function (event) {
+                if (!inspecting) { return; }
+                event.preventDefault();
+                event.stopPropagation();
+
+                var hit = resolve(event.target);
+                if (!hit || !hit.groups.length) { hideOverlay(); return; }
+                selected = hit.element;
+                showOverlay(hit, true);
+
+                window.parent.postMessage({
+                    type: 'iw-live-theme-edit',
+                    label: hit.label,
+                    screen: hit.screen,
+                    groups: hit.groups,
+                    variant: hit.variant,
+                    componentLabel: hit.componentLabel,
+                }, origin);
+            }, true);
+
+            document.addEventListener('keydown', function (event) {
+                if (inspecting && 'Escape' === event.key) { hideOverlay(); }
+            });
+
+            // Keep the frame glued to its element while the page moves.
+            function reposition() {
+                if (selected) { placeOverlay(selected); } else { hideOverlay(); }
+            }
+            window.addEventListener('scroll', reposition, { passive: true });
+            window.addEventListener('resize', reposition);
+
             window.addEventListener('message', function (event) {
                 if (event.origin !== origin) { return; }
                 var data = event.data || {};
+
+                // Replace the theme layer with freshly compiled CSS from the editor.
                 if (data.type === 'iw-live-theme-css' && typeof data.css === 'string') {
                     styleEl.textContent = data.css;
                 }
+
+                if (data.type === 'iw-live-theme-inspect') {
+                    inspecting = !!data.enabled;
+                    document.documentElement.classList.toggle('iw-le-inspecting', inspecting);
+                    if (inspecting) {
+                        // Picking again: release the frozen selection so hover
+                        // highlighting works right away.
+                        selected = null;
+                    } else if (!selected) {
+                        // Picking ends on selection (browser-inspector
+                        // behaviour), so keep the frame when there is one: it
+                        // shows what the panel is editing.
+                        hideOverlay();
+                    }
+                }
+
+                // The editor closed the popover: drop the selection so hovering
+                // highlights again.
+                if (data.type === 'iw-live-theme-deselect') { hideOverlay(); }
             });
         })();
     </script>

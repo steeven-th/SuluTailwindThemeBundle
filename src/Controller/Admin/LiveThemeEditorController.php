@@ -7,12 +7,15 @@ namespace ItechWorld\SuluTailwindThemeBundle\Controller\Admin;
 use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,8 +36,15 @@ use Twig\Environment;
  * the /admin path (secured by the Sulu admin firewall — no explicit auth here),
  * a self-contained HTML page, and a REST save endpoint using the session cookie.
  *
- * Current scope: primary color editing end-to-end (the vertical slice proving
- * the loop). Further sections/tokens are added incrementally.
+ * Settings reach the entity through four channels, because they are not stored
+ * alike: `colors` (palette roles) and `families` (font list) need shape-aware
+ * writes, `tokens` is a generic dot-path patch into the tokens JSON, and `menu`
+ * targets the entity's own menuConfig column.
+ *
+ * Two update mechanisms coexist: a setting backed by a CSS custom property is
+ * recompiled and swapped into the preview without a reload, while a setting
+ * driving a Twig param or a BEM modifier class needs the demo HTML re-rendered
+ * — those ride the preview URL as query overrides ("structural reload").
  */
 class LiveThemeEditorController extends AbstractController
 {
@@ -82,6 +92,14 @@ class LiveThemeEditorController extends AbstractController
             'cards' => $this->currentCards($theme->getTokens()),
             'hero' => $this->currentHero($theme->getTokens()),
             'articles' => $this->currentArticles($theme->getTokens()),
+            'menu' => $this->currentMenu($theme),
+            'variants' => $this->currentVariants($theme->getTokens()),
+            'colorTokenGroups' => $this->colorTokenChoices($theme->getTokens()),
+            'buttonChoices' => $this->buttonChoices($theme->getTokens()),
+            'separatorModes' => self::VARIANT_SEPARATOR_MODES,
+            'separatorStyles' => self::VARIANT_SEPARATOR_STYLES,
+            'variantColorGroups' => array_keys(self::VARIANT_COLOR_GROUPS),
+            'groupLabels' => self::FIELD_GROUPS,
         ]);
     }
 
@@ -106,7 +124,25 @@ class LiveThemeEditorController extends AbstractController
     public function previewAction(Request $request, int $id): Response
     {
         $theme = $this->findThemeOrFail($id);
-        $section = $request->query->getString('section', DemoContentProvider::DEFAULT_SECTION);
+
+        // Previews are whole pages, not per-setting mock-ups: one page holds the
+        // menu, a hero, content blocks and the footer, so most settings can be
+        // edited without ever swapping the preview (and click-to-edit does not
+        // yank the page from under you).
+        $preview = $request->query->getString('preview', DemoContentProvider::DEFAULT_PREVIEW);
+        if (!in_array($preview, DemoContentProvider::PREVIEWS, true)) {
+            $preview = DemoContentProvider::DEFAULT_PREVIEW;
+        }
+
+        // The reference preview is the only one without site chrome: it shows
+        // the type specimen and the palette, which no real page can display.
+        $hasChrome = 'reference' !== $preview;
+
+        // Keep the Symfony web debug toolbar out of the iframe: it would show up
+        // a second time, on top of the previewed page. The profiler still
+        // collects everything — only the injection is skipped, because
+        // WebDebugToolbarListener bails out on a non-html request format.
+        $request->setRequestFormat('iw-preview');
 
         // Session image seed: the editor picks a random one on load and keeps it
         // for the session, so demo images vary between openings but stay stable
@@ -119,46 +155,62 @@ class LiveThemeEditorController extends AbstractController
         // placeholder. Set here so it stays scoped to the preview route.
         $this->twig->addGlobal('iw_demo_mode', true);
 
-        // The cards section renders a demo article-card grid whose structural
-        // tokens (ratio, hover effects) arrive as query overrides and are baked
-        // into the config here (CSS tokens still swap live via preview-css).
-        $cardConfig = null;
-        $demoArticles = [];
-        if ('cards' === $section) {
-            $cardConfig = $this->buildCardConfig($theme->getTokens(), $this->readCardStructQuery($request));
-            $demoArticles = $this->demoContentProvider->getArticles($demoSeed);
-        }
+        // Point the theme global at the theme being edited. It normally carries
+        // the active webspace theme's tokens, which resolve to an empty array
+        // under /admin — block templates read it for the settings that are not
+        // pure CSS (block variants above all, but also radius helpers), so
+        // without this the demo would render unstyled by those.
+        $this->twig->addGlobal('iw_sulu_tailwind_theme', $theme->getTokens());
 
-        // The page-hero section renders a demo banner whose appearance is fully
-        // structural (Twig params / BEM classes), so every value arrives as a
-        // query override and is baked into the hero params here.
+        $tokens = $theme->getTokens();
+
+        // Every structural override rides the query string, whatever screen it
+        // belongs to: one page shows several components at once, so they are all
+        // resolved regardless of which screen is open in the panel.
+        $menuConfig = $hasChrome ? $this->buildMenuConfig($theme, $this->readMenuStructQuery($request)) : null;
+        $footerConfig = $hasChrome ? $this->buildFooterConfig($theme) : null;
+
+        // Blocks carry the variant being edited; the card look (surface, hover,
+        // ratio) is shared by every card grid on any page.
+        $variantSlug = $this->resolveVariantSlug($tokens, $request->query->getString('variant'));
+        $cardConfig = $this->buildCardConfig($tokens, $this->readCardStructQuery($request));
+
+        // Page preview: hero banner on top of the content blocks.
         $heroConfig = null;
         $demoHero = null;
-        if ('hero' === $section) {
-            $heroConfig = $this->buildHeroConfig($theme->getTokens(), $this->readHeroStructQuery($request));
+        if ('page' === $preview) {
+            $heroConfig = $this->buildHeroConfig($tokens, $this->readHeroStructQuery($request));
             $demoHero = $this->demoContentProvider->getHero($demoSeed);
         }
 
-        // The articles section renders a demo listing: the display config drives
-        // the container class + which card elements show, while the card look
-        // (surface, hover, ratio) reuses the theme's card config as-is.
+        // Articles preview: the listing display config drives the container
+        // class and which card elements show.
         $articlesConfig = null;
-        if ('articles' === $section) {
-            $articlesConfig = $this->buildArticlesConfig($theme->getTokens(), $this->readArticlesStructQuery($request));
-            $cardConfig = $this->buildCardConfig($theme->getTokens(), []);
+        $demoArticles = [];
+        if ('articles' === $preview) {
+            $articlesConfig = $this->buildArticlesConfig($tokens, $this->readArticlesStructQuery($request));
             $demoArticles = $this->demoContentProvider->getArticles($demoSeed);
         }
 
-        return $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/preview.html.twig', [
+        $response = $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/preview.html.twig', [
             'themeCss' => $this->compiler->compileToString($theme),
-            'demoBlocks' => $this->demoContentProvider->getBlocks($section, $demoSeed),
-            'section' => $section,
+            'demoBlocks' => $this->demoContentProvider->getBlocks($preview, $demoSeed, $variantSlug),
+            'variantSlug' => $variantSlug,
+            'preview' => $preview,
             'cardConfig' => $cardConfig,
             'demoArticles' => $demoArticles,
             'heroConfig' => $heroConfig,
             'demoHero' => $demoHero,
             'articlesConfig' => $articlesConfig,
+            'menuConfig' => $menuConfig,
+            'footerConfig' => $footerConfig,
         ]);
+
+        // The custom request format above skips the toolbar; set the type back
+        // explicitly so the iframe always gets HTML.
+        $response->headers->set('Content-Type', 'text/html; charset=UTF-8');
+
+        return $response;
     }
 
     /**
@@ -186,16 +238,18 @@ class LiveThemeEditorController extends AbstractController
     {
         $theme = $this->findThemeOrFail($id);
 
-        $overrides = $this->readOverrides($request);
+        $overrides = $this->readOverrides($request, $theme);
         if (!$overrides['hasAny']) {
             return new JsonResponse(['error' => 'No valid overrides'], Response::HTTP_BAD_REQUEST);
         }
 
         // Transient clone: mutate a fresh entity, never touch the managed one.
+        // The menu colors compile to --iw-menu-* variables, so the menu patch
+        // has to ride along for them to swap live.
         $transient = new ThemeConfig();
         $transient->setLabel($theme->getLabel());
         $transient->setTokens($this->applyOverrides($theme->getTokens(), $overrides));
-        $transient->setMenuConfig($theme->getMenuConfig());
+        $transient->setMenuConfig($this->applyMenuPatch($theme->getMenuConfig(), $overrides['menu']));
 
         return new JsonResponse(['css' => $this->compiler->compileToString($transient)]);
     }
@@ -220,12 +274,13 @@ class LiveThemeEditorController extends AbstractController
     {
         $theme = $this->findThemeOrFail($id);
 
-        $overrides = $this->readOverrides($request);
+        $overrides = $this->readOverrides($request, $theme);
         if (!$overrides['hasAny']) {
             return new JsonResponse(['error' => 'No valid overrides'], Response::HTTP_BAD_REQUEST);
         }
 
         $theme->setTokens($this->applyOverrides($theme->getTokens(), $overrides));
+        $theme->setMenuConfig($this->applyMenuPatch($theme->getMenuConfig(), $overrides['menu']));
         $this->entityManager->flush();
 
         // Recompile the on-disk CSS only if the theme is live on a webspace,
@@ -563,6 +618,323 @@ class LiveThemeEditorController extends AbstractController
     private const ARTICLES_LISTING_VISIBLE = ['listing', 'both'];
 
     /**
+     * Menu color slots exposed by the Menu screen (menuConfig.colors.<key>),
+     * mapped to their English labels, in display order. Mirrors the admin form;
+     * each one compiles to a --iw-menu-* custom property, so editing them swaps
+     * the preview CSS live (no reload).
+     *
+     * @var array<string, string>
+     */
+    private const MENU_COLOR_SLOTS = [
+        'bg' => 'Background',
+        'text' => 'Text',
+        'textHover' => 'Text hover',
+        'secondBg' => 'Level 2 background',
+        'secondText' => 'Level 2 text',
+        'secondTextHover' => 'Level 2 text hover',
+        'thirdBg' => 'Level 3 background',
+        'thirdText' => 'Level 3 text',
+        'divider' => 'Dividers',
+        'burgerOpen' => 'Burger (closed menu)',
+        'burgerClose' => 'Burger (open menu)',
+        'socialMedia' => 'Social icons',
+        'socialMediaHover' => 'Social icons hover',
+    ];
+
+    /**
+     * Menu fields that drive Twig params / BEM classes rather than CSS custom
+     * properties: editing one re-renders the demo menu, so the value rides the
+     * preview URL (the "targeted structural reload").
+     *
+     * Each entry declares the value `type` so the patch is stored with the same
+     * shape the admin form produces — unlike the string-only `tokens` channel,
+     * which is why booleans can be exposed here.
+     *
+     * `showFor` lists the menu types the control applies to (empty = all) and
+     * the optional `panels` key restricts a control to the accordion ('0') or
+     * drill-down ('1') sub-menu mode — together they mirror the
+     * visibleCondition attributes of iw_theme_config_menu.xml.
+     *
+     * @var array<string, array{label: string, type: string, options: array<string, string>, showFor: list<string>, panels?: string}>
+     */
+    private const MENU_STRUCT_FIELDS = [
+        'type' => [
+            'label' => 'Menu type', 'type' => 'enum', 'showFor' => [],
+            'options' => [
+                'navbar' => 'Navbar', 'burger' => 'Burger', 'fullscreen' => 'Fullscreen',
+                'sidebar' => 'Sidebar', 'megamenu' => 'Mega menu',
+            ],
+        ],
+        'navPosition' => [
+            'label' => 'Navigation position', 'type' => 'enum', 'showFor' => ['navbar', 'megamenu'],
+            'options' => ['left' => 'Left', 'center' => 'Center', 'right' => 'Right'],
+        ],
+        'animation' => [
+            'label' => 'Panel animation', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
+            'options' => ['none' => 'None', 'slide' => 'Slide', 'fade' => 'Fade'],
+        ],
+        'slideDirection' => [
+            'label' => 'Slide direction', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
+            'options' => ['top' => 'Top', 'right' => 'Right', 'bottom' => 'Bottom', 'left' => 'Left'],
+        ],
+        'childLevels' => [
+            'label' => 'Navigation levels', 'type' => 'int', 'showFor' => [],
+            'options' => ['1' => '1', '2' => '2', '3' => '3'],
+        ],
+        'sidebarPosition' => [
+            'label' => 'Sidebar side', 'type' => 'enum', 'showFor' => ['sidebar'],
+            'options' => ['left' => 'Left', 'right' => 'Right'],
+        ],
+        'subMenuPanels' => [
+            'label' => 'Sub-menus as sliding panels', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
+            'options' => ['0' => 'No (accordion)', '1' => 'Yes (drill-down)'],
+        ],
+        'clickParentPage' => [
+            'label' => 'Parent page access', 'type' => 'enum', 'showFor' => ['burger', 'fullscreen', 'sidebar'],
+            'panels' => '0',
+            'options' => ['none' => 'Not clickable', 'split' => 'Split (link + chevron)', 'selflink' => 'Self link in sub-menu'],
+        ],
+        'clickParentPagePanels' => [
+            'label' => 'Parent page clickable', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
+            'panels' => '1',
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+        'clickParentPageNavbar' => [
+            'label' => 'Parent page clickable', 'type' => 'bool', 'showFor' => ['navbar'],
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+        'twoColumns' => [
+            'label' => 'Two columns', 'type' => 'bool', 'showFor' => ['fullscreen'],
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+        'displayLogoDesktop' => [
+            'label' => 'Desktop logo', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+        ],
+        'displayLogoMobile' => [
+            'label' => 'Mobile logo', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+        ],
+        'displaySiteName' => [
+            'label' => 'Site name', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+        ],
+        'displaySocialMedia' => [
+            'label' => 'Social media links', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+        ],
+        'transparentNavbar' => [
+            'label' => 'Transparent navbar', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+        'scrollBg' => [
+            'label' => 'Background on scroll', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+        'scrollHide' => [
+            'label' => 'Hide on scroll down', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'No', '1' => 'Yes'],
+        ],
+    ];
+
+    /**
+     * Default value for each structural menu field, as the string the select
+     * carries. Mirrors the admin form defaults.
+     *
+     * @var array<string, string>
+     */
+    private const MENU_DEFAULTS = [
+        'type' => 'navbar',
+        'navPosition' => 'center',
+        'animation' => 'none',
+        'slideDirection' => 'top',
+        'childLevels' => '2',
+        'sidebarPosition' => 'left',
+        'subMenuPanels' => '0',
+        'clickParentPage' => 'none',
+        'clickParentPagePanels' => '0',
+        'clickParentPageNavbar' => '0',
+        'twoColumns' => '0',
+        'displayLogoDesktop' => '0',
+        'displayLogoMobile' => '0',
+        'displaySiteName' => '0',
+        'displaySocialMedia' => '0',
+        'transparentNavbar' => '0',
+        'scrollBg' => '0',
+        'scrollHide' => '0',
+    ];
+
+    /**
+     * Demo image seed standing in for the fullscreen menu background when the
+     * theme has none: that image drives the fullscreen layout and its curtain
+     * animation, so the preview always needs one.
+     */
+    private const MENU_DEMO_FULLSCREEN_SEED = 801;
+
+    /**
+     * Block-variant color properties exposed by the Variants screen, grouped for
+     * display: group label => (property key => property label). Every one of
+     * them compiles into the `.iw-variant--<slug>` rule set, so editing one is a
+     * pure CSS swap — the demo never reloads.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private const VARIANT_COLOR_GROUPS = [
+        'Text' => [
+            'title' => 'Titles',
+            'subtitle' => 'Subtitles',
+            'paragraph' => 'Paragraphs',
+            'list' => 'Lists',
+        ],
+        'Links' => [
+            'link' => 'Links',
+            'linkHover' => 'Links (hover)',
+        ],
+        'Surfaces' => [
+            'blockBg' => 'Block background',
+            'paragraphBg' => 'Paragraph background',
+            'hr' => 'Separators',
+        ],
+        'Forms' => [
+            'formBg' => 'Field background',
+            'formText' => 'Field text',
+            'formLabel' => 'Labels',
+            'formPlaceholder' => 'Placeholders',
+            'formBorder' => 'Borders',
+            'formBorderFocus' => 'Borders (focus)',
+            'formBorderError' => 'Borders (error)',
+        ],
+    ];
+
+    /**
+     * Separator styles offered per variant, mirroring the admin form. Rendered
+     * entirely in CSS from the `.iw-variant--<slug> hr` rules.
+     *
+     * @var array<string, string>
+     */
+    private const VARIANT_SEPARATOR_STYLES = [
+        'solid' => 'Solid', 'dashed' => 'Dashed', 'dotted' => 'Dotted', 'double' => 'Double',
+        'gradient' => 'Gradient', 'wave' => 'Wave', 'zigzag' => 'Zigzag', 'dots' => 'Dots',
+        'diamond' => 'Diamond',
+    ];
+
+    /**
+     * Separator modes offered per variant. The form also has an `image` mode,
+     * left out here because it needs a media picker; an untouched variant keeps
+     * whatever mode it has stored.
+     *
+     * @var array<string, string>
+     */
+    private const VARIANT_SEPARATOR_MODES = [
+        'style' => 'Line', 'none' => 'None',
+    ];
+
+    /**
+     * Special (non-palette) color values the color-token control offers.
+     *
+     * @var array<string, string>
+     */
+    private const COLOR_TOKEN_SPECIALS = [
+        'transparent' => 'Transparent',
+    ];
+
+    /**
+     * Field groups: the unit both entry points work with.
+     *
+     * The panel enters settings by topic (a screen = several groups); clicking a
+     * component in the preview enters by element (a rule = the groups that
+     * actually restyle THAT component). Declaring the groups once is what keeps
+     * the two views consistent — and what stops a click from offering every
+     * setting of the enclosing component.
+     *
+     * @var array<string, string> Group key => human label
+     */
+    private const FIELD_GROUPS = [
+        'colors.palette' => 'Palette',
+        'borders.card' => 'Card radius',
+        'borders.image' => 'Image radius',
+        'borders.paragraph' => 'Paragraph radius',
+        'typo.families' => 'Font families',
+        'typo.h1' => 'Heading 1', 'typo.h2' => 'Heading 2', 'typo.h3' => 'Heading 3',
+        'typo.h4' => 'Heading 4', 'typo.h5' => 'Heading 5', 'typo.h6' => 'Heading 6',
+        'typo.body' => 'Body text', 'typo.link' => 'Links',
+        'cards.spacing' => 'Card spacing', 'cards.image' => 'Card image', 'cards.hover' => 'Card hover',
+        'hero.layout' => 'Hero layout',
+        'articles.listing' => 'Listing layout', 'articles.display' => 'Listing content',
+        'menu.type' => 'Menu type & layout',
+        'menu.nav' => 'Navigation',
+        'menu.logos' => 'Logos & site name',
+        'menu.social' => 'Social links',
+        'menu.scroll' => 'Scroll behavior',
+        'menu.colors.main' => 'Menu colors',
+        'menu.colors.sub' => 'Sub-menu colors',
+        'menu.colors.burger' => 'Burger colors',
+        'menu.colors.social' => 'Social link colors',
+        'menu.colors.divider' => 'Divider color',
+        'variant.text' => 'Variant text colors',
+        'variant.links' => 'Variant link colors',
+        'variant.surfaces' => 'Variant surfaces',
+        'variant.forms' => 'Variant form colors',
+        'variant.separator' => 'Variant separator',
+        'variant.button' => 'Variant buttons',
+    ];
+
+    /**
+     * Group of each structural menu field.
+     *
+     * @var array<string, string>
+     */
+    private const MENU_FIELD_GROUPS = [
+        'type' => 'menu.type', 'navPosition' => 'menu.type',
+        'animation' => 'menu.type', 'slideDirection' => 'menu.type',
+        'sidebarPosition' => 'menu.type', 'twoColumns' => 'menu.type',
+        'childLevels' => 'menu.nav', 'subMenuPanels' => 'menu.nav',
+        'clickParentPage' => 'menu.nav', 'clickParentPagePanels' => 'menu.nav',
+        'clickParentPageNavbar' => 'menu.nav',
+        'displayLogoDesktop' => 'menu.logos', 'displayLogoMobile' => 'menu.logos',
+        'displaySiteName' => 'menu.logos',
+        'displaySocialMedia' => 'menu.social',
+        'transparentNavbar' => 'menu.scroll', 'scrollBg' => 'menu.scroll', 'scrollHide' => 'menu.scroll',
+    ];
+
+    /**
+     * Group of each menu color slot.
+     *
+     * @var array<string, string>
+     */
+    private const MENU_COLOR_GROUPS = [
+        'bg' => 'menu.colors.main', 'text' => 'menu.colors.main', 'textHover' => 'menu.colors.main',
+        'secondBg' => 'menu.colors.sub', 'secondText' => 'menu.colors.sub',
+        'secondTextHover' => 'menu.colors.sub', 'thirdBg' => 'menu.colors.sub', 'thirdText' => 'menu.colors.sub',
+        'divider' => 'menu.colors.divider',
+        'burgerOpen' => 'menu.colors.burger', 'burgerClose' => 'menu.colors.burger',
+        'socialMedia' => 'menu.colors.social', 'socialMediaHover' => 'menu.colors.social',
+    ];
+
+    /**
+     * Group of each card field.
+     *
+     * @var array<string, string>
+     */
+    private const CARD_FIELD_GROUPS = [
+        'cardGap' => 'cards.spacing', 'cardPadding' => 'cards.spacing', 'cardHoverDuration' => 'cards.hover',
+        'cardImageRatio' => 'cards.image', 'cardHoverTransform' => 'cards.hover',
+        'cardHoverImage' => 'cards.hover', 'cardHoverShadow' => 'cards.hover',
+    ];
+
+    /**
+     * Group of each block-variant color property (mirrors the display groups).
+     *
+     * @var array<string, string>
+     */
+    private const VARIANT_GROUP_KEYS = [
+        'Text' => 'variant.text',
+        'Links' => 'variant.links',
+        'Surfaces' => 'variant.surfaces',
+        'Forms' => 'variant.forms',
+    ];
+
+    /**
      * Read all overrides (colors + generic token patch) from the JSON body.
      *
      * The editor always posts the full desired state; each control contributes
@@ -571,9 +943,12 @@ class LiveThemeEditorController extends AbstractController
      *
      * @param Request $request The HTTP request
      *
-     * @return array{colors: array<string, string>, tokens: array<string, string>, families: array<string, string>, hasAny: bool}
+     * @param Request     $request The HTTP request
+     * @param ThemeConfig $theme   The theme being edited (whitelists depend on its own data)
+     *
+     * @return array{colors: array<string, string>, tokens: array<string, string>, families: array<string, string>, menu: array<string, mixed>, variants: array<string, string>, hasAny: bool}
      */
-    private function readOverrides(Request $request): array
+    private function readOverrides(Request $request, ThemeConfig $theme): array
     {
         /** @var array<string, mixed> $data */
         $data = json_decode($request->getContent(), true) ?? [];
@@ -581,12 +956,19 @@ class LiveThemeEditorController extends AbstractController
         $colors = $this->extractColorOverrides(is_array($data['colors'] ?? null) ? $data['colors'] : []);
         $tokens = $this->extractTokenPatch(is_array($data['tokens'] ?? null) ? $data['tokens'] : []);
         $families = $this->extractFontFamilies(is_array($data['families'] ?? null) ? $data['families'] : []);
+        $menu = $this->extractMenuPatch(is_array($data['menu'] ?? null) ? $data['menu'] : []);
+        $variants = $this->extractVariantPatch(
+            is_array($data['variants'] ?? null) ? $data['variants'] : [],
+            $theme->getTokens(),
+        );
 
         return [
             'colors' => $colors,
             'tokens' => $tokens,
             'families' => $families,
-            'hasAny' => [] !== $colors || [] !== $tokens || [] !== $families,
+            'menu' => $menu,
+            'variants' => $variants,
+            'hasAny' => [] !== $colors || [] !== $tokens || [] !== $families || [] !== $menu || [] !== $variants,
         ];
     }
 
@@ -669,8 +1051,8 @@ class LiveThemeEditorController extends AbstractController
     /**
      * Apply both colors and token-patch overrides onto a tokens array.
      *
-     * @param array<string, mixed>                                                                                     $tokens    The theme tokens
-     * @param array{colors: array<string, string>, tokens: array<string, string>, families: array<string, string>, hasAny: bool} $overrides Normalized overrides
+     * @param array<string, mixed>                                                                                                                                            $tokens    The theme tokens
+     * @param array{colors: array<string, string>, tokens: array<string, string>, families: array<string, string>, menu: array<string, mixed>, variants: array<string, string>, hasAny: bool} $overrides Normalized overrides
      *
      * @return array<string, mixed> The tokens with all overrides applied
      */
@@ -679,6 +1061,7 @@ class LiveThemeEditorController extends AbstractController
         $tokens = $this->applyColorOverrides($tokens, $overrides['colors']);
         $tokens = $this->applyTokenPatch($tokens, $overrides['tokens']);
         $tokens = $this->applyFontFamilies($tokens, $overrides['families']);
+        $tokens = $this->applyVariantPatch($tokens, $overrides['variants']);
 
         return $tokens;
     }
@@ -730,7 +1113,12 @@ class LiveThemeEditorController extends AbstractController
             if (!is_string($value) || !isset(self::RADIUS_OPTIONS[$value])) {
                 $value = '';
             }
-            $fields[] = ['path' => 'borders.' . $key, 'label' => $label, 'value' => $value];
+            $fields[] = [
+                'path' => 'borders.' . $key,
+                'label' => $label,
+                'value' => $value,
+                'group' => 'borders.' . str_replace('Radius', '', $key),
+            ];
         }
 
         return $fields;
@@ -763,7 +1151,7 @@ class LiveThemeEditorController extends AbstractController
             if (!is_string($value) || 1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value)) {
                 $value = '#808080';
             }
-            $colors[] = ['role' => $role, 'label' => $label, 'value' => $value];
+            $colors[] = ['role' => $role, 'label' => $label, 'value' => $value, 'group' => 'colors.palette'];
         }
 
         return $colors;
@@ -893,7 +1281,10 @@ class LiveThemeEditorController extends AbstractController
 
         $families = [];
         foreach (self::FAMILY_SLOTS as $role => $label) {
-            $families[] = ['role' => $role, 'label' => $label, 'name' => $nameByRole[$role] ?? ''];
+            $families[] = [
+                'role' => $role, 'label' => $label, 'name' => $nameByRole[$role] ?? '',
+                'group' => 'typo.families',
+            ];
         }
 
         // Assignments: merge stored props over the display defaults.
@@ -910,6 +1301,7 @@ class LiveThemeEditorController extends AbstractController
             $elements[] = [
                 'key' => $key,
                 'label' => $label,
+                'group' => 'typo.' . $key,
                 'path' => 'typography.assignments.' . $key,
                 'family' => isset(self::FAMILY_SLOTS[$props['family']]) ? $props['family'] : 'body',
                 'weight' => isset(self::TYPO_WEIGHTS[$props['weight']]) ? $props['weight'] : '400',
@@ -1053,6 +1445,9 @@ class LiveThemeEditorController extends AbstractController
                 'label' => $field['label'],
                 'value' => $value,
                 'options' => $field['options'],
+                'group' => self::CARD_FIELD_GROUPS[$key]
+                    ?? (str_starts_with($key, 'pageHero_') ? 'hero.layout'
+                    : ('articles_listingStyle' === $key ? 'articles.listing' : 'articles.display')),
             ];
         }
 
@@ -1200,6 +1595,524 @@ class LiveThemeEditorController extends AbstractController
         }
 
         return $overrides;
+    }
+
+    /**
+     * Demo fallback for a theme whose footer was never configured: the preview
+     * pages would otherwise end abruptly, and the footer is a large tinted
+     * surface that says a lot about a theme. Mirrors the fixture defaults.
+     *
+     * @var array<string, mixed>
+     */
+    private const FOOTER_DEMO_DEFAULTS = [
+        'type' => 'columns',
+        'variant' => '',
+        'displayLogo' => false,
+        'displaySiteName' => true,
+        'siteNamePosition' => 'beside',
+        'tagline' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        'displaySocialMedia' => true,
+        'copyright' => '',
+    ];
+
+    /**
+     * Build the footer configuration for the preview.
+     *
+     * The footer has no editor screen yet (its template system is still to be
+     * built), so this is the stored config — falling back to the demo defaults
+     * when there is none — plus the site name the website context normally
+     * injects.
+     *
+     * @param ThemeConfig $theme The theme configuration
+     *
+     * @return array<string, mixed> The footer config for footer/_<type>.html.twig
+     */
+    private function buildFooterConfig(ThemeConfig $theme): array
+    {
+        $config = $theme->getFooterConfig();
+        if ('' === (string) ($config['type'] ?? '')) {
+            $config = array_merge(self::FOOTER_DEMO_DEFAULTS, $config);
+        }
+        $config['siteName'] = $theme->getLabel();
+
+        return $config;
+    }
+
+    /**
+     * Resolve the variant slug the preview should render, falling back to the
+     * theme's first variant when the query carries none or an unknown one.
+     *
+     * @param array<string, mixed> $tokens    The theme tokens
+     * @param string               $requested The requested slug (possibly empty)
+     *
+     * @return string|null The slug to render, or null when the theme has no variant
+     */
+    private function resolveVariantSlug(array $tokens, string $requested): ?string
+    {
+        $slugs = array_column(
+            VariantResolver::normalizeVariants(is_array($tokens['blockVariants'] ?? null) ? $tokens['blockVariants'] : []),
+            'slug',
+        );
+
+        if ([] === $slugs) {
+            return null;
+        }
+
+        return in_array($requested, $slugs, true) ? $requested : (string) $slugs[0];
+    }
+
+    /**
+     * Build the option list of the color-token control: every palette color of
+     * the theme with its 11 shades, plus the special values.
+     *
+     * Values are stored the way the theme does it — `ref:<name>-<shade>` keeps a
+     * variant tied to the palette, so restyling the palette restyles the variant
+     * (which is why a raw hex is the exception, not the rule).
+     *
+     * @param array<string, mixed> $tokens The theme tokens
+     *
+     * @return list<array{label: string, options: array<string, string>}> Grouped options
+     */
+    private function colorTokenChoices(array $tokens): array
+    {
+        $groups = [];
+        foreach (ColorSet::fromTokens($tokens)->getColors() as $color) {
+            $name = is_string($color['role'] ?? null) ? $color['role'] : ($color['slug'] ?? '');
+            if (!is_string($name) || '' === $name || in_array($name, ['black', 'white'], true)) {
+                continue;
+            }
+
+            $options = ['ref:' . $name => ucfirst($name) . ' (base)'];
+            foreach (ColorShades::ALL as $shade) {
+                $options['ref:' . $name . '-' . $shade] = ucfirst($name) . ' ' . $shade;
+            }
+            $groups[] = ['label' => ucfirst($name), 'options' => $options];
+        }
+
+        $groups[] = ['label' => 'Special', 'options' => self::COLOR_TOKEN_SPECIALS];
+
+        return $groups;
+    }
+
+    /**
+     * Return the current state of every block variant for the Variants screen.
+     *
+     * A stored value the color-token control cannot represent (a raw rgba(),
+     * typically) is reported as `custom`: the control then opens on a
+     * placeholder option and sends nothing back unless the user picks something,
+     * so the original value survives.
+     *
+     * @param array<string, mixed> $tokens The theme tokens
+     *
+     * @return list<array{
+     *     slug: string,
+     *     label: string,
+     *     colors: list<array{group: string, path: string, label: string, value: string, custom: string}>,
+     *     separatorMode: string,
+     *     separatorStyle: string,
+     *     buttonStyle: string
+     * }>
+     */
+    private function currentVariants(array $tokens): array
+    {
+        $known = [];
+        foreach ($this->colorTokenChoices($tokens) as $group) {
+            foreach (array_keys($group['options']) as $value) {
+                $known[$value] = true;
+            }
+        }
+
+        $variants = [];
+        foreach (VariantResolver::normalizeVariants(is_array($tokens['blockVariants'] ?? null) ? $tokens['blockVariants'] : []) as $variant) {
+            $slug = (string) $variant['slug'];
+
+            $colors = [];
+            foreach (self::VARIANT_COLOR_GROUPS as $groupLabel => $props) {
+                foreach ($props as $prop => $label) {
+                    $stored = is_string($variant[$prop] ?? null) ? $variant[$prop] : '';
+                    $isHex = 1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $stored);
+                    $colors[] = [
+                        'group' => self::VARIANT_GROUP_KEYS[$groupLabel],
+                        'groupLabel' => $groupLabel,
+                        'path' => $slug . '.' . $prop,
+                        'label' => $label,
+                        // Representable values preselect their option; anything
+                        // else lands in `custom` and is shown as-is.
+                        'value' => (isset($known[$stored]) || $isHex) ? $stored : '',
+                        'custom' => (isset($known[$stored]) || $isHex || '' === $stored) ? '' : $stored,
+                    ];
+                }
+            }
+
+            $mode = is_string($variant['separatorMode'] ?? null) ? $variant['separatorMode'] : 'style';
+            $style = is_string($variant['separatorStyle'] ?? null) ? $variant['separatorStyle'] : 'solid';
+
+            $variants[] = [
+                'slug' => $slug,
+                'label' => is_string($variant['label'] ?? null) && '' !== $variant['label'] ? $variant['label'] : $slug,
+                'colors' => $colors,
+                'separatorMode' => isset(self::VARIANT_SEPARATOR_MODES[$mode]) ? $mode : 'style',
+                'separatorStyle' => isset(self::VARIANT_SEPARATOR_STYLES[$style]) ? $style : 'solid',
+                'buttonStyle' => is_string($variant['buttonStyle'] ?? null) ? $variant['buttonStyle'] : '',
+            ];
+        }
+
+        return $variants;
+    }
+
+    /**
+     * Return the theme's button styles as slug => label, for the per-variant
+     * button picker.
+     *
+     * @param array<string, mixed> $tokens The theme tokens
+     *
+     * @return array<string, string> Slug => label
+     */
+    private function buttonChoices(array $tokens): array
+    {
+        $choices = [];
+        foreach (ButtonResolver::normalizeButtons($tokens['buttons'] ?? []) as $button) {
+            $slug = is_string($button['slug'] ?? null) ? $button['slug'] : '';
+            if ('' === $slug) {
+                continue;
+            }
+            $choices[$slug] = is_string($button['label'] ?? null) && '' !== $button['label']
+                ? $button['label']
+                : ucfirst($slug);
+        }
+
+        return $choices;
+    }
+
+    /**
+     * Validate a raw variant patch: keep only `<slug>.<prop>` entries targeting
+     * an existing variant, with a value valid for that property.
+     *
+     * @param array<mixed, mixed>  $patch  Raw path => value map
+     * @param array<string, mixed> $tokens The theme tokens (for the slug and option whitelists)
+     *
+     * @return array<string, string> The validated path => value patch
+     */
+    private function extractVariantPatch(array $patch, array $tokens): array
+    {
+        $slugs = array_column(
+            VariantResolver::normalizeVariants(is_array($tokens['blockVariants'] ?? null) ? $tokens['blockVariants'] : []),
+            'slug',
+        );
+        $colorProps = array_merge(...array_values(array_map('array_keys', self::VARIANT_COLOR_GROUPS)));
+        $buttons = $this->buttonChoices($tokens);
+
+        $clean = [];
+        foreach ($patch as $path => $value) {
+            if (!is_string($path) || !is_string($value) || '' === $value) {
+                continue;
+            }
+
+            $dot = strrpos($path, '.');
+            if (false === $dot) {
+                continue;
+            }
+            $slug = substr($path, 0, $dot);
+            $prop = substr($path, $dot + 1);
+            if (!in_array($slug, $slugs, true)) {
+                continue;
+            }
+
+            $valid = match (true) {
+                in_array($prop, $colorProps, true) => $this->isColorTokenValue($value, $tokens),
+                'separatorMode' === $prop => isset(self::VARIANT_SEPARATOR_MODES[$value]),
+                'separatorStyle' === $prop => isset(self::VARIANT_SEPARATOR_STYLES[$value]),
+                'buttonStyle' === $prop => isset($buttons[$value]),
+                default => false,
+            };
+
+            if ($valid) {
+                $clean[$path] = $value;
+            }
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Check whether a value is an acceptable color token: a hex color, one of
+     * the special keywords, or a `ref:` alias pointing at a known palette color.
+     *
+     * @param string               $value  The candidate value
+     * @param array<string, mixed> $tokens The theme tokens
+     *
+     * @return bool True when the value can be stored
+     */
+    private function isColorTokenValue(string $value, array $tokens): bool
+    {
+        if (isset(self::COLOR_TOKEN_SPECIALS[$value])) {
+            return true;
+        }
+        if (1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value)) {
+            return true;
+        }
+
+        $parsed = ColorSet::parseRef($value);
+        if (null === $parsed) {
+            return false;
+        }
+        if (null !== $parsed['shade'] && !in_array($parsed['shade'], ColorShades::ALL, true)) {
+            return false;
+        }
+
+        return null !== ColorSet::fromTokens($tokens)->baseHexFor($parsed['name']);
+    }
+
+    /**
+     * Apply a validated variant patch onto the tokens' blockVariants list.
+     *
+     * Variants are addressed by their stable slug, never by list position, and
+     * the list is normalized first so a legacy variant without a slug gets the
+     * same one the compiler assigns it.
+     *
+     * @param array<string, mixed>  $tokens The theme tokens
+     * @param array<string, string> $patch  Validated `<slug>.<prop>` => value patch
+     *
+     * @return array<string, mixed> The tokens with the patch applied
+     */
+    private function applyVariantPatch(array $tokens, array $patch): array
+    {
+        if ([] === $patch) {
+            return $tokens;
+        }
+
+        $variants = VariantResolver::normalizeVariants(
+            is_array($tokens['blockVariants'] ?? null) ? $tokens['blockVariants'] : [],
+        );
+
+        $bySlug = [];
+        foreach ($variants as $i => $variant) {
+            $bySlug[(string) $variant['slug']] = $i;
+        }
+
+        foreach ($patch as $path => $value) {
+            $dot = strrpos($path, '.');
+            $slug = substr($path, 0, (int) $dot);
+            $prop = substr($path, (int) $dot + 1);
+            if (isset($bySlug[$slug])) {
+                $variants[$bySlug[$slug]][$prop] = $value;
+            }
+        }
+
+        $tokens['blockVariants'] = $variants;
+
+        return $tokens;
+    }
+
+    /**
+     * Return the current menu state for the Menu screen: the color slots (live
+     * CSS swap) and the structural fields (reload the demo).
+     *
+     * Color slots may hold a palette alias (`ref:secondary-950`) instead of a
+     * hex value. The picker cannot represent one, so the alias is reported
+     * alongside a neutral fallback: the screen shows it as read-only-ish and
+     * the editor only sends back the slots the user actually touched, which
+     * keeps untouched aliases intact.
+     *
+     * @param ThemeConfig $theme The theme configuration
+     *
+     * @return array{
+     *     colors: list<array{slot: string, label: string, value: string, alias: string}>,
+     *     struct: list<array{path: string, label: string, value: string, options: array<string, string>, showFor: string, panels: string}>
+     * }
+     */
+    private function currentMenu(ThemeConfig $theme): array
+    {
+        $menuConfig = $theme->getMenuConfig();
+        $storedColors = is_array($menuConfig['colors'] ?? null) ? $menuConfig['colors'] : [];
+
+        $colors = [];
+        foreach (self::MENU_COLOR_SLOTS as $slot => $label) {
+            $stored = $storedColors[$slot] ?? '';
+            $stored = is_string($stored) ? $stored : '';
+            $isHex = 1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $stored);
+            $colors[] = [
+                'slot' => $slot,
+                'label' => $label,
+                'group' => self::MENU_COLOR_GROUPS[$slot],
+                'value' => $isHex ? $stored : '#808080',
+                'alias' => $isHex ? '' : $stored,
+            ];
+        }
+
+        $struct = [];
+        foreach (self::MENU_STRUCT_FIELDS as $key => $field) {
+            $struct[] = [
+                'path' => $key,
+                'label' => $field['label'],
+                'group' => self::MENU_FIELD_GROUPS[$key],
+                'value' => $this->menuFieldValue($menuConfig, $key),
+                'options' => $field['options'],
+                'showFor' => implode(',', $field['showFor']),
+                'panels' => $field['panels'] ?? '',
+            ];
+        }
+
+        return ['colors' => $colors, 'struct' => $struct];
+    }
+
+    /**
+     * Resolve one structural menu field to the string value its select carries,
+     * normalizing the stored type (bool/int) back to an option key.
+     *
+     * @param array<string, mixed> $menuConfig The stored menu configuration
+     * @param string               $key        The field key
+     *
+     * @return string The current option value
+     */
+    private function menuFieldValue(array $menuConfig, string $key): string
+    {
+        $field = self::MENU_STRUCT_FIELDS[$key];
+        $stored = $menuConfig[$key] ?? null;
+
+        $value = match ($field['type']) {
+            'bool' => null === $stored ? null : (($stored && 'false' !== $stored) ? '1' : '0'),
+            'int' => null === $stored ? null : (string) (int) $stored,
+            default => is_string($stored) ? $stored : null,
+        };
+
+        return (null !== $value && isset($field['options'][$value]))
+            ? $value
+            : self::MENU_DEFAULTS[$key];
+    }
+
+    /**
+     * Validate a raw menu patch: keep only known structural fields and color
+     * slots with a valid value, casting each to its stored type.
+     *
+     * Keys are either a structural field name (`type`, `scrollHide`, …) or a
+     * color slot path (`colors.bg`). Anything else is dropped.
+     *
+     * @param array<mixed, mixed> $patch Raw key => value map
+     *
+     * @return array<string, mixed> The validated patch, values already typed
+     */
+    private function extractMenuPatch(array $patch): array
+    {
+        $clean = [];
+        foreach ($patch as $key => $value) {
+            if (!is_string($key) || !is_string($value)) {
+                continue;
+            }
+
+            if (str_starts_with($key, 'colors.')) {
+                $slot = substr($key, 7);
+                if (isset(self::MENU_COLOR_SLOTS[$slot])
+                    && 1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value)) {
+                    $clean[$key] = $value;
+                }
+                continue;
+            }
+
+            $field = self::MENU_STRUCT_FIELDS[$key] ?? null;
+            if (null === $field || !isset($field['options'][$value])) {
+                continue;
+            }
+
+            $clean[$key] = match ($field['type']) {
+                'bool' => '1' === $value,
+                'int' => (int) $value,
+                default => $value,
+            };
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Apply a validated menu patch onto a menu configuration.
+     *
+     * Merges in place so sibling keys survive — notably the media fields
+     * (logos, fullscreen image) and any color slot the editor did not send.
+     *
+     * @param array<string, mixed> $menuConfig The stored menu configuration
+     * @param array<string, mixed> $patch      The validated patch
+     *
+     * @return array<string, mixed> The menu configuration with the patch applied
+     */
+    private function applyMenuPatch(array $menuConfig, array $patch): array
+    {
+        if ([] === $patch) {
+            return $menuConfig;
+        }
+
+        $colors = is_array($menuConfig['colors'] ?? null) ? $menuConfig['colors'] : [];
+
+        foreach ($patch as $key => $value) {
+            if (str_starts_with($key, 'colors.')) {
+                $colors[substr($key, 7)] = $value;
+                continue;
+            }
+            $menuConfig[$key] = $value;
+        }
+
+        if ([] !== $colors) {
+            $menuConfig['colors'] = $colors;
+        }
+
+        return $menuConfig;
+    }
+
+    /**
+     * Read and validate the structural menu overrides from the preview query
+     * string, keeping only known fields with a valid option value.
+     *
+     * @param Request $request The preview request
+     *
+     * @return array<string, mixed> The validated field => typed value overrides
+     */
+    private function readMenuStructQuery(Request $request): array
+    {
+        $raw = [];
+        foreach (array_keys(self::MENU_STRUCT_FIELDS) as $key) {
+            $value = $request->query->getString($key);
+            if ('' !== $value) {
+                $raw[$key] = $value;
+            }
+        }
+
+        return $this->extractMenuPatch($raw);
+    }
+
+    /**
+     * Build the menu configuration passed to the demo menu partial: the stored
+     * config patched with the query overrides, plus the demo-only bits the
+     * website context normally provides (site name) or the theme may lack
+     * (a fullscreen background image).
+     *
+     * @param ThemeConfig          $theme     The theme configuration
+     * @param array<string, mixed> $overrides Validated structural overrides
+     *
+     * @return array<string, mixed> The menu config for menu/_<type>.html.twig
+     */
+    private function buildMenuConfig(ThemeConfig $theme, array $overrides): array
+    {
+        $config = $this->applyMenuPatch($theme->getMenuConfig(), $overrides);
+
+        // Fill every structural key so the partial never falls back to a
+        // template default that differs from what the screen shows.
+        foreach (array_keys(self::MENU_STRUCT_FIELDS) as $key) {
+            if (!array_key_exists($key, $config)) {
+                $config[$key] = $this->extractMenuPatch([$key => self::MENU_DEFAULTS[$key]])[$key];
+            }
+        }
+
+        // Injected by ThemeExtension::getMenuConfig() from the webspace, which
+        // does not exist here.
+        $config['siteName'] = $theme->getLabel();
+
+        // The fullscreen menu keys its layout and curtain animation off the
+        // background image, so the preview always needs one. The demo seed
+        // replaces the configured media (which is not editable here anyway) —
+        // the partial resolves it to a picsum placeholder in demo mode.
+        $config['fullscreenImage'] = ['id' => self::MENU_DEMO_FULLSCREEN_SEED];
+
+        return $config;
     }
 
     /**
