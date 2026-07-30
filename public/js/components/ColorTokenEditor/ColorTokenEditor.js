@@ -8,6 +8,7 @@ import themeConfigStore from '../../stores/themeConfigStore';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
+import {getSuluPrimaryColor} from '../../utils/suluColors';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -48,6 +49,10 @@ function colorLabel(color) {
 
 /**
  * Inline CSS injected once for the ChromePicker overrides inside the popover.
+ *
+ * The accent (active tab, selected swatch) is the admin's own primary color,
+ * probed from the live DOM rather than hardcoded, so the picker matches Sulu —
+ * and follows it if the admin is re-skinned.
  */
 const PICKER_STYLE_ID = 'iw-color-token-editor-styles';
 
@@ -55,6 +60,8 @@ function ensurePickerStyles() {
     if (document.getElementById(PICKER_STYLE_ID)) {
         return;
     }
+
+    const accent = getSuluPrimaryColor();
 
     const style = document.createElement('style');
     style.id = PICKER_STYLE_ID;
@@ -97,8 +104,8 @@ function ensurePickerStyles() {
             color: #333;
         }
         .iw-palette-tab--active {
-            color: #1a56db;
-            border-bottom-color: #1a56db;
+            color: ${accent};
+            border-bottom-color: ${accent};
         }
         .iw-palette-row {
             padding: 4px 8px;
@@ -128,10 +135,10 @@ function ensurePickerStyles() {
             z-index: 1;
         }
         .iw-palette-swatch--selected {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${accent};
         }
         .iw-palette-swatch--selected:hover {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db, 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${accent}, 0 2px 8px rgba(0,0,0,0.2);
         }
         .iw-palette-tooltip {
             position: absolute;

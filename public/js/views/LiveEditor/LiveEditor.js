@@ -1,13 +1,21 @@
 // @flow
 import React, {Fragment} from 'react';
-import {action, computed, observable} from 'mobx';
+import {action, computed, observable, toJS} from 'mobx';
 import {observer} from 'mobx-react';
 import {Dialog, Loader, Toolbar} from 'sulu-admin-bundle/components';
 import {withToolbar} from 'sulu-admin-bundle/containers';
 import {Requester} from 'sulu-admin-bundle/services';
 import {translate} from 'sulu-admin-bundle/utils';
 import themeConfigStore from '../../stores/themeConfigStore';
-import ColorField from './ColorField';
+import ArticleStyleField from './fields/ArticleStyleField';
+import ButtonStyleField from './fields/ButtonStyleField';
+import ColorField from './fields/ColorField';
+import FontField from './fields/FontField';
+import NumberField from './fields/NumberField';
+import RadiusField from './fields/RadiusField';
+import SelectField from './fields/SelectField';
+import VariantField from './fields/VariantField';
+import {SCREENS, buildScreen} from './screens';
 import ensureLiveEditorStyles from './styles';
 
 /**
@@ -66,12 +74,12 @@ const DIRTY_ROUTE_HOOK_PRIORITY = 2048;
  *
  * - the preview iframe, served by LiveThemeEditorController with demo content
  *   styled by the theme being edited;
- * - the live loop: every change is recompiled server-side and the resulting CSS
- *   is swapped into the preview through postMessage, without a reload;
- * - persistence, through the same REST endpoints as the standalone Twig page.
- *
- * This is the React port of that Twig page. It starts with the Colors screen;
- * the remaining screens and the click-to-edit inspector follow.
+ * - the live loop: a setting backed by a CSS custom property is recompiled
+ *   server-side and swapped into the preview through postMessage, while a
+ *   setting driving a Twig parameter or a BEM class rides the preview URL and
+ *   re-renders the demo instead;
+ * - persistence, through five channels, because the entity does not store the
+ *   settings alike (see screens.js).
  */
 @observer
 class LiveEditor extends React.Component<*> {
@@ -83,11 +91,35 @@ class LiveEditor extends React.Component<*> {
     showSuccess: Object = observable.box(false);
 
     @observable label: string = '';
-    /** Editable palette roles: [{role, label, labelKey, value}] */
-    @observable colors: Array<Object> = [];
-    /** Current, possibly unsaved, value per role: {role: "#hex"} */
-    @observable values: Object = {};
+    /**
+     * Everything the editor can change, as served by /state.
+     *
+     * Deliberately not named `state`: that property belongs to React, which
+     * writes it outside of any action — which MobX's strict mode forbids on an
+     * observable.
+     *
+     * A reference observable: the payload never changes once loaded, so there
+     * is no point turning 30 KB of JSON into an observable tree.
+     */
+    @observable.ref editorState: ?Object = null;
+    /**
+     * Current values per save channel, posted as a whole on every request.
+     *
+     * Observable maps, not plain objects: this admin runs MobX 4, where adding
+     * a key to an observable object goes unnoticed — the preview would stop
+     * reacting the first time a field is touched.
+     */
+    values: Object = {
+        colors: observable.map(),
+        tokens: observable.map(),
+        families: observable.map(),
+        menu: observable.map(),
+        variants: observable.map(),
+    };
+    /** Structural values, which ride the preview URL instead of the CSS */
+    struct: Object = observable.map();
 
+    @observable screen: string = SCREENS[0].key;
     @observable preview: string = PREVIEWS[0];
     @observable viewport: string = VIEWPORTS[0];
     /** Whether the preview shows overrides that are not persisted yet */
@@ -126,9 +158,18 @@ class LiveEditor extends React.Component<*> {
     }
 
     @computed get previewUrl(): string {
+        // Every structural value travels, whatever screen is open: one preview
+        // page shows several components at once. Their names are unique across
+        // screens, which is what makes a single flat query work.
+        const struct = toJS(this.struct);
+        const query = Object.keys(struct)
+            .map((path) => encodeURIComponent(path) + '=' + encodeURIComponent(struct[path]))
+            .join('&');
+
         return BASE_PATH + this.themeId + '/preview'
             + '?preview=' + encodeURIComponent(this.preview)
-            + '&demoSeed=' + this.demoSeed;
+            + '&demoSeed=' + this.demoSeed
+            + (query ? '&' + query : '');
     }
 
     @computed get previewOptions(): Array<Object> {
@@ -145,6 +186,43 @@ class LiveEditor extends React.Component<*> {
         }));
     }
 
+    /**
+     * The sections of the open screen, rebuilt from the current values so a
+     * change is reflected wherever the field is shown.
+     */
+    @computed get sections(): Array<Object> {
+        if (!this.editorState) {
+            return [];
+        }
+
+        return buildScreen(this.screen, this.editorState, this.valueOf).map((section) => ({
+            ...section,
+            fields: section.fields.map((field) => ({
+                ...field,
+                value: this.valueOf(field.channel, field.path, field.value),
+            })),
+        }));
+    }
+
+    /**
+     * The value a channel currently holds, falling back to the served one.
+     *
+     * Reading through this keeps the screens reactive: whatever they look at
+     * becomes a dependency of the computed that renders them.
+     *
+     * @param {string} channel  The save channel, or 'struct'
+     * @param {string} path     The key inside that channel
+     * @param {string} fallback The value served by /state
+     *
+     * @returns {string} The current value
+     */
+    valueOf = (channel: string, path: string, fallback: string) => {
+        const map = 'struct' === channel ? this.struct : this.values[channel];
+        const stored = map ? map.get(path) : undefined;
+
+        return undefined === stored ? fallback : stored;
+    };
+
     componentDidMount() {
         ensureLiveEditorStyles();
 
@@ -157,20 +235,16 @@ class LiveEditor extends React.Component<*> {
         );
 
         Requester.get(BASE_PATH + this.themeId + '/state')
-            .then(action((state) => {
-                this.label = state.label || '';
-                this.colors = state.colors || [];
-                this.values = this.colors.reduce((values, color) => {
-                    values[color.role] = color.value;
-
-                    return values;
-                }, {});
+            .then(action((data) => {
+                this.label = data.label || '';
+                this.editorState = data;
+                this.seedValues(data);
 
                 // Point the shared store at the theme being edited: the bundle's
                 // field types read their palette from it, and it otherwise holds
                 // the theme assigned to the first webspace.
-                if (state.themeConfig) {
-                    themeConfigStore.update(state.themeConfig);
+                if (data.themeConfig) {
+                    themeConfigStore.update(data.themeConfig);
                 }
 
                 this.loading = false;
@@ -194,6 +268,35 @@ class LiveEditor extends React.Component<*> {
         // The store now holds the edited theme, which is not necessarily the one
         // the rest of the admin expects — force a re-fetch on the next read.
         themeConfigStore.invalidate();
+    }
+
+    /**
+     * Fill every channel with the theme's current values.
+     *
+     * The editor posts its whole state on each request rather than a diff, so
+     * the server rebuilds the theme from a complete picture — the same contract
+     * the standalone page used.
+     *
+     * @param {Object} state The state served by /state
+     */
+    @action seedValues(state: Object) {
+        SCREENS.forEach((screen) => {
+            buildScreen(screen.key, state, this.valueOf).forEach((section) => {
+                section.fields.forEach((field) => {
+                    if (field.struct) {
+                        this.struct.set(field.path, field.value);
+                    }
+
+                    // `seed: false` marks a value that must not be posted until
+                    // the user touches it — a menu color slot holding a palette
+                    // alias, say, which the plain color standing in for it would
+                    // otherwise overwrite on the first save.
+                    if (false !== field.seed && 'struct' !== field.channel) {
+                        this.values[field.channel].set(field.path, field.value);
+                    }
+                });
+            });
+        });
     }
 
     setIframeRef = (ref: ?HTMLIFrameElement) => {
@@ -240,11 +343,11 @@ class LiveEditor extends React.Component<*> {
     }
 
     /**
-     * Recompile the theme with the current overrides and swap the result into
-     * the preview. Nothing is persisted here.
+     * Recompile the theme with the current values and swap the result into the
+     * preview. Nothing is persisted here.
      */
     pushCss = () => {
-        Requester.post(BASE_PATH + this.themeId + '/preview-css', {colors: this.values})
+        Requester.post(BASE_PATH + this.themeId + '/preview-css', this.payload())
             .then((response) => {
                 if (response && typeof response.css === 'string') {
                     this.postToPreview({type: 'iw-live-theme-css', css: response.css});
@@ -255,22 +358,51 @@ class LiveEditor extends React.Component<*> {
             });
     };
 
-    @action handleColorChange = (role: string, value: ?string) => {
-        if (!value) {
+    /**
+     * The five save channels, as the endpoints expect them.
+     *
+     * @returns {Object} The request payload
+     */
+    payload(): Object {
+        return {
+            colors: toJS(this.values.colors),
+            tokens: toJS(this.values.tokens),
+            families: toJS(this.values.families),
+            menu: toJS(this.values.menu),
+            variants: toJS(this.values.variants),
+        };
+    }
+
+    @action handleFieldChange = (field: Object, value: ?string) => {
+        if (undefined === value || null === value) {
             return;
         }
 
-        // The palette is generated from these roles, so the server only accepts
-        // opaque hex here — the picker also offers transparency and `ref:`
-        // values, which would be dropped without a word.
-        if (!OPAQUE_HEX_PATTERN.test(value)) {
+        // The palette is generated from the base roles, so the server only
+        // accepts opaque hex for them — the picker also offers transparency and
+        // `ref:` values, which would be dropped without a word.
+        if ('colors' === field.channel && !OPAQUE_HEX_PATTERN.test(value)) {
             this.addWarning('iw_sulu_tailwind_theme.live_editor_base_color_hint');
 
             return;
         }
 
-        this.values = {...this.values, [role]: value};
+        // 'struct' is not a save channel: which variant is on display is a view
+        // choice, so it only ever rides the preview URL.
+        if ('struct' !== field.channel) {
+            this.values[field.channel].set(field.path, value);
+        }
+
         this.dirty = true;
+
+        // A structural setting drives a Twig parameter or a BEM class, which no
+        // amount of CSS swapping can produce: the demo has to be rendered again
+        // with the new value, so it rides the preview URL instead.
+        if (field.struct) {
+            this.struct.set(field.path, value);
+
+            return;
+        }
 
         if (this.pushTimeout) {
             clearTimeout(this.pushTimeout);
@@ -288,6 +420,17 @@ class LiveEditor extends React.Component<*> {
         }
     };
 
+    @action handleScreenChange = (screen: string) => {
+        this.screen = screen;
+
+        // Only swap the preview when the current page does not already show
+        // what this screen configures.
+        const config = SCREENS.find((candidate) => candidate.key === screen);
+        if (config && !config.previews.includes(this.preview)) {
+            this.preview = config.previews[0];
+        }
+    };
+
     @action handlePreviewChange = (preview: string) => {
         this.preview = preview;
     };
@@ -299,7 +442,7 @@ class LiveEditor extends React.Component<*> {
     @action handleSave = () => {
         this.saving = true;
 
-        Requester.post(BASE_PATH + this.themeId + '/save', {colors: this.values})
+        Requester.post(BASE_PATH + this.themeId + '/save', this.payload())
             .then(action(() => {
                 this.saving = false;
                 this.dirty = false;
@@ -322,8 +465,8 @@ class LiveEditor extends React.Component<*> {
      * Returning false cancels the navigation; the router replays it through
      * updateRouteMethod once the user confirms.
      *
-     * @param {?Object}   route            The route being navigated to
-     * @param {?Object}   attributes       Its attributes
+     * @param {?Object}   route             The route being navigated to
+     * @param {?Object}   attributes        Its attributes
      * @param {?Function} updateRouteMethod The router method to replay
      *
      * @returns {boolean} Whether the navigation may proceed
@@ -381,25 +524,45 @@ class LiveEditor extends React.Component<*> {
         this.confirmingNavigation = false;
     };
 
-    renderColorsScreen() {
+    renderField(field: Object) {
+        switch (field.kind) {
+            case 'color':
+                return <ColorField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'number':
+                return <NumberField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'radius':
+                return <RadiusField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'buttonStyle':
+                return <ButtonStyleField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'variant':
+                return <VariantField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'font':
+                return <FontField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            case 'articleStyle':
+                return <ArticleStyleField field={field} key={field.key} onChange={this.handleFieldChange} />;
+            default:
+                return <SelectField field={field} key={field.key} onChange={this.handleFieldChange} />;
+        }
+    }
+
+    renderScreen() {
+        const hint = translate('iw_sulu_tailwind_theme.live_editor_hint_' + this.screen);
+
         return (
-            <div className="iw-le__screen">
+            <Fragment>
                 <h2 className="iw-le__screen-title">
-                    {translate('iw_sulu_tailwind_theme.colors')}
+                    {translate('iw_sulu_tailwind_theme.live_editor_screen_' + this.screen)}
                 </h2>
-                <p className="iw-le__screen-hint">
-                    {translate('iw_sulu_tailwind_theme.live_editor_colors_hint')}
-                </p>
-                {this.colors.map((color) => (
-                    <ColorField
-                        key={color.role}
-                        label={color.labelKey ? translate(color.labelKey) : color.label}
-                        onChange={this.handleColorChange}
-                        role={color.role}
-                        value={this.values[color.role]}
-                    />
+                <p className="iw-le__screen-hint">{hint}</p>
+
+                {this.sections.map((section, index) => (
+                    <div className="iw-le__section" key={section.title || index}>
+                        {section.title && <p className="iw-le__section-title">{section.title}</p>}
+                        {section.hint && <p className="iw-le__section-hint">{section.hint}</p>}
+                        {section.fields.map((field) => this.renderField(field))}
+                    </div>
                 ))}
-            </div>
+            </Fragment>
         );
     }
 
@@ -414,9 +577,23 @@ class LiveEditor extends React.Component<*> {
 
         return (
             <div className="iw-le">
-                <aside className="iw-le__panel">
+                <nav className="iw-le__screens">
                     <div className="iw-le__theme">{this.label}</div>
-                    {this.renderColorsScreen()}
+                    {SCREENS.map((screen) => (
+                        <button
+                            className={'iw-le__screen-button'
+                                + (this.screen === screen.key ? ' iw-le__screen-button--active' : '')}
+                            key={screen.key}
+                            onClick={() => this.handleScreenChange(screen.key)}
+                            type="button"
+                        >
+                            {translate('iw_sulu_tailwind_theme.live_editor_screen_' + screen.key)}
+                        </button>
+                    ))}
+                </nav>
+
+                <aside className="iw-le__panel">
+                    {this.renderScreen()}
                 </aside>
 
                 <main className="iw-le__stage">

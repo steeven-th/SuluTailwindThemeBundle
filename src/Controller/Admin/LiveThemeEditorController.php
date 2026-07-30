@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Twig\Environment;
 
 /**
@@ -58,7 +60,61 @@ class LiveThemeEditorController extends AbstractController
         private readonly Environment $twig,
         private readonly GoogleFontsCatalog $fontsCatalog,
         private readonly ThemeConfigResolver $themeConfigResolver,
+        private readonly TranslatorInterface $translator,
     ) {
+    }
+
+    /**
+     * Translate a label into the admin user's language.
+     *
+     * Every label the editor exposes is a translation key, sharing the keys of
+     * the theme forms so a setting reads the same in both places. A value that
+     * is not a key (a font name, a variant label typed by the user) comes back
+     * untouched, which is what the translator does with an unknown id.
+     *
+     * @param string $key The translation key
+     *
+     * @return string The translated label
+     */
+    private function label(string $key): string
+    {
+        $user = $this->getUser();
+        $locale = ($user instanceof User && '' !== ($user->getLocale() ?? '')) ? $user->getLocale() : null;
+
+        return $this->translator->trans($key, [], 'admin', $locale);
+    }
+
+    /**
+     * Translate the labels of a list of field descriptors, options included.
+     *
+     * @param list<array<string, mixed>> $fields The field descriptors
+     *
+     * @return list<array<string, mixed>> The translated descriptors
+     */
+    private function translateFields(array $fields): array
+    {
+        foreach ($fields as $index => $field) {
+            if (isset($field['label']) && is_string($field['label'])) {
+                $fields[$index]['label'] = $this->label($field['label']);
+            }
+            if (is_array($field['options'] ?? null)) {
+                $fields[$index]['options'] = $this->translateMap($field['options']);
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Translate the values of a value => label map, keeping its keys.
+     *
+     * @param array<string, string> $map The label map
+     *
+     * @return array<string, string> The translated map
+     */
+    private function translateMap(array $map): array
+    {
+        return array_map($this->label(...), $map);
     }
 
     /**
@@ -80,29 +136,91 @@ class LiveThemeEditorController extends AbstractController
     {
         $theme = $this->findThemeOrFail($id);
 
-        return $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/index.html.twig', [
-            'themeId' => $id,
-            'themeLabel' => $theme->getLabel(),
-            'colors' => $this->currentColors($theme->getTokens()),
-            'borders' => $this->currentBorders($theme->getTokens()),
-            'radiusOptions' => self::RADIUS_OPTIONS,
-            'typography' => $this->currentTypography($theme->getTokens()),
+        return $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/index.html.twig', array_merge(
+            [
+                'themeId' => $id,
+                'themeLabel' => $theme->getLabel(),
+            ],
+            $this->editorData($theme),
+        ));
+    }
+
+    /**
+     * Every setting the editor exposes, plus the option sets its controls need.
+     *
+     * Shared by the standalone Twig page and the admin view's JSON state so a
+     * screen is described once during the port from one to the other.
+     *
+     * @param ThemeConfig $theme The theme being edited
+     *
+     * @return array<string, mixed> The editor data
+     */
+    private function editorData(ThemeConfig $theme): array
+    {
+        $tokens = $theme->getTokens();
+        $cards = $this->currentCards($tokens);
+        $menu = $this->currentMenu($theme);
+        $typography = $this->currentTypography($tokens);
+
+        // Labels are translation keys, shared with the theme forms; they are
+        // resolved here so both the standalone page and the admin view show the
+        // admin user's language.
+        $typography['families'] = $this->translateFields($typography['families']);
+        $typography['elements'] = $this->translateFields($typography['elements']);
+
+        return [
+            'colors' => $this->translateFields($this->currentColors($tokens)),
+            'borders' => $this->translateFields($this->currentBorders($tokens)),
+            'radiusOptions' => $this->translateMap(self::RADIUS_OPTIONS),
+            'typography' => $typography,
             'fontChoices' => $this->fontChoices(),
-            'familySlots' => self::FAMILY_SLOTS,
-            'typoWeights' => self::TYPO_WEIGHTS,
-            'typoStyles' => self::TYPO_STYLES,
-            'cards' => $this->currentCards($theme->getTokens()),
-            'hero' => $this->currentHero($theme->getTokens()),
-            'articles' => $this->currentArticles($theme->getTokens()),
-            'menu' => $this->currentMenu($theme),
-            'variants' => $this->currentVariants($theme->getTokens()),
-            'colorTokenGroups' => $this->colorTokenChoices($theme->getTokens()),
-            'buttonChoices' => $this->buttonChoices($theme->getTokens()),
-            'separatorModes' => self::VARIANT_SEPARATOR_MODES,
-            'separatorStyles' => self::VARIANT_SEPARATOR_STYLES,
-            'variantColorGroups' => array_keys(self::VARIANT_COLOR_GROUPS),
-            'groupLabels' => self::FIELD_GROUPS,
-        ]);
+            'familySlots' => $this->translateMap(self::FAMILY_SLOTS),
+            'typoWeights' => $this->translateMap(self::TYPO_WEIGHTS),
+            'typoStyles' => $this->translateMap(self::TYPO_STYLES),
+            'cards' => [
+                'css' => $this->translateFields($cards['css']),
+                'struct' => $this->translateFields($cards['struct']),
+            ],
+            'hero' => $this->translateFields($this->currentHero($tokens)),
+            'articles' => $this->translateFields($this->currentArticles($tokens)),
+            'menu' => [
+                'colors' => $this->translateFields($menu['colors']),
+                'struct' => $this->translateFields($menu['struct']),
+            ],
+            'variants' => $this->translateVariants($this->currentVariants($tokens)),
+            'colorTokenGroups' => $this->colorTokenChoices($tokens),
+            'buttonChoices' => $this->buttonChoices($tokens),
+            'separatorModes' => $this->translateMap(self::VARIANT_SEPARATOR_MODES),
+            'separatorStyles' => $this->translateMap(self::VARIANT_SEPARATOR_STYLES),
+            'variantColorGroups' => array_map($this->label(...), array_values(self::VARIANT_GROUP_LABEL_KEYS)),
+            'groupLabels' => $this->translateMap(self::FIELD_GROUPS),
+        ];
+    }
+
+    /**
+     * Translate the labels carried by the variants, colors included.
+     *
+     * A variant's own label is user-typed, so it is left alone; only the
+     * property and group labels are keys.
+     *
+     * @param list<array<string, mixed>> $variants The variant descriptors
+     *
+     * @return list<array<string, mixed>> The translated descriptors
+     */
+    private function translateVariants(array $variants): array
+    {
+        foreach ($variants as $index => $variant) {
+            if (is_array($variant['colors'] ?? null)) {
+                foreach ($variant['colors'] as $colorIndex => $color) {
+                    $variants[$index]['colors'][$colorIndex]['label'] = $this->label($color['label']);
+                    $variants[$index]['colors'][$colorIndex]['groupLabel'] = $this->label(
+                        self::VARIANT_GROUP_LABEL_KEYS[$color['groupLabel']] ?? $color['groupLabel'],
+                    );
+                }
+            }
+        }
+
+        return $variants;
     }
 
     /**
@@ -323,19 +441,78 @@ class LiveThemeEditorController extends AbstractController
     public function stateAction(int $id): JsonResponse
     {
         $theme = $this->findThemeOrFail($id);
+        $data = $this->editorData($theme);
 
-        $colors = [];
-        foreach ($this->currentColors($theme->getTokens()) as $color) {
-            $color['labelKey'] = 'iw_sulu_tailwind_theme.colors_' . $color['role'];
-            $colors[] = $color;
+        foreach ($data['colors'] as $index => $color) {
+            $data['colors'][$index]['labelKey'] = 'iw_sulu_tailwind_theme.colors_' . $color['role'];
         }
 
-        return new JsonResponse([
+        // Option maps become ordered lists on the way out — see optionList().
+        $data['radiusOptions'] = $this->optionList($data['radiusOptions']);
+        $data['familySlots'] = $this->optionList($data['familySlots']);
+        $data['typoWeights'] = $this->optionList($data['typoWeights']);
+        $data['typoStyles'] = $this->optionList($data['typoStyles']);
+        $data['separatorModes'] = $this->optionList($data['separatorModes']);
+        $data['separatorStyles'] = $this->optionList($data['separatorStyles']);
+        $data['buttonChoices'] = $this->optionList($data['buttonChoices']);
+
+        $data['cards'] = [
+            'css' => $this->fieldOptionLists($data['cards']['css']),
+            'struct' => $this->fieldOptionLists($data['cards']['struct']),
+        ];
+        $data['hero'] = $this->fieldOptionLists($data['hero']);
+        $data['articles'] = $this->fieldOptionLists($data['articles']);
+        $data['menu']['struct'] = $this->fieldOptionLists($data['menu']['struct']);
+
+        foreach ($data['colorTokenGroups'] as $index => $group) {
+            $data['colorTokenGroups'][$index]['options'] = $this->optionList($group['options']);
+        }
+
+        return new JsonResponse(array_merge($data, [
             'id' => $id,
             'label' => $theme->getLabel(),
-            'colors' => $colors,
             'themeConfig' => $this->themeConfigResolver->resolve($theme),
-        ]);
+        ]));
+    }
+
+    /**
+     * Turn a value => label option map into an ordered list of {value, label}.
+     *
+     * PHP encodes a map whose keys happen to run 0..n-1 as a JSON array, which
+     * would drop the values entirely — the menu's sub-menu mode ('0'/'1') is
+     * exactly that case. Every option set crossing to the admin view therefore
+     * travels as an explicit list, which is also what the React selects want.
+     *
+     * @param array<string|int, string> $options The option map
+     *
+     * @return list<array{value: string, label: string}> The option list
+     */
+    private function optionList(array $options): array
+    {
+        $list = [];
+        foreach ($options as $value => $label) {
+            $list[] = ['value' => (string) $value, 'label' => $label];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Apply {@see optionList()} to the `options` of every field descriptor.
+     *
+     * @param list<array<string, mixed>> $fields The field descriptors
+     *
+     * @return list<array<string, mixed>> The descriptors with listed options
+     */
+    private function fieldOptionLists(array $fields): array
+    {
+        foreach ($fields as $index => $field) {
+            if (is_array($field['options'] ?? null)) {
+                $fields[$index]['options'] = $this->optionList($field['options']);
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -364,14 +541,14 @@ class LiveThemeEditorController extends AbstractController
      * (rarely themed). Keys gate which overrides the endpoints accept.
      */
     private const EDITABLE_ROLES = [
-        ColorRoles::PRIMARY => 'Primary',
-        ColorRoles::SECONDARY => 'Secondary',
-        ColorRoles::ACCENT => 'Accent',
-        ColorRoles::BACKGROUND => 'Background',
-        ColorRoles::NEUTRAL => 'Neutral',
-        ColorRoles::ERROR => 'Error',
-        ColorRoles::WARNING => 'Warning',
-        ColorRoles::SUCCESS => 'Success',
+        ColorRoles::PRIMARY => 'iw_sulu_tailwind_theme.colors_primary',
+        ColorRoles::SECONDARY => 'iw_sulu_tailwind_theme.colors_secondary',
+        ColorRoles::ACCENT => 'iw_sulu_tailwind_theme.colors_accent',
+        ColorRoles::BACKGROUND => 'iw_sulu_tailwind_theme.colors_background',
+        ColorRoles::NEUTRAL => 'iw_sulu_tailwind_theme.colors_neutral',
+        ColorRoles::ERROR => 'iw_sulu_tailwind_theme.colors_error',
+        ColorRoles::WARNING => 'iw_sulu_tailwind_theme.colors_warning',
+        ColorRoles::SUCCESS => 'iw_sulu_tailwind_theme.colors_success',
     ];
 
     /**
@@ -385,9 +562,9 @@ class LiveThemeEditorController extends AbstractController
      * mapped to their English labels, in display order.
      */
     private const BORDER_FIELDS = [
-        'cardRadius' => 'Cards',
-        'imageRadius' => 'Images',
-        'paragraphRadius' => 'Paragraphs',
+        'cardRadius' => 'iw_sulu_tailwind_theme.card_radius',
+        'imageRadius' => 'iw_sulu_tailwind_theme.image_radius',
+        'paragraphRadius' => 'iw_sulu_tailwind_theme.paragraph_radius',
     ];
 
     /**
@@ -412,9 +589,9 @@ class LiveThemeEditorController extends AbstractController
      * Keys gate which family overrides the endpoints accept.
      */
     private const FAMILY_SLOTS = [
-        'heading' => 'Headings',
-        'body' => 'Body',
-        'accent' => 'Accent',
+        'heading' => 'iw_sulu_tailwind_theme.typography_heading_family',
+        'body' => 'iw_sulu_tailwind_theme.typography_body_family',
+        'accent' => 'iw_sulu_tailwind_theme.typography_accent_family',
     ];
 
     /**
@@ -423,14 +600,14 @@ class LiveThemeEditorController extends AbstractController
      * in display order. Keys gate the assignment dot-paths accepted below.
      */
     private const TYPO_ELEMENTS = [
-        'h1' => 'Heading 1',
-        'h2' => 'Heading 2',
-        'h3' => 'Heading 3',
-        'h4' => 'Heading 4',
-        'h5' => 'Heading 5',
-        'h6' => 'Heading 6',
-        'body' => 'Body text',
-        'link' => 'Links',
+        'h1' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_1',
+        'h2' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_2',
+        'h3' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_3',
+        'h4' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_4',
+        'h5' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_5',
+        'h6' => 'iw_sulu_tailwind_theme.live_editor_typo_heading_6',
+        'body' => 'iw_sulu_tailwind_theme.live_editor_typo_body_text',
+        'link' => 'iw_sulu_tailwind_theme.links',
     ];
 
     /**
@@ -438,11 +615,11 @@ class LiveThemeEditorController extends AbstractController
      * label, in display order.
      */
     private const TYPO_WEIGHTS = [
-        '400' => '400 · Regular',
-        '500' => '500 · Medium',
-        '600' => '600 · Semi-Bold',
-        '700' => '700 · Bold',
-        '800' => '800 · Extra-Bold',
+        '400' => 'iw_sulu_tailwind_theme.live_editor_weight_400_regular',
+        '500' => 'iw_sulu_tailwind_theme.live_editor_weight_500_medium',
+        '600' => 'iw_sulu_tailwind_theme.live_editor_weight_600_semi_bold',
+        '700' => 'iw_sulu_tailwind_theme.live_editor_weight_700_bold',
+        '800' => 'iw_sulu_tailwind_theme.live_editor_weight_800_extra_bold',
     ];
 
     /**
@@ -450,8 +627,8 @@ class LiveThemeEditorController extends AbstractController
      * label, in display order.
      */
     private const TYPO_STYLES = [
-        'normal' => 'Normal',
-        'italic' => 'Italic',
+        'normal' => 'iw_sulu_tailwind_theme.live_editor_style_normal',
+        'italic' => 'iw_sulu_tailwind_theme.live_editor_style_italic',
     ];
 
     /**
@@ -526,14 +703,14 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, array{label: string, options: array<string, string>}>
      */
     private const CARD_CSS_FIELDS = [
-        'cardGap' => ['label' => 'Grid gap', 'options' => [
-            '0.5rem' => 'Very compact', '1rem' => 'Compact', '1.25rem' => 'Compact +',
-            '1.5rem' => 'Normal', '2rem' => 'Spacious', '2.5rem' => 'Large',
+        'cardGap' => ['label' => 'iw_sulu_tailwind_theme.card_gap', 'options' => [
+            '0.5rem' => 'iw_sulu_tailwind_theme.card_gap_very_compact', '1rem' => 'iw_sulu_tailwind_theme.card_gap_compact', '1.25rem' => 'iw_sulu_tailwind_theme.card_gap_compact_plus',
+            '1.5rem' => 'iw_sulu_tailwind_theme.card_gap_normal', '2rem' => 'iw_sulu_tailwind_theme.card_gap_spacious', '2.5rem' => 'iw_sulu_tailwind_theme.card_gap_large',
         ]],
-        'cardPadding' => ['label' => 'Padding', 'options' => [
-            '0' => 'None', '0.5rem' => 'XS', '1rem' => 'S', '1.5rem' => 'M', '2rem' => 'L',
+        'cardPadding' => ['label' => 'iw_sulu_tailwind_theme.articles_card_padding', 'options' => [
+            '0' => 'iw_sulu_tailwind_theme.articles_card_padding_none', '0.5rem' => 'XS (p-2)', '1rem' => 'iw_sulu_tailwind_theme.articles_card_padding_small', '1.5rem' => 'M (p-6)', '2rem' => 'iw_sulu_tailwind_theme.articles_card_padding_large',
         ]],
-        'cardHoverDuration' => ['label' => 'Hover duration', 'options' => [
+        'cardHoverDuration' => ['label' => 'iw_sulu_tailwind_theme.articles_card_hover_duration', 'options' => [
             '150ms' => '150ms', '300ms' => '300ms', '500ms' => '500ms', '700ms' => '700ms',
         ]],
     ];
@@ -547,20 +724,20 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, array{label: string, options: array<string, string>}>
      */
     private const CARD_STRUCT_FIELDS = [
-        'cardImageRatio' => ['label' => 'Image ratio', 'options' => [
+        'cardImageRatio' => ['label' => 'iw_sulu_tailwind_theme.articles_card_image_ratio', 'options' => [
             '16:9' => '16:9', '4:3' => '4:3', '1:1' => '1:1', '3:4' => '3:4 (portrait)',
         ]],
-        'cardHoverTransform' => ['label' => 'Hover transform', 'options' => [
-            'none' => 'None', 'lift' => 'Lift', 'lift-strong' => 'Lift (strong)',
-            'scale-up' => 'Scale up', 'scale-down' => 'Scale down', 'tilt' => 'Tilt',
+        'cardHoverTransform' => ['label' => 'iw_sulu_tailwind_theme.articles_card_hover_transform', 'options' => [
+            'none' => 'iw_sulu_tailwind_theme.articles_card_hover_transform_none', 'lift' => 'iw_sulu_tailwind_theme.articles_card_hover_transform_lift', 'lift-strong' => 'Lift (strong)',
+            'scale-up' => 'Scale up', 'scale-down' => 'Scale down', 'tilt' => 'iw_sulu_tailwind_theme.articles_card_hover_transform_tilt',
         ]],
-        'cardHoverImage' => ['label' => 'Hover image', 'options' => [
-            'none' => 'None', 'zoom' => 'Zoom', 'zoom-strong' => 'Zoom (strong)',
-            'grayscale' => 'Grayscale', 'brightness' => 'Brightness',
+        'cardHoverImage' => ['label' => 'iw_sulu_tailwind_theme.articles_card_hover_image', 'options' => [
+            'none' => 'iw_sulu_tailwind_theme.articles_card_hover_image_none', 'zoom' => 'iw_sulu_tailwind_theme.articles_card_hover_image_zoom', 'zoom-strong' => 'Zoom (strong)',
+            'grayscale' => 'iw_sulu_tailwind_theme.articles_card_hover_image_grayscale', 'brightness' => 'iw_sulu_tailwind_theme.articles_card_hover_image_brightness',
         ]],
-        'cardHoverShadow' => ['label' => 'Hover shadow', 'options' => [
-            'none' => 'None', 'sm' => 'Small', 'md' => 'Medium', 'lg' => 'Large',
-            'xl' => 'XL', 'glow-primary' => 'Glow primary', 'glow-accent' => 'Glow accent',
+        'cardHoverShadow' => ['label' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow', 'options' => [
+            'none' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow_none', 'sm' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow_sm', 'md' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow_md', 'lg' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow_lg',
+            'xl' => 'iw_sulu_tailwind_theme.articles_card_hover_shadow_xl', 'glow-primary' => 'Glow primary', 'glow-accent' => 'Glow accent',
         ]],
     ];
 
@@ -589,20 +766,20 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, array{label: string, options: array<string, string>}>
      */
     private const HERO_STRUCT_FIELDS = [
-        'pageHero_height' => ['label' => 'Height', 'options' => [
-            'sm' => 'Small', 'md' => 'Medium', 'lg' => 'Large', 'full' => 'Full screen',
+        'pageHero_height' => ['label' => 'iw_sulu_tailwind_theme.page.hero_height', 'options' => [
+            'sm' => 'iw_sulu_tailwind_theme.page.hero_height_sm', 'md' => 'iw_sulu_tailwind_theme.page.hero_height_md', 'lg' => 'iw_sulu_tailwind_theme.page.hero_height_lg', 'full' => 'iw_sulu_tailwind_theme.page.hero_height_full',
         ]],
-        'pageHero_titleDisplay' => ['label' => 'Title display', 'options' => [
-            'overlay' => 'Overlay on image', 'below' => 'Below image', 'hidden' => 'Hidden (image only)',
+        'pageHero_titleDisplay' => ['label' => 'iw_sulu_tailwind_theme.page.hero_title_display', 'options' => [
+            'overlay' => 'iw_sulu_tailwind_theme.page.hero_display_overlay', 'below' => 'iw_sulu_tailwind_theme.page.hero_display_below', 'hidden' => 'iw_sulu_tailwind_theme.page.hero_display_hidden',
         ]],
-        'pageHero_alignX' => ['label' => 'Horizontal align', 'options' => [
-            'left' => 'Left', 'center' => 'Center', 'right' => 'Right',
+        'pageHero_alignX' => ['label' => 'iw_sulu_tailwind_theme.page.hero_align_x', 'options' => [
+            'left' => 'iw_sulu_tailwind_theme.align_left', 'center' => 'iw_sulu_tailwind_theme.align_center', 'right' => 'iw_sulu_tailwind_theme.align_right',
         ]],
-        'pageHero_alignY' => ['label' => 'Vertical align (overlay)', 'options' => [
-            'top' => 'Top', 'middle' => 'Middle', 'bottom' => 'Bottom',
+        'pageHero_alignY' => ['label' => 'iw_sulu_tailwind_theme.page.hero_align_y', 'options' => [
+            'top' => 'iw_sulu_tailwind_theme.page.hero_align_top', 'middle' => 'iw_sulu_tailwind_theme.page.hero_align_middle', 'bottom' => 'iw_sulu_tailwind_theme.page.hero_align_bottom',
         ]],
-        'pageHero_shade' => ['label' => 'Readability shade (overlay)', 'options' => [
-            'none' => 'None', 'light' => 'Light', 'medium' => 'Medium', 'strong' => 'Strong',
+        'pageHero_shade' => ['label' => 'iw_sulu_tailwind_theme.page.hero_shade', 'options' => [
+            'none' => 'iw_sulu_tailwind_theme.page.hero_shade_none', 'light' => 'iw_sulu_tailwind_theme.page.hero_shade_light', 'medium' => 'iw_sulu_tailwind_theme.page.hero_shade_medium', 'strong' => 'iw_sulu_tailwind_theme.page.hero_shade_strong',
         ]],
     ];
 
@@ -629,17 +806,17 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, array{label: string, options: array<string, string>}>
      */
     private const ARTICLES_STRUCT_FIELDS = [
-        'articles_listingStyle' => ['label' => 'Listing style', 'options' => [
-            'grid' => 'Grid', 'cards' => 'Cards', 'list' => 'List',
+        'articles_listingStyle' => ['label' => 'iw_sulu_tailwind_theme.articles_listing_style', 'options' => [
+            'grid' => 'iw_sulu_tailwind_theme.style.article_listing_grid', 'cards' => 'iw_sulu_tailwind_theme.style.article_listing_cards', 'list' => 'iw_sulu_tailwind_theme.style.article_listing_list',
         ]],
-        'articles_showDates' => ['label' => 'Dates', 'options' => [
-            'hidden' => 'Hidden', 'page' => 'Page only', 'listing' => 'Listing only', 'both' => 'Everywhere',
+        'articles_showDates' => ['label' => 'iw_sulu_tailwind_theme.articles_show_dates', 'options' => [
+            'hidden' => 'iw_sulu_tailwind_theme.articles_visibility_hidden', 'page' => 'iw_sulu_tailwind_theme.articles_visibility_page', 'listing' => 'iw_sulu_tailwind_theme.articles_visibility_listing', 'both' => 'iw_sulu_tailwind_theme.articles_visibility_both',
         ]],
-        'articles_showCategories' => ['label' => 'Categories', 'options' => [
-            'hidden' => 'Hidden', 'page' => 'Page only', 'listing' => 'Listing only', 'both' => 'Everywhere',
+        'articles_showCategories' => ['label' => 'iw_sulu_tailwind_theme.articles_show_categories', 'options' => [
+            'hidden' => 'iw_sulu_tailwind_theme.articles_visibility_hidden', 'page' => 'iw_sulu_tailwind_theme.articles_visibility_page', 'listing' => 'iw_sulu_tailwind_theme.articles_visibility_listing', 'both' => 'iw_sulu_tailwind_theme.articles_visibility_both',
         ]],
-        'articles_showExcerpts' => ['label' => 'Excerpts', 'options' => [
-            'hidden' => 'Hidden', 'listing' => 'Listing only', 'both' => 'Everywhere',
+        'articles_showExcerpts' => ['label' => 'iw_sulu_tailwind_theme.articles_show_excerpts', 'options' => [
+            'hidden' => 'iw_sulu_tailwind_theme.articles_visibility_hidden', 'listing' => 'iw_sulu_tailwind_theme.articles_visibility_listing', 'both' => 'iw_sulu_tailwind_theme.articles_visibility_both',
         ]],
     ];
 
@@ -670,19 +847,19 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, string>
      */
     private const MENU_COLOR_SLOTS = [
-        'bg' => 'Background',
-        'text' => 'Text',
-        'textHover' => 'Text hover',
-        'secondBg' => 'Level 2 background',
-        'secondText' => 'Level 2 text',
-        'secondTextHover' => 'Level 2 text hover',
-        'thirdBg' => 'Level 3 background',
-        'thirdText' => 'Level 3 text',
-        'divider' => 'Dividers',
-        'burgerOpen' => 'Burger (closed menu)',
-        'burgerClose' => 'Burger (open menu)',
-        'socialMedia' => 'Social icons',
-        'socialMediaHover' => 'Social icons hover',
+        'bg' => 'iw_sulu_tailwind_theme.menu_colors_bg',
+        'text' => 'iw_sulu_tailwind_theme.menu_colors_text',
+        'textHover' => 'iw_sulu_tailwind_theme.menu_colors_textHover',
+        'secondBg' => 'iw_sulu_tailwind_theme.menu_colors_secondBg',
+        'secondText' => 'iw_sulu_tailwind_theme.menu_colors_secondText',
+        'secondTextHover' => 'iw_sulu_tailwind_theme.menu_colors_secondTextHover',
+        'thirdBg' => 'iw_sulu_tailwind_theme.menu_colors_thirdBg',
+        'thirdText' => 'iw_sulu_tailwind_theme.menu_colors_thirdText',
+        'divider' => 'iw_sulu_tailwind_theme.menu_colors_divider',
+        'burgerOpen' => 'iw_sulu_tailwind_theme.menu_colors_burgerOpen',
+        'burgerClose' => 'iw_sulu_tailwind_theme.menu_colors_burgerClose',
+        'socialMedia' => 'iw_sulu_tailwind_theme.menu_colors_socialMedia',
+        'socialMediaHover' => 'iw_sulu_tailwind_theme.menu_colors_socialMediaHover',
     ];
 
     /**
@@ -703,81 +880,81 @@ class LiveThemeEditorController extends AbstractController
      */
     private const MENU_STRUCT_FIELDS = [
         'type' => [
-            'label' => 'Menu type', 'type' => 'enum', 'showFor' => [],
+            'label' => 'iw_sulu_tailwind_theme.menu_type', 'type' => 'enum', 'showFor' => [],
             'options' => [
-                'navbar' => 'Navbar', 'burger' => 'Burger', 'fullscreen' => 'Fullscreen',
-                'sidebar' => 'Sidebar', 'megamenu' => 'Mega menu',
+                'navbar' => 'iw_sulu_tailwind_theme.menu_type_navbar', 'burger' => 'iw_sulu_tailwind_theme.menu_type_burger', 'fullscreen' => 'iw_sulu_tailwind_theme.menu_type_fullscreen',
+                'sidebar' => 'iw_sulu_tailwind_theme.menu_type_sidebar', 'megamenu' => 'iw_sulu_tailwind_theme.menu_type_megamenu',
             ],
         ],
         'navPosition' => [
-            'label' => 'Navigation position', 'type' => 'enum', 'showFor' => ['navbar', 'megamenu'],
-            'options' => ['left' => 'Left', 'center' => 'Center', 'right' => 'Right'],
+            'label' => 'iw_sulu_tailwind_theme.menu_navPosition', 'type' => 'enum', 'showFor' => ['navbar', 'megamenu'],
+            'options' => ['left' => 'iw_sulu_tailwind_theme.menu_navPosition_left', 'center' => 'iw_sulu_tailwind_theme.menu_navPosition_center', 'right' => 'iw_sulu_tailwind_theme.menu_navPosition_right'],
         ],
         'animation' => [
-            'label' => 'Panel animation', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
-            'options' => ['none' => 'None', 'slide' => 'Slide', 'fade' => 'Fade'],
+            'label' => 'iw_sulu_tailwind_theme.menu_animation', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
+            'options' => ['none' => 'iw_sulu_tailwind_theme.menu_animation_none', 'slide' => 'iw_sulu_tailwind_theme.menu_animation_slide', 'fade' => 'iw_sulu_tailwind_theme.menu_animation_fade'],
         ],
         'slideDirection' => [
-            'label' => 'Slide direction', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
-            'options' => ['top' => 'Top', 'right' => 'Right', 'bottom' => 'Bottom', 'left' => 'Left'],
+            'label' => 'iw_sulu_tailwind_theme.menu_slideDirection', 'type' => 'enum', 'showFor' => ['navbar', 'burger'],
+            'options' => ['top' => 'iw_sulu_tailwind_theme.menu_slideDirection_top', 'right' => 'iw_sulu_tailwind_theme.menu_slideDirection_right', 'bottom' => 'iw_sulu_tailwind_theme.menu_slideDirection_bottom', 'left' => 'iw_sulu_tailwind_theme.menu_slideDirection_left'],
         ],
         'childLevels' => [
-            'label' => 'Navigation levels', 'type' => 'int', 'showFor' => [],
+            'label' => 'iw_sulu_tailwind_theme.menu_childLevels', 'type' => 'int', 'showFor' => [],
             'options' => ['1' => '1', '2' => '2', '3' => '3'],
         ],
         'sidebarPosition' => [
-            'label' => 'Sidebar side', 'type' => 'enum', 'showFor' => ['sidebar'],
-            'options' => ['left' => 'Left', 'right' => 'Right'],
+            'label' => 'iw_sulu_tailwind_theme.menu_sidebarPosition', 'type' => 'enum', 'showFor' => ['sidebar'],
+            'options' => ['left' => 'iw_sulu_tailwind_theme.menu_position_left', 'right' => 'iw_sulu_tailwind_theme.menu_position_right'],
         ],
         'subMenuPanels' => [
-            'label' => 'Sub-menus as sliding panels', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
-            'options' => ['0' => 'No (accordion)', '1' => 'Yes (drill-down)'],
+            'label' => 'iw_sulu_tailwind_theme.menu_subMenuPanels', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_submenu_accordion', '1' => 'iw_sulu_tailwind_theme.live_editor_submenu_drilldown'],
         ],
         'clickParentPage' => [
-            'label' => 'Parent page access', 'type' => 'enum', 'showFor' => ['burger', 'fullscreen', 'sidebar'],
+            'label' => 'iw_sulu_tailwind_theme.menu_clickParentPage', 'type' => 'enum', 'showFor' => ['burger', 'fullscreen', 'sidebar'],
             'panels' => '0',
-            'options' => ['none' => 'Not clickable', 'split' => 'Split (link + chevron)', 'selflink' => 'Self link in sub-menu'],
+            'options' => ['none' => 'iw_sulu_tailwind_theme.menu_clickParentPage_none', 'split' => 'iw_sulu_tailwind_theme.menu_clickParentPage_split', 'selflink' => 'iw_sulu_tailwind_theme.menu_clickParentPage_selflink'],
         ],
         'clickParentPagePanels' => [
-            'label' => 'Parent page clickable', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
+            'label' => 'iw_sulu_tailwind_theme.menu_clickParentPage', 'type' => 'bool', 'showFor' => ['burger', 'sidebar'],
             'panels' => '1',
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
         'clickParentPageNavbar' => [
-            'label' => 'Parent page clickable', 'type' => 'bool', 'showFor' => ['navbar'],
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'label' => 'iw_sulu_tailwind_theme.menu_clickParentPageNavbar', 'type' => 'bool', 'showFor' => ['navbar'],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
         'twoColumns' => [
-            'label' => 'Two columns', 'type' => 'bool', 'showFor' => ['fullscreen'],
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'label' => 'iw_sulu_tailwind_theme.menu_twoColumns', 'type' => 'bool', 'showFor' => ['fullscreen'],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
         'displayLogoDesktop' => [
-            'label' => 'Desktop logo', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+            'label' => 'iw_sulu_tailwind_theme.menu_displayLogoDesktop', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_hidden', '1' => 'iw_sulu_tailwind_theme.live_editor_visible'],
         ],
         'displayLogoMobile' => [
-            'label' => 'Mobile logo', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+            'label' => 'iw_sulu_tailwind_theme.menu_displayLogoMobile', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_hidden', '1' => 'iw_sulu_tailwind_theme.live_editor_visible'],
         ],
         'displaySiteName' => [
-            'label' => 'Site name', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+            'label' => 'iw_sulu_tailwind_theme.menu_displaySiteName', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_hidden', '1' => 'iw_sulu_tailwind_theme.live_editor_visible'],
         ],
         'displaySocialMedia' => [
-            'label' => 'Social media links', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'Hidden', '1' => 'Visible'],
+            'label' => 'iw_sulu_tailwind_theme.menu_displaySocialMedia', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_hidden', '1' => 'iw_sulu_tailwind_theme.live_editor_visible'],
         ],
         'transparentNavbar' => [
-            'label' => 'Transparent navbar', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'label' => 'iw_sulu_tailwind_theme.menu_transparentNavbar', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
         'scrollBg' => [
-            'label' => 'Background on scroll', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'label' => 'iw_sulu_tailwind_theme.menu_scrollBg', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
         'scrollHide' => [
-            'label' => 'Hide on scroll down', 'type' => 'bool', 'showFor' => [],
-            'options' => ['0' => 'No', '1' => 'Yes'],
+            'label' => 'iw_sulu_tailwind_theme.menu_scrollHide', 'type' => 'bool', 'showFor' => [],
+            'options' => ['0' => 'iw_sulu_tailwind_theme.live_editor_no', '1' => 'iw_sulu_tailwind_theme.live_editor_yes'],
         ],
     ];
 
@@ -825,28 +1002,28 @@ class LiveThemeEditorController extends AbstractController
      */
     private const VARIANT_COLOR_GROUPS = [
         'Text' => [
-            'title' => 'Titles',
-            'subtitle' => 'Subtitles',
-            'paragraph' => 'Paragraphs',
-            'list' => 'Lists',
+            'title' => 'iw_sulu_tailwind_theme.live_editor_variant_titles',
+            'subtitle' => 'iw_sulu_tailwind_theme.live_editor_variant_subtitles',
+            'paragraph' => 'iw_sulu_tailwind_theme.live_editor_variant_paragraphs',
+            'list' => 'iw_sulu_tailwind_theme.live_editor_variant_lists',
         ],
         'Links' => [
-            'link' => 'Links',
-            'linkHover' => 'Links (hover)',
+            'link' => 'iw_sulu_tailwind_theme.links',
+            'linkHover' => 'iw_sulu_tailwind_theme.live_editor_variant_links_hover',
         ],
         'Surfaces' => [
-            'blockBg' => 'Block background',
-            'paragraphBg' => 'Paragraph background',
-            'hr' => 'Separators',
+            'blockBg' => 'iw_sulu_tailwind_theme.variant_blockBg',
+            'paragraphBg' => 'iw_sulu_tailwind_theme.variant_paragraphBg',
+            'hr' => 'iw_sulu_tailwind_theme.live_editor_variant_separators',
         ],
         'Forms' => [
-            'formBg' => 'Field background',
-            'formText' => 'Field text',
-            'formLabel' => 'Labels',
-            'formPlaceholder' => 'Placeholders',
-            'formBorder' => 'Borders',
-            'formBorderFocus' => 'Borders (focus)',
-            'formBorderError' => 'Borders (error)',
+            'formBg' => 'iw_sulu_tailwind_theme.live_editor_variant_field_background',
+            'formText' => 'iw_sulu_tailwind_theme.live_editor_variant_field_text',
+            'formLabel' => 'iw_sulu_tailwind_theme.live_editor_variant_labels',
+            'formPlaceholder' => 'iw_sulu_tailwind_theme.live_editor_variant_placeholders',
+            'formBorder' => 'iw_sulu_tailwind_theme.borders',
+            'formBorderFocus' => 'iw_sulu_tailwind_theme.live_editor_variant_borders_focus',
+            'formBorderError' => 'iw_sulu_tailwind_theme.live_editor_variant_borders_error',
         ],
     ];
 
@@ -857,9 +1034,9 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, string>
      */
     private const VARIANT_SEPARATOR_STYLES = [
-        'solid' => 'Solid', 'dashed' => 'Dashed', 'dotted' => 'Dotted', 'double' => 'Double',
-        'gradient' => 'Gradient', 'wave' => 'Wave', 'zigzag' => 'Zigzag', 'dots' => 'Dots',
-        'diamond' => 'Diamond',
+        'solid' => 'iw_sulu_tailwind_theme.line_solid', 'dashed' => 'iw_sulu_tailwind_theme.separator_dashed', 'dotted' => 'iw_sulu_tailwind_theme.separator_dotted', 'double' => 'iw_sulu_tailwind_theme.live_editor_separator_double',
+        'gradient' => 'iw_sulu_tailwind_theme.separator_gradient', 'wave' => 'iw_sulu_tailwind_theme.separator_wave', 'zigzag' => 'iw_sulu_tailwind_theme.separator_zigzag', 'dots' => 'iw_sulu_tailwind_theme.separator_dots',
+        'diamond' => 'iw_sulu_tailwind_theme.separator_diamond',
     ];
 
     /**
@@ -870,7 +1047,7 @@ class LiveThemeEditorController extends AbstractController
      * @var array<string, string>
      */
     private const VARIANT_SEPARATOR_MODES = [
-        'style' => 'Line', 'none' => 'None',
+        'style' => 'iw_sulu_tailwind_theme.style.line', 'none' => 'iw_sulu_tailwind_theme.variant_separator_mode_none',
     ];
 
     /**
@@ -971,6 +1148,21 @@ class LiveThemeEditorController extends AbstractController
      *
      * @var array<string, string>
      */
+    /**
+     * Display labels of the variant color groups.
+     *
+     * The group names themselves are identifiers (see VARIANT_GROUP_KEYS), so
+     * their translation lives here rather than in the group map.
+     *
+     * @var array<string, string>
+     */
+    private const VARIANT_GROUP_LABEL_KEYS = [
+        'Text' => 'iw_sulu_tailwind_theme.live_editor_variant_group_text',
+        'Links' => 'iw_sulu_tailwind_theme.live_editor_variant_group_links',
+        'Surfaces' => 'iw_sulu_tailwind_theme.live_editor_variant_group_surfaces',
+        'Forms' => 'iw_sulu_tailwind_theme.live_editor_variant_group_forms',
+    ];
+
     private const VARIANT_GROUP_KEYS = [
         'Text' => 'variant.text',
         'Links' => 'variant.links',
@@ -1000,7 +1192,10 @@ class LiveThemeEditorController extends AbstractController
         $colors = $this->extractColorOverrides(is_array($data['colors'] ?? null) ? $data['colors'] : []);
         $tokens = $this->extractTokenPatch(is_array($data['tokens'] ?? null) ? $data['tokens'] : []);
         $families = $this->extractFontFamilies(is_array($data['families'] ?? null) ? $data['families'] : []);
-        $menu = $this->extractMenuPatch(is_array($data['menu'] ?? null) ? $data['menu'] : []);
+        $menu = $this->extractMenuPatch(
+            is_array($data['menu'] ?? null) ? $data['menu'] : [],
+            $theme->getTokens(),
+        );
         $variants = $this->extractVariantPatch(
             is_array($data['variants'] ?? null) ? $data['variants'] : [],
             $theme->getTokens(),
@@ -1316,17 +1511,25 @@ class LiveThemeEditorController extends AbstractController
         $typography = is_array($tokens['typography'] ?? null) ? $tokens['typography'] : [];
 
         // Font families: index the stored list by role.
-        $nameByRole = [];
+        $storedByRole = [];
         foreach (is_array($typography['families'] ?? null) ? $typography['families'] : [] as $family) {
             if (is_array($family) && is_string($family['role'] ?? null)) {
-                $nameByRole[$family['role']] = is_string($family['name'] ?? null) ? $family['name'] : '';
+                $storedByRole[$family['role']] = [
+                    'name' => is_string($family['name'] ?? null) ? $family['name'] : '',
+                    // Carried to the editor so its font picker opens on the
+                    // right tab, and so the choice round-trips unchanged.
+                    'source' => is_string($family['source'] ?? null) ? $family['source'] : 'google',
+                ];
             }
         }
 
         $families = [];
         foreach (self::FAMILY_SLOTS as $role => $label) {
             $families[] = [
-                'role' => $role, 'label' => $label, 'name' => $nameByRole[$role] ?? '',
+                'role' => $role,
+                'label' => $label,
+                'name' => $storedByRole[$role]['name'] ?? '',
+                'source' => $storedByRole[$role]['source'] ?? 'google',
                 'group' => 'typo.families',
             ];
         }
@@ -1368,20 +1571,67 @@ class LiveThemeEditorController extends AbstractController
      */
     private function extractFontFamilies(array $families): array
     {
-        $allowed = $this->fontMeta();
-
         $overrides = [];
-        foreach ($families as $role => $name) {
+        foreach ($families as $role => $value) {
             if (!is_string($role) || !isset(self::FAMILY_SLOTS[$role])) {
                 continue;
             }
-            if (!is_string($name) || ('' !== $name && !isset($allowed[$name]))) {
+
+            // Either a bare name, or {name, source} as the font picker sends it.
+            $name = is_array($value) ? ($value['name'] ?? null) : $value;
+            $source = is_array($value) ? ($value['source'] ?? null) : null;
+
+            if (!is_string($name)) {
                 continue;
             }
-            $overrides[$role] = $name;
+
+            $name = $this->sanitizeFontName($name);
+            if (null === $name) {
+                continue;
+            }
+
+            $overrides[$role] = ['name' => $name, 'source' => is_string($source) ? $source : null];
         }
 
         return $overrides;
+    }
+
+    /**
+     * Font sources a family may declare.
+     *
+     * `local` covers a font the project serves itself: like a system font, it
+     * gets no Google Fonts import.
+     */
+    private const FONT_SOURCES = ['google', 'system', 'local'];
+
+    /**
+     * Validate a font family name, or null when it cannot be one.
+     *
+     * The whole Google catalogue is allowed — restricting the editor to a
+     * curated list was how injection used to be prevented, which the compiler
+     * and the Google Fonts resolver now handle by escaping what they
+     * interpolate. What is left here is a plausibility check: a family name is
+     * short, printable, single-line, and free of the characters that only ever
+     * show up in an attempt at breaking out of a CSS string or a URL.
+     *
+     * @param string $name The candidate name
+     *
+     * @return string|null The trimmed name, or null when it is not usable
+     */
+    private function sanitizeFontName(string $name): ?string
+    {
+        $name = trim($name);
+
+        if ('' === $name) {
+            // An empty name is legitimate: it clears the slot.
+            return '';
+        }
+
+        if (mb_strlen($name) > 64 || 1 !== preg_match('/^[\p{L}\p{N} ._+-]+$/u', $name)) {
+            return null;
+        }
+
+        return $name;
     }
 
     /**
@@ -1408,7 +1658,21 @@ class LiveThemeEditorController extends AbstractController
         $typography = is_array($tokens['typography'] ?? null) ? $tokens['typography'] : [];
         $families = is_array($typography['families'] ?? null) ? array_values($typography['families']) : [];
 
-        foreach ($overrides as $role => $name) {
+        foreach ($overrides as $role => $override) {
+            $name = $override['name'];
+
+            // A known font keeps its catalogued source and fallback; for the
+            // rest, the picker says where the font comes from — which decides
+            // whether a Google Fonts import is emitted — and the fallback stays
+            // on the safe side.
+            $source = $meta[$name]['source'] ?? null;
+            $fallback = $meta[$name]['fallback'] ?? null;
+
+            if (null === $source) {
+                $source = in_array($override['source'], self::FONT_SOURCES, true) ? $override['source'] : 'google';
+                $fallback = 'sans-serif';
+            }
+
             // Locate the existing entry for this role.
             $index = null;
             foreach ($families as $i => $family) {
@@ -1429,14 +1693,14 @@ class LiveThemeEditorController extends AbstractController
 
             if (null !== $index) {
                 $families[$index]['name'] = $name;
-                $families[$index]['source'] = $meta[$name]['source'];
-                $families[$index]['fallback'] = $meta[$name]['fallback'];
+                $families[$index]['source'] = $source;
+                $families[$index]['fallback'] = $fallback;
             } else {
                 $families[] = [
                     'name' => $name,
                     'role' => $role,
-                    'source' => $meta[$name]['source'],
-                    'fallback' => $meta[$name]['fallback'],
+                    'source' => $source,
+                    'fallback' => $fallback,
                 ];
             }
         }
@@ -2032,11 +2296,13 @@ class LiveThemeEditorController extends AbstractController
      * Keys are either a structural field name (`type`, `scrollHide`, …) or a
      * color slot path (`colors.bg`). Anything else is dropped.
      *
-     * @param array<mixed, mixed> $patch Raw key => value map
+     * @param array<mixed, mixed>  $patch  Raw key => value map
+     * @param array<string, mixed> $tokens The theme tokens, needed only to
+     *                                     validate `ref:` color aliases
      *
      * @return array<string, mixed> The validated patch, values already typed
      */
-    private function extractMenuPatch(array $patch): array
+    private function extractMenuPatch(array $patch, array $tokens = []): array
     {
         $clean = [];
         foreach ($patch as $key => $value) {
@@ -2046,8 +2312,11 @@ class LiveThemeEditorController extends AbstractController
 
             if (str_starts_with($key, 'colors.')) {
                 $slot = substr($key, 7);
-                if (isset(self::MENU_COLOR_SLOTS[$slot])
-                    && 1 === preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $value)) {
+                // Same values the menu form accepts: its color fields are
+                // color-token editors with the palette turned on, and the
+                // compiler resolves `ref:` aliases — so restricting this to raw
+                // hex would silently drop a palette shade picked in the editor.
+                if (isset(self::MENU_COLOR_SLOTS[$slot]) && $this->isColorTokenValue($value, $tokens)) {
                     $clean[$key] = $value;
                 }
                 continue;
