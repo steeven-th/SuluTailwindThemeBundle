@@ -17,6 +17,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -63,6 +64,7 @@ class LiveThemeEditorController extends AbstractController
         private readonly ThemeConfigResolver $themeConfigResolver,
         private readonly TranslatorInterface $translator,
         private readonly ThemeConfigController $themeConfigController,
+        private readonly ThemeProvider $themeProvider,
     ) {
     }
 
@@ -478,6 +480,13 @@ class LiveThemeEditorController extends AbstractController
         // across the reloads triggered by structural changes. 0 = fixed defaults.
         $demoSeed = max(0, $request->query->getInt('demoSeed'));
 
+        // Every Twig function resolves the theme through the provider, which
+        // normally answers with the webspace's. Point it at the theme being
+        // previewed, or the listing style, the article config and the radius
+        // helpers would all describe the live site instead. Request-scoped: the
+        // provider is only pinned for this render.
+        $this->themeProvider->setPreviewTheme($theme);
+
         // Demo mode as a Twig global (not a template var): block templates include
         // image partials with `only`, which strips context vars — a global is the
         // only value that survives, letting every image resolve to a picsum
@@ -545,20 +554,26 @@ class LiveThemeEditorController extends AbstractController
             $demoFacets = $this->demoContentProvider->getArticleFacets();
         }
 
-        $response = $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/preview.html.twig', [
-            'themeCss' => $this->compiler->compileToString($theme),
-            'demoBlocks' => $this->demoContentProvider->getBlocks($preview, $demoSeed, $variantSlug),
-            'variantSlug' => $variantSlug,
-            'preview' => $preview,
-            'cardConfig' => $cardConfig,
-            'demoArticles' => $demoArticles,
-            'demoFacets' => $demoFacets,
-            'heroConfig' => $heroConfig,
-            'demoHero' => $demoHero,
-            'articlesConfig' => $articlesConfig,
-            'menuConfig' => $menuConfig,
-            'footerConfig' => $footerConfig,
-        ]);
+        try {
+            $response = $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/preview.html.twig', [
+                'themeCss' => $this->compiler->compileToString($theme),
+                'demoBlocks' => $this->demoContentProvider->getBlocks($preview, $demoSeed, $variantSlug),
+                'variantSlug' => $variantSlug,
+                'preview' => $preview,
+                'cardConfig' => $cardConfig,
+                'demoArticles' => $demoArticles,
+                'demoFacets' => $demoFacets,
+                'heroConfig' => $heroConfig,
+                'demoHero' => $demoHero,
+                'articlesConfig' => $articlesConfig,
+                'menuConfig' => $menuConfig,
+                'footerConfig' => $footerConfig,
+            ]);
+        } finally {
+            // Release the pin even if rendering throws, so a later lookup in the
+            // same PHP process (worker runtimes, tests) cannot inherit it.
+            $this->themeProvider->setPreviewTheme(null);
+        }
 
         // The custom request format above skips the toolbar; set the type back
         // explicitly so the iframe always gets HTML.

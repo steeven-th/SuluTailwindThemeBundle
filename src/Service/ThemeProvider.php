@@ -74,7 +74,31 @@ class ThemeProvider
      */
     public function getActiveTheme(): ?ThemeConfig
     {
-        return $this->getThemeForWebspace();
+        return $this->previewTheme ?? $this->getThemeForWebspace();
+    }
+
+    /**
+     * Theme every lookup resolves to, whatever the request says.
+     *
+     * The Live Theme Editor renders the real front-end Twig for a theme that is
+     * not the webspace's — and often not even saved. Every Twig function goes
+     * through getActiveTheme(), so without this the preview would read the
+     * settings of the live site instead of the ones being edited: the listing
+     * style, the article config, the radius helpers, the menu and footer.
+     */
+    private ?ThemeConfig $previewTheme = null;
+
+    /**
+     * Pin the theme every lookup resolves to.
+     *
+     * Scoped to a single request by the caller (the preview route); pass null
+     * to release it.
+     *
+     * @param ThemeConfig|null $theme The theme to preview
+     */
+    public function setPreviewTheme(?ThemeConfig $theme): void
+    {
+        $this->previewTheme = $theme;
     }
 
     /**

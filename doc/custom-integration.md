@@ -399,6 +399,16 @@ class MyThemeAwareService
 | `getMenuConfig()` | `array` | Menu type, colors, animation, display options |
 | `getBlockStyles()` | `array` | Block style configuration (layout variations) |
 | `resetCache()` | `void` | Clear the in-memory cache (useful after activating a theme) |
+| `setPreviewTheme()` | `void` | Pin the theme every lookup resolves to (see below) |
+
+> **Note — the Live Theme Editor.** Its preview renders the real front-end
+> templates for the theme being edited, which is not the webspace's theme and
+> may not even be saved yet. It does so by pinning that theme with
+> `setPreviewTheme()`, released as soon as the preview is rendered. Any service
+> reading the theme through `ThemeProvider` (or the Twig functions, which all go
+> through it) therefore describes the previewed theme automatically. Services
+> that read the theme by some other route — a repository lookup, a cached value
+> of their own — will keep describing the live site inside the preview.
 
 ### Usage in a controller
 
