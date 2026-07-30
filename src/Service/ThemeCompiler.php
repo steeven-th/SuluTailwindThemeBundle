@@ -680,9 +680,11 @@ class ThemeCompiler
         // Listing wrappers (grid layouts shared by every listing style)
         $css .= "/* Article listing layouts */\n";
         $css .= ".iw-article-listing { display: block; }\n";
-        $css .= ".iw-article-listing--cards { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }\n";
-        $css .= ".iw-article-listing--grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }\n";
-        $css .= ".iw-article-listing--list { display: flex; flex-direction: column; gap: 1.5rem; }\n";
+        // Gaps cascade from the global card gap (Components > Cards), like every
+        // other card grid in the bundle, falling back to the per-style default.
+        $css .= ".iw-article-listing--cards { display: grid; grid-template-columns: 1fr; gap: var(--iw-cards-gap, 2.5rem); }\n";
+        $css .= ".iw-article-listing--grid { display: grid; grid-template-columns: 1fr; gap: var(--iw-cards-gap, 2rem); }\n";
+        $css .= ".iw-article-listing--list { display: flex; flex-direction: column; gap: var(--iw-cards-gap, 1.5rem); }\n";
         $css .= "@media (min-width: 640px) {\n";
         $css .= "  .iw-article-listing--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }\n";
         $css .= "}\n";
