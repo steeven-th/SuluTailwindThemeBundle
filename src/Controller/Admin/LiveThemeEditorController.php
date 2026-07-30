@@ -15,6 +15,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -56,6 +57,7 @@ class LiveThemeEditorController extends AbstractController
         private readonly DemoContentProvider $demoContentProvider,
         private readonly Environment $twig,
         private readonly GoogleFontsCatalog $fontsCatalog,
+        private readonly ThemeConfigResolver $themeConfigResolver,
     ) {
     }
 
@@ -292,6 +294,48 @@ class LiveThemeEditorController extends AbstractController
         }
 
         return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * Return the editor's initial state as JSON, for the React admin view.
+     *
+     * The standalone Twig page gets the same data through template variables;
+     * the fullscreen admin view is mounted by the router with nothing but the
+     * theme id, so it fetches its starting point here.
+     *
+     * The resolved theme config (palette shades, variants, buttons, borders) is
+     * what the bundle's React field types read from their shared store, so the
+     * pickers show the palette of the theme being edited rather than the one
+     * assigned to the first webspace.
+     *
+     * @param int $id The theme configuration ID
+     *
+     * @return JsonResponse The editor state
+     *
+     * @throws NotFoundHttpException If the theme is not found
+     */
+    #[Route(
+        '/admin/theme-live-editor/{id}/state',
+        name: 'iw_sulu_tailwind_theme.live_editor_state',
+        methods: ['GET'],
+        requirements: ['id' => '\d+'],
+    )]
+    public function stateAction(int $id): JsonResponse
+    {
+        $theme = $this->findThemeOrFail($id);
+
+        $colors = [];
+        foreach ($this->currentColors($theme->getTokens()) as $color) {
+            $color['labelKey'] = 'iw_sulu_tailwind_theme.colors_' . $color['role'];
+            $colors[] = $color;
+        }
+
+        return new JsonResponse([
+            'id' => $id,
+            'label' => $theme->getLabel(),
+            'colors' => $colors,
+            'themeConfig' => $this->themeConfigResolver->resolve($theme),
+        ]);
     }
 
     /**

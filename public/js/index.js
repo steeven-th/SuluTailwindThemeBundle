@@ -16,6 +16,8 @@ import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker'
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
+import OpenLiveEditorAction from './components/OpenLiveEditorAction/OpenLiveEditorAction';
+import LiveEditor from './views/LiveEditor/LiveEditor';
 
 /**
  * Register all custom field types for the SuluTailwindThemeBundle admin interface.
@@ -39,7 +41,24 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     }
 
     viewRegistry.add('iw_sulu_tailwind_theme.webspace_theme_form', WebspaceThemeForm);
+
+    // The editor lives in the regular admin layout: the navigation stays
+    // available (collapsible, so it does not crowd the preview) and the view
+    // feeds its own tools into Sulu's toolbar through withToolbar. Only the
+    // default view padding is dropped, so the preview can fill the space.
+    //
+    // Note: `fullscreen: true` is deliberately NOT used. The sulu-admin-bundle
+    // npm package the admin is built from does not implement it (unlike the
+    // PHP vendor sources), and it would remove the very toolbar this view
+    // relies on.
+    viewRegistry.add(
+        'iw_sulu_tailwind_theme.live_editor',
+        LiveEditor,
+        {disableDefaultSpacing: true}
+    );
+
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.save', SaveWithConfigReloadAction);
+    formToolbarActionRegistry.add('iw_sulu_tailwind_theme.open_live_editor', OpenLiveEditorAction);
 
     fieldRegistry.add('iw_theme_variant_picker', VariantPicker);
     fieldRegistry.add('iw_theme_style_picker', StylePicker);

@@ -955,5 +955,19 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Fond de l'infobulle",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Texte de l'infobulle",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Fond des contrôles",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Couleur des contrôles"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Couleur des contrôles",
+
+    "iw_sulu_tailwind_theme.live_editor": "Éditeur visuel",
+    "iw_sulu_tailwind_theme.live_editor_colors_hint": "Les couleurs de base d'où toute la palette est dérivée. L'aperçu se met à jour à chaque changement.",
+    "iw_sulu_tailwind_theme.live_editor_preview_page": "Page",
+    "iw_sulu_tailwind_theme.live_editor_preview_articles": "Articles",
+    "iw_sulu_tailwind_theme.live_editor_preview_reference": "Référence",
+    "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Bureau",
+    "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablette",
+    "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobile",
+    "iw_sulu_tailwind_theme.live_editor_saved": "Thème enregistré",
+    "iw_sulu_tailwind_theme.live_editor_load_error": "Impossible de charger le thème.",
+    "iw_sulu_tailwind_theme.live_editor_save_error": "Impossible d'enregistrer le thème.",
+    "iw_sulu_tailwind_theme.live_editor_base_color_hint": "Une couleur de base doit être une couleur opaque (hexadécimal) : la palette en est dérivée.",
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "Impossible de mettre à jour l'aperçu."
 }

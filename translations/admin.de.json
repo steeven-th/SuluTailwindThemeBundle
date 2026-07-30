@@ -857,5 +857,19 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup-Hintergrund",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Popup-Text",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Hintergrund der Bedienelemente",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Farbe der Bedienelemente"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Farbe der Bedienelemente",
+
+    "iw_sulu_tailwind_theme.live_editor": "Visueller Editor",
+    "iw_sulu_tailwind_theme.live_editor_colors_hint": "Die Grundfarben, aus denen die gesamte Palette abgeleitet wird. Die Vorschau wird bei jeder Änderung aktualisiert.",
+    "iw_sulu_tailwind_theme.live_editor_preview_page": "Seite",
+    "iw_sulu_tailwind_theme.live_editor_preview_articles": "Artikel",
+    "iw_sulu_tailwind_theme.live_editor_preview_reference": "Referenz",
+    "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Desktop",
+    "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablet",
+    "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobil",
+    "iw_sulu_tailwind_theme.live_editor_saved": "Theme gespeichert",
+    "iw_sulu_tailwind_theme.live_editor_load_error": "Das Theme konnte nicht geladen werden.",
+    "iw_sulu_tailwind_theme.live_editor_save_error": "Das Theme konnte nicht gespeichert werden.",
+    "iw_sulu_tailwind_theme.live_editor_base_color_hint": "Eine Grundfarbe muss eine deckende Hex-Farbe sein: Die gesamte Palette wird daraus abgeleitet.",
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "Die Vorschau konnte nicht aktualisiert werden."
 }

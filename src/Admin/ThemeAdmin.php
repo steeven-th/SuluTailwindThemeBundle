@@ -37,6 +37,14 @@ class ThemeAdmin extends Admin
     public const EDIT_FORM_VIEW = 'iw_sulu_tailwind_theme.edit_form';
 
     /**
+     * The Live Theme Editor, a view of its own inside the regular admin layout.
+     * The view feeds its tools (back, preview selector, save) into Sulu's own
+     * toolbar. Same name on both sides — it is the view type looked up in the
+     * JS viewRegistry as well as the route name.
+     */
+    public const LIVE_EDITOR_VIEW = 'iw_sulu_tailwind_theme.live_editor';
+
+    /**
      * Section collapsibility configuration for block forms.
      *
      * Each entry maps a section name to its translation key and default open/closed state.
@@ -228,6 +236,7 @@ class ThemeAdmin extends Admin
 
         if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $formToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.save');
+            $formToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.open_live_editor');
         }
 
         if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::DELETE)) {
@@ -273,6 +282,22 @@ class ThemeAdmin extends Admin
                     ->setBackView(static::LIST_VIEW)
                     ->setTitleProperty('label')
             );
+
+            // ── Live Theme Editor ──────────────────────────────────
+            // No parent view: it is not a tab of the edit form but a screen of
+            // its own, opened from the form toolbar. backView tells it where
+            // the toolbar's back button returns.
+            if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
+                $viewCollection->add(
+                    $this->viewBuilderFactory
+                        ->createViewBuilder(
+                            static::LIVE_EDITOR_VIEW,
+                            '/theme-live-editor/:id',
+                            static::LIVE_EDITOR_VIEW
+                        )
+                        ->setOption('backView', static::EDIT_FORM_VIEW)
+                );
+            }
 
             // ── Edit form: details tab ─────────────────────────────
             $viewCollection->add(

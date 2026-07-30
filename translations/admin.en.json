@@ -864,5 +864,19 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup background",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Popup text",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Controls background",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color",
+
+    "iw_sulu_tailwind_theme.live_editor": "Visual editor",
+    "iw_sulu_tailwind_theme.live_editor_colors_hint": "The base colors the whole palette is derived from. The preview updates on every change.",
+    "iw_sulu_tailwind_theme.live_editor_preview_page": "Page",
+    "iw_sulu_tailwind_theme.live_editor_preview_articles": "Articles",
+    "iw_sulu_tailwind_theme.live_editor_preview_reference": "Reference",
+    "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Desktop",
+    "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablet",
+    "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobile",
+    "iw_sulu_tailwind_theme.live_editor_saved": "Theme saved",
+    "iw_sulu_tailwind_theme.live_editor_load_error": "The theme could not be loaded.",
+    "iw_sulu_tailwind_theme.live_editor_save_error": "The theme could not be saved.",
+    "iw_sulu_tailwind_theme.live_editor_base_color_hint": "A base color must be an opaque hex color: the whole palette is derived from it.",
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "The preview could not be updated."
 }
