@@ -211,6 +211,136 @@ class DemoContentProvider
     }
 
     /**
+     * Demo navigation tree for the Menu section preview.
+     *
+     * Shaped exactly like sulu_page_navigation_root_tree() output ({title, url,
+     * children}), which returns an empty array in the admin context (no
+     * webspace). Every url is "#": sulu_content_path() returns any slug that
+     * does not start with "/" untouched, so no route is ever resolved.
+     *
+     * @param int $levels How many levels to build (1–3, mirrors childLevels)
+     *
+     * @return list<array<string, mixed>> The demo navigation items
+     */
+    public function getNavigation(int $levels = 2): array
+    {
+        $levels = max(1, min(3, $levels));
+
+        $tree = [
+            ['Lorem ipsum', [
+                ['Consectetur', ['Adipiscing elit', 'Sed do eiusmod', 'Tempor incididunt']],
+                ['Ut labore', ['Dolore magna', 'Aliqua enim']],
+                ['Ad minim veniam', []],
+            ]],
+            ['Quis nostrud', [
+                ['Exercitation', ['Ullamco laboris', 'Nisi ut aliquip']],
+                ['Ex ea commodo', []],
+            ]],
+            ['Duis aute irure', [
+                ['Reprehenderit', []],
+                ['In voluptate', []],
+                ['Velit esse', []],
+                ['Cillum dolore', []],
+            ]],
+            ['Excepteur sint', []],
+            ['Occaecat', []],
+        ];
+
+        $items = [];
+        foreach ($tree as [$title, $children]) {
+            $items[] = $this->navItem($title, $children, $levels, 1);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Build a single demo navigation item, recursing while the depth budget
+     * allows it (children are dropped past the requested level count).
+     *
+     * @param string                  $title    The item title
+     * @param list<array{0: string, 1: list<string>}|string> $children Raw children specs
+     * @param int                     $levels   Total levels allowed
+     * @param int                     $depth    Current depth (1-based)
+     *
+     * @return array<string, mixed> The navigation item
+     */
+    private function navItem(string $title, array $children, int $levels, int $depth): array
+    {
+        $resolved = [];
+        if ($depth < $levels) {
+            foreach ($children as $child) {
+                [$childTitle, $grandChildren] = is_array($child) ? $child : [$child, []];
+                $resolved[] = $this->navItem($childTitle, $grandChildren, $levels, $depth + 1);
+            }
+        }
+
+        return ['title' => $title, 'url' => '#', 'children' => $resolved];
+    }
+
+    /**
+     * Demo footer snippet for the preview.
+     *
+     * Shaped like the `iw_theme_footer` snippet area the footer partials read
+     * (content.columns[].{column_title, pages[].{title, url}}), which resolves
+     * to null without a webspace. Urls are "#", so sulu_content_path() returns
+     * them untouched.
+     *
+     * @return array<string, mixed> The demo footer snippet
+     */
+    public function getFooterSnippet(): array
+    {
+        return [
+            'content' => [
+                'columns' => [
+                    [
+                        'column_title' => 'Lorem ipsum',
+                        'pages' => [
+                            ['title' => 'Dolor sit amet', 'url' => '#'],
+                            ['title' => 'Consectetur', 'url' => '#'],
+                            ['title' => 'Adipiscing elit', 'url' => '#'],
+                        ],
+                    ],
+                    [
+                        'column_title' => 'Sed do eiusmod',
+                        'pages' => [
+                            ['title' => 'Tempor incididunt', 'url' => '#'],
+                            ['title' => 'Ut labore', 'url' => '#'],
+                        ],
+                    ],
+                    [
+                        'column_title' => 'Quis nostrud',
+                        'pages' => [
+                            ['title' => 'Exercitation', 'url' => '#'],
+                            ['title' => 'Ullamco laboris', 'url' => '#'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Demo social media links for the Menu section preview.
+     *
+     * Shaped like the social-media snippet blocks the menu partials read, minus
+     * the `icon` media (sulu_snippet_load_by_area returns null in the admin
+     * context anyway). Without an icon the partials fall back to the
+     * `.iw-social-text` label, which is colored by the same
+     * --iw-menu-social-media custom properties as the icons.
+     *
+     * @return list<array<string, string>> The demo social links
+     */
+    public function getSocialLinks(): array
+    {
+        return [
+            ['name' => 'Facebook', 'url' => '#'],
+            ['name' => 'Instagram', 'url' => '#'],
+            ['name' => 'LinkedIn', 'url' => '#'],
+        ];
+    }
+
+    /**
      * Merge a block preset with sane default layout settings so the shared
      * block wrapper renders comfortably without a full Sulu settings payload.
      *

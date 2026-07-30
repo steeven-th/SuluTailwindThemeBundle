@@ -26,14 +26,24 @@
 {# Parent page self-link for navbar (simple boolean toggle) #}
 {% set clickNavbar = config.clickParentPageNavbar|default(false) %}
 
-{# Load social media links from snippet area #}
+{# Load social media links from snippet area. In demo mode (Live Theme Editor
+   preview) the snippet area cannot be resolved — there is no webspace — so
+   placeholder links stand in. #}
 {% set socialLinks = [] %}
 {% if config.displaySocialMedia|default(false) %}
-    {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_menu_social_media_links') %}
-    {% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
-        {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+    {% if iw_demo_mode|default(false) %}
+        {% set socialLinks = iw_sulu_tailwind_theme_demo_social_links() %}
+    {% else %}
+        {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_menu_social_media_links') %}
+        {% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
+            {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+        {% endif %}
     {% endif %}
 {% endif %}
+
+{# Home link: demo mode has no webspace, so sulu_content_path('/') cannot
+   resolve a route — fall back to a dead anchor. #}
+{% set homePath = iw_demo_mode|default(false) ? '#' : sulu_content_path('/') %}
 
 <header
     data-controller="menu"
@@ -48,7 +58,7 @@
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center {{ navPosition == 'left' ? 'mr-0' : '' }}">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
+                <a href="{{ homePath }}" class="iw-menu__text flex items-center gap-2 no-underline">
                     {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
                         <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                     {% endif %}
@@ -66,7 +76,11 @@
             </div>
 
             {# Desktop navigation — position depends on navPosition setting #}
-            {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
+            {# Demo mode (Live Theme Editor preview) has no webspace, so the real
+               navigation resolves to an empty tree — swap in a demo one. #}
+            {% set navItems = iw_demo_mode|default(false)
+                ? iw_sulu_tailwind_theme_demo_navigation(config.childLevels|default(2))
+                : sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
             {% set navPositionClass = {
                 'left': 'md:ml-6 md:mr-auto',
                 'center': 'md:mx-auto',

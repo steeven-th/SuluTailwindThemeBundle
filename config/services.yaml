@@ -128,6 +128,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
             - '@itech_world.sulu_tailwind_theme.block_template_resolver'
+            - '@ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }

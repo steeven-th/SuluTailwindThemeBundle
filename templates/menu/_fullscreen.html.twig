@@ -3,7 +3,12 @@
 {# Resolve fullscreen image media URL #}
 {% set fullscreenImageUrl = null %}
 {% if config.fullscreenImage is defined and config.fullscreenImage.id|default(null) is not null %}
-    {% set fsMedia = sulu_resolve_media(config.fullscreenImage.id, app.request.locale) %}
+    {# Demo mode (Live Theme Editor preview) passes an integer seed instead of a
+       media id, resolved to a picsum placeholder — the image drives the layout
+       and the curtain animation, so the preview needs one. #}
+    {% set fsMedia = iw_demo_mode|default(false)
+        ? iw_sulu_tailwind_theme_demo_media(config.fullscreenImage.id)
+        : sulu_resolve_media(config.fullscreenImage.id, app.request.locale) %}
     {% if fsMedia is not null %}
         {% set fullscreenImageUrl = fsMedia.url|default(null) %}
     {% endif %}
@@ -34,14 +39,24 @@
     {% endif %}
 {% endif %}
 
-{# Load social media links from snippet area #}
+{# Load social media links from snippet area. In demo mode (Live Theme Editor
+   preview) the snippet area cannot be resolved — there is no webspace — so
+   placeholder links stand in. #}
 {% set socialLinks = [] %}
 {% if config.displaySocialMedia|default(false) %}
-    {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_menu_social_media_links') %}
-    {% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
-        {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+    {% if iw_demo_mode|default(false) %}
+        {% set socialLinks = iw_sulu_tailwind_theme_demo_social_links() %}
+    {% else %}
+        {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_menu_social_media_links') %}
+        {% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
+            {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+        {% endif %}
     {% endif %}
 {% endif %}
+
+{# Home link: demo mode has no webspace, so sulu_content_path('/') cannot
+   resolve a route — fall back to a dead anchor. #}
+{% set homePath = iw_demo_mode|default(false) ? '#' : sulu_content_path('/') %}
 
 <header
     data-controller="menu"
@@ -59,7 +74,7 @@
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
+                <a href="{{ homePath }}" class="iw-menu__text flex items-center gap-2 no-underline">
                     {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
                         <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
                     {% endif %}
@@ -121,7 +136,11 @@
     {# Fullscreen overlay — sits BELOW the navbar (z-30 < z-50) so the navbar's
        burger stays visible and animates into the X (single button, no separate
        close). #}
-    {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
+    {# Demo mode (Live Theme Editor preview) has no webspace, so the real
+       navigation resolves to an empty tree — swap in a demo one. #}
+    {% set navItems = iw_demo_mode|default(false)
+        ? iw_sulu_tailwind_theme_demo_navigation(config.childLevels|default(2))
+        : sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
 
     {# Macro: navigation items (L1 / L2 / L3) #}
     {% macro render_nav_items(navItems, twoColumns, clickMode) %}

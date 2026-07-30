@@ -8,9 +8,14 @@
    a <style> block (never an inline style attribute — project convention). #}
 
 {% set socialLinks = [] %}
-{% set socialSnippet = sulu_snippet_load_by_area('iw_theme_footer_social_media_links') %}
-{% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
-    {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+{% if iw_demo_mode|default(false) %}
+    {# Demo mode (Live Theme Editor preview): no webspace, so no snippet area. #}
+    {% set socialLinks = iw_sulu_tailwind_theme_demo_social_links() %}
+{% else %}
+    {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_footer_social_media_links') %}
+    {% if socialSnippet is not null and socialSnippet.content is defined and socialSnippet.content.blocks_social_medias is defined %}
+        {% set socialLinks = socialSnippet.content.blocks_social_medias %}
+    {% endif %}
 {% endif %}
 
 {% if socialLinks|length > 0 %}

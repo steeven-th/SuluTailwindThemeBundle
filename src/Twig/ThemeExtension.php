@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\DemoContentProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -27,6 +28,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly ThemeCompiler $compiler,
         private readonly GoogleFontsResolver $fontsResolver,
         private readonly BlockTemplateResolver $blockTemplateResolver,
+        private readonly DemoContentProvider $demoContentProvider,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -58,6 +60,9 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_demo_media', $this->getDemoMedia(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_demo_navigation', $this->getDemoNavigation(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_demo_social_links', $this->getDemoSocialLinks(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_demo_footer_snippet', $this->getDemoFooterSnippet(...)),
         ];
     }
 
@@ -85,6 +90,50 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             'focusPointX' => null,
             'focusPointY' => null,
         ];
+    }
+
+    /**
+     * Build a demo navigation tree for the Live Theme Editor preview.
+     *
+     * The menu partials call sulu_page_navigation_root_tree(), which returns an
+     * empty array outside a webspace (the editor runs under /admin), so demo
+     * mode swaps in this lorem-ipsum tree instead — same shape, urls set to "#"
+     * so sulu_content_path() short-circuits without resolving a route.
+     *
+     * @param int|string $levels How many navigation levels to build (1–3)
+     *
+     * @return list<array<string, mixed>> The demo navigation items
+     */
+    public function getDemoNavigation(int|string $levels = 2): array
+    {
+        return $this->demoContentProvider->getNavigation((int) $levels);
+    }
+
+    /**
+     * Build demo social media links for the Live Theme Editor preview.
+     *
+     * Stands in for sulu_snippet_load_by_area(), which returns null outside a
+     * webspace. The links carry no icon media, so the menu partials render the
+     * text fallback — colored by the same menu social-media variables.
+     *
+     * @return list<array<string, string>> The demo social links
+     */
+    public function getDemoSocialLinks(): array
+    {
+        return $this->demoContentProvider->getSocialLinks();
+    }
+
+    /**
+     * Build a demo footer snippet for the Live Theme Editor preview.
+     *
+     * Stands in for sulu_snippet_load_by_area('iw_theme_footer'), which returns
+     * null outside a webspace, so the footer shows its link columns.
+     *
+     * @return array<string, mixed> The demo footer snippet
+     */
+    public function getDemoFooterSnippet(): array
+    {
+        return $this->demoContentProvider->getFooterSnippet();
     }
 
     /**

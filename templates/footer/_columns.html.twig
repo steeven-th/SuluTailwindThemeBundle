@@ -12,7 +12,11 @@
 {% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
 
 {% set columns = [] %}
-{% set footerSnippet = sulu_snippet_load_by_area('iw_theme_footer') %}
+{# Demo mode (Live Theme Editor preview) has no webspace, so the Footer
+   snippet area resolves to null — stand in with demo columns. #}
+{% set footerSnippet = iw_demo_mode|default(false)
+    ? iw_sulu_tailwind_theme_demo_footer_snippet()
+    : sulu_snippet_load_by_area('iw_theme_footer') %}
 {% if footerSnippet is not null and footerSnippet.content is defined and footerSnippet.content.columns is defined %}
     {% set columns = footerSnippet.content.columns %}
 {% endif %}

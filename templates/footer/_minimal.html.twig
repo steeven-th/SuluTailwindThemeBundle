@@ -9,7 +9,11 @@
 
 {# Inline links: first column of the Footer snippet. No snippet → no links. #}
 {% set navLinks = [] %}
-{% set footerSnippet = sulu_snippet_load_by_area('iw_theme_footer') %}
+{# Demo mode (Live Theme Editor preview) has no webspace, so the Footer
+   snippet area resolves to null — stand in with demo columns. #}
+{% set footerSnippet = iw_demo_mode|default(false)
+    ? iw_sulu_tailwind_theme_demo_footer_snippet()
+    : sulu_snippet_load_by_area('iw_theme_footer') %}
 {% if footerSnippet is not null and footerSnippet.content.columns is defined and footerSnippet.content.columns|length > 0
         and footerSnippet.content.columns[0].pages is defined and footerSnippet.content.columns[0].pages|length > 0 %}
     {% set navLinks = footerSnippet.content.columns[0].pages %}
@@ -30,7 +34,7 @@
         {# Left: brand (optional) + copyright #}
         <div class="iw-footer__left flex flex-wrap items-center gap-x-4 gap-y-2">
             {% if logoUrl or showName %}
-                <a href="{{ sulu_content_path('/') }}" class="iw-footer__brand-link inline-flex items-center gap-2 no-underline">
+                <a href="{{ iw_demo_mode|default(false) ? '#' : sulu_content_path('/') }}" class="iw-footer__brand-link inline-flex items-center gap-2 no-underline">
                     {% if logoUrl %}
                         <img src="{{ logoUrl }}" alt="" class="iw-footer__logo">
                     {% endif %}

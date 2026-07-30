@@ -24,7 +24,7 @@
 {% if logoUrl or showName or config.tagline|default('') is not empty %}
     <div class="iw-footer__brand flex flex-col gap-4 {{ align == 'center' ? 'items-center text-center' : 'items-start' }}">
         {% if logoUrl or showName %}
-            <a href="{{ sulu_content_path('/') }}"
+            <a href="{{ iw_demo_mode|default(false) ? '#' : sulu_content_path('/') }}"
                class="iw-footer__brand-link inline-flex no-underline {{ stacked
                     ? 'flex-col gap-2 ' ~ (align == 'center' ? 'items-center' : 'items-start')
                     : 'items-center gap-2.5' }}">
