@@ -65,9 +65,13 @@ class GoogleFontsResolver
             $weights = array_unique($weights);
             sort($weights);
 
-            // URL-encode the family name (spaces become +)
-            $encodedName = str_replace(' ', '+', $name);
-            $weightString = implode(';', $weights);
+            // Percent-encode the family name: it is free text coming from the
+            // admin, and the resulting URL is interpolated into a CSS
+            // `@import url('…')`, where an unescaped quote or parenthesis would
+            // break out of the statement. Spaces stay as "+", the form the
+            // Google Fonts API expects.
+            $encodedName = str_replace('%20', '+', rawurlencode($name));
+            $weightString = implode(';', array_map('intval', $weights));
             $familyParams[] = "family={$encodedName}:wght@{$weightString}";
         }
 

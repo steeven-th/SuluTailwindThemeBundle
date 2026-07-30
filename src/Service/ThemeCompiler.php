@@ -1040,6 +1040,53 @@ class ThemeCompiler
      *
      * @return string CSS variable declarations
      */
+    /**
+     * The generic font families a fallback may be, per the CSS specification.
+     *
+     * A fallback is emitted unquoted, so it can only ever be one of these
+     * keywords; anything else (a stale category such as "display", or injected
+     * text) falls back to sans-serif.
+     *
+     * @var list<string>
+     */
+    private const GENERIC_FONT_FAMILIES = [
+        'sans-serif', 'serif', 'monospace', 'cursive', 'fantasy',
+        'system-ui', 'ui-sans-serif', 'ui-serif', 'ui-monospace', 'ui-rounded',
+        'math', 'emoji', 'fangsong',
+    ];
+
+    /**
+     * Escape a value for use inside a single-quoted CSS string.
+     *
+     * Backslashes and quotes are escaped as CSS requires, and line breaks —
+     * which are illegal in a CSS string and would truncate the declaration —
+     * are dropped along with the other control characters.
+     *
+     * @param string $value The raw value
+     *
+     * @return string The escaped value
+     */
+    private static function escapeCssString(string $value): string
+    {
+        $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value) ?? '';
+
+        return str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
+    }
+
+    /**
+     * Reduce a fallback to a generic font family keyword.
+     *
+     * @param string $fallback The stored fallback
+     *
+     * @return string A generic family, defaulting to sans-serif
+     */
+    private static function genericFontFamily(string $fallback): string
+    {
+        $fallback = strtolower(trim($fallback));
+
+        return in_array($fallback, self::GENERIC_FONT_FAMILIES, true) ? $fallback : 'sans-serif';
+    }
+
     private function generateTypographyVariables(array $typography): string
     {
         $css = "  /* Typography — Font families */\n";
@@ -1050,7 +1097,23 @@ class ThemeCompiler
             $role = $family['role'] ?? 'body';
             $name = $family['name'] ?? 'sans-serif';
             $fallback = $family['fallback'] ?? 'sans-serif';
-            $css .= "  --font-family-{$role}: '{$name}', {$fallback};\n";
+
+            // Font names are free text: they reach here from the theme form and
+            // the live editor, so everything interpolated into the declaration
+            // is escaped or restricted to a known keyword. An unescaped quote in
+            // a name would otherwise close the CSS string and let arbitrary
+            // declarations through.
+            $role = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $role) ?? '';
+            if ('' === $role) {
+                continue;
+            }
+
+            $css .= sprintf(
+                "  --font-family-%s: '%s', %s;\n",
+                $role,
+                self::escapeCssString((string) $name),
+                self::genericFontFamily((string) $fallback),
+            );
         }
 
         // Assignment variables per element
