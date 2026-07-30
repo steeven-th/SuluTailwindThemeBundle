@@ -262,26 +262,64 @@
     {% endif %}
 
     {% if articlesConfig is not null %}
-    <section class="iw-articles-demo">
-        <div class="iw-article-listing iw-article-listing--{{ articlesConfig.listingStyle }}">
-            {% for article in demoArticles|default([]) %}
-                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
-                    article: article,
+    {# The listing as a real page shows it: filters sidebar, result count and
+       pagination — all three are theme settings, and none of them can be judged
+       from a bare grid of cards. The partials take plain data and no Sulu
+       runtime, so the demo feeds them directly. #}
+    {# Same setting and same default as pages/article_listing.html.twig: the
+       sidebar has no "hidden" value, the filter bar is always part of a
+       filtered listing. #}
+    {% set sidebarStyle = iw_sulu_tailwind_theme.components_sidebarStyle|default('left') %}
+
+    <section class="iw-articles-demo container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="iw-article-layout iw-article-layout--{{ sidebarStyle }}" data-controller="article-filters"
+             data-article-filters-auto-submit-value="{{ iw_sulu_tailwind_theme.components_filtersAutoSubmit|default(false) ? 'true' : 'false' }}"
+             data-article-filters-offcanvas-value="{{ sidebarStyle == 'offcanvas' ? 'true' : 'false' }}">
+            {# Anti-FOUC, same as the real listing: arm the drawer before paint so
+               the in-flow sidebar never flashes before Stimulus connects. #}
+            <script>(function(){var e=document.currentScript.parentElement;if('true'===e.getAttribute('data-article-filters-offcanvas-value')||window.matchMedia('(max-width: 767.98px)').matches){e.classList.add('iw-article-layout--drawer-armed');}})();</script>
+
+            {# Drawer toggle and backdrop, exactly as article_listing.html.twig
+               renders them: in "offcanvas" mode the sidebar is only reachable
+               through this button, so the preview needs it to be judgeable at
+               all. Hidden until the Stimulus controller reveals it. #}
+            {% set toggleButtonStyle = iw_sulu_tailwind_theme.components_filtersToggleStyle|default('') %}
+            <button type="button"
+                    class="iw-article-filters__toggle{% if toggleButtonStyle is not empty %} iw-button--{{ toggleButtonStyle }} iw-article-filters__toggle--themed{% endif %}"
+                    hidden
+                    data-article-filters-target="toggle"
+                    data-action="article-filters#open"
+                    aria-haspopup="dialog"
+                    aria-expanded="false"
+                    aria-controls="iw-article-filters-panel">
+                <span class="iw-article-filters__toggle-label">{{ 'iw_sulu_tailwind_theme.article.filters_title'|trans }}</span>
+            </button>
+
+            <div class="iw-article-filters__backdrop"
+                 hidden
+                 data-article-filters-target="backdrop"
+                 data-action="article-filters#close"></div>
+
+            {% include '@ItechWorldSuluTailwindTheme/components/_article_filters.html.twig' with {
+                facets: demoFacets|default({}),
+                active: {},
+                baseUrl: '#',
+                resultCount: demoArticles|length,
+            } only %}
+
+            <div class="iw-article-layout__results" data-article-filters-target="results">
+                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_list.html.twig' with {
+                    articles: demoArticles|default([]),
+                    activeStyle: articlesConfig.listingStyle,
+                    currentPage: 1,
+                    totalPages: 3,
+                    baseUrl: '#',
                     imageRatio: cardConfig.cardImageRatio,
-                    layout: articlesConfig.listingStyle == 'list' ? 'horizontal' : 'vertical',
-                    showImage: true,
                     showDate: articlesConfig.showDate,
                     showExcerpt: articlesConfig.showExcerpt,
                     showCategory: articlesConfig.showCategory,
-                    cardImagePadded: cardConfig.cardImagePadded,
-                    cardSurface: cardConfig.cardSurface,
-                    cardBorder: cardConfig.cardBorder,
-                    cardHoverTransform: cardConfig.cardHoverTransform,
-                    cardHoverImage: cardConfig.cardHoverImage,
-                    cardHoverShadow: cardConfig.cardHoverShadow,
-                    cardHoverBorder: cardConfig.cardHoverBorder,
                 } only %}
-            {% endfor %}
+            </div>
         </div>
     </section>
     {% endif %}

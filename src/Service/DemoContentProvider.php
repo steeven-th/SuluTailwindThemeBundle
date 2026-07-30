@@ -337,6 +337,8 @@ class DemoContentProvider
         // Six consecutive seeds derived from the session base (fixed 200 offset
         // by default), so every card gets a distinct but session-stable image.
         $base = $baseSeed > 0 ? $baseSeed : 200;
+        // Enough cards to fill a page and leave more behind it, so the listing
+        // shows its pagination — the setting cannot be judged on a single page.
         $specs = [
             ['Lorem ipsum dolor sit amet', 'Design', '2024-05-12', $base + 1],
             ['Consectetur adipiscing elit sed', 'Development', '2024-04-28', $base + 2],
@@ -344,6 +346,9 @@ class DemoContentProvider
             ['Ut enim ad minim veniam quis', 'Design', '2024-03-30', $base + 4],
             ['Duis aute irure dolor in reprehenderit', 'Development', '2024-03-11', $base + 5],
             ['Excepteur sint occaecat cupidatat', 'Product', '2024-02-22', $base + 6],
+            ['Nemo enim ipsam voluptatem quia', 'Design', '2024-02-08', $base + 7],
+            ['Neque porro quisquam est qui', 'Culture', '2024-01-25', $base + 8],
+            ['Temporibus autem quibusdam et aut', 'Development', '2024-01-12', $base + 9],
         ];
 
         $articles = [];
@@ -530,6 +535,32 @@ class DemoContentProvider
             'lateralMargins' => 'exterior',
             'showBackground' => true,
         ], $block);
+    }
+
+    /**
+     * Demo facets for the article filters sidebar.
+     *
+     * The sidebar partial takes plain lists and no Sulu runtime, so the preview
+     * can render it as-is; the counts and names only have to look plausible.
+     *
+     * @return array{categories: list<array<string, mixed>>, tags: list<array<string, mixed>>}
+     */
+    public function getArticleFacets(): array
+    {
+        return [
+            'categories' => [
+                ['id' => 1, 'key' => 'design', 'name' => 'Design'],
+                ['id' => 2, 'key' => 'development', 'name' => 'Development'],
+                ['id' => 3, 'key' => 'product', 'name' => 'Product'],
+                ['id' => 4, 'key' => 'culture', 'name' => 'Culture'],
+            ],
+            'tags' => [
+                ['id' => 1, 'name' => 'Lorem'],
+                ['id' => 2, 'name' => 'Ipsum'],
+                ['id' => 3, 'name' => 'Dolor'],
+                ['id' => 4, 'name' => 'Sit amet'],
+            ],
+        ];
     }
 
     /**

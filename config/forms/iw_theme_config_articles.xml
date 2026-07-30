@@ -11,6 +11,21 @@
 
     <properties>
         <!-- Page styles section -->
+        <section name="articleListing">
+            <meta>
+                <title>iw_sulu_tailwind_theme.articles_section_listing</title>
+            </meta>
+            <properties>
+                <property name="articles_listingStyle" type="iw_theme_article_style_picker" colspan="12">
+                    <meta><title>iw_sulu_tailwind_theme.articles_listing_style</title></meta>
+                    <params>
+                        <param name="article_type" value="listing"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Listing section -->
         <section name="articlePageStyles">
             <meta>
                 <title>iw_sulu_tailwind_theme.articles_section_page_styles</title>
@@ -34,21 +49,6 @@
                     <meta><title>iw_sulu_tailwind_theme.articles_blog_style</title></meta>
                     <params>
                         <param name="article_type" value="blog"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
-        <!-- Listing section -->
-        <section name="articleListing">
-            <meta>
-                <title>iw_sulu_tailwind_theme.articles_section_listing</title>
-            </meta>
-            <properties>
-                <property name="articles_listingStyle" type="iw_theme_article_style_picker" colspan="12">
-                    <meta><title>iw_sulu_tailwind_theme.articles_listing_style</title></meta>
-                    <params>
-                        <param name="article_type" value="listing"/>
                     </params>
                 </property>
             </properties>

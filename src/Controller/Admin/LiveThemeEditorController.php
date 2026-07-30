@@ -535,12 +535,14 @@ class LiveThemeEditorController extends AbstractController
         // class and which card elements show.
         $articlesConfig = null;
         $demoArticles = [];
+        $demoFacets = [];
         if ('articles' === $preview) {
             $articlesConfig = $this->buildArticlesConfig(
                 $tokens,
                 $this->withoutDraftKeys($this->readArticlesStructQuery($request), $draft),
             );
             $demoArticles = $this->demoContentProvider->getArticles($demoSeed);
+            $demoFacets = $this->demoContentProvider->getArticleFacets();
         }
 
         $response = $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/preview.html.twig', [
@@ -550,6 +552,7 @@ class LiveThemeEditorController extends AbstractController
             'preview' => $preview,
             'cardConfig' => $cardConfig,
             'demoArticles' => $demoArticles,
+            'demoFacets' => $demoFacets,
             'heroConfig' => $heroConfig,
             'demoHero' => $demoHero,
             'articlesConfig' => $articlesConfig,
