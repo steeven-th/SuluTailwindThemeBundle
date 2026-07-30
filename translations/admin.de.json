@@ -835,7 +835,7 @@
     "iw_sulu_tailwind_theme.image_padding_info": "Der Abstand wird automatisch angewendet, wenn ein Bildradius konfiguriert ist (damit die abgerundeten Ecken sichtbar bleiben).",
     "iw_sulu_tailwind_theme.mobile_image_position": "Bildposition auf Mobilgeräten",
     "iw_sulu_tailwind_theme.mobile_image_position_info": "Auf größeren Bildschirmen wird die Position durch die Einstellungen „Bildposition“ / „Inhalt rechts“ gesteuert.",
-    "iw_sulu_tailwind_theme.components_section_maps": "Karten (Leaflet)",
+    "iw_sulu_tailwind_theme.components_section_maps": "Map",
     "iw_sulu_tailwind_theme.components_section_maps_info": "Interaktive Karten für den Standort-Block, das CTA-Standort-Zubehör und das Formular-Standort-Widget. Die Attribution des Kartenanbieters wird immer angezeigt (OpenStreetMap/Carto-Vorgabe). Farben leer lassen, um sie vom Theme zu erben.",
     "iw_sulu_tailwind_theme.components_maps_tile_provider": "Kartenstil (Tiles)",
     "iw_sulu_tailwind_theme.components_maps_provider_osm": "OpenStreetMap (Standard)",

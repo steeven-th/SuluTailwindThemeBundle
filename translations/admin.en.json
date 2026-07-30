@@ -842,7 +842,7 @@
     "iw_sulu_tailwind_theme.image_padding_info": "The margin is applied automatically when an image radius is configured (so the rounded corners stay visible).",
     "iw_sulu_tailwind_theme.mobile_image_position": "Image position on mobile",
     "iw_sulu_tailwind_theme.mobile_image_position_info": "On larger screens the position is controlled by the 'Image position' / 'Content on the right' settings.",
-    "iw_sulu_tailwind_theme.components_section_maps": "Maps (Leaflet)",
+    "iw_sulu_tailwind_theme.components_section_maps": "Map",
     "iw_sulu_tailwind_theme.components_section_maps_info": "Interactive maps used by the Location block, the CTA location accessory and the form location widget. The tile provider attribution is always displayed (OpenStreetMap/Carto requirement). Leave colors empty to inherit them from the theme.",
     "iw_sulu_tailwind_theme.components_maps_tile_provider": "Map style (tiles)",
     "iw_sulu_tailwind_theme.components_maps_provider_osm": "OpenStreetMap (standard)",
