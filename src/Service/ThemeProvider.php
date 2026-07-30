@@ -8,6 +8,7 @@ use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides access to the theme configuration for the current webspace.
@@ -33,6 +34,7 @@ class ThemeProvider
         private readonly ThemeCompiler $compiler,
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
+        private readonly ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -74,8 +76,58 @@ class ThemeProvider
      */
     public function getActiveTheme(): ?ThemeConfig
     {
-        return $this->previewTheme ?? $this->getThemeForWebspace();
+        return $this->previewTheme
+            ?? $this->requestedPreviewTheme()
+            ?? $this->getThemeForWebspace();
     }
+
+    /**
+     * Theme requested through the `themeId` query parameter of a Sulu preview.
+     *
+     * Sulu's PreviewBundle renders real pages in a separate website sub-kernel,
+     * which the in-memory pin above cannot reach. PreviewRenderer does copy the
+     * admin request query into the sub-kernel request, so the Live Theme Editor
+     * passes the theme along as `?themeId=` — that is how a theme not assigned
+     * to any webspace can be previewed on real content.
+     *
+     * Only honoured on a preview render, flagged by the request attribute
+     * PreviewRenderer sets itself. On a public website request the parameter is
+     * ignored, so a visitor cannot repaint the site through a crafted URL.
+     *
+     * @return ThemeConfig|null The requested theme, or null outside a preview
+     */
+    private function requestedPreviewTheme(): ?ThemeConfig
+    {
+        $request = $this->requestStack?->getCurrentRequest();
+
+        if (null === $request || true !== $request->attributes->get('preview')) {
+            return null;
+        }
+
+        // Read through all() and validate by hand: the query is attacker-shaped
+        // here, and both get() and getInt() throw on a non-scalar or
+        // non-numeric value, which would turn a junk URL into a broken render.
+        $requested = $request->query->all()['themeId'] ?? null;
+
+        if (!is_numeric($requested) || (int) $requested <= 0) {
+            return null;
+        }
+
+        $themeId = (int) $requested;
+
+        if (!array_key_exists($themeId, $this->previewThemeCache)) {
+            $this->previewThemeCache[$themeId] = $this->repository->find($themeId);
+        }
+
+        return $this->previewThemeCache[$themeId];
+    }
+
+    /**
+     * In-memory cache of themes resolved from a preview query, keyed by ID.
+     *
+     * @var array<int, ThemeConfig|null>
+     */
+    private array $previewThemeCache = [];
 
     /**
      * Theme every lookup resolves to, whatever the request says.

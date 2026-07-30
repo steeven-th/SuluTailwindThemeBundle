@@ -88,6 +88,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@?sulu_core.webspace.request_analyzer'
+            - '@?request_stack'
 
     itech_world.sulu_tailwind_theme.config_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver

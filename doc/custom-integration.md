@@ -409,6 +409,13 @@ class MyThemeAwareService
 > through it) therefore describes the previewed theme automatically. Services
 > that read the theme by some other route — a repository lookup, a cached value
 > of their own — will keep describing the live site inside the preview.
+>
+> When the editor previews a **real page**, Sulu's PreviewBundle renders it in a
+> separate website sub-kernel that the in-memory pin cannot reach. The theme
+> travels as a `themeId` query parameter instead, which `PreviewRenderer` copies
+> into the sub-kernel request. It is honoured **only** on a preview render
+> (recognised by the `preview` request attribute), so the parameter has no
+> effect on a public website URL.
 
 ### Usage in a controller
 
