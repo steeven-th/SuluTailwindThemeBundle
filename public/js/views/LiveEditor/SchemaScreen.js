@@ -80,6 +80,11 @@ export default class SchemaScreen extends React.Component<*> {
                 this.formStore = formStore;
                 this.formInspector = new FormInspector(formStore);
                 this.schema = schema;
+
+                // Each tab opens on its own first section: the accordion state
+                // is per screen, and carrying it over would land on a section
+                // the new tab does not have — leaving everything closed.
+                this.openSection = undefined;
             }))
             .catch(action(() => {
                 this.failed = true;
@@ -116,7 +121,7 @@ export default class SchemaScreen extends React.Component<*> {
      * A screen generated from a schema can carry sixty fields across eight
      * sections; keeping several open defeats the point. `undefined` means
      * untouched, and opens the first section; an empty string means the user
-     * closed everything.
+     * closed everything. Reset whenever a screen loads.
      */
     @observable openSection: ?string = undefined;
 
@@ -169,16 +174,24 @@ export default class SchemaScreen extends React.Component<*> {
             <div className="iw-le__field" key={name}>
                 {entry.label && <label className="iw-le__field-label">{entry.label}</label>}
                 <FieldType
+                    data={this.formStore.data}
                     dataPath={'/' + name}
+                    defaultType={entry.defaultType}
                     disabled={false}
                     error={undefined}
+                    fieldTypeOptions={fieldRegistry.getOptions(entry.type)}
                     formInspector={this.formInspector}
+                    label={entry.label || name}
+                    maxOccurs={entry.maxOccurs}
+                    minOccurs={entry.minOccurs}
                     onChange={(value) => this.handleChange(name, entry.type, value)}
-                    router={this.props.router}
                     onFinish={this.handleFinish}
+                    onSuccess={this.handleFinish}
+                    router={this.props.router}
                     schemaOptions={entry.options || {}}
                     schemaPath={'/' + name}
                     showAllErrors={false}
+                    types={entry.types}
                     value={this.formStore.data[name]}
                 />
                 {entry.description && <p className="iw-le__field-hint">{entry.description}</p>}

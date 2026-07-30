@@ -1,22 +1,15 @@
 // @flow
-import React, {Fragment} from 'react';
+import React from 'react';
 import {action, computed, observable, toJS} from 'mobx';
 import {observer} from 'mobx-react';
-import {Dialog, Loader, Toolbar} from 'sulu-admin-bundle/components';
+import {Dialog, Loader, Tabs, Toolbar} from 'sulu-admin-bundle/components';
 import {withToolbar} from 'sulu-admin-bundle/containers';
 import {Requester} from 'sulu-admin-bundle/services';
 import {translate} from 'sulu-admin-bundle/utils';
+import {userStore} from 'sulu-admin-bundle/stores';
 import themeConfigStore from '../../stores/themeConfigStore';
-import ArticleStyleField from './fields/ArticleStyleField';
-import ButtonStyleField from './fields/ButtonStyleField';
-import ColorField from './fields/ColorField';
-import FontField from './fields/FontField';
-import NumberField from './fields/NumberField';
-import RadiusField from './fields/RadiusField';
-import SelectField from './fields/SelectField';
-import VariantField from './fields/VariantField';
 import SchemaScreen from './SchemaScreen';
-import {SCREENS, buildScreen} from './screens';
+import {SCREENS, formKeyFor} from './screens';
 import ensureLiveEditorStyles from './styles';
 
 /**
@@ -26,8 +19,8 @@ import ensureLiveEditorStyles from './styles';
 const BASE_PATH = '/admin/theme-live-editor/';
 
 /**
- * How long to wait after the last change before recompiling the CSS. Long
- * enough to swallow a drag across a color picker, short enough to feel live.
+ * How long to wait after the last change before recompiling. Long enough to
+ * swallow a drag across a color picker, short enough to feel live.
  */
 const PUSH_DEBOUNCE = 200;
 
@@ -45,16 +38,26 @@ const WARNING_TIMEOUT = 5000;
 const PREVIEWS = ['page', 'articles', 'reference'];
 
 /**
- * Preview stage widths, keyed by viewport. The widths themselves live in the
- * stylesheet as iw-le__frame--<viewport> modifiers; desktop is unconstrained.
+ * Preview stage widths, keyed by viewport. The widths live in the stylesheet as
+ * iw-le__frame--<viewport> modifiers; desktop is unconstrained.
  */
 const VIEWPORTS = ['desktop', 'tablet', 'mobile'];
 
 /**
- * The only color shape the base palette roles accept, mirroring the server-side
- * validation in LiveThemeEditorController::extractColorOverrides().
+ * Field types whose value compiles to a CSS custom property, and therefore show
+ * up through a stylesheet swap alone. Anything else — a media, a toggle, a
+ * layout choice — drives the Twig, so the page has to be rendered again.
  */
-const OPAQUE_HEX_PATTERN = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+const CSS_ONLY_FIELD_TYPES = ['iw_theme_color_token_editor', 'iw_theme_palette_editor'];
+
+/**
+ * Settings panel width: default, floor, and the room always left to the
+ * preview. Kept as a user preference, so a chosen width survives a reload.
+ */
+const PANEL_WIDTH_DEFAULT = 380;
+const PANEL_WIDTH_MIN = 300;
+const STAGE_WIDTH_MIN = 320;
+const PANEL_WIDTH_SETTING = 'iw_sulu_tailwind_theme.live_editor_panel_width';
 
 /**
  * Priority of the unsaved-changes route hook, matching the one Sulu's Form view
@@ -66,21 +69,19 @@ const DIRTY_ROUTE_HOOK_PRIORITY = 2048;
  * Live Theme Editor — admin view.
  *
  * Rendered inside the regular admin layout: the navigation stays available (and
- * can be collapsed to give the preview room), and the view's own tools live in
- * Sulu's toolbar through withToolbar — back button, preview selector and save.
+ * collapsible) and the view's tools live in Sulu's toolbar through withToolbar.
  * The viewport switcher sits on a dark toolbar under the preview, the same
  * component Sulu's page preview uses.
  *
- * It drives three things:
+ * Every screen is generated from a theme form schema (see SchemaScreen), so the
+ * editor covers the theme without declaring a single field of its own. What
+ * this view owns is the loop around them: which screen and which preview are
+ * open, pushing changes so the preview reflects them, and saving.
  *
- * - the preview iframe, served by LiveThemeEditorController with demo content
- *   styled by the theme being edited;
- * - the live loop: a setting backed by a CSS custom property is recompiled
- *   server-side and swapped into the preview through postMessage, while a
- *   setting driving a Twig parameter or a BEM class rides the preview URL and
- *   re-renders the demo instead;
- * - persistence, through five channels, because the entity does not store the
- *   settings alike (see screens.js).
+ * A change reaches the preview one of two ways. Backed by a CSS custom
+ * property, it is recompiled server-side and swapped in without a reload;
+ * driving a Twig parameter or a BEM class, it needs the page rendered again,
+ * which the server does from the draft it just stored.
  */
 @observer
 class LiveEditor extends React.Component<*> {
@@ -92,54 +93,25 @@ class LiveEditor extends React.Component<*> {
     showSuccess: Object = observable.box(false);
 
     @observable label: string = '';
-    /**
-     * Everything the editor can change, as served by /state.
-     *
-     * Deliberately not named `state`: that property belongs to React, which
-     * writes it outside of any action — which MobX's strict mode forbids on an
-     * observable.
-     *
-     * A reference observable: the payload never changes once loaded, so there
-     * is no point turning 30 KB of JSON into an observable tree.
-     */
-    @observable.ref editorState: ?Object = null;
-    /**
-     * Current values per save channel, posted as a whole on every request.
-     *
-     * Observable maps, not plain objects: this admin runs MobX 4, where adding
-     * a key to an observable object goes unnoticed — the preview would stop
-     * reacting the first time a field is touched.
-     */
-    values: Object = {
-        colors: observable.map(),
-        tokens: observable.map(),
-        families: observable.map(),
-        menu: observable.map(),
-        variants: observable.map(),
-    };
-    /** Structural values, which ride the preview URL instead of the CSS */
-    struct: Object = observable.map();
 
     /**
      * The theme as the admin forms see it, one flat property per field, used to
-     * seed the screens generated from a form schema.
+     * seed the screens.
      */
     @observable.ref formData: ?Object = null;
 
     /**
-     * What those screens actually changed — a patch, never the whole theme.
-     *
-     * The older screens post their entire state on every request, including the
-     * values they were seeded with; sending the full form alongside would make
-     * whichever is applied last win by accident. A patch only ever carries a
-     * deliberate change.
+     * What the screens changed — a patch, never the whole theme, so a screen
+     * cannot overwrite what another one changed.
      */
     formPatch: Object = observable.map();
 
     @observable screen: string = SCREENS[0].key;
     @observable preview: string = PREVIEWS[0];
     @observable viewport: string = VIEWPORTS[0];
-    /** Whether the preview shows overrides that are not persisted yet */
+    /** Block variant the preview stamps on its demo blocks — a view choice */
+    @observable variant: string = '';
+    /** Whether the preview shows changes that are not persisted yet */
     @observable dirty: boolean = false;
     /** Bumped to re-render the preview, which then picks up the stored draft */
     @observable reloadCounter: number = 0;
@@ -159,7 +131,15 @@ class LiveEditor extends React.Component<*> {
      */
     demoSeed: number = Math.floor(Math.random() * 100000) + 1;
 
+    /** Width of the settings panel, dragged by the user and remembered */
+    @observable panelWidth: number = PANEL_WIDTH_DEFAULT;
+    /** True while dragging, so the iframe stops swallowing the mouse */
+    @observable resizing: boolean = false;
+
+    root: ?HTMLElement = null;
     iframe: ?HTMLIFrameElement = null;
+    /** Scroll offset kept across a re-render, so the page does not jump back up */
+    previewScroll: number = 0;
     pushTimeout: ?TimeoutID = null;
     warningTimeouts: Array<TimeoutID> = [];
 
@@ -177,19 +157,11 @@ class LiveEditor extends React.Component<*> {
     }
 
     @computed get previewUrl(): string {
-        // Every structural value travels, whatever screen is open: one preview
-        // page shows several components at once. Their names are unique across
-        // screens, which is what makes a single flat query work.
-        const struct = toJS(this.struct);
-        const query = Object.keys(struct)
-            .map((path) => encodeURIComponent(path) + '=' + encodeURIComponent(struct[path]))
-            .join('&');
-
         return BASE_PATH + this.themeId + '/preview'
             + '?preview=' + encodeURIComponent(this.preview)
             + '&demoSeed=' + this.demoSeed
             + '&r=' + this.reloadCounter
-            + (query ? '&' + query : '');
+            + (this.variant ? '&variant=' + encodeURIComponent(this.variant) : '');
     }
 
     @computed get previewOptions(): Array<Object> {
@@ -207,44 +179,19 @@ class LiveEditor extends React.Component<*> {
     }
 
     /**
-     * The sections of the open screen, rebuilt from the current values so a
-     * change is reflected wherever the field is shown.
+     * The block variants to choose from, read from the shared theme config
+     * store — which the editor points at the theme being edited on load.
      */
-    @computed get sections(): Array<Object> {
-        if (!this.editorState) {
-            return [];
-        }
-
-        return buildScreen(this.screen, this.editorState, this.valueOf).map((section) => ({
-            ...section,
-            fields: section.fields.map((field) => ({
-                ...field,
-                value: this.valueOf(field.channel, field.path, field.value),
-            })),
+    @computed get variantOptions(): Array<Object> {
+        return Array.from(themeConfigStore.variants || []).map((variant) => ({
+            label: variant.label || variant.slug,
+            value: variant.slug,
         }));
     }
 
-    /**
-     * The value a channel currently holds, falling back to the served one.
-     *
-     * Reading through this keeps the screens reactive: whatever they look at
-     * becomes a dependency of the computed that renders them.
-     *
-     * @param {string} channel  The save channel, or 'struct'
-     * @param {string} path     The key inside that channel
-     * @param {string} fallback The value served by /state
-     *
-     * @returns {string} The current value
-     */
-    valueOf = (channel: string, path: string, fallback: string) => {
-        const map = 'struct' === channel ? this.struct : this.values[channel];
-        const stored = map ? map.get(path) : undefined;
-
-        return undefined === stored ? fallback : stored;
-    };
-
     componentDidMount() {
         ensureLiveEditorStyles();
+        this.restorePanelWidth();
 
         // Guard navigation exactly like a Sulu form does: leaving with unsaved
         // changes asks for confirmation first, whether through the back button
@@ -254,37 +201,46 @@ class LiveEditor extends React.Component<*> {
             DIRTY_ROUTE_HOOK_PRIORITY
         );
 
-        // The theme in its form shape, for the screens generated from a schema.
+        // The theme in its form shape, which every screen is seeded from.
         Requester.get('/admin/api/iw-theme-configs/' + this.themeId)
             .then(action((data) => {
                 this.formData = data;
+                this.label = data.label || '';
+                this.loading = false;
             }))
             .catch(action(() => {
                 this.addError('iw_sulu_tailwind_theme.live_editor_load_error');
+                this.loading = false;
             }));
 
+        // Resolved palette, variants and buttons, which the bundle's field
+        // types read from their shared store; it otherwise holds the theme
+        // assigned to the first webspace.
         Requester.get(BASE_PATH + this.themeId + '/state')
-            .then(action((data) => {
-                this.label = data.label || '';
-                this.editorState = data;
-                this.seedValues(data);
-
-                // Point the shared store at the theme being edited: the bundle's
-                // field types read their palette from it, and it otherwise holds
-                // the theme assigned to the first webspace.
-                if (data.themeConfig) {
-                    themeConfigStore.update(data.themeConfig);
+            .then(action((state) => {
+                if (!state.themeConfig) {
+                    return;
                 }
 
-                this.loading = false;
+                themeConfigStore.update(state.themeConfig);
+
+                // Start on the first variant rather than on none: the selector
+                // would otherwise show no current value, and the preview would
+                // fall back to whatever the blocks resolve to.
+                const [first] = state.themeConfig.variants || [];
+                if (first && first.slug) {
+                    this.variant = first.slug;
+                }
             }))
-            .catch(action(() => {
-                this.addError('iw_sulu_tailwind_theme.live_editor_load_error');
-                this.loading = false;
-            }));
+            .catch(() => {
+                // The screens work without it; only the palette previews of the
+                // color pickers would fall back to the active theme.
+            });
     }
 
     componentWillUnmount() {
+        this.stopResize();
+
         if (this.pushTimeout) {
             clearTimeout(this.pushTimeout);
         }
@@ -299,37 +255,58 @@ class LiveEditor extends React.Component<*> {
         themeConfigStore.invalidate();
     }
 
-    /**
-     * Fill every channel with the theme's current values.
-     *
-     * The editor posts its whole state on each request rather than a diff, so
-     * the server rebuilds the theme from a complete picture — the same contract
-     * the standalone page used.
-     *
-     * @param {Object} state The state served by /state
-     */
-    @action seedValues(state: Object) {
-        SCREENS.forEach((screen) => {
-            buildScreen(screen.key, state, this.valueOf).forEach((section) => {
-                section.fields.forEach((field) => {
-                    if (field.struct) {
-                        this.struct.set(field.path, field.value);
-                    }
-
-                    // `seed: false` marks a value that must not be posted until
-                    // the user touches it — a menu color slot holding a palette
-                    // alias, say, which the plain color standing in for it would
-                    // otherwise overwrite on the first save.
-                    if (false !== field.seed && 'struct' !== field.channel) {
-                        this.values[field.channel].set(field.path, field.value);
-                    }
-                });
-            });
-        });
-    }
-
     setIframeRef = (ref: ?HTMLIFrameElement) => {
         this.iframe = ref;
+    };
+
+    setRootRef = (ref: ?HTMLElement) => {
+        this.root = ref;
+    };
+
+    @action restorePanelWidth() {
+        const stored = parseInt(userStore.getPersistentSetting(PANEL_WIDTH_SETTING), 10);
+
+        if (stored) {
+            this.panelWidth = Math.max(PANEL_WIDTH_MIN, stored);
+        }
+    }
+
+    /**
+     * Resize the panel, keeping it usable and leaving the preview room.
+     *
+     * @param {number} width The requested width
+     */
+    @action setPanelWidth(width: number) {
+        const available = this.root ? this.root.getBoundingClientRect().width : 0;
+        const max = available ? Math.max(PANEL_WIDTH_MIN, available - STAGE_WIDTH_MIN) : Infinity;
+
+        this.panelWidth = Math.min(Math.max(width, PANEL_WIDTH_MIN), max);
+    }
+
+    @action handleResizeStart = (event: SyntheticMouseEvent<*>) => {
+        event.preventDefault();
+        this.resizing = true;
+
+        document.addEventListener('mousemove', this.handleResizeMove);
+        document.addEventListener('mouseup', this.stopResize);
+    };
+
+    handleResizeMove = (event: MouseEvent) => {
+        if (!this.root) {
+            return;
+        }
+
+        this.setPanelWidth(event.clientX - this.root.getBoundingClientRect().left);
+    };
+
+    @action stopResize = () => {
+        document.removeEventListener('mousemove', this.handleResizeMove);
+        document.removeEventListener('mouseup', this.stopResize);
+
+        if (this.resizing) {
+            this.resizing = false;
+            userStore.setPersistentSetting(PANEL_WIDTH_SETTING, this.panelWidth);
+        }
     };
 
     /**
@@ -372,41 +349,14 @@ class LiveEditor extends React.Component<*> {
     }
 
     /**
-     * Recompile the theme with the current values and swap the result into the
-     * preview. Nothing is persisted here.
-     */
-    pushCss = () => {
-        Requester.post(BASE_PATH + this.themeId + '/preview-css', this.payload())
-            .then((response) => {
-                if (response && typeof response.css === 'string') {
-                    this.postToPreview({type: 'iw-live-theme-css', css: response.css});
-                }
-            })
-            .catch(() => {
-                this.addError('iw_sulu_tailwind_theme.live_editor_preview_error');
-            });
-    };
-
-    /**
-     * The five save channels, as the endpoints expect them.
+     * Recompile from the current changes and bring them to the preview.
      *
-     * @returns {Object} The request payload
+     * Nothing is persisted; the server also keeps the payload so the next
+     * render shows it.
+     *
+     * @param {boolean} reload Re-render instead of swapping the stylesheet
      */
-    payload(): Object {
-        return {
-            form: toJS(this.formPatch),
-            colors: toJS(this.values.colors),
-            tokens: toJS(this.values.tokens),
-            families: toJS(this.values.families),
-            menu: toJS(this.values.menu),
-            variants: toJS(this.values.variants),
-        };
-    }
-
-    /**
-     * Recompile from the form data and swap the result into the preview.
-     */
-    pushFormCss = (reload: boolean = false) => {
+    pushChanges = (reload: boolean = false) => {
         Requester.post(BASE_PATH + this.themeId + '/preview-form-css', {form: toJS(this.formPatch)})
             .then((response) => {
                 if (reload) {
@@ -424,90 +374,57 @@ class LiveEditor extends React.Component<*> {
             });
     };
 
-    /**
-     * Field types whose value compiles to a CSS custom property, and therefore
-     * shows up through a stylesheet swap alone. Anything else — a media, a
-     * toggle, a layout choice — drives the Twig, so the page has to be rendered
-     * again to be seen.
-     */
-    static CSS_ONLY_FIELD_TYPES = ['iw_theme_color_token_editor', 'iw_theme_palette_editor'];
+    @action reloadPreview = () => {
+        // Remember where the user was looking: a structural change re-renders
+        // the page, and landing back at the top loses the very component being
+        // adjusted. Same origin, so the offset is readable directly.
+        try {
+            this.previewScroll = this.iframe && this.iframe.contentWindow
+                ? this.iframe.contentWindow.scrollY
+                : 0;
+        } catch (error) {
+            this.previewScroll = 0;
+        }
 
-    @action handleSchemaChange = (name: string, value: mixed, type: string) => {
-        // The schema screen owns its data while it lives and hands back the
-        // whole set; replaced rather than mutated, as MobX 4 would not notice a
-        // new key on an observable object.
+        this.reloadCounter += 1;
+    };
+
+    @action handleFieldChange = (name: string, value: mixed, type: string) => {
         this.formPatch.set(name, value);
         this.dirty = true;
 
         // The preview reloads once the server knows about the change, since the
         // render reads the draft it just stored.
-        const reloadAfterPush = !LiveEditor.CSS_ONLY_FIELD_TYPES.includes(type);
+        const reloadAfterPush = !CSS_ONLY_FIELD_TYPES.includes(type);
 
         if (this.pushTimeout) {
             clearTimeout(this.pushTimeout);
         }
-        this.pushTimeout = setTimeout(() => this.pushFormCss(reloadAfterPush), PUSH_DEBOUNCE);
-    };
-
-    @action reloadPreview = () => {
-        this.reloadCounter += 1;
-    };
-
-    @action handleFieldChange = (field: Object, value: ?string) => {
-        if (undefined === value || null === value) {
-            return;
-        }
-
-        // The palette is generated from the base roles, so the server only
-        // accepts opaque hex for them — the picker also offers transparency and
-        // `ref:` values, which would be dropped without a word.
-        if ('colors' === field.channel && !OPAQUE_HEX_PATTERN.test(value)) {
-            this.addWarning('iw_sulu_tailwind_theme.live_editor_base_color_hint');
-
-            return;
-        }
-
-        // 'struct' is not a save channel: which variant is on display is a view
-        // choice, so it only ever rides the preview URL.
-        if ('struct' !== field.channel) {
-            this.values[field.channel].set(field.path, value);
-        }
-
-        this.dirty = true;
-
-        // A structural setting drives a Twig parameter or a BEM class, which no
-        // amount of CSS swapping can produce: the demo has to be rendered again
-        // with the new value, so it rides the preview URL instead.
-        if (field.struct) {
-            this.struct.set(field.path, value);
-
-            return;
-        }
-
-        if (this.pushTimeout) {
-            clearTimeout(this.pushTimeout);
-        }
-        this.pushTimeout = setTimeout(this.pushCss, PUSH_DEBOUNCE);
+        this.pushTimeout = setTimeout(() => this.pushChanges(reloadAfterPush), PUSH_DEBOUNCE);
     };
 
     /**
-     * A fresh preview document carries the persisted CSS, so unsaved overrides
+     * A fresh preview document carries the persisted CSS, so unsaved changes
      * have to be pushed again after every reload.
      */
     handleIframeLoad = () => {
+        if (this.previewScroll && this.iframe && this.iframe.contentWindow) {
+            this.iframe.contentWindow.scrollTo(0, this.previewScroll);
+        }
+
         if (this.dirty) {
-            this.pushCss();
+            this.pushChanges();
         }
     };
 
-    @action handleScreenChange = (screen: string) => {
-        this.screen = screen;
+    @action handleScreenChange = (index: number) => {
+        const screen = SCREENS[index];
+        this.screen = screen.key;
 
         // Only swap the preview when the current page does not already show
         // what this screen configures.
-        const config = SCREENS.find((candidate) => candidate.key === screen);
-        if (config && !config.previews.includes(this.preview)) {
-            this.preview = config.previews[0];
+        if (!screen.previews.includes(this.preview)) {
+            this.preview = screen.previews[0];
         }
     };
 
@@ -519,13 +436,18 @@ class LiveEditor extends React.Component<*> {
         this.viewport = viewport;
     };
 
+    @action handleVariantChange = (variant: string) => {
+        this.variant = variant;
+    };
+
     @action handleSave = () => {
         this.saving = true;
 
-        Requester.post(BASE_PATH + this.themeId + '/save', this.payload())
+        Requester.post(BASE_PATH + this.themeId + '/save', {form: toJS(this.formPatch)})
             .then(action(() => {
                 this.saving = false;
                 this.dirty = false;
+                this.formPatch.clear();
                 this.showSuccess.set(true);
             }))
             .catch(action(() => {
@@ -604,55 +526,29 @@ class LiveEditor extends React.Component<*> {
         this.confirmingNavigation = false;
     };
 
-    renderField(field: Object) {
-        switch (field.kind) {
-            case 'color':
-                return <ColorField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'number':
-                return <NumberField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'radius':
-                return <RadiusField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'buttonStyle':
-                return <ButtonStyleField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'variant':
-                return <VariantField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'font':
-                return <FontField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            case 'articleStyle':
-                return <ArticleStyleField field={field} key={field.key} onChange={this.handleFieldChange} />;
-            default:
-                return <SelectField field={field} key={field.key} onChange={this.handleFieldChange} />;
-        }
-    }
-
-    renderScreen() {
-        const hint = translate('iw_sulu_tailwind_theme.live_editor_hint_' + this.screen);
-        const screen = SCREENS.find((candidate) => candidate.key === this.screen);
-
+    renderStageToolbar() {
         return (
-            <Fragment>
-                <h2 className="iw-le__screen-title">
-                    {translate('iw_sulu_tailwind_theme.live_editor_screen_' + this.screen)}
-                </h2>
-                <p className="iw-le__screen-hint">{hint}</p>
-
-                {screen && screen.formKey && this.formData &&
-                    <SchemaScreen
-                        data={this.formData}
-                        formKey={screen.formKey}
-                        onChange={this.handleSchemaChange}
-                        router={this.props.router}
-                    />
-                }
-
-                {this.sections.map((section, index) => (
-                    <div className="iw-le__section" key={section.title || index}>
-                        {section.title && <p className="iw-le__section-title">{section.title}</p>}
-                        {section.hint && <p className="iw-le__section-hint">{section.hint}</p>}
-                        {section.fields.map((field) => this.renderField(field))}
-                    </div>
-                ))}
-            </Fragment>
+            <Toolbar skin="dark">
+                <Toolbar.Controls grow={true}>
+                    <Toolbar.Items>
+                        <Toolbar.Select
+                            icon="su-expand"
+                            onChange={this.handleViewportChange}
+                            options={this.viewportOptions}
+                            value={this.viewport}
+                        />
+                        {this.variantOptions.length > 0 &&
+                            <Toolbar.Select
+                                icon="su-brush"
+                                label={translate('iw_sulu_tailwind_theme.live_editor_variant_pick')}
+                                onChange={this.handleVariantChange}
+                                options={this.variantOptions}
+                                value={this.variant}
+                            />
+                        }
+                    </Toolbar.Items>
+                </Toolbar.Controls>
+            </Toolbar>
         );
     }
 
@@ -665,54 +561,59 @@ class LiveEditor extends React.Component<*> {
             );
         }
 
+        const selectedIndex = SCREENS.findIndex((screen) => screen.key === this.screen);
+
         return (
-            <div className="iw-le">
-                <nav className="iw-le__screens">
-                    <div className="iw-le__theme">{this.label}</div>
-                    {SCREENS.map((screen) => (
-                        <button
-                            className={'iw-le__screen-button'
-                                + (this.screen === screen.key ? ' iw-le__screen-button--active' : '')}
-                            key={screen.key}
-                            onClick={() => this.handleScreenChange(screen.key)}
-                            type="button"
-                        >
-                            {translate('iw_sulu_tailwind_theme.live_editor_screen_' + screen.key)}
-                        </button>
-                    ))}
-                </nav>
+            <div
+                className={'iw-le' + (this.resizing ? ' iw-le--resizing' : '')}
+                ref={this.setRootRef}
+                style={{'--iw-le-panel-w': this.panelWidth + 'px'}}
+            >
+                <div className="iw-le__tabs">
+                    <Tabs onSelect={this.handleScreenChange} selectedIndex={selectedIndex} type="root">
+                        {SCREENS.map((screen) => (
+                            <Tabs.Tab key={screen.key}>
+                                {translate('iw_sulu_tailwind_theme.' + screen.key)}
+                            </Tabs.Tab>
+                        ))}
+                    </Tabs>
+                </div>
 
-                <aside className="iw-le__panel">
-                    {this.renderScreen()}
-                </aside>
-
-                <main className="iw-le__stage">
-                    <div className="iw-le__stage-body">
-                        <div className={'iw-le__frame iw-le__frame--' + this.viewport}>
-                            <iframe
-                                className="iw-le__iframe"
-                                onLoad={this.handleIframeLoad}
-                                ref={this.setIframeRef}
-                                src={this.previewUrl}
-                                title={this.label}
+                <div className="iw-le__body">
+                    <aside className="iw-le__panel">
+                        {this.formData &&
+                            <SchemaScreen
+                                data={this.formData}
+                                formKey={formKeyFor(this.screen)}
+                                onChange={this.handleFieldChange}
+                                router={this.props.router}
                             />
-                        </div>
-                    </div>
+                        }
+                    </aside>
 
-                    {/* Same toolbar as Sulu's page preview, viewport select included */}
-                    <Toolbar skin="dark">
-                        <Toolbar.Controls grow={true}>
-                            <Toolbar.Items>
-                                <Toolbar.Select
-                                    icon="su-expand"
-                                    onChange={this.handleViewportChange}
-                                    options={this.viewportOptions}
-                                    value={this.viewport}
+                    <div
+                        className="iw-le__resizer"
+                        onMouseDown={this.handleResizeStart}
+                        role="separator"
+                    />
+
+                    <main className="iw-le__stage">
+                        <div className="iw-le__stage-body">
+                            <div className={'iw-le__frame iw-le__frame--' + this.viewport}>
+                                <iframe
+                                    className="iw-le__iframe"
+                                    onLoad={this.handleIframeLoad}
+                                    ref={this.setIframeRef}
+                                    src={this.previewUrl}
+                                    title={this.label}
                                 />
-                            </Toolbar.Items>
-                        </Toolbar.Controls>
-                    </Toolbar>
-                </main>
+                            </div>
+                        </div>
+
+                        {/* Same toolbar as Sulu's page preview */}
+                        {this.renderStageToolbar()}
+                    </main>
+                </div>
 
                 <Dialog
                     cancelText={translate('sulu_admin.cancel')}

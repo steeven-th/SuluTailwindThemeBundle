@@ -65,18 +65,22 @@ function ensurePaletteStyles() {
         .iw-palette-editor__row {
             padding: 8px 0;
         }
+        /* The colour and its slug sit side by side when there is room, and
+           stack when there is not: this field also renders in the live theme
+           editor's panel, which is narrower than a form column. */
         .iw-palette-editor__controls {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
         .iw-palette-editor__color {
-            width: 220px;
-            flex-shrink: 0;
+            flex: 0 1 220px;
+            min-width: 0;
         }
         .iw-palette-editor__slug {
-            width: 200px;
-            flex-shrink: 0;
+            flex: 0 1 200px;
+            min-width: 0;
         }
         .iw-palette-editor__actions {
             width: 32px;

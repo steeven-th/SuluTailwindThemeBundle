@@ -42,60 +42,33 @@ function buildCss(primary: string): string {
         --iw-le-radius: 3px;
 
         display: flex;
+        flex-direction: column;
         height: 100%;
         overflow: hidden;
         background: var(--iw-le-canvas);
         color: var(--iw-le-text);
         font-size: 13px;
     }
+    .iw-le__tabs {
+        flex: 0 0 auto;
+        background: var(--iw-le-surface);
+    }
+    .iw-le__body {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
     .iw-le--loading {
         align-items: center;
         justify-content: center;
     }
-    .iw-le__screens {
-        display: flex;
-        flex-direction: column;
-        flex: 0 0 180px;
-        width: 180px;
-        overflow-y: auto;
-        padding: 16px 8px;
-        background: var(--iw-le-surface);
-        border-right: 1px solid var(--iw-le-border);
-    }
-    .iw-le__theme {
-        margin: 0 8px 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--iw-le-border);
-        font-weight: 600;
-        font-size: 15px;
-    }
-    .iw-le__screen-button {
-        padding: 8px 10px;
-        border: 0;
-        border-radius: var(--iw-le-radius);
-        background: none;
-        color: var(--iw-le-text);
-        font: inherit;
-        text-align: left;
-        cursor: pointer;
-    }
-    .iw-le__screen-button:hover {
-        background: var(--iw-le-hover);
-        color: var(--iw-le-primary);
-    }
-    .iw-le__screen-button--active {
-        background: var(--iw-le-primary);
-        color: var(--iw-le-surface);
-    }
     /* Stated explicitly rather than left to specificity: hovering the selected
        screen greys the background, so its label has to leave white behind. */
-    .iw-le__screen-button--active:hover {
-        background: var(--iw-le-hover);
-        color: var(--iw-le-primary);
-    }
     .iw-le__panel {
-        flex: 0 0 320px;
-        width: 320px;
+        /* Width is dragged by the user; the value rides a custom property set
+           on the root, so the rules themselves stay in this stylesheet. */
+        flex: 0 0 var(--iw-le-panel-w, 380px);
+        width: var(--iw-le-panel-w, 380px);
         overflow-y: auto;
         padding: 16px;
         background: var(--iw-le-surface);
@@ -179,6 +152,31 @@ function buildCss(primary: string): string {
         display: block;
         color: var(--iw-le-muted);
         font-weight: 400;
+    }
+    /* Sulu lays its fields on a twelve-column grid that only collapses below a
+       520px *viewport*, so in a 380px panel a three-column field would still be
+       a third of it. The panel forces every item to full width instead — the
+       class names are hashed by CSS modules, but keep their source name. */
+    .iw-le__panel [class*="colSpan-"] {
+        width: 100%;
+    }
+    .iw-le__resizer {
+        flex: 0 0 5px;
+        margin-left: -3px;
+        background: none;
+        cursor: col-resize;
+        z-index: 1;
+    }
+    .iw-le__resizer:hover,
+    .iw-le--resizing .iw-le__resizer {
+        background: var(--iw-le-primary);
+    }
+    /* While dragging, the iframe must not swallow the pointer. */
+    .iw-le--resizing {
+        user-select: none;
+    }
+    .iw-le--resizing .iw-le__iframe {
+        pointer-events: none;
     }
     .iw-le__stage {
         display: flex;
