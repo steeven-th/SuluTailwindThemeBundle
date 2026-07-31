@@ -412,34 +412,6 @@ class LiveThemeEditorController extends AbstractController
     }
 
     /**
-     * Render the standalone editor page (opened via window.open).
-     *
-     * @param int $id The theme configuration ID
-     *
-     * @return Response The self-contained HTML editor page
-     *
-     * @throws NotFoundHttpException If the theme is not found
-     */
-    #[Route(
-        '/admin/theme-live-editor/{id}',
-        name: 'iw_sulu_tailwind_theme.live_editor',
-        methods: ['GET'],
-        requirements: ['id' => '\d+'],
-    )]
-    public function indexAction(int $id): Response
-    {
-        $theme = $this->findThemeOrFail($id);
-
-        return $this->render('@ItechWorldSuluTailwindTheme/admin/live-editor/index.html.twig', array_merge(
-            [
-                'themeId' => $id,
-                'themeLabel' => $theme->getLabel(),
-            ],
-            $this->editorData($theme),
-        ));
-    }
-
-    /**
      * Every setting the editor exposes, plus the option sets its controls need.
      *
      * Shared by the standalone Twig page and the admin view's JSON state so a
