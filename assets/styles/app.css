@@ -17,6 +17,16 @@
     box-sizing: border-box;
 }
 
+/* Absorb the fullbleed overflow.
+   A block that breaks out of its container does so with `width: 100vw`, which
+   counts the scrollbar while the usable area does not — leaving a stray
+   horizontal scrollbar of a dozen pixels on any page using the CTA banner.
+   `clip` rather than `hidden`: it creates no scroll container, so the sticky
+   menu keeps positioning against the viewport. */
+body {
+    overflow-x: clip;
+}
+
 /* ─── Typography ────────────────────────────────────────────────────────── */
 body {
     font-family: var(--font-body-family, var(--font-family-body, sans-serif));

@@ -103,7 +103,7 @@
     "iw_sulu_tailwind_theme.buttons_secondary": "Secondary button",
     "iw_sulu_tailwind_theme.buttons_accent": "Accent button",
     "iw_sulu_tailwind_theme.button": "Button",
-    "iw_sulu_tailwind_theme.buttons_info": "Define your button styles. Each is named by a unique slug and available everywhere a button style is chosen.",
+    "iw_sulu_tailwind_theme.buttons_info": "Define your button styles. Each is named by a unique slug and available everywhere a button style is chosen. ⚠️ Renaming the slug of a button already in use breaks the link: blocks referencing it lose its style, and variants fall back to the first button in the list. Create a new button instead.",
     "iw_sulu_tailwind_theme.button_label": "Label",
     "iw_sulu_tailwind_theme.button_slug": "Slug",
     "iw_sulu_tailwind_theme.button_slug_info": "Stable identifier used in the CSS class (.iw-button--slug). Renaming it breaks blocks that already use this button.",

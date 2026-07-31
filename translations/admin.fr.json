@@ -103,7 +103,7 @@
     "iw_sulu_tailwind_theme.buttons_secondary": "Bouton secondaire",
     "iw_sulu_tailwind_theme.buttons_accent": "Bouton accent",
     "iw_sulu_tailwind_theme.button": "Bouton",
-    "iw_sulu_tailwind_theme.buttons_info": "Définissez vos styles de boutons. Chacun est nommé par un slug unique et disponible partout où un style de bouton est choisi.",
+    "iw_sulu_tailwind_theme.buttons_info": "Définissez vos styles de boutons. Chacun est nommé par un slug unique et disponible partout où un style de bouton est choisi. ⚠️ Renommer le slug d'un bouton déjà utilisé casse le lien : les blocs qui le référencent perdent son style, et les variantes retombent sur le premier bouton de la liste. Créez plutôt un nouveau bouton.",
     "iw_sulu_tailwind_theme.button_label": "Libellé",
     "iw_sulu_tailwind_theme.button_slug": "Slug",
     "iw_sulu_tailwind_theme.button_slug_info": "Identifiant stable utilisé dans la classe CSS (.iw-button--slug). Le renommer casse les blocs qui utilisent déjà ce bouton.",
