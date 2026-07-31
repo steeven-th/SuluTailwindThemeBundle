@@ -65,6 +65,11 @@ const isRealPreview = (preview: string): boolean => preview.startsWith(REAL_PREF
 const LIVE_CSS_ID = 'iw-live-theme-css';
 
 /**
+ * The page form the editor returns to when it was opened from a page.
+ */
+const PAGE_FORM_VIEW = 'sulu_page.page_edit_form.content';
+
+/**
  * Query parameters the preview URL owns.
  *
  * A page's own query is appended to that URL, so a filter field named `id` or
@@ -424,6 +429,7 @@ class LiveEditor extends React.Component<*> {
                 // when there is no themeConfig: the two are independent.
                 if (state.realPreview) {
                     this.realConfig = state.realPreview;
+                    this.openRequestedPage();
                 }
 
                 if (!state.themeConfig) {
@@ -693,6 +699,41 @@ class LiveEditor extends React.Component<*> {
         if (isRealPreview(preview)) {
             this.openWebspace(preview.slice(REAL_PREFIX.length));
         }
+    };
+
+    /**
+     * Start on the page the editor was opened from, when there is one.
+     *
+     * Opening from a page toolbar carries webspace, page and locale; the
+     * editor then skips the demo previews and shows that page straight away.
+     * Called once the server has listed the webspaces, since a source cannot
+     * be selected before the editor knows how to render it.
+     */
+    @action openRequestedPage = () => {
+        const {locale, page, webspace} = this.props.router.attributes;
+
+        if (!page || !webspace) {
+            return;
+        }
+
+        const known = ((this.realConfig && this.realConfig.webspaces) || [])
+            .some((entry) => entry.key === webspace);
+
+        // An unknown webspace would leave the preview on a source it cannot
+        // render; the demo previews remain a usable fallback.
+        if (!known) {
+            this.addWarning('iw_sulu_tailwind_theme.live_editor_real_pages_failed');
+
+            return;
+        }
+
+        if (locale) {
+            this.realLocale = String(locale);
+        }
+
+        this.preview = REAL_PREFIX + webspace;
+        this.openWebspace(String(webspace));
+        this.selectRealPage(String(page));
     };
 
     /**
@@ -1075,6 +1116,16 @@ class LiveEditor extends React.Component<*> {
     };
 
     handleBack = () => {
+        const {locale, page, webspace} = this.props.router.attributes;
+
+        // Opened from a page: go back to that page, not to the theme form the
+        // view builder declares as its default.
+        if (page && webspace) {
+            this.props.router.navigate(PAGE_FORM_VIEW, {id: page, locale, webspace});
+
+            return;
+        }
+
         this.props.router.navigate(this.backView, {id: this.themeId});
     };
 

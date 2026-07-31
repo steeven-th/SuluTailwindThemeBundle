@@ -434,11 +434,25 @@ class ThemeAdmin extends Admin
 
         $themeData = $this->themeConfigResolver->resolve($activeTheme);
 
+        // Which theme dresses which webspace. Lets the page toolbar open the
+        // live editor on the theme of the page being edited, without a round
+        // trip: it is a handful of entries, known at configuration time.
+        $webspaceThemes = [];
+
+        foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
+            $theme = $this->webspaceThemeRepository->findThemeForWebspace($webspace->getKey());
+
+            if (null !== $theme) {
+                $webspaceThemes[$webspace->getKey()] = $theme->getId();
+            }
+        }
+
         return array_merge($themeData, [
             'blockStyles' => self::BLOCK_STYLE_OPTIONS,
             'articleStyles' => self::ARTICLE_STYLE_OPTIONS,
             'collapsibleSections' => self::COLLAPSIBLE_SECTIONS,
             'hasApiKey' => $this->googleFontsCatalog->hasApiKey(),
+            'webspaceThemes' => $webspaceThemes,
         ]);
     }
 

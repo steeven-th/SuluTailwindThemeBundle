@@ -17,6 +17,7 @@ import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePick
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
 import OpenLiveEditorAction from './components/OpenLiveEditorAction/OpenLiveEditorAction';
+import OpenLiveEditorFromPageAction from './components/OpenLiveEditorFromPageAction/OpenLiveEditorFromPageAction';
 import LiveEditor from './views/LiveEditor/LiveEditor';
 
 /**
@@ -34,6 +35,9 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         ArticleStylePicker.articleStyles = config.articleStyles || {};
         collapsibleSections.init(config.collapsibleSections || {});
         FontPicker.hasApiKey = config.hasApiKey || false;
+        // Which theme dresses which webspace, so the page toolbar knows
+        // which one to open without asking the server.
+        OpenLiveEditorFromPageAction.webspaceThemes = config.webspaceThemes || {};
     }
 
     if (initialized) {
@@ -59,6 +63,10 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
 
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.save', SaveWithConfigReloadAction);
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.open_live_editor', OpenLiveEditorAction);
+    formToolbarActionRegistry.add(
+        'iw_sulu_tailwind_theme.open_live_editor_from_page',
+        OpenLiveEditorFromPageAction
+    );
 
     fieldRegistry.add('iw_theme_variant_picker', VariantPicker);
     fieldRegistry.add('iw_theme_style_picker', StylePicker);

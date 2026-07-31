@@ -19,6 +19,14 @@ services:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
 
+    # Adds the live editor button to the page form, a view owned by the page
+    # bundle — hence a separate admin from the theme one.
+    itech_world.sulu_tailwind_theme.page_live_editor_admin:
+        class: ItechWorld\SuluTailwindThemeBundle\Admin\PageLiveEditorAdmin
+        tags:
+            - { name: 'sulu.admin' }
+            - { name: 'sulu.context', context: 'admin' }
+
     itech_world.sulu_tailwind_theme.webspace_theme_admin:
         class: ItechWorld\SuluTailwindThemeBundle\Admin\WebspaceThemeAdmin
         arguments:
