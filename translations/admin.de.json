@@ -868,6 +868,7 @@
     "iw_sulu_tailwind_theme.live_editor_real_pages_failed": "Die Seitenliste konnte nicht geladen werden.",
     "iw_sulu_tailwind_theme.live_editor_real_preview_failed": "Die Vorschau dieser Seite konnte nicht geöffnet werden.",
     "iw_sulu_tailwind_theme.live_editor_real_link_unavailable": "Dieser Link verlässt die Vorschau: Die Seite ist nicht in der Liste.",
+    "iw_sulu_tailwind_theme.live_editor_panel_resize": "Breite des Einstellungsbereichs",
     "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Desktop",
     "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablet",
     "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobil",

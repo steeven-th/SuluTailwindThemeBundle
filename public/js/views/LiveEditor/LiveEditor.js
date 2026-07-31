@@ -104,6 +104,10 @@ const PANEL_WIDTH_MIN = 300;
 const STAGE_WIDTH_MIN = 320;
 const PANEL_WIDTH_SETTING = 'iw_sulu_tailwind_theme.live_editor_panel_width';
 
+/** Keyboard resize steps, the larger one on Shift. */
+const PANEL_RESIZE_STEP = 16;
+const PANEL_RESIZE_STEP_LARGE = 64;
+
 /**
  * Priority of the unsaved-changes route hook, matching the one Sulu's Form view
  * uses so the editor guards navigation the same way forms do.
@@ -499,11 +503,41 @@ class LiveEditor extends React.Component<*> {
      * @param {number} width The requested width
      */
     @action setPanelWidth(width: number) {
-        const available = this.root ? this.root.getBoundingClientRect().width : 0;
-        const max = available ? Math.max(PANEL_WIDTH_MIN, available - STAGE_WIDTH_MIN) : Infinity;
-
-        this.panelWidth = Math.min(Math.max(width, PANEL_WIDTH_MIN), max);
+        this.panelWidth = Math.min(Math.max(width, PANEL_WIDTH_MIN), this.maxPanelWidth);
     }
+
+    /**
+     * Widest the panel may get while leaving the preview usable.
+     */
+    get maxPanelWidth(): number {
+        const available = this.root ? this.root.getBoundingClientRect().width : 0;
+
+        return available ? Math.max(PANEL_WIDTH_MIN, available - STAGE_WIDTH_MIN) : Infinity;
+    }
+
+    /**
+     * Resize with the arrow keys, so the panel is not mouse-only.
+     *
+     * @param {Object} event The keyboard event
+     */
+    @action handleResizeKey = (event: SyntheticKeyboardEvent<*>) => {
+        const step = event.shiftKey ? PANEL_RESIZE_STEP_LARGE : PANEL_RESIZE_STEP;
+
+        if ('ArrowLeft' === event.key) {
+            this.setPanelWidth(this.panelWidth - step);
+        } else if ('ArrowRight' === event.key) {
+            this.setPanelWidth(this.panelWidth + step);
+        } else if ('Home' === event.key) {
+            this.setPanelWidth(PANEL_WIDTH_MIN);
+        } else if ('End' === event.key) {
+            this.setPanelWidth(this.maxPanelWidth);
+        } else {
+            return;
+        }
+
+        event.preventDefault();
+        this.persistPanelWidth();
+    };
 
     @action handleResizeStart = (event: SyntheticMouseEvent<*>) => {
         event.preventDefault();
@@ -527,9 +561,16 @@ class LiveEditor extends React.Component<*> {
 
         if (this.resizing) {
             this.resizing = false;
-            userStore.setPersistentSetting(PANEL_WIDTH_SETTING, this.panelWidth);
+            this.persistPanelWidth();
         }
     };
+
+    /**
+     * Remember the panel width, so it survives leaving the editor.
+     */
+    persistPanelWidth() {
+        userStore.setPersistentSetting(PANEL_WIDTH_SETTING, this.panelWidth);
+    }
 
     /**
      * Show an error in the toolbar. Sulu renders it in a snackbar the user
@@ -1272,9 +1313,16 @@ class LiveEditor extends React.Component<*> {
                     </aside>
 
                     <div
+                        aria-label={translate('iw_sulu_tailwind_theme.live_editor_panel_resize')}
+                        aria-orientation="vertical"
+                        aria-valuemax={this.maxPanelWidth}
+                        aria-valuemin={PANEL_WIDTH_MIN}
+                        aria-valuenow={Math.round(this.panelWidth)}
                         className="iw-le__resizer"
+                        onKeyDown={this.handleResizeKey}
                         onMouseDown={this.handleResizeStart}
                         role="separator"
+                        tabIndex={0}
                     />
 
                     <main className="iw-le__stage">

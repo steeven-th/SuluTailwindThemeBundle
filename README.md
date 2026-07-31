@@ -456,6 +456,18 @@ Navigate to **Settings > Themes** in the Sulu admin panel. From there you can:
 6. **Configure block variants**: Define named color schemes (slug-based) for content blocks, each referencing a button style by slug
 7. **Configure menu**: Choose menu type, colors, animation, and display options
 
+### Live Theme Editor
+
+Rather than filling in the forms above, a theme can be edited visually, with a
+live preview beside the settings — same data, another way in.
+
+Open it with the **Live editor** button on a theme form, or on a page form to
+edit the theme dressing that page, already showing it. The preview runs either
+on demo content or on **real pages** of a webspace; settings backed by a CSS
+custom property appear without re-rendering anything.
+
+> See **[Live Theme Editor](doc/live-theme-editor.md)** for the full guide.
+
 ### Multi-site setup
 
 In a multi-webspace Sulu installation, you can assign different themes to different webspaces:
@@ -620,6 +632,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
+| [Live Theme Editor](doc/live-theme-editor.md) | Visual theme editing with a live preview, on demo content or on real pages |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 

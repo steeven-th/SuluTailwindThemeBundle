@@ -875,6 +875,7 @@
     "iw_sulu_tailwind_theme.live_editor_real_pages_failed": "Could not load the page list.",
     "iw_sulu_tailwind_theme.live_editor_real_preview_failed": "Could not open the preview for this page.",
     "iw_sulu_tailwind_theme.live_editor_real_link_unavailable": "That link leaves the preview: the page is not in the list.",
+    "iw_sulu_tailwind_theme.live_editor_panel_resize": "Settings panel width",
     "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Desktop",
     "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablet",
     "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobile",

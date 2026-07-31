@@ -193,8 +193,14 @@ function buildCss(primary: string): string {
         z-index: 1;
     }
     .iw-le__resizer:hover,
+    .iw-le__resizer:focus-visible,
     .iw-le--resizing .iw-le__resizer {
         background: var(--iw-le-primary);
+    }
+    /* Focusable for keyboard resizing: the highlight above is the focus cue,
+       so the default outline would only double it on a 5px strip. */
+    .iw-le__resizer:focus {
+        outline: none;
     }
     /* While dragging, the iframe must not swallow the pointer. */
     .iw-le--resizing {

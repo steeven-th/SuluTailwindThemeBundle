@@ -966,6 +966,7 @@
     "iw_sulu_tailwind_theme.live_editor_real_pages_failed": "Impossible de charger la liste des pages.",
     "iw_sulu_tailwind_theme.live_editor_real_preview_failed": "Impossible d'ouvrir l'aperçu de cette page.",
     "iw_sulu_tailwind_theme.live_editor_real_link_unavailable": "Ce lien sort de l'aperçu : la page n'est pas dans la liste.",
+    "iw_sulu_tailwind_theme.live_editor_panel_resize": "Largeur du panneau de réglages",
     "iw_sulu_tailwind_theme.live_editor_viewport_desktop": "Bureau",
     "iw_sulu_tailwind_theme.live_editor_viewport_tablet": "Tablette",
     "iw_sulu_tailwind_theme.live_editor_viewport_mobile": "Mobile",
