@@ -147,11 +147,26 @@ export default class SchemaScreen extends React.Component<*> {
 
     handleChange = (name: string, type: string, value: mixed) => {
         const {formStore} = this;
+        const previous = toJS(formStore.data[name]);
 
         formStore.change('/' + name, value);
+
+        const next = toJS(formStore.data[name]);
+
+        // Several field types fire onChange just by being opened, re-sending
+        // the value they already hold. Passing that on would mark the theme
+        // dirty and re-render the preview for nothing.
+        //
+        // Compared as JSON rather than with a deep-equality helper: lodash is
+        // not a declared dependency of this bundle, and both sides come out of
+        // the same store, so key order is stable.
+        if (JSON.stringify(previous) === JSON.stringify(next)) {
+            return;
+        }
+
         // Only the touched field goes up: the parent posts a patch, never the
         // whole theme, so a screen never overwrites what another one changed.
-        this.props.onChange(name, toJS(formStore.data[name]), type);
+        this.props.onChange(name, next, type);
     };
 
     renderField(name: string, entry: Object) {
