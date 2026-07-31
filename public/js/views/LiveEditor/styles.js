@@ -84,20 +84,46 @@ function buildCss(primary: string): string {
         color: var(--iw-le-muted);
         line-height: 1.4;
     }
-    .iw-le__section {
-        margin-bottom: 20px;
+    /* Two-level navigation: a screen generated from a form schema can carry
+       sixty fields, unreadable as one flat list. Level one lists the sections,
+       level two shows one of them behind a back arrow. */
+    .iw-le__nav {
+        display: flex;
+        flex-direction: column;
     }
-    .iw-le__section-title {
-        margin: 0 0 8px;
+    .iw-le__nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 12px 0;
+        border: 0;
+        border-bottom: 1px solid var(--iw-le-border);
+        background: none;
+        color: var(--iw-le-text);
+        font: inherit;
         font-weight: 600;
+        text-align: left;
+        cursor: pointer;
     }
-    /* Collapsible sections: a screen generated from a form schema can carry
-       sixty fields, unreadable as one flat list. */
-    .iw-le__section-toggle {
+    .iw-le__nav-item:hover {
+        color: var(--iw-le-primary);
+    }
+    .iw-le__nav-chevron {
+        flex: none;
+        width: 0;
+        height: 0;
+        border-left: 5px solid currentColor;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+    }
+    .iw-le__back {
         display: flex;
         align-items: center;
         gap: 8px;
         width: 100%;
+        margin-bottom: 16px;
         padding: 8px 0;
         border: 0;
         border-bottom: 1px solid var(--iw-le-border);
@@ -108,29 +134,28 @@ function buildCss(primary: string): string {
         text-align: left;
         cursor: pointer;
     }
-    .iw-le__section-toggle:hover {
+    .iw-le__back:hover {
         color: var(--iw-le-primary);
     }
-    .iw-le__section-chevron {
+    .iw-le__back-chevron {
+        flex: none;
         width: 0;
         height: 0;
-        border-left: 5px solid currentColor;
+        border-right: 5px solid currentColor;
         border-top: 4px solid transparent;
         border-bottom: 4px solid transparent;
-        transform: rotate(90deg);
-        transition: transform .15s;
     }
-    .iw-le__section--closed .iw-le__section-chevron {
-        transform: rotate(0deg);
+    /* Sulu nests sections; those are shown inline rather than as a third level. */
+    .iw-le__subsection {
+        margin: 16px 0;
     }
-    .iw-le__section-toggle + .iw-le__field,
-    .iw-le__section-toggle + .iw-le__section-hint {
-        margin-top: 12px;
-    }
-    .iw-le__section-hint {
-        margin: 0 0 10px;
+    .iw-le__subsection-title {
+        margin-bottom: 8px;
         color: var(--iw-le-muted);
-        line-height: 1.4;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
     }
     .iw-le__field {
         margin-bottom: 12px;

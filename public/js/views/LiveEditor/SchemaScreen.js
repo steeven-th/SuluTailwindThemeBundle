@@ -84,7 +84,7 @@ export default class SchemaScreen extends React.Component<*> {
                 // Each tab opens on its own first section: the accordion state
                 // is per screen, and carrying it over would land on a section
                 // the new tab does not have — leaving everything closed.
-                this.openSection = undefined;
+                this.openSection = null;
             }))
             .catch(action(() => {
                 this.failed = true;
@@ -116,24 +116,22 @@ export default class SchemaScreen extends React.Component<*> {
     }
 
     /**
-     * The open section — one at a time, an accordion.
+     * The section being edited, or null for the section list.
      *
      * A screen generated from a schema can carry sixty fields across eight
-     * sections; keeping several open defeats the point. `undefined` means
-     * untouched, and opens the first section; an empty string means the user
-     * closed everything. Reset whenever a screen loads.
+     * sections, so it is navigated rather than scrolled: level one lists the
+     * sections, level two shows the settings of one of them. Reset whenever a
+     * screen loads — the sections of the previous tab do not exist here.
      */
-    @observable openSection: ?string = undefined;
+    @observable openSection: ?string = null;
 
-    @action toggleSection = (name: string) => {
-        this.openSection = this.isSectionClosed(name) ? name : '';
+    @action enterSection = (name: string) => {
+        this.openSection = name;
     };
 
-    isSectionClosed(name: string): boolean {
-        return undefined === this.openSection
-            ? name !== this.firstSectionName
-            : name !== this.openSection;
-    }
+    @action leaveSection = () => {
+        this.openSection = null;
+    };
 
     /**
      * Field types call onFinish() unguarded when they lose focus or commit a
@@ -215,15 +213,58 @@ export default class SchemaScreen extends React.Component<*> {
     }
 
     /**
-     * The first section of the screen, opened by default.
+     * Level one: the settings that live outside any section, then the list of
+     * sections to drill into.
      */
-    get firstSectionName(): ?string {
-        const schema = this.schema || {};
+    renderSectionList(schema: Object) {
+        const names = Object.keys(schema).filter((name) => this.isVisible(schema[name]));
 
-        return Object.keys(schema).find((name) => 'section' === schema[name].type);
+        return (
+            <div>
+                {names
+                    .filter((name) => 'section' !== schema[name].type)
+                    .map((name) => this.renderField(name, schema[name]))}
+
+                <div className="iw-le__nav">
+                    {names.filter((name) => 'section' === schema[name].type).map((name) => (
+                        <button
+                            className="iw-le__nav-item"
+                            key={name}
+                            onClick={() => this.enterSection(name)}
+                            type="button"
+                        >
+                            <span className="iw-le__nav-label">{schema[name].label || name}</span>
+                            <span className="iw-le__nav-chevron" />
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
     }
 
-    renderEntries(schema: Object) {
+    /**
+     * Level two: one section's settings, behind a back arrow.
+     *
+     * A section can itself hold sections (Sulu nests them); those are rendered
+     * inline here rather than adding a third level, which would bury settings
+     * deeper than the panel is worth.
+     */
+    renderSection(name: string, entry: Object) {
+        return (
+            <div>
+                <button className="iw-le__back" onClick={this.leaveSection} type="button">
+                    <span className="iw-le__back-chevron" />
+                    {entry.label || name}
+                </button>
+                {this.renderFields(entry.items || {})}
+            </div>
+        );
+    }
+
+    /**
+     * Render entries as fields, flattening any nested section.
+     */
+    renderFields(schema: Object) {
         return Object.keys(schema).map((name) => {
             const entry = schema[name];
 
@@ -232,25 +273,29 @@ export default class SchemaScreen extends React.Component<*> {
             }
 
             if ('section' === entry.type) {
-                const closed = this.isSectionClosed(name);
-
                 return (
-                    <div className={'iw-le__section' + (closed ? ' iw-le__section--closed' : '')} key={name}>
-                        <button
-                            className="iw-le__section-toggle"
-                            onClick={() => this.toggleSection(name)}
-                            type="button"
-                        >
-                            <span className="iw-le__section-chevron" />
-                            {entry.label || name}
-                        </button>
-                        {!closed && this.renderEntries(entry.items || {})}
+                    <div className="iw-le__subsection" key={name}>
+                        <div className="iw-le__subsection-title">{entry.label || name}</div>
+                        {this.renderFields(entry.items || {})}
                     </div>
                 );
             }
 
             return this.renderField(name, entry);
         });
+    }
+
+    renderEntries(schema: Object) {
+        const open = this.openSection;
+        const entry = open ? schema[open] : null;
+
+        // A section that vanished — a visibleCondition turned false, or the
+        // schema changed under us — must not leave the panel blank.
+        if (open && (!entry || 'section' !== entry.type || !this.isVisible(entry))) {
+            return this.renderSectionList(schema);
+        }
+
+        return entry ? this.renderSection(open, entry) : this.renderSectionList(schema);
     }
 
     render() {
