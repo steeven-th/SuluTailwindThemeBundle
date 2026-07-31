@@ -193,6 +193,7 @@ function buildCss(primary: string): string {
         overflow: auto;
     }
     .iw-le__frame {
+        position: relative;
         width: 100%;
         height: 100%;
         background: var(--iw-le-surface);
@@ -211,6 +212,16 @@ function buildCss(primary: string): string {
         width: 100%;
         height: 100%;
         border: 0;
+    }
+    /* Sits on top of the frame while it loads, so the document underneath is
+       never unmounted — unmounting it would cancel the load being waited on. */
+    .iw-le__frame-pending {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--iw-le-surface);
     }
 `;
 }

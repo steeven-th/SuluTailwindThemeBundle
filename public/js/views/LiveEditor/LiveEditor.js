@@ -1,11 +1,12 @@
 // @flow
 import React from 'react';
-import {action, computed, observable, toJS} from 'mobx';
+import {action, computed, observable, reaction, toJS} from 'mobx';
 import {observer} from 'mobx-react';
 import {Dialog, Loader, Tabs, Toolbar} from 'sulu-admin-bundle/components';
 import {withToolbar} from 'sulu-admin-bundle/containers';
 import {Requester} from 'sulu-admin-bundle/services';
-import {translate} from 'sulu-admin-bundle/utils';
+import {PreviewStore} from 'sulu-preview-bundle/containers';
+import {buildQueryString, translate} from 'sulu-admin-bundle/utils';
 import {userStore} from 'sulu-admin-bundle/stores';
 import themeConfigStore from '../../stores/themeConfigStore';
 import SchemaScreen from './SchemaScreen';
@@ -36,6 +37,45 @@ const WARNING_TIMEOUT = 5000;
  * without ever swapping the preview.
  */
 const PREVIEWS = ['page', 'articles', 'reference'];
+
+/**
+ * Prefix of the preview sources that render actual pages of the site through
+ * Sulu's PreviewBundle, one per webspace ('real:website'). They are appended
+ * to the demo sources once the server has told us which webspaces exist.
+ *
+ * The demo previews stay: a theme assigned to no webspace, or a site with no
+ * content yet, has nothing real to show — and a real page does not necessarily
+ * exercise every setting the screens expose.
+ */
+const REAL_PREFIX = 'real:';
+
+/**
+ * Whether a preview source renders a real page rather than demo content.
+ *
+ * @param {string} preview The preview source
+ *
+ * @return {boolean} True for a real-page source
+ */
+const isRealPreview = (preview: string): boolean => preview.startsWith(REAL_PREFIX);
+
+/**
+ * ID of the stylesheet the editor injects into a real-page preview, so the
+ * same element is reused instead of stacking one per change.
+ */
+const LIVE_CSS_ID = 'iw-live-theme-css';
+
+/**
+ * Query parameters the preview URL owns.
+ *
+ * A page's own query is appended to that URL, so a filter field named `id` or
+ * `provider` would override the ones identifying the preview — the later
+ * occurrence wins server-side — and the render would fail or show the wrong
+ * page. They are dropped instead.
+ */
+const RESERVED_QUERY_KEYS = [
+    'webspaceKey', 'segmentKey', 'provider', 'id', 'locale', 'token',
+    'targetGroupId', 'dateTime', 'themeId', 'themeDraft', 'r',
+];
 
 /**
  * Preview stage widths, keyed by viewport. The widths live in the stylesheet as
@@ -116,6 +156,55 @@ class LiveEditor extends React.Component<*> {
     /** Bumped to re-render the preview, which then picks up the stored draft */
     @observable reloadCounter: number = 0;
 
+    /**
+     * Real-page preview state.
+     *
+     * `realConfig` comes from the server (draft key + webspaces), `realPages`
+     * is the page list of the chosen webspace, and `realStore` is Sulu's own
+     * PreviewStore, which owns the token and builds the render URL. Reusing it
+     * keeps us on Sulu's preview protocol instead of a parallel one.
+     */
+    @observable.ref realConfig: ?Object = undefined;
+    @observable.ref realPages: Array<Object> = [];
+    @observable realWebspace: string = '';
+    /** Content locale of the previewed page — the one the admin is working in */
+    @observable realLocale: string = userStore.contentLocale;
+    @observable realPageId: string = '';
+    @observable realToken: string = '';
+    /**
+     * Query the previewed page is asked for, beyond its identity: the page of
+     * a listing, the active filters.
+     *
+     * PreviewRenderer copies the admin request query into the sub-kernel, so
+     * these travel to the rendered page. Without them a pagination link or a
+     * filter form would render page 1 again, since the preview URL identifies
+     * the page but nothing of what is being asked of it.
+     */
+    @observable realQuery: string = '';
+    @observable realLoading: boolean = false;
+    /**
+     * Whether the initial state has been answered for.
+     *
+     * The preview URL carries the block variant, which only arrives with that
+     * response: mounting the frame any earlier renders the preview once for
+     * nothing and cancels it mid-flight when the variant lands.
+     */
+    @observable stateLoaded: boolean = false;
+    /**
+     * Whether the frame is still fetching its document.
+     *
+     * A real page is rendered by a whole website sub-kernel, which takes long
+     * enough that the frame would otherwise sit blank with no sign of progress.
+     */
+    @observable previewLoading: boolean = false;
+    /**
+     * Observable on purpose: realPreviewUrl bails out on it before reading the
+     * token, so a plain field would short-circuit the computed before it ever
+     * touches an observable — leaving it memoised as empty forever, and the
+     * preview stuck on its loader.
+     */
+    @observable.ref realStore: ?Object = null;
+
     /** Unsaved-changes guard, mirroring Sulu's Form view */
     @observable showDirtyWarning: boolean = false;
     postponedRoute: ?Object = undefined;
@@ -124,6 +213,7 @@ class LiveEditor extends React.Component<*> {
     /** True only while a confirmed navigation is replayed through the hook */
     confirmingNavigation: boolean = false;
     routeHookDisposer: ?Function = null;
+    previewUrlDisposer: ?Function = null;
 
     /**
      * Image seed for the demo content, drawn once per session: preview images
@@ -157,6 +247,10 @@ class LiveEditor extends React.Component<*> {
     }
 
     @computed get previewUrl(): string {
+        if (isRealPreview(this.preview)) {
+            return this.realPreviewUrl;
+        }
+
         return BASE_PATH + this.themeId + '/preview'
             + '?preview=' + encodeURIComponent(this.preview)
             + '&demoSeed=' + this.demoSeed
@@ -164,10 +258,108 @@ class LiveEditor extends React.Component<*> {
             + (this.variant ? '&variant=' + encodeURIComponent(this.variant) : '');
     }
 
+    /**
+     * The render URL of Sulu's PreviewBundle, plus what it needs to describe
+     * the theme being edited rather than the webspace's: the theme itself, and
+     * the key to the draft the sub-kernel cannot read from our session.
+     *
+     * Empty until a page is picked and the preview session has a token; the
+     * iframe then stays blank instead of loading a half-formed URL.
+     */
+    @computed get realPreviewUrl(): string {
+        return this.previewUrlWithQuery(this.realQuery) + '&r=' + this.reloadCounter;
+    }
+
+    /**
+     * The render URL of the current page, asked with a given query.
+     *
+     * @param {string} query Query string for the page, without the '?'
+     *
+     * @return {string} The full render URL, or '' if the session is not ready
+     */
+    previewUrlWithQuery(query: string): string {
+        const store = this.realStore;
+
+        if (!store || !this.realToken || !this.realPageId) {
+            return '';
+        }
+
+        const draftKey = this.realConfig && this.realConfig.draftKey;
+
+        return store.renderRoute
+            + '&themeId=' + encodeURIComponent(String(this.themeId))
+            + (draftKey ? '&themeDraft=' + encodeURIComponent(draftKey) : '')
+            + (query ? '&' + query : '');
+    }
+
+    /**
+     * The demo previews, then one entry per webspace.
+     *
+     * The webspaces only appear once the server has listed them, which also
+     * means a real-page source can never be picked before the editor knows how
+     * to render it.
+     */
     @computed get previewOptions(): Array<Object> {
-        return PREVIEWS.map((preview) => ({
+        const demo = PREVIEWS.map((preview) => ({
             label: translate('iw_sulu_tailwind_theme.live_editor_preview_' + preview),
             value: preview,
+        }));
+
+        const webspaces = (this.realConfig && this.realConfig.webspaces) || [];
+
+        return demo.concat(webspaces.map((webspace) => ({
+            label: webspace.name,
+            value: REAL_PREFIX + webspace.key,
+        })));
+    }
+
+    /**
+     * Whether the preview has no URL to show yet.
+     *
+     * Only ever true for a real page, whose URL waits on the page list and on
+     * a preview token; the demo previews always have one.
+     */
+    /**
+     * What a screen is seeded with: the stored theme, plus everything edited
+     * since.
+     *
+     * A screen builds its form store once, from this data. Seeding it with the
+     * stored theme alone would show the saved value again on every return to a
+     * tab — and worse, a field re-emitting that stale value would push it into
+     * the patch and undo the edit at save time.
+     */
+    @computed get screenData(): Object {
+        return {...(this.formData || {}), ...toJS(this.formPatch)};
+    }
+
+    /**
+     * What the frame actually loads.
+     *
+     * Blank until the preview is settled: loading the URL before the initial
+     * state lands would render a whole page with the wrong variant, then throw
+     * it away and re-render — the cancelled request seen in the network panel.
+     */
+    @computed get previewSrc(): string {
+        if (this.previewPending || '' === this.previewUrl) {
+            return 'about:blank';
+        }
+
+        return this.previewUrl;
+    }
+
+    @computed get previewPending(): boolean {
+        if (!this.stateLoaded) {
+            return true;
+        }
+
+        return isRealPreview(this.preview) && '' === this.previewUrl;
+    }
+
+    @computed get realPageOptions(): Array<Object> {
+        return this.realPages.map((page) => ({
+            // A page without a title in this locale still needs to be pickable.
+            label: page.title || translate('iw_sulu_tailwind_theme.live_editor_real_page_untitled'),
+            value: page.id,
         }));
     }
 
@@ -201,6 +393,16 @@ class LiveEditor extends React.Component<*> {
             DIRTY_ROUTE_HOOK_PRIORITY
         );
 
+        // Watch what the frame actually loads rather than flag every caller
+        // that changes it: a re-render, a page switch and a webspace switch all
+        // end up here. about:blank is not a load worth a spinner.
+        this.previewUrlDisposer = reaction(
+            () => this.previewSrc,
+            action((src) => {
+                this.previewLoading = 'about:blank' !== src;
+            })
+        );
+
         // The theme in its form shape, which every screen is seeded from.
         Requester.get('/admin/api/iw-theme-configs/' + this.themeId)
             .then(action((data) => {
@@ -218,6 +420,12 @@ class LiveEditor extends React.Component<*> {
         // assigned to the first webspace.
         Requester.get(BASE_PATH + this.themeId + '/state')
             .then(action((state) => {
+                // Webspaces and draft key for the real-page preview. Kept even
+                // when there is no themeConfig: the two are independent.
+                if (state.realPreview) {
+                    this.realConfig = state.realPreview;
+                }
+
                 if (!state.themeConfig) {
                     return;
                 }
@@ -232,14 +440,22 @@ class LiveEditor extends React.Component<*> {
                     this.variant = first.slug;
                 }
             }))
-            .catch(() => {
+            .then(action(() => {
+                this.stateLoaded = true;
+            }))
+            .catch(action(() => {
                 // The screens work without it; only the palette previews of the
                 // color pickers would fall back to the active theme.
-            });
+                this.stateLoaded = true;
+            }));
     }
 
     componentWillUnmount() {
         this.stopResize();
+
+        if (this.previewUrlDisposer) {
+            this.previewUrlDisposer();
+        }
 
         if (this.pushTimeout) {
             clearTimeout(this.pushTimeout);
@@ -366,7 +582,7 @@ class LiveEditor extends React.Component<*> {
                 }
 
                 if (response && typeof response.css === 'string') {
-                    this.postToPreview({type: 'iw-live-theme-css', css: response.css});
+                    this.applyPreviewCss(response.css);
                 }
             })
             .catch(() => {
@@ -404,10 +620,52 @@ class LiveEditor extends React.Component<*> {
     };
 
     /**
+     * Bring recompiled CSS to the preview document.
+     *
+     * The demo previews carry our own script, which listens for the message and
+     * swaps the stylesheet. A page rendered by Sulu's PreviewBundle does not —
+     * it is the real front-end document — so the editor writes the stylesheet
+     * into the frame itself. Same origin under /admin, so it can reach in.
+     *
+     * @param {string} css The recompiled theme CSS
+     */
+    applyPreviewCss(css: string) {
+        if (!isRealPreview(this.preview)) {
+            this.postToPreview({type: 'iw-live-theme-css', css});
+
+            return;
+        }
+
+        const document = this.iframe && this.iframe.contentDocument;
+
+        if (!document || !document.head) {
+            return;
+        }
+
+        let style = document.getElementById(LIVE_CSS_ID);
+
+        if (!style) {
+            style = document.createElement('style');
+            style.id = LIVE_CSS_ID;
+            // Appended last so it wins over the theme's own stylesheet, which
+            // is a <link> to the file compiled from the *saved* theme.
+            document.head.appendChild(style);
+        }
+
+        style.textContent = css;
+    }
+
+    /**
      * A fresh preview document carries the persisted CSS, so unsaved changes
      * have to be pushed again after every reload.
      */
-    handleIframeLoad = () => {
+    handleIframeLoad = action(() => {
+        this.previewLoading = false;
+
+        if (isRealPreview(this.preview)) {
+            this.interceptPreviewLinks();
+        }
+
         if (this.previewScroll && this.iframe && this.iframe.contentWindow) {
             this.iframe.contentWindow.scrollTo(0, this.previewScroll);
         }
@@ -415,21 +673,381 @@ class LiveEditor extends React.Component<*> {
         if (this.dirty) {
             this.pushChanges();
         }
-    };
+    });
 
     @action handleScreenChange = (index: number) => {
         const screen = SCREENS[index];
         this.screen = screen.key;
 
         // Only swap the preview when the current page does not already show
-        // what this screen configures.
-        if (!screen.previews.includes(this.preview)) {
+        // what this screen configures. A real page shows all of them, so it is
+        // never swapped away from — it was chosen deliberately.
+        if (!isRealPreview(this.preview) && !screen.previews.includes(this.preview)) {
             this.preview = screen.previews[0];
         }
     };
 
     @action handlePreviewChange = (preview: string) => {
         this.preview = preview;
+
+        if (isRealPreview(preview)) {
+            this.openWebspace(preview.slice(REAL_PREFIX.length));
+        }
+    };
+
+    /**
+     * Open a webspace's pages in the preview.
+     *
+     * Loading is lazy and per webspace: a session that never leaves the demo
+     * previews pays nothing, and switching webspaces starts from a clean page
+     * list rather than one belonging to the previous site.
+     *
+     * @param {string} webspace Key of the webspace to preview
+     */
+    @action openWebspace = (webspace: string) => {
+        if (!webspace || webspace === this.realWebspace) {
+            return;
+        }
+
+        this.realWebspace = webspace;
+        this.realPages = [];
+        this.realPageId = '';
+        this.realToken = '';
+        this.realQuery = '';
+        this.realStore = null;
+        this.loadRealPages();
+    };
+
+    /**
+     * Load every page of the current webspace, flat, to fill the picker.
+     *
+     * Served by our own endpoint rather than Sulu's page API: that one is
+     * hierarchical, and a flat call returns the root level only — here the home
+     * page alone, every other page being its child.
+     */
+    @action loadRealPages = () => {
+        const webspace = this.realWebspace;
+
+        if (!webspace) {
+            return;
+        }
+
+        this.realLoading = true;
+
+        Requester.get(BASE_PATH + 'pages' + buildQueryString({webspace, locale: this.realLocale}))
+            .then(action((response) => {
+                const pages = (response && response.pages) || [];
+
+                this.realPages = pages;
+                this.realLoading = false;
+
+                // Nothing chosen yet: open on the first page, so switching to
+                // this source shows something instead of an empty frame.
+                if (!this.realPageId && pages.length > 0) {
+                    this.selectRealPage(pages[0].id);
+                }
+            }))
+            .catch(action(() => {
+                this.realLoading = false;
+                this.realPages = [];
+                this.addWarning('iw_sulu_tailwind_theme.live_editor_real_pages_failed');
+            }));
+    };
+
+    /**
+     * Start a preview session for a page and point the iframe at it.
+     *
+     * The token belongs to Sulu's PreviewStore, which also builds the render
+     * URL — we only append the theme and draft on top of it.
+     *
+     * @param {string} pageId UUID of the page to preview
+     */
+    @action selectRealPage = (pageId: string) => {
+        this.realPageId = pageId;
+        this.realToken = '';
+        // Another page: start at the top rather than at the offset kept for
+        // re-rendering the one before it.
+        this.previewScroll = 0;
+
+        const store = new PreviewStore('pages', pageId, this.realLocale, this.realWebspace, undefined);
+
+        this.realStore = store;
+
+        store.start()
+            .then(action(() => {
+                // Ignore a session that finished starting after the user moved
+                // on to another page: its token would render the wrong one.
+                if (this.realStore === store) {
+                    this.realToken = store.token || '';
+                }
+            }))
+            .catch(action(() => {
+                if (this.realStore === store) {
+                    this.addWarning('iw_sulu_tailwind_theme.live_editor_real_preview_failed');
+                }
+            }));
+    };
+
+    /**
+     * Keep navigation inside the preview session.
+     *
+     * A real page renders real links, pointing at the public site. Following
+     * one leaves the preview behind: the frame then shows the site with its
+     * own theme, so edits appear to do nothing, and the next re-render snaps
+     * back to the page originally picked. Links that match a known page switch
+     * the preview to it instead; the others are not followed at all.
+     */
+    interceptPreviewLinks() {
+        const document = this.iframe && this.iframe.contentDocument;
+
+        if (document) {
+            // Capture phase, so the site's own handlers cannot navigate first.
+            document.addEventListener('click', this.handlePreviewLinkClick, true);
+            // Bubble phase, unlike the click handler: the page's own filter
+            // controller intercepts submits and filters over AJAX, and it must
+            // get its chance first — see the defaultPrevented guard below.
+            document.addEventListener('submit', this.handlePreviewSubmit, false);
+        }
+
+        this.patchPreviewFetch();
+    }
+
+    /**
+     * Make the site's own AJAX work inside the preview.
+     *
+     * Front-end controllers build their URLs from window.location, which in the
+     * frame is the preview render route — so an AJAX call lands on it stripped
+     * of the provider, id and token that identify what to render, fails, and
+     * falls back to a full navigation showing Sulu's error.
+     *
+     * Rather than disable those controllers (the filter one also drives the
+     * offcanvas drawer), their calls to the render route are rewritten with the
+     * preview parameters put back, keeping whatever query they asked for. The
+     * page then filters and paginates over AJAX exactly as it does live.
+     */
+    patchPreviewFetch() {
+        const frameWindow = this.iframe && this.iframe.contentWindow;
+
+        if (!frameWindow || frameWindow.__iwPreviewFetchPatched) {
+            return;
+        }
+
+        const originalFetch = frameWindow.fetch;
+
+        if (!originalFetch) {
+            return;
+        }
+
+        frameWindow.__iwPreviewFetchPatched = true;
+        frameWindow.fetch = (input, init) => {
+            const requested = 'string' == typeof input ? input : input && input.url;
+            const rewritten = this.rewritePreviewRequest(requested);
+
+            return originalFetch.call(frameWindow, rewritten || input, init);
+        };
+    }
+
+    /**
+     * Rewrite a request the framed page makes to the preview render route.
+     *
+     * @param {?string} requested The URL the page asked for
+     *
+     * @return {?string} The rewritten URL, or null to leave the call alone
+     */
+    rewritePreviewRequest(requested: ?string): ?string {
+        if (!requested) {
+            return null;
+        }
+
+        let url;
+
+        try {
+            url = new URL(requested, window.location.origin);
+        } catch (error) {
+            return null;
+        }
+
+        // Only the render route is confusing to the page; anything else it
+        // fetches (an API of its own, an asset) is left untouched.
+        if (url.origin !== window.location.origin || '/admin/preview/render' !== url.pathname) {
+            return null;
+        }
+
+        const query = new URLSearchParams(url.search);
+
+        RESERVED_QUERY_KEYS.forEach((key) => query.delete(key));
+
+        const next = query.toString();
+
+        // Remember it, so re-rendering the preview keeps the same filters.
+        this.setRealQuery(next);
+
+        return this.previewUrlWithQuery(next) || null;
+    }
+
+    @action setRealQuery = (query: string) => {
+        this.realQuery = query;
+    };
+
+    handlePreviewLinkClick = (event: MouseEvent) => {
+        const target = event.target;
+        const link = target && target.closest ? target.closest('a[href]') : null;
+
+        if (!link) {
+            return;
+        }
+
+        const href = link.getAttribute('href') || '';
+
+        // In-page anchors stay in the document: nothing to intercept. Neither
+        // do mailto:/tel: and friends, which never navigate the frame away.
+        if ('' === href || href.startsWith('#') || /^[a-z][a-z0-9+.-]*:/i.test(href) && !/^https?:/i.test(href)) {
+            return;
+        }
+
+        let path;
+        let query;
+
+        try {
+            const url = new URL(link.href, window.location.origin);
+
+            // Another host is never one of our pages.
+            if (url.origin !== window.location.origin) {
+                return;
+            }
+
+            path = url.pathname;
+            query = url.search.replace(/^\?/, '');
+        } catch (error) {
+            return;
+        }
+
+        event.preventDefault();
+        this.openPreviewPath(path, query);
+    };
+
+    /**
+     * Intercept filter forms the same way as links.
+     *
+     * A GET form replaces the whole query string of the URL it submits to —
+     * here the preview render URL, whose provider, id and token would go with
+     * it. The fields are turned into a query for the previewed page instead.
+     */
+    handlePreviewSubmit = (event: Event) => {
+        const form = event.target;
+
+        if (!form || 'FORM' !== form.tagName) {
+            return;
+        }
+
+        // The page handled it itself (the filter controller filters over AJAX,
+        // whose request is rewritten in patchPreviewFetch). Stepping in here
+        // would re-render the whole frame on top of that.
+        if (event.defaultPrevented) {
+            return;
+        }
+
+        // A POST form carries a body the preview URL cannot express; leaving it
+        // alone at least keeps the failure visible rather than silently wrong.
+        if (form.method && 'get' !== form.method.toLowerCase()) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const action = form.getAttribute('action') || '';
+        let path = '';
+
+        if (action) {
+            try {
+                path = new URL(action, window.location.origin).pathname;
+            } catch (error) {
+                path = '';
+            }
+        }
+
+        // URLSearchParams drops the File entries FormData may hold, which a
+        // filter bar never has anyway.
+        const query = new URLSearchParams(new FormData(form)).toString();
+
+        // No action, or one pointing at the render route: inside the frame that
+        // resolves to the preview endpoint rather than to a page of the site.
+        // Such a form acts on the page being shown, so ask it again with the
+        // new query instead of trying to resolve a path that is not one.
+        if ('' === path || '/admin/preview/render' === path) {
+            this.applyPreviewQuery(query);
+
+            return;
+        }
+
+        this.openPreviewPath(path, query);
+    };
+
+    /**
+     * Re-render the current page with a different query.
+     *
+     * @param {string} query Query string for the page, without the '?'
+     */
+    @action applyPreviewQuery = (query: string) => {
+        const safeQuery = new URLSearchParams(query);
+
+        RESERVED_QUERY_KEYS.forEach((key) => safeQuery.delete(key));
+
+        this.realQuery = safeQuery.toString();
+        this.reloadPreview();
+    };
+
+    /**
+     * Point the preview at a path of the site, keeping what is asked of it.
+     *
+     * Staying on the same page only refreshes it: restarting a preview session
+     * for a page already being previewed would drop the query and land back on
+     * the first page of a listing.
+     *
+     * @param {string} path  Pathname of the target page
+     * @param {string} query Query string to render it with, without the '?'
+     */
+    openPreviewPath(path: string, query: string) {
+        const safeQuery = new URLSearchParams(query);
+
+        RESERVED_QUERY_KEYS.forEach((key) => safeQuery.delete(key));
+
+        // The page list carries no route, so the server resolves the path —
+        // it also knows the pages the list did not return.
+        Requester.get(BASE_PATH + 'resolve-page' + buildQueryString({
+            webspace: this.realWebspace,
+            locale: this.realLocale,
+            path,
+        }))
+            .then(action((response) => {
+                const pageId = response && response.pageId;
+
+                if (!pageId) {
+                    this.addWarning('iw_sulu_tailwind_theme.live_editor_real_link_unavailable');
+
+                    return;
+                }
+
+                this.realQuery = safeQuery.toString();
+
+                if (pageId === this.realPageId) {
+                    this.reloadPreview();
+
+                    return;
+                }
+
+                this.selectRealPage(pageId);
+            }))
+            .catch(() => {
+                this.addWarning('iw_sulu_tailwind_theme.live_editor_real_link_unavailable');
+            });
+    }
+
+    @action handleRealPageChange = (pageId: string) => {
+        // Picked from the toolbar rather than followed from the page: start
+        // from the page itself, not from a listing's filters or page number.
+        this.realQuery = '';
+        this.selectRealPage(pageId);
     };
 
     @action handleViewportChange = (viewport: string) => {
@@ -537,13 +1155,24 @@ class LiveEditor extends React.Component<*> {
                             options={this.viewportOptions}
                             value={this.viewport}
                         />
-                        {this.variantOptions.length > 0 &&
+                        {/* The variant stamps demo blocks, so it is meaningless
+                            on a real page — which shows its own content. */}
+                        {!isRealPreview(this.preview) && this.variantOptions.length > 0 &&
                             <Toolbar.Select
                                 icon="su-brush"
                                 label={translate('iw_sulu_tailwind_theme.live_editor_variant_pick')}
                                 onChange={this.handleVariantChange}
                                 options={this.variantOptions}
                                 value={this.variant}
+                            />
+                        }
+                        {isRealPreview(this.preview) &&
+                            <Toolbar.Select
+                                icon="su-document"
+                                label={translate('iw_sulu_tailwind_theme.live_editor_real_page_pick')}
+                                onChange={this.handleRealPageChange}
+                                options={this.realPageOptions}
+                                value={this.realPageId}
                             />
                         }
                     </Toolbar.Items>
@@ -583,7 +1212,7 @@ class LiveEditor extends React.Component<*> {
                     <aside className="iw-le__panel">
                         {this.formData &&
                             <SchemaScreen
-                                data={this.formData}
+                                data={this.screenData}
                                 formKey={formKeyFor(this.screen)}
                                 onChange={this.handleFieldChange}
                                 router={this.props.router}
@@ -600,13 +1229,21 @@ class LiveEditor extends React.Component<*> {
                     <main className="iw-le__stage">
                         <div className="iw-le__stage-body">
                             <div className={'iw-le__frame iw-le__frame--' + this.viewport}>
+                                {/* The frame stays mounted and the loader sits
+                                    on top: swapping it out would cancel the
+                                    very load being waited on. about:blank
+                                    while there is no URL yet, since an empty
+                                    src resolves to the admin page itself. */}
                                 <iframe
                                     className="iw-le__iframe"
                                     onLoad={this.handleIframeLoad}
                                     ref={this.setIframeRef}
-                                    src={this.previewUrl}
+                                    src={this.previewSrc}
                                     title={this.label}
                                 />
+                                {(this.previewPending || this.previewLoading) &&
+                                    <div className="iw-le__frame-pending"><Loader /></div>
+                                }
                             </div>
                         </div>
 

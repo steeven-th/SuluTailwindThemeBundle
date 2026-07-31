@@ -28,6 +28,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Sulu\Bundle\SecurityBundle\Entity\User;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
+use Sulu\Content\Domain\Model\DimensionContentInterface;
+use Sulu\Route\Domain\Repository\RouteRepositoryInterface;
 use Twig\Environment;
 
 /**
@@ -67,6 +70,8 @@ class LiveThemeEditorController extends AbstractController
         private readonly ThemeConfigController $themeConfigController,
         private readonly ThemeProvider $themeProvider,
         private readonly ThemeDraftStorage $draftStorage,
+        private readonly WebspaceManagerInterface $webspaceManager,
+        private readonly RouteRepositoryInterface $routeRepository,
     ) {
     }
 
@@ -199,6 +204,42 @@ class LiveThemeEditorController extends AbstractController
         if (null !== $key) {
             $this->draftStorage->clear($key);
         }
+    }
+
+    /**
+     * What the editor needs to preview the theme on a real page.
+     *
+     * The page itself is picked client-side through Sulu's own page API; what
+     * only the server can supply is the draft key (derived from the application
+     * secret) and the list of webspaces with their locales, since the preview
+     * URL needs a webspace and a locale that actually exist.
+     *
+     * @param int $id The theme configuration ID
+     *
+     * @return array<string, mixed> {draftKey, webspaces: [{key, name, locales}]}
+     */
+    private function realPreviewConfig(int $id): array
+    {
+        $webspaces = [];
+
+        foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
+            $locales = [];
+
+            foreach ($webspace->getAllLocalizations() as $localization) {
+                $locales[] = $localization->getLocale();
+            }
+
+            $webspaces[] = [
+                'key' => $webspace->getKey(),
+                'name' => $webspace->getName(),
+                'locales' => $locales,
+            ];
+        }
+
+        return [
+            'draftKey' => $this->draftStorageKey($id),
+            'webspaces' => $webspaces,
+        ];
     }
 
     /**
@@ -751,6 +792,116 @@ class LiveThemeEditorController extends AbstractController
      *
      * @throws NotFoundHttpException If the theme is not found
      */
+    /**
+     * List every page of a webspace, flat, for the preview page picker.
+     *
+     * Sulu's own page list is hierarchical: a flat call returns the root level
+     * only, which here is the home page alone — every other page is its child.
+     * The picker needs them all, whatever their depth.
+     *
+     * @param Request $request Carries webspace and locale
+     *
+     * @return JsonResponse {pages: [{id, title}]}
+     */
+    #[Route(
+        '/admin/theme-live-editor/pages',
+        name: 'iw_sulu_tailwind_theme.live_editor_pages',
+        methods: ['GET'],
+    )]
+    public function pagesAction(Request $request): JsonResponse
+    {
+        $query = $request->query->all();
+        $webspace = is_string($query['webspace'] ?? null) ? $query['webspace'] : '';
+        $locale = is_string($query['locale'] ?? null) ? $query['locale'] : '';
+
+        if ('' === $webspace || '' === $locale) {
+            return new JsonResponse(['pages' => []]);
+        }
+
+        // version = 0 is the working copy, as Sulu's own page list filters it;
+        // without it every past version comes back as a duplicate. lft orders
+        // them as the content tree does.
+        $rows = $this->entityManager->createQuery(
+            'SELECT DISTINCT p.uuid, c.title, p.lft'
+            . ' FROM Sulu\Page\Domain\Model\PageDimensionContent c'
+            . ' JOIN c.page p'
+            . ' WHERE p.webspaceKey = :webspace AND c.locale = :locale'
+            . ' AND c.stage = :stage AND c.version = 0'
+            . ' ORDER BY p.lft'
+        )
+            ->setParameter('webspace', $webspace)
+            ->setParameter('locale', $locale)
+            ->setParameter('stage', DimensionContentInterface::STAGE_DRAFT)
+            ->getArrayResult();
+
+        $pages = [];
+
+        foreach ($rows as $row) {
+            $pages[] = [
+                'id' => $row['uuid'],
+                'title' => $row['title'] ?? '',
+            ];
+        }
+
+        return new JsonResponse(['pages' => $pages]);
+    }
+
+    /**
+     * Resolve a front-end path to the page it renders.
+     *
+     * A real-page preview shows the site's own links, which point at public
+     * URLs. Following one would leave the preview — and with it the theme being
+     * edited — so the editor asks which page a link leads to and moves the
+     * preview there instead.
+     *
+     * Resolution has to happen here: the admin page list carries no route, and
+     * the routes table also knows the pages the list does not return.
+     *
+     * @param Request $request Carries webspace, locale and path
+     *
+     * @return JsonResponse {pageId: string|null}
+     */
+    #[Route(
+        '/admin/theme-live-editor/resolve-page',
+        name: 'iw_sulu_tailwind_theme.live_editor_resolve_page',
+        methods: ['GET'],
+    )]
+    public function resolvePageAction(Request $request): JsonResponse
+    {
+        $query = $request->query->all();
+        $path = is_string($query['path'] ?? null) ? $query['path'] : '';
+        $webspace = is_string($query['webspace'] ?? null) ? $query['webspace'] : '';
+        $locale = is_string($query['locale'] ?? null) ? $query['locale'] : '';
+
+        if ('' === $path || '' === $webspace || '' === $locale) {
+            return new JsonResponse(['pageId' => null]);
+        }
+
+        // Rendered links are locale-prefixed (/en/blog) while routes are stored
+        // without it (/blog); try both rather than guess the prefixing scheme.
+        $candidates = ['/' . trim($path, '/')];
+        $prefix = '/' . $locale;
+
+        if (str_starts_with($path, $prefix . '/') || $path === $prefix) {
+            $candidates[] = '/' . trim(substr($path, strlen($prefix)), '/');
+        }
+
+        foreach ($candidates as $slug) {
+            $route = $this->routeRepository->findOneBy([
+                'webspace' => $webspace,
+                'locale' => $locale,
+                'slug' => $slug,
+                'resourceKey' => 'pages',
+            ]);
+
+            if (null !== $route) {
+                return new JsonResponse(['pageId' => $route->getResourceId()]);
+            }
+        }
+
+        return new JsonResponse(['pageId' => null]);
+    }
+
     #[Route(
         '/admin/theme-live-editor/{id}/state',
         name: 'iw_sulu_tailwind_theme.live_editor_state',
@@ -795,6 +946,7 @@ class LiveThemeEditorController extends AbstractController
             'id' => $id,
             'label' => $theme->getLabel(),
             'themeConfig' => $this->themeConfigResolver->resolve($theme),
+            'realPreview' => $this->realPreviewConfig($id),
         ]));
     }
 

@@ -11,6 +11,11 @@
  * configures: opening it only swaps the preview when the current page is not
  * one of them, so editing colors or typography never yanks the page away.
  * The first entry is the fallback when a swap is needed.
+ *
+ * Real-page sources (one per webspace) are not listed: a real page shows every
+ * screen's settings, so switching screens never pulls it away from someone who
+ * chose it. They are never a fallback either — a theme with no webspace, or a
+ * site with no content, has nothing to render.
  */
 export const SCREENS = [
     {key: 'colors', previews: ['page', 'articles', 'reference']},
