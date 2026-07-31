@@ -103,7 +103,7 @@
     "iw_sulu_tailwind_theme.buttons_secondary": "Sekundäre Schaltfläche",
     "iw_sulu_tailwind_theme.buttons_accent": "Akzent-Schaltfläche",
     "iw_sulu_tailwind_theme.button": "Schaltfläche",
-    "iw_sulu_tailwind_theme.buttons_info": "Definiere deine Schaltflächen-Stile. Jeder wird durch einen eindeutigen Slug benannt und ist überall verfügbar, wo ein Schaltflächen-Stil gewählt wird.",
+    "iw_sulu_tailwind_theme.buttons_info": "Definiere deine Schaltflächen-Stile. Jeder wird durch einen eindeutigen Slug benannt und ist überall verfügbar, wo ein Schaltflächen-Stil gewählt wird. ⚠️ Das Umbenennen des Slugs einer bereits verwendeten Schaltfläche zerstört die Verknüpfung: Blöcke verlieren deren Stil, Varianten fallen auf die erste Schaltfläche der Liste zurück. Lege stattdessen eine neue Schaltfläche an.",
     "iw_sulu_tailwind_theme.button_label": "Bezeichnung",
     "iw_sulu_tailwind_theme.button_slug": "Slug",
     "iw_sulu_tailwind_theme.button_slug_info": "Stabiler Bezeichner für die CSS-Klasse (.iw-button--slug). Umbenennen beschädigt Blöcke, die diese Schaltfläche bereits verwenden.",
