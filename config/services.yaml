@@ -89,6 +89,13 @@ services:
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator
 
+    # Flat form properties ⇄ nested JSON columns. Shared by the theme form
+    # controller and anything that needs to build a theme from form data.
+    itech_world.sulu_tailwind_theme.form_mapper:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.slug_validator'
+
     itech_world.sulu_tailwind_theme.block_template_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver
 
@@ -197,6 +204,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider: '@itech_world.sulu_tailwind_theme.provider'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver: '@itech_world.sulu_tailwind_theme.config_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator: '@itech_world.sulu_tailwind_theme.slug_validator'
+    ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper: '@itech_world.sulu_tailwind_theme.form_mapper'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
