@@ -200,17 +200,24 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
     }
 
     /**
-     * Get the locale from the request.
+     * Get the locale used for the permission check.
      *
-     * Webspace theme assignments are not localized.
+     * Webspace theme assignments are not localized, so no locale is reported.
+     *
+     * Returning a locale here would be actively harmful: Sulu matches it against
+     * the locales attached to the user's roles and discards every role that does
+     * not list it (AccessControlManager::getRolesForLocale). Defaulting to "en"
+     * therefore denied access to any user whose roles are restricted to other
+     * locales — a French-only editor got a 403 on this endpoint despite holding
+     * full permissions on the security context. A null locale skips that filter.
      *
      * @param Request $request The HTTP request
      *
-     * @return string The locale
+     * @return string|null Always null: the resource is not localized
      */
-    public function getLocale(Request $request): string
+    public function getLocale(Request $request): ?string
     {
-        return $request->query->getString('locale', 'en');
+        return null;
     }
 
     /**
