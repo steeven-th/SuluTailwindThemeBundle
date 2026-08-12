@@ -15,7 +15,7 @@ The `.iw-embed` component is shared with the sandboxed mode of the code block, s
 Worth knowing before overriding anything, because part of it is enforced in the markup:
 
 - **The URL is validated server-side** (`EmbedUrlValidator`): `https` only, no credentials, and an optional host allowlist from the bundle config. An invalid URL renders **nothing** — no frame, no error, no broken layout.
-- **`sandbox` never includes `allow-top-navigation`**, in any mode. An embed cannot redirect the page hosting it.
+- **`sandbox` never includes `allow-top-navigation`**, in any mode: an embed must not be able to redirect the page on its own. A *Allow the page to be redirected* checkbox adds `allow-top-navigation-by-user-activation`, which permits it **only in response to a real user gesture** — required by booking engines and search forms that send the visitor to their results page.
 - **`allow` is built from explicit editor choices.** Camera, microphone and geolocation are opt-in per block, not granted wholesale.
 - **When consent is required, the `src` attribute is absent from the DOM.** Do not write CSS that assumes an iframe is always loaded — style `.iw-embed__consent` instead.
 

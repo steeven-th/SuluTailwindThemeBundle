@@ -56,5 +56,6 @@
     "iw_sulu_tailwind_theme.consent_load": "Inhalt anzeigen",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Einstellungen verwalten",
     "iw_sulu_tailwind_theme.code_frame": "Eingebetteter Inhalt",
-    "iw_sulu_tailwind_theme.code_too_long": "Dieser Code-Block überschreitet die maximal zulässige Größe und wurde nicht dargestellt."
+    "iw_sulu_tailwind_theme.code_too_long": "Dieser Code-Block überschreitet die maximal zulässige Größe und wurde nicht dargestellt.",
+    "iw_sulu_tailwind_theme.code_contains_iframe": "Dieser Block enthält ein iframe, das in einem isolierten Rahmen nicht funktionieren kann: Die Skripte der entfernten Website werden blockiert. Verwenden Sie den Block „Externer Inhalt (iframe)“ und fügen Sie nur die Adresse ein."
 }

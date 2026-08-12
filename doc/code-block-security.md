@@ -22,16 +22,19 @@ Out of the box, pasted markup is placed in the `srcdoc` of an `<iframe sandbox="
 | ❌ cannot | read or modify the hosting page's DOM |
 | ❌ cannot | read your cookies or `localStorage` |
 | ❌ cannot | steal an admin session from the preview |
-| ❌ cannot | navigate or redirect the page around it |
+| ❌ cannot | navigate or redirect the page around it, unless *Allow the page to be redirected* is ticked — and then only on a real user gesture |
 
 A stored XSS in this block is confined to a rectangle.
 
 ### What the sandbox costs, honestly
 
+The sandbox tokens are `allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox` — enough for a transactional widget to submit its form and open its result. `allow-same-origin` is **never** granted here: a `srcdoc` inherits the parent page's origin, so adding it would hand the pasted code the site's DOM and cookies, cancelling the isolation rather than tightening it. (The iframe block can grant it safely, because it points at a genuinely different origin.)
+
 Sandboxing is not free, and pretending otherwise leads to support tickets:
 
 - **A widget that must act on the whole page will not work.** Chat bubbles (Crisp, Intercom), analytics tags, and anything that positions itself `fixed` over the site are incompatible by design — they need the page, and the page is exactly what the sandbox withholds.
 - **Cookies and `localStorage` are unavailable** in an opaque origin. Widgets that persist state across visits may misbehave.
+- **An `<iframe>` pasted into this block cannot work.** The sandbox propagates to nested frames, so the inner iframe also gets an opaque origin, its script requests carry `Origin: null`, and the remote server's CORS rejects every one of them. Use the **iframe block** and paste the address only — it points the browser straight at the third-party origin. A dev-only notice flags this when the snippet contains an iframe.
 - **Two problems the bundle solves for you**, which are usually why people give up on sandboxing:
   - *Unstyled output* — the theme stylesheet is linked into the sandboxed document (a frame with an opaque origin can still fetch subresources by absolute URL), so the widget inherits your colors and fonts. Toggle: **Apply the theme styles**.
   - *Fixed height* — since the bundle writes the sandbox document, it injects a `ResizeObserver` that posts the content height to the parent, where the `embed_resize` controller applies it. Sizing mode **Automatic** uses it; the parent authenticates the message by comparing `event.source` with its own frame's `contentWindow`, because an opaque-origin frame reports its origin as the string `"null"` and origin filtering would be worthless.

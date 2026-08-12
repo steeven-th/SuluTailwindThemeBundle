@@ -564,6 +564,8 @@
     "iw_sulu_tailwind_theme.embed_allow_media_info": "Only needed for video conferencing. Leave unchecked otherwise.",
     "iw_sulu_tailwind_theme.embed_allow_geolocation": "Allow geolocation",
     "iw_sulu_tailwind_theme.embed_allow_geolocation_info": "Needed by some maps. Leave unchecked otherwise.",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation": "Allow the page to be redirected",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation_info": "Needed by booking engines and search forms, which redirect the page to their results. Redirection stays impossible without a visitor action: the embedded content cannot redirect your page on its own.",
 
     "iw_sulu_tailwind_theme.consent_mode": "Consent before loading",
     "iw_sulu_tailwind_theme.consent_mode_info": "External content contacts a third party as soon as the page is displayed and may set trackers there. These modes prevent any call until the visitor agrees.",

@@ -16,6 +16,16 @@
 #}
 {% set mode = iw_sulu_tailwind_theme_code_mode(unsandboxed|default(false), code) %}
 
+{# Pasting an <iframe> here cannot work while sandboxed, and the failure is
+   cryptic: the sandbox propagates to nested frames, so the inner iframe also
+   gets an opaque origin, its script requests carry `Origin: null`, and the
+   remote server's CORS rejects every one of them. The fix is to use the iframe
+   block, which points the browser straight at the third-party origin.
+   Surfaced in dev only — the embed still renders, this is guidance. #}
+{% if mode == 'sandboxed' and app.environment == 'dev' and code|default('') matches '/<iframe[\\s>]/i' %}
+    <p class="iw-block-code__notice">{{ 'iw_sulu_tailwind_theme.code_contains_iframe'|trans }}</p>
+{% endif %}
+
 {% if mode == 'too_long' %}
     {# Nothing rendered on the site. The notice is dev-only so an editor whose
        paste silently vanished still gets an explanation while working. #}
@@ -30,6 +40,11 @@
     <div class="iw-block-code__raw">{{ code|raw }}</div>
 
 {% else %}
+    {# Sandbox mode is `isolated`, not `strict`: a transactional widget (booking
+       engine, search form) needs to submit and to open its result, which
+       `allow-scripts` alone forbids. And never `standard` — a srcdoc inherits
+       the parent page's origin, so allow-same-origin would cancel the isolation
+       entirely rather than tighten it. #}
     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_embed_frame.html.twig' with {
         srcdoc: iw_sulu_tailwind_theme_code_srcdoc(
             code,
@@ -41,7 +56,8 @@
         ratio: ratio|default('16-9'),
         heightPreset: heightPreset|default(500),
         heightCustom: heightCustom|default(500),
-        sandboxMode: 'strict',
+        sandboxMode: 'isolated',
+        allowTopNavigation: allowTopNavigation ?? false,
         lazyLoad: false,
         allowFullscreen: false,
         allowMedia: false,

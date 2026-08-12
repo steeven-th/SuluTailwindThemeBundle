@@ -564,6 +564,8 @@
     "iw_sulu_tailwind_theme.embed_allow_media_info": "Nur für Videokonferenzen erforderlich. Andernfalls abgewählt lassen.",
     "iw_sulu_tailwind_theme.embed_allow_geolocation": "Standortbestimmung erlauben",
     "iw_sulu_tailwind_theme.embed_allow_geolocation_info": "Für manche Karten erforderlich. Andernfalls abgewählt lassen.",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation": "Weiterleitung der Seite erlauben",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation_info": "Erforderlich für Buchungsmaschinen und Suchformulare, die die Seite zu ihren Ergebnissen weiterleiten. Ohne Aktion des Besuchers bleibt eine Weiterleitung unmöglich: Der eingebettete Inhalt kann Ihre Seite nicht von sich aus weiterleiten.",
 
     "iw_sulu_tailwind_theme.consent_mode": "Einwilligung vor dem Laden",
     "iw_sulu_tailwind_theme.consent_mode_info": "Externe Inhalte kontaktieren beim Seitenaufruf einen Dritten und können dort Tracker setzen. Diese Modi verhindern jeden Aufruf, bis der Besucher zustimmt.",

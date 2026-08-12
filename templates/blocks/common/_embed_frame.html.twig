@@ -20,8 +20,9 @@
      - ratio: '16-9' | '4-3' | '1-1' | '21-9' | '9-16' (heightMode = ratio)
      - heightPreset: 300 | 400 | 500 | 600 | 800 | 1000 (heightMode = preset)
      - heightCustom: free height in px (heightMode = custom)
-     - sandboxMode: 'standard' | 'strict' | 'none'
+     - sandboxMode: 'standard' | 'isolated' | 'strict' | 'none'
      - lazyLoad, allowFullscreen, allowMedia, allowGeolocation: booleans
+     - allowTopNavigation: allow the embed to navigate the page on a user gesture
      - consentMode: 'none' | 'placeholder' | 'delegated'
      - consentService, consentText, consentImage: placeholder configuration
      - frameClass: extra classes (radius…)
@@ -64,13 +65,31 @@
     <style>#{{ embedId }} { --iw-embed-height: {{ customHeight }}px; }</style>
 {% endif %}
 
-{# Sandbox tokens. `strict` gives an opaque origin: no cookies, no storage —
-   maximum isolation, but many widgets legitimately break under it. #}
+{# Sandbox tokens.
+
+   `standard` suits an embed pointing at a third-party origin. `isolated` is for
+   an inline document (srcdoc): it deliberately omits `allow-same-origin`,
+   because a srcdoc inherits the parent page's origin — granting it there would
+   hand the embedded code the site's DOM and cookies, destroying the isolation
+   instead of tightening it. It keeps forms and popups, without which a
+   transactional widget (booking engine, search form) cannot work at all.
+
+   `strict` is the most restrictive: scripts only. #}
 {% set sandboxTokens = {
     'standard': 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox',
+    'isolated': 'allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox',
     'strict': 'allow-scripts'
 } %}
 {% set sandboxValue = sandboxTokens[sandboxMode|default('standard')]|default(null) %}
+
+{# Top-level navigation, opt-in per block.
+   `allow-top-navigation` is never granted: it would let an embed redirect the
+   hosting page on its own, which is the actual attack. The
+   `-by-user-activation` variant only allows it in response to a real user
+   gesture — what a booking engine needs when the visitor hits "search". #}
+{% if sandboxValue is not null and allowTopNavigation|default(false) %}
+    {% set sandboxValue = sandboxValue ~ ' allow-top-navigation-by-user-activation' %}
+{% endif %}
 
 {# Feature policy, built from explicit editor choices rather than a blanket
    allow-list: a scheduling widget has no business asking for the camera. #}

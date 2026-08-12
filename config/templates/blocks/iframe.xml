@@ -183,6 +183,15 @@
                         <param name="default_value" value="false"/>
                     </params>
                 </property>
+                <property name="allowTopNavigation" type="checkbox">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_allow_top_navigation</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_allow_top_navigation_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
                 <property name="consentMode" type="single_select">
                     <meta>
                         <title>iw_sulu_tailwind_theme.consent_mode</title>

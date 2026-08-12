@@ -56,5 +56,6 @@
     "iw_sulu_tailwind_theme.consent_load": "Display the content",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Manage my preferences",
     "iw_sulu_tailwind_theme.code_frame": "Embedded content",
-    "iw_sulu_tailwind_theme.code_too_long": "This code block exceeds the maximum allowed size and was not rendered."
+    "iw_sulu_tailwind_theme.code_too_long": "This code block exceeds the maximum allowed size and was not rendered.",
+    "iw_sulu_tailwind_theme.code_contains_iframe": "This block contains an iframe, which cannot work inside an isolated frame: the remote site's scripts will be blocked. Use the \"External content (iframe)\" block and paste the address only."
 }

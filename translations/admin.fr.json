@@ -564,6 +564,8 @@
     "iw_sulu_tailwind_theme.embed_allow_media_info": "Nécessaire pour la visioconférence uniquement. À laisser décoché sinon.",
     "iw_sulu_tailwind_theme.embed_allow_geolocation": "Autoriser la géolocalisation",
     "iw_sulu_tailwind_theme.embed_allow_geolocation_info": "Nécessaire pour certaines cartes. À laisser décoché sinon.",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation": "Autoriser la redirection de la page",
+    "iw_sulu_tailwind_theme.embed_allow_top_navigation_info": "Nécessaire aux moteurs de réservation et formulaires de recherche, qui redirigent la page vers leurs résultats. La redirection reste impossible sans action du visiteur : le contenu intégré ne peut pas rediriger votre page tout seul.",
 
     "iw_sulu_tailwind_theme.consent_mode": "Consentement avant chargement",
     "iw_sulu_tailwind_theme.consent_mode_info": "Un contenu externe contacte un tiers dès l'affichage de la page et peut y déposer des traceurs. Ces modes empêchent tout appel tant que le visiteur n'a pas accepté.",
