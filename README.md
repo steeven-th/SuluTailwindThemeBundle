@@ -50,6 +50,10 @@
 * **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
+* **Accordion / FAQ block**: built on native `<details>`/`<summary>` — keyboard operation, the expanded state announced to screen readers and "one item open at a time" all work **without JavaScript**. Optional schema.org `FAQPage` markup and deep links to a single answer
+* **External embeds**: an iframe block with server-side URL validation (https only, no credentials, optional host allowlist), a sandbox that never lets an embed redirect your page, and per-block camera/microphone/geolocation opt-in
+* **Third-party consent**: consent-gated embeds carry **no `src` at all** until allowed — no request, no cookie, no IP disclosed. Driven by a neutral `window.iwConsent` API that plugs into any cookie manager in three lines (adapters documented for Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi)
+* **Code / widget block**: paste a third-party widget; it runs sandboxed by default, with the theme stylesheet injected and self-sizing so it looks and behaves native. Unsandboxed execution is a project-level opt-in, never an editor decision
 * **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
 * **Site-wide cards**: configure surface, title/text/badge colors, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
 * **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
@@ -196,12 +200,28 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
             "toc": {
                 "enabled": true,
                 "fetch": "lazy"
+            },
+            "accordion": {
+                "enabled": true,
+                "fetch": "lazy"
+            },
+            "consent": {
+                "enabled": true,
+                "fetch": "eager"
+            },
+            "embed_resize": {
+                "enabled": true,
+                "fetch": "lazy"
             }
         }
     },
     "entrypoints": []
 }
 ```
+
+> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is only required if you use the consent options of the iframe or code blocks; see **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
+
+> The `accordion` controller is **optional**. The accordion block is built on native `<details>`/`<summary>` and is fully functional without JavaScript — including "one item open at a time". The controller only backfills that grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130, and opens the panel targeted by the URL fragment.
 
 **Configure Webpack** to disable symlink resolution in your `webpack.config.js`:
 
@@ -319,6 +339,40 @@ The typography tab includes a **Font Picker** with autocomplete for Google Fonts
    You can also sync from the admin UI by clicking the **sync button (↻)** in the Font Picker.
 
 > **Without an API key**, the Font Picker still works: the Google tab falls back to a free-text input, and the System tab lists 15 cross-platform fonts (Arial, Georgia, Courier New, etc.).
+
+### Restricting what the iframe block may embed (optional)
+
+The iframe block only ever embeds `https` URLs, rejects credentials in the URL, and never grants the embed permission to navigate the hosting page. That is enough for most sites, since the URL is typed by an authenticated editor.
+
+If you want to go further and pin the providers your editors may embed, declare a host allowlist:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    blocks:
+        iframe:
+            allowed_hosts: ['www.youtube.com', 'calendly.com']
+```
+
+An entry also covers its subdomains (`example.com` matches `widget.example.com`), matching whole labels only — `evil-example.com` does **not** match `example.com`. A URL outside the list simply renders nothing. Leave the list empty (the default) to allow any `https` host.
+
+### Code block: allowing unsandboxed execution (optional, off by default)
+
+The code block lets editors paste a third-party widget. By default that markup always runs inside a sandboxed iframe: it can execute its own scripts, but cannot reach the page's DOM, cookies, or your admin session.
+
+Some widgets genuinely need the page — chat bubbles, analytics tags, anything positioned over the whole site. For those, a project can expose a per-block escape hatch:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    blocks:
+        code:
+            allow_unsandboxed: true
+```
+
+This does not disable the sandbox; it makes a *Run without isolation* checkbox appear in the block form. Until then the checkbox does not exist at all.
+
+> ⚠️ **Understand what this grants.** Sulu has no per-block permission: anyone who can edit a page can use the block. With this enabled, an editor can execute arbitrary JavaScript on the public site — and, because Sulu's preview renders pages in a same-origin iframe, in the browser of any administrator who previews that page. In effect, every page editor becomes an administrator of the site. Read **[Code block security](doc/code-block-security.md)** before turning it on.
+>
+> Turning it back to `false` is an immediate, safe rollback: a stored `unsandboxed` value is ignored without the opt-in, so every existing block returns to the sandbox with no migration.
 
 ### Article templates (optional)
 
@@ -470,7 +524,7 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 
 ### Page templates
 
-The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **14 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -620,6 +674,8 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
+| [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
+| [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 
@@ -632,7 +688,9 @@ SuluTailwindThemeBundle/
 │   ├── lists/              # Sulu admin list XML
 │   ├── templates/
 │   │   ├── pages/          # Page template XML (uses <type ref="..."/>)
-│   │   ├── blocks/         # Global block type definitions (14 types)
+│   │   ├── blocks/         # Global block type definitions (15 types)
+│   │   ├── blocks-code/    # Code block, sandboxed variant (default)
+│   │   ├── blocks-code-open/ # Code block + unsandboxed opt-in variant
 │   │   └── fragments/      # Shared property fragments (reference)
 │   └── services.yaml       # Service definitions
 ├── src/

@@ -1,0 +1,144 @@
+{# Embedded frame — shared by the iframe block and (in sandboxed mode) the code
+   block.
+
+   Security model, in short:
+     - The URL is validated server-side before it ever reaches `src`
+       (https only, no credentials, optional host allowlist). An invalid URL
+       renders nothing rather than a broken or dangerous frame.
+     - `sandbox` restricts what the embedded document may do. `standard` omits
+       allow-top-navigation on purpose: an embed must never be able to redirect
+       the page hosting it.
+     - When consent is required, `src` is NOT emitted at all — it is handed to
+       the Stimulus controller as a value and only written on consent. No src,
+       no request, no cookie, no IP disclosed.
+
+   Expected variables:
+     - src: the already-validated URL (or srcdoc content, see `srcdoc`)
+     - srcdoc: inline document to render instead of a URL (code block)
+     - frameTitle: accessible name for the frame — required by WCAG 4.1.2
+     - heightMode: 'ratio' | 'preset' | 'custom'
+     - ratio: '16-9' | '4-3' | '1-1' | '21-9' | '9-16' (heightMode = ratio)
+     - heightPreset: 300 | 400 | 500 | 600 | 800 | 1000 (heightMode = preset)
+     - heightCustom: free height in px (heightMode = custom)
+     - sandboxMode: 'standard' | 'strict' | 'none'
+     - lazyLoad, allowFullscreen, allowMedia, allowGeolocation: booleans
+     - consentMode: 'none' | 'placeholder' | 'delegated'
+     - consentService, consentText, consentImage: placeholder configuration
+     - frameClass: extra classes (radius…)
+#}
+{% set consentMode = consentMode|default('none') %}
+{% set needsConsent = consentMode != 'none' %}
+{% set service = consentService|default('') is not empty ? consentService : 'embed' %}
+
+{# Sizing. Ratios and presets are enumerated classes (no inline style, and no
+   dependency on the Tailwind safelist). A free height cannot be enumerated, so
+   it goes through a <style> block scoped to this embed's id — the escape hatch
+   the project rules allow when no class-based alternative exists. The value is
+   clamped and rounded to an integer, so nothing an editor types can leak into
+   the stylesheet as arbitrary CSS. #}
+{% set heightMode = heightMode|default('ratio') %}
+{% set embedId = '' %}
+{% set sizeClass = 'iw-ratio--16-9' %}
+
+{% if heightMode == 'auto' %}
+    {# Self-sizing: the sandboxed document reports its height and the
+       embed_resize controller writes it into --iw-embed-height. The class
+       default applies until the first message arrives. #}
+    {% set embedId = iw_sulu_tailwind_theme_unique_id('embed') %}
+    {% set sizeClass = 'iw-embed--h-custom iw-embed--auto' %}
+{% elseif heightMode == 'preset' %}
+    {% set presets = [300, 400, 500, 600, 800, 1000] %}
+    {% set preset = heightPreset|default(500) %}
+    {% set sizeClass = 'iw-embed--h-' ~ (preset in presets ? preset : 500) %}
+{% elseif heightMode == 'custom' %}
+    {% set embedId = iw_sulu_tailwind_theme_unique_id('embed') %}
+    {% set customHeight = max(50, min(5000, heightCustom|default(500)|abs|round)) %}
+    {% set sizeClass = 'iw-embed--h-custom' %}
+{% else %}
+    {% set ratios = ['16-9', '4-3', '1-1', '21-9', '9-16'] %}
+    {% set selectedRatio = ratio|default('16-9') %}
+    {% set sizeClass = 'iw-ratio--' ~ (selectedRatio in ratios ? selectedRatio : '16-9') %}
+{% endif %}
+
+{% if heightMode == 'custom' %}
+    <style>#{{ embedId }} { --iw-embed-height: {{ customHeight }}px; }</style>
+{% endif %}
+
+{# Sandbox tokens. `strict` gives an opaque origin: no cookies, no storage —
+   maximum isolation, but many widgets legitimately break under it. #}
+{% set sandboxTokens = {
+    'standard': 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox',
+    'strict': 'allow-scripts'
+} %}
+{% set sandboxValue = sandboxTokens[sandboxMode|default('standard')]|default(null) %}
+
+{# Feature policy, built from explicit editor choices rather than a blanket
+   allow-list: a scheduling widget has no business asking for the camera. #}
+{% set allowFeatures = [] %}
+{% if allowFullscreen|default(true) %}{% set allowFeatures = allowFeatures|merge(['fullscreen']) %}{% endif %}
+{% if allowMedia|default(false) %}{% set allowFeatures = allowFeatures|merge(['camera', 'microphone', 'autoplay']) %}{% endif %}
+{% if allowGeolocation|default(false) %}{% set allowFeatures = allowFeatures|merge(['geolocation']) %}{% endif %}
+
+{# A single data-controller attribute may list several controllers, so consent
+   and self-sizing compose on the same element. #}
+{% set controllers = [] %}
+{% if needsConsent %}{% set controllers = controllers|merge(['consent']) %}{% endif %}
+{% if heightMode == 'auto' %}{% set controllers = controllers|merge(['embed-resize']) %}{% endif %}
+
+<div
+    {% if embedId is not empty %}id="{{ embedId }}"{% endif %}
+    class="iw-embed {{ sizeClass }} {{ frameClass|default('') }}"
+    {% if controllers is not empty %}data-controller="{{ controllers|join(' ') }}"{% endif %}
+    {% if needsConsent %}
+        data-consent-service-value="{{ service }}"
+        data-consent-mode-value="{{ consentMode }}"
+        {% if src|default('') is not empty %}data-consent-src-value="{{ src }}"{% endif %}
+        {% if srcdoc|default('') is not empty %}data-consent-srcdoc-value="{{ srcdoc|e('html_attr') }}"{% endif %}
+    {% endif %}
+>
+    <iframe
+        {% if needsConsent %}
+            {# Neither src nor srcdoc is emitted: an inline document would run
+               immediately, and it is usually the pasted markup itself that
+               calls the third party. Both are handed to the controller and
+               written only on consent. #}
+            data-consent-target="frame"
+            hidden
+        {% else %}
+            {% if src|default('') is not empty %}src="{{ src }}"{% endif %}
+            {% if srcdoc|default('') is not empty %}srcdoc="{{ srcdoc|e('html_attr') }}"{% endif %}
+        {% endif %}
+        {% if heightMode == 'auto' %}data-embed-resize-target="frame"{% endif %}
+        class="iw-embed__frame"
+        title="{{ frameTitle|default('iw_sulu_tailwind_theme.embed_frame'|trans) }}"
+        {% if sandboxValue is not null %}sandbox="{{ sandboxValue }}"{% endif %}
+        {% if lazyLoad|default(true) %}loading="lazy"{% endif %}
+        referrerpolicy="strict-origin-when-cross-origin"
+        {% if allowFeatures is not empty %}allow="{{ allowFeatures|join('; ') }}"{% endif %}
+        {% if allowFullscreen|default(true) %}allowfullscreen{% endif %}
+    ></iframe>
+
+    {% if needsConsent %}
+        <div class="iw-embed__consent" data-consent-target="placeholder">
+            {% if consentImage|default(null) is not null and consentImage.id is defined %}
+                {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
+                <img src="{{ consentMedia.url }}" alt="" loading="lazy" class="iw-embed__consent-image">
+            {% endif %}
+
+            <div class="iw-embed__consent-body">
+                <p class="iw-embed__consent-text">
+                    {{ consentText|default('') is not empty
+                        ? consentText
+                        : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': service}) }}
+                </p>
+                {# Reuses the theme's button style so the placeholder matches
+                   every other button on the site, variant included. #}
+                <button type="button" class="iw-embed__consent-button iw-button--{{ consentButtonStyle|default('primary') }}" data-action="consent#accept">
+                    {{ (consentMode == 'delegated'
+                        ? 'iw_sulu_tailwind_theme.consent_open_preferences'
+                        : 'iw_sulu_tailwind_theme.consent_load')|trans }}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>

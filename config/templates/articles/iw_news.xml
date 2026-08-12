@@ -64,6 +64,9 @@
                         <type ref="text_images"/>
                         <type ref="gallery"/>
                         <type ref="cta"/>
+                        <type ref="accordion"/>
+                        <type ref="iframe"/>
+                        <type ref="code"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

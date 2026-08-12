@@ -98,6 +98,24 @@
                 "name": "toc",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "accordion": {
+                "main": "controllers/accordion_controller.js",
+                "name": "accordion",
+                "fetch": "lazy",
+                "enabled": true
+            },
+            "consent": {
+                "main": "controllers/consent_controller.js",
+                "name": "consent",
+                "fetch": "eager",
+                "enabled": true
+            },
+            "embed_resize": {
+                "main": "controllers/embed_resize_controller.js",
+                "name": "embed-resize",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

@@ -284,6 +284,103 @@ heading typography is restored via CSS.
 
 ---
 
+### `iw_sulu_tailwind_theme_unique_id(prefix)`
+
+Generates an id that is unique within the current rendering. Sulu content blocks
+carry no stable identifier, yet some markup needs one: grouping
+`<details name="…">` so a single accordion panel stays open at a time, wiring
+`aria-labelledby`, or scoping a style rule to one block instance.
+
+The counter is per-request, so the same page always renders the same ids —
+unlike a random value, which would churn the HTML on every render. Ids are only
+ever compared within one document; they are not stable across requests.
+
+```twig
+{% set baseId = iw_sulu_tailwind_theme_unique_id('accordion') %}
+<details id="{{ baseId }}-1" name="{{ baseId }}">…</details>
+```
+
+**Parameters:**
+- `prefix` (`string`) — Short identifier prefix, sanitized to `[a-z0-9-]` (default `iw`)
+
+**Returns:** `string` — The unique id (e.g. `iw-accordion-1`).
+
+---
+
+### `iw_sulu_tailwind_theme_embed_url(url)`
+
+Validates the URL of an embedded frame **before it reaches an `src` attribute**.
+This is the security-critical step of the iframe block: a `javascript:` URL in an
+iframe `src` executes in the page context.
+
+Accepts `https` only (an `http` frame inside an `https` page is blocked as mixed
+content anyway), rejects credentials in the URL and control characters, and
+applies the optional `blocks.iframe.allowed_hosts` allowlist.
+
+```twig
+{% set embedUrl = iw_sulu_tailwind_theme_embed_url(url|default('')) %}
+{% if embedUrl is not null %}
+    {# render the frame #}
+{% endif %}
+```
+
+Returning `null` rather than throwing lets the template skip the frame: a
+mistyped URL should never take a whole page down.
+
+**Parameters:**
+- `url` (`string|null`) — The URL entered by the editor
+
+**Returns:** `string|null` — The URL when safe to embed, `null` otherwise.
+
+---
+
+### `iw_sulu_tailwind_theme_code_mode(unsandboxedRequested, code)`
+
+Resolves how a code block's pasted markup must be executed. Delegates to
+`CodeBlockPolicy`, which enforces that **an editor-facing setting may only add
+restriction, never remove it**: without the project-level
+`blocks.code.allow_unsandboxed` opt-in, a stored `unsandboxed` value is ignored.
+
+```twig
+{% set mode = iw_sulu_tailwind_theme_code_mode(unsandboxed|default(false), code) %}
+```
+
+**Parameters:**
+- `unsandboxedRequested` (`bool`) — The block's "unsandboxed" checkbox
+- `code` (`string|null`) — The pasted markup, checked against the length limit
+
+**Returns:** `string` — `sandboxed`, `raw`, or `too_long`.
+
+See [`code-block-security.md`](./code-block-security.md) for the full model.
+
+---
+
+### `iw_sulu_tailwind_theme_code_srcdoc(code, inheritStyles, autoHeight)`
+
+Builds the document served to the sandboxed iframe of a code block. The markup is
+wrapped rather than passed through, for the two reasons that otherwise make
+sandboxing impractical:
+
+- the compiled theme stylesheet is linked in, so the widget inherits the site's
+  colors and fonts instead of rendering unstyled (a frame with an opaque origin
+  can still fetch subresources by absolute URL);
+- a `ResizeObserver` is injected that posts the content height to the parent,
+  where the `embed_resize` controller applies it — a sandboxed frame cannot
+  resize its parent on its own.
+
+The pasted markup is emitted verbatim: sanitizing here would defeat the purpose
+of the block, and the sandbox — not escaping — is what contains it. Escaping
+happens once, when the returned string is written into the `srcdoc` attribute.
+
+**Parameters:**
+- `code` (`string`) — The pasted markup
+- `inheritStyles` (`bool`) — Link the theme stylesheet (default `true`)
+- `autoHeight` (`bool`) — Inject the height reporter (default `true`)
+
+**Returns:** `string` — The full HTML document.
+
+---
+
 ## Partial: `blocks/common/_image.html.twig`
 
 The single rendering point for every content image. Emits a `<picture>` with
