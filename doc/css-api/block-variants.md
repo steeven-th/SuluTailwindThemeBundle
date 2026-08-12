@@ -47,7 +47,7 @@ Additionally:
 - `color` is set to the `title` value (default text color for the block)
 - `background-color` is applied via the `[data-has-bg="true"]` selector — only when the **Show background** checkbox is checked
 
-The compiler also injects per-variant form variables (`--form-bg`, `--form-text`, `--form-label`, `--form-border`, `--form-border-focus`, `--form-border-error`, `--form-placeholder`) when the variant defines them. See [`forms.md`](../forms.md) (when published in L9) for the form API.
+The compiler also injects per-variant form variables (`--form-bg`, `--form-text`, `--form-label`, `--form-border`, `--form-border-focus`, `--form-border-error`, `--form-placeholder`) when the variant defines them. See [`forms.md`](./forms.md) for the form API.
 
 ---
 

@@ -74,10 +74,10 @@ config/templates/
 │   └── iw_theme_default.xml              ← Page template (~50 lines, uses <type ref="..."/>)
 ├── fragments/                       ← Shared property fragments (reference/documentation)
 │   ├── header.xml                   ← title + url properties
-│   ├── blocks.xml                   ← Block container with all 14 type references
+│   ├── blocks.xml                   ← Block container with all type references
 │   └── components/
-│       ├── title_group.xml          ← title + subtitle + alignment (used by 9/11 blocks)
-│       ├── variant.xml              ← Color variant picker (used by 11/11 blocks)
+│       ├── title_group.xml          ← title + subtitle + alignment (used by 16/17 blocks)
+│       ├── variant.xml              ← Color variant picker (used by 17/17 blocks)
 │       └── settings.xml             ← All settings properties (single source of truth)
 └── blocks/                          ← Global block types (registered via Sulu DI)
     ├── text.xml
@@ -216,7 +216,7 @@ Instead of manually writing header properties and block lists, you can **include
         <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/header.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-        <!-- Include the full blocks container (all 14 types) -->
+        <!-- Include the full blocks container (all types) -->
         <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/blocks.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
     </properties>

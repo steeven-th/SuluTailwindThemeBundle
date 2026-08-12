@@ -50,6 +50,10 @@
 * **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
+* **Accordion / FAQ block**: built on native `<details>`/`<summary>` — keyboard operation, the expanded state announced to screen readers and "one item open at a time" all work **without JavaScript**. Optional schema.org `FAQPage` markup and deep links to a single answer
+* **External embeds**: an iframe block with server-side URL validation (https only, no credentials, optional host allowlist), a sandbox that never lets an embed redirect your page, and per-block camera/microphone/geolocation opt-in
+* **Third-party consent**: consent-gated embeds carry **no `src` at all** until allowed — no request, no cookie, no IP disclosed. Driven by a neutral `window.iwConsent` API that plugs into any cookie manager in three lines (adapters documented for Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi)
+* **Code / widget block**: paste a third-party widget; it runs sandboxed by default, with the theme stylesheet injected and self-sizing so it looks and behaves native. Unsandboxed execution is a project-level opt-in, never an editor decision
 * **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
 * **Site-wide cards**: configure surface, title/text/badge colors, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
 * **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
@@ -684,7 +688,9 @@ SuluTailwindThemeBundle/
 │   ├── lists/              # Sulu admin list XML
 │   ├── templates/
 │   │   ├── pages/          # Page template XML (uses <type ref="..."/>)
-│   │   ├── blocks/         # Global block type definitions (14 types)
+│   │   ├── blocks/         # Global block type definitions (15 types)
+│   │   ├── blocks-code/    # Code block, sandboxed variant (default)
+│   │   ├── blocks-code-open/ # Code block + unsandboxed opt-in variant
 │   │   └── fragments/      # Shared property fragments (reference)
 │   └── services.yaml       # Service definitions
 ├── src/
