@@ -386,7 +386,12 @@ img.object-cover {
 }
 
 /* Consent placeholder — shown while the embed is not allowed to load.
-   It fills the embed box so the page does not reflow when the frame appears. */
+   It fills the embed box so the page does not reflow when the frame appears.
+
+   Colors follow the active block variant, like every other surface nested in a
+   block (document card, linked-page card, key-figures timeline…): the variant
+   owns the block's palette, so a placeholder wired to the global tokens would
+   render the theme's colors instead of the variant's. */
 .iw-embed__consent {
     position: absolute;
     inset: 0;
@@ -397,8 +402,8 @@ img.object-cover {
     gap: var(--iw-embed-consent-gap, 1rem);
     padding: var(--iw-embed-consent-padding, 1.5rem);
     text-align: center;
-    background-color: var(--iw-embed-consent-bg, var(--color-surface, #f3f4f6));
-    color: var(--iw-embed-consent-text, var(--color-surface-foreground, var(--color-text)));
+    background-color: var(--iw-embed-consent-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, var(--color-surface, #f3f4f6))));
+    color: var(--iw-embed-consent-text, var(--iw-variant-paragraph-color, inherit));
 }
 
 .iw-embed__consent[hidden] {
@@ -432,20 +437,22 @@ img.object-cover {
     line-height: var(--iw-embed-consent-text-line-height, 1.5);
 }
 
-.iw-embed__consent-button {
-    padding: var(--iw-embed-consent-button-padding-y, 0.625rem) var(--iw-embed-consent-button-padding-x, 1.25rem);
-    border: 0;
-    border-radius: var(--iw-embed-consent-button-radius, var(--border-radius, 0.375rem));
-    background-color: var(--iw-embed-consent-button-bg, var(--color-primary));
-    color: var(--iw-embed-consent-button-text, var(--color-surface-on-accent, #fff));
-    font: inherit;
-    font-weight: var(--iw-embed-consent-button-weight, 600);
-    cursor: pointer;
-    transition: opacity var(--iw-embed-consent-transition-duration, 200ms) ease;
-}
+/* The button carries the theme's own `.iw-button--primary`, so it inherits the
+   configured colors, radius, padding and hover effect instead of duplicating
+   them here.
 
-.iw-embed__consent-button:hover {
-    opacity: var(--iw-embed-consent-button-hover-opacity, 0.85);
+   These fallbacks sit in `:where()` — specificity 0 — so they dress the button
+   if a theme defines no "primary" button style, and never win against
+   `.iw-button--*` when one exists. */
+:where(.iw-embed__consent-button) {
+    padding: 0.625rem 1.25rem;
+    border: 0;
+    border-radius: var(--border-radius, 0.375rem);
+    background-color: var(--color-primary);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .iw-embed__consent-button:focus-visible {

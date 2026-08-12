@@ -76,22 +76,21 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-embed-consent-bg` | `var(--color-surface, #f3f4f6)` | Placeholder background. |
-| `--iw-embed-consent-text` | `var(--color-surface-foreground, var(--color-text))` | Placeholder text color. |
+| `--iw-embed-consent-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, …))` | Placeholder background. **Follows the active block variant**, like every other surface nested in a block. |
+| `--iw-embed-consent-text` | `var(--iw-variant-paragraph-color, inherit)` | Placeholder text color. Follows the active block variant. |
 | `--iw-embed-consent-padding` | `1.5rem` | Inner padding. |
 | `--iw-embed-consent-gap` | `1rem` | Space between message and button. |
 | `--iw-embed-consent-max-width` | `36rem` | Max width of the message column. |
 | `--iw-embed-consent-image-opacity` | `0.35` | Opacity of the background visual. |
 | `--iw-embed-consent-text-size` | `0.9375rem` | Message font size. |
 | `--iw-embed-consent-text-line-height` | `1.5` | Message line height. |
-| `--iw-embed-consent-button-bg` | `var(--color-primary)` | Button background. |
-| `--iw-embed-consent-button-text` | `var(--color-surface-on-accent, #fff)` | Button label color. |
-| `--iw-embed-consent-button-radius` | `var(--border-radius, 0.375rem)` | Button radius. |
-| `--iw-embed-consent-button-padding-y` / `-x` | `0.625rem` / `1.25rem` | Button padding. |
-| `--iw-embed-consent-button-weight` | `600` | Button font weight. |
-| `--iw-embed-consent-button-hover-opacity` | `0.85` | Button opacity on hover. |
 | `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring. |
-| `--iw-embed-consent-transition-duration` | `200ms` | Hover transition. |
+
+> **The button has no colors of its own.** It carries the theme's `.iw-button--primary`, so it inherits the configured background, text color, radius, padding and hover effect — and stays consistent with every other button on the site. Restyle it through the theme's button settings, or by overriding `.iw-button--primary`.
+>
+> The bundle ships bare fallbacks inside `:where(.iw-embed__consent-button)` (specificity 0) so the button still looks like a button if a theme defines no "primary" style; they never win against a real `.iw-button--*` rule.
+>
+> To use another button style, override the partial and pass `consentButtonStyle` (e.g. `'secondary'`).
 
 ---
 

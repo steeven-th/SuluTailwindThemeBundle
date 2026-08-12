@@ -131,7 +131,9 @@
                         ? consentText
                         : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': service}) }}
                 </p>
-                <button type="button" class="iw-embed__consent-button" data-action="consent#accept">
+                {# Reuses the theme's button style so the placeholder matches
+                   every other button on the site, variant included. #}
+                <button type="button" class="iw-embed__consent-button iw-button--{{ consentButtonStyle|default('primary') }}" data-action="consent#accept">
                     {{ (consentMode == 'delegated'
                         ? 'iw_sulu_tailwind_theme.consent_open_preferences'
                         : 'iw_sulu_tailwind_theme.consent_load')|trans }}
