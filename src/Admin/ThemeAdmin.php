@@ -122,6 +122,10 @@ class ThemeAdmin extends Admin
             ['key' => 'cards', 'label' => 'iw_sulu_tailwind_theme.style.cards'],
             ['key' => 'bordered', 'label' => 'iw_sulu_tailwind_theme.style.bordered'],
         ],
+        'iframe' => [
+            ['key' => 'default', 'label' => 'iw_sulu_tailwind_theme.style.default'],
+            ['key' => 'fullwidth', 'label' => 'iw_sulu_tailwind_theme.style.fullwidth'],
+        ],
         'separator' => [
             ['key' => 'line', 'label' => 'iw_sulu_tailwind_theme.style.line'],
             ['key' => 'spacer', 'label' => 'iw_sulu_tailwind_theme.style.spacer'],

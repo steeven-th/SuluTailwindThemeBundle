@@ -65,6 +65,7 @@
                         <type ref="gallery"/>
                         <type ref="cta"/>
                         <type ref="accordion"/>
+                        <type ref="iframe"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

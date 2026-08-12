@@ -129,6 +129,7 @@
                         <type ref="gallery"/>
                         <type ref="location"/>
                         <type ref="cta"/>
+                        <type ref="iframe"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

@@ -48,6 +48,22 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('blocks')
+                    ->addDefaultsIfNotSet()
+                    ->info('Per-block security settings')
+                    ->children()
+                        ->arrayNode('iframe')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('allowed_hosts')
+                                    ->defaultValue([])
+                                    ->scalarPrototype()->end()
+                                    ->info('Hosts the iframe block may embed (an entry also covers its subdomains). Empty allows any https host.')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
     }
 
@@ -181,6 +197,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.article_templates_types',
             $config['article_templates']['types'],
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts',
+            $config['blocks']['iframe']['allowed_hosts'],
         );
 
         $container->import('../config/services.yaml');

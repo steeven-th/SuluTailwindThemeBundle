@@ -200,12 +200,18 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
             "accordion": {
                 "enabled": true,
                 "fetch": "lazy"
+            },
+            "consent": {
+                "enabled": true,
+                "fetch": "eager"
             }
         }
     },
     "entrypoints": []
 }
 ```
+
+> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is only required if you use the consent options of the iframe or code blocks; see **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
 
 > The `accordion` controller is **optional**. The accordion block is built on native `<details>`/`<summary>` and is fully functional without JavaScript — including "one item open at a time". The controller only backfills that grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130, and opens the panel targeted by the URL fragment.
 
@@ -325,6 +331,21 @@ The typography tab includes a **Font Picker** with autocomplete for Google Fonts
    You can also sync from the admin UI by clicking the **sync button (↻)** in the Font Picker.
 
 > **Without an API key**, the Font Picker still works: the Google tab falls back to a free-text input, and the System tab lists 15 cross-platform fonts (Arial, Georgia, Courier New, etc.).
+
+### Restricting what the iframe block may embed (optional)
+
+The iframe block only ever embeds `https` URLs, rejects credentials in the URL, and never grants the embed permission to navigate the hosting page. That is enough for most sites, since the URL is typed by an authenticated editor.
+
+If you want to go further and pin the providers your editors may embed, declare a host allowlist:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    blocks:
+        iframe:
+            allowed_hosts: ['www.youtube.com', 'calendly.com']
+```
+
+An entry also covers its subdomains (`example.com` matches `widget.example.com`), matching whole labels only — `evil-example.com` does **not** match `example.com`. A URL outside the list simply renders nothing. Leave the list empty (the default) to allow any `https` host.
 
 ### Article templates (optional)
 
@@ -476,7 +497,7 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 
 ### Page templates
 
-The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **15 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **16 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `iframe`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -626,6 +647,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
+| [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 

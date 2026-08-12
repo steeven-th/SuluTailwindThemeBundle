@@ -73,6 +73,7 @@
                         <type ref="cta"/>
                         <type ref="testimonial"/>
                         <type ref="accordion"/>
+                        <type ref="iframe"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

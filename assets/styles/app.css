@@ -353,6 +353,113 @@ img.object-cover {
     opacity: var(--iw-block-text-quote-footer-opacity, 0.75);
 }
 
+/* ─── Block: iframe / embed ────────────────────────────────────────────── */
+/* Shared by the iframe block and the sandboxed mode of the code block.
+   Sizing is either an `iw-ratio--*` class (aspect ratio) or an
+   `iw-embed--h-*` class (fixed height); the free-height variant reads
+   `--iw-embed-height`, set by a <style> block scoped to the embed id. */
+
+.iw-embed {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.iw-embed__frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Enumerated heights — the admin only ever emits these values. */
+.iw-embed--h-300 { height: 300px; }
+.iw-embed--h-400 { height: 400px; }
+.iw-embed--h-500 { height: 500px; }
+.iw-embed--h-600 { height: 600px; }
+.iw-embed--h-800 { height: 800px; }
+.iw-embed--h-1000 { height: 1000px; }
+
+/* Free height, clamped server-side and injected as a scoped custom property. */
+.iw-embed--h-custom {
+    height: var(--iw-embed-height, 500px);
+}
+
+/* Consent placeholder — shown while the embed is not allowed to load.
+   It fills the embed box so the page does not reflow when the frame appears. */
+.iw-embed__consent {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--iw-embed-consent-gap, 1rem);
+    padding: var(--iw-embed-consent-padding, 1.5rem);
+    text-align: center;
+    background-color: var(--iw-embed-consent-bg, var(--color-surface, #f3f4f6));
+    color: var(--iw-embed-consent-text, var(--color-surface-foreground, var(--color-text)));
+}
+
+.iw-embed__consent[hidden] {
+    display: none;
+}
+
+/* A background illustration rather than content: it is decorative (alt=""),
+   so it must not intercept clicks meant for the button. */
+.iw-embed__consent-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: var(--iw-embed-consent-image-opacity, 0.35);
+    pointer-events: none;
+}
+
+.iw-embed__consent-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--iw-embed-consent-gap, 1rem);
+    max-width: var(--iw-embed-consent-max-width, 36rem);
+}
+
+.iw-embed__consent-text {
+    margin: 0;
+    font-size: var(--iw-embed-consent-text-size, 0.9375rem);
+    line-height: var(--iw-embed-consent-text-line-height, 1.5);
+}
+
+.iw-embed__consent-button {
+    padding: var(--iw-embed-consent-button-padding-y, 0.625rem) var(--iw-embed-consent-button-padding-x, 1.25rem);
+    border: 0;
+    border-radius: var(--iw-embed-consent-button-radius, var(--border-radius, 0.375rem));
+    background-color: var(--iw-embed-consent-button-bg, var(--color-primary));
+    color: var(--iw-embed-consent-button-text, var(--color-surface-on-accent, #fff));
+    font: inherit;
+    font-weight: var(--iw-embed-consent-button-weight, 600);
+    cursor: pointer;
+    transition: opacity var(--iw-embed-consent-transition-duration, 200ms) ease;
+}
+
+.iw-embed__consent-button:hover {
+    opacity: var(--iw-embed-consent-button-hover-opacity, 0.85);
+}
+
+.iw-embed__consent-button:focus-visible {
+    outline: var(--iw-embed-consent-focus-width, 2px) solid var(--iw-embed-consent-focus-color, var(--color-primary));
+    outline-offset: var(--iw-embed-consent-focus-offset, 2px);
+}
+
+/* Block modes */
+.iw-block-iframe--fullwidth .iw-embed {
+    /* Break out of the container, absorbed by `body { overflow-x: clip }`. */
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+}
+
 /* ─── Block: accordion ─────────────────────────────────────────────────── */
 /* Built on native <details>/<summary>. Three modes: --list (rules between
    items), --cards (one surface per item), --bordered (single box with inner

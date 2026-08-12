@@ -99,6 +99,11 @@ services:
     itech_world.sulu_tailwind_theme.block_template_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver
 
+    itech_world.sulu_tailwind_theme.embed_url_validator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator
+        arguments:
+            - '%itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts%'
+
     itech_world.sulu_tailwind_theme.google_fonts_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver
 
@@ -127,6 +132,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
             - '@itech_world.sulu_tailwind_theme.block_template_resolver'
+            - '@itech_world.sulu_tailwind_theme.embed_url_validator'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }
@@ -207,6 +213,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper: '@itech_world.sulu_tailwind_theme.form_mapper'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
+    ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
     ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension: '@itech_world.sulu_tailwind_theme.twig_extension'

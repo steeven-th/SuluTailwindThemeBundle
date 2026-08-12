@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -32,6 +33,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly ThemeCompiler $compiler,
         private readonly GoogleFontsResolver $fontsResolver,
         private readonly BlockTemplateResolver $blockTemplateResolver,
+        private readonly EmbedUrlValidator $embedUrlValidator,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -63,7 +65,25 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
         ];
+    }
+
+    /**
+     * Validate an embed URL before it is written into an `src` attribute.
+     *
+     * Delegates to EmbedUrlValidator: https only, no credentials, and an
+     * optional host allowlist from the bundle config. Returns null when the URL
+     * must not be embedded, which lets the template skip the frame instead of
+     * rendering a dangerous or broken one.
+     *
+     * @param string|null $url The URL entered by the editor
+     *
+     * @return string|null The URL when safe to embed, null otherwise
+     */
+    public function getEmbedUrl(?string $url): ?string
+    {
+        return $this->embedUrlValidator->validate($url);
     }
 
     /**

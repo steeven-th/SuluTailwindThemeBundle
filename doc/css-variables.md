@@ -50,6 +50,7 @@ Each content block has its own CSS API page. Override-friendly via `--iw-block-{
 |-------|--------|-----------|
 | Text | one_column / two_columns / quote | [`css-api/blocks/text.md`](./css-api/blocks/text.md) |
 | Accordion | list / cards / bordered | [`css-api/blocks/accordion.md`](./css-api/blocks/accordion.md) |
+| Iframe | default / fullwidth | [`css-api/blocks/iframe.md`](./css-api/blocks/iframe.md) |
 | Separator | line / divider / spacer | [`css-api/blocks/separator.md`](./css-api/blocks/separator.md) |
 | Key figures | grid_2x2 / inline / progress / timeline / with_icons | [`css-api/blocks/key-figures.md`](./css-api/blocks/key-figures.md) |
 | Testimonial | cards / minimal / slider | [`css-api/blocks/testimonial.md`](./css-api/blocks/testimonial.md) |

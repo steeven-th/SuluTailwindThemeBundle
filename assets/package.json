@@ -104,6 +104,12 @@
                 "name": "accordion",
                 "fetch": "lazy",
                 "enabled": true
+            },
+            "consent": {
+                "main": "controllers/consent_controller.js",
+                "name": "consent",
+                "fetch": "eager",
+                "enabled": true
             }
         },
         "importmap": {

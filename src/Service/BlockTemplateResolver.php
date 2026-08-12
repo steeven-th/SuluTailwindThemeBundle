@@ -53,6 +53,7 @@ class BlockTemplateResolver
         'cta' => 'centered',
         'testimonial' => 'cards',
         'accordion' => 'list',
+        'iframe' => 'default',
         'separator' => 'line',
         'article_carousel' => 'carousel',
         'article_featured' => 'hero',
