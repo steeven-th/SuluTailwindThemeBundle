@@ -18,6 +18,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeDraftStorage;
+use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -67,7 +68,7 @@ class LiveThemeEditorController extends AbstractController
         private readonly GoogleFontsCatalog $fontsCatalog,
         private readonly ThemeConfigResolver $themeConfigResolver,
         private readonly TranslatorInterface $translator,
-        private readonly ThemeConfigController $themeConfigController,
+        private readonly ThemeFormMapper $formMapper,
         private readonly ThemeProvider $themeProvider,
         private readonly ThemeDraftStorage $draftStorage,
         private readonly WebspaceManagerInterface $webspaceManager,
@@ -155,8 +156,8 @@ class LiveThemeEditorController extends AbstractController
             return;
         }
 
-        $this->themeConfigController->mapDataToEntity(
-            array_merge($this->themeConfigController->serializeTheme($theme), $patch),
+        $this->formMapper->mapDataToEntity(
+            array_merge($this->formMapper->serializeTheme($theme), $patch),
             $theme,
         );
     }

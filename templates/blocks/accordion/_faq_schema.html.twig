@@ -1,0 +1,37 @@
+{# Accordion — schema.org FAQPage structured data (opt-in per block).
+
+   Emitted only when the editor ticks "faqSchema", because the markup asserts
+   that the block IS a list of frequently asked questions; using it on a generic
+   accordion would misdescribe the page.
+
+   Answers keep their HTML: schema.org/acceptedAnswer accepts a limited subset
+   and search engines strip the rest. json_encode escapes quotes, backslashes
+   and control characters, and — with default flags — forward slashes too, so a
+   `</script>` inside the content comes out as `<\/script>` and cannot close the
+   tag early. `|raw` is required because Twig's HTML autoescaping would turn the
+   JSON quotes into entities and break the document.
+
+   Expected variables:
+     - items: the repeatable block items (itemTitle, itemContent)
+#}
+{% set questions = [] %}
+{% for item in items %}
+    {% if item.type|default('item') == 'item' and item.itemTitle|default('') is not empty and item.itemContent|default('') is not empty %}
+        {% set questions = questions|merge([{
+            '@type': 'Question',
+            'name': item.itemTitle,
+            'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': item.itemContent
+            }
+        }]) %}
+    {% endif %}
+{% endfor %}
+
+{% if questions is not empty %}
+    <script type="application/ld+json">{{ {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': questions
+    }|json_encode|raw }}</script>
+{% endif %}

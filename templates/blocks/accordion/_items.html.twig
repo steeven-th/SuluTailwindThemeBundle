@@ -1,0 +1,69 @@
+{# Accordion items — shared markup for every accordion style.
+
+   Built on native <details>/<summary>, which buys real accessibility for free:
+   <summary> is focusable, toggles on Enter/Space, and the browser maps the open
+   state to aria-expanded on it. Do NOT add aria-expanded by hand — it would
+   duplicate a state the browser already owns and desynchronise from it.
+
+   "One panel open at a time" is the native `name` attribute (same name = same
+   exclusive group, like radio buttons). It needs no JavaScript at all; the
+   accordion Stimulus controller only backfills it on older browsers.
+
+   Expected variables:
+     - items: the repeatable block items (itemTitle, itemContent, itemOpen)
+     - baseId: unique id prefix for this block, used to make each panel linkable
+     - groupName: unique name shared by the group when singleOpen is on, else ''
+     - itemTitleTag: heading tag for each question ('h3'..'h5' or 'none')
+     - iconStyle: 'chevron' | 'plus' | 'arrow' | 'none'
+     - itemClass: extra classes for a single item (radius on the cards style)
+#}
+{% set itemTitleTag = itemTitleTag|default('h3') %}
+{% set iconStyle = iconStyle|default('chevron') %}
+
+{% for item in items %}
+    {% if item.type|default('item') == 'item' and item.itemTitle|default('') is not empty %}
+        <details
+            id="{{ baseId|default('iw-accordion') }}-{{ loop.index }}"
+            class="iw-accordion__item {{ itemClass|default('') }}"
+            {% if groupName|default('') is not empty %}name="{{ groupName }}"{% endif %}
+            {% if item.itemOpen|default(false) %}open{% endif %}
+        >
+            <summary class="iw-accordion__summary">
+                {% if itemTitleTag == 'none' %}
+                    <span class="iw-accordion__title">{{ item.itemTitle }}</span>
+                {% else %}
+                    {% set headingTag = iw_sulu_tailwind_theme_heading_tag(itemTitleTag, 'h3') %}
+                    <{{ headingTag }} class="iw-accordion__title">{{ item.itemTitle }}</{{ headingTag }}>
+                {% endif %}
+
+                {% if iconStyle != 'none' %}
+                    <span class="iw-accordion__icon iw-accordion__icon--{{ iconStyle }}" aria-hidden="true">
+                        {% if iconStyle == 'plus' %}
+                            {# Two bars: the vertical one is hidden when open, turning + into − #}
+                            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <path d="M3 10h14"/>
+                                <path class="iw-accordion__icon-bar" d="M10 3v14"/>
+                            </svg>
+                        {% elseif iconStyle == 'arrow' %}
+                            <svg viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 14.5 3.5 8l1.4-1.4L10 11.7l5.1-5.1L16.5 8z"/>
+                            </svg>
+                        {% else %}
+                            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m5 7.5 5 5 5-5"/>
+                            </svg>
+                        {% endif %}
+                    </span>
+                {% endif %}
+            </summary>
+
+            {% if item.itemContent|default('') is not empty %}
+                <div class="iw-accordion__panel">
+                    <div class="iw-accordion__content prose max-w-none">
+                        {{ item.itemContent|raw }}
+                    </div>
+                </div>
+            {% endif %}
+        </details>
+    {% endif %}
+{% endfor %}

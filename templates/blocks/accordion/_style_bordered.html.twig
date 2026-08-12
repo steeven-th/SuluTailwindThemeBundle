@@ -1,0 +1,38 @@
+{# Accordion block — single bordered box, items separated by inner rules #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if items is defined and items is iterable %}
+        {% set baseId = iw_sulu_tailwind_theme_unique_id('accordion') %}
+        {% set groupName = (singleOpen|default(false)) ? baseId : '' %}
+
+        {# The radius sits on the box, so `overflow-hidden` keeps the first and
+           last summaries from square-cornering out of it on hover/open. #}
+        <div class="iw-block-accordion iw-block-accordion--bordered iw-accordion--icon-{{ iconPosition|default('right') }} {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} overflow-hidden"
+             data-controller="accordion"
+             data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
+        >
+            {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_items.html.twig' with {
+                items: items,
+                baseId: baseId,
+                groupName: groupName,
+                itemTitleTag: itemTitleTag|default('h3'),
+                iconStyle: iconStyle|default('chevron')
+            } only %}
+        </div>
+
+        {% if faqSchema|default(false) %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_faq_schema.html.twig' with {
+                items: items
+            } only %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

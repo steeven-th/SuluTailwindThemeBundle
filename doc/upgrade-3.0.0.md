@@ -290,3 +290,69 @@ fields. New public CSS API `.iw-page-hero*` / `.iw-page-title`, overridable via
 the banner still works, just without the scroll effect. If you use a **custom
 page template**, include the fragment via XInclude and add the `_page_hero`
 include to your Twig to opt in.
+
+---
+
+## New content blocks: accordion, iframe, code (new)
+
+Three block types are added to `iw_theme_default` and to the article templates.
+They are additions, not breaking changes: existing content is unaffected, and no
+migration is required.
+
+### `accordion` — collapsible items / FAQ
+
+Built on native `<details>`/`<summary>`, so keyboard operation, the expanded
+state announced to screen readers, and the whole open/close behaviour work
+**without JavaScript** — including "one item open at a time", which uses the
+native shared `name` attribute rather than a script.
+
+Two consequences when overriding it: there is **no state class** (target
+`details[open]`), and **`aria-expanded` must not be added** — the browser already
+derives it from the open state, and writing it by hand desynchronises.
+
+Styles: `list` (default), `cards`, `bordered`. Optional schema.org `FAQPage`
+markup. Each panel gets an id, so a single answer can be linked to directly.
+
+**New Stimulus controller** `accordion`, **optional**: it only backfills the
+exclusive grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130,
+and opens the panel targeted by the URL fragment.
+
+### `iframe` — external embed
+
+URLs are validated server-side (`https` only, no credentials, optional
+`blocks.iframe.allowed_hosts` allowlist); an invalid URL renders nothing. No
+sandbox mode grants `allow-top-navigation`, so an embed can never redirect the
+page hosting it. Camera, microphone and geolocation are opt-in per block.
+
+Sizing: aspect ratio, preset height, or a free height emitted through a `<style>`
+block scoped to the embed id (clamped server-side — no inline `style` attribute).
+
+Styles: `default`, `fullwidth`.
+
+### `code` — pasted HTML/JS widget
+
+Runs **sandboxed by default** (`srcdoc` + `sandbox="allow-scripts"`, opaque
+origin): scripts execute, but cannot reach the page DOM, cookies, storage or the
+admin session. The theme stylesheet is linked into the sandbox and the frame
+reports its height, so the widget looks and sizes like native content.
+
+Unsandboxed execution is a **project-level opt-in**
+(`blocks.code.allow_unsandboxed: true`); until then the checkbox does not exist
+in the admin form. Content can never widen what configuration allows, so setting
+it back to `false` returns every existing block to the sandbox with no migration.
+
+Read [code-block-security.md](code-block-security.md) before enabling it.
+
+Styles: `default`, `fullwidth`.
+
+### Third-party consent (transverse)
+
+The iframe and code blocks can gate loading behind consent. When they do, the
+frame carries **no `src` and no `srcdoc`** until allowed — no request, no cookie,
+no IP disclosed. Any cookie manager drives it through a neutral
+`window.iwConsent` API; adapters for Axeptio, Tarteaucitron, Klaro, Cookiebot and
+Didomi are in [consent.md](consent.md).
+
+**New Stimulus controllers**: `consent` — register it with **`"fetch": "eager"`**,
+unlike every other controller in the bundle, because it installs the API your
+cookie manager calls; and `embed_resize` (lazy) for self-sizing code embeds.

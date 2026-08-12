@@ -1,0 +1,38 @@
+{# Accordion block — plain list separated by rules (classic FAQ) #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if items is defined and items is iterable %}
+        {# A shared `name` makes the group mutually exclusive natively, no JS.
+           The id prefix is always generated so each panel stays linkable. #}
+        {% set baseId = iw_sulu_tailwind_theme_unique_id('accordion') %}
+        {% set groupName = (singleOpen|default(false)) ? baseId : '' %}
+
+        <div class="iw-block-accordion iw-block-accordion--list iw-accordion--icon-{{ iconPosition|default('right') }}"
+             data-controller="accordion"
+             data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
+        >
+            {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_items.html.twig' with {
+                items: items,
+                baseId: baseId,
+                groupName: groupName,
+                itemTitleTag: itemTitleTag|default('h3'),
+                iconStyle: iconStyle|default('chevron')
+            } only %}
+        </div>
+
+        {% if faqSchema|default(false) %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_faq_schema.html.twig' with {
+                items: items
+            } only %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

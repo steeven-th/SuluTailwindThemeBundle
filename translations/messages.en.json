@@ -50,5 +50,12 @@
     "iw_sulu_tailwind_theme.map": "Map",
     "iw_sulu_tailwind_theme.map_hint_scroll": "Use Ctrl + scroll to zoom the map",
     "iw_sulu_tailwind_theme.map_hint_scroll_mac": "Use ⌘ + scroll to zoom the map",
-    "iw_sulu_tailwind_theme.map_hint_touch": "Use two fingers to move the map"
+    "iw_sulu_tailwind_theme.map_hint_touch": "Use two fingers to move the map",
+    "iw_sulu_tailwind_theme.embed_frame": "External content",
+    "iw_sulu_tailwind_theme.consent_default_text": "This content is provided by %service%. By displaying it, you agree that this service may set cookies and collect your browsing data.",
+    "iw_sulu_tailwind_theme.consent_load": "Display the content",
+    "iw_sulu_tailwind_theme.consent_open_preferences": "Manage my preferences",
+    "iw_sulu_tailwind_theme.code_frame": "Embedded content",
+    "iw_sulu_tailwind_theme.code_too_long": "This code block exceeds the maximum allowed size and was not rendered.",
+    "iw_sulu_tailwind_theme.code_contains_iframe": "This block contains an iframe, which cannot work inside an isolated frame: the remote site's scripts will be blocked. Use the \"External content (iframe)\" block and paste the address only."
 }

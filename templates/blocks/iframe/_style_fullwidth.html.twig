@@ -1,0 +1,40 @@
+{# Iframe block — full-width embed, breaking out of the container #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {# Validated server-side: an unsafe or malformed URL yields null and the
+       frame is simply not rendered. #}
+    {% set embedUrl = iw_sulu_tailwind_theme_embed_url(url|default('')) %}
+
+    {% if embedUrl is not null %}
+        <div class="iw-block-iframe iw-block-iframe--fullwidth">
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_embed_frame.html.twig' with {
+                src: embedUrl,
+                frameTitle: iframeTitle|default('') is not empty ? iframeTitle : title|default(''),
+                heightMode: heightMode|default('ratio'),
+                ratio: ratio|default('16-9'),
+                heightPreset: heightPreset|default(500),
+                heightCustom: heightCustom|default(500),
+                sandboxMode: sandboxMode|default('standard'),
+                lazyLoad: lazyLoad ?? true,
+                allowFullscreen: allowFullscreen ?? true,
+                allowMedia: allowMedia ?? false,
+                allowGeolocation: allowGeolocation ?? false,
+                allowTopNavigation: allowTopNavigation ?? false,
+                consentMode: consentMode|default('none'),
+                consentService: consentService|default(''),
+                consentText: consentText|default(''),
+                consentImage: consentImage|default(null),
+                frameClass: iw_sulu_tailwind_theme_radius_class('card', cardRadius|default(''))
+            } only %}
+        </div>
+    {% endif %}
+{% endblock %}

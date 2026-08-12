@@ -1,6 +1,6 @@
 # Transverse components — CSS API
 
-Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), the **location map** (interactive Leaflet map shared by the location block, the CTA accessory and the form widget), and the shared **gallery navigation arrows** (slider/carousel previous/next buttons).
+Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), the **location map** (interactive Leaflet map shared by the location block, the CTA accessory and the form widget), the shared **gallery navigation arrows** (slider/carousel previous/next buttons), and the **embed frame** (shared by the iframe and code blocks).
 
 > See [`css-conventions.md`](../css-conventions.md) for the BEM naming policy.
 >
@@ -298,6 +298,25 @@ Overlay card displayed on the location block, sitting on top of the map.
 | `.iw-location-card__scroll-hint` | "Scroll for more" hint (desktop only) |
 
 The card has an internal collapsed/expanded state on mobile. On desktop the body is always visible with a scroll hint.
+
+## Embed frame
+
+`.iw-embed` and its parts are shared by the **iframe** block (external URL) and the sandboxed mode of the **code** block (pasted widget). Styling it once therefore covers both.
+
+| Class | Role |
+|-------|------|
+| `.iw-embed` | Sizing box, positioning context for the consent placeholder. |
+| `.iw-embed__frame` | The `<iframe>`. Borderless, fills its box. |
+| `.iw-embed--h-300` … `--h-1000` | Enumerated fixed heights. |
+| `.iw-embed--h-custom` | Free height, reads `--iw-embed-height`. |
+| `.iw-embed--auto` | Self-sizing: height reported from a sandboxed document. |
+| `.iw-embed__consent` + `__consent-image` / `__consent-body` / `__consent-text` / `__consent-button` | Placeholder shown while the embed is not allowed to load. |
+
+Aspect-ratio sizing reuses the shared `.iw-ratio--*` utilities.
+
+> Full variable list and override examples: [`blocks/iframe.md`](./blocks/iframe.md). Consent behaviour: [`../consent.md`](../consent.md).
+
+---
 
 ## Location map (Leaflet)
 

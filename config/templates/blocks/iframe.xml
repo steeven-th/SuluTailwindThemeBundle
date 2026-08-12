@@ -1,0 +1,296 @@
+<?xml version="1.0" ?>
+<!-- Global block type: Iframe (external embed) -->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>iframe</key>
+    <meta>
+        <title>iw_sulu_tailwind_theme.block.iframe</title>
+    </meta>
+
+    <properties>
+        <!-- ── Content ── -->
+        <section name="content">
+            <meta><title>iw_sulu_tailwind_theme.content</title></meta>
+            <properties>
+                <property name="title" type="text_line">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title</title>
+                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+                    </meta>
+                </property>
+                <property name="subTitle" type="text_line">
+                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                </property>
+                <property name="titleTag" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h2"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="titleAlignment" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="url" type="text_line">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.iframe_url</title>
+                        <info_text>iw_sulu_tailwind_theme.iframe_url_info</info_text>
+                    </meta>
+                </property>
+                <property name="iframeTitle" type="text_line">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.iframe_title</title>
+                        <info_text>iw_sulu_tailwind_theme.iframe_title_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Appearance ── -->
+        <section name="appearance">
+            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
+            <properties>
+                <property name="variant" type="iw_theme_variant_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
+                </property>
+                <property name="style" type="iw_theme_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
+                    <params>
+                        <param name="block_type" value="iframe"/>
+                    </params>
+                </property>
+                <property name="heightMode" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_height_mode</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_height_mode_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="ratio"/>
+                        <param name="values" type="collection">
+                            <param name="ratio"><meta><title>iw_sulu_tailwind_theme.embed_height_mode_ratio</title></meta></param>
+                            <param name="preset"><meta><title>iw_sulu_tailwind_theme.embed_height_mode_preset</title></meta></param>
+                            <param name="custom"><meta><title>iw_sulu_tailwind_theme.embed_height_mode_custom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="ratio" type="single_select" colspan="6"
+                          visibleCondition="__parent.heightMode == 'ratio'">
+                    <meta><title>iw_sulu_tailwind_theme.embed_ratio</title></meta>
+                    <params>
+                        <param name="default_value" value="16-9"/>
+                        <param name="values" type="collection">
+                            <param name="16-9"><meta><title>iw_sulu_tailwind_theme.embed_ratio_16_9</title></meta></param>
+                            <param name="4-3"><meta><title>iw_sulu_tailwind_theme.embed_ratio_4_3</title></meta></param>
+                            <param name="1-1"><meta><title>iw_sulu_tailwind_theme.embed_ratio_1_1</title></meta></param>
+                            <param name="21-9"><meta><title>iw_sulu_tailwind_theme.embed_ratio_21_9</title></meta></param>
+                            <param name="9-16"><meta><title>iw_sulu_tailwind_theme.embed_ratio_9_16</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="heightPreset" type="single_select" colspan="6"
+                          visibleCondition="__parent.heightMode == 'preset'">
+                    <meta><title>iw_sulu_tailwind_theme.embed_height_preset</title></meta>
+                    <params>
+                        <param name="default_value" value="500"/>
+                        <param name="values" type="collection">
+                            <param name="300"><meta><title>iw_sulu_tailwind_theme.embed_height_300</title></meta></param>
+                            <param name="400"><meta><title>iw_sulu_tailwind_theme.embed_height_400</title></meta></param>
+                            <param name="500"><meta><title>iw_sulu_tailwind_theme.embed_height_500</title></meta></param>
+                            <param name="600"><meta><title>iw_sulu_tailwind_theme.embed_height_600</title></meta></param>
+                            <param name="800"><meta><title>iw_sulu_tailwind_theme.embed_height_800</title></meta></param>
+                            <param name="1000"><meta><title>iw_sulu_tailwind_theme.embed_height_1000</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="heightCustom" type="number" colspan="6"
+                          visibleCondition="__parent.heightMode == 'custom'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_height_custom</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_height_custom_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="500"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
+                <property name="sandboxMode" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_sandbox</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_sandbox_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="standard"/>
+                        <param name="values" type="collection">
+                            <param name="standard"><meta><title>iw_sulu_tailwind_theme.embed_sandbox_standard</title></meta></param>
+                            <param name="strict"><meta><title>iw_sulu_tailwind_theme.embed_sandbox_strict</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.embed_sandbox_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="lazyLoad" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_lazy_load</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_lazy_load_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+                <property name="allowFullscreen" type="checkbox" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.embed_allow_fullscreen</title></meta>
+                    <params>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+                <property name="allowMedia" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_allow_media</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_allow_media_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+                <property name="allowGeolocation" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_allow_geolocation</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_allow_geolocation_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+                <property name="allowTopNavigation" type="checkbox">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.embed_allow_top_navigation</title>
+                        <info_text>iw_sulu_tailwind_theme.embed_allow_top_navigation_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+                <property name="consentMode" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.consent_mode</title>
+                        <info_text>iw_sulu_tailwind_theme.consent_mode_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.consent_mode_none</title></meta></param>
+                            <param name="placeholder"><meta><title>iw_sulu_tailwind_theme.consent_mode_placeholder</title></meta></param>
+                            <param name="delegated"><meta><title>iw_sulu_tailwind_theme.consent_mode_delegated</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="consentService" type="text_line" colspan="6"
+                          visibleCondition="__parent.consentMode != 'none'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.consent_service</title>
+                        <info_text>iw_sulu_tailwind_theme.consent_service_info</info_text>
+                    </meta>
+                </property>
+                <property name="consentText" type="text_area" colspan="6"
+                          visibleCondition="__parent.consentMode != 'none'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.consent_text</title>
+                        <info_text>iw_sulu_tailwind_theme.consent_text_info</info_text>
+                    </meta>
+                </property>
+                <property name="consentImage" type="single_media_selection"
+                          visibleCondition="__parent.consentMode != 'none'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.consent_image</title>
+                        <info_text>iw_sulu_tailwind_theme.consent_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+                <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
+                    <params>
+                        <param name="default_value" value="mt-5"/>
+                    </params>
+                </property>
+                <property name="marginBottom" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.margin_bottom</title></meta>
+                    <params>
+                        <param name="default_value" value="mb-5"/>
+                    </params>
+                </property>
+                <property name="lateralMargins" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
+                    <params>
+                        <param name="default_value" value="exterior"/>
+                        <param name="values" type="collection">
+                            <param name="exterior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_exterior</title></meta></param>
+                            <param name="interior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_interior</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.lateral_margins_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
+                    <params>
+                        <param name="default_value" value="pt-5"/>
+                    </params>
+                </property>
+                <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.padding_bottom</title></meta>
+                    <params>
+                        <param name="default_value" value="pb-5"/>
+                    </params>
+                </property>
+                <property name="paddingLateral" type="iw_theme_margin_selector">
+                    <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
+                    <params>
+                        <param name="prefix" value="px"/>
+                        <param name="default_value" value="px-5"/>
+                    </params>
+                </property>
+                <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
+                    <params>
+                        <param name="theme_key" value="cardRadius"/>
+                    </params>
+                </property>
+                <property name="cardRadius" type="iw_theme_radius_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.card_radius</title></meta>
+                    <params>
+                        <param name="theme_key" value="cardRadius"/>
+                    </params>
+                </property>
+                <property name="showBackground" type="checkbox">
+                    <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
+                    <params>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</template>

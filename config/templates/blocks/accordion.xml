@@ -1,0 +1,221 @@
+<?xml version="1.0" ?>
+<!-- Global block type: Accordion (FAQ) -->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>accordion</key>
+    <meta>
+        <title>iw_sulu_tailwind_theme.block.accordion</title>
+    </meta>
+
+    <properties>
+        <!-- ── Content ── -->
+        <section name="content">
+            <meta><title>iw_sulu_tailwind_theme.content</title></meta>
+            <properties>
+                <property name="title" type="text_line">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title</title>
+                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+                    </meta>
+                </property>
+                <property name="subTitle" type="text_line">
+                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                </property>
+                <property name="titleTag" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h2"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="titleAlignment" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <block name="items" default-type="item" minOccurs="1">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accordion_items</title>
+                    </meta>
+                    <types>
+                        <type name="item">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.accordion_item</title>
+                            </meta>
+                            <properties>
+                                <property name="itemTitle" type="text_line">
+                                    <meta><title>iw_sulu_tailwind_theme.accordion_item_title</title></meta>
+                                </property>
+                                <property name="itemContent" type="text_editor">
+                                    <meta><title>iw_sulu_tailwind_theme.accordion_item_content</title></meta>
+                                </property>
+                                <property name="itemOpen" type="checkbox">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.accordion_item_open</title>
+                                        <info_text>iw_sulu_tailwind_theme.accordion_item_open_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="default_value" value="false"/>
+                                    </params>
+                                </property>
+                            </properties>
+                        </type>
+                    </types>
+                </block>
+            </properties>
+        </section>
+
+        <!-- ── Appearance ── -->
+        <section name="appearance">
+            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
+            <properties>
+                <property name="variant" type="iw_theme_variant_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
+                </property>
+                <property name="style" type="iw_theme_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
+                    <params>
+                        <param name="block_type" value="accordion"/>
+                    </params>
+                </property>
+                <property name="itemTitleTag" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accordion_item_title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.accordion_item_title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h3"/>
+                        <param name="values" type="collection">
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                            <param name="h5"><meta><title>iw_sulu_tailwind_theme.title_level_h5</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.accordion_item_title_level_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="iconStyle" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.accordion_icon_style</title></meta>
+                    <params>
+                        <param name="default_value" value="chevron"/>
+                        <param name="values" type="collection">
+                            <param name="chevron"><meta><title>iw_sulu_tailwind_theme.accordion_icon_chevron</title></meta></param>
+                            <param name="plus"><meta><title>iw_sulu_tailwind_theme.accordion_icon_plus</title></meta></param>
+                            <param name="arrow"><meta><title>iw_sulu_tailwind_theme.accordion_icon_arrow</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.accordion_icon_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="iconPosition" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.accordion_icon_position</title></meta>
+                    <params>
+                        <param name="default_value" value="right"/>
+                        <param name="values" type="collection">
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.position_right</title></meta></param>
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.position_left</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
+                <property name="singleOpen" type="checkbox">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accordion_single_open</title>
+                        <info_text>iw_sulu_tailwind_theme.accordion_single_open_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+                <property name="faqSchema" type="checkbox">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.accordion_faq_schema</title>
+                        <info_text>iw_sulu_tailwind_theme.accordion_faq_schema_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="false"/>
+                    </params>
+                </property>
+                <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
+                    <params>
+                        <param name="default_value" value="mt-5"/>
+                    </params>
+                </property>
+                <property name="marginBottom" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.margin_bottom</title></meta>
+                    <params>
+                        <param name="default_value" value="mb-5"/>
+                    </params>
+                </property>
+                <property name="lateralMargins" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
+                    <params>
+                        <param name="default_value" value="exterior"/>
+                        <param name="values" type="collection">
+                            <param name="exterior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_exterior</title></meta></param>
+                            <param name="interior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_interior</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.lateral_margins_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
+                    <params>
+                        <param name="default_value" value="pt-5"/>
+                    </params>
+                </property>
+                <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.padding_bottom</title></meta>
+                    <params>
+                        <param name="default_value" value="pb-5"/>
+                    </params>
+                </property>
+                <property name="paddingLateral" type="iw_theme_margin_selector">
+                    <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
+                    <params>
+                        <param name="prefix" value="px"/>
+                        <param name="default_value" value="px-5"/>
+                    </params>
+                </property>
+                <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
+                    <params>
+                        <param name="theme_key" value="cardRadius"/>
+                    </params>
+                </property>
+                <property name="cardRadius" type="iw_theme_radius_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.card_radius</title></meta>
+                    <params>
+                        <param name="theme_key" value="cardRadius"/>
+                    </params>
+                </property>
+                <property name="showBackground" type="checkbox">
+                    <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
+                    <params>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</template>
