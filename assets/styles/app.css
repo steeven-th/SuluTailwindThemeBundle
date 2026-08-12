@@ -353,6 +353,154 @@ img.object-cover {
     opacity: var(--iw-block-text-quote-footer-opacity, 0.75);
 }
 
+/* ─── Block: accordion ─────────────────────────────────────────────────── */
+/* Built on native <details>/<summary>. Three modes: --list (rules between
+   items), --cards (one surface per item), --bordered (single box with inner
+   rules). The open/closed state is the native `[open]` attribute — no state
+   class is emitted, so overrides target `details[open]` like the bundle does.
+
+   `interpolate-size` is scoped to the block, never set on :root: enabling
+   keyword interpolation globally would change how every `height: auto`
+   transition behaves on the host site, which is not ours to decide. */
+
+.iw-block-accordion {
+    interpolate-size: allow-keywords;
+}
+
+/* Item — the <details> element itself */
+.iw-block-accordion .iw-accordion__item {
+    overflow: hidden;
+}
+
+/* Summary — the clickable row. `list-style: none` + ::-webkit-details-marker
+   remove the native triangle so the themed icon is the only affordance. */
+.iw-block-accordion .iw-accordion__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--iw-accordion-summary-gap, 1rem);
+    padding: var(--iw-accordion-summary-padding-y, 1rem) var(--iw-accordion-summary-padding-x, 0);
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--iw-accordion-transition-duration, 200ms) ease;
+}
+
+.iw-block-accordion .iw-accordion__summary::-webkit-details-marker {
+    display: none;
+}
+
+.iw-block-accordion .iw-accordion__summary:hover {
+    color: var(--iw-accordion-summary-color-hover, var(--color-primary));
+}
+
+/* Keyboard focus must stay visible: <summary> is the interactive element and
+   its focus ring is the only cue for keyboard users. */
+.iw-block-accordion .iw-accordion__summary:focus-visible {
+    outline: var(--iw-accordion-focus-width, 2px) solid var(--iw-accordion-focus-color, var(--color-primary));
+    outline-offset: var(--iw-accordion-focus-offset, 2px);
+}
+
+/* Title — neutralises the heading margins so any level lines up identically */
+.iw-block-accordion .iw-accordion__title {
+    margin: 0;
+    font-size: var(--iw-accordion-title-size, 1.0625rem);
+    font-weight: var(--iw-accordion-title-weight, 600);
+    line-height: var(--iw-accordion-title-line-height, 1.4);
+}
+
+/* Icon */
+.iw-block-accordion .iw-accordion__icon {
+    flex: none;
+    width: var(--iw-accordion-icon-size, 1.25rem);
+    height: var(--iw-accordion-icon-size, 1.25rem);
+    color: var(--iw-accordion-icon-color, currentColor);
+    transition: transform var(--iw-accordion-transition-duration, 200ms) ease;
+}
+
+.iw-block-accordion .iw-accordion__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Icon on the left: reorder without touching the DOM, so the reading order
+   (title first) stays correct for screen readers and keyboard users. */
+.iw-accordion--icon-left .iw-accordion__summary {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+/* Rotation on open — chevron and arrow flip, the plus turns into a minus */
+.iw-block-accordion details[open] > .iw-accordion__summary .iw-accordion__icon--chevron,
+.iw-block-accordion details[open] > .iw-accordion__summary .iw-accordion__icon--arrow {
+    transform: rotate(180deg);
+}
+
+.iw-block-accordion .iw-accordion__icon-bar {
+    transform-origin: center;
+    transition: opacity var(--iw-accordion-transition-duration, 200ms) ease;
+}
+
+.iw-block-accordion details[open] > .iw-accordion__summary .iw-accordion__icon--plus .iw-accordion__icon-bar {
+    opacity: 0;
+}
+
+/* Panel */
+.iw-block-accordion .iw-accordion__panel {
+    padding-bottom: var(--iw-accordion-panel-padding-bottom, 1rem);
+}
+
+.iw-block-accordion .iw-accordion__content {
+    color: var(--iw-accordion-content-color, inherit);
+}
+
+/* Open/close animation — progressive enhancement.
+   ::details-content is only honoured by engines that can animate it; anywhere
+   else the panel simply appears instantly, which is a perfectly good fallback. */
+@media (prefers-reduced-motion: no-preference) {
+    .iw-block-accordion .iw-accordion__item::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition:
+            block-size var(--iw-accordion-transition-duration, 200ms) ease,
+            content-visibility var(--iw-accordion-transition-duration, 200ms) allow-discrete;
+    }
+
+    .iw-block-accordion .iw-accordion__item[open]::details-content {
+        block-size: auto;
+    }
+}
+
+/* Mode: --list — rules between items */
+.iw-block-accordion--list .iw-accordion__item + .iw-accordion__item {
+    border-top: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+}
+
+/* Mode: --cards — one surface per item, spaced by the shared cards gap */
+.iw-block-accordion--cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-accordion-cards-gap, var(--iw-cards-gap, 1.5rem));
+}
+
+.iw-block-accordion--cards .iw-accordion__item {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+    background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface, transparent));
+    border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+}
+
+/* Mode: --bordered — single box, inner rules between items */
+.iw-block-accordion--bordered {
+    border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+}
+
+.iw-block-accordion--bordered .iw-accordion__item {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+}
+
+.iw-block-accordion--bordered .iw-accordion__item + .iw-accordion__item {
+    border-top: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+}
+
 /* ─── Block: separator ─────────────────────────────────────────────────── */
 /* Three modes: --line (single horizontal rule), --divider (rule + central
    label or icon), --spacer (empty vertical gap). Width / style / icon size /

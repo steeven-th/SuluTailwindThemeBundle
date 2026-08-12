@@ -196,12 +196,18 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
             "toc": {
                 "enabled": true,
                 "fetch": "lazy"
+            },
+            "accordion": {
+                "enabled": true,
+                "fetch": "lazy"
             }
         }
     },
     "entrypoints": []
 }
 ```
+
+> The `accordion` controller is **optional**. The accordion block is built on native `<details>`/`<summary>` and is fully functional without JavaScript — including "one item open at a time". The controller only backfills that grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130, and opens the panel targeted by the URL fragment.
 
 **Configure Webpack** to disable symlink resolution in your `webpack.config.js`:
 
@@ -470,7 +476,7 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 
 ### Page templates
 
-The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **14 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **15 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 

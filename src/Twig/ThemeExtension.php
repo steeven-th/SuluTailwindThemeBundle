@@ -22,6 +22,11 @@ use Twig\TwigFunction;
  */
 class ThemeExtension extends AbstractExtension implements GlobalsInterface
 {
+    /**
+     * Sequence backing getUniqueId(), reset on every request with the service.
+     */
+    private int $uniqueIdCounter = 0;
+
     public function __construct(
         private readonly ThemeProvider $themeProvider,
         private readonly ThemeCompiler $compiler,
@@ -57,7 +62,33 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
         ];
+    }
+
+    /**
+     * Generate an id that is unique within the current rendering.
+     *
+     * Sulu content blocks carry no stable identifier, yet some markup needs one:
+     * grouping `<details name="…">` so a single panel stays open at a time,
+     * wiring `aria-labelledby`, or scoping a style rule to one block instance.
+     *
+     * The counter is per-request (the extension is a service, rebuilt on every
+     * request), so the same page always renders the same ids — unlike a random
+     * value, which would churn the HTML on each render and break HTTP caching
+     * diffs. Ids are only ever compared within one document, so a per-request
+     * sequence is enough; they are not meant to be stable across requests.
+     *
+     * @param string $prefix A short identifier prefix (e.g. "accordion")
+     *
+     * @return string The unique id (e.g. "iw-accordion-1")
+     */
+    public function getUniqueId(string $prefix = 'iw'): string
+    {
+        // Keep the prefix usable as an HTML id and a CSS selector.
+        $prefix = preg_replace('/[^a-z0-9-]/', '', strtolower($prefix)) ?: 'iw';
+
+        return \sprintf('iw-%s-%d', $prefix, ++$this->uniqueIdCounter);
     }
 
     /**

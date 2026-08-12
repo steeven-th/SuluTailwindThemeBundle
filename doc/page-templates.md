@@ -4,7 +4,7 @@ The bundle ships with a ready-to-use page template and a modular architecture fo
 
 ## Default page template
 
-The `iw_theme_default` template includes **14 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The `iw_theme_default` template includes **15 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -90,6 +90,7 @@ config/templates/
     ├── document.xml
     ├── cta.xml
     ├── testimonial.xml
+    ├── accordion.xml
     ├── separator.xml
     ├── article_list.xml
     ├── article_carousel.xml
@@ -169,6 +170,7 @@ Since blocks are registered globally, creating a custom page template with a sub
 | `document` | Document downloads | Content (title group + media), Appearance, Settings |
 | `cta` | Call to action | Content (title group + buttons + image), Appearance, Settings |
 | `testimonial` | Testimonials | Content (title group + testimonials block), Appearance, Settings |
+| `accordion` | Collapsible items / FAQ | Content (title group + items block), Appearance (+ item heading level, icon style and position), Settings (+ single-open, FAQ markup) |
 | `separator` | Visual separator | Content (height + line style), Appearance, Settings |
 | `article_list` | Article list (grid/list/cards) | Content (title group + smart_content articles + count + pagination), Appearance, Settings |
 | `article_carousel` | Article carousel | Content (title group + smart_content articles + count + autoplay + interval), Appearance, Settings |
