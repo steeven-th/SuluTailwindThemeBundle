@@ -181,6 +181,10 @@ export default class extends Controller {
         service: String,
         mode: { type: String, default: 'placeholder' },
         src: String,
+        // Inline document, used by the sandboxed code block. Held back for the
+        // same reason as `src`: an inline document runs the moment it lands on
+        // the element, and it is usually the pasted markup that calls out.
+        srcdoc: String,
         remember: { type: Boolean, default: true },
     };
 
@@ -249,6 +253,10 @@ export default class extends Controller {
             frame.setAttribute('src', this.srcValue);
         }
 
+        if (this.srcdocValue && frame.getAttribute('srcdoc') !== this.srcdocValue) {
+            frame.setAttribute('srcdoc', this.srcdocValue);
+        }
+
         frame.hidden = false;
 
         if (this.hasPlaceholderTarget) {
@@ -270,6 +278,7 @@ export default class extends Controller {
         const frame = this.frameTarget;
 
         frame.removeAttribute('src');
+        frame.removeAttribute('srcdoc');
         frame.hidden = true;
 
         if (this.hasPlaceholderTarget) {

@@ -1,0 +1,35 @@
+{# Code block — pasted HTML/JS embed, inside the page container.
+
+   Execution mode is resolved server-side by CodeBlockPolicy, never by the
+   template: the sandbox is on unless the project opted out through
+   `blocks.code.allow_unsandboxed` AND the editor ticked the box. A stored
+   "unsandboxed" value alone can never lift it. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if code|default('') is not empty %}
+        <div class="iw-block-code iw-block-code--default">
+            {% include '@ItechWorldSuluTailwindTheme/blocks/code/_render.html.twig' with {
+                code: code,
+                unsandboxed: unsandboxed|default(false),
+                heightMode: heightMode|default('auto'),
+                ratio: ratio|default('16-9'),
+                heightPreset: heightPreset|default(500),
+                heightCustom: heightCustom|default(500),
+                inheritThemeStyles: inheritThemeStyles ?? true,
+                consentMode: consentMode|default('none'),
+                consentService: consentService|default(''),
+                consentText: consentText|default(''),
+                frameClass: iw_sulu_tailwind_theme_radius_class('card', cardRadius|default(''))
+            } only %}
+        </div>
+    {% endif %}
+{% endblock %}

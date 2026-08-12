@@ -104,6 +104,11 @@ services:
         arguments:
             - '%itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts%'
 
+    itech_world.sulu_tailwind_theme.code_block_policy:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy
+        arguments:
+            - '%itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed%'
+
     itech_world.sulu_tailwind_theme.google_fonts_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver
 
@@ -133,6 +138,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
             - '@itech_world.sulu_tailwind_theme.block_template_resolver'
             - '@itech_world.sulu_tailwind_theme.embed_url_validator'
+            - '@itech_world.sulu_tailwind_theme.code_block_policy'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }
@@ -214,6 +220,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
+    ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
     ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension: '@itech_world.sulu_tailwind_theme.twig_extension'

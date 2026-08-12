@@ -1,0 +1,54 @@
+{# Code block rendering — shared by the code block styles.
+
+   Three outcomes, decided server-side:
+
+     sandboxed  the markup runs inside <iframe sandbox="allow-scripts"> with an
+                opaque origin: no access to the page DOM, cookies, storage or
+                the admin session. Scripts still run, so widgets work.
+     raw        the markup is written straight into the page. This is a stored
+                XSS by design, and is only reachable when the project set
+                `blocks.code.allow_unsandboxed: true` and the editor ticked the
+                box. See doc/code-block-security.md.
+     too_long   the snippet exceeds CodeBlockPolicy::MAX_LENGTH and is dropped.
+
+   Expected variables: code, unsandboxed, heightMode, ratio, heightPreset,
+   heightCustom, inheritThemeStyles, consent* and frameClass.
+#}
+{% set mode = iw_sulu_tailwind_theme_code_mode(unsandboxed|default(false), code) %}
+
+{% if mode == 'too_long' %}
+    {# Nothing rendered on the site. The notice is dev-only so an editor whose
+       paste silently vanished still gets an explanation while working. #}
+    {% if app.environment == 'dev' %}
+        <p class="iw-block-code__notice">{{ 'iw_sulu_tailwind_theme.code_too_long'|trans }}</p>
+    {% endif %}
+
+{% elseif mode == 'raw' %}
+    {# Deliberate: the project configured this block to execute pasted markup in
+       the page. Escaping here would make the block pointless — the security
+       decision was taken in config, not here. #}
+    <div class="iw-block-code__raw">{{ code|raw }}</div>
+
+{% else %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_embed_frame.html.twig' with {
+        srcdoc: iw_sulu_tailwind_theme_code_srcdoc(
+            code,
+            inheritThemeStyles ?? true,
+            (heightMode|default('auto')) == 'auto'
+        ),
+        frameTitle: 'iw_sulu_tailwind_theme.code_frame'|trans,
+        heightMode: heightMode|default('auto'),
+        ratio: ratio|default('16-9'),
+        heightPreset: heightPreset|default(500),
+        heightCustom: heightCustom|default(500),
+        sandboxMode: 'strict',
+        lazyLoad: false,
+        allowFullscreen: false,
+        allowMedia: false,
+        allowGeolocation: false,
+        consentMode: consentMode|default('none'),
+        consentService: consentService|default(''),
+        consentText: consentText|default(''),
+        frameClass: frameClass|default('')
+    } only %}
+{% endif %}

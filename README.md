@@ -204,6 +204,10 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
             "consent": {
                 "enabled": true,
                 "fetch": "eager"
+            },
+            "embed_resize": {
+                "enabled": true,
+                "fetch": "lazy"
             }
         }
     },
@@ -346,6 +350,25 @@ itech_world_sulu_tailwind_theme:
 ```
 
 An entry also covers its subdomains (`example.com` matches `widget.example.com`), matching whole labels only — `evil-example.com` does **not** match `example.com`. A URL outside the list simply renders nothing. Leave the list empty (the default) to allow any `https` host.
+
+### Code block: allowing unsandboxed execution (optional, off by default)
+
+The code block lets editors paste a third-party widget. By default that markup always runs inside a sandboxed iframe: it can execute its own scripts, but cannot reach the page's DOM, cookies, or your admin session.
+
+Some widgets genuinely need the page — chat bubbles, analytics tags, anything positioned over the whole site. For those, a project can expose a per-block escape hatch:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    blocks:
+        code:
+            allow_unsandboxed: true
+```
+
+This does not disable the sandbox; it makes a *Run without isolation* checkbox appear in the block form. Until then the checkbox does not exist at all.
+
+> ⚠️ **Understand what this grants.** Sulu has no per-block permission: anyone who can edit a page can use the block. With this enabled, an editor can execute arbitrary JavaScript on the public site — and, because Sulu's preview renders pages in a same-origin iframe, in the browser of any administrator who previews that page. In effect, every page editor becomes an administrator of the site. Read **[Code block security](doc/code-block-security.md)** before turning it on.
+>
+> Turning it back to `false` is an immediate, safe rollback: a stored `unsandboxed` value is ignored without the opt-in, so every existing block returns to the sandbox with no migration.
 
 ### Article templates (optional)
 
@@ -497,7 +520,7 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 
 ### Page templates
 
-The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **16 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `iframe`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -648,6 +671,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
 | [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
+| [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 

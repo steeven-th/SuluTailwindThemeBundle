@@ -110,6 +110,12 @@
                 "name": "consent",
                 "fetch": "eager",
                 "enabled": true
+            },
+            "embed_resize": {
+                "main": "controllers/embed_resize_controller.js",
+                "name": "embed-resize",
+                "fetch": "lazy",
+                "enabled": true
             }
         },
         "importmap": {

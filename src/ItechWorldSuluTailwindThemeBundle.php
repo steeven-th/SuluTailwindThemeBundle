@@ -62,6 +62,15 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                                 ->end()
                             ->end()
                         ->end()
+                        ->arrayNode('code')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('allow_unsandboxed')
+                                    ->defaultFalse()
+                                    ->info('Expose a per-block checkbox letting editors run pasted markup directly in the page. Makes anyone able to edit a page able to execute JavaScript on the site, including in the admin preview. Leave false unless every editor is trusted at administrator level.')
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
@@ -158,6 +167,25 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                 ],
             ]);
 
+            // Register the code block variant. The escape-hatch checkbox that
+            // disables the sandbox only exists in the admin form when the
+            // project explicitly opted in, so an editor is never offered a
+            // decision the project has not made. Same trick as the form block:
+            // both files declare <key>code</key>, only one directory is loaded.
+            $codeBlockDir = $this->isUnsandboxedCodeAllowed($builder)
+                ? __DIR__ . '/../config/templates/blocks-code-open'
+                : __DIR__ . '/../config/templates/blocks-code';
+
+            $builder->prependExtensionConfig('sulu_admin', [
+                'templates' => [
+                    'block' => [
+                        'directories' => [
+                            'iw_sulu_tailwind_theme_code' => $codeBlockDir,
+                        ],
+                    ],
+                ],
+            ]);
+
             // Register article template directories (opt-in, requires SuluArticleBundle)
             $this->registerArticleTemplates($builder);
 
@@ -202,8 +230,35 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             'itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts',
             $config['blocks']['iframe']['allowed_hosts'],
         );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed',
+            $config['blocks']['code']['allow_unsandboxed'],
+        );
 
         $container->import('../config/services.yaml');
+    }
+
+    /**
+     * Whether the project allows editors to disable the code block sandbox.
+     *
+     * Read from the raw extension config: prependExtension() runs before config
+     * processing, so the processed values are not available yet.
+     *
+     * @param ContainerBuilder $builder The container builder
+     *
+     * @return bool True when the unsandboxed checkbox must be exposed
+     */
+    private function isUnsandboxedCodeAllowed(ContainerBuilder $builder): bool
+    {
+        $allowed = false;
+
+        foreach ($builder->getExtensionConfig('itech_world_sulu_tailwind_theme') as $config) {
+            if (isset($config['blocks']['code']['allow_unsandboxed'])) {
+                $allowed = (bool) $config['blocks']['code']['allow_unsandboxed'];
+            }
+        }
+
+        return $allowed;
     }
 
     /**

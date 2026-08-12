@@ -54,5 +54,7 @@
     "iw_sulu_tailwind_theme.embed_frame": "Contenu externe",
     "iw_sulu_tailwind_theme.consent_default_text": "Ce contenu est fourni par %service%. En l'affichant, vous acceptez que ce service dépose des cookies et collecte vos données de navigation.",
     "iw_sulu_tailwind_theme.consent_load": "Afficher le contenu",
-    "iw_sulu_tailwind_theme.consent_open_preferences": "Gérer mes préférences"
+    "iw_sulu_tailwind_theme.consent_open_preferences": "Gérer mes préférences",
+    "iw_sulu_tailwind_theme.code_frame": "Contenu intégré",
+    "iw_sulu_tailwind_theme.code_too_long": "Ce bloc de code dépasse la taille maximale autorisée et n'a pas été affiché."
 }

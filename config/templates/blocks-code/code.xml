@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<!--
+    Global block type: Code (HTML/JS embed) — sandboxed variant (default).
+
+    Pasted markup always runs inside a sandboxed iframe, so it cannot reach the
+    hosting page's DOM, cookies or admin session. There is no editor-facing way
+    to turn that off: a project that genuinely needs unsandboxed execution opts
+    in through the bundle configuration, which swaps this file for the
+    blocks-code-open variant.
+
+        itech_world_sulu_tailwind_theme:
+            blocks:
+                code:
+                    allow_unsandboxed: true
+-->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>code</key>
+    <meta>
+        <title>iw_sulu_tailwind_theme.block.code</title>
+    </meta>
+
+    <properties>
+        <!-- ── Content ── -->
+        <section name="content">
+            <meta><title>iw_sulu_tailwind_theme.content</title></meta>
+            <properties>
+                <property name="title" type="text_line">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title</title>
+                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+                    </meta>
+                </property>
+                <property name="subTitle" type="text_line">
+                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                </property>
+                <property name="titleTag" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h2"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="titleAlignment" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!-- text_area, never text_editor: a rich-text editor would
+                     reformat and strip the pasted markup. -->
+                <property name="code" type="text_area">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.code_snippet</title>
+                        <info_text>iw_sulu_tailwind_theme.code_snippet_info_sandboxed</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Appearance ── -->
+        <section name="appearance">
+            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
+            <properties>
+                <property name="variant" type="iw_theme_variant_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
+                </property>
+                <property name="style" type="iw_theme_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
+                    <params>
+                        <param name="block_type" value="code"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
+                <xi:include href="../fragments/code-block-common.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+            </properties>
+        </section>
+    </properties>
+</template>

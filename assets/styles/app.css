@@ -453,7 +453,36 @@ img.object-cover {
     outline-offset: var(--iw-embed-consent-focus-offset, 2px);
 }
 
+/* Self-sizing embed (sandboxed code block): the frame reports its content
+   height and the embed_resize controller writes --iw-embed-height. The class
+   default applies until the first message arrives, so nothing collapses. */
+.iw-embed--auto {
+    height: var(--iw-embed-height, 300px);
+    transition: height var(--iw-embed-auto-transition-duration, 150ms) ease;
+}
+
+/* ─── Block: code ──────────────────────────────────────────────────────── */
+/* Pasted third-party markup. In sandboxed mode the payload is an iframe and
+   inherits the `.iw-embed` rules above; in raw mode it is inlined, so the
+   bundle styles nothing inside it — a widget brings its own look. */
+
+.iw-block-code__raw {
+    /* Containment only: a widget with its own floats must not drag the rest of
+       the page along. No visual opinion is imposed on the pasted markup. */
+    display: flow-root;
+}
+
+.iw-block-code__notice {
+    padding: var(--iw-block-code-notice-padding, 1rem);
+    border: 1px dashed var(--iw-block-code-notice-border, var(--color-border, #e5e7eb));
+    border-radius: var(--iw-block-code-notice-radius, var(--border-radius, 0.375rem));
+    color: var(--iw-block-code-notice-text, var(--color-secondary-600, inherit));
+    font-size: var(--iw-block-code-notice-size, 0.875rem);
+}
+
 /* Block modes */
+.iw-block-code--fullwidth .iw-embed,
+.iw-block-code--fullwidth .iw-block-code__raw,
 .iw-block-iframe--fullwidth .iw-embed {
     /* Break out of the container, absorbed by `body { overflow-x: clip }`. */
     width: 100vw;

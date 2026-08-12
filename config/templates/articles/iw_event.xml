@@ -130,6 +130,7 @@
                         <type ref="location"/>
                         <type ref="cta"/>
                         <type ref="iframe"/>
+                        <type ref="code"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

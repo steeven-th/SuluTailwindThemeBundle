@@ -74,6 +74,7 @@
                         <type ref="testimonial"/>
                         <type ref="accordion"/>
                         <type ref="iframe"/>
+                        <type ref="code"/>
                         <type ref="document"/>
                         <type ref="separator"/>
                     </types>

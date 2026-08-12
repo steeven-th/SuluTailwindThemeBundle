@@ -54,6 +54,7 @@ class BlockTemplateResolver
         'testimonial' => 'cards',
         'accordion' => 'list',
         'iframe' => 'default',
+        'code' => 'default',
         'separator' => 'line',
         'article_carousel' => 'carousel',
         'article_featured' => 'hero',

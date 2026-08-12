@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
@@ -34,6 +35,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly GoogleFontsResolver $fontsResolver,
         private readonly BlockTemplateResolver $blockTemplateResolver,
         private readonly EmbedUrlValidator $embedUrlValidator,
+        private readonly CodeBlockPolicy $codeBlockPolicy,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -66,7 +68,83 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
         ];
+    }
+
+    /**
+     * Resolve how a code block's markup must be executed.
+     *
+     * @param bool        $unsandboxedRequested The block's "unsandboxed" checkbox
+     * @param string|null $code                 The pasted markup, checked against the length limit
+     *
+     * @return string 'sandboxed', 'raw', or 'too_long' when the snippet exceeds the limit
+     */
+    public function getCodeMode(bool $unsandboxedRequested, ?string $code = null): string
+    {
+        if (!$this->codeBlockPolicy->isWithinLengthLimit($code)) {
+            return 'too_long';
+        }
+
+        return $this->codeBlockPolicy->resolveMode($unsandboxedRequested);
+    }
+
+    /**
+     * Build the document served to the sandboxed iframe of a code block.
+     *
+     * The markup is wrapped rather than passed through, for two reasons that
+     * would otherwise make the sandbox unusable in practice:
+     *
+     *  - **The theme stylesheet is linked in.** A sandboxed frame inherits none
+     *    of the page's CSS, so a widget would render unstyled. A frame with an
+     *    opaque origin can still fetch subresources by absolute URL, so linking
+     *    the compiled theme CSS works and the embed looks native.
+     *  - **A height reporter is injected.** The frame cannot resize its parent,
+     *    which is the usual reason people give up on sandboxing. Since we own
+     *    this document, a ResizeObserver posts the content height out and the
+     *    embed_resize controller applies it.
+     *
+     * The pasted markup itself is emitted verbatim: sanitising here would defeat
+     * the point of the block, and the sandbox — not escaping — is what contains
+     * it. Escaping happens once, when this string is written into the `srcdoc`
+     * attribute by the template.
+     *
+     * @param string      $code          The pasted markup
+     * @param bool        $inheritStyles Whether to link the theme stylesheet
+     * @param bool        $autoHeight    Whether to inject the height reporter
+     *
+     * @return string The full HTML document
+     */
+    public function getCodeSrcdoc(string $code, bool $inheritStyles = true, bool $autoHeight = true): string
+    {
+        $head = '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
+
+        if ($inheritStyles) {
+            $cssPath = $this->getCssPath();
+            if ('' !== $cssPath) {
+                $head .= '<link rel="stylesheet" href="' . htmlspecialchars($cssPath, \ENT_QUOTES, 'UTF-8') . '">';
+            }
+        }
+
+        // Transparent background so the embed sits on the block's own surface,
+        // and no default margin so the reported height matches the content.
+        $head .= '<style>html,body{margin:0;padding:0;background:transparent;}</style>';
+
+        $script = '';
+        if ($autoHeight) {
+            // postMessage targets '*': the parent cannot be identified by origin
+            // from an opaque-origin frame. The parent authenticates the message
+            // by comparing event.source with its own iframe's contentWindow.
+            $script = '<script>(function(){'
+                . 'var send=function(){parent.postMessage({type:"iw-embed-height",'
+                . 'height:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*");};'
+                . 'if(window.ResizeObserver){new ResizeObserver(send).observe(document.documentElement);}'
+                . 'window.addEventListener("load",send);document.addEventListener("DOMContentLoaded",send);'
+                . '})();</script>';
+        }
+
+        return '<!doctype html><html><head>' . $head . '</head><body>' . $code . $script . '</body></html>';
     }
 
     /**
