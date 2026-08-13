@@ -53,7 +53,7 @@
             </properties>
         </section>
 
-        <!-- Buttons — unlimited, named by slug (repeatable block) -->
+        <!-- Buttons - unlimited, named by slug (repeatable block) -->
         <block name="buttons" default-type="button" minOccurs="0">
             <meta>
                 <title>iw_sulu_tailwind_theme.buttons</title>

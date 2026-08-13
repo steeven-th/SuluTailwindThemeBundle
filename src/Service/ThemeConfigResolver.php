@@ -64,7 +64,7 @@ class ThemeConfigResolver
 
             // The configured color travels with its shades under a "base" key.
             // A shade-less ref (ref:accent) resolves to it server-side, and the
-            // JS resolver needs the same value to preview the same color — the
+            // JS resolver needs the same value to preview the same color - the
             // generator reworks lightness, so no shade reproduces the input.
             $shades['base'] = $value;
 

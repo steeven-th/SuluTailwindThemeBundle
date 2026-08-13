@@ -58,7 +58,7 @@ export function resolveRef(value, palette) {
     // (ThemeCompiler::resolveColorValue returns the base hex), otherwise the
     // admin previews one color and the site renders another. Falling back to
     // 500 would be wrong: the palette generator reworks lightness, so no shade
-    // reproduces the input — that is the whole reason "base" exists.
+    // reproduces the input - that is the whole reason "base" exists.
     if (parsed.shade === null) {
         return shades.base || shades[500] || value;
     }

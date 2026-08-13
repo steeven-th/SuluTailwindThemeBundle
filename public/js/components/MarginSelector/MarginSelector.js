@@ -5,7 +5,7 @@ import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 /**
  * Available spacing values.
  *
- * These are Tailwind spacing steps, where one unit is 0.25rem — 4px at a 16px
+ * These are Tailwind spacing steps, where one unit is 0.25rem - 4px at a 16px
  * root. The buttons show both, because a mockup is measured in pixels and the
  * Tailwind number alone means nothing without that conversion in mind.
  */

@@ -152,24 +152,6 @@ function ensurePickerStyles() {
         .iw-palette-swatch--selected:hover {
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db, 0 2px 8px rgba(0,0,0,0.2);
         }
-        .iw-palette-tooltip {
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: #fff;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.12s;
-        }
-        .iw-palette-swatch:hover .iw-palette-tooltip {
-            opacity: 1;
-        }
         .iw-color-picker-tabbed {
             background: #fff;
             border: 1px solid #c0c0c0;
@@ -386,7 +368,7 @@ export default class ColorTokenEditor extends React.Component {
                 }
             }
         } catch (e) {
-            // User cancelled the eyedropper — do nothing
+            // User cancelled the eyedropper - do nothing
         }
     };
 
@@ -493,12 +475,8 @@ export default class ColorTokenEditor extends React.Component {
                                                 + (isSelected ? ' iw-palette-swatch--selected' : '')}
                                             style={{backgroundColor: baseHex}}
                                             onClick={() => this.handleSwatchClick(baseHex, key, null)}
-                                            title={key}
-                                        >
-                                            <span className="iw-palette-tooltip">
-                                                {label} — {translate('iw_sulu_tailwind_theme.palette_base')}
-                                            </span>
-                                        </div>
+                                            title={`${label} - ${translate('iw_sulu_tailwind_theme.palette_base')} (${baseHex})`}
+                                        />
                                     );
                                 })()}
 
@@ -518,12 +496,8 @@ export default class ColorTokenEditor extends React.Component {
                                             className={swatchClass}
                                             style={{backgroundColor: hex}}
                                             onClick={() => this.handleSwatchClick(hex, key, shade)}
-                                            title={`${key}-${shade}`}
-                                        >
-                                            <span className="iw-palette-tooltip">
-                                                {label} {shade}
-                                            </span>
-                                        </div>
+                                            title={`${label} ${shade} (${hex})`}
+                                        />
                                     );
                                 })}
                             </div>

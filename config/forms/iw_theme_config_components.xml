@@ -179,6 +179,7 @@
                             <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.card_gap_normal</title></meta></param>
                             <param name="2rem"><meta><title>iw_sulu_tailwind_theme.card_gap_spacious</title></meta></param>
                             <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.card_gap_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.card_gap_xlarge</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -196,9 +197,13 @@
                         <param name="values" type="collection">
                             <param name="0"><meta><title>iw_sulu_tailwind_theme.articles_card_padding_none</title></meta></param>
                             <param name="0.5rem"><meta><title>8 px (0.5rem · p-2)</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px (0.75rem · p-3)</title></meta></param>
                             <param name="1rem"><meta><title>16 px (1rem · p-4)</title></meta></param>
+                            <param name="1.25rem"><meta><title>20 px (1.25rem · p-5)</title></meta></param>
                             <param name="1.5rem"><meta><title>24 px (1.5rem · p-6)</title></meta></param>
                             <param name="2rem"><meta><title>32 px (2rem · p-8)</title></meta></param>
+                            <param name="2.5rem"><meta><title>40 px (2.5rem · p-10)</title></meta></param>
+                            <param name="3rem"><meta><title>48 px (3rem · p-12)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -625,7 +630,7 @@
             </properties>
         </section>
 
-        <!-- Images / delivery — site-wide image output settings. -->
+        <!-- Images / delivery - site-wide image output settings. -->
         <section name="componentsImages">
             <meta>
                 <title>iw_sulu_tailwind_theme.components_section_images</title>

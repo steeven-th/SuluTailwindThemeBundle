@@ -92,7 +92,7 @@ Same pattern for every role (`--color-secondary-*`, `--color-accent-*`, …,
 >
 > The generator keeps the **hue** of the configured color and reworks its
 > **lightness** onto a fixed eleven-step ramp. Your color therefore appears in
-> the palette only by coincidence — `--color-accent-500` is *not* the hex you
+> the palette only by coincidence - `--color-accent-500` is *not* the hex you
 > typed:
 >
 > ```css
@@ -101,7 +101,7 @@ Same pattern for every role (`--color-secondary-*`, `--color-accent-*`, …,
 > ```
 >
 > Use **`--color-accent`**, without a level, whenever a brand guideline gives you
-> an exact value. The levels are there for the surrounding tones — hovers,
+> an exact value. The levels are there for the surrounding tones - hovers,
 > borders, tinted backgrounds.
 >
 > The same applies to `ref:` values stored in the theme: **`ref:accent`** resolves
@@ -146,7 +146,7 @@ Where `{el}` is `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `body`, or `link`.
 
 > **Reproducing a design handed over in pixels.** `--font-size-{el}` is in `rem`
 > and `--line-height-{el}` is a **unitless multiplier**, not a length: `1.2` means
-> 1.2 × the font size. To convert a mockup, divide — a 67px line height on a 77px
+> 1.2 × the font size. To convert a mockup, divide - a 67px line height on a 77px
 > heading is `67 ÷ 77 = 0.87`. The admin steps are 0.0625rem for the size (exactly
 > 1px at a 16px root) and 0.01 for the line height, so both values are reachable.
 

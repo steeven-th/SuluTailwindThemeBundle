@@ -376,7 +376,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * the locales attached to the user's roles and discards every role that does
      * not list it (AccessControlManager::getRolesForLocale). Defaulting to "en"
      * therefore denied access to any user whose roles are restricted to other
-     * locales — a French-only editor got a 403 on this endpoint despite holding
+     * locales - a French-only editor got a 403 on this endpoint despite holding
      * full permissions on the security context. A null locale skips that filter.
      *
      * @param Request $request The HTTP request
