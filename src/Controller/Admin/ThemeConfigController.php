@@ -271,7 +271,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             if (1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $hex)) {
                 continue;
             }
-            $palette[$name] = $this->paletteGenerator->generatePalette($hex);
+            $shades = $this->paletteGenerator->generatePalette($hex);
+            // Ship the configured color alongside its shades, so a shade-less
+            // ref previews the same value the compiler will emit.
+            $shades['base'] = $hex;
+
+            $palette[$name] = $shades;
         }
 
         return new JsonResponse($palette);
@@ -371,7 +376,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * the locales attached to the user's roles and discards every role that does
      * not list it (AccessControlManager::getRolesForLocale). Defaulting to "en"
      * therefore denied access to any user whose roles are restricted to other
-     * locales — a French-only editor got a 403 on this endpoint despite holding
+     * locales - a French-only editor got a 403 on this endpoint despite holding
      * full permissions on the security context. A null locale skips that filter.
      *
      * @param Request $request The HTTP request

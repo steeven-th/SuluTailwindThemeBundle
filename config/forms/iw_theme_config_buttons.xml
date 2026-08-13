@@ -19,11 +19,15 @@
                     <params>
                         <param name="default_value" value="1.5rem"/>
                         <param name="values" type="collection">
-                            <param name="0.5rem"><meta><title>XS (px-2)</title></meta></param>
-                            <param name="1rem"><meta><title>S (px-4)</title></meta></param>
-                            <param name="1.5rem"><meta><title>M (px-6)</title></meta></param>
-                            <param name="2rem"><meta><title>L (px-8)</title></meta></param>
-                            <param name="2.5rem"><meta><title>XL (px-10)</title></meta></param>
+                            <param name="0.25rem"><meta><title>4 px (0.25rem · px-1)</title></meta></param>
+                            <param name="0.5rem"><meta><title>8 px (0.5rem · px-2)</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px (0.75rem · px-3)</title></meta></param>
+                            <param name="1rem"><meta><title>16 px (1rem · px-4)</title></meta></param>
+                            <param name="1.25rem"><meta><title>20 px (1.25rem · px-5)</title></meta></param>
+                            <param name="1.5rem"><meta><title>24 px (1.5rem · px-6)</title></meta></param>
+                            <param name="2rem"><meta><title>32 px (2rem · px-8)</title></meta></param>
+                            <param name="2.5rem"><meta><title>40 px (2.5rem · px-10)</title></meta></param>
+                            <param name="3rem"><meta><title>48 px (3rem · px-12)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -34,18 +38,22 @@
                     <params>
                         <param name="default_value" value="0.75rem"/>
                         <param name="values" type="collection">
-                            <param name="0.25rem"><meta><title>XS (py-1)</title></meta></param>
-                            <param name="0.5rem"><meta><title>S (py-2)</title></meta></param>
-                            <param name="0.75rem"><meta><title>M (py-3)</title></meta></param>
-                            <param name="1rem"><meta><title>L (py-4)</title></meta></param>
-                            <param name="1.25rem"><meta><title>XL (py-5)</title></meta></param>
+                            <param name="0.25rem"><meta><title>4 px (0.25rem · py-1)</title></meta></param>
+                            <param name="0.5rem"><meta><title>8 px (0.5rem · py-2)</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px (0.75rem · py-3)</title></meta></param>
+                            <param name="1rem"><meta><title>16 px (1rem · py-4)</title></meta></param>
+                            <param name="1.25rem"><meta><title>20 px (1.25rem · py-5)</title></meta></param>
+                            <param name="1.5rem"><meta><title>24 px (1.5rem · py-6)</title></meta></param>
+                            <param name="2rem"><meta><title>32 px (2rem · py-8)</title></meta></param>
+                            <param name="2.5rem"><meta><title>40 px (2.5rem · py-10)</title></meta></param>
+                            <param name="3rem"><meta><title>48 px (3rem · py-12)</title></meta></param>
                         </param>
                     </params>
                 </property>
             </properties>
         </section>
 
-        <!-- Buttons — unlimited, named by slug (repeatable block) -->
+        <!-- Buttons - unlimited, named by slug (repeatable block) -->
         <block name="buttons" default-type="button" minOccurs="0">
             <meta>
                 <title>iw_sulu_tailwind_theme.buttons</title>
