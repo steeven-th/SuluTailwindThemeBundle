@@ -37,7 +37,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-paragraph-color` | `paragraph` | Color for `<p>` |
 | `--iw-variant-link-color` | `link` | Color for links (excluding `.iw-button--*`) |
 | `--iw-variant-link-hover` | `linkHover` | Link hover color |
-| `--iw-variant-list-color` | `list` | Color for `<ul>` / `<ol>` |
+| `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
@@ -61,13 +61,13 @@ The compiled CSS automatically styles these HTML elements inside any `.iw-varian
 | `.iw-block__subtitle` | `color: var(--iw-variant-subtitle-color)` |
 | `p` | `color: var(--iw-variant-paragraph-color)` |
 | `a` (excluding `[class*="iw-button--"]`) | `color: var(--iw-variant-link-color)`, hover → `--iw-variant-link-hover` |
-| `ul`, `ol` | `color: var(--iw-variant-list-color)` |
+| `ul li::marker`, `ol li::marker` | `color: var(--iw-variant-list-color)` - the item text inherits the paragraph color |
 | `table` | Full styling with borders using `--iw-variant-hr-color` |
 | `table th` | Bold, `--iw-variant-title-color` text, `--iw-variant-subtle-bg` background |
 | `code` (inline) | `--iw-variant-subtle-bg` background, border `--iw-variant-hr-color` |
 | `pre` (code block) | `--iw-variant-subtle-bg` background, padded, border `--iw-variant-hr-color` |
 | `blockquote` | Left border `--iw-variant-hr-color`, italic, `--iw-variant-subtitle-color` |
-| `.todo-list` | Checkbox accent color from `--iw-variant-link-color` |
+| `.todo-list input[type="checkbox"]` | `accent-color: var(--iw-variant-list-color)` - a to-do list has no marker, its checkbox plays that role |
 | `hr` | Styled based on `separatorMode` / `separatorStyle` (solid, dashed, dotted, double, gradient, wave, zigzag, dots, diamond) |
 
 All rules are scoped via the `.iw-variant--{slug}` selector and therefore sit at specificity 0,2,0. They can be overridden with a single custom property without rewriting selectors.
