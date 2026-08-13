@@ -124,6 +124,11 @@ services:
         arguments:
             - '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
 
+    # Draws the placeholder images of the demo content at run time, in the
+    # colors of the theme: nothing is shipped with the bundle.
+    itech_world.sulu_tailwind_theme.demo_image_generator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\DemoImageGenerator
+
     itech_world.sulu_tailwind_theme.google_fonts_catalog:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog
         arguments:
@@ -169,6 +174,17 @@ services:
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@doctrine.orm.entity_manager'
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+        tags:
+            - { name: 'console.command' }
+
+    ItechWorld\SuluTailwindThemeBundle\Command\DemoContentCommand:
+        arguments:
+            - '@messenger.default_bus'
+            - '@sulu_core.webspace.webspace_manager'
+            - '@sulu_media.media_manager'
+            - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.demo_image_generator'
+            - '@itech_world.sulu_tailwind_theme.provider'
         tags:
             - { name: 'console.command' }
 
