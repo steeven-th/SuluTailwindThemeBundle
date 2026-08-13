@@ -205,18 +205,13 @@ Generic filled badge (primary palette by default). Rendered by `templates/compon
 
 ## Prose (rich text)
 
-Rich-text content (the `paragraph` block, text widgets, CTA/text-image bodies, etc.) is styled with the Tailwind Typography plugin's **`.prose`** class — the bundle deliberately keeps this Tailwind convention rather than introducing a custom `.iw-prose` class, so the full Typography ecosystem (modifiers, plugin config) stays available.
+Rich-text content (the `paragraph` block, text widgets, CTA/text-image bodies, accordion answers, etc.) is wrapped in a **`.prose`** container.
 
-Templates typically combine `.prose` with `max-w-none` and an optional size/scheme modifier:
+> **The bundle does not require `@tailwindcss/typography`.** It borrows the class name as a convention, but styles rich text itself. The plugin ships a complete typographic scale that would compete with the theme tokens for the same properties, so it is not a dependency. Install it if you want its extras, but nothing here depends on it - and modifiers such as `prose-lg` or `prose-invert` only work if you do install it.
 
-| Class | Role |
-|-------|------|
-| `.prose` | Base rich-text styling (Tailwind Typography). |
-| `.prose-sm` / `.prose-lg` | Smaller / larger type scale. |
-| `.prose-invert` | Light text on dark backgrounds. |
-| `max-w-none` | Removes the plugin's default max-width (almost always used alongside). |
+Templates combine `.prose` with `max-w-none`.
 
-On top of the plugin, the bundle adds a few overrides in `app.css` so prose content follows the active theme/variant:
+The bundle styles the following, so rich text follows the active theme and variant:
 
 | Selector | Effect |
 |----------|--------|
@@ -224,12 +219,22 @@ On top of the plugin, the bundle adds a few overrides in `app.css` so prose cont
 | `.prose a:hover` | Hover color follows `--iw-variant-link-hover` → `--color-link-hover`. |
 | `.prose img` | Image radius follows `--radius-img`. |
 | `.prose blockquote` | Left border in `--color-primary`, italic, slightly dimmed. |
+| `.prose ul`, `.prose ol` | Restores markers, indents the list and spaces it from surrounding paragraphs. |
+| `.prose li::marker` | Marker color follows `--iw-variant-list-color`, falling back to the text color. |
+| `.prose .todo-list` | Keeps CKEditor to-do lists marker-free; their checkbox carries the color instead. |
 
-**Customise** by overriding these rules (or any Tailwind Typography variable) in your own CSS:
+Tailwind's preflight removes list markers site-wide (`list-style: none` on `ol` and `ul`), which is what navigation components rely on. Restoring them is therefore scoped to `.prose`: editor content gets its bullets back, menus and accordions keep the reset.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-prose-list-indent` | `1.5rem` | Left indent of a list, keeping markers clear of the paragraphs around it. |
+| `--iw-prose-list-item-gap` | `0.25em` | Space between two items. |
+| `--iw-prose-nested-list-margin` | `0.25em` | Vertical margin of a nested list, tighter than a top-level one. |
+
+**Customise** by overriding these rules in your own CSS:
 ```css
 .prose {
-    --tw-prose-body: var(--color-text);
-    --tw-prose-headings: var(--color-primary);
+    --iw-prose-list-indent: 2rem;
 }
 ```
 

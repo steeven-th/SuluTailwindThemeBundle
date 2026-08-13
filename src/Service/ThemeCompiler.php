@@ -2332,11 +2332,9 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-list-color, inherit);\n";
             $css .= "}\n";
 
-            // List bottom margin inside iw-block__text
-            $css .= ".iw-variant--{$index} .iw-block__text ul,\n";
-            $css .= ".iw-variant--{$index} .iw-block__text ol {\n";
-            $css .= "  margin-bottom: 1em;\n";
-            $css .= "}\n";
+            // List spacing is no longer emitted per variant: the bundle CSS sets
+            // it once on `.prose ul/ol`, alongside the markers it restores. Two
+            // sources for the same margin only invite drift.
 
             // Table styling (CKEditor wraps in <figure class="table">)
             $css .= ".iw-variant--{$index} figure.table {\n";
