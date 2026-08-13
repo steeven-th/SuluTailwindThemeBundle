@@ -18,10 +18,10 @@ use PHPUnit\Framework\TestCase;
 final class ThemeFixturesTest extends TestCase
 {
     #[Test]
-    public function itShipsTheEightPresets(): void
+    public function itShipsTheSevenPresets(): void
     {
         self::assertSame(
-            ['corporate', 'creative', 'minimal', 'nature', 'halloween', 'christmas', 'megamenu', 'asmt'],
+            ['corporate', 'creative', 'minimal', 'nature', 'halloween', 'christmas', 'megamenu'],
             array_keys(ThemeFixtures::getPresets()),
         );
     }
@@ -75,18 +75,6 @@ final class ThemeFixturesTest extends TestCase
         self::assertMatchesRegularExpression('/\.iw-button--[a-z0-9-]+ \{/', $css);
         // No unresolved reference leaks into the output.
         self::assertStringNotContainsString('ref:', $css);
-    }
-
-    #[Test]
-    public function theAsmtPresetExposesItsBrandColors(): void
-    {
-        $css = $this->compile(ThemeFixtures::getPresets()['asmt']['tokens']);
-
-        self::assertStringContainsString('--color-pink:', $css);
-        self::assertStringContainsString('--color-green:', $css);
-        self::assertStringContainsString('--color-gray-blue:', $css);
-        self::assertStringContainsString('.iw-variant--employeur {', $css);
-        self::assertStringContainsString('.iw-button--salarie {', $css);
     }
 
     /**

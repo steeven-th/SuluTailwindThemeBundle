@@ -123,6 +123,20 @@ For each element (`h1`-`h6`, `body`, `link`), the following variables are genera
 
 Where `{el}` is `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `body`, or `link`.
 
+> **Reproducing a design handed over in pixels.** `--font-size-{el}` is in `rem`
+> and `--line-height-{el}` is a **unitless multiplier**, not a length: `1.2` means
+> 1.2 × the font size. To convert a mockup, divide — a 67px line height on a 77px
+> heading is `67 ÷ 77 = 0.87`. The admin steps are 0.0625rem for the size (exactly
+> 1px at a 16px root) and 0.01 for the line height, so both values are reachable.
+
+> **Font weights are validated against the font.** The weight field only offers
+> what the assigned family actually ships, and the server refuses a save that
+> asks for a missing weight. This is not cosmetic: the Google Fonts CSS2 API
+> rejects an entire request citing an unavailable weight, which would leave the
+> site with no custom font at all rather than just one wrong heading. When the
+> font catalog is unavailable (no API key) or does not know the family, every
+> weight is offered and nothing is blocked.
+
 **Full list of generated variables:**
 
 | Variable | Default |
