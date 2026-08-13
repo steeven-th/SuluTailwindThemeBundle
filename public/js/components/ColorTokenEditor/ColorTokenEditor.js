@@ -134,29 +134,30 @@ function ensurePickerStyles() {
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             z-index: 1;
         }
+        /* The configured color, set apart from the generated shades: larger,
+           darker outline, and separated by a rule. It is what a brand guideline
+           asks for, so it must not read as one shade among eleven. */
+        .iw-palette-swatch--base {
+            width: 36px;
+            height: 36px;
+            margin-right: 8px;
+            align-self: center;
+            border: 2px solid rgba(0,0,0,0.35);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+        }
+        .iw-palette-swatch--base::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            right: -5px;
+            border-right: 1px solid rgba(0,0,0,0.12);
+        }
         .iw-palette-swatch--selected {
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${accent};
         }
         .iw-palette-swatch--selected:hover {
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${accent}, 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .iw-palette-tooltip {
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: #fff;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.12s;
-        }
-        .iw-palette-swatch:hover .iw-palette-tooltip {
-            opacity: 1;
         }
         .iw-color-picker-tabbed {
             background: #fff;
@@ -374,7 +375,7 @@ export default class ColorTokenEditor extends React.Component {
                 }
             }
         } catch (e) {
-            // User cancelled the eyedropper — do nothing
+            // User cancelled the eyedropper - do nothing
         }
     };
 
@@ -401,7 +402,11 @@ export default class ColorTokenEditor extends React.Component {
      * @param {number} shade     The shade level (50, 100, ..., 950)
      */
     handleSwatchClick = (hex, colorKey, shade) => {
-        const refValue = `ref:${colorKey}-${shade}`;
+        // A null shade means the base color itself: `ref:accent` resolves to the
+        // exact value the user configured, while `ref:accent-500` is a generated
+        // shade that almost never matches it (the palette generator keeps the hue
+        // and reworks the lightness). Brand colors must reference the base.
+        const refValue = null === shade ? `ref:${colorKey}` : `ref:${colorKey}-${shade}`;
         this.setState({internalValue: refValue});
         this.props.onChange(refValue);
 
@@ -457,6 +462,31 @@ export default class ColorTokenEditor extends React.Component {
                                 {label}
                             </div>
                             <div className="iw-palette-swatches">
+                                {/* The configured color itself, before the generated
+                                    shades and visually set apart: it is the one a
+                                    brand guideline asks for, and no shade reproduces
+                                    it. Emits `ref:<key>` without a level. */}
+                                {(() => {
+                                    const baseHex = color.value;
+                                    if (!baseHex) {
+                                        return null;
+                                    }
+
+                                    const baseRef = 'ref:' + key;
+                                    const isSelected = normalizedValue === baseRef
+                                        || normalizedValue === baseHex.toLowerCase();
+
+                                    return (
+                                        <div
+                                            className={'iw-palette-swatch iw-palette-swatch--base'
+                                                + (isSelected ? ' iw-palette-swatch--selected' : '')}
+                                            style={{backgroundColor: baseHex}}
+                                            onClick={() => this.handleSwatchClick(baseHex, key, null)}
+                                            title={`${label} - ${translate('iw_sulu_tailwind_theme.palette_base')} (${baseHex})`}
+                                        />
+                                    );
+                                })()}
+
                                 {SHADE_LEVELS.map((shade) => {
                                     const hex = shades[shade];
                                     if (!hex) return null;
@@ -473,12 +503,8 @@ export default class ColorTokenEditor extends React.Component {
                                             className={swatchClass}
                                             style={{backgroundColor: hex}}
                                             onClick={() => this.handleSwatchClick(hex, key, shade)}
-                                            title={`${key}-${shade}`}
-                                        >
-                                            <span className="iw-palette-tooltip">
-                                                {label} {shade}
-                                            </span>
-                                        </div>
+                                            title={`${label} ${shade} (${hex})`}
+                                        />
                                     );
                                 })}
                             </div>

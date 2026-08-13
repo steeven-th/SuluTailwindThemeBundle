@@ -69,7 +69,7 @@ const radiusCssForKey = (key) => {
  * The option list is rendered through Sulu's `Popover`, which portals it to
  * the document body. This keeps it above the form chrome (e.g. the "add
  * block" button) and lets it flip above the trigger / scroll internally when
- * there is no room below — same behavior as Sulu's native selects.
+ * there is no room below - same behavior as Sulu's native selects.
  *
  * Two modes, depending on schemaOptions:
  * - `theme_key` (block forms): adaptive mode. A "Theme default" option is
@@ -293,6 +293,14 @@ export default class RadiusSelector extends React.Component {
                         >
                             {this.renderThumbnail(option.css, isSelected)}
                             <span>{option.label}</span>
+                            {/* The pixel value next to the Tailwind name: a
+                                mockup gives radii in pixels, and "xl" says
+                                nothing on its own. */}
+                            {!option.themeDefault && 'full' !== option.key && (
+                                <span style={{marginLeft: 'auto', fontSize: '11px', opacity: 0.6}}>
+                                    {option.css}
+                                </span>
+                            )}
                         </li>
                     );
                 })}
