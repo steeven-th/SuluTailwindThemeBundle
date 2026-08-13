@@ -64,11 +64,15 @@
                     <params>
                         <param name="default_value" value="700"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -79,7 +83,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="2.5"/>
                     </params>
                 </property>
@@ -102,7 +106,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.2"/>
                     </params>
                 </property>
@@ -126,11 +130,15 @@
                     <params>
                         <param name="default_value" value="600"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -139,7 +147,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="2"/>
                     </params>
                 </property>
@@ -158,7 +166,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.25"/>
                     </params>
                 </property>
@@ -180,11 +188,15 @@
                     <params>
                         <param name="default_value" value="600"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -193,7 +205,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1.5"/>
                     </params>
                 </property>
@@ -212,7 +224,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.3"/>
                     </params>
                 </property>
@@ -234,11 +246,15 @@
                     <params>
                         <param name="default_value" value="600"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -247,7 +263,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1.25"/>
                     </params>
                 </property>
@@ -266,7 +282,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.35"/>
                     </params>
                 </property>
@@ -288,11 +304,15 @@
                     <params>
                         <param name="default_value" value="500"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -301,7 +321,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1.125"/>
                     </params>
                 </property>
@@ -320,7 +340,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.4"/>
                     </params>
                 </property>
@@ -342,11 +362,15 @@
                     <params>
                         <param name="default_value" value="500"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -355,7 +379,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1"/>
                     </params>
                 </property>
@@ -374,7 +398,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.4"/>
                     </params>
                 </property>
@@ -396,11 +420,15 @@
                     <params>
                         <param name="default_value" value="400"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -409,7 +437,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1"/>
                     </params>
                 </property>
@@ -428,7 +456,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.5"/>
                     </params>
                 </property>
@@ -450,11 +478,15 @@
                     <params>
                         <param name="default_value" value="500"/>
                         <param name="values" type="collection">
+                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
+                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
+                            <param name="300"><meta><title>300 (Light)</title></meta></param>
                             <param name="400"><meta><title>400 (Regular)</title></meta></param>
                             <param name="500"><meta><title>500 (Medium)</title></meta></param>
                             <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
                             <param name="700"><meta><title>700 (Bold)</title></meta></param>
                             <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
+                            <param name="900"><meta><title>900 (Black)</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -463,7 +495,7 @@
                     <params>
                         <param name="min" value="0.5"/>
                         <param name="max" value="10"/>
-                        <param name="step" value="0.125"/>
+                        <param name="step" value="0.0625"/>
                         <param name="default_value" value="1"/>
                     </params>
                 </property>
@@ -482,7 +514,7 @@
                     <params>
                         <param name="min" value="0.8"/>
                         <param name="max" value="3"/>
-                        <param name="step" value="0.05"/>
+                        <param name="step" value="0.01"/>
                         <param name="default_value" value="1.5"/>
                     </params>
                 </property>

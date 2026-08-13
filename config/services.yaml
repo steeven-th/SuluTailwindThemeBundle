@@ -109,8 +109,13 @@ services:
         arguments:
             - '%itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed%'
 
+    # The catalog lets the resolver drop weights a family does not ship: the
+    # Google Fonts API rejects the whole request over a single unavailable
+    # weight, which would leave the page without any custom font.
     itech_world.sulu_tailwind_theme.google_fonts_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
 
     itech_world.sulu_tailwind_theme.google_fonts_catalog:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog
