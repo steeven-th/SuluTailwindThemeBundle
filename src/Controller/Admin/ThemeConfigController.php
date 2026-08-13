@@ -8,12 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Entity\WebspaceTheme;
 use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
+use ItechWorld\SuluTailwindThemeBundle\Exception\TypographyWeightException;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
+use ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\Metadata\FieldDescriptorFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\PaginatedRepresentation;
@@ -59,6 +61,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly ThemeFormMapper $formMapper,
         private readonly TranslatorInterface $translator,
+        private readonly TypographyWeightValidator $weightValidator,
     ) {
     }
 
@@ -156,6 +159,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             return $this->slugValidationResponse($e);
         }
 
+        try {
+            $this->weightValidator->validate($theme->getTokens()['typography'] ?? []);
+        } catch (TypographyWeightException $e) {
+            return $this->typographyWeightResponse($e);
+        }
+
         $this->entityManager->persist($theme);
         $this->entityManager->flush();
 
@@ -193,6 +202,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             $this->formMapper->mapDataToEntity($data, $theme);
         } catch (SlugValidationException $e) {
             return $this->slugValidationResponse($e);
+        }
+
+        try {
+            $this->weightValidator->validate($theme->getTokens()['typography'] ?? []);
+        } catch (TypographyWeightException $e) {
+            return $this->typographyWeightResponse($e);
         }
 
         $this->entityManager->flush();
@@ -425,6 +440,43 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             '{slug}',
             $exception->slug,
             $this->translator->trans($exception->messageKey, [], 'admin', $locale),
+        );
+
+        return new JsonResponse([
+            'code' => Response::HTTP_UNPROCESSABLE_ENTITY,
+            'detail' => $message,
+        ], Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * Build the snackbar response for an unavailable font weight.
+     *
+     * Same mechanism as slugValidationResponse(): Sulu's ResourceFormStore reads
+     * `detail` from the error body and Form.js surfaces it in the native
+     * snackbar. See docs/sulu-bundle-cookbook.md.
+     *
+     * @param TypographyWeightException $exception The validation failure
+     *
+     * @return JsonResponse A 422 carrying the translated message
+     */
+    private function typographyWeightResponse(TypographyWeightException $exception): JsonResponse
+    {
+        $user = $this->getUser();
+        $locale = ($user instanceof SuluUserInterface && '' !== (string) $user->getLocale())
+            ? $user->getLocale()
+            : 'en';
+
+        // The admin JSON catalogs use the ICU `{placeholder}` syntax so the same
+        // keys stay usable from the JS side; the Symfony translator does not
+        // interpolate those, hence the explicit replacement.
+        $message = strtr(
+            $this->translator->trans($exception->messageKey, [], 'admin', $locale),
+            [
+                '{element}' => strtoupper($exception->element),
+                '{font}' => $exception->fontName,
+                '{weight}' => (string) $exception->weight,
+                '{available}' => implode(', ', $exception->available),
+            ],
         );
 
         return new JsonResponse([

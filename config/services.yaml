@@ -109,8 +109,20 @@ services:
         arguments:
             - '%itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed%'
 
+    # The catalog lets the resolver drop weights a family does not ship: the
+    # Google Fonts API rejects the whole request over a single unavailable
+    # weight, which would leave the page without any custom font.
     itech_world.sulu_tailwind_theme.google_fonts_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
+
+    # Server-side backstop: a font can be swapped after its weights were set,
+    # and themes also arrive through fixtures, the install command or an import.
+    itech_world.sulu_tailwind_theme.typography_weight_validator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
 
     itech_world.sulu_tailwind_theme.google_fonts_catalog:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog
@@ -218,6 +230,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator: '@itech_world.sulu_tailwind_theme.slug_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper: '@itech_world.sulu_tailwind_theme.form_mapper'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
+    ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator: '@itech_world.sulu_tailwind_theme.typography_weight_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'

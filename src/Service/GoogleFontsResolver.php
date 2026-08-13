@@ -9,6 +9,12 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
  *
  * Parses font family configurations from design tokens and generates
  * the appropriate Google Fonts import URL with specified weights.
+ *
+ * Requested weights are filtered against the font's actual variants when the
+ * catalog is available: the CSS2 API rejects a request citing a weight a family
+ * does not ship, and it fails the whole request — one bad weight would drop
+ * every font on the page, not just that weight. Filtering degrades the styling
+ * of a single element instead of stripping the page of its typography.
  */
 class GoogleFontsResolver
 {
@@ -16,6 +22,17 @@ class GoogleFontsResolver
      * Base URL for the Google Fonts CSS2 API.
      */
     private const GOOGLE_FONTS_BASE_URL = 'https://fonts.googleapis.com/css2';
+
+    /**
+     * @param GoogleFontsCatalog|null $catalog Used to check which weights a family
+     *                                         actually ships; when absent (no API
+     *                                         key, catalog never synced) weights
+     *                                         are passed through unfiltered
+     */
+    public function __construct(
+        private readonly ?GoogleFontsCatalog $catalog = null,
+    ) {
+    }
 
     /**
      * Resolve typography tokens into a Google Fonts CSS2 URL.
@@ -61,6 +78,10 @@ class GoogleFontsResolver
                 $weights = [400];
             }
 
+            // Drop weights the family does not ship, so one unavailable weight
+            // cannot make the API reject the request and leave the page unstyled.
+            $weights = $this->filterAvailableWeights($name, $weights);
+
             // Deduplicate and sort weights numerically for consistent URLs
             $weights = array_unique($weights);
             sort($weights);
@@ -78,6 +99,55 @@ class GoogleFontsResolver
         $queryString = implode('&', $familyParams);
 
         return self::GOOGLE_FONTS_BASE_URL . '?' . $queryString . '&display=swap';
+    }
+
+    /**
+     * Keep only the weights a family actually ships.
+     *
+     * The catalog is optional: without an API key it is never synced, and an
+     * empty catalog must not be read as "this font has no weights" — that would
+     * silently strip every weight from every URL. In that case, and whenever the
+     * family is simply absent from the catalog, the weights pass through
+     * untouched and behaviour is exactly what it was before filtering existed.
+     *
+     * If filtering removes everything (an editor picked 900 on a family that
+     * only has 400), the request still needs a weight, so it falls back to the
+     * closest available one rather than emitting an empty `wght@`.
+     *
+     * @param string     $familyName The font family name
+     * @param list<int>  $weights    The requested weights
+     *
+     * @return list<int> The weights safe to request
+     */
+    private function filterAvailableWeights(string $familyName, array $weights): array
+    {
+        $available = null !== $this->catalog
+            ? $this->catalog->getAvailableWeights($familyName)
+            : [];
+
+        if ([] === $available) {
+            return $weights;
+        }
+
+        $filtered = array_values(array_filter(
+            $weights,
+            static fn (int $weight): bool => \in_array($weight, $available, true),
+        ));
+
+        if ([] !== $filtered) {
+            return $filtered;
+        }
+
+        // Nothing survived: keep the closest weight to what was asked for, so
+        // the element still renders in that family instead of falling back to a
+        // system font.
+        $requested = $weights[0] ?? 400;
+        usort(
+            $available,
+            static fn (int $a, int $b): int => abs($a - $requested) <=> abs($b - $requested),
+        );
+
+        return [$available[0]];
     }
 
     /**

@@ -165,6 +165,51 @@ class GoogleFontsCatalog
     }
 
     /**
+     * Read the numeric weights a Google font ships.
+     *
+     * The catalog stores the API's `variants` list, which mixes numeric weights
+     * with named ones ("regular" = 400, "italic" = 400) and italic suffixes
+     * ("700italic"). Only the upright numeric value matters to callers: both the
+     * URL builder and the form validator reason about `wght` axes, never italics.
+     *
+     * An empty result means "unknown", never "this family has no weights": the
+     * catalog is only populated once synced with an API key. Callers must treat
+     * it as an absence of information and let the requested weights through.
+     *
+     * @param string $familyName The font family name
+     *
+     * @return list<int> The available weights, empty when unknown
+     */
+    public function getAvailableWeights(string $familyName): array
+    {
+        foreach ($this->getCatalog()['google'] ?? [] as $font) {
+            if (($font['family'] ?? null) !== $familyName) {
+                continue;
+            }
+
+            $weights = [];
+            foreach ($font['variants'] ?? [] as $variant) {
+                $variant = str_replace('italic', '', (string) $variant);
+
+                if ('' === $variant || 'regular' === $variant) {
+                    $weights[] = 400;
+                    continue;
+                }
+
+                if (ctype_digit($variant)) {
+                    $weights[] = (int) $variant;
+                }
+            }
+
+            sort($weights);
+
+            return array_values(array_unique($weights));
+        }
+
+        return [];
+    }
+
+    /**
      * Check whether a Google Fonts API key is configured.
      *
      * @return bool True if an API key is available
