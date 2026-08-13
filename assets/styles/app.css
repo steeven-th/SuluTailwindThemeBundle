@@ -270,6 +270,57 @@ img.object-cover {
     opacity: 0.9;
 }
 
+/* Lists in rich text.
+   Tailwind's preflight strips markers site-wide (`list-style: none` on ol/ul),
+   and the `prose` class comes from @tailwindcss/typography, which this bundle
+   deliberately does not require: the plugin ships a full typographic scale that
+   would compete with the theme tokens. Markers are therefore restored here.
+
+   Scoped to `.prose`, so only editor content is affected - menus, accordions
+   and navigation components keep relying on the reset. */
+.prose ul,
+.prose ol {
+    /* Indented so the markers sit clear of the surrounding paragraphs instead
+       of aligning with them. */
+    padding-left: var(--iw-prose-list-indent, 1.5rem);
+    margin-block: 1em;
+    list-style-position: outside;
+}
+
+.prose ul { list-style-type: disc; }
+.prose ol { list-style-type: decimal; }
+
+/* Nested levels stay distinguishable. */
+.prose ul ul { list-style-type: circle; }
+.prose ul ul ul { list-style-type: square; }
+.prose ol ol { list-style-type: lower-alpha; }
+.prose ol ol ol { list-style-type: lower-roman; }
+
+/* A nested list belongs to its parent item, so it needs far less breathing
+   room than a list separating two paragraphs. */
+.prose li > ul,
+.prose li > ol {
+    margin-block: var(--iw-prose-nested-list-margin, 0.25em);
+}
+
+.prose li + li {
+    margin-top: var(--iw-prose-list-item-gap, 0.25em);
+}
+
+/* Follows the variant's bullet color, falling back to the text color the way a
+   browser does natively - the bundle imposes no color of its own here. */
+.prose li::marker {
+    color: var(--iw-variant-list-color, currentColor);
+}
+
+/* CKEditor to-do lists carry their own checkbox and must never get a marker,
+   inside a variant or not. Higher specificity than the rules above, so it wins
+   whatever the order. */
+.prose .todo-list {
+    list-style: none;
+    padding-left: 0;
+}
+
 /* ─── Scrollbar Hide Utility ────────────────────────────────────────────── */
 .scrollbar-hide {
     -ms-overflow-style: none;
