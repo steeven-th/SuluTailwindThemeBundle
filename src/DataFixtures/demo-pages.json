@@ -1,0 +1,3480 @@
+{
+ "media_pool": 12,
+ "pages": [
+  {
+   "title": "Test Blocks",
+   "locale": "en",
+   "data": {
+    "title": "Test Blocks",
+    "blocks": [
+     {
+      "_id": "6e337e8d",
+      "type": "linked_pages",
+      "links": [
+       {
+        "_id": "f50c847c",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "252b398c",
+        "link": {
+         "rel": null,
+         "href": "@page:separator",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "38d43689",
+        "link": {
+         "rel": null,
+         "href": "@page:Document",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "c34eecda",
+        "link": {
+         "rel": null,
+         "href": "@page:Linked pages",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "d2d4baed",
+        "link": {
+         "rel": null,
+         "href": "@page:testimonial",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "42ab7e29",
+        "link": {
+         "rel": null,
+         "href": "@page:Key figures",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "fc057021",
+        "link": {
+         "rel": null,
+         "href": "@page:Article Carousel",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "ef1de730",
+        "link": {
+         "rel": null,
+         "href": "@page:Call to action",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "2f749ea8",
+        "link": {
+         "rel": null,
+         "href": "@page:Form",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "6f0fa741",
+        "link": {
+         "rel": null,
+         "href": "@page:Location",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "ff9e6fff",
+        "link": {
+         "rel": null,
+         "href": "@page:Text - Images",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "7ad0b2a4",
+        "link": {
+         "rel": null,
+         "href": "@page:Gallery",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "483a27bc",
+        "link": {
+         "rel": null,
+         "href": "@page:Accordion",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "e9c166af",
+        "link": {
+         "rel": null,
+         "href": "@page:iFrame",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "bd8748fa",
+        "link": {
+         "rel": null,
+         "href": "@page:Code - Widget",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "a71c1e50",
+        "link": {
+         "rel": null,
+         "href": "@page:Articles",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       }
+      ],
+      "style": "cards",
+      "variant": 0,
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ],
+    "heroImage": null,
+    "heroTitle": null,
+    "heroSubtitle": null
+   }
+  },
+  {
+   "title": "Accordion",
+   "locale": "en",
+   "data": {
+    "title": "Accordion",
+    "blocks": [
+     {
+      "_id": "a59959de",
+      "type": "accordion",
+      "items": [
+       {
+        "_id": "ba7d961c",
+        "type": "item",
+        "itemOpen": false,
+        "itemTitle": "Question 1",
+        "itemContent": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.</p>"
+       },
+       {
+        "_id": "c3d6c301",
+        "type": "item",
+        "itemOpen": false,
+        "itemTitle": "Question 2",
+        "itemContent": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.</p>"
+       },
+       {
+        "_id": "1877f41e",
+        "type": "item",
+        "itemOpen": false,
+        "itemTitle": "Question 3",
+        "itemContent": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software like Aldus PageMaker and Microsoft Word including versions of Lorem Ipsum.</p>"
+       }
+      ],
+      "style": "list",
+      "title": "titre",
+      "variant": "clair-nature",
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "faqSchema": false,
+      "iconStyle": "chevron",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "singleOpen": false,
+      "iconPosition": "right",
+      "itemTitleTag": "h3",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left"
+     }
+    ],
+    "heroImage": null,
+    "heroTitle": null,
+    "heroSubtitle": null
+   }
+  },
+  {
+   "title": "Article Carousel",
+   "locale": "en",
+   "data": {
+    "url": null,
+    "title": "Article Carousel",
+    "blocks": [
+     {
+      "_id": "929f0cc9",
+      "type": "article_carousel",
+      "style": "carousel",
+      "title": "titre",
+      "variant": 0,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Articles",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/articles",
+    "title": "Articles",
+    "blocks": [
+     {
+      "_id": "929f0cc9",
+      "type": "article_carousel",
+      "style": "carousel",
+      "title": "titre",
+      "variant": 1,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-lg"
+     },
+     {
+      "_id": "f1bff0e1",
+      "type": "article_featured",
+      "style": "hero",
+      "title": "titre",
+      "variant": 1,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "articles_hero": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "4614f45d",
+      "type": "article_featured",
+      "style": "side_by_side",
+      "title": "titre",
+      "variant": 0,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none",
+      "articles_side_by_side": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      }
+     },
+     {
+      "_id": "cadb2f21",
+      "type": "article_featured",
+      "style": "spotlight",
+      "title": "titre",
+      "variant": 1,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "0bcdb91b",
+      "type": "article_list",
+      "style": "grid",
+      "title": "titre",
+      "variant": 0,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": 2,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "articlesCount": null,
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showPagination": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "e0d6f19d",
+      "type": "article_list",
+      "style": "list",
+      "title": "titre",
+      "variant": 1,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "articlesCount": 2,
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showPagination": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "bfec2581",
+      "type": "article_list",
+      "style": "cards",
+      "title": "titre",
+      "variant": 0,
+      "articles": {
+       "tags": null,
+       "types": [
+        "news",
+        "events",
+        "publications",
+        "default"
+       ],
+       "sortBy": "workflowPublished",
+       "presentAs": null,
+       "categories": null,
+       "dataSource": null,
+       "sortMethod": "asc",
+       "limitResult": null,
+       "tagOperator": "or",
+       "categoryOperator": "or",
+       "audienceTargeting": null,
+       "includeSubFolders": null
+      },
+      "autoplay": true,
+      "interval": 1500,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "articlesCount": 2,
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showPagination": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Call to action",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/call-to-action",
+    "title": "Call to action",
+    "blocks": [
+     {
+      "_id": "515ce454",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "banner",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "none",
+      "paddingLateral": "px-0",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "paragraphImageRadius": "rounded-none",
+      "secondaryButtonStyle": "secondary"
+     },
+     {
+      "_id": "b34ee929",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "style": "centered",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "paragraphImageRadius": "rounded-none",
+      "secondaryButtonStyle": "secondary"
+     },
+     {
+      "_id": "c1ef9569",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": "@media:1",
+       "displayOption": null
+      },
+      "style": "split",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "accessoryType": "video",
+      "paddingBottom": "pb-5",
+      "accessoryImage": {
+       "id": "@media:2",
+       "displayOption": null
+      },
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "accessoryVimeoId": "428046504",
+      "accessoryCounters": [],
+      "accessoryLocation": {
+       "lat": 43.58039085560786,
+       "code": "65800",
+       "long": 0.7036588838268677,
+       "town": "Aureilhan",
+       "zoom": 3,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 novembre",
+       "country": "France"
+      },
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "accessoryYoutubeId": "MsErcdTL_iY",
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "accessoryVideoPoster": {
+       "id": "@media:3",
+       "displayOption": null
+      },
+      "paragraphImageRadius": "rounded-2xl",
+      "secondaryButtonStyle": "secondary",
+      "accessoryVideoProvider": "youtube"
+     },
+     {
+      "_id": "a1c04b47",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": "@media:4",
+       "displayOption": null
+      },
+      "style": "split",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "accessoryType": "video",
+      "paddingBottom": "pb-5",
+      "accessoryImage": {
+       "id": "@media:5",
+       "displayOption": null
+      },
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "accessoryVimeoId": "428046504",
+      "accessoryCounters": [],
+      "accessoryLocation": {
+       "lat": 43.58039085560786,
+       "code": "65800",
+       "long": 0.7036588838268677,
+       "town": "Aureilhan",
+       "zoom": 3,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 novembre",
+       "country": "France"
+      },
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "accessoryVideoFile": {
+       "id": "@media:6",
+       "displayOption": null
+      },
+      "accessoryYoutubeId": "MsErcdTL_iY",
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "accessoryVideoPoster": {
+       "id": "@media:7",
+       "displayOption": null
+      },
+      "paragraphImageRadius": "rounded-2xl",
+      "secondaryButtonStyle": "secondary",
+      "accessoryVideoProvider": "file"
+     },
+     {
+      "_id": "9ff7aa05",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": "@media:8",
+       "displayOption": null
+      },
+      "style": "split",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "accessoryType": "image",
+      "paddingBottom": "pb-5",
+      "accessoryImage": {
+       "id": "@media:9",
+       "displayOption": null
+      },
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "accessoryVimeoId": "428046504",
+      "accessoryCounters": [],
+      "accessoryLocation": {
+       "lat": 43.58039085560786,
+       "code": "65800",
+       "long": 0.7036588838268677,
+       "town": "Aureilhan",
+       "zoom": 3,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 novembre",
+       "country": "France"
+      },
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "accessoryYoutubeId": "MsErcdTL_iY",
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "accessoryVideoPoster": {
+       "id": "@media:10",
+       "displayOption": null
+      },
+      "paragraphImageRadius": "rounded-2xl",
+      "secondaryButtonStyle": "secondary",
+      "accessoryVideoProvider": "youtube"
+     },
+     {
+      "_id": "97b69cd1",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": "@media:11",
+       "displayOption": null
+      },
+      "style": "split",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "accessoryType": "location",
+      "paddingBottom": "pb-5",
+      "accessoryImage": {
+       "id": "@media:12",
+       "displayOption": null
+      },
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "accessoryVimeoId": "428046504",
+      "accessoryCounters": [],
+      "accessoryLocation": {
+       "lat": 43.58039085560786,
+       "code": "65800",
+       "long": 0.7036588838268677,
+       "town": "Aureilhan",
+       "zoom": 3,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 novembre",
+       "country": "France"
+      },
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "accessoryYoutubeId": "MsErcdTL_iY",
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "accessoryVideoPoster": {
+       "id": "@media:1",
+       "displayOption": null
+      },
+      "paragraphImageRadius": "rounded-2xl",
+      "secondaryButtonStyle": "secondary",
+      "accessoryVideoProvider": "youtube"
+     },
+     {
+      "_id": "9c639465",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "cta",
+      "image": {
+       "id": "@media:2",
+       "displayOption": null
+      },
+      "style": "split",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "accessoryType": "counter",
+      "paddingBottom": "pb-5",
+      "accessoryImage": {
+       "id": "@media:3",
+       "displayOption": null
+      },
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "accessoryVimeoId": "428046504",
+      "accessoryCounters": [
+       {
+        "_id": "b7153026",
+        "type": "counter",
+        "unit": "%",
+        "count": "50",
+        "label": "sdfgdqfg"
+       },
+       {
+        "_id": "e4231ffc",
+        "type": "counter",
+        "unit": "%",
+        "count": "50",
+        "label": "sdfgdqfg"
+       },
+       {
+        "_id": "b8810a0f",
+        "type": "counter",
+        "unit": "%",
+        "count": "50",
+        "label": "sdfgdqfg"
+       }
+      ],
+      "accessoryLocation": {
+       "lat": 43.58039085560786,
+       "code": "65800",
+       "long": 0.7036588838268677,
+       "town": "Aureilhan",
+       "zoom": 3,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 novembre",
+       "country": "France"
+      },
+      "primaryButtonLink": {
+       "rel": null,
+       "href": "@page:text",
+       "query": null,
+       "title": null,
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "page"
+      },
+      "accessoryYoutubeId": "MsErcdTL_iY",
+      "primaryButtonStyle": "primary",
+      "secondaryButtonLink": {
+       "rel": null,
+       "href": "https://google.com",
+       "query": null,
+       "title": "Google",
+       "anchor": null,
+       "locale": "en",
+       "target": "_self",
+       "provider": "external"
+      },
+      "accessoryVideoPoster": {
+       "id": "@media:4",
+       "displayOption": null
+      },
+      "paragraphImageRadius": "rounded-2xl",
+      "secondaryButtonStyle": "secondary",
+      "accessoryVideoProvider": "vimeo"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Code - Widget",
+   "locale": "en",
+   "data": {
+    "title": "Code - Widget",
+    "blocks": [
+     {
+      "_id": "8349345e",
+      "code": "<div id=\"test-widget-container\" style=\"font-family: Arial, sans-serif; padding: 20px; border: 2px dashed #007bff; border-radius: 8px; background-color: #f8f9fa; text-align: center;\">\n    <h3 style=\"color: #007bff; margin-top: 0;\">Test du Widget SULU</h3>\n    <p style=\"color: #555;\">Si tu vois ce texte et que le compteur ci-dessous fonctionne, ton bloc s'exécute correctement !</p>\n    \n    <div style=\"font-size: 24px; font-weight: bold; margin: 15px 0; color: #333;\">\n        Compteur : <span id=\"widget-counter\">0</span>\n    </div>\n    \n    <button id=\"widget-button\" style=\"background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;\">\n        Clique-moi\n    </button>\n</div>\n\n<script>\n    (function() {\n        let count = 0;\n        const button = document.getElementById('widget-button');\n        const counterSpan = document.getElementById('widget-counter');\n\n        if (button && counterSpan) {\n            button.addEventListener('click', function() {\n                count++;\n                counterSpan.textContent = count;\n            });\n        }\n    })();\n</script>",
+      "type": "code",
+      "ratio": "16-9",
+      "style": "default",
+      "title": "titre",
+      "variant": "clair-nature",
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "heightMode": "auto",
+      "paddingTop": "pt-5",
+      "blockRadius": "",
+      "consentMode": "none",
+      "consentText": null,
+      "unsandboxed": false,
+      "heightPreset": 500,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "allowTopNavigation": false,
+      "inheritThemeStyles": true
+     },
+     {
+      "_id": "22eded5b",
+      "code": "<button class=\"iw-button--primary\">Test</button>\n<p>Texte de contrôle</p>",
+      "type": "code",
+      "ratio": "16-9",
+      "style": "default",
+      "title": "titre",
+      "variant": "clair-nature",
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "heightMode": "auto",
+      "paddingTop": "pt-5",
+      "blockRadius": "",
+      "consentMode": "none",
+      "consentText": null,
+      "unsandboxed": false,
+      "heightPreset": 500,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "inheritThemeStyles": true
+     },
+     {
+      "_id": "f2e1446a",
+      "code": "<iframe name=\"booking-engine\" src=\"https://aeroport-carcassonne.resatravel.com/export/engine\" style=\"width: 100%;height: 600px;\" frameborder=\"0\" scrolling=\"no\"></iframe>",
+      "type": "code",
+      "style": "fullwidth",
+      "title": "titre",
+      "variant": "clair-nature",
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "heightMode": "auto",
+      "paddingTop": "pt-5",
+      "consentMode": "none",
+      "unsandboxed": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "allowTopNavigation": true,
+      "inheritThemeStyles": true
+     }
+    ],
+    "heroImage": null,
+    "heroTitle": null,
+    "heroSubtitle": null
+   }
+  },
+  {
+   "title": "Document",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/document",
+    "title": "Document",
+    "blocks": [
+     {
+      "_id": "9976ddc3",
+      "type": "document",
+      "style": "default",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "documents": {
+       "ids": [
+        "@media:5",
+        "@media:6",
+        "@media:7"
+       ],
+       "displayOption": null
+      },
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "18a046da",
+      "type": "document",
+      "style": "grid",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "documents": {
+       "ids": [
+        "@media:8",
+        "@media:9",
+        "@media:10"
+       ],
+       "displayOption": null
+      },
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "right",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Form",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/form",
+    "title": "Form",
+    "blocks": [
+     {
+      "_id": "bb599952",
+      "type": "form",
+      "style": "centered",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "twigTemplate": "forms/contact.html.twig",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "dc63245d",
+      "type": "form",
+      "style": "split",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "widgetType": "text",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "twigTemplate": "forms/contact.html.twig",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "1eef6f86",
+      "type": "form",
+      "style": "split",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "widgetType": "image",
+      "blockRadius": "rounded-none",
+      "widgetImage": {
+       "id": "@media:11",
+       "displayOption": null
+      },
+      "marginBottom": "mb-5",
+      "twigTemplate": "forms/contact.html.twig",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "1ad2c1cb",
+      "type": "form",
+      "style": "split",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "formRight": true,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "widgetType": "location",
+      "blockRadius": "rounded-none",
+      "widgetImage": {
+       "id": "@media:12",
+       "displayOption": null
+      },
+      "marginBottom": "mb-5",
+      "twigTemplate": "forms/contact.html.twig",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "widgetLocation": {
+       "lat": 43.20817874674293,
+       "code": "65800",
+       "long": 0.05627260664330615,
+       "town": "Aureilhan",
+       "zoom": 10,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 Novembre",
+       "country": "France"
+      },
+      "paragraphImageRadius": "rounded-2xl"
+     },
+     {
+      "_id": "96619cb8",
+      "type": "form",
+      "style": "card",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "twigTemplate": "forms/contact.html.twig",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Gallery",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/gallery",
+    "title": "Gallery",
+    "blocks": [
+     {
+      "_id": "3ac96ad2",
+      "type": "gallery",
+      "style": "grid",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7"
+       ],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "4d8e3936",
+      "type": "gallery",
+      "style": "masonry",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:8",
+        "@media:9",
+        "@media:10",
+        "@media:11",
+        "@media:12",
+        "@media:1",
+        "@media:2"
+       ],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "4e1e8db3",
+      "type": "gallery",
+      "style": "slider",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7",
+        "@media:8",
+        "@media:9"
+       ],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "6445c1d5",
+      "type": "gallery",
+      "style": "carousel",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:10",
+        "@media:11",
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4"
+       ],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "df875f39",
+      "type": "gallery",
+      "style": "wide_carousel",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:5",
+        "@media:6",
+        "@media:7",
+        "@media:8",
+        "@media:9",
+        "@media:10",
+        "@media:11"
+       ],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "enableParallax": true,
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "2d6bb36a",
+      "type": "gallery",
+      "style": "wide_carousel",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6"
+       ],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "enableParallax": false,
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "a7cfa4d5",
+      "type": "gallery",
+      "style": "wide_carousel",
+      "title": null,
+      "images": {
+       "ids": [
+        "@media:7"
+       ],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": null,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "1_1",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "enableParallax": true,
+      "lateralMargins": "interior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "parallaxIntensity": "subtle",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "9aa144f3",
+      "type": "gallery",
+      "style": "filmstrip",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:8",
+        "@media:9",
+        "@media:10",
+        "@media:11",
+        "@media:12",
+        "@media:1",
+        "@media:2"
+       ],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "enableParallax": true,
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "1f6fe44c",
+      "type": "gallery",
+      "style": "filmstrip",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:3"
+       ],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "singleImage": true,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "enableParallax": true,
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "iFrame",
+   "locale": "en",
+   "data": {
+    "title": "iFrame",
+    "blocks": [
+     {
+      "_id": "994cf1f4",
+      "url": "https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&amp;layer=mapnik",
+      "type": "iframe",
+      "ratio": "16-9",
+      "style": "default",
+      "title": "titre",
+      "variant": "clair-nature",
+      "lazyLoad": true,
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "allowMedia": false,
+      "heightMode": "ratio",
+      "paddingTop": "pt-5",
+      "consentMode": "none",
+      "iframeTitle": "Site otidea.com",
+      "sandboxMode": "standard",
+      "heightCustom": 5000,
+      "heightPreset": 500,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "none",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "allowFullscreen": true,
+      "allowGeolocation": true,
+      "allowTopNavigation": false
+     },
+     {
+      "_id": "2b937ca9",
+      "url": "https://aeroport-carcassonne.resatravel.com/export/engine",
+      "type": "iframe",
+      "ratio": "16-9",
+      "style": "default",
+      "title": "titre",
+      "variant": "clair-nature",
+      "lazyLoad": true,
+      "subTitle": "sous titre",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "allowMedia": false,
+      "heightMode": "ratio",
+      "paddingTop": "pt-5",
+      "consentMode": "none",
+      "iframeTitle": "Site otidea.com",
+      "sandboxMode": "standard",
+      "heightCustom": 5000,
+      "heightPreset": 500,
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "none",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "allowFullscreen": true,
+      "allowGeolocation": false,
+      "allowTopNavigation": true
+     }
+    ],
+    "heroImage": null,
+    "heroTitle": null,
+    "heroSubtitle": null
+   }
+  },
+  {
+   "title": "Key figures",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/key-figures",
+    "title": "Key figures",
+    "blocks": [
+     {
+      "_id": "31400547",
+      "type": "key_figures",
+      "style": "inline",
+      "figures": [
+       {
+        "_id": "98a04eb0",
+        "type": "figure",
+        "image": {
+         "id": "@media:4",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "0b4c10bf",
+        "type": "figure",
+        "image": {
+         "id": "@media:5",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "1998b039",
+        "type": "figure",
+        "image": {
+         "id": "@media:6",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "cebb0c6a",
+        "type": "figure",
+        "image": {
+         "id": "@media:7",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "acbe551d",
+        "type": "figure",
+        "image": {
+         "id": "@media:8",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "71081c00",
+        "type": "figure",
+        "image": {
+         "id": "@media:9",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       }
+      ],
+      "variant": 0,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "effa62ed",
+      "type": "key_figures",
+      "style": "with_icons",
+      "figures": [
+       {
+        "_id": "bb4518a0",
+        "type": "figure",
+        "image": {
+         "id": "@media:10",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "58fedda3",
+        "type": "figure",
+        "image": {
+         "id": "@media:11",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "51fd411e",
+        "type": "figure",
+        "image": {
+         "id": "@media:12",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "108fd6da",
+        "type": "figure",
+        "image": {
+         "id": "@media:1",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "7cfa6d8b",
+        "type": "figure",
+        "image": {
+         "id": "@media:2",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "4e600efd",
+        "type": "figure",
+        "image": {
+         "id": "@media:3",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       }
+      ],
+      "variant": 1,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "a5f09d6b",
+      "type": "key_figures",
+      "style": "grid_2x2",
+      "figures": [
+       {
+        "_id": "ccf71925",
+        "type": "figure",
+        "image": {
+         "id": "@media:4",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "b901a791",
+        "type": "figure",
+        "image": {
+         "id": "@media:5",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "27ab8954",
+        "type": "figure",
+        "image": {
+         "id": "@media:6",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "918c3a68",
+        "type": "figure",
+        "image": {
+         "id": "@media:7",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "ebd8372a",
+        "type": "figure",
+        "image": {
+         "id": "@media:8",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "46e37d2d",
+        "type": "figure",
+        "image": {
+         "id": "@media:9",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       }
+      ],
+      "variant": 0,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "a6ceb6d6",
+      "type": "key_figures",
+      "style": "progress",
+      "figures": [
+       {
+        "_id": "fdc54bc8",
+        "type": "figure",
+        "image": {
+         "id": "@media:10",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "b7e30418",
+        "type": "figure",
+        "image": {
+         "id": "@media:11",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "1fdcb6b8",
+        "type": "figure",
+        "image": {
+         "id": "@media:12",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "c8b8ae4e",
+        "type": "figure",
+        "image": {
+         "id": "@media:1",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "0784e8a9",
+        "type": "figure",
+        "image": {
+         "id": "@media:2",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "e489406f",
+        "type": "figure",
+        "image": {
+         "id": "@media:3",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       }
+      ],
+      "variant": 1,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "43f5e48a",
+      "type": "key_figures",
+      "style": "timeline",
+      "figures": [
+       {
+        "_id": "b711d659",
+        "type": "figure",
+        "image": {
+         "id": "@media:4",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "c70c2afe",
+        "type": "figure",
+        "image": {
+         "id": "@media:5",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "c0963754",
+        "type": "figure",
+        "image": {
+         "id": "@media:6",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "7548b88d",
+        "type": "figure",
+        "image": {
+         "id": "@media:7",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "3e03bdeb",
+        "type": "figure",
+        "image": {
+         "id": "@media:8",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       },
+       {
+        "_id": "05ada4b1",
+        "type": "figure",
+        "image": {
+         "id": "@media:9",
+         "displayOption": null
+        },
+        "title": "titre",
+        "number": "5",
+        "subTitle": "sous titre"
+       }
+      ],
+      "variant": 0,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Linked pages",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/linked-pages",
+    "title": "Linked pages",
+    "blocks": [
+     {
+      "_id": "8b2c91bf",
+      "type": "linked_pages",
+      "links": [
+       {
+        "_id": "74e3863a",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "e2064b2d",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "7008d064",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "f743e7fe",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": "The events",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "6c82a557",
+        "link": {
+         "rel": null,
+         "href": 13,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "f219b67b",
+        "link": {
+         "rel": null,
+         "href": 14,
+         "query": null,
+         "title": "PDF 3",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       }
+      ],
+      "style": "cards",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "center",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "1f7a7df6",
+      "type": "linked_pages",
+      "links": [
+       {
+        "_id": "cf5270f0",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "777b20d2",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "8ef6cd6c",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "aaf5d87f",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": "The events",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "ff20242b",
+        "link": {
+         "rel": null,
+         "href": 13,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "baee6845",
+        "link": {
+         "rel": null,
+         "href": 14,
+         "query": null,
+         "title": "PDF 3",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       }
+      ],
+      "style": "list",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-32",
+      "titleAlignment": "center",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "05e449e4",
+      "type": "linked_pages",
+      "links": [
+       {
+        "_id": "02f6cd8e",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "e4f3c55e",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "b1ebbc3b",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "07899bd6",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": "The events",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "81426eb2",
+        "link": {
+         "rel": null,
+         "href": 13,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "3fbf7ce5",
+        "link": {
+         "rel": null,
+         "href": 14,
+         "query": null,
+         "title": "PDF 3",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       }
+      ],
+      "style": "minimal",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "center",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "afe614ed",
+      "type": "linked_pages",
+      "links": [
+       {
+        "_id": "40680f01",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "06bcfdc1",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "type": "link",
+        "excerpt": "dskjhfvvd qkjfgvdskj fg"
+       },
+       {
+        "_id": "9936a429",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "1c025a48",
+        "link": {
+         "rel": null,
+         "href": null,
+         "query": null,
+         "title": "The events",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "694c018d",
+        "link": {
+         "rel": null,
+         "href": 13,
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       },
+       {
+        "_id": "e5e220cf",
+        "link": {
+         "rel": null,
+         "href": 14,
+         "query": null,
+         "title": "PDF 3",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "media"
+        },
+        "type": "link"
+       }
+      ],
+      "style": "carousel",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "center",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "Location",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/location",
+    "title": "Location",
+    "blocks": [
+     {
+      "_id": "7cf9d260",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "location",
+      "style": "map_only",
+      "title": "titre",
+      "variant": 0,
+      "location": {
+       "lat": 43.238504737557214,
+       "code": "65800",
+       "long": 0.09026172628163742,
+       "town": "Aureilhan",
+       "zoom": 18,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 Novembre",
+       "country": "France"
+      },
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "85c32b8f",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "location",
+      "style": "map_with_info",
+      "title": "titre",
+      "variant": 1,
+      "location": {
+       "lat": 43.238504737557214,
+       "code": "65800",
+       "long": 0.09026172628163742,
+       "town": "Aureilhan",
+       "zoom": 18,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 Novembre",
+       "country": "France"
+      },
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "71adef90",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "location",
+      "style": "fullwidth",
+      "title": "titre",
+      "variant": 2,
+      "location": {
+       "lat": 43.238504737557214,
+       "code": "65800",
+       "long": 0.09026172628163742,
+       "town": "Aureilhan",
+       "zoom": 18,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 Novembre",
+       "country": "France"
+      },
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "60f95031",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "location",
+      "style": "overlay",
+      "title": "titre",
+      "variant": 0,
+      "location": {
+       "lat": 43.238504737557214,
+       "code": "65800",
+       "long": 0.09026172628163742,
+       "town": "Aureilhan",
+       "zoom": 18,
+       "title": "Otidea",
+       "number": "11",
+       "street": "rue du 11 Novembre",
+       "country": "France"
+      },
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "separator",
+   "locale": "en",
+   "data": {
+    "url": null,
+    "title": "separator",
+    "blocks": [
+     {
+      "_id": "e99a8d71",
+      "text": "<p>sdlkfhgs lkfgsdlkfhgsdlfkjgh</p>",
+      "type": "text",
+      "style": "spacer",
+      "title": "titre",
+      "height": "md",
+      "variant": 0,
+      "iconSize": "md",
+      "subTitle": "sous titre",
+      "lineStyle": "dotted",
+      "lineWidth": "thick",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "d4dce6c1",
+      "type": "separator",
+      "style": "line",
+      "height": "md",
+      "variant": 1,
+      "iconSize": "md",
+      "lineStyle": "dashed",
+      "lineWidth": "thick",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "008eadaf",
+      "text": "<p>sdlkfhgs lkfgsdlkfhgsdlfkjgh</p>",
+      "type": "text",
+      "style": "spacer",
+      "title": "titre",
+      "height": "md",
+      "variant": 0,
+      "iconSize": "md",
+      "subTitle": "sous titre",
+      "lineStyle": "dotted",
+      "lineWidth": "thick",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "c3162059",
+      "type": "text_images",
+      "style": "one_column",
+      "variant": 0,
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "marginBottom": "mb-5",
+      "imagePosition": "right",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "testimonial",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/testimonial",
+    "title": "testimonial",
+    "blocks": [
+     {
+      "_id": "501a3160",
+      "type": "testimonial",
+      "style": "cards",
+      "title": "titre",
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "testimonials": [
+       {
+        "_id": "ab7d6c14",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:1",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "171d2328",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:2",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "68a39997",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:3",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "9ee28737",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:4",
+         "displayOption": null
+        },
+        "rating": 4
+       }
+      ],
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "81591d9e",
+      "type": "testimonial",
+      "style": "slider",
+      "title": "titre",
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "testimonials": [
+       {
+        "_id": "61edbb22",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:5",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "0f128034",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkjzl dkfqbfl ksdbf ",
+        "author": "Rean D. S.",
+        "avatar": {
+         "id": "@media:6",
+         "displayOption": null
+        },
+        "rating": 43
+       },
+       {
+        "_id": "75f892f8",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:7",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "2b5aed0f",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:8",
+         "displayOption": null
+        },
+        "rating": 4
+       }
+      ],
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "f23d1238",
+      "type": "testimonial",
+      "style": "minimal",
+      "title": "titre",
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "marginBottom": "mb-5",
+      "testimonials": [
+       {
+        "_id": "161b430d",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:9",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "4926fcad",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:10",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "d81ff437",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:11",
+         "displayOption": null
+        },
+        "rating": 4
+       },
+       {
+        "_id": "f024fb99",
+        "role": "gérant",
+        "type": "testimonial",
+        "quote": "lkdefgh dqlfgldsjfghqdfgks :dlfb skdjfhvsdkfjsdhfvkjsd vfkjsdgh fdjh. sdkj sdkj fgsdkj gkj",
+        "author": "Jean D. S.",
+        "avatar": {
+         "id": "@media:12",
+         "displayOption": null
+        },
+        "rating": 4
+       }
+      ],
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  },
+  {
+   "title": "text",
+   "locale": "en",
+   "data": {
+    "title": "text",
+    "blocks": [
+     {
+      "_id": "8021e120",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p><ul><li data-list-item-id=\"ec23a60d86bd5cb8998245185cd369644\">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><li data-list-item-id=\"eaa3c1d1083535de9ef2e9fa9258da3a4\">Suspendisse sit amet quam fermentum, rutrum odio viverra, faucibus turpis.</li><li data-list-item-id=\"e762fda2003778f31426b804e7d596c34\">Nulla accumsan massa vel viverra lobortis.</li><li data-list-item-id=\"eab790f4e08d200c88a622df20495d8b1\">Sed pellentesque nisi sit amet risus bibendum, nec dictum eros commodo.</li><li data-list-item-id=\"eeff7725576797048f19208e1c47054a5\">Donec ultrices enim et tempus rhoncus.</li></ul>",
+      "type": "text",
+      "style": "one_column",
+      "title": "What is Lorem Ipsum?",
+      "variant": 0,
+      "subTitle": "Lorem Ipsum",
+      "marginTop": "mt-0",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-4xl",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "interior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-lg"
+     },
+     {
+      "_id": "c3a4c4ca",
+      "type": "text",
+      "style": "one_column",
+      "variant": "clair-nature",
+      "titleTag": "h2",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left"
+     },
+     {
+      "_id": "196eec5b",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>",
+      "type": "text",
+      "style": "two_columns",
+      "title": "What is Lorem Ipsum?",
+      "variant": 1,
+      "subTitle": "Lorem Ipsum",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-4xl",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphRadius": "rounded-3xl",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "fa1d5507",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>",
+      "type": "text",
+      "style": "quote",
+      "title": "What is Lorem Ipsum?",
+      "variant": 2,
+      "subTitle": "Lorem Ipsum",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-2xl",
+      "marginBottom": "mb-5",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "titleAlignment": "left",
+      "paragraphRadius": "rounded-md",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ],
+    "heroImage": {
+     "id": "@media:1",
+     "displayOption": null
+    },
+    "heroTitle": "aaa",
+    "heroSubtitle": "bbb"
+   }
+  },
+  {
+   "title": "Text - Images",
+   "locale": "en",
+   "data": {
+    "title": "Text - Images",
+    "blocks": [
+     {
+      "_id": "ce3ba390",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "style": "classic",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:2",
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7",
+        "@media:8",
+        "@media:9"
+       ],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "",
+      "imageFilter": "original",
+      "marginBottom": "mb-5",
+      "imagePosition": "left",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "mobileImagePosition": "bottom",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "87a61be6",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": "@media:10",
+       "displayOption": null
+      },
+      "style": "overlay",
+      "title": "titre",
+      "images": {
+       "ids": [],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "",
+      "imageFilter": "original",
+      "contentRight": true,
+      "marginBottom": "mb-5",
+      "imagePosition": "right",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "0b589c7b",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": "@media:11",
+       "displayOption": null
+      },
+      "style": "overlay",
+      "title": "titre",
+      "images": {
+       "ids": [],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageFilter": "original",
+      "contentRight": true,
+      "marginBottom": "mb-5",
+      "imagePosition": "right",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "9ef51dd3",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "fullwidth",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7"
+       ],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "",
+      "imageBottom": false,
+      "imageFilter": "original",
+      "contentRight": true,
+      "imagePadding": true,
+      "marginBottom": "mb-5",
+      "imagePosition": "right",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showBackground": true,
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "a1bff866",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "fullwidth",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:8",
+        "@media:9",
+        "@media:10",
+        "@media:11",
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3"
+       ],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageBottom": false,
+      "imageFilter": "original",
+      "contentRight": true,
+      "imagePadding": true,
+      "marginBottom": "mb-5",
+      "imagePosition": "right",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-md"
+     },
+     {
+      "_id": "227aec31",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "mosaic",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7",
+        "@media:8",
+        "@media:9",
+        "@media:10",
+        "@media:11"
+       ],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageBottom": false,
+      "imageFilter": "original",
+      "contentRight": true,
+      "marginBottom": "mb-5",
+      "imagePosition": "bottom",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "mosaicImagePosition": "right",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "2064667c",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "sidebar",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4",
+        "@media:5",
+        "@media:6",
+        "@media:7"
+       ],
+       "displayOption": null
+      },
+      "variant": 1,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageBottom": false,
+      "imageFilter": "16_9",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "imagePosition": "bottom",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "fa591cb6",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": "@media:8",
+       "displayOption": null
+      },
+      "style": "hero_banner",
+      "title": "titre",
+      "images": {
+       "ids": [],
+       "displayOption": null
+      },
+      "variant": 2,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageBottom": false,
+      "imageFilter": "16_9",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "imagePosition": "bottom",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     },
+     {
+      "_id": "8fde1641",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "type": "text_images",
+      "image": {
+       "id": null,
+       "displayOption": null
+      },
+      "style": "split_screen",
+      "title": "titre",
+      "images": {
+       "ids": [
+        "@media:9",
+        "@media:10",
+        "@media:11",
+        "@media:12",
+        "@media:1",
+        "@media:2",
+        "@media:3",
+        "@media:4"
+       ],
+       "displayOption": null
+      },
+      "variant": 0,
+      "subTitle": "sous titre",
+      "marginTop": "mt-5",
+      "paddingTop": "pt-5",
+      "blockRadius": "rounded-none",
+      "imageBottom": false,
+      "imageFilter": "16_9",
+      "contentRight": false,
+      "marginBottom": "mb-5",
+      "imagePosition": "bottom",
+      "paddingBottom": "pb-5",
+      "lateralMargins": "exterior",
+      "paddingLateral": "px-5",
+      "showImagesName": true,
+      "titleAlignment": "left",
+      "paragraphImageRadius": "rounded-none"
+     }
+    ]
+   }
+  }
+ ]
+}

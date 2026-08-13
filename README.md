@@ -637,7 +637,13 @@ php bin/adminconsole iw-sulu:theme:migrate-webspaces
 
 # Run integration diagnostics (check theme, CSS, assets, article bundle)
 php bin/adminconsole iw:tailwind-theme:check
+
+# Create a set of demo pages showing every block and its variants
+php bin/adminconsole iw-sulu:theme:demo-content
+php bin/adminconsole iw-sulu:theme:demo-content "Test Blocks" --minimal
 ```
+
+See **[Demo content](doc/demo-content.md)** for what gets created and how to remove it.
 
 ### Security
 

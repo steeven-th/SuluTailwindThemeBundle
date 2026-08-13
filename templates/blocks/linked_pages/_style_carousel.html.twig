@@ -26,7 +26,10 @@
             <div class="iw-block-linked-pages__slides">
                 {% for link in links %}
                     {% set linkView = linksView[loop.index0].link|default({}) %}
-                    {% set linkUrl = link.link|default('') %}
+                    {# An unresolvable link comes back as a structure, not a URL string.
+                       The dots below filter on the same condition, so their count
+                       matches the slides. #}
+                    {% set linkUrl = link.link is defined and link.link is not iterable ? link.link : '' %}
                     {% if linkUrl is not empty %}
                         {% set linkTarget = linkView.target|default('_self') %}
                         {% set linkRel = linkView.rel|default('') %}
@@ -92,7 +95,8 @@
             {# Dots — the slider controller drives the active state via inline opacity. #}
             <div data-slider-target="dots" class="iw-block-linked-pages__dots">
                 {% for link in links %}
-                    {% if (link.link|default('')) is not empty %}
+                    {# Same condition as the slides above - keep the two in sync. #}
+                    {% if link.link is defined and link.link is not iterable and link.link is not empty %}
                         <button
                             type="button"
                             data-action="slider#goTo"

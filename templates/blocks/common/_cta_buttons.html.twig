@@ -7,7 +7,12 @@
      - secondaryButtonView: object (view data with target, title, rel, href, provider, optional)
      - secondaryButtonStyle: string (button style key: primary, secondary, accent)
 #}
-{% if primaryButtonLink|default('') is not empty %}
+{# An unresolvable link - deleted or unpublished target - comes back as the raw
+   reference structure rather than a URL string, so both are narrowed up front. #}
+{% set primaryButtonLink = primaryButtonLink is defined and primaryButtonLink is not iterable ? primaryButtonLink : '' %}
+{% set secondaryButtonLink = secondaryButtonLink is defined and secondaryButtonLink is not iterable ? secondaryButtonLink : '' %}
+
+{% if primaryButtonLink is not empty %}
     {% set primaryTarget = primaryButtonView.target|default('_self') %}
     {% set primaryRel = primaryButtonView.rel|default('') %}
     {% set primaryBtnClass = 'iw-button--' ~ (primaryButtonStyle|default('primary')) %}
@@ -31,7 +36,7 @@
             {{ primaryLabel }}
         </a>
 
-        {% if secondaryButtonLink|default('') is not empty %}
+        {% if secondaryButtonLink is not empty %}
             {% set secondaryTarget = secondaryButtonView.target|default('_self') %}
             {% set secondaryRel = secondaryButtonView.rel|default('') %}
             {% set secondaryBtnClass = 'iw-button--' ~ (secondaryButtonStyle|default('secondary')) %}
