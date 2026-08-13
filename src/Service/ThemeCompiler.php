@@ -2405,8 +2405,12 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));\n";
             $css .= "}\n";
 
-            $css .= ".iw-variant--{$index} ul,\n";
-            $css .= ".iw-variant--{$index} ol {\n";
+            // Only the markers: colouring the whole <ul>/<ol> made every item
+            // inherit it, which just duplicated the paragraph color over an
+            // arbitrary slice of the content and made the common design ask
+            // impossible - accent bullets with body-coloured text.
+            $css .= ".iw-variant--{$index} ul li::marker,\n";
+            $css .= ".iw-variant--{$index} ol li::marker {\n";
             $css .= "  color: var(--iw-variant-list-color, inherit);\n";
             $css .= "}\n";
 
@@ -2482,7 +2486,13 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} .todo-list {\n";
             $css .= "  list-style: none;\n";
             $css .= "  padding-left: 0;\n";
-            $css .= "  color: var(--iw-variant-list-color, inherit);\n";
+            $css .= "}\n";
+
+            // A to-do list has no marker to colour - its checkbox plays that
+            // role, so the bullet color drives it through accent-color. Colouring
+            // the text instead would bring back the very problem ::marker fixes.
+            $css .= ".iw-variant--{$index} .todo-list input[type=\"checkbox\"] {\n";
+            $css .= "  accent-color: var(--iw-variant-list-color, currentColor);\n";
             $css .= "}\n";
 
             $css .= ".iw-variant--{$index} .todo-list .todo-list__label {\n";
