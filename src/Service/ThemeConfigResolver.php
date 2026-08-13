@@ -61,6 +61,13 @@ class ThemeConfigResolver
             // Key OKLCH shades by BOTH the role (stable) and the slug, so refs
             // resolve either way.
             $shades = $this->paletteGenerator->generatePalette($value);
+
+            // The configured color travels with its shades under a "base" key.
+            // A shade-less ref (ref:accent) resolves to it server-side, and the
+            // JS resolver needs the same value to preview the same color — the
+            // generator reworks lightness, so no shade reproduces the input.
+            $shades['base'] = $value;
+
             foreach ([$role, $color['slug']] as $name) {
                 if (null === $name) {
                     continue;

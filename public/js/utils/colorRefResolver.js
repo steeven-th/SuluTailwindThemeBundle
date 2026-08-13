@@ -53,10 +53,17 @@ export function resolveRef(value, palette) {
     const shades = palette?.[parsed.name];
     if (!shades) return value;
 
-    // Shade-less ref (ref:primary) → the 500 shade is the closest to the base.
-    const shade = parsed.shade === null ? 500 : parsed.shade;
+    // Shade-less ref (ref:primary) → the configured color itself, shipped under
+    // the "base" key. It must match what the compiler emits server-side
+    // (ThemeCompiler::resolveColorValue returns the base hex), otherwise the
+    // admin previews one color and the site renders another. Falling back to
+    // 500 would be wrong: the palette generator reworks lightness, so no shade
+    // reproduces the input — that is the whole reason "base" exists.
+    if (parsed.shade === null) {
+        return shades.base || shades[500] || value;
+    }
 
-    return shades[shade] || value;
+    return shades[parsed.shade] || value;
 }
 
 /**

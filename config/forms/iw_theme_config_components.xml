@@ -195,10 +195,10 @@
                         <param name="default_value" value="1rem"/>
                         <param name="values" type="collection">
                             <param name="0"><meta><title>iw_sulu_tailwind_theme.articles_card_padding_none</title></meta></param>
-                            <param name="0.5rem"><meta><title>XS (p-2)</title></meta></param>
-                            <param name="1rem"><meta><title>S (p-4)</title></meta></param>
-                            <param name="1.5rem"><meta><title>M (p-6)</title></meta></param>
-                            <param name="2rem"><meta><title>L (p-8)</title></meta></param>
+                            <param name="0.5rem"><meta><title>8 px (0.5rem · p-2)</title></meta></param>
+                            <param name="1rem"><meta><title>16 px (1rem · p-4)</title></meta></param>
+                            <param name="1.5rem"><meta><title>24 px (1.5rem · p-6)</title></meta></param>
+                            <param name="2rem"><meta><title>32 px (2rem · p-8)</title></meta></param>
                         </param>
                     </params>
                 </property>

@@ -271,7 +271,12 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             if (1 !== preg_match('/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $hex)) {
                 continue;
             }
-            $palette[$name] = $this->paletteGenerator->generatePalette($hex);
+            $shades = $this->paletteGenerator->generatePalette($hex);
+            // Ship the configured color alongside its shades, so a shade-less
+            // ref previews the same value the compiler will emit.
+            $shades['base'] = $hex;
+
+            $palette[$name] = $shades;
         }
 
         return new JsonResponse($palette);

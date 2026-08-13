@@ -3,8 +3,11 @@ import React from 'react';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 
 /**
- * Available margin values for selection.
- * These correspond to Tailwind CSS spacing scale values.
+ * Available spacing values.
+ *
+ * These are Tailwind spacing steps, where one unit is 0.25rem — 4px at a 16px
+ * root. The buttons show both, because a mockup is measured in pixels and the
+ * Tailwind number alone means nothing without that conversion in mind.
  */
 const MARGIN_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 32];
 
@@ -105,6 +108,7 @@ export default class MarginSelector extends React.Component {
     render() {
         const {value} = this.props;
         const currentValue = this.parseCurrentValue(value);
+        const prefix = this.resolvePrefix();
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
 
@@ -122,10 +126,11 @@ export default class MarginSelector extends React.Component {
 
                     const buttonStyle = {
                         display: 'inline-flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '36px',
-                        height: '32px',
+                        width: '40px',
+                        height: '38px',
                         border: isSelected ? `2px solid ${primary}` : '1px solid #d0d0d0',
                         borderRadius: '4px',
                         backgroundColor: isSelected ? tint : '#fff',
@@ -144,9 +149,12 @@ export default class MarginSelector extends React.Component {
                             type="button"
                             style={buttonStyle}
                             onClick={() => this.handleSelect(marginValue)}
-                            title={`Spacing: ${marginValue}`}
+                            title={`${prefix}-${marginValue} · ${marginValue * 4} px`}
                         >
-                            {marginValue}
+                            <span>{marginValue}</span>
+                            <span style={{fontSize: '9px', opacity: 0.65, lineHeight: 1}}>
+                                {marginValue * 4}px
+                            </span>
                         </button>
                     );
                 })}
