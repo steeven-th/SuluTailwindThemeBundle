@@ -40,7 +40,7 @@
 * **Design tokens**: Store all theme settings as structured JSON, compiled to CSS custom properties
 * **Admin interface**: Full CRUD with 7 tabs (details, colors, typography, buttons, borders, block variants, menu)
 * **Multi-webspace support**: Assign different themes to different webspaces (sites) in a multi-site Sulu installation
-* **Multiple themes**: Create and switch between 8 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu, asmt)
+* **Multiple themes**: Create and switch between 7 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu)
 * **Named palette**: 10 base color roles + unlimited brand colors, each named by slug and expanded to OKLCH shades under a stable `--color-<role>` alias and a `--color-<slug>` alias
 * **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--<slug>` classes, `.iw-button--<slug>` styles
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
