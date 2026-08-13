@@ -18,7 +18,8 @@
         <nav class="iw-block-linked-pages iw-block-linked-pages--minimal">
             {% for link in links %}
                 {% set linkView = linksView[loop.index0].link|default({}) %}
-                {% set linkUrl = link.link|default('') %}
+                {# An unresolvable link comes back as a structure, not a URL string. #}
+                {% set linkUrl = link.link is defined and link.link is not iterable ? link.link : '' %}
                 {% if linkUrl is not empty %}
                     {% set linkTarget = linkView.target|default('_self') %}
                     {% set linkRel = linkView.rel|default('') %}
