@@ -57,23 +57,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h1_weight" type="single_select" colspan="2">
+                <property name="typography_assignments_h1_weight" type="iw_theme_weight_picker" colspan="2">
                     <meta>
                         <title>iw_sulu_tailwind_theme.typography_h1_weight</title>
                     </meta>
                     <params>
                         <param name="default_value" value="700"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h1"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h1_size" type="number" colspan="2">
@@ -125,21 +115,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h2_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_h2_weight</title></meta>
+                <property name="typography_assignments_h2_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_h2_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="600"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h2"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h2_size" type="number" colspan="2">
@@ -183,21 +165,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h3_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_h3_weight</title></meta>
+                <property name="typography_assignments_h3_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_h3_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="600"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h3"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h3_size" type="number" colspan="2">
@@ -241,21 +215,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h4_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_h4_weight</title></meta>
+                <property name="typography_assignments_h4_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_h4_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="600"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h4"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h4_size" type="number" colspan="2">
@@ -299,21 +265,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h5_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_h5_weight</title></meta>
+                <property name="typography_assignments_h5_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_h5_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="500"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h5"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h5_size" type="number" colspan="2">
@@ -357,21 +315,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_h6_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_h6_weight</title></meta>
+                <property name="typography_assignments_h6_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_h6_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="500"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="h6"/>
                     </params>
                 </property>
                 <property name="typography_assignments_h6_size" type="number" colspan="2">
@@ -415,21 +365,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_body_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_body_weight</title></meta>
+                <property name="typography_assignments_body_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_body_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="400"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="body"/>
                     </params>
                 </property>
                 <property name="typography_assignments_body_size" type="number" colspan="2">
@@ -473,21 +415,13 @@
                         </param>
                     </params>
                 </property>
-                <property name="typography_assignments_link_weight" type="single_select" colspan="2">
-                    <meta><title>iw_sulu_tailwind_theme.typography_link_weight</title></meta>
+                <property name="typography_assignments_link_weight" type="iw_theme_weight_picker" colspan="2">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.typography_link_weight</title>
+                    </meta>
                     <params>
                         <param name="default_value" value="500"/>
-                        <param name="values" type="collection">
-                            <param name="100"><meta><title>100 (Thin)</title></meta></param>
-                            <param name="200"><meta><title>200 (Extra-Light)</title></meta></param>
-                            <param name="300"><meta><title>300 (Light)</title></meta></param>
-                            <param name="400"><meta><title>400 (Regular)</title></meta></param>
-                            <param name="500"><meta><title>500 (Medium)</title></meta></param>
-                            <param name="600"><meta><title>600 (Semi-Bold)</title></meta></param>
-                            <param name="700"><meta><title>700 (Bold)</title></meta></param>
-                            <param name="800"><meta><title>800 (Extra-Bold)</title></meta></param>
-                            <param name="900"><meta><title>900 (Black)</title></meta></param>
-                        </param>
+                        <param name="element" value="link"/>
                     </params>
                 </property>
                 <property name="typography_assignments_link_size" type="number" colspan="2">

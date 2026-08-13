@@ -78,9 +78,7 @@ final class GoogleFontsResolverTest extends TestCase
     #[Test]
     public function itPassesWeightsThroughForAFamilyAbsentFromTheCatalog(): void
     {
-        $resolver = new GoogleFontsResolver($this->catalog([
-            ['family' => 'Roboto', 'category' => 'sans-serif', 'variants' => ['regular']],
-        ]));
+        $resolver = new GoogleFontsResolver($this->catalog(['Roboto' => [400]]));
 
         $url = $resolver->resolve($this->tokens('Lato', ['h1' => 850]));
 
@@ -95,28 +93,13 @@ final class GoogleFontsResolverTest extends TestCase
     #[Test]
     public function itDropsWeightsTheFamilyDoesNotShip(): void
     {
-        $resolver = new GoogleFontsResolver($this->catalog([
-            ['family' => 'Lato', 'category' => 'sans-serif', 'variants' => ['100', '300', 'regular', '700', '900']],
-        ]));
+        $resolver = new GoogleFontsResolver($this->catalog(['Lato' => [100, 300, 400, 700, 900]]));
 
         // 800 is not shipped by Lato; 400 and 900 are.
         $url = $resolver->resolve($this->tokens('Lato', ['h1' => 900, 'h2' => 800, 'body' => 400]));
 
         self::assertStringContainsString('family=Lato:wght@400;900', (string) $url);
         self::assertStringNotContainsString('800', (string) $url);
-    }
-
-    #[Test]
-    public function itReadsNamedAndItalicVariantsAsWeights(): void
-    {
-        $resolver = new GoogleFontsResolver($this->catalog([
-            ['family' => 'Lato', 'category' => 'sans-serif', 'variants' => ['regular', 'italic', '700italic']],
-        ]));
-
-        // "regular" means 400, "700italic" means 700 is available upright too.
-        $url = $resolver->resolve($this->tokens('Lato', ['h1' => 700, 'body' => 400]));
-
-        self::assertStringContainsString('family=Lato:wght@400;700', (string) $url);
     }
 
     /**
@@ -126,9 +109,7 @@ final class GoogleFontsResolverTest extends TestCase
     #[Test]
     public function itFallsBackToTheClosestWeightWhenNoneSurvive(): void
     {
-        $resolver = new GoogleFontsResolver($this->catalog([
-            ['family' => 'Lato', 'category' => 'sans-serif', 'variants' => ['regular', '700']],
-        ]));
+        $resolver = new GoogleFontsResolver($this->catalog(['Lato' => [400, 700]]));
 
         $url = $resolver->resolve($this->tokens('Lato', ['h1' => 900]));
 
@@ -156,21 +137,19 @@ final class GoogleFontsResolverTest extends TestCase
     }
 
     /**
-     * A catalog stub returning the given Google font entries.
+     * A catalog stub exposing the weights of the given families.
      *
      * A stub rather than a mock: the resolver's behaviour is what is under test,
      * not how many times it reads the catalog.
      *
-     * @param list<array{family: string, category: string, variants: list<string>}> $googleFonts
+     * @param array<string, list<int>> $weightsByFamily
      */
-    private function catalog(array $googleFonts): GoogleFontsCatalog
+    private function catalog(array $weightsByFamily): GoogleFontsCatalog
     {
         $catalog = $this->createStub(GoogleFontsCatalog::class);
-        $catalog->method('getCatalog')->willReturn([
-            'google' => $googleFonts,
-            'system' => [],
-            'local' => [],
-        ]);
+        $catalog->method('getAvailableWeights')->willReturnCallback(
+            static fn (string $family): array => $weightsByFamily[$family] ?? [],
+        );
 
         return $catalog;
     }

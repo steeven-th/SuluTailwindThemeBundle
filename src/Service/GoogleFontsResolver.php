@@ -121,7 +121,9 @@ class GoogleFontsResolver
      */
     private function filterAvailableWeights(string $familyName, array $weights): array
     {
-        $available = $this->getAvailableWeights($familyName);
+        $available = null !== $this->catalog
+            ? $this->catalog->getAvailableWeights($familyName)
+            : [];
 
         if ([] === $available) {
             return $weights;
@@ -146,49 +148,6 @@ class GoogleFontsResolver
         );
 
         return [$available[0]];
-    }
-
-    /**
-     * Read the numeric weights a Google font ships, from the synced catalog.
-     *
-     * The catalog stores the API's `variants` list, which mixes numeric weights
-     * with the named ones ("regular" = 400, "italic" = 400) and italic suffixes
-     * ("700italic"). Only the upright numeric value matters here: the URL builder
-     * requests `wght@` axes, never italics.
-     *
-     * @param string $familyName The font family name
-     *
-     * @return list<int> The available weights, empty when unknown
-     */
-    private function getAvailableWeights(string $familyName): array
-    {
-        if (null === $this->catalog) {
-            return [];
-        }
-
-        foreach ($this->catalog->getCatalog()['google'] ?? [] as $font) {
-            if (($font['family'] ?? null) !== $familyName) {
-                continue;
-            }
-
-            $weights = [];
-            foreach ($font['variants'] ?? [] as $variant) {
-                $variant = str_replace('italic', '', (string) $variant);
-
-                if ('' === $variant || 'regular' === $variant) {
-                    $weights[] = 400;
-                    continue;
-                }
-
-                if (ctype_digit($variant)) {
-                    $weights[] = (int) $variant;
-                }
-            }
-
-            return array_values(array_unique($weights));
-        }
-
-        return [];
     }
 
     /**
