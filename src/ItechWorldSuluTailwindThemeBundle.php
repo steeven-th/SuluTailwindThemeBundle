@@ -77,12 +77,23 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
     }
 
     /**
-     * Prepend configuration into other bundles (sulu_admin, doctrine).
+     * Prepend configuration into other bundles (sulu_admin, sulu_media, doctrine).
      */
     public function prependExtension(
         ContainerConfigurator $container,
         ContainerBuilder $builder,
     ): void {
+        // Register the theme's image formats (iw_theme_*, iw_og_image). Without
+        // them the templates fall back to the untouched original file, so images
+        // are served full-size, uncropped and without their WebP/AVIF variants.
+        if ($builder->hasExtension('sulu_media')) {
+            $builder->prependExtensionConfig('sulu_media', [
+                'image_format_files' => [
+                    __DIR__ . '/../config/image-formats.xml',
+                ],
+            ]);
+        }
+
         // Register Doctrine ORM mapping for this bundle's entities
         if ($builder->hasExtension('doctrine')) {
             $builder->prependExtensionConfig('doctrine', [
