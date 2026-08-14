@@ -91,7 +91,9 @@ final class ArticleListingController extends ContentController
             'limit' => $result['limit'],
         ];
         // Contextual facets: only the categories/tags present in the page's
-        // editorial scope (independent of the visitor's active filters).
+        // editorial scope (independent of the visitor's active filters), further
+        // narrowed to the categories the admin selected in the smart_content —
+        // the listed articles often carry categories from unrelated branches.
         $scopeTaxonomy = $this->listingResolver->resolveScopeTaxonomy(
             array_merge($scope, ['locale' => $locale, 'webspaceKey' => $webspaceKey]),
             $locale,
@@ -100,6 +102,7 @@ final class ArticleListingController extends ContentController
             $locale,
             $scopeTaxonomy['categoryIds'],
             $scopeTaxonomy['tagNames'],
+            $scope['baseCategoryIds'],
         );
         $parameters['activeFilters'] = [
             'categories' => $categoryKeys,

@@ -36,18 +36,78 @@ final class ArticleFacetsServiceTest extends TestCase
     ];
 
     #[Test]
-    public function itShowsSubCategoriesUnderTheirParentWhenNoArticleCarriesTheParent(): void
+    public function itDropsALoneParentNoArticleCarries(): void
     {
+        // Every listed article hangs from "Prevention order", so that facet
+        // would select the whole listing: it filters nothing and only restates
+        // the page. Its children take its place at the top level.
         $facets = $this->createService()->getFacets('en', [8, 9], []);
 
         self::assertSame(
             [
-                ['id' => 7, 'key' => 'prevention-order', 'name' => 'Prevention order', 'depth' => 0],
-                ['id' => 8, 'key' => 'job-sheet', 'name' => 'Job sheet', 'depth' => 1],
-                ['id' => 9, 'key' => null, 'name' => 'Employer', 'depth' => 1],
+                ['id' => 8, 'key' => 'job-sheet', 'name' => 'Job sheet', 'depth' => 0],
+                ['id' => 9, 'key' => null, 'name' => 'Employer', 'depth' => 0],
             ],
             $facets['categories'],
         );
+    }
+
+    #[Test]
+    public function itKeepsAParentArticlesCarryDirectly(): void
+    {
+        // Dropping it would leave the articles filed directly under the parent
+        // unreachable from any facet.
+        $facets = $this->createService()->getFacets('en', [7, 8, 9], []);
+
+        self::assertSame([7, 8, 9], array_column($facets['categories'], 'id'));
+        self::assertSame([0, 1, 1], array_column($facets['categories'], 'depth'));
+    }
+
+    #[Test]
+    public function itKeepsParentsWhenSeveralBranchesAreListed(): void
+    {
+        // With two branches each parent excludes the other one, so both are
+        // meaningful filters and stay in place.
+        $facets = $this->createService()->getFacets('en', [8, 9, 3], []);
+
+        self::assertSame([7, 8, 9, 3], array_column($facets['categories'], 'id'));
+        self::assertSame([0, 1, 1, 0], array_column($facets['categories'], 'depth'));
+    }
+
+    #[Test]
+    public function itKeepsALoneCategoryThatHasNoChildrenToPromote(): void
+    {
+        $facets = $this->createService()->getFacets('en', [3], []);
+
+        self::assertSame([3], array_column($facets['categories'], 'id'));
+    }
+
+    #[Test]
+    public function itDropsCarriedCategoriesOutsideTheSmartContentSelection(): void
+    {
+        // The listed articles also carry "Sport", but the editor scoped the page
+        // on the two sub-categories: the unrelated branch has no place here.
+        $facets = $this->createService()->getFacets('en', [8, 9, 3], [], [8, 9]);
+
+        self::assertSame([8, 9], array_column($facets['categories'], 'id'));
+    }
+
+    #[Test]
+    public function itExposesTheCarriedChildrenOfASelectedParent(): void
+    {
+        // Selecting the whole branch still surfaces the sub-categories the
+        // articles actually carry.
+        $facets = $this->createService()->getFacets('en', [8, 9, 3], [], [7]);
+
+        self::assertSame([8, 9], array_column($facets['categories'], 'id'));
+    }
+
+    #[Test]
+    public function itKeepsEveryCarriedCategoryWhenTheSmartContentSelectsNone(): void
+    {
+        $facets = $this->createService()->getFacets('en', [8, 9, 3], [], []);
+
+        self::assertSame([7, 8, 9, 3], array_column($facets['categories'], 'id'));
     }
 
     #[Test]
@@ -68,9 +128,10 @@ final class ArticleFacetsServiceTest extends TestCase
     #[Test]
     public function itSkipsAnUntranslatedParentButKeepsItsChildren(): void
     {
-        // The parent has no name in this locale: it cannot be labelled, yet its
-        // children must stay listed rather than vanish with it.
-        $facets = $this->createService(untranslated: [7])->getFacets('en', [8, 9], []);
+        // The parent is carried by articles, so it is kept — but it has no name
+        // in this locale and cannot be labelled. Its children must stay listed
+        // rather than vanish with it, and move up to the freed level.
+        $facets = $this->createService(untranslated: [7])->getFacets('en', [7, 8, 9], []);
 
         self::assertSame([8, 9], array_column($facets['categories'], 'id'));
         self::assertSame([0, 0], array_column($facets['categories'], 'depth'));

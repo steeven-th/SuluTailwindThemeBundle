@@ -294,19 +294,28 @@ Both have a full override API documented in [Transverse components → Tags](tra
 
 ## Listing filters — category tree
 
-In the listing sidebar (`templates/components/_article_filters.html.twig`), the category facets mirror the Sulu category tree instead of listing root categories only. A listing scoped on sub-categories alone still shows them, under their parent:
+In the listing sidebar (`templates/components/_article_filters.html.twig`), the category facets mirror the Sulu category tree instead of listing root categories only. A listing scoped on the sub-categories "Job sheet" and "Employer" shows exactly those two:
+
+```
+[ ] Job sheet
+[ ] Employer
+```
+
+while one spanning two branches keeps the parents, which now tell them apart:
 
 ```
 [ ] Prevention order
     [ ] Job sheet
     [ ] Employer
 [ ] Sport
+    [ ] Judo
 ```
 
-Two rules drive the rendering:
+Three rules drive the list:
 
-- **A parent is pulled in even when no article carries it directly**, so its children are never displayed out of context.
-- **Ticking a category includes its whole sub-tree.** Filtering on "Prevention order" also returns the articles categorised only under "Job sheet" or "Employer". Every option therefore stays selectable — a parent always filters something, and never comes back empty.
+- **Only the categories selected in the page's smart_content** (or hanging below one of them) are offered. Listed articles routinely carry categories from unrelated branches — an article filed under "Job sheet" may also be tagged "Judo" — and those would be noise in a filter bar the editor scoped on purpose. Selecting no category in the smart_content lifts the restriction and exposes everything the articles carry.
+- **A lone top-level parent no article carries is dropped.** It would match every listed article, so it filters nothing and merely restates the page itself. It is kept as soon as a second branch appears (it then excludes that branch) or if articles are filed directly under it (dropping it would make them unreachable).
+- **Ticking a category includes its whole sub-tree.** Filtering on "Prevention order" also returns the articles categorised only under "Job sheet" or "Employer", so a parent facet never comes back empty.
 
 Nesting is carried by a depth modifier present on every row (`--depth-0` for a root), capped at 3 levels — deeper categories are still listed, they just stop indenting.
 
