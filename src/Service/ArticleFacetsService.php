@@ -18,14 +18,18 @@ use Sulu\Bundle\TagBundle\Tag\TagRepositoryInterface;
  * names to {@see getFacets()}; passing null exposes every category and tag.
  *
  * Categories are exposed as the *flattened* Sulu category tree: a category the
- * articles carry is always listed under its ancestors, so a listing scoped on
- * sub-categories only ("Employer", "Job sheet") still shows them grouped under
- * their parent ("Prevention order"). Ancestors nobody carries directly are kept
- * as well — every option stays selectable, since {@see resolveCategoryIds()}
- * expands a selection to its whole sub-tree and a parent therefore always
- * filters something. The list stays flat (with a `depth` marker driving the
- * indentation) so consumers can keep looking a category up by key or id without
- * walking a nested structure.
+ * articles carry is listed under its ancestors, so a listing spanning several
+ * branches shows each option in context. Every option is selectable, since
+ * {@see resolveCategoryIds()} expands a selection to its whole sub-tree.
+ *
+ * A lone top-level ancestor nobody carries is dropped though: it would match
+ * every listed article, so it filters nothing and merely restates the page
+ * itself — a listing scoped on "Employer" and "Job sheet" shows those two, not
+ * the "Prevention order" they hang from. See {@see stripRedundantRoots()}.
+ *
+ * The list stays flat (with a `depth` marker driving the indentation) so
+ * consumers can keep looking a category up by key or id without walking a
+ * nested structure.
  */
 final class ArticleFacetsService
 {
@@ -51,21 +55,60 @@ final class ArticleFacetsService
      * When $scopeCategoryIds / $scopeTagNames are provided (contextual facets),
      * the options are restricted to that taxonomy; null exposes everything.
      *
+     * $selectedCategoryIds narrows this further to what the editor picked in the
+     * page's smart_content: the listed articles usually carry categories from
+     * other branches too (an article filed under "Job sheet" may also be tagged
+     * "Judo"), and those have no place in a filter bar the editor scoped on
+     * purpose. Leave it empty to expose every carried category.
+     *
      * @param string     $locale           Current request locale (drives category translation)
      * @param int[]|null $scopeCategoryIds  Category ids present in the page scope, or null for all
      * @param string[]|null $scopeTagNames  Tag names present in the page scope, or null for all
+     * @param int[]      $selectedCategoryIds Categories selected in the smart_content; empty for no restriction
      *
      * @return array{
      *     categories: array<int, array{id: int, key: string|null, name: string, depth: int}>,
      *     tags: array<int, array{id: int, name: string}>,
      * }
      */
-    public function getFacets(string $locale, ?array $scopeCategoryIds = null, ?array $scopeTagNames = null): array
-    {
+    public function getFacets(
+        string $locale,
+        ?array $scopeCategoryIds = null,
+        ?array $scopeTagNames = null,
+        array $selectedCategoryIds = [],
+    ): array {
+        if ([] !== $selectedCategoryIds && null !== $scopeCategoryIds) {
+            $scopeCategoryIds = $this->restrictToSelection($scopeCategoryIds, $selectedCategoryIds);
+        }
+
         return [
             'categories' => $this->resolveCategories($locale, $scopeCategoryIds),
             'tags' => $this->resolveTags($scopeTagNames),
         ];
+    }
+
+    /**
+     * Keep only the carried categories the editor selected in the smart_content,
+     * or that hang below one of them.
+     *
+     * Categories are matched against the selection *and* its descendants, so
+     * selecting a whole branch still exposes the sub-categories the articles
+     * actually carry. A selected category no article carries is dropped along
+     * the way: it would only add a facet returning nothing.
+     *
+     * @param int[] $carriedIds  Categories the listed articles carry
+     * @param int[] $selectedIds Categories picked in the smart_content
+     *
+     * @return int[]
+     */
+    private function restrictToSelection(array $carriedIds, array $selectedIds): array
+    {
+        $allowed = array_flip($this->expandWithDescendants($selectedIds));
+
+        return array_values(array_filter(
+            $carriedIds,
+            static fn ($id): bool => isset($allowed[(int) $id]),
+        ));
     }
 
     /**
@@ -142,9 +185,10 @@ final class ArticleFacetsService
      * Resolve the categories as localized, hierarchy-aware facet options.
      *
      * The categories the articles actually carry drive the list; their ancestors
-     * are pulled in so every option is displayed in its branch. The tree is
-     * returned flattened in display order, each entry carrying its relative
-     * `depth`.
+     * are pulled in so every option is displayed in its branch, minus the
+     * leading ones that would filter nothing ({@see stripRedundantRoots()}). The
+     * tree is returned flattened in display order, each entry carrying its
+     * relative `depth`.
      *
      * @param string     $locale Locale used to translate category names
      * @param int[]|null $only   When set, the categories articles carry; null exposes the whole tree
@@ -193,7 +237,43 @@ final class ArticleFacetsService
             $childrenByParent[null !== $parentId && isset($entities[$parentId]) ? $parentId : 0][] = $id;
         }
 
+        $childrenByParent[0] = $this->stripRedundantRoots($childrenByParent, $scopeIds);
+
         return $this->flattenBranch($childrenByParent, $entities, $names, $keys, 0, 0);
+    }
+
+    /**
+     * Drop the leading roots that cannot filter anything.
+     *
+     * A lone root no article carries was only pulled in to give its children a
+     * context: every listed article sits under it, so ticking it would select
+     * the whole listing — it just repeats what the page already is. Its children
+     * take its place, and the walk continues in case they in turn expose a
+     * single context-only root.
+     *
+     * A root articles *do* carry is kept: dropping it would leave the articles
+     * filed directly under it unreachable from any facet. Two roots or more are
+     * kept as well, since each then excludes the other branch.
+     *
+     * @param array<int, int[]> $childrenByParent Category ids indexed by parent id (0 = local root)
+     * @param int[]             $carriedIds       Categories the listed articles carry directly
+     *
+     * @return int[] The root ids to display
+     */
+    private function stripRedundantRoots(array $childrenByParent, array $carriedIds): array
+    {
+        $rootIds = $childrenByParent[0] ?? [];
+        $carried = array_flip($carriedIds);
+
+        while (
+            1 === \count($rootIds)
+            && !isset($carried[$rootIds[0]])
+            && [] !== ($childrenByParent[$rootIds[0]] ?? [])
+        ) {
+            $rootIds = $childrenByParent[$rootIds[0]];
+        }
+
+        return $rootIds;
     }
 
     /**
