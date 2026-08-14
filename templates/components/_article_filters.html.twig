@@ -83,9 +83,12 @@
             <fieldset class="iw-article-filters__group iw-article-filters__fieldset">
                 <legend class="iw-article-filters__legend">{{ 'iw_sulu_tailwind_theme.article.sidebar_categories'|trans }}</legend>
                 <div class="iw-article-filters__options">
+                    {# The facet list mirrors the category tree: every category is
+                       selectable (picking a parent filters its whole sub-tree) and
+                       `depth` carries the nesting for the indentation. #}
                     {% for category in facets.categories %}
                         {% set value = category.key is not empty ? category.key : category.id %}
-                        <label class="iw-article-filters__option">
+                        <label class="iw-article-filters__option iw-article-filters__option--depth-{{ category.depth|default(0) }}">
                             <input type="checkbox" name="category[]" value="{{ value }}"
                                    class="iw-article-filters__checkbox"
                                    {{ value|trim in activeCategories ? 'checked' }}>

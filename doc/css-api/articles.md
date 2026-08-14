@@ -292,6 +292,45 @@ Both have a full override API documented in [Transverse components → Tags](tra
 
 ---
 
+## Listing filters — category tree
+
+In the listing sidebar (`templates/components/_article_filters.html.twig`), the category facets mirror the Sulu category tree instead of listing root categories only. A listing scoped on sub-categories alone still shows them, under their parent:
+
+```
+[ ] Prevention order
+    [ ] Job sheet
+    [ ] Employer
+[ ] Sport
+```
+
+Two rules drive the rendering:
+
+- **A parent is pulled in even when no article carries it directly**, so its children are never displayed out of context.
+- **Ticking a category includes its whole sub-tree.** Filtering on "Prevention order" also returns the articles categorised only under "Job sheet" or "Employer". Every option therefore stays selectable — a parent always filters something, and never comes back empty.
+
+Nesting is carried by a depth modifier present on every row (`--depth-0` for a root), capped at 3 levels — deeper categories are still listed, they just stop indenting.
+
+| Class | Role |
+|-------|------|
+| `.iw-article-filters__option--depth-0` | Root category row |
+| `.iw-article-filters__option--depth-{1,2,3}` | Indented sub-category row |
+
+| Variable | Default | Role |
+|----------|---------|------|
+| `--iw-article-filters-indent` | `1rem` | Indentation step per tree level |
+
+The `topbar` layout flows the options on a single wrapping row. When the list actually nests, each root category starts its own row there so its children read as belonging to it; a flat list keeps flowing inline untouched.
+
+```css
+/* Wider indentation with a guide line */
+.iw-article-filters__option--depth-1 {
+    --iw-article-filters-indent: 1.5rem;
+    border-inline-start: 1px solid var(--color-surface-border);
+}
+```
+
+---
+
 ## Event info
 
 Floating card with date, location and organizer — designed to sit on top of an event hero image.

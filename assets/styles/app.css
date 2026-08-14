@@ -4004,6 +4004,16 @@ span.iw-breadcrumbs__separator {
     gap: var(--iw-article-filters-topbar-options-gap, 0.5rem 1rem);
 }
 
+/* Options flow on a single wrapping row here, which would run every branch of the
+   category tree together. Only when the list actually nests, each root category
+   starts its own row so its children read as belonging to it. A flat list — the
+   common case — keeps flowing inline untouched. */
+.iw-article-layout--topbar:not(.iw-article-layout--drawer-armed)
+    .iw-article-filters__options:has(.iw-article-filters__option--depth-1)
+    .iw-article-filters__option--depth-0 {
+    flex-basis: 100%;
+}
+
 /* The submit button aligns with the controls (labels sit above them). */
 .iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply,
 .iw-article-layout--topbar:not(.iw-article-layout--drawer-armed) .iw-article-filters__apply-btn {
@@ -4171,6 +4181,20 @@ span.iw-breadcrumbs__separator {
 
 .iw-article-filters__option:hover .iw-article-filters__option-label {
     color: var(--iw-article-filters-option-hover, var(--color-surface-accent));
+}
+
+/* Category facets mirror the Sulu category tree: sub-categories are indented one
+   step per level. */
+.iw-article-filters__option--depth-1 {
+    padding-inline-start: var(--iw-article-filters-indent, 1rem);
+}
+
+.iw-article-filters__option--depth-2 {
+    padding-inline-start: calc(var(--iw-article-filters-indent, 1rem) * 2);
+}
+
+.iw-article-filters__option--depth-3 {
+    padding-inline-start: calc(var(--iw-article-filters-indent, 1rem) * 3);
 }
 
 .iw-article-filters__apply {
