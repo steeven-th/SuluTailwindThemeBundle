@@ -426,6 +426,28 @@ format — no broken URLs. The focus point is applied automatically from the med
 
 See [`doc/css-api/images.md`](css-api/images.md) for the `iw-ratio--*` and `focus-*` CSS classes.
 
+#### Image formats
+
+The bundle registers its own Sulu image formats (`config/image-formats.xml`, prepended into `sulu_media.image_format_files`), so they are available to any project installing it — no configuration needed. Every format crops around the media focus point, and Sulu derives the `.webp` / `.avif` variants the partial serves.
+
+| Format key | Size | Mode | Used by |
+|---|---|---|---|
+| `iw_theme_16_9` | 1920×1080 | outbound | Default format, banners, cards |
+| `iw_theme_4_3` | 1200×900 | outbound | 4:3 cards and galleries |
+| `iw_theme_1_1` | 800×800 | outbound | Square cards and galleries |
+| `iw_theme_3_4` | 600×800 | outbound | Portrait cards and galleries |
+| `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
+| `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
+| `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
+| `iw_theme_avatar` | 200×200 | outbound | Author avatars |
+| `iw_theme_logo_desktop` | 400×80 | inset | Header logo |
+| `iw_theme_logo_mobile` | 200×64 | inset | Mobile header logo |
+| `iw_og_image` | 1200×630 | outbound | `og:image`, `twitter:image`, JSON-LD |
+
+> The partial falls back to the original file when a format key is unknown (`media.thumbnails[format]|default(media.url)`). That degrades silently — the page still renders, but with the full-size uncropped file and no WebP/AVIF. If images look oversized, check that the format key exists.
+
+**Do not redeclare these keys** in your project's `config/image-formats.xml`: Sulu throws `Media format with key "…" already exists!` at compile time when the same key is defined twice with different settings. To use other dimensions, declare your own key and pass it through the partial's `format` parameter.
+
 ---
 
 ### `iw_sulu_tailwind_theme_article_config()`
