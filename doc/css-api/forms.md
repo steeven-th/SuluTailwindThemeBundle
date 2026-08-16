@@ -9,6 +9,13 @@ This is distinct from the **`form` block wrapper** (`.iw-block-form*`), which on
 the surrounding layout (centered / card / split). See [`blocks/form.md`](blocks/form.md)
 for the wrapper. This page documents the **fields inside** the form.
 
+> **You do not have to apply the theme yourself.** The form block renders SuluFormBundle
+> forms through a bridge template shipped with the bundle, which already declares
+> `{% form_theme %}` with the theme below — a selected form comes out styled. You only need
+> the theme name when rendering a form outside the block:
+> `{% form_theme myForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}`.
+> See [`../form-block.md`](../form-block.md).
+
 > Conventions: strict BEM, `iw-` prefix. See [`../css-conventions.md`](../css-conventions.md).
 >
 > All colors come from `--iw-form-*` custom properties that **cascade from the active block

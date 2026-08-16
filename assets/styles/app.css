@@ -549,12 +549,23 @@ img.object-cover {
     display: flow-root;
 }
 
+/* Dev-only explanation shown where a block rendered nothing. Same treatment for
+   the code and form blocks: each keeps its own custom properties so a project
+   can restyle one without the other. */
 .iw-block-code__notice {
     padding: var(--iw-block-code-notice-padding, 1rem);
     border: 1px dashed var(--iw-block-code-notice-border, var(--color-border, #e5e7eb));
     border-radius: var(--iw-block-code-notice-radius, var(--border-radius, 0.375rem));
     color: var(--iw-block-code-notice-text, var(--color-secondary-600, inherit));
     font-size: var(--iw-block-code-notice-size, 0.875rem);
+}
+
+.iw-block-form__notice {
+    padding: var(--iw-block-form-notice-padding, 1rem);
+    border: 1px dashed var(--iw-block-form-notice-border, var(--color-border, #e5e7eb));
+    border-radius: var(--iw-block-form-notice-radius, var(--border-radius, 0.375rem));
+    color: var(--iw-block-form-notice-text, var(--color-secondary-600, inherit));
+    font-size: var(--iw-block-form-notice-size, 0.875rem);
 }
 
 /* Block modes */
