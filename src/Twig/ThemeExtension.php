@@ -12,6 +12,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFunction;
@@ -70,7 +71,45 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_template_exists', $this->templateExists(...), [
+                'needs_environment' => true,
+            ]),
         ];
+    }
+
+    /**
+     * Tell whether SuluFormBundle is installed.
+     *
+     * The form block only renders a SuluFormBundle form when it is, since the
+     * bridge template calls form helpers that do not exist otherwise. Same
+     * check as the one picking the admin form variant in the bundle class.
+     *
+     * @return bool True when SuluFormBundle is available
+     */
+    public function hasFormBundle(): bool
+    {
+        return class_exists(\Sulu\Bundle\FormBundle\SuluFormBundle::class);
+    }
+
+    /**
+     * Tell whether a Twig template can be loaded.
+     *
+     * Lets a template choose between a project override and a bundled default
+     * without the blanket `ignore missing`, which turns a typo into silence.
+     *
+     * @param Environment $env  Injected by Twig (needs_environment)
+     * @param string      $name Template name, e.g. 'forms/_sulu_form.html.twig'
+     *
+     * @return bool True when the template exists in the Twig loader
+     */
+    public function templateExists(Environment $env, string $name): bool
+    {
+        if ('' === $name) {
+            return false;
+        }
+
+        return $env->getLoader()->exists($name);
     }
 
     /**

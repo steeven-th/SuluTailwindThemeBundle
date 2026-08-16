@@ -1,0 +1,113 @@
+# Form block
+
+The `form` block puts a contact form on a page. It has two modes, and the admin form
+only offers the first one when SuluFormBundle is installed.
+
+| Mode | When to use | What the editor picks |
+|------|-------------|-----------------------|
+| **SuluFormBundle** | Forms built and managed in the admin, with stored submissions and notification mails | A form, from a dropdown |
+| **Twig template** | A form the project renders itself (custom controller, third-party service, newsletter embed) | A template path |
+
+Both modes share the block's layout options — `centered`, `card`, `split` — and its
+info column widgets (text, image, location map).
+
+---
+
+## SuluFormBundle mode
+
+### Install
+
+```bash
+composer require sulu/form-bundle
+```
+
+That is the whole setup. The bundle detects SuluFormBundle and, from then on:
+
+- the block's admin form gains the **Use SuluFormBundle** toggle and the form dropdown
+  (without the bundle, the block only offers the Twig template path);
+- the selected form renders through the bridge template shipped at
+  `@ItechWorldSuluTailwindTheme/forms/_sulu_form.html.twig`;
+- the bundle's **form theme** is applied to it, so every field comes out with the
+  `iw-form__*` classes and follows the active block variant's colors.
+
+Nothing has to be created in the project. The bridge template is included only when
+SuluFormBundle is present — Twig never compiles a template it does not include, so the
+form helpers it calls cannot fail on a project without the bundle.
+
+### What `single_form_selection` gives you
+
+In Sulu 3, `SingleFormSelectionPropertyResolver` resolves the field to an **already-built
+Symfony `FormView`** — not an id. Passing it to `sulu_form_get_by_id()` fails:
+
+```
+getFormById(): Argument #1 ($id) must be of type int, Symfony\Component\Form\FormView given
+```
+
+The bridge template receives it as `formView` and renders it directly. A bare numeric id
+is still accepted and resolved through `sulu_form_get_by_id()`, for content stored by an
+earlier version.
+
+### Customising the rendering
+
+Override the bridge at the standard Symfony bundle path:
+
+```
+templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_sulu_form.html.twig
+```
+
+A project-level `templates/forms/_sulu_form.html.twig` also still takes precedence when it
+exists — that was the required setup in earlier versions, so those projects keep working.
+It receives `formId` alongside `formView` for the same reason. Prefer `formView` in new code.
+
+To keep the theme but change a single field's markup, override a block of the form theme
+instead — see [Forms — CSS API](css-api/forms.md).
+
+---
+
+## Twig template mode
+
+Turn **Use SuluFormBundle** off and enter a template path, relative to the project's
+`templates/` directory:
+
+```
+forms/contact.html.twig
+```
+
+The bundle does not ship this template: it is your form. To match the rest of the site,
+build it with the same public classes the form theme uses — `iw-form iw-form__grid` on the
+`<form>`, one `iw-form__col` per field. A full example is in
+[Forms — CSS API → Custom form template](css-api/forms.md#custom-form-template-without-suluformbundle).
+
+---
+
+## When the block renders nothing
+
+A block that renders nothing used to do so in complete silence. It now explains itself in
+the `dev` environment, in a `.iw-block-form__notice` box:
+
+| Situation | What you see in `dev` |
+|-----------|----------------------|
+| SuluFormBundle mode, bundle not installed | A note pointing at `composer require sulu/form-bundle` |
+| SuluFormBundle mode, no form selected | A note asking to pick a form in the admin |
+| Twig mode, template path not found | The path that was looked up, so a typo is obvious |
+| Twig mode, no path entered | A note asking for a path |
+
+In `prod` the block stays empty — a visitor never sees these. The notice inherits the
+theme's text colors and can be restyled through `--iw-block-form-notice-*`.
+
+---
+
+## Testing a form locally
+
+If the linked page of a `sulu-link` in a field label is not published, Sulu strips the tag
+and keeps only its text. A consent label showing no `<a>` therefore does not mean the label
+is broken — publish the target page before judging the rendering.
+
+---
+
+## See also
+
+- [Forms — CSS API](css-api/forms.md) — every `iw-form__*` class, the `--iw-form-*`
+  variables, the combobox and file-input widgets, and the custom-template example
+- [Form block wrapper — CSS API](css-api/blocks/form.md) — the surrounding layout
+  (`centered` / `card` / `split`) and its info column

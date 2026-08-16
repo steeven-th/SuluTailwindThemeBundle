@@ -381,6 +381,37 @@ happens once, when the returned string is written into the `srcdoc` attribute.
 
 ---
 
+### `iw_sulu_tailwind_theme_has_form_bundle()`
+
+Tells whether SuluFormBundle is installed. The form block checks it before including
+the bridge template that renders a selected form: a template Twig never includes is
+never compiled, so the form helpers it calls cannot break a project without the bundle.
+
+**Returns:** `bool`
+
+---
+
+### `iw_sulu_tailwind_theme_template_exists(name)`
+
+Tells whether a template can be loaded, so a template can pick between a project
+override and a bundled default — or report a missing file — instead of relying on
+`ignore missing`, which turns a typo into silence.
+
+```twig
+{% if iw_sulu_tailwind_theme_template_exists(twigTemplate) %}
+    {% include twigTemplate %}
+{% elseif app.environment == 'dev' %}
+    <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_template_missing'|trans({'%template%': twigTemplate}) }}</p>
+{% endif %}
+```
+
+**Parameters:**
+- `name` (`string`) — Template name, e.g. `forms/contact.html.twig` or a `@Bundle/...` path
+
+**Returns:** `bool`
+
+---
+
 ## Partial: `blocks/common/_image.html.twig`
 
 The single rendering point for every content image. Emits a `<picture>` with
