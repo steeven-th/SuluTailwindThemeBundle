@@ -14,37 +14,41 @@
         <div class="iw-block-document iw-block-document--default">
             {% for mediaId in documents %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
-                <a
-                    href="{{ media.url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="iw-document-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
-                    download
-                >
-                    {# File type icon #}
-                    <div class="iw-document-card__icon-wrap {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
-                        <svg class="iw-document-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
+                {# A media deleted from the library resolves to null: skip the card
+                   rather than linking to nowhere. #}
+                {% if media is not null %}
+                    <a
+                        href="{{ media.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="iw-document-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
+                        download
+                    >
+                        {# File type icon #}
+                        <div class="iw-document-card__icon-wrap {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                            <svg class="iw-document-card__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
 
-                    {# File info #}
-                    <div class="iw-document-card__info">
-                        <span class="iw-document-card__title">
-                            {{ media.title|default(media.name|default('Document')) }}
-                        </span>
-                        {% if media.mimeType is defined %}
-                            <span class="iw-document-card__mime">
-                                {{ media.mimeType|split('/')|last }}
+                        {# File info #}
+                        <div class="iw-document-card__info">
+                            <span class="iw-document-card__title">
+                                {{ media.title|default(media.name|default('Document')) }}
                             </span>
-                        {% endif %}
-                    </div>
+                            {% if media.mimeType is defined %}
+                                <span class="iw-document-card__mime">
+                                    {{ media.mimeType|split('/')|last }}
+                                </span>
+                            {% endif %}
+                        </div>
 
-                    {# Download arrow #}
-                    <svg class="iw-document-card__download" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                    </svg>
-                </a>
+                        {# Download arrow #}
+                        <svg class="iw-document-card__download" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                    </a>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

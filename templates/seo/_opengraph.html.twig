@@ -19,23 +19,29 @@
    so og:image:width/height are never advertised for a smaller fallback. #}
 {% set ogImageUrl = null %}
 {% set ogImageSized = false %}
+{# A media deleted from the library resolves to null: skip the image rather than
+   taking down the whole page from inside the <head>. #}
 {% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
     {% set ogMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
-    {% if ogMedia.thumbnails['iw_og_image'] is defined %}
-        {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
-        {% set ogImageSized = true %}
-    {% else %}
-        {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
-    {% endif %}
-{% elseif content.heroImage is defined and content.heroImage is not empty %}
-    {% set heroId = content.heroImage %}
-    {% if heroId %}
-        {% set ogMedia = sulu_resolve_media(heroId, app.request.locale) %}
+    {% if ogMedia is not null %}
         {% if ogMedia.thumbnails['iw_og_image'] is defined %}
             {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
             {% set ogImageSized = true %}
         {% else %}
             {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
+        {% endif %}
+    {% endif %}
+{% elseif content.heroImage is defined and content.heroImage is not empty %}
+    {% set heroId = content.heroImage %}
+    {% if heroId %}
+        {% set ogMedia = sulu_resolve_media(heroId, app.request.locale) %}
+        {% if ogMedia is not null %}
+            {% if ogMedia.thumbnails['iw_og_image'] is defined %}
+                {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
+                {% set ogImageSized = true %}
+            {% else %}
+                {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endif %}

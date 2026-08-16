@@ -62,7 +62,12 @@
 {% set resolvedImages = [] %}
 {% if images is defined and images is iterable %}
     {% for mediaId in images %}
-        {% set resolvedImages = resolvedImages|merge([sulu_resolve_media(mediaId, app.request.locale)]) %}
+        {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+        {# A media deleted from the library resolves to null: keep it out of the
+           list, which drives the slide count, the dots and the lightbox. #}
+        {% if resolvedMedia is not null %}
+            {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+        {% endif %}
     {% endfor %}
 {% endif %}
 

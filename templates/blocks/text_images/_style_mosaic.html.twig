@@ -87,9 +87,19 @@
 
             {# Mosaic images — full width when stacked, 2 columns when side-by-side #}
             {% if images is defined and images is iterable %}
+                {# Resolve first, dropping any media deleted from the library: the
+                   mosaic gives its first item a full-width slot, so a hole at the
+                   front would leave the grid without a hero image. #}
+                {% set resolvedImages = [] %}
+                {% for mediaId in images %}
+                    {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+                    {% if resolvedMedia is not null %}
+                        {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+                    {% endif %}
+                {% endfor %}
+
                 <div class="iw-block-text-images__mosaic-grid {{ isSideBySide ? 'lg:col-span-2' : '' }} {{ imageFirst ? 'order-1' : 'order-2' }} {{ isSideBySide ? (imageFirst ? 'lg:order-1' : 'lg:order-2') : '' }} grid grid-cols-2 gap-2 md:gap-5">
-                    {% for mediaId in images %}
-                        {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                    {% for media in resolvedImages %}
                         {# First image spans full width in 16:9, others use selected format #}
                         {% set isHero = loop.first %}
                         {% set imgFormat = isHero ? 'iw_theme_16_9' : baseFormat %}
