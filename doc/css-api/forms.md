@@ -54,10 +54,14 @@ The column width is driven by the SuluFormBundle `width` field (`half`, `one-thi
 
 | Class | Role |
 |-------|------|
-| `.iw-form__label` | Field label. Centralises the label color (`--iw-form-label`). |
+| `.iw-form__label` | Field label. Centralises the label color (`--iw-form-label`). Also carried by the inline label of a single checkbox and by each expanded choice (radio / checkbox list), so every label of the form follows the same color. |
 | `.iw-form__label--required` | Marker added when the field is required (override hook — add your own `::after { content: " *" }` if desired). |
 | `.iw-form__submit` | Submit button override hook (the variant styling is carried by `.iw-button--variant`). |
 | `.iw-form__headline` | SuluFormBundle headline field — owns the bottom border color. |
+
+> Labels are rendered as **rich content**, like SuluFormBundle does natively: a consent
+> checkbox can link to the privacy policy straight from its label in the admin. Expanded
+> choice options are the exception — plain text only, as typed in the admin.
 
 ---
 
