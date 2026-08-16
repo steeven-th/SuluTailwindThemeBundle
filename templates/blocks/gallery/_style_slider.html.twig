@@ -35,6 +35,17 @@
     } only %}
 
     {% if images is defined and images is iterable %}
+        {# Resolve once, dropping any media deleted from the library: slides, dots
+           and the navigation test all read the same list and must stay in sync —
+           skipping inside a single loop would leave a dot without its slide. #}
+        {% set resolvedImages = [] %}
+        {% for mediaId in images %}
+            {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+            {% if resolvedMedia is not null %}
+                {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+            {% endif %}
+        {% endfor %}
+
         {# Map imageFilter value to Sulu thumbnail name and CSS aspect-ratio #}
         {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
         {% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
@@ -54,8 +65,7 @@
                 class="iw-block-gallery iw-block-gallery--slider iw-block-gallery--slider-single relative overflow-hidden {{ ratioClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}"
             >
                 {# Carousel slides #}
-                {% for mediaId in images %}
-                    {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                {% for media in resolvedImages %}
                     <div
                         data-slider-target="slide"
                         class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
@@ -77,7 +87,7 @@
                 {% endfor %}
 
                 {# Prev / Next buttons + dots only when there is something to navigate to #}
-                {% if images|length > 1 %}
+                {% if resolvedImages|length > 1 %}
                     <button
                         type="button"
                         data-action="slider#prev"
@@ -97,7 +107,7 @@
 
                     {# Dot indicators #}
                     <div data-slider-target="dots" class="iw-block-gallery__dots absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
-                        {% for mediaId in images %}
+                        {% for media in resolvedImages %}
                             <button
                                 type="button"
                                 data-action="slider#goTo"
@@ -121,8 +131,7 @@
                     data-slider-target="track"
                     class="iw-block-gallery__track flex overflow-x-auto scroll-smooth snap-x snap-mandatory {{ gapClass }} pb-4 scrollbar-hide"
                 >
-                    {% for mediaId in images %}
-                        {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                    {% for media in resolvedImages %}
                         <figure class="iw-block__image iw-block-gallery__item flex-none w-[80%] sm:w-[60%] md:w-[40%] lg:w-[30%] snap-start{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
                             <a
                                 href="{{ media.url }}"
@@ -141,7 +150,7 @@
                 </div>
 
                 {# Navigation buttons only when there is something to scroll to #}
-                {% if images|length > 1 %}
+                {% if resolvedImages|length > 1 %}
                     <button
                         type="button"
                         data-action="slider#prev"

@@ -1958,6 +1958,9 @@ class ThemeCompiler
         $css .= ".iw-form__check {\n";
         $css .= "  width: 1.125rem;\n";
         $css .= "  height: 1.125rem;\n";
+        // The box sits in a flex row next to a label that can wrap over several
+        // lines; without this it gets squeezed into an ellipse.
+        $css .= "  flex-shrink: 0;\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  accent-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "}\n\n";
@@ -2311,7 +2314,16 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-subtitle-color, inherit);\n";
             $css .= "}\n";
 
-            $css .= ".iw-variant--{$index} p {\n";
+            // Every text-bearing element of rich content, not just <p>. The block
+            // itself falls back to the TITLE color (see above), so anything left
+            // out here silently renders in the heading color - white body text on
+            // a light background, in the worst case. List items were the first
+            // casualty; definition lists and captions were next in line.
+            $css .= ".iw-variant--{$index} p,\n";
+            $css .= ".iw-variant--{$index} li,\n";
+            $css .= ".iw-variant--{$index} dt,\n";
+            $css .= ".iw-variant--{$index} dd,\n";
+            $css .= ".iw-variant--{$index} figcaption {\n";
             $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
@@ -2323,10 +2335,10 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));\n";
             $css .= "}\n";
 
-            // Only the markers: colouring the whole <ul>/<ol> made every item
-            // inherit it, which just duplicated the paragraph color over an
-            // arbitrary slice of the content and made the common design ask
-            // impossible - accent bullets with body-coloured text.
+            // The list color drives the MARKER only - the item text follows the
+            // paragraph color, like every other line of the content (rule above).
+            // Colouring the whole <ul>/<ol> with it would make the common design
+            // ask impossible: accent bullets with body-coloured text.
             $css .= ".iw-variant--{$index} ul li::marker,\n";
             $css .= ".iw-variant--{$index} ol li::marker {\n";
             $css .= "  color: var(--iw-variant-list-color, inherit);\n";
@@ -2404,22 +2416,20 @@ class ThemeCompiler
             $css .= "  padding-left: 0;\n";
             $css .= "}\n";
 
-            // A to-do list has no marker to colour - its checkbox plays that
-            // role, so the bullet color drives it through accent-color. Colouring
-            // the text instead would bring back the very problem ::marker fixes.
-            $css .= ".iw-variant--{$index} .todo-list input[type=\"checkbox\"] {\n";
-            $css .= "  accent-color: var(--iw-variant-list-color, currentColor);\n";
-            $css .= "}\n";
-
             $css .= ".iw-variant--{$index} .todo-list .todo-list__label {\n";
             $css .= "  display: flex;\n";
             $css .= "  align-items: flex-start;\n";
             $css .= "  gap: 0.5rem;\n";
             $css .= "}\n";
 
+            // A to-do list has no marker to colour - its checkbox plays that
+            // role, so the bullet color drives it through accent-color, falling
+            // back to the link color then the primary token. Emitted once: a
+            // second rule further down used to override this one with the link
+            // color, leaving the list color with nothing to act on.
             $css .= ".iw-variant--{$index} .todo-list input[type=\"checkbox\"] {\n";
             $css .= "  margin-top: 0.25em;\n";
-            $css .= "  accent-color: var(--iw-variant-link-color, var(--color-primary, currentColor));\n";
+            $css .= "  accent-color: var(--iw-variant-list-color, var(--iw-variant-link-color, var(--color-primary, currentColor)));\n";
             $css .= "}\n";
 
             $css .= $this->generateVariantFormCss((string) $index, $props);

@@ -19,6 +19,16 @@
     {% endif %}
 
     {% if images is defined and images is iterable %}
+        {# Resolve once, dropping any media deleted from the library: every loop and
+           length test below reads the same list and must stay in sync. #}
+        {% set resolvedImages = [] %}
+        {% for mediaId in images %}
+            {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+            {% if resolvedMedia is not null %}
+                {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+            {% endif %}
+        {% endfor %}
+
         {% set showNames = showImagesName|default(false) %}
 
         {# Map imageFilter value to Sulu thumbnail name and CSS aspect-ratio #}
@@ -36,12 +46,11 @@
         >
             {# Blurred backgrounds — JS will move this to the parent <section> #}
             <div class="iw-carousel-3d__bgs" data-carousel3d-target="bgsContainer">
-                {% for mediaId in images %}
-                    {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                {% for media in resolvedImages %}
                     <div
                         class="iw-carousel-3d__bg"
                         data-carousel3d-target="bg"
-                        {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == images|length - 1 %}data-previous{% else %}data-hidden{% endif %}
+                        {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == resolvedImages|length - 1 %}data-previous{% else %}data-hidden{% endif %}
                         style="--bg: url('{{ media.thumbnails['iw_theme_16_9']|default(media.url) }}')"
                     ></div>
                 {% endfor %}
@@ -61,7 +70,7 @@
             {# Carousel #}
             <div class="iw-carousel-3d{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}" style="--slide-aspect: {{ slideAspect }};">
                 {# Previous button only when there is more than one slide #}
-                {% if images|length > 1 %}
+                {% if resolvedImages|length > 1 %}
                 <button
                     type="button"
                     data-action="carousel3d#prev"
@@ -75,12 +84,11 @@
                 <div class="iw-carousel-3d__wrapper">
                     {# ── Slides ── #}
                     <div class="iw-carousel-3d__slides">
-                        {% for mediaId in images %}
-                            {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                        {% for media in resolvedImages %}
                             <div
                                 class="iw-carousel-3d__slide"
                                 data-carousel3d-target="slide"
-                                {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == images|length - 1 %}data-previous{% else %}data-hidden{% endif %}
+                                {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == resolvedImages|length - 1 %}data-previous{% else %}data-hidden{% endif %}
                             >
                                 <div class="iw-carousel-3d__slide-inner">
                                     <div class="iw-carousel-3d__image-wrapper{{ imageRadius ? ' ' ~ imageRadius ~ ' overflow-hidden' : '' }}">
@@ -105,12 +113,11 @@
                     {# ── Info overlays ── #}
                     {% if showNames %}
                         <div class="iw-carousel-3d__infos">
-                            {% for mediaId in images %}
-                                {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                            {% for media in resolvedImages %}
                                 <div
                                     class="iw-carousel-3d__info"
                                     data-carousel3d-target="info"
-                                    {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == images|length - 1 %}data-previous{% else %}data-hidden{% endif %}
+                                    {% if loop.first %}data-current{% elseif loop.index0 == 1 %}data-next{% elseif loop.index0 == resolvedImages|length - 1 %}data-previous{% else %}data-hidden{% endif %}
                                 >
                                     <div class="iw-carousel-3d__info-inner">
                                         <span class="iw-carousel-3d__title">{{ media.title|default('') }}</span>
@@ -122,7 +129,7 @@
                 </div>
 
                 {# Next button only when there is more than one slide #}
-                {% if images|length > 1 %}
+                {% if resolvedImages|length > 1 %}
                 <button
                     type="button"
                     data-action="carousel3d#next"

@@ -34,7 +34,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 |----------|-----------|---------|
 | `--iw-variant-title-color` | `title` | Color for `h1`–`h6` |
 | `--iw-variant-subtitle-color` | `subtitle` | Color for `.iw-block__subtitle` / blockquote text |
-| `--iw-variant-paragraph-color` | `paragraph` | Color for `<p>` |
+| `--iw-variant-paragraph-color` | `paragraph` | Color for every text-bearing element of the content: `<p>`, list items, definition lists, captions, table cells |
 | `--iw-variant-link-color` | `link` | Color for links (excluding `.iw-button--*`) |
 | `--iw-variant-link-hover` | `linkHover` | Link hover color |
 | `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
@@ -44,7 +44,10 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 
 Additionally:
 
-- `color` is set to the `title` value (default text color for the block)
+- `color` is set to the `title` value (default text color for the block). Any text
+  element **not** listed in the table below therefore inherits the *heading* color,
+  which is rarely what you want for body content — add it to the paragraph rule
+  rather than leaving it to inherit.
 - `background-color` is applied via the `[data-has-bg="true"]` selector — only when the **Show background** checkbox is checked
 
 The compiler also injects per-variant form variables (`--form-bg`, `--form-text`, `--form-label`, `--form-border`, `--form-border-focus`, `--form-border-error`, `--form-placeholder`) when the variant defines them. See [`forms.md`](./forms.md) for the form API.
@@ -59,9 +62,9 @@ The compiled CSS automatically styles these HTML elements inside any `.iw-varian
 |---------|---------|
 | `h1`–`h6` | `color: var(--iw-variant-title-color)` |
 | `.iw-block__subtitle` | `color: var(--iw-variant-subtitle-color)` |
-| `p` | `color: var(--iw-variant-paragraph-color)` |
+| `p`, `li`, `dt`, `dd`, `figcaption` | `color: var(--iw-variant-paragraph-color)` |
 | `a` (excluding `[class*="iw-button--"]`) | `color: var(--iw-variant-link-color)`, hover → `--iw-variant-link-hover` |
-| `ul li::marker`, `ol li::marker` | `color: var(--iw-variant-list-color)` - the item text inherits the paragraph color |
+| `ul li::marker`, `ol li::marker` | `color: var(--iw-variant-list-color)` - the marker only; the item text takes the paragraph color from the rule above |
 | `table` | Full styling with borders using `--iw-variant-hr-color` |
 | `table th` | Bold, `--iw-variant-title-color` text, `--iw-variant-subtle-bg` background |
 | `code` (inline) | `--iw-variant-subtle-bg` background, border `--iw-variant-hr-color` |
