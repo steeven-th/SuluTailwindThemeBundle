@@ -1958,6 +1958,9 @@ class ThemeCompiler
         $css .= ".iw-form__check {\n";
         $css .= "  width: 1.125rem;\n";
         $css .= "  height: 1.125rem;\n";
+        // The box sits in a flex row next to a label that can wrap over several
+        // lines; without this it gets squeezed into an ellipse.
+        $css .= "  flex-shrink: 0;\n";
         $css .= "  cursor: pointer;\n";
         $css .= "  accent-color: var(--iw-form-border-focus, var(--color-primary, #3b82f6));\n";
         $css .= "}\n\n";
