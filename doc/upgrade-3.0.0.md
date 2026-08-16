@@ -280,10 +280,27 @@ hidden) with free horizontal + vertical positioning, a readability veil, and
 breadcrumb placement (with the title / top bar / hidden). These are exposed to
 Twig as `iw_sulu_tailwind_theme.pageHero_*`.
 
-Additive change: existing pages render unchanged until an editor fills these
-fields. New public CSS API `.iw-page-hero*` / `.iw-page-title`, overridable via
+New public CSS API `.iw-page-hero*` / `.iw-page-title`, overridable via
 `--iw-page-hero-*` / `--iw-page-title-*`. See
 [page-templates.md](page-templates.md#page-hero-optional-banner).
+
+### Every page now carries an H1 (breaking, visual)
+
+A page with no banner image and no `heroTitle` — the most common case of all —
+used to render **no `<h1>` at all**: the fallback to the page title was computed
+but only used on the banner branch. Silent, and costly for SEO and screen
+readers.
+
+The heading is now always emitted, falling back to the page title, which means
+**pages that previously showed no headline now show one**, styled with
+`.iw-page-title`. If a template of yours already renders its own headline inside
+the content blocks, you will get two — remove one, or set **Components → Page
+hero → Title display** to `hidden`: the H1 is then kept in the markup but
+visually hidden through the new `.iw-visually-hidden` utility, so the document
+stays correct without the visible duplicate.
+
+The same applies with a banner: `hidden` no longer drops the `<h1>` from the
+page, it only hides it visually.
 
 **New Stimulus controller** `hero_parallax` — register it in your
 `controllers.json` (see the README) to enable the parallax option; without it

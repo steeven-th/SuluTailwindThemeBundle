@@ -7,7 +7,8 @@
     - title: H1 text. Overrides the page title when the editor set heroTitle.
     - subtitle: optional tagline below the H1
     - display: 'overlay' (title over the image) | 'below' (title under the
-               image) | 'hidden' (image only). Default 'overlay'.
+               image) | 'hidden' (image only, the H1 is kept for crawlers and
+               assistive tech). Default 'overlay'.
     - alignX: 'left' | 'center' | 'right' — horizontal text alignment (both modes)
     - alignY: 'top' | 'middle' | 'bottom' — vertical position (overlay only)
     - shade: 'none' | 'light' | 'medium' | 'strong' — readability veil (overlay)
@@ -52,6 +53,12 @@
 
         <section class="iw-page-hero iw-page-hero--h-{{ height }}{{ parallax ? ' iw-page-hero--parallax' : '' }}"
                  {%- if parallax %} data-controller="hero-parallax"{% endif %}>
+            {# "hidden" hides the title visually, not semantically: the page
+               would otherwise ship without any <h1>. #}
+            {% if display == 'hidden' and heroTitle is not empty %}
+                <h1 class="iw-visually-hidden">{{ heroTitle }}</h1>
+            {% endif %}
+
             {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
                 media: media,
                 format: 'iw_theme_hero',

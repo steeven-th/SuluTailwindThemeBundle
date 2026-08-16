@@ -58,12 +58,19 @@
             </div>
         {% endif %}
 
-        {# Render the overriding headline even without a banner so the editor's
-           heroTitle input is never silently dropped. #}
-        {% if heroTitleText is not empty %}
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                <h1 class="iw-page-title">{{ heroTitleText }}</h1>
-            </div>
+        {# Always emit the H1, using pageH1 rather than heroTitleText: a content
+           page with neither a banner nor a heroTitle is the most common case of
+           all, and it used to render no <h1> at all — a silent SEO and a11y
+           hole on most of the site. When the site-wide config hides the hero
+           title, keep the heading for crawlers and assistive tech only. #}
+        {% if pageH1 is not empty %}
+            {% if heroDisplay == 'hidden' %}
+                <h1 class="iw-visually-hidden">{{ pageH1 }}</h1>
+            {% else %}
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    <h1 class="iw-page-title">{{ pageH1 }}</h1>
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 

@@ -39,8 +39,8 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 Rendering rules (see `templates/pages/default.html.twig`):
 
 - **`heroImage` set** → the `_page_hero` component renders the banner with the site-wide appearance. The H1 is `heroTitle` (or the page title as a fallback).
-- **`heroImage` empty, `heroTitle` set** → no banner; the headline is still rendered as an H1 above the content so the input is never silently dropped.
-- **Both empty** → unchanged behavior (top breadcrumb + content blocks).
+- **`heroImage` empty** → no banner; the headline is rendered as an H1 above the content, using `heroTitle` when the editor set one and the page title otherwise.
+- **`pageHero_titleDisplay: hidden`** → the H1 is still emitted, visually hidden (`.iw-visually-hidden`), with or without a banner. Every page carries exactly one `<h1>`, whatever the configuration.
 
 The breadcrumb also honors the global breadcrumbs setting (Components → Breadcrumb): if breadcrumbs are disabled for pages, none is shown regardless of `pageHero_breadcrumb`.
 
@@ -61,6 +61,7 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
 | `.iw-page-hero__breadcrumb` (+ `--below`) | Breadcrumb trail (`--iw-page-hero-breadcrumb-*`) |
 | `.iw-page-title` | Headline rendered without a banner (`--iw-page-title-*`) |
+| `.iw-visually-hidden` | Utility: keeps the H1 in the accessibility tree when the title display is `hidden` |
 
 > The parallax option requires the `hero_parallax` Stimulus controller to be registered in your `controllers.json` (see the installation section of the README).
 
