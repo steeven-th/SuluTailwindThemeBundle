@@ -280,9 +280,36 @@ hidden) with free horizontal + vertical positioning, a readability veil, and
 breadcrumb placement (with the title / top bar / hidden). These are exposed to
 Twig as `iw_sulu_tailwind_theme.pageHero_*`.
 
-New public CSS API `.iw-page-hero*` / `.iw-page-title`, overridable via
-`--iw-page-hero-*` / `--iw-page-title-*`. See
+New public CSS API `.iw-page-hero*`, overridable via `--iw-page-hero-*`. See
 [page-templates.md](page-templates.md#page-hero-optional-banner).
+
+### The banner no longer depends on the image (breaking, visual)
+
+The image used to be the **condition** for the hero: without one, the component
+was never called and every appearance setting — height, alignment, title
+placement, breadcrumb mode — was silently ignored. Wanting a tall header with a
+centered title and no photo was simply impossible.
+
+The image is now a **property** of the hero. The component renders in both
+cases, so a page without a banner gets the same layout settings as one with a
+banner. Three consequences to check after upgrading:
+
+- **Pages without a banner image now show a header box** the height of
+  `pageHero_height` (`md` → up to 560 px by default). Set the height to `sm`, or
+  restyle `.iw-page-hero--no-image`, if that is too much for your site.
+- **`pageHero_breadcrumb` is now honored without an image too.** The breadcrumb
+  used to be forced into a top bar; with the default `with_title` it now sits
+  inside the header.
+- **`.iw-page-title` is gone.** The image-less headline is rendered by the hero
+  component like any other, as `.iw-page-hero__title` inside
+  `.iw-page-hero--no-image`. Custom CSS targeting `.iw-page-title` or
+  `--iw-page-title-*` must move to those.
+
+Without an image the header sits on a transparent background and takes the theme
+text colors (no white-on-photo treatment, no text shadow). `--iw-page-hero-bg`
+paints a flat color behind it. `pageHero_shade` and `pageHero_parallax` are
+ignored — there is nothing to veil, and nothing to scroll — and `below` falls
+back to `overlay`, there being no image for the header to sit under.
 
 ### Every page now carries an H1 (breaking, visual)
 
@@ -292,15 +319,16 @@ but only used on the banner branch. Silent, and costly for SEO and screen
 readers.
 
 The heading is now always emitted, falling back to the page title, which means
-**pages that previously showed no headline now show one**, styled with
-`.iw-page-title`. If a template of yours already renders its own headline inside
-the content blocks, you will get two — remove one, or set **Components → Page
-hero → Title display** to `hidden`: the H1 is then kept in the markup but
-visually hidden through the new `.iw-visually-hidden` utility, so the document
-stays correct without the visible duplicate.
+**pages that previously showed no headline now show one**. If a template of
+yours already renders its own headline inside the content blocks, you will get
+two — remove one, or set **Components → Page hero → Title display** to
+`hidden`: the H1 is then kept in the markup but visually hidden through the new
+`.iw-visually-hidden` utility, so the document stays correct without the visible
+duplicate. With that setting and no image, no empty banner is rendered either.
 
 The same applies with a banner: `hidden` no longer drops the `<h1>` from the
-page, it only hides it visually.
+page, it only hides it visually. A `heroImage` whose media was deleted no longer
+drops the whole header: it falls back to the image-less banner.
 
 **New Stimulus controller** `hero_parallax` — register it in your
 `controllers.json` (see the README) to enable the parallax option; without it

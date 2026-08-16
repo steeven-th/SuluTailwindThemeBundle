@@ -3408,6 +3408,30 @@ section.block:has([data-slider-fullbleed-value]) {
 .iw-page-hero--h-lg { --iw-page-hero-ratio: 16 / 11; --iw-page-hero-max-height: 720px; }
 .iw-page-hero--h-full { --iw-page-hero-ratio: auto; --iw-page-hero-height: 100svh; --iw-page-hero-max-height: none; }
 
+/* No banner image: the header sits on the page background instead of a photo,
+   so it drops the light-on-dark treatment and takes the theme text colors.
+   The background stays transparent — set --iw-page-hero-bg for a flat color. */
+.iw-page-hero--no-image {
+    background: var(--iw-page-hero-bg, transparent);
+}
+
+.iw-page-hero--no-image .iw-page-hero__title {
+    color: var(--iw-page-hero-title-no-image-color, inherit);
+    text-shadow: none;
+}
+
+.iw-page-hero--no-image .iw-page-hero__subtitle {
+    color: var(--iw-page-hero-subtitle-no-image-color, var(--color-secondary-600));
+    text-shadow: none;
+}
+
+.iw-page-hero--no-image .iw-page-hero__breadcrumb {
+    text-shadow: none;
+    --iw-breadcrumbs-color: initial;
+    --iw-breadcrumbs-current-color: initial;
+    --iw-breadcrumbs-link-hover: initial;
+}
+
 .iw-page-hero__image {
     width: 100%;
     height: 100%;
@@ -3517,15 +3541,6 @@ section.block:has([data-slider-fullbleed-value]) {
     --iw-breadcrumbs-color: initial;
     --iw-breadcrumbs-current-color: initial;
     --iw-breadcrumbs-link-hover: initial;
-}
-
-/* Headline rendered without a banner image — heroTitle when the editor set one,
-   the page title otherwise, so a page is never left without an <h1>. */
-.iw-page-title {
-    margin: 0;
-    font-size: var(--iw-page-title-size, clamp(1.75rem, 4vw, 3rem));
-    font-weight: var(--iw-page-title-weight, 700);
-    line-height: var(--iw-page-title-line-height, 1.15);
 }
 
 /* ─── Article meta ──────────────────────────────────────────────────────── */

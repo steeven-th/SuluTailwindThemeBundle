@@ -19,60 +19,38 @@
     {# Site-wide breadcrumbs toggle for pages (Components config). #}
     {% set pageBreadcrumbsOn = (iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both')) in ['both', 'pages'] %}
 
-    {% if heroImageId %}
-        {# "with_title" needs a visible header; fall back to a top bar otherwise. #}
-        {% set effectiveBreadcrumb = (heroDisplay == 'hidden' and heroBreadcrumbMode == 'with_title')
-            ? 'top_bar' : heroBreadcrumbMode %}
+    {# One call, image or not: the banner image is a property of the hero, not a
+       condition for it. Every appearance setting therefore applies to a page
+       without a banner too, and the H1 always comes from pageH1 — which falls
+       back to the page title, so no page ever ships without a heading. #}
 
-        {% if effectiveBreadcrumb == 'top_bar' and pageBreadcrumbsOn %}
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-                    context: 'page',
-                    pageUuid: resource.uuid|default(null),
-                } only %}
-            </div>
-        {% endif %}
+    {# "with_title" needs a visible header; fall back to a top bar otherwise. #}
+    {% set effectiveBreadcrumb = (heroDisplay == 'hidden' and heroBreadcrumbMode == 'with_title')
+        ? 'top_bar' : heroBreadcrumbMode %}
 
-        {% include '@ItechWorldSuluTailwindTheme/pages/common/_page_hero.html.twig' with {
-            image: heroImageId,
-            title: pageH1,
-            subtitle: content.heroSubtitle|default(''),
-            display: heroDisplay,
-            alignX: iw_sulu_tailwind_theme.pageHero_alignX|default('left'),
-            alignY: iw_sulu_tailwind_theme.pageHero_alignY|default('bottom'),
-            shade: iw_sulu_tailwind_theme.pageHero_shade|default('medium'),
-            height: iw_sulu_tailwind_theme.pageHero_height|default('md'),
-            parallax: heroParallax,
-            breadcrumb: (effectiveBreadcrumb == 'with_title') and pageBreadcrumbsOn,
-            breadcrumbPageUuid: resource.uuid|default(null),
-            breadcrumbCurrentTitle: content.title|default(''),
-        } only %}
-    {% else %}
-        {# No banner image: keep the standard top breadcrumb, gated by the config. #}
-        {% if pageBreadcrumbsOn %}
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-                    context: 'page',
-                    pageUuid: resource.uuid|default(null),
-                } only %}
-            </div>
-        {% endif %}
-
-        {# Always emit the H1, using pageH1 rather than heroTitleText: a content
-           page with neither a banner nor a heroTitle is the most common case of
-           all, and it used to render no <h1> at all — a silent SEO and a11y
-           hole on most of the site. When the site-wide config hides the hero
-           title, keep the heading for crawlers and assistive tech only. #}
-        {% if pageH1 is not empty %}
-            {% if heroDisplay == 'hidden' %}
-                <h1 class="iw-visually-hidden">{{ pageH1 }}</h1>
-            {% else %}
-                <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    <h1 class="iw-page-title">{{ pageH1 }}</h1>
-                </div>
-            {% endif %}
-        {% endif %}
+    {% if effectiveBreadcrumb == 'top_bar' and pageBreadcrumbsOn %}
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'page',
+                pageUuid: resource.uuid|default(null),
+            } only %}
+        </div>
     {% endif %}
+
+    {% include '@ItechWorldSuluTailwindTheme/pages/common/_page_hero.html.twig' with {
+        image: heroImageId,
+        title: pageH1,
+        subtitle: content.heroSubtitle|default(''),
+        display: heroDisplay,
+        alignX: iw_sulu_tailwind_theme.pageHero_alignX|default('left'),
+        alignY: iw_sulu_tailwind_theme.pageHero_alignY|default('bottom'),
+        shade: iw_sulu_tailwind_theme.pageHero_shade|default('medium'),
+        height: iw_sulu_tailwind_theme.pageHero_height|default('md'),
+        parallax: heroParallax,
+        breadcrumb: (effectiveBreadcrumb == 'with_title') and pageBreadcrumbsOn,
+        breadcrumbPageUuid: resource.uuid|default(null),
+        breadcrumbCurrentTitle: content.title|default(''),
+    } only %}
 
     {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
         blocks: content.blocks|default([]),
