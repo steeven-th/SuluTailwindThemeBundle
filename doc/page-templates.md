@@ -38,9 +38,15 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 
 Rendering rules (see `templates/pages/default.html.twig`):
 
-- **`heroImage` set** → the `_page_hero` component renders the banner with the site-wide appearance. The H1 is `heroTitle` (or the page title as a fallback).
-- **`heroImage` empty, `heroTitle` set** → no banner; the headline is still rendered as an H1 above the content so the input is never silently dropped.
-- **Both empty** → unchanged behavior (top breadcrumb + content blocks).
+The banner image is a **property** of the hero, not a condition for it: the component is called with or without one, so every setting above applies in both cases. The H1 is `heroTitle` when the editor set one, the page title otherwise — no page ever ships without a heading.
+
+- **`heroImage` set** → the banner renders the image with the site-wide appearance.
+- **`heroImage` empty** → the same banner renders without an image, on a transparent background (`.iw-page-hero--no-image`), with the theme text colors instead of the light-on-photo ones. Height, alignment and title placement are unchanged. Set `--iw-page-hero-bg` for a flat color.
+- **`pageHero_titleDisplay: hidden`** → the H1 is still emitted, visually hidden (`.iw-visually-hidden`). Without an image, no empty banner is rendered — only the hidden heading.
+- **`pageHero_titleDisplay: below`** without an image → falls back to `overlay`: there is no image for the header to sit under.
+- **`pageHero_shade` and `pageHero_parallax`** are ignored without an image — there is nothing to veil, and nothing to scroll.
+
+A `heroImage` pointing at a deleted media resolves to nothing and falls back to the image-less banner, rather than dropping the header (and the H1) entirely.
 
 The breadcrumb also honors the global breadcrumbs setting (Components → Breadcrumb): if breadcrumbs are disabled for pages, none is shown regardless of `pageHero_breadcrumb`.
 
@@ -51,6 +57,7 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | Class | Role |
 |-------|------|
 | `.iw-page-hero` + `.iw-page-hero--h-{sm\|md\|lg\|full}` | Banner wrapper / height (`--iw-page-hero-ratio`, `--iw-page-hero-max-height`) |
+| `.iw-page-hero--no-image` | Image-less banner: transparent background (`--iw-page-hero-bg`), theme text colors (`--iw-page-hero-title-no-image-color`, `--iw-page-hero-subtitle-no-image-color`), no text shadow |
 | `.iw-page-hero--parallax` / `.iw-page-hero__image--parallax` | Parallax modifier / taller image |
 | `.iw-page-hero__image` | The rendered `<img>` (object-cover, no radius — banner is edge-to-edge) |
 | `.iw-page-hero__overlay` + `.iw-page-hero--y-{top\|middle\|bottom}` | Overlay layer / vertical position (`--iw-page-hero-overlay-padding-block`) |
@@ -60,7 +67,7 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero__title` (+ `--below`) | The H1 (`--iw-page-hero-title-*`) |
 | `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
 | `.iw-page-hero__breadcrumb` (+ `--below`) | Breadcrumb trail (`--iw-page-hero-breadcrumb-*`) |
-| `.iw-page-title` | Headline rendered without a banner (`--iw-page-title-*`) |
+| `.iw-visually-hidden` | Utility: keeps the H1 in the accessibility tree when the title display is `hidden` |
 
 > The parallax option requires the `hero_parallax` Stimulus controller to be registered in your `controllers.json` (see the installation section of the README).
 
