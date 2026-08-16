@@ -36,7 +36,11 @@
                     {# Fallback: pull the media title (or filename) when linking to a media asset #}
                     {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
                         {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
-                        {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                        {# A media deleted from the library resolves to null: leave the label
+                           empty and let the URL fallback below take over. #}
+                        {% if linkedMedia is not null %}
+                            {% set linkLabel = linkedMedia.title|default(linkedMedia.name|default('')) %}
+                        {% endif %}
                     {% endif %}
                     {# Last-resort fallback: show the URL itself if no label could be resolved #}
                     {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}

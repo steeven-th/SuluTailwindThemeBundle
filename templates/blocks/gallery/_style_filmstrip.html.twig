@@ -34,6 +34,16 @@
     } only %}
 
     {% if images is defined and images is iterable and images|length > 0 %}
+        {# Resolve once, dropping any media deleted from the library: every loop and
+           length test below reads the same list and must stay in sync. #}
+        {% set resolvedImages = [] %}
+        {% for mediaId in images %}
+            {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+            {% if resolvedMedia is not null %}
+                {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+            {% endif %}
+        {% endfor %}
+
         {# Map imageFilter value to Sulu thumbnail name and CSS aspect-ratio #}
         {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
         {% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
@@ -48,9 +58,8 @@
             class="iw-block-gallery iw-block-gallery--filmstrip"
         >
             {# Main image display — bottom margin only when the thumbnail strip is rendered below #}
-            <div class="iw-block-gallery__main relative overflow-hidden {{ ratioClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}{{ images|length > 1 ? ' mb-4' : '' }}">
-                {% for mediaId in images %}
-                    {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+            <div class="iw-block-gallery__main relative overflow-hidden {{ ratioClass }}{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}{{ resolvedImages|length > 1 ? ' mb-4' : '' }}">
+                {% for media in resolvedImages %}
                     <div
                         data-slider-target="slide"
                         class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ loop.first ? '' : 'hidden' }}"
@@ -73,7 +82,7 @@
                 {% endfor %}
 
                 {# Prev / Next arrows on the main image only when there is more than one #}
-                {% if images|length > 1 %}
+                {% if resolvedImages|length > 1 %}
                     <button
                         type="button"
                         data-action="slider#prev"
@@ -97,7 +106,7 @@
                is more than one image, otherwise the strip is useless.
                When paddingLateral is absent or 0, add horizontal padding so
                the arrows and thumbnails don't touch the block edges. #}
-            {% if images|length > 1 %}
+            {% if resolvedImages|length > 1 %}
             <div class="iw-block-gallery__thumbnails flex items-center gap-2{{ noGap ? ' px-4' : '' }}">
                 {# Prev thumbnails #}
                 <button
@@ -116,8 +125,7 @@
                     data-slider-target="thumbnailTrack"
                     class="iw-block-gallery__thumbnails-track flex gap-2 overflow-x-auto flex-1 min-w-0 scrollbar-hide py-1"
                 >
-                    {% for mediaId in images %}
-                        {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+                    {% for media in resolvedImages %}
                         <button
                             type="button"
                             data-slider-target="thumbnail"

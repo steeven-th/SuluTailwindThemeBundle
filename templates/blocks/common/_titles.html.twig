@@ -24,11 +24,16 @@
     {% if separatorMode == 'style' or separatorMode is empty %}
         <hr class="my-6">
     {% elseif separatorMode == 'image' and variantConfig.separatorImage is defined and variantConfig.separatorImage.id is defined %}
-        {# Image mode → render custom image separator #}
+        {# Image mode → render custom image separator. A media deleted from the
+           library resolves to null: fall back to the plain rule. #}
         {% set separatorMedia = sulu_resolve_media(variantConfig.separatorImage.id, app.request.locale) %}
-        <div class="iw-block__separator my-6">
-            <img src="{{ separatorMedia.url }}" alt="" loading="lazy" class="mx-auto max-h-8 w-auto">
-        </div>
+        {% if separatorMedia is not null %}
+            <div class="iw-block__separator my-6">
+                <img src="{{ separatorMedia.url }}" alt="" loading="lazy" class="mx-auto max-h-8 w-auto">
+            </div>
+        {% else %}
+            <hr class="my-6">
+        {% endif %}
     {% elseif separatorMode != 'none' %}
         {# Fallback to default hr if image is missing #}
         <hr class="my-6">

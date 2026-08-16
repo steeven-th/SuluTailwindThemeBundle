@@ -141,7 +141,11 @@
         <div class="iw-embed__consent" data-consent-target="placeholder">
             {% if consentImage|default(null) is not null and consentImage.id is defined %}
                 {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
-                <img src="{{ consentMedia.url }}" alt="" loading="lazy" class="iw-embed__consent-image">
+                {# A media deleted from the library resolves to null: the consent
+                   panel stays, it just loses its illustration. #}
+                {% if consentMedia is not null %}
+                    <img src="{{ consentMedia.url }}" alt="" loading="lazy" class="iw-embed__consent-image">
+                {% endif %}
             {% endif %}
 
             <div class="iw-embed__consent-body">

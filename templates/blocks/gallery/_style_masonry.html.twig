@@ -42,19 +42,23 @@
         <div class="iw-block-gallery iw-block-gallery--masonry columns-1 sm:columns-2 lg:columns-3 xl:columns-4 {{ gapClass }}">
             {% for mediaId in images %}
                 {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
-                <figure class="iw-block__image iw-block-gallery__item break-inside-avoid{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
-                    <a
-                        href="{{ media.url }}"
-                        class="iw-block-gallery__link glightbox"
-                        data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
-                    >
-                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
-                            media: media,
-                            format: 'iw_theme_gallery_thumb',
-                            classes: 'iw-block-gallery__img cursor-pointer',
-                        }) }}
-                    </a>
-                </figure>
+                {# A media deleted from the library resolves to null: skip the item
+                   rather than emitting a lightbox link to nowhere. #}
+                {% if media is not null %}
+                    <figure class="iw-block__image iw-block-gallery__item break-inside-avoid{{ imageRadiusClass ? ' ' ~ imageRadiusClass : '' }}">
+                        <a
+                            href="{{ media.url }}"
+                            class="iw-block-gallery__link glightbox"
+                            data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
+                        >
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: media,
+                                format: 'iw_theme_gallery_thumb',
+                                classes: 'iw-block-gallery__img cursor-pointer',
+                            }) }}
+                        </a>
+                    </figure>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

@@ -14,18 +14,22 @@
                 {% set heroId = content.heroImage %}
                 {% if heroId %}
                     {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
-                    <div class="iw-article-page__hero-inline-image">
-                        {# `iw_hero_md` is not a defined format → the effective format is iw_theme_16_9 (focus-aware, avif/webp). #}
-                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
-                            media: heroMedia,
-                            format: 'iw_theme_16_9',
-                            alt: heroMedia.title|default(content.title),
-                            raw: true,
-                            loading: 'eager',
-                            itemprop: 'image',
-                            classes: 'iw-article-page__hero-inline-image-img',
-                        }) }}
-                    </div>
+                    {# A media deleted from the library resolves to null: the title
+                       column simply takes the full width. #}
+                    {% if heroMedia is not null %}
+                        <div class="iw-article-page__hero-inline-image">
+                            {# `iw_hero_md` is not a defined format → the effective format is iw_theme_16_9 (focus-aware, avif/webp). #}
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: heroMedia,
+                                format: 'iw_theme_16_9',
+                                alt: heroMedia.title|default(content.title),
+                                raw: true,
+                                loading: 'eager',
+                                itemprop: 'image',
+                                classes: 'iw-article-page__hero-inline-image-img',
+                            }) }}
+                        </div>
+                    {% endif %}
                 {% endif %}
             {% endif %}
 
