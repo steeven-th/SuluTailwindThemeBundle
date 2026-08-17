@@ -9,6 +9,13 @@ This is distinct from the **`form` block wrapper** (`.iw-block-form*`), which on
 the surrounding layout (centered / card / split). See [`blocks/form.md`](blocks/form.md)
 for the wrapper. This page documents the **fields inside** the form.
 
+> **You do not have to apply the theme yourself.** The form block renders SuluFormBundle
+> forms through a bridge template shipped with the bundle, which already declares
+> `{% form_theme %}` with the theme below — a selected form comes out styled. You only need
+> the theme name when rendering a form outside the block:
+> `{% form_theme myForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}`.
+> See [`../form-block.md`](../form-block.md).
+
 > Conventions: strict BEM, `iw-` prefix. See [`../css-conventions.md`](../css-conventions.md).
 >
 > All colors come from `--iw-form-*` custom properties that **cascade from the active block
@@ -54,10 +61,14 @@ The column width is driven by the SuluFormBundle `width` field (`half`, `one-thi
 
 | Class | Role |
 |-------|------|
-| `.iw-form__label` | Field label. Centralises the label color (`--iw-form-label`). |
+| `.iw-form__label` | Field label. Centralises the label color (`--iw-form-label`). Also carried by the inline label of a single checkbox and by each expanded choice (radio / checkbox list), so every label of the form follows the same color. |
 | `.iw-form__label--required` | Marker added when the field is required (override hook — add your own `::after { content: " *" }` if desired). |
 | `.iw-form__submit` | Submit button override hook (the variant styling is carried by `.iw-button--variant`). |
 | `.iw-form__headline` | SuluFormBundle headline field — owns the bottom border color. |
+
+> Labels are rendered as **rich content**, like SuluFormBundle does natively: a consent
+> checkbox can link to the privacy policy straight from its label in the admin. Expanded
+> choice options are the exception — plain text only, as typed in the admin.
 
 ---
 

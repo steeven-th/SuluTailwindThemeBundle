@@ -3,8 +3,13 @@
      - image: Sulu media object (with .id)
      - imageRadius: optional Tailwind radius class
 #}
-{% if image is defined and image.id is defined %}
-    {% set resolvedImage = sulu_resolve_media(image.id, app.request.locale) %}
+{% set resolvedImage = image is defined and image.id is defined
+    ? sulu_resolve_media(image.id, app.request.locale)
+    : null %}
+
+{# A media deleted from the library resolves to null: render no widget at all
+   rather than a broken image. #}
+{% if resolvedImage is not null %}
     <div class="iw-block-form__widget iw-block-form__widget--image{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
         <img
             src="{{ resolvedImage.thumbnails['iw_theme_4_3']|default(resolvedImage.url) }}"

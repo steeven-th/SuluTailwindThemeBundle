@@ -17,11 +17,15 @@
         {% set heroId = content.heroImage %}
         {% if heroId %}
             {% set heroMedia = sulu_resolve_media(heroId, app.request.locale) %}
-            {% set avifEnabled = iw_sulu_tailwind_theme.imageAvif is defined ? iw_sulu_tailwind_theme.imageAvif : true %}
-            {% set heroBgUrl = heroMedia.thumbnails[heroFormat]|default(heroMedia.url) %}
-            {% set heroBgAvif = avifEnabled ? heroMedia.thumbnails[heroFormat ~ '.avif']|default(null) : null %}
-            {% set heroBgWebp = heroMedia.thumbnails[heroFormat ~ '.webp']|default(null) %}
-            {% set heroFocus = iw_sulu_tailwind_theme_focus_class(heroMedia.focusPointX|default(null), heroMedia.focusPointY|default(null), 'bg') %}
+            {# A media deleted from the library resolves to null: the header keeps
+               its layout, only the background image is dropped. #}
+            {% if heroMedia is not null %}
+                {% set avifEnabled = iw_sulu_tailwind_theme.imageAvif is defined ? iw_sulu_tailwind_theme.imageAvif : true %}
+                {% set heroBgUrl = heroMedia.thumbnails[heroFormat]|default(heroMedia.url) %}
+                {% set heroBgAvif = avifEnabled ? heroMedia.thumbnails[heroFormat ~ '.avif']|default(null) : null %}
+                {% set heroBgWebp = heroMedia.thumbnails[heroFormat ~ '.webp']|default(null) %}
+                {% set heroFocus = iw_sulu_tailwind_theme_focus_class(heroMedia.focusPointX|default(null), heroMedia.focusPointY|default(null), 'bg') %}
+            {% endif %}
         {% endif %}
     {% endif %}
 

@@ -31,14 +31,20 @@
         {% set posterUrl = '' %}
         {% if posterImage is defined and posterImage.id is defined %}
             {% set resolvedPoster = sulu_resolve_media(posterImage.id, app.request.locale) %}
-            {% set posterUrl = resolvedPoster.thumbnails['iw_theme_16_9']|default(resolvedPoster.url) %}
+            {# A deleted poster costs the still frame, not the video. #}
+            {% if resolvedPoster is not null %}
+                {% set posterUrl = resolvedPoster.thumbnails['iw_theme_16_9']|default(resolvedPoster.url) %}
+            {% endif %}
         {% endif %}
-        <video
-            src="{{ resolvedVideo.url }}"
-            class="iw-block-cta__video w-full iw-ratio--16-9"
-            controls
-            preload="metadata"
-            {% if posterUrl %}poster="{{ posterUrl }}"{% endif %}
-        ></video>
+        {# A deleted video file leaves nothing to play: render no player at all. #}
+        {% if resolvedVideo is not null %}
+            <video
+                src="{{ resolvedVideo.url }}"
+                class="iw-block-cta__video w-full iw-ratio--16-9"
+                controls
+                preload="metadata"
+                {% if posterUrl %}poster="{{ posterUrl }}"{% endif %}
+            ></video>
+        {% endif %}
     {% endif %}
 </div>

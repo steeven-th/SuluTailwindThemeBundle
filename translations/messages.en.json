@@ -11,7 +11,6 @@
     "iw_sulu_tailwind_theme.fileinput_size_exceeded": "File too large (max. {size}).",
     "iw_sulu_tailwind_theme.fileinput_drop_or": "Drop your files here or",
     "iw_sulu_tailwind_theme.fileinput_browse": "browse",
-
     "iw_sulu_tailwind_theme.article.related_articles": "Related articles",
     "iw_sulu_tailwind_theme.article.no_articles": "No articles found.",
     "iw_sulu_tailwind_theme.article.event_until": "until",
@@ -57,5 +56,9 @@
     "iw_sulu_tailwind_theme.consent_open_preferences": "Manage my preferences",
     "iw_sulu_tailwind_theme.code_frame": "Embedded content",
     "iw_sulu_tailwind_theme.code_too_long": "This code block exceeds the maximum allowed size and was not rendered.",
-    "iw_sulu_tailwind_theme.code_contains_iframe": "This block contains an iframe, which cannot work inside an isolated frame: the remote site's scripts will be blocked. Use the \"External content (iframe)\" block and paste the address only."
+    "iw_sulu_tailwind_theme.code_contains_iframe": "This block contains an iframe, which cannot work inside an isolated frame: the remote site's scripts will be blocked. Use the \"External content (iframe)\" block and paste the address only.",
+    "iw_sulu_tailwind_theme.form_bundle_missing": "This block is set to render a SuluFormBundle form, but the bundle is not installed. Run \"composer require sulu/form-bundle\", or turn the option off to use a Twig template.",
+    "iw_sulu_tailwind_theme.form_not_selected": "No form is selected in this block: pick one in the admin.",
+    "iw_sulu_tailwind_theme.form_template_missing": "Template \"%template%\" was not found. Check the path entered in the block, relative to the project's templates/ directory.",
+    "iw_sulu_tailwind_theme.form_template_empty": "No Twig template is set on this block: enter a path, or tick the SuluFormBundle option."
 }

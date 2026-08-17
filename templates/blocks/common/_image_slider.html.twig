@@ -15,10 +15,14 @@
     {% for mediaId in images %}
         {# Live Theme Editor preview (`iw_demo_mode` global): resolve to a picsum
            placeholder instead of a real media, so the demo needs no fixtures. #}
-        {% set resolvedImage = iw_demo_mode|default(false)
+        {% set resolvedMedia = iw_demo_mode|default(false)
             ? iw_sulu_tailwind_theme_demo_media(mediaId, imageFormat|default('iw_theme_16_9'))
             : sulu_resolve_media(mediaId, app.request.locale) %}
-        {% set resolvedImages = resolvedImages|merge([resolvedImage]) %}
+        {# A media deleted from the library resolves to null: keep it out of the
+           list, which drives the slide count, the dots and the lightbox. #}
+        {% if resolvedMedia is not null %}
+            {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+        {% endif %}
     {% endfor %}
 {% endif %}
 

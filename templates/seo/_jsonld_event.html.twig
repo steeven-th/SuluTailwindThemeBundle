@@ -5,14 +5,20 @@
 
 {# Resolve image URL #}
 {% set imageUrl = null %}
+{# A media deleted from the library resolves to null: skip the image rather than
+   taking down the whole page from inside the <head>. #}
 {% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
     {% set imgMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
-    {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
+    {% if imgMedia is not null %}
+        {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
+    {% endif %}
 {% elseif content.heroImage is defined and content.heroImage is not empty %}
     {% set heroId = content.heroImage %}
     {% if heroId %}
         {% set imgMedia = sulu_resolve_media(heroId, app.request.locale) %}
-        {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
+        {% if imgMedia is not null %}
+            {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
+        {% endif %}
     {% endif %}
 {% endif %}
 

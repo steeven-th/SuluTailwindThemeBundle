@@ -113,7 +113,10 @@
         {%- for child in form -%}
             <label class="inline-flex items-center gap-2 cursor-pointer text-sm">
                 {{- form_widget(child) -}}
-                <span>{{ child.vars.label|default(child.vars.name)|trans({}, choice_translation_domain) }}</span>
+                {# Same label hook as every other field so the choice text follows
+                   the variant color. No |raw here: choice options are plain text
+                   lines in the admin, not rich content. #}
+                <span class="iw-form__label">{{ child.vars.label|default(child.vars.name)|trans({}, choice_translation_domain) }}</span>
             </label>
         {%- endfor -%}
     </div>
@@ -169,9 +172,16 @@
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
-        <label class="inline-flex items-center gap-2 cursor-pointer text-sm">
+        {# items-start, not items-center: a consent label wraps over several lines
+           and the box has to stay on the first one. #}
+        <label class="inline-flex items-start gap-2 cursor-pointer text-sm">
             {{- form_widget(form, widget_attr) -}}
-            <span>{{ label|default(name|humanize)|trans }}</span>
+            {# |raw like every other label of this theme and like SuluFormBundle's
+               own form_label: a consent checkbox carries rich text from the
+               editor, typically a link to the privacy policy. #}
+            <span class="iw-form__label{{ required ? ' iw-form__label--required' : '' }}">
+                {{- label|default(name|humanize)|trans|raw -}}
+            </span>
         </label>
         {{- form_errors(form) -}}
         {{- form_help(form) -}}

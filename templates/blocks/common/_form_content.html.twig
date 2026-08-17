@@ -1,28 +1,56 @@
 {# Form content — renders either a SuluFormBundle form or a custom Twig template include.
    Expected variables:
      - useSuluFormBundle: boolean toggle (true = SuluFormBundle, false = Twig template)
-     - form: the SuluFormBundle form ID from single_form_selection (when useSuluFormBundle is true)
+     - form: what single_form_selection resolves to — in Sulu 3, an already-built
+       Symfony FormView (when useSuluFormBundle is true)
      - twigTemplate: path to a Twig template (when useSuluFormBundle is false)
 
    SuluFormBundle mode:
-     Includes "forms/_sulu_form.html.twig" from the project's templates directory.
-     This file is NOT shipped by the bundle to avoid compile errors when SuluFormBundle
-     is not installed. The user must create it in their project. See documentation.
+     Delegates to the bridge template shipped with the bundle. It is included
+     only when SuluFormBundle is installed — a template Twig never compiles
+     cannot fail on the form helpers it calls — so nothing has to be created in
+     the project to make the block work.
+
+     A project-level templates/forms/_sulu_form.html.twig still takes precedence
+     when it exists, which keeps projects built against earlier versions working.
+     For new overrides, prefer the standard bundle path:
+     templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_sulu_form.html.twig
+
+   Failures are reported in dev rather than swallowed: a block that renders
+   nothing with no explanation is the hardest kind of bug to chase.
 #}
 
 {% if useSuluFormBundle|default(false) %}
-    {# SuluFormBundle 3.0 integration — delegates to a project-level bridge template
-       that calls sulu_form_get_by_id(). #}
-    {% if form is defined and form is not empty %}
-        {% include 'forms/_sulu_form.html.twig' ignore missing with {
+    {% if not iw_sulu_tailwind_theme_has_form_bundle() %}
+        {% if app.environment == 'dev' %}
+            <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_bundle_missing'|trans }}</p>
+        {% endif %}
+    {% elseif form is defined and form is not empty %}
+        {% set bridgeTemplate = iw_sulu_tailwind_theme_template_exists('forms/_sulu_form.html.twig')
+            ? 'forms/_sulu_form.html.twig'
+            : '@ItechWorldSuluTailwindTheme/forms/_sulu_form.html.twig' %}
+
+        {# formId is passed alongside formView for the legacy project templates
+           that still read it. Prefer formView in new overrides. #}
+        {% include bridgeTemplate with {
+            formView: form,
             formId: form,
             formType: 'page',
             formTypeId: page.id|default('')
         } only %}
+    {% elseif app.environment == 'dev' %}
+        <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_not_selected'|trans }}</p>
     {% endif %}
 {% else %}
     {# Custom Twig template include — user provides the template path from their project #}
     {% if twigTemplate is defined and twigTemplate is not empty %}
-        {% include twigTemplate ignore missing %}
+        {% if iw_sulu_tailwind_theme_template_exists(twigTemplate) %}
+            {% include twigTemplate %}
+        {% elseif app.environment == 'dev' %}
+            {# A typo in the path used to render nothing at all, with no hint. #}
+            <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_template_missing'|trans({'%template%': twigTemplate}) }}</p>
+        {% endif %}
+    {% elseif app.environment == 'dev' %}
+        <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_template_empty'|trans }}</p>
     {% endif %}
 {% endif %}

@@ -3,6 +3,16 @@
 
 {% block block_content %}
     {% if images is defined and images is iterable %}
+        {# Resolve once, dropping any media deleted from the library: every loop and
+           length test below reads the same list and must stay in sync. #}
+        {% set resolvedImages = [] %}
+        {% for mediaId in images %}
+            {% set resolvedMedia = sulu_resolve_media(mediaId, app.request.locale) %}
+            {% if resolvedMedia is not null %}
+                {% set resolvedImages = resolvedImages|merge([resolvedMedia]) %}
+            {% endif %}
+        {% endfor %}
+
         {% set isParallax = enableParallax|default(false) %}
         {% set overlayRadius = iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')) %}
         {% set overlayTitleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
@@ -37,8 +47,7 @@
 
             {# Fullbleed slides — absolute to the section (via fullbleed mode).
                All images use eager loading since carousel can show any slide at any time. #}
-            {% for mediaId in images %}
-                {% set media = sulu_resolve_media(mediaId, app.request.locale) %}
+            {% for media in resolvedImages %}
                 <div
                     data-slider-target="slide"
                     class="iw-block-gallery__slide absolute inset-0 w-full h-full {{ not loop.first ? 'hidden' : '' }}"
@@ -79,7 +88,7 @@
             {% endif %}
 
             {# Navigation buttons + dots only when there is more than one slide #}
-            {% if images|length > 1 %}
+            {% if resolvedImages|length > 1 %}
                 <button
                     type="button"
                     data-action="slider#prev"
@@ -99,7 +108,7 @@
 
                 {# Dot indicators #}
                 <div data-slider-target="dots" class="iw-block-gallery__dots absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-sm z-20">
-                    {% for mediaId in images %}
+                    {% for media in resolvedImages %}
                         <button
                             type="button"
                             data-action="slider#goTo"

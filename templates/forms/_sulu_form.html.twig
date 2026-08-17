@@ -1,0 +1,38 @@
+{#
+    SuluFormBundle bridge — renders a form selected in the form block, themed
+    with the bundle's form theme.
+
+    This template is only ever included when SuluFormBundle is installed (the
+    form block checks iw_sulu_tailwind_theme_has_form_bundle() first), so the
+    form helpers below are always defined by the time Twig compiles it.
+
+    To customise the rendering, override this file in your project at
+    templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_sulu_form.html.twig
+    — the standard Symfony bundle-override path. A legacy project-level
+    templates/forms/_sulu_form.html.twig also still takes precedence.
+
+    Expected variables:
+      - formView:   what single_form_selection resolves to in Sulu 3 — an
+                    already-built Symfony FormView. A numeric id is also
+                    accepted and resolved through sulu_form_get_by_id().
+      - formType:   content type context passed to sulu_form_get_by_id ('page')
+      - formTypeId: the id of the page or article holding the block
+#}
+
+{% set suluForm = null %}
+
+{% if formView is defined and formView is not empty %}
+    {% if formView.vars is defined or formView is iterable %}
+        {# Sulu 3: SingleFormSelectionPropertyResolver already returns a FormView. #}
+        {% set suluForm = formView %}
+    {% elseif formView matches '/^\\d+$/' %}
+        {# A bare id, e.g. from content stored by an earlier version. #}
+        {% set suluForm = sulu_form_get_by_id(formView, formType|default('page'), formTypeId|default('')) %}
+    {% endif %}
+{% endif %}
+
+{% if suluForm is not null %}
+    {# The theme puts iw-form on the <form> element itself: no wrapper needed. #}
+    {% form_theme suluForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}
+    {{ form(suluForm) }}
+{% endif %}
