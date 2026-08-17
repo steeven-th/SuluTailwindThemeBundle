@@ -103,14 +103,20 @@ With the bridge imported, use theme tokens directly as Tailwind classes:
 ```twig
 {# Before (without bridge) — verbose arbitrary values #}
 <div class="bg-[var(--color-primary-50)] text-[var(--color-text)] rounded-[var(--border-radius)]">
-    <h2 class="font-[var(--font-family-heading)]">Title</h2>
+    <p class="font-[var(--font-family-heading)]">Tagline</p>
 </div>
 
 {# After (with bridge) — clean utility classes #}
 <div class="bg-primary-50 text-text rounded">
-    <h2 class="font-heading">Title</h2>
+    <p class="font-heading">Tagline</p>
 </div>
 ```
+
+> `font-heading` and `--font-family-heading` name the *role*, which is the right
+> choice for decorative text. On an actual heading, read the level variable
+> instead — `font-[var(--font-h2-family)]` on an `<h2>` — otherwise the family
+> chosen per level in the Typography tab never reaches the markup. See
+> [Per-element variables](css-api/theme-tokens.md#per-element-variables).
 
 ### Color utilities
 

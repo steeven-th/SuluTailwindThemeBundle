@@ -1,0 +1,89 @@
+{#
+    Menu logo images — desktop and mobile, with their transparent-mode variants.
+
+    Every menu template includes this partial, so the logo markup lives in one
+    place: resolving four medias in five templates would be five chances to let
+    the variants drift apart.
+
+    When a transparent-mode logo is configured, both variants are rendered
+    stacked in the same grid cell and cross-faded by CSS on the
+    `.iw-menu--transparent:not(.iw-menu--scrolled)` state — the very state that
+    drives the bar background, so the logo never lags behind the background it
+    sits on. Without a transparent variant, the markup is the plain <img> it has
+    always been.
+
+    Parameters:
+    - config: the menuConfig object (required)
+    - displayDesktop / displayMobile: override the admin display toggles
+      (optional; default to config.displayLogoDesktop / config.displayLogoMobile)
+    - transparentSwap: whether the transparent-mode variant applies here
+      (optional, default true). Pass false inside overlays and side panels: they
+      paint their own opaque background, but they still live under `.iw-menu`,
+      so the swap selector would otherwise light up a pale logo over them.
+#}
+{% set showDesktop = displayDesktop ?? config.displayLogoDesktop|default(false) %}
+{% set showMobile = displayMobile ?? config.displayLogoMobile|default(false) %}
+{% set allowSwap = transparentSwap ?? true %}
+
+{# Resolve the four medias. A media deleted from the library resolves to null:
+   skip that variant rather than rendering a broken image. #}
+{% set logoDesktopUrl = null %}
+{% set logoMobileUrl = null %}
+{% set logoDesktopTransparentUrl = null %}
+{% set logoMobileTransparentUrl = null %}
+
+{% if showDesktop and config.logoDesktop.id|default(null) is not null %}
+    {% set media = sulu_resolve_media(config.logoDesktop.id, app.request.locale) %}
+    {% if media is not null %}
+        {% set logoDesktopUrl = media.thumbnails['iw_theme_logo_desktop']|default(media.url)|default(null) %}
+    {% endif %}
+{% endif %}
+
+{% if showMobile and config.logoMobile.id|default(null) is not null %}
+    {% set media = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
+    {% if media is not null %}
+        {% set logoMobileUrl = media.thumbnails['iw_theme_logo_mobile']|default(media.url)|default(null) %}
+    {% endif %}
+{% endif %}
+
+{# Transparent variants only matter when the bar is actually transparent. #}
+{% if allowSwap and config.transparentNavbar|default(false) %}
+    {% if showDesktop and config.logoTransparentDesktop.id|default(null) is not null %}
+        {% set media = sulu_resolve_media(config.logoTransparentDesktop.id, app.request.locale) %}
+        {% if media is not null %}
+            {% set logoDesktopTransparentUrl = media.thumbnails['iw_theme_logo_desktop']|default(media.url)|default(null) %}
+        {% endif %}
+    {% endif %}
+    {% if showMobile and config.logoTransparentMobile.id|default(null) is not null %}
+        {% set media = sulu_resolve_media(config.logoTransparentMobile.id, app.request.locale) %}
+        {% if media is not null %}
+            {% set logoMobileTransparentUrl = media.thumbnails['iw_theme_logo_mobile']|default(media.url)|default(null) %}
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+{% if logoDesktopUrl %}
+    {% if logoDesktopTransparentUrl %}
+        <span class="iw-menu__logo-swap hidden md:grid">
+            <img src="{{ logoDesktopUrl }}" alt=""
+                 class="iw-menu__logo--desktop iw-menu__logo-state iw-menu__logo-state--default w-auto">
+            <img src="{{ logoDesktopTransparentUrl }}" alt=""
+                 class="iw-menu__logo--desktop iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
+        </span>
+    {% else %}
+        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
+    {% endif %}
+{% endif %}
+
+{% if logoMobileUrl %}
+    {% if logoMobileTransparentUrl %}
+        <span class="iw-menu__logo-swap grid md:hidden">
+            <img src="{{ logoMobileUrl }}" alt=""
+                 class="iw-menu__logo--mobile iw-menu__logo-state iw-menu__logo-state--default w-auto">
+            <img src="{{ logoMobileTransparentUrl }}" alt=""
+                 class="iw-menu__logo--mobile iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
+        </span>
+    {% else %}
+        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
+    {% endif %}
+{% endif %}
