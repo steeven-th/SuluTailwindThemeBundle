@@ -475,6 +475,8 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_logo_mobile` | 200×64 | inset | Mobile header logo |
 | `iw_og_image` | 1200×630 | outbound | `og:image`, `twitter:image`, JSON-LD |
 
+> `iw_og_image` also serves the theme-wide fallback thumbnail set in **Components > Sharing > Default share image** (`iw_sulu_tailwind_theme.components_shareDefaultImage`), used when a page carries neither an excerpt image nor a hero image.
+
 > The partial falls back to the original file when a format key is unknown (`media.thumbnails[format]|default(media.url)`). That degrades silently — the page still renders, but with the full-size uncropped file and no WebP/AVIF. If images look oversized, check that the format key exists.
 
 **Do not redeclare these keys** in your project's `config/image-formats.xml`: Sulu throws `Media format with key "…" already exists!` at compile time when the same key is defined twice with different settings. To use other dimensions, declare your own key and pass it through the partial's `format` parameter.

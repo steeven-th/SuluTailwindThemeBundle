@@ -4,7 +4,7 @@
     Automatically resolves:
     - og:title from content title or SEO title
     - og:description from excerpt description
-    - og:image from excerpt image or hero image
+    - og:image from excerpt image, hero image, or the theme's default share image
     - og:type from article type (article for news/blog, event for events)
 
     Override this block in your template to customize OG tags.
@@ -14,11 +14,15 @@
 {% set ogUrl = app.request.uri %}
 {% set ogSiteName = sulu_page_navigation_root_tree('main', 0)|length > 0 ? '' : '' %}
 
-{# Resolve OG image: excerpt image → hero image.
+{# Resolve OG image: excerpt image → hero image → theme default share image.
+   The theme default (Components > Sharing) is the last resort so that a page
+   carrying neither of the two still shares with a thumbnail — typically a home
+   page or a page built out of blocks only.
    ogImageSized is true only when the dedicated 1200x630 iw_og_image thumbnail is served,
    so og:image:width/height are never advertised for a smaller fallback. #}
 {% set ogImageUrl = null %}
 {% set ogImageSized = false %}
+{% set ogDefaultShareImage = iw_sulu_tailwind_theme.components_shareDefaultImage|default(null) %}
 {# A media deleted from the library resolves to null: skip the image rather than
    taking down the whole page from inside the <head>. #}
 {% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
@@ -42,6 +46,16 @@
             {% else %}
                 {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
             {% endif %}
+        {% endif %}
+    {% endif %}
+{% elseif ogDefaultShareImage is not null and ogDefaultShareImage.id|default(null) is not null %}
+    {% set ogMedia = sulu_resolve_media(ogDefaultShareImage.id, app.request.locale) %}
+    {% if ogMedia is not null %}
+        {% if ogMedia.thumbnails['iw_og_image'] is defined %}
+            {% set ogImageUrl = ogMedia.thumbnails['iw_og_image'] %}
+            {% set ogImageSized = true %}
+        {% else %}
+            {% set ogImageUrl = ogMedia.thumbnails['sulu-400x400']|default(ogMedia.url) %}
         {% endif %}
     {% endif %}
 {% endif %}

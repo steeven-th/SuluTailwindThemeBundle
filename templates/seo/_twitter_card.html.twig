@@ -5,8 +5,14 @@
 {% set twitterTitle = extension.seo.title|default(content.title|default('')) %}
 {% set twitterDescription = extension.excerpt.description|default(extension.seo.description|default('')) %}
 
-{# Resolve image: same logic as OG #}
+{# Resolve image: same logic as OG — excerpt image → hero image → theme default
+   share image (Components > Sharing).
+   Keep the resolution and the card-type decision below in the SAME template:
+   twitter:card is derived from twitterImageUrl, so a fallback added elsewhere
+   (in a project template, after this include) would emit a second, contradictory
+   twitter:card — and crawlers keep the first one they read. #}
 {% set twitterImageUrl = null %}
+{% set twitterDefaultShareImage = iw_sulu_tailwind_theme.components_shareDefaultImage|default(null) %}
 {# A media deleted from the library resolves to null: skip the image rather than
    taking down the whole page from inside the <head>. #}
 {% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
@@ -21,6 +27,11 @@
         {% if twitterMedia is not null %}
             {% set twitterImageUrl = twitterMedia.thumbnails['iw_og_image']|default(twitterMedia.thumbnails['sulu-400x400']|default(twitterMedia.url)) %}
         {% endif %}
+    {% endif %}
+{% elseif twitterDefaultShareImage is not null and twitterDefaultShareImage.id|default(null) is not null %}
+    {% set twitterMedia = sulu_resolve_media(twitterDefaultShareImage.id, app.request.locale) %}
+    {% if twitterMedia is not null %}
+        {% set twitterImageUrl = twitterMedia.thumbnails['iw_og_image']|default(twitterMedia.thumbnails['sulu-400x400']|default(twitterMedia.url)) %}
     {% endif %}
 {% endif %}
 
