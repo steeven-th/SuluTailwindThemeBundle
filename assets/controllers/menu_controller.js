@@ -76,7 +76,7 @@ export default class extends Controller {
         this._onDocumentClick = this._handleDocumentClick.bind(this);
         document.addEventListener('click', this._onDocumentClick);
 
-        // Scroll behavior: add shadow on scroll
+        // Scroll behavior: background-on-scroll and smart hide/reveal
         this._onScroll = this._handleScroll.bind(this);
         window.addEventListener('scroll', this._onScroll, { passive: true });
 
@@ -431,16 +431,18 @@ export default class extends Controller {
     }
 
     /**
-     * Handle scroll: shadow on scroll, optional background-on-scroll for a
-     * transparent navbar, and optional smart hide/reveal by scroll direction.
+     * Handle scroll: optional background-on-scroll for a transparent navbar,
+     * and optional smart hide/reveal by scroll direction.
+     *
+     * The drop shadow is no longer forced here: it is a theme setting
+     * (Menu > Bar chrome > Shadow) compiled to --iw-menu-shadow, so that the
+     * bar looks the same at rest and once scrolled unless the theme says
+     * otherwise.
      *
      * @private
      */
     _handleScroll() {
         const y = window.scrollY;
-
-        // Shadow once scrolled away from the very top
-        this.element.classList.toggle('shadow-md', y > 10);
 
         // Background on scroll: a transparent navbar becomes solid past the
         // threshold and turns transparent again at the top of the page.

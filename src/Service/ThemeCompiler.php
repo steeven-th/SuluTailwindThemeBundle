@@ -1317,13 +1317,53 @@ class ThemeCompiler
         'burgerClose' => 'burger-close',
         'socialMedia' => 'social-media',
         'socialMediaHover' => 'social-media-hover',
+        // Bottom rule of the bar itself — distinct from `divider`, which colors
+        // the separators between menu levels inside the dropdowns and panels.
+        'border' => 'border-color',
     ];
 
     /**
-     * Generate CSS custom properties for menu colors.
+     * Bottom rule widths, keyed by the `borderWidth` menu setting.
+     */
+    private const MENU_BORDER_WIDTHS = [
+        'none' => '0',
+        '1' => '1px',
+        '2' => '2px',
+        '3' => '3px',
+    ];
+
+    /**
+     * Drop shadows, keyed by the `shadow` menu setting. Presets rather than free
+     * values: the editor picks an intensity, the theme owns the rendering.
+     */
+    private const MENU_SHADOWS = [
+        'none' => 'none',
+        'subtle' => '0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        'strong' => '0 4px 16px -2px rgb(0 0 0 / 0.18)',
+    ];
+
+    /**
+     * Backdrop filters, keyed by the `blur` menu setting. `none` is emitted as
+     * such (not `blur(0)`) so the bar never creates a compositing layer when the
+     * effect is off.
+     */
+    private const MENU_BACKDROPS = [
+        'none' => 'none',
+        'light' => 'blur(4px)',
+        'medium' => 'blur(8px)',
+        'strong' => 'blur(16px)',
+    ];
+
+    /**
+     * Generate CSS custom properties for menu colors and bar chrome.
      *
-     * Only the "colors" sub-object of menuConfig generates CSS variables.
-     * Other keys (type, animation, childLevels, display options) are
+     * Two families are emitted:
+     * - the "colors" sub-object of menuConfig, mapped through
+     *   {@see MENU_COLOR_VAR_SUFFIX};
+     * - the bar chrome (background opacity, bottom rule width, drop shadow and
+     *   backdrop blur), resolved from presets.
+     *
+     * The remaining keys (type, animation, childLevels, display options) are
      * configuration values consumed by Twig, not CSS.
      *
      * @param array<string, mixed> $menuConfig Menu configuration values
@@ -1335,6 +1375,7 @@ class ThemeCompiler
         $css = "  /* Menu colors */\n";
 
         $colors = $menuConfig['colors'] ?? [];
+        $resolvedBg = null;
         foreach ($colors as $key => $value) {
             if (is_array($value)) {
                 continue;
@@ -1344,10 +1385,56 @@ class ThemeCompiler
                 continue;
             }
             $resolved = $this->resolveColorValue((string) $value);
+            if ('bg' === $key) {
+                $resolvedBg = $resolved;
+            }
             $css .= "  --iw-menu-{$suffix}: {$resolved};\n";
         }
 
+        $css .= "\n  /* Menu bar chrome */\n";
+
+        // Painted surface of the bar: the configured background, thinned by the
+        // opacity setting. Kept as its own variable so the bar can be translucent
+        // while dropdowns, overlays and side panels stay on the opaque
+        // --iw-menu-bg (a see-through dropdown is unreadable).
+        $opacity = $this->normalizeMenuOpacity($menuConfig['bgOpacity'] ?? null);
+        $bgExpression = $resolvedBg ?? 'var(--iw-menu-bg)';
+        $css .= 100 === $opacity
+            ? "  --iw-menu-surface: {$bgExpression};\n"
+            : "  --iw-menu-surface: color-mix(in srgb, {$bgExpression} {$opacity}%, transparent);\n";
+
+        $borderWidth = self::MENU_BORDER_WIDTHS[(string) ($menuConfig['borderWidth'] ?? 'none')]
+            ?? self::MENU_BORDER_WIDTHS['none'];
+        $css .= "  --iw-menu-border-width: {$borderWidth};\n";
+
+        $shadow = self::MENU_SHADOWS[(string) ($menuConfig['shadow'] ?? 'none')]
+            ?? self::MENU_SHADOWS['none'];
+        $css .= "  --iw-menu-shadow: {$shadow};\n";
+
+        $backdrop = self::MENU_BACKDROPS[(string) ($menuConfig['blur'] ?? 'none')]
+            ?? self::MENU_BACKDROPS['none'];
+        $css .= "  --iw-menu-backdrop: {$backdrop};\n";
+
         return $css . "\n";
+    }
+
+    /**
+     * Clamp the menu background opacity to an integer percentage.
+     *
+     * Anything unusable (null, empty, non-numeric) falls back to a fully opaque
+     * bar, which is the behavior of themes saved before the setting existed.
+     *
+     * @param mixed $value Raw `bgOpacity` value from the menu configuration
+     *
+     * @return int Percentage between 0 and 100
+     */
+    private function normalizeMenuOpacity(mixed $value): int
+    {
+        if (null === $value || '' === $value || !is_numeric($value)) {
+            return 100;
+        }
+
+        return max(0, min(100, (int) round((float) $value)));
     }
 
     /**
@@ -1375,18 +1462,47 @@ class ThemeCompiler
         // header instead of the viewport. The transform of .iw-menu--hidden only
         // applies transiently while smart-hiding, and the controller drops that
         // class whenever an overlay/sidebar is open.
-        $css .= ".iw-menu { background-color: var(--iw-menu-bg); color: var(--iw-menu-text);\n";
+        // The bar chrome (background, bottom rule, shadow, backdrop blur) is
+        // grouped here so the transparent modifier below can drop all of it at
+        // once: a rule or a shadow floating over a hero looks like a glitch.
+        $css .= ".iw-menu { background-color: var(--iw-menu-surface, var(--iw-menu-bg)); color: var(--iw-menu-text);\n";
+        $css .= "  border-bottom: var(--iw-menu-border-width, 0) solid var(--iw-menu-border-color, transparent);\n";
+        $css .= "  box-shadow: var(--iw-menu-shadow, none);\n";
+        $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
+        $css .= "  backdrop-filter: var(--iw-menu-backdrop, none);\n";
         $css .= "  transition: background-color var(--iw-menu-scroll-duration, 300ms) ease,\n";
         $css .= "    transform var(--iw-menu-scroll-duration, 300ms) ease,\n";
+        $css .= "    border-color var(--iw-menu-scroll-duration, 300ms) ease,\n";
         $css .= "    box-shadow 0.2s ease; }\n";
-        $css .= ".iw-menu > nav { background-color: inherit; }\n";
+        // The inner <nav> deliberately paints nothing: the header already spans
+        // the full width, and a second background layer would double a
+        // translucent bar's opacity. The sidebar is the exception below — there
+        // the sticky element is the <nav>, not the header.
+        $css .= ".iw-menu > nav { background-color: transparent; }\n";
 
-        // Transparent navbar modifier
-        $css .= ".iw-menu.iw-menu--transparent { background-color: transparent; }\n";
+        // Sidebar menu: the header wraps both the bar and the sliding panel and
+        // does not stick, so the bar chrome belongs to its sticky <nav>.
+        $css .= ".iw-menu--sidebar { background-color: transparent; border-bottom: 0; box-shadow: none;\n";
+        $css .= "  -webkit-backdrop-filter: none; backdrop-filter: none; }\n";
+        $css .= ".iw-menu--sidebar > nav { background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
+        $css .= "  border-bottom: var(--iw-menu-border-width, 0) solid var(--iw-menu-border-color, transparent);\n";
+        $css .= "  box-shadow: var(--iw-menu-shadow, none);\n";
+        $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
+        $css .= "  backdrop-filter: var(--iw-menu-backdrop, none); }\n";
+
+        // Transparent navbar modifier: no background, and no chrome either, so
+        // the bar truly disappears over the hero.
+        $css .= ".iw-menu.iw-menu--transparent, .iw-menu--sidebar.iw-menu--transparent > nav {\n";
+        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none; }\n";
 
         // Scroll behavior (L16): a transparent navbar takes its background once
-        // scrolled; the smart-hide modifier slides it out of view.
-        $css .= ".iw-menu.iw-menu--transparent.iw-menu--scrolled { background-color: var(--iw-menu-bg); }\n";
+        // scrolled; the smart-hide modifier slides it out of view. The chrome
+        // comes back with the background, in the same transition.
+        $css .= ".iw-menu.iw-menu--transparent.iw-menu--scrolled,\n";
+        $css .= ".iw-menu--sidebar.iw-menu--transparent.iw-menu--scrolled > nav {\n";
+        $css .= "  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
+        $css .= "  border-bottom-color: var(--iw-menu-border-color, transparent);\n";
+        $css .= "  box-shadow: var(--iw-menu-shadow, none); }\n";
         $css .= ".iw-menu.iw-menu--hidden { transform: translateY(-100%); }\n";
         // Respect reduced-motion: no slide/fade animation, instant state change
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu { transition: none; } }\n";
@@ -1424,6 +1540,24 @@ class ThemeCompiler
         // Logo sizing
         $css .= ".iw-menu__logo--desktop { max-height: 40px; }\n";
         $css .= ".iw-menu__logo--mobile { max-height: 32px; }\n";
+
+        // Transparent-mode logo swap. Both variants are stacked in the same grid
+        // cell and cross-faded, rather than toggled with `display`: the images
+        // keep their responsive `hidden md:block` utilities, the swap is timed on
+        // the same state (and duration) as the background, and neither variant is
+        // fetched mid-scroll — no flash on the first swap.
+        // The wrapper's own `display` stays on the responsive utilities
+        // (hidden md:grid / grid md:hidden), so it is never forced here.
+        $css .= ".iw-menu__logo-swap > * { grid-area: 1 / 1; }\n";
+        $css .= ".iw-menu__logo-state {\n";
+        $css .= "  transition: opacity var(--iw-menu-scroll-duration, 300ms) ease;\n";
+        $css .= "}\n";
+        // Default state: the regular logo is shown, the transparent one waits.
+        $css .= ".iw-menu__logo-state--transparent { opacity: 0; pointer-events: none; }\n";
+        // Over the hero (transparent, not yet scrolled) the variants swap.
+        $css .= ".iw-menu--transparent:not(.iw-menu--scrolled) .iw-menu__logo-state--transparent { opacity: 1; pointer-events: auto; }\n";
+        $css .= ".iw-menu--transparent:not(.iw-menu--scrolled) .iw-menu__logo-state--default { opacity: 0; pointer-events: none; }\n";
+        $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__logo-state { transition: none; } }\n";
 
         // Fullscreen overlay (transition is handled by JS, not CSS, to avoid conflicts)
         $css .= ".iw-menu__overlay {\n";
