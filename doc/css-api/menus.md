@@ -1,6 +1,10 @@
 # Menu CSS variables
 
-Generated from **Settings > Themes > Menu** tab (colors section only).
+Generated from **Settings > Themes > Menu** tab (colors section only). The bar
+chrome variables — `--iw-menu-surface`, `--iw-menu-border-width`,
+`--iw-menu-border-color`, `--iw-menu-shadow`, `--iw-menu-backdrop` — come from
+the Bar chrome section and are documented in
+[`menus.md`](../menus.md#bar-chrome).
 
 > For the full reference on menu CSS classes (navbar, burger, fullscreen, sidebar, megamenu), see [`menus.md`](../menus.md).
 

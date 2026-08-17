@@ -46,7 +46,7 @@
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
 * **Block variants**: Slug-named per-block color schemes applied via CSS custom properties
-* **Menu configuration**: Configurable menu type, colors, animation, and display options
+* **Menu configuration**: Configurable menu type, colors, animation, and display options, plus the bar chrome — bottom rule, drop shadow, background opacity and backdrop blur — and a transparent-mode logo variant that cross-fades with the background on scroll
 * **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
