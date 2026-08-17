@@ -2118,7 +2118,7 @@ img.object-cover {
 
 /* Title */
 .iw-block-article-featured .iw-featured-article-card__title {
-    font-family: var(--font-family-heading);
+    font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));
     font-weight: 600;
     font-size: var(--iw-featured-article-card-title-size, 1.25rem);
     line-height: 1.375;
@@ -3130,7 +3130,7 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-article-page__title {
-    font-family: var(--font-family-heading);
+    font-family: var(--font-h1-family, var(--font-family-heading, sans-serif));
     font-size: var(--font-size-h1);
     font-weight: var(--font-h1-weight);
     line-height: var(--line-height-h1);
@@ -3663,7 +3663,7 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-article-related__title {
-    font-family: var(--font-family-heading);
+    font-family: var(--font-h2-family, var(--font-family-heading, sans-serif));
     font-size: var(--iw-article-related-title-size, var(--font-size-h3));
     font-weight: 600;
     color: var(--iw-article-related-title-color, inherit);
