@@ -574,6 +574,8 @@ Add the theme functions to your `templates/base.html.twig`:
 
 > The `{% block seo_structured_data %}` block is required for article JSON-LD (schema.org) to appear in the `<head>`. Article templates automatically fill this block with NewsArticle, BlogPosting, or Event structured data.
 
+> **Share thumbnail.** `og:image` / `twitter:image` resolve in this order: excerpt image, hero image, then the theme's **Components > Sharing > Default share image**. Set that last one and no page is ever shared without a thumbnail — a home page built out of blocks typically has neither of the first two. Do not add your own fallback after these includes: `twitter:card` is derived from the resolved image inside `_twitter_card.html.twig`, so a second set of tags would emit two contradictory `twitter:card` values and crawlers keep the first.
+
 > The bundle also provides `@ItechWorldSuluTailwindTheme/base.html.twig` as a ready-to-extend base template. See **[Custom Integration Guide](doc/custom-integration.md)** for a complete example with SEO, fallback navigation, and more.
 
 ### Twig functions
