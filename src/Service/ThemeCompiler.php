@@ -557,7 +557,9 @@ class ThemeCompiler
         // Card category badge: visual provided by the generic .iw-category-badge
         // component (app.css); the card only adds spacing via .iw-article-card__category.
         $css .= ".iw-article-card__title {\n";
-        $css .= "  font-family: var(--font-family-heading);\n";
+        // Rendered as an <h3>: read the h3 assignment family so that changing
+        // the heading family of a level in the Typography tab reaches the card.
+        $css .= "  font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));\n";
         $css .= "  font-weight: 600;\n";
         $css .= "  font-size: 1.125rem;\n";
         $css .= "  line-height: 1.375;\n";
