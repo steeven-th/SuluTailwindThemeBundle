@@ -445,3 +445,24 @@ resolution, switch to the include — otherwise the transparent-mode variants ne
 render. Pass `transparentSwap: false` inside overlays and side panels: they paint
 their own opaque background, so the pale variant would show over the wrong
 surface.
+
+---
+
+## CTA banner: the title alignment setting now applies (breaking, visual)
+
+The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so
+the **Title alignment** field was offered in the admin and did nothing. It now
+drives the whole content column: heading, subtitle, body column inset and the
+actions row. The `--centered` and `--split` styles were already correct and are
+untouched.
+
+**Existing banners will move.** The field defaults to `left` in `cta.xml`, so
+every banner saved so far carries `left` in its content — not because an editor
+picked it, but because the setting had no visible effect to pick against.
+Reopen those blocks and set **Title alignment** to *Center* to keep the previous
+rendering.
+
+Left untouched on purpose: the default stays `left` at the XML level, since it
+is the right default for `--centered` and `--split`. The banner template falls
+back to `center` when the value is absent, so a block that predates the field
+keeps its centered hero.

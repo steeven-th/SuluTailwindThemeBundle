@@ -133,7 +133,11 @@ class ThemeCheckCommand extends Command
         }
 
         // ── Check 7: SuluArticleBundle availability ──
-        if (class_exists(\Sulu\Bundle\ArticleBundle\SuluArticleBundle::class)) {
+        // Articles ship with the Sulu 3 core, under the Sulu\Article namespace.
+        // The Sulu 2 class (Sulu\Bundle\ArticleBundle\SuluArticleBundle) no
+        // longer exists, so probing it reported "not installed" on every
+        // Sulu 3 install. Same class the bundle itself gates on.
+        if (class_exists(\Sulu\Article\Infrastructure\Symfony\HttpKernel\SuluArticleBundle::class)) {
             $checks[] = ['<fg=green>✓</>', 'SuluArticleBundle', 'Available — article templates and blocks will work'];
         } else {
             $checks[] = ['<fg=yellow>!</>', 'SuluArticleBundle', 'Not installed — article templates and blocks will be disabled'];
