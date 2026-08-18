@@ -90,14 +90,5 @@
             </properties>
         </section>
 
-        <!-- Related articles -->
-        <section name="related">
-            <meta><title>iw_sulu_tailwind_theme.article.section_related</title></meta>
-            <properties>
-                <xi:include href="../fragments/article-related.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-            </properties>
-        </section>
-
     </properties>
 </template>

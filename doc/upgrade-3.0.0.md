@@ -466,3 +466,36 @@ Left untouched on purpose: the default stays `left` at the XML level, since it
 is the right default for `--centered` and `--split`. The banner template falls
 back to `center` when the value is absent, so a block that predates the field
 keeps its centered hero.
+
+---
+
+## Related articles section removed (breaking)
+
+The fixed "Related articles" section at the bottom of blog posts is gone, along
+with its sidebar counterpart in the `sidebar` blog style. Article bodies now
+accept every base block type, so listing articles is the job of the
+`article_list`, `article_carousel` and `article_featured` blocks — which offer
+what the fixed section never did: margins, spacing, variants, layout styles and
+a properly scoped smart content.
+
+Removed:
+
+- the `relatedArticles` field (fragment `article-related.xml`) from
+  `iw_blog_post`;
+- the **Articles > Show related articles** and **Related articles count**
+  theme settings (`articles_showRelated`, `articles_relatedCount`), and the
+  matching `showRelated` / `relatedCount` keys of
+  `iw_sulu_tailwind_theme_article_config()`;
+- the `article_related` Twig block, `articles/common/_article_related.html.twig`
+  and every `.iw-article-related*` class and `--iw-article-related-*` variable.
+
+**Migration.** Content stored under `relatedArticles` stays in the database but
+is no longer read or rendered. Where a "read next" section is wanted, add an
+`article_list` (or carousel / featured) block at the end of the article body and
+scope its smart content. Templates overriding `{% block article_related %}` must
+drop the override — the block no longer exists.
+
+Two behaviors worth knowing, both fixed by the move: the section had no margin
+setting of its own, and a smart content left unfiltered listed the current
+article among its own related ones. Blocks have per-instance margins and are
+scoped explicitly, so neither carries over.

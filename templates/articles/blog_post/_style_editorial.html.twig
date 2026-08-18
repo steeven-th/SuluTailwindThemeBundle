@@ -130,12 +130,3 @@
     </div>
 {% endblock %}
 
-
-{% block article_related %}
-    {% if articleConfig.showRelated|iw_article_visible('page') and content.relatedArticles is defined and content.relatedArticles is iterable %}
-        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_related.html.twig' with {
-            articles: content.relatedArticles,
-            maxItems: articleConfig.relatedCount|default(3),
-        } only %}
-    {% endif %}
-{% endblock %}

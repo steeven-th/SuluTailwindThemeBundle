@@ -111,26 +111,6 @@
                         } only %}
                     </div>
                 {% endif %}
-
-                {# Related articles in sidebar #}
-                {% if articleConfig.showRelated|iw_article_visible('page') and content.relatedArticles is defined and content.relatedArticles is iterable and content.relatedArticles|length > 0 %}
-                    <div>
-                        <h3 class="text-xs uppercase tracking-wide text-[var(--color-secondary-500)] font-semibold mb-3">
-                            {{ 'iw_sulu_tailwind_theme.article.related_articles'|trans }}
-                        </h3>
-                        <div class="space-y-4">
-                            {% for article in content.relatedArticles|slice(0, articleConfig.relatedCount|default(3)) %}
-                                {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
-                                    article: article,
-                                    showExcerpt: false,
-                                    showCategory: false,
-                                    layout: 'horizontal',
-                                    imageRatio: '1/1',
-                                } only %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
             </div>
         </aside>
     </div>
@@ -138,4 +118,3 @@
 {% endblock %}
 
 {% block article_footer %}{% endblock %}
-{% block article_related %}{% endblock %}
