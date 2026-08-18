@@ -523,8 +523,6 @@ appearance and visibility toggles.
 | `showCategories` | string | `both` | Visibility scope |
 | `showExcerpts` | string | `listing` | Visibility scope |
 | `showBreadcrumbs` | string | `page` | Visibility scope |
-| `showRelated` | string | `page` | Visibility scope |
-| `relatedCount` | int | `3` | Number of related articles to render |
 
 The card appearance keys (`cardSurface`, `cardBorder`, `cardHoverTransform`,
 `cardHoverImage`, `cardHoverShadow`, `cardHoverBorder`) are consumed by

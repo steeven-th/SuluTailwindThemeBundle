@@ -400,7 +400,7 @@ Three article templates will appear in the admin, each in its own tab:
 |----------|-------|-------------|
 | **News** (`iw_news`) | news | Press/news articles with hero, authors, dates, categories, tags |
 | **Event** (`iw_event`) | events | Events with start/end dates, location (physical or online), organizer |
-| **Blog Post** (`iw_blog_post`) | publications | Blog/journal articles with excerpt, reading time, related articles |
+| **Blog Post** (`iw_blog_post`) | publications | Blog/journal articles with excerpt and reading time |
 
 All templates use shared [XML fragments](config/templates/fragments/) (`article-hero`, `article-authors`, `article-dates`, etc.) that you can also include in your own custom article templates via `xi:include`.
 

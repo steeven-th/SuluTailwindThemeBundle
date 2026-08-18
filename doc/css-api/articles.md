@@ -1,6 +1,6 @@
 # Articles — CSS API
 
-Public CSS surface for everything related to articles: the **card** (used in listings and related sections), the **page** (hero, header, body, footer), and the **inline components** (meta strip, author block, related articles, categories, tags, event info).
+Public CSS surface for everything related to articles: the **card** (used in listings), the **page** (hero, header, body, footer), and the **inline components** (meta strip, author block, categories, tags, event info).
 
 All values are exposed as `--iw-article-*` custom properties so a user-land project can re-skin the entire article surface with a handful of variables, without touching the Twig templates.
 
@@ -257,27 +257,6 @@ Avatar (image or initials fallback) + name + optional role.
 | `--iw-article-author-role-color` | Role text color (default `--color-secondary-500`) |
 | `--iw-article-author-avatar-bg` | Initials fallback background (default `--color-primary-100`) |
 | `--iw-article-author-avatar-text` | Initials fallback foreground (default `--color-primary-700`) |
-
----
-
-## Article related
-
-"Related articles" section at the bottom of an article page.
-
-| Class | Role |
-|-------|------|
-| `.iw-article-related` | Block — full `<section>` |
-| `.iw-article-related--cols-2` / `--cols-3` / `--cols-4` | Column-count modifier (desktop) |
-| `.iw-article-related__title` | Section `<h2>` title |
-| `.iw-article-related__grid` | Grid of article cards |
-
-| Variable | Purpose |
-|----------|---------|
-| `--iw-article-related-margin-top` | Space above the section (default `4rem`) |
-| `--iw-article-related-margin-bottom` | Space below the section (default `2rem`) |
-| `--iw-article-related-title-size` | Title font-size (default `--font-size-h3`) |
-| `--iw-article-related-title-color` | Title color (default `inherit`) |
-| `--iw-article-related-gap` | Gap between cards (default `2rem`) |
 
 ---
 

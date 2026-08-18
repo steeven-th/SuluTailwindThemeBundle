@@ -260,8 +260,6 @@ class ArticleExtension extends AbstractExtension
             'showCategories' => $tokens['articles_showCategories'] ?? 'both',
             'showTags' => $tokens['articles_showTags'] ?? 'page',
             'showExcerpts' => $tokens['articles_showExcerpts'] ?? 'listing',
-            'showRelated' => $tokens['articles_showRelated'] ?? 'page',
-            'relatedCount' => (int) ($tokens['articles_relatedCount'] ?? 3),
             // Reading components: share buttons (opt-in, off by default).
             'shareEnabled' => (bool) ($tokens['articles_shareEnabled'] ?? false),
             'sharePosition' => (string) ($tokens['articles_sharePosition'] ?? 'footer'),

@@ -708,7 +708,6 @@
     "iw_sulu_tailwind_theme.article.section_hero": "Hero",
     "iw_sulu_tailwind_theme.article.section_meta": "Meta",
     "iw_sulu_tailwind_theme.article.section_content": "Content",
-    "iw_sulu_tailwind_theme.article.section_related": "Related articles",
     "iw_sulu_tailwind_theme.article.section_event_details": "Event details",
     "iw_sulu_tailwind_theme.article.section_organizer": "Organizer",
 
@@ -727,8 +726,6 @@
     "iw_sulu_tailwind_theme.article.author_contact_select": "Select a contact",
     "iw_sulu_tailwind_theme.article.author_organization_select": "Select an organization",
 
-    "iw_sulu_tailwind_theme.article.related_articles": "Related articles",
-    "iw_sulu_tailwind_theme.article.related_articles_info": "Automatically fetched or manually selected related articles",
 
     "iw_sulu_tailwind_theme.article.event_start_date": "Start date",
     "iw_sulu_tailwind_theme.article.event_end_date": "End date",
@@ -810,8 +807,6 @@
     "iw_sulu_tailwind_theme.articles_show_categories": "Show categories (badges)",
     "iw_sulu_tailwind_theme.articles_show_tags": "Tags",
     "iw_sulu_tailwind_theme.articles_show_excerpts": "Show excerpts",
-    "iw_sulu_tailwind_theme.articles_show_related": "Show related articles",
-    "iw_sulu_tailwind_theme.articles_related_count": "Number of related articles",
     "iw_sulu_tailwind_theme.articles_section_reading_components": "Reading components",
     "iw_sulu_tailwind_theme.articles_share_enabled": "Share buttons",
     "iw_sulu_tailwind_theme.articles_share_position": "Position",
