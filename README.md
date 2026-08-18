@@ -404,6 +404,8 @@ Three article templates will appear in the admin, each in its own tab:
 
 All templates use shared [XML fragments](config/templates/fragments/) (`article-hero`, `article-authors`, `article-dates`, etc.) that you can also include in your own custom article templates via `xi:include`.
 
+The article body accepts the **same 17 block types as a page** — the full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
+
 Each article type comes with **multiple page styles** that can be selected via theme configuration:
 
 | Type | Available styles | Default |

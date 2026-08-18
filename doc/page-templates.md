@@ -191,7 +191,9 @@ Since blocks are registered globally, creating a custom page template with a sub
 | `article_carousel` | Article carousel | Content (title group + smart_content articles + count + autoplay + interval), Appearance, Settings |
 | `article_featured` | Featured article (hero/side-by-side/spotlight) | Content (title group + smart_content articles), Appearance, Settings |
 
-> The 3 article blocks require `SuluArticleBundle` to be installed. They use `smart_content` with `provider: articles` to fetch articles.
+> The 3 article blocks use `smart_content` with `provider: articles` to fetch articles. Articles ship with the Sulu 3 core (`Sulu\Article`), so there is nothing extra to install.
+
+> **Article templates offer the same 17 types.** `iw_news`, `iw_event` and `iw_blog_post` declare the identical list, so a block behaves the same wherever it is placed — pages and article bodies share the block dispatcher (`components/_blocks.html.twig`), not just the block definitions.
 
 Each block has 3 sections: **Content** (block-specific), **Appearance** (variant + style), and **Settings** (margins, paddings, radius, background).
 

@@ -63,12 +63,21 @@
                         <type ref="text"/>
                         <type ref="text_images"/>
                         <type ref="gallery"/>
+                        <type ref="key_figures"/>
+                        <type ref="linked_pages"/>
+                        <type ref="location"/>
+                        <type ref="form"/>
+                        <type ref="document"/>
                         <type ref="cta"/>
+                        <type ref="testimonial"/>
                         <type ref="accordion"/>
                         <type ref="iframe"/>
                         <type ref="code"/>
-                        <type ref="document"/>
                         <type ref="separator"/>
+                        <type ref="article_carousel"/>
+                        <type ref="article_featured"/>
+                        <type ref="article_list"/>
+
                     </types>
                 </block>
             </properties>
