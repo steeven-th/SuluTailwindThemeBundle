@@ -401,3 +401,47 @@ Didomi are in [consent.md](consent.md).
 **New Stimulus controllers**: `consent` — register it with **`"fetch": "eager"`**,
 unlike every other controller in the bundle, because it installs the API your
 cookie manager calls; and `embed_resize` (lazy) for self-sizing code embeds.
+
+---
+
+## Navbar chrome: rule, shadow, blur, translucency (new)
+
+The bar used to offer only its colors and a binary transparent/solid choice. It
+now has a **Bar chrome** section (Menu tab): bottom rule (width + free color),
+drop shadow, background opacity and backdrop blur — see
+[menus.md](menus.md#bar-chrome). Plus a transparent-mode logo variant per
+breakpoint, cross-faded on the same state as the background.
+
+### The scroll shadow is now a setting (breaking, visual)
+
+The `menu` Stimulus controller used to add Tailwind's `shadow-md` to the bar past
+10px of scroll — an unconfigurable shadow, absent at rest. It no longer does:
+the shadow is `--iw-menu-shadow`, driven by **Bar chrome > Drop shadow**, applied
+at rest as well as on scroll.
+
+**Themes upgraded without touching that setting therefore lose their scroll
+shadow.** Pick *Subtle* to get the closest equivalent — it now shows at the top
+of the page too, which is the intended behavior. `transition-shadow` was dropped
+from the menu templates at the same time; the transition lives in the compiled
+CSS.
+
+### `.iw-menu > nav` no longer inherits the background
+
+It used to repaint the bar background, which was invisible with an opaque color
+but would double a translucent one. The inner `<nav>` is now transparent — the
+header spans the full width and already paints it.
+
+The **sidebar** menu is the exception: there the sticky element *is* the `<nav>`,
+so its header carries a new `.iw-menu--sidebar` class that moves the chrome onto
+that `<nav>`. If you override a sidebar menu template, keep the class on the
+`<header>`.
+
+### Logo markup moved to a partial
+
+The four medias are resolved once in
+`@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig`, included by every
+menu template. If you override a menu template and copied the old inline
+resolution, switch to the include — otherwise the transparent-mode variants never
+render. Pass `transparentSwap: false` inside overlays and side panels: they paint
+their own opaque background, so the pale variant would show over the wrong
+surface.

@@ -134,6 +134,8 @@ class ThemeFormMapper
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
+        // Social sharing fallback (Open Graph / Twitter Card thumbnail).
+        'components_shareDefaultImage',
         // Site-wide page hero (banner) appearance. Per-page content lives in
         // the page's Hero section; these drive how it is displayed everywhere.
         'pageHero_height', 'pageHero_parallax', 'pageHero_titleDisplay',

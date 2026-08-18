@@ -34,9 +34,13 @@ The theme compiles all design tokens into CSS custom properties on `:root`. You 
 
 ### Typography
 
+On a heading, read the level variable rather than the role: `--font-h1-family`
+falls back to the heading role but also carries the family chosen for that level
+in the Typography tab, which `--font-family-heading` alone would ignore.
+
 ```css
 .my-heading {
-    font-family: var(--font-family-heading);
+    font-family: var(--font-h1-family, var(--font-family-heading));
     font-size: var(--font-size-3xl);
 }
 .my-body-text {

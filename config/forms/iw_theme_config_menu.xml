@@ -283,6 +283,33 @@
                     </meta>
                 </property>
 
+                <!-- Transparent-mode logos: a bar sitting over a dark hero usually
+                     needs a light logo, while the same bar once scrolled back over
+                     a light background needs the regular one. Both variants are
+                     rendered and cross-faded on the scrolled state, so the swap
+                     happens exactly when the background comes back. -->
+                <property name="menuConfig_logoTransparentDesktop" type="single_media_selection" colspan="6"
+                          visibleCondition="menuConfig_transparentNavbar == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_logoTransparentDesktop</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_logoTransparentDesktop_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+
+                <property name="menuConfig_logoTransparentMobile" type="single_media_selection" colspan="6"
+                          visibleCondition="menuConfig_transparentNavbar == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_logoTransparentMobile</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_logoTransparentMobile_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+
                 <!-- Background on scroll: only relevant for a transparent navbar -->
                 <property name="menuConfig_scrollBg" type="checkbox" colspan="6"
                           visibleCondition="menuConfig_transparentNavbar == true">
@@ -298,6 +325,91 @@
                         <title>iw_sulu_tailwind_theme.menu_scrollHide</title>
                         <info_text>iw_sulu_tailwind_theme.menu_scrollHide_info</info_text>
                     </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Bar chrome: what detaches the bar from the content underneath.
+             Intensities are presets so the theme keeps control of the rendered
+             values (same approach as the button hover effects); only the rule
+             color is free, since it belongs to the brand. -->
+        <section name="menuAppearance">
+            <meta>
+                <title>iw_sulu_tailwind_theme.menu_appearance</title>
+                <info_text>iw_sulu_tailwind_theme.menu_appearance_info</info_text>
+            </meta>
+            <properties>
+                <property name="menuConfig_borderWidth" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_borderWidth</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_borderWidth_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.menu_borderWidth_none</title></meta></param>
+                            <param name="1"><meta><title>iw_sulu_tailwind_theme.menu_borderWidth_1</title></meta></param>
+                            <param name="2"><meta><title>iw_sulu_tailwind_theme.menu_borderWidth_2</title></meta></param>
+                            <param name="3"><meta><title>iw_sulu_tailwind_theme.menu_borderWidth_3</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="menuConfig_colors_border" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="menuConfig_borderWidth != 'none'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_colors_border</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_colors_border_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="menuConfig_shadow" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_shadow</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_shadow_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.menu_shadow_none</title></meta></param>
+                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.menu_shadow_subtle</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.menu_shadow_strong</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Background opacity: what makes the blur visible. A fully opaque
+                     bar has nothing to blur behind it, hence the paired info text. -->
+                <property name="menuConfig_bgOpacity" type="number" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_bgOpacity</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_bgOpacity_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="100"/>
+                        <param name="min" value="0"/>
+                        <param name="max" value="100"/>
+                        <param name="step" value="5"/>
+                    </params>
+                </property>
+
+                <property name="menuConfig_blur" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_blur</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_blur_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.menu_blur_none</title></meta></param>
+                            <param name="light"><meta><title>iw_sulu_tailwind_theme.menu_blur_light</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.menu_blur_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.menu_blur_strong</title></meta></param>
+                        </param>
+                    </params>
                 </property>
             </properties>
         </section>

@@ -4,22 +4,6 @@
 {% set animation = config.animation|default('none') %}
 {% set slideDirection = config.slideDirection|default('top') %}
 
-{# Resolve logo media URLs #}
-{% set logoDesktopUrl = null %}
-{% set logoMobileUrl = null %}
-{% if config.logoDesktop is defined and config.logoDesktop.id|default(null) is not null %}
-    {% set logoDesktopMedia = sulu_resolve_media(config.logoDesktop.id, app.request.locale) %}
-    {% if logoDesktopMedia is not null %}
-        {% set logoDesktopUrl = logoDesktopMedia.thumbnails['iw_theme_logo_desktop']|default(logoDesktopMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-{% if config.logoMobile is defined and config.logoMobile.id|default(null) is not null %}
-    {% set logoMobileMedia = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
-    {% if logoMobileMedia is not null %}
-        {% set logoMobileUrl = logoMobileMedia.thumbnails['iw_theme_logo_mobile']|default(logoMobileMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-
 {# Navigation position: left, center (default), right #}
 {% set navPosition = config.navPosition|default('center') %}
 
@@ -51,7 +35,7 @@
     data-menu-slide-direction-value="{{ slideDirection }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
+    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     <nav class="relative z-50 md:container md:mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 md:h-20">
@@ -59,12 +43,8 @@
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center {{ navPosition == 'left' ? 'mr-0' : '' }}">
                 <a href="{{ homePath }}" class="iw-menu__text flex items-center gap-2 no-underline">
-                    {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
-                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
-                    {% endif %}
-                    {% if config.displayLogoMobile|default(false) and logoMobileUrl %}
-                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
-                    {% endif %}
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
+                        with { config: config } only %}
                     {% if config.displaySiteName|default(false) %}
                         <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
                     {% endif %}

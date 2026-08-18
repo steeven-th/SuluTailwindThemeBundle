@@ -2,22 +2,6 @@
 {% set position = config.sidebarPosition|default('left') %}
 {% set isLeft = position == 'left' %}
 
-{# Resolve logo media URLs #}
-{% set logoDesktopUrl = null %}
-{% set logoMobileUrl = null %}
-{% if config.logoDesktop is defined and config.logoDesktop.id|default(null) is not null %}
-    {% set logoDesktopMedia = sulu_resolve_media(config.logoDesktop.id, app.request.locale) %}
-    {% if logoDesktopMedia is not null %}
-        {% set logoDesktopUrl = logoDesktopMedia.thumbnails['iw_theme_logo_desktop']|default(logoDesktopMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-{% if config.logoMobile is defined and config.logoMobile.id|default(null) is not null %}
-    {% set logoMobileMedia = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
-    {% if logoMobileMedia is not null %}
-        {% set logoMobileUrl = logoMobileMedia.thumbnails['iw_theme_logo_mobile']|default(logoMobileMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-
 {# Load social media links from snippet area. In demo mode (Live Theme Editor
    preview) the snippet area cannot be resolved — there is no webspace — so
    placeholder links stand in. #}
@@ -176,14 +160,16 @@
 {% endmacro %}
 
 {# Macro: logo display #}
-{% macro render_logo(displayDesktop, logoDesktopUrl, displayMobile, logoMobileUrl, displaySiteName, siteName, homePath) %}
+{# homePath is passed in: a macro has no access to the template context, and
+   demo mode (Live Theme Editor) has no webspace to resolve a route from. #}
+{% macro render_logo(config, homePath) %}
+    {% set displayDesktop = config.displayLogoDesktop|default(false) %}
+    {% set displayMobile = config.displayLogoMobile|default(false) %}
+    {% set displaySiteName = config.displaySiteName|default(false) %}
+    {% set siteName = config.siteName|default('') %}
     <a href="{{ homePath }}" class="iw-menu__text flex items-center gap-2 no-underline">
-        {% if displayDesktop and logoDesktopUrl %}
-            <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
-        {% endif %}
-        {% if displayMobile and logoMobileUrl %}
-            <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
-        {% endif %}
+        {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
+            with { config: config } only %}
         {% if displaySiteName %}
             <span class="text-lg font-bold">{{ siteName }}</span>
         {% endif %}
@@ -197,19 +183,17 @@
 <header data-controller="menu"
         data-menu-animation-value="slide"
         data-menu-slide-direction-value="{{ position }}"
-        class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }}">
+        class="iw-menu iw-menu--sidebar {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }}">
 
-    {# ═══ NAVBAR: always visible (mobile + desktop) ═══ #}
-    <nav class="sticky top-0 z-50 w-full transition-shadow">
+    {# ═══ NAVBAR: always visible (mobile + desktop) ═══
+       Unlike the other menu types, the sticky element here is this <nav>, not
+       the <header> (which also wraps the sliding panel). The bar chrome
+       therefore lives on the <nav>, driven by .iw-menu--sidebar. #}
+    <nav class="sticky top-0 z-50 w-full">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 md:h-20">
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
-                {{ _self.render_logo(
-                    config.displayLogoDesktop|default(false), logoDesktopUrl,
-                    config.displayLogoMobile|default(false), logoMobileUrl,
-                    config.displaySiteName|default(false), config.siteName|default(''),
-                    homePath
-                ) }}
+                {{ _self.render_logo(config, homePath) }}
             </div>
 
             {# RIGHT — Social media + Burger #}

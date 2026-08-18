@@ -23,22 +23,6 @@
 {# Animation: curtain (split) when image present, slide from right otherwise #}
 {% set animation = fullscreenImageUrl ? 'curtain' : 'slide' %}
 
-{# Resolve logo media URLs #}
-{% set logoDesktopUrl = null %}
-{% set logoMobileUrl = null %}
-{% if config.logoDesktop is defined and config.logoDesktop.id|default(null) is not null %}
-    {% set logoDesktopMedia = sulu_resolve_media(config.logoDesktop.id, app.request.locale) %}
-    {% if logoDesktopMedia is not null %}
-        {% set logoDesktopUrl = logoDesktopMedia.thumbnails['iw_theme_logo_desktop']|default(logoDesktopMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-{% if config.logoMobile is defined and config.logoMobile.id|default(null) is not null %}
-    {% set logoMobileMedia = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
-    {% if logoMobileMedia is not null %}
-        {% set logoMobileUrl = logoMobileMedia.thumbnails['iw_theme_logo_mobile']|default(logoMobileMedia.url)|default(null) %}
-    {% endif %}
-{% endif %}
-
 {# Load social media links from snippet area. In demo mode (Live Theme Editor
    preview) the snippet area cannot be resolved — there is no webspace — so
    placeholder links stand in. #}
@@ -64,7 +48,7 @@
     data-menu-slide-direction-value="right"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full transition-shadow"
+    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     {# Navbar — z-50 so it stays ABOVE the fullscreen panel (z-30): the single
        burger button stays visible and animates into the X (like the burger menu),
@@ -75,12 +59,8 @@
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
                 <a href="{{ homePath }}" class="iw-menu__text flex items-center gap-2 no-underline">
-                    {% if config.displayLogoDesktop|default(false) and logoDesktopUrl %}
-                        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
-                    {% endif %}
-                    {% if config.displayLogoMobile|default(false) and logoMobileUrl %}
-                        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
-                    {% endif %}
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
+                        with { config: config } only %}
                     {% if config.displaySiteName|default(false) %}
                         <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
                     {% endif %}
@@ -236,16 +216,19 @@
         </nav>
     {% endmacro %}
 
-    {# Macro: logo in overlay — respects admin display toggles #}
-    {% macro render_overlay_logo(displayDesktop, logoDesktopUrl, displayMobile, logoMobileUrl) %}
-        {% if (displayDesktop and logoDesktopUrl) or (displayMobile and logoMobileUrl) %}
+    {# Macro: logo in overlay — respects admin display toggles.
+       transparentSwap is off here: the overlay paints its own opaque background,
+       so the transparent-mode variant would be shown over the wrong surface. #}
+    {% macro render_overlay_logo(config) %}
+        {# Capture first: the wrapper carries padding, so it must not be rendered
+           when the toggles are on but no media is actually set. #}
+        {% set logoMarkup %}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
+                with { config: config, transparentSwap: false } only %}
+        {% endset %}
+        {% if logoMarkup|trim is not empty %}
             <div class="flex items-center justify-center pt-4 pb-2">
-                {% if displayDesktop and logoDesktopUrl %}
-                    <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
-                {% endif %}
-                {% if displayMobile and logoMobileUrl %}
-                    <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
-                {% endif %}
+                {{ logoMarkup }}
             </div>
         {% endif %}
     {% endmacro %}
@@ -293,7 +276,7 @@
                     {% if navItems is not empty %}
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
-                    {{ _self.render_overlay_logo(config.displayLogoDesktop|default(false), logoDesktopUrl, config.displayLogoMobile|default(false), logoMobileUrl) }}
+                    {{ _self.render_overlay_logo(config) }}
                     {{ _self.render_social_links(socialLinks) }}
                 </div>
             </div>
@@ -308,7 +291,7 @@
             {% if navItems is not empty %}
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
             {% endif %}
-            {{ _self.render_overlay_logo(config.displayLogoDesktop|default(false), logoDesktopUrl, config.displayLogoMobile|default(false), logoMobileUrl) }}
+            {{ _self.render_overlay_logo(config) }}
             {{ _self.render_social_links(socialLinks) }}
         </div>
     {% endif %}

@@ -649,5 +649,28 @@
                 </property>
             </properties>
         </section>
+
+        <!-- Sharing - social preview (Open Graph / Twitter Card) fallbacks. -->
+        <section name="componentsSharing">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_sharing</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_sharing_info</info_text>
+            </meta>
+            <properties>
+                <!-- Last-resort share thumbnail. Used only when the page provides
+                     neither an excerpt image nor a hero image, so that a page built
+                     out of blocks (the home page, typically) still shares with a
+                     picture. Served through the iw_og_image format (1200x630). -->
+                <property name="components_shareDefaultImage" type="single_media_selection" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_share_default_image</title>
+                        <info_text>iw_sulu_tailwind_theme.components_share_default_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>
