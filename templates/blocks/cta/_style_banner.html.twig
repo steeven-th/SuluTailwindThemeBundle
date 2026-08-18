@@ -7,6 +7,22 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
+    {# Alignment (admin: Title alignment). The banner used to hardcode
+       `text-center`, so the setting was offered and did nothing. It defaults to
+       center here — that is the layout's own identity — and drives the whole
+       content column: on a full-bleed hero, a left-aligned heading over centered
+       body copy and buttons reads as a mistake rather than a choice. #}
+    {% set bannerAlignment = titleAlignment|default('center') %}
+    {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
+    {% set titleAlignClass = alignMap[bannerAlignment]|default('text-center') %}
+    {% set justifyMap = {'left': 'justify-start', 'center': 'justify-center', 'right': 'justify-end'} %}
+    {% set actionsJustifyClass = justifyMap[bannerAlignment]|default('justify-center') %}
+    {# The prose column is width-capped, so it also needs to be pushed to the
+       chosen side — text-align alone would leave the box itself centered. #}
+    {# `is defined` rather than `|default()`: the left case is an empty string,
+       which `default` would swap back to `mx-auto` and re-center the column. #}
+    {% set textInsetMap = {'left': '', 'center': 'mx-auto', 'right': 'ml-auto'} %}
+    {% set textInsetClass = textInsetMap[bannerAlignment] is defined ? textInsetMap[bannerAlignment] : 'mx-auto' %}
     {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
     {% set bannerMediaId = (bannerImage is defined and bannerImage.id is defined) ? bannerImage.id : null %}
 
@@ -33,20 +49,20 @@
             <div class="iw-block-cta__overlay absolute inset-0 bg-black/50"></div>
         {% endif %}
 
-        <div class="iw-block-cta__content relative z-10 container mx-auto py-16 md:py-20 lg:py-24 px-6 md:px-8 text-center text-white">
+        <div class="iw-block-cta__content relative z-10 container mx-auto py-16 md:py-20 lg:py-24 px-6 md:px-8 {{ titleAlignClass }} text-white">
             {% if title is defined and title is not empty %}
-                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] text-white">{{ title }}</{{ titleTag }}>
+                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] {{ titleAlignClass }} text-white">{{ title }}</{{ titleTag }}>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <p class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 text-white/80">{{ subTitle }}</p>
+                <p class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 {{ titleAlignClass }} text-white/80">{{ subTitle }}</p>
             {% endif %}
             {% if text is defined and text is not empty %}
-                <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-2xl mx-auto mt-8">
+                <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-2xl {{ textInsetClass }} mt-8">
                     {{ text|raw }}
                 </div>
             {% endif %}
 
-            <div class="iw-block-cta__actions-wrap flex justify-center">
+            <div class="iw-block-cta__actions-wrap flex {{ actionsJustifyClass }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
                     primaryButtonLink: primaryButtonLink|default(''),
                     primaryButtonView: view.blocks[_key].primaryButtonLink|default({}),
