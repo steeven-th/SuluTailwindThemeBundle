@@ -6,6 +6,12 @@
     form block checks iw_sulu_tailwind_theme_has_form_bundle() first), so the
     form helpers below are always defined by the time Twig compiles it.
 
+    After a successful submission the form is replaced by its success message —
+    see doc/form-block.md. SuluFormBundle redirects to `?send=true`, which the
+    bundle's FormSubmissionRedirectSubscriber completes with the id of the form
+    that was posted, so a page holding two form blocks only confirms the right
+    one.
+
     To customise the rendering, override this file in your project at
     templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_sulu_form.html.twig
     — the standard Symfony bundle-override path. A legacy project-level
@@ -37,12 +43,31 @@
 {% endif %}
 
 {% if suluForm is not null %}
-    {# The theme puts iw-form on the <form> element itself: no wrapper needed. #}
-    {# Two blocks of a page may point at the same form, and Sulu hands both the
-       very same FormView — which Symfony refuses to render twice. This returns
-       the view untouched the first time, and an id-suffixed copy afterwards. #}
-    {% set suluForm = iw_sulu_tailwind_theme_reusable_form(suluForm) %}
+    {% if iw_sulu_tailwind_theme_form_submitted(suluForm) %}
+        {# Confirmation, shown in place of the form after a successful submission.
+           The text is the one editors type per locale in the form's admin
+           settings; an empty field falls back to a translated default, because
+           an empty page reads as "nothing happened" and gets the form sent twice.
+           `raw`: the admin field is a rich text editor, and its content is
+           authored in the admin — same trust level as any other block text. #}
+        {% set submittedFormId = iw_sulu_tailwind_theme_form_id(suluForm) %}
+        <div class="iw-form-success{{ colorScheme|default('auto') == 'dark' ? ' iw-form-success--dark' }}"
+             {% if submittedFormId %}id="iw-form-{{ submittedFormId }}"{% endif %}
+             role="status">
+            <svg class="iw-form-success__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5"/>
+            </svg>
+            <div class="iw-form-success__text">{{ iw_sulu_tailwind_theme_form_success_text(suluForm)|raw }}</div>
+        </div>
+    {% else %}
+        {# The theme puts iw-form on the <form> element itself: no wrapper needed. #}
+        {# Two blocks of a page may point at the same form, and Sulu hands both the
+           very same FormView — which Symfony refuses to render twice. This returns
+           the view untouched the first time, and an id-suffixed copy afterwards. #}
+        {% set suluForm = iw_sulu_tailwind_theme_reusable_form(suluForm) %}
 
-    {% form_theme suluForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}
-    {{ form(iw_sulu_tailwind_theme_with_color_scheme(suluForm, colorScheme|default('auto'))) }}
+        {% form_theme suluForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}
+        {{ form(iw_sulu_tailwind_theme_with_color_scheme(suluForm, colorScheme|default('auto'))) }}
+    {% endif %}
 {% endif %}

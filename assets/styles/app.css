@@ -2868,6 +2868,50 @@ section.block:has([data-slider-fullbleed-value]) {
     /* Hook only — no default styling. */
 }
 
+/* Post-submission confirmation, rendered in place of the form. Lives here
+   rather than in the compiled form theme because it is part of the block, not
+   of a field: the same markup serves the three layout modifiers. Colors derive
+   from the `success` color role, so a theme that recolors it recolors this. */
+.iw-form-success {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--iw-form-success-gap, 0.75rem);
+    padding: var(--iw-form-success-padding, 1.25rem 1.5rem);
+    border-radius: var(--iw-form-success-radius, var(--border-paragraphRadius, var(--border-radius, 8px)));
+    background-color: var(--iw-form-success-bg, var(--color-success-100, #dcfce7));
+    color: var(--iw-form-success-color, var(--color-success-900, #14532d));
+    border: 1px solid var(--iw-form-success-border, var(--color-success-200, #bbf7d0));
+}
+
+.iw-form-success__icon {
+    flex-shrink: 0;
+    width: var(--iw-form-success-icon-size, 1.5rem);
+    height: var(--iw-form-success-icon-size, 1.5rem);
+    color: var(--iw-form-success-icon-color, var(--color-success-700, #15803d));
+}
+
+/* The text comes from a rich text editor, so it arrives wrapped in <p>. Strip
+   the outer margins so a one-line message is not padded twice. */
+.iw-form-success__text > :first-child {
+    margin-top: 0;
+}
+
+.iw-form-success__text > :last-child {
+    margin-bottom: 0;
+}
+
+/* Dark surfaces (block variant set to dark, or the --split info column):
+   the light-green panel would burn a hole in them. */
+.iw-form-success--dark {
+    background-color: var(--iw-form-success-dark-bg, color-mix(in srgb, var(--color-success, #16a34a) 18%, transparent));
+    color: var(--iw-form-success-dark-color, #fff);
+    border-color: var(--iw-form-success-dark-border, color-mix(in srgb, var(--color-success, #16a34a) 45%, transparent));
+}
+
+.iw-form-success--dark .iw-form-success__icon {
+    color: var(--iw-form-success-dark-icon-color, var(--color-success-300, #86efac));
+}
+
 /* --split info side: the primary-color panel that hosts the duplicated title
    + subtitle. Exposed as a CSS variable so a theme can override without
    rewriting the template. */

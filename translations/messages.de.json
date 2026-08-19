@@ -59,5 +59,6 @@
     "iw_sulu_tailwind_theme.form_bundle_missing": "Dieser Block soll ein SuluFormBundle-Formular anzeigen, das Bundle ist jedoch nicht installiert. Führen Sie „composer require sulu/form-bundle“ aus oder deaktivieren Sie die Option, um ein Twig-Template zu verwenden.",
     "iw_sulu_tailwind_theme.form_not_selected": "In diesem Block ist kein Formular ausgewählt: Wählen Sie eines in der Administration aus.",
     "iw_sulu_tailwind_theme.form_template_missing": "Das Template „%template%“ wurde nicht gefunden. Prüfen Sie den im Block angegebenen Pfad, relativ zum Verzeichnis templates/ des Projekts.",
-    "iw_sulu_tailwind_theme.form_template_empty": "In diesem Block ist kein Twig-Template angegeben: Tragen Sie einen Pfad ein oder aktivieren Sie die SuluFormBundle-Option."
+    "iw_sulu_tailwind_theme.form_template_empty": "In diesem Block ist kein Twig-Template angegeben: Tragen Sie einen Pfad ein oder aktivieren Sie die SuluFormBundle-Option.",
+    "iw_sulu_tailwind_theme.form_success_default": "Vielen Dank, Ihre Nachricht wurde gesendet. Wir melden uns in Kürze bei Ihnen."
 }

@@ -530,3 +530,20 @@ size on one level, redefine the variable after the theme stylesheet:
 ```css
 :root { --font-size-h1: 6rem; }
 ```
+
+## Forms confirm their submission (new)
+
+A successful submission used to hand the visitor an empty form and no message at
+all — SuluFormBundle redirects to `?send=true` and stores a per-locale success
+text, but exposes neither to Twig. The form block now renders that text in place
+of the form, in a `.iw-form-success` box, falling back to a translated default
+(`iw_sulu_tailwind_theme.form_success_default`) when the admin field is empty.
+
+Sulu's redirect is completed with the id of the submitted form and an anchor
+(`?send=true&iw_form=12#iw-form-12`), so a page with two form blocks only
+confirms the one that was posted, and the visitor lands on the confirmation.
+
+**Migration.** Nothing to change, unless the project overrides
+`forms/_sulu_form.html.twig`: such an override renders the form unconditionally
+and therefore keeps the old silent behaviour. Add the branch — see
+[Form block](form-block.md#after-a-successful-submission).

@@ -54,6 +54,39 @@ and its reCAPTCHA field only registers when the Google EWZ bundle is installed. 
 adds an opt-in **Cloudflare Turnstile** field, and the form theme already hides the honeypot
 field for you — see [Cloudflare Turnstile](turnstile.md).
 
+### After a successful submission
+
+SuluFormBundle answers a valid submission with a redirect to `?send=true` and stores a
+**success text per locale** on the form (admin → the form's settings), but exposes neither
+to Twig. The bundle wires the two together: on that follow-up request the block renders the
+success text **in place of the form**, in a `.iw-form-success` box.
+
+| Case | What the visitor gets |
+|------|----------------------|
+| Success text filled in | That text, rendered as rich text, in the page locale |
+| Success text empty | A translated default (`iw_sulu_tailwind_theme.form_success_default`) |
+| Submission invalid | The form again, with its errors — no success box |
+
+Two forms on the same page each confirm on their own: the bundle's
+`FormSubmissionRedirectSubscriber` completes Sulu's redirect with the id of the form that
+was posted (`?send=true&iw_form=12#iw-form-12`), and the anchor scrolls the visitor down to
+the confirmation rather than leaving them at the top of a long page. The **same** form in
+two blocks confirms in both — both blocks POST the same id, and nothing in the request tells
+them apart.
+
+Overriding the default message project-wide is a translation override:
+
+```json
+// translations/messages.fr.json
+{
+    "iw_sulu_tailwind_theme.form_success_default": "C'est noté, merci !"
+}
+```
+
+A project that overrides the bridge template must keep the
+`iw_sulu_tailwind_theme_form_submitted()` branch to preserve this — see
+[Twig Reference](twig-reference.md).
+
 ### The same form in several blocks
 
 A contact form at the top *and* at the bottom of a long page is a legitimate layout, and it

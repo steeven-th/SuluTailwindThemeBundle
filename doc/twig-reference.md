@@ -428,6 +428,57 @@ never compiled, so the form helpers it calls cannot break a project without the 
 
 ---
 
+### `iw_sulu_tailwind_theme_form_submitted(formView)`
+
+Tells whether *this* form was just submitted successfully — i.e. whether the current
+request is the one following SuluFormBundle's `?send=true` redirect, **and** the id in
+that redirect is this form's. Two form blocks on one page therefore do not both confirm.
+
+**Parameters:**
+- `formView` (`FormView`) — What `single_form_selection` resolves to
+
+**Returns:** `bool`
+
+---
+
+### `iw_sulu_tailwind_theme_form_success_text(formView)`
+
+The message to show for a submitted form: the rich text an editor typed in the form's
+admin settings for the current locale, or the translated
+`iw_sulu_tailwind_theme.form_success_default` when that field is empty. Never returns an
+empty string — a successful submission must never be silent.
+
+Render it with `|raw`: the source is a rich text editor in the admin.
+
+```twig
+{% if iw_sulu_tailwind_theme_form_submitted(suluForm) %}
+    <div class="iw-form-success" id="iw-form-{{ iw_sulu_tailwind_theme_form_id(suluForm) }}" role="status">
+        {{ iw_sulu_tailwind_theme_form_success_text(suluForm)|raw }}
+    </div>
+{% else %}
+    {{ form(suluForm) }}
+{% endif %}
+```
+
+**Parameters:**
+- `formView` (`FormView`) — What `single_form_selection` resolves to
+
+**Returns:** `string` — HTML
+
+---
+
+### `iw_sulu_tailwind_theme_form_id(formView)`
+
+The SuluFormBundle id of the form a view renders, read from the `formId` hidden field.
+Used to build the `iw-form-{id}` anchor the success redirect points at.
+
+**Parameters:**
+- `formView` (`FormView`) — What `single_form_selection` resolves to
+
+**Returns:** `int|null` — `null` when the view is not a dynamic form
+
+---
+
 ### `iw_sulu_tailwind_theme_template_exists(name)`
 
 Tells whether a template can be loaded, so a template can pick between a project

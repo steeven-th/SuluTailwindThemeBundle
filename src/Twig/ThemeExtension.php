@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
+use ItechWorld\SuluTailwindThemeBundle\Service\FormSuccessResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
@@ -41,6 +42,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly CodeBlockPolicy $codeBlockPolicy,
         private readonly VariantColorSchemeResolver $colorSchemeResolver,
         private readonly FormViewDuplicator $formViewDuplicator,
+        private readonly FormSuccessResolver $formSuccessResolver,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -74,6 +76,9 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_form_submitted', $this->isFormSubmitted(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_form_success_text', $this->getFormSuccessText(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_form_id', $this->getFormId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
@@ -324,6 +329,52 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
     public function reusableForm(object $formView): object
     {
         return $this->formViewDuplicator->makeRenderable($formView);
+    }
+
+    /**
+     * Tell whether this form was just submitted successfully.
+     *
+     * True on the request following SuluFormBundle's `?send=true` redirect, and
+     * only for the form that was actually posted — the bridge template then
+     * shows the confirmation instead of an empty form.
+     *
+     * @param object $formView A Symfony FormView
+     *
+     * @return bool True when the confirmation must replace the form
+     */
+    public function isFormSubmitted(object $formView): bool
+    {
+        return $this->formSuccessResolver->isSubmitted($formView);
+    }
+
+    /**
+     * The success message to show for a submitted form.
+     *
+     * Returns the rich text an editor typed in the admin for the current
+     * locale, or a translated default when that field was left empty — the
+     * point being that a successful submission is never silent.
+     *
+     * @param object $formView A Symfony FormView
+     *
+     * @return string HTML, to be rendered raw
+     */
+    public function getFormSuccessText(object $formView): string
+    {
+        return $this->formSuccessResolver->getSuccessText($formView);
+    }
+
+    /**
+     * The SuluFormBundle id of the form a view renders.
+     *
+     * Used to build the `iw-form-{id}` anchor the success redirect points at.
+     *
+     * @param object $formView A Symfony FormView
+     *
+     * @return int|null The form id, or null when the view is not a dynamic form
+     */
+    public function getFormId(object $formView): ?int
+    {
+        return $this->formSuccessResolver->getFormId($formView);
     }
 
     /**
