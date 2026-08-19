@@ -14,8 +14,31 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    {# Site-wide breadcrumb (pages) — gated by the Components config #}
-    {% if (iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both')) in ['both', 'articles'] %}
+    {# A listing IS a page, so it wears the same banner as one — same hero data
+       (image, title, subtitle) and the same site-wide appearance from
+       Components → Page hero. Before this, the listing rendered a bare <h1> in a
+       container and looked like a different site. Kept identical to
+       pages/default.html.twig on purpose: the two must not drift apart. #}
+    {% set heroImageId = content.heroImage|default(null) %}
+    {% set heroTitleText = content.heroTitle|default('') %}
+    {% set pageH1 = heroTitleText is not empty ? heroTitleText : content.title|default('') %}
+
+    {% set heroDisplay = iw_sulu_tailwind_theme.pageHero_titleDisplay|default('overlay') %}
+    {% set heroBreadcrumbMode = iw_sulu_tailwind_theme.pageHero_breadcrumb|default('with_title') %}
+    {% set heroParallax = iw_sulu_tailwind_theme.pageHero_parallax is defined ? iw_sulu_tailwind_theme.pageHero_parallax : false %}
+
+    {# Breadcrumb visibility keeps reading the 'articles' scope, as this template
+       always has: a listing page is where readers expect the article trail, and
+       switching it to the 'pages' scope would silently turn it off for projects
+       that only enabled breadcrumbs on articles. Only its placement is shared
+       with regular pages. #}
+    {% set listingBreadcrumbsOn = (iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both')) in ['both', 'articles'] %}
+
+    {# "with_title" needs a visible header; fall back to a top bar otherwise. #}
+    {% set effectiveBreadcrumb = (heroDisplay == 'hidden' and heroBreadcrumbMode == 'with_title')
+        ? 'top_bar' : heroBreadcrumbMode %}
+
+    {% if effectiveBreadcrumb == 'top_bar' and listingBreadcrumbsOn %}
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
                 context: 'page',
@@ -24,14 +47,22 @@
         </div>
     {% endif %}
 
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {# Page title #}
-        {% if content.title is defined and content.title is not empty %}
-            <h1 class="font-[var(--font-h1-family)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-8">
-                {{ content.title }}
-            </h1>
-        {% endif %}
+    {% include '@ItechWorldSuluTailwindTheme/pages/common/_page_hero.html.twig' with {
+        image: heroImageId,
+        title: pageH1,
+        subtitle: content.heroSubtitle|default(''),
+        display: heroDisplay,
+        alignX: iw_sulu_tailwind_theme.pageHero_alignX|default('left'),
+        alignY: iw_sulu_tailwind_theme.pageHero_alignY|default('bottom'),
+        shade: iw_sulu_tailwind_theme.pageHero_shade|default('medium'),
+        height: iw_sulu_tailwind_theme.pageHero_height|default('md'),
+        parallax: heroParallax,
+        breadcrumb: (effectiveBreadcrumb == 'with_title') and listingBreadcrumbsOn,
+        breadcrumbPageUuid: resource.uuid|default(null),
+        breadcrumbCurrentTitle: content.title|default(''),
+    } only %}
 
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {# Prefer the server-side filtered list; fall back to native smart_content. #}
         {% set isFiltered = filteredArticles is defined %}
         {% set listingArticles = isFiltered ? filteredArticles : (content.articles|default([])) %}

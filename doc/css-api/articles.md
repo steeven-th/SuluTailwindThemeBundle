@@ -148,10 +148,12 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-hero__inner` | Inner wrapper, only present in `--contained` mode. Carries the `overflow: hidden` and the radius for the contained variant |
 | `.iw-article-hero__image` | The `<img>` element inside the hero. Its own radius is forced to `0` — the wrapper (or `__inner`) does the clipping |
 | `.iw-article-hero__breadcrumb` | Bottom overlay hosting the breadcrumb trail over a dark gradient (fullwidth-hero styles: news/blog classic, event card info). Forces light breadcrumb colors |
+| `.iw-article-hero--h-sm` / `--h-md` / `--h-lg` / `--h-full` | Hero height, emitted from the site-wide **Components → Page hero** height so an article banner matches a page one. Same ratios and caps as `.iw-page-hero--h-*`. `--h-full` falls back to the large preset in `contained` mode |
 
 | Variable | Purpose |
 |----------|---------|
-| `--iw-article-hero-max-height` | Max height of the hero (default `500px`). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
+| `--iw-article-hero-max-height` | Max height of the hero (default `500px`, overridden by the height modifier below). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
+| `--iw-article-hero-ratio` | Crop ratio of the hero (default `16 / 9`, set by the height modifier) |
 | `--iw-article-hero-radius` | Image radius in `contained` mode (default falls back to `--border-imageRadius`) |
 | `--iw-article-hero-contained-max-width` | Max-width of the centered container in `contained` mode (default `1280px`) |
 | `--iw-article-hero-margin-bottom` | Bottom spacing of the `fullwidth` hero (default `1.5rem`) |

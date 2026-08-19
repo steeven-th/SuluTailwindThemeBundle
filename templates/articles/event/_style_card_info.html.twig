@@ -14,10 +14,12 @@
 
 {% block article_hero %}
     <div class="relative">
+        {# No maxHeight here on purpose: it used to be pinned at 450px, which
+           silently ignored the site-wide Page hero height and left this style
+           looking different from every other banner on the site. #}
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_hero.html.twig' with {
             image: content.heroImage|default(null),
             style: 'fullwidth',
-            maxHeight: '450px',
             breadcrumb: true,
             breadcrumbPageUuid: view.url.page.uuid|default(null),
             breadcrumbCurrentTitle: content.title|default(''),

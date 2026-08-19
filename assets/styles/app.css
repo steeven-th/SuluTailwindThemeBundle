@@ -3396,6 +3396,29 @@ section.block:has([data-slider-fullbleed-value]) {
     max-height: none;
 }
 
+/* Hero height, driven by the site-wide Page hero setting (Components → Page
+   hero) so an article banner carries the same visual weight as a page one —
+   same ratios and caps as .iw-page-hero--h-*. Only the height travels: a page
+   hero also owns a readability veil and title placement, which have no meaning
+   here since each article style renders its title below the image. */
+.iw-article-hero--h-sm { --iw-article-hero-ratio: 16 / 5; --iw-article-hero-max-height: 340px; }
+.iw-article-hero--h-md { --iw-article-hero-ratio: 16 / 9; --iw-article-hero-max-height: 560px; }
+.iw-article-hero--h-lg { --iw-article-hero-ratio: 16 / 11; --iw-article-hero-max-height: 720px; }
+
+.iw-article-hero--h-full.iw-article-hero--fullwidth,
+.iw-article-hero--h-full.iw-article-hero--parallax {
+    --iw-article-hero-ratio: auto;
+    height: 100svh;
+    max-height: none;
+}
+
+/* A viewport-tall banner makes no sense once the hero sits inside the page
+   container with rounded corners, so "full" falls back to the large preset. */
+.iw-article-hero--h-full.iw-article-hero--contained {
+    --iw-article-hero-ratio: 16 / 11;
+    --iw-article-hero-max-height: 720px;
+}
+
 /* ─── Page hero ─────────────────────────────────────────────────────────── */
 /* Full-width banner at the top of a page. The header (title + subtitle +
    breadcrumb) can be overlaid on the image (with a readability veil and

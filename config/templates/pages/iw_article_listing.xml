@@ -9,6 +9,7 @@
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
     <key>iw_article_listing</key>
@@ -33,6 +34,18 @@
             <meta><title>iw_sulu_tailwind_theme.url</title></meta>
             <tag name="sulu.rlp"/>
         </property>
+
+        <!-- Hero section: same banner as a regular page, so a listing does not
+             look like a different site. Its appearance comes from the site-wide
+             Page hero component; only the content is per-page. heroTitle is also
+             what lets an editor override the H1 without renaming the page. -->
+        <section name="hero">
+            <meta><title>iw_sulu_tailwind_theme.page.section_hero</title></meta>
+            <properties>
+                <xi:include href="../fragments/page-hero.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+            </properties>
+        </section>
 
         <!-- Article source -->
         <section name="articles">

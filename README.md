@@ -451,6 +451,8 @@ Article templates extend the project's `base.html.twig` — your menu, footer, a
 
 The `iw_article_listing` page template renders a filtered, paginated article list. Create a page with this template (e.g. `/news`, `/blog`) and the articles are filtered **server-side** from the URL query string:
 
+> A listing page carries the same **Hero** section as a regular page — banner image, `heroTitle` overriding the H1, subtitle — and the same site-wide appearance from **Components → Page hero**. Article pages take their banner height from that setting too, so pages, listings and articles share one banner style instead of three.
+
 | Query param | Example | Description |
 |-------------|---------|-------------|
 | `category` | `?category=news` | Filter by category key (slug). Multiple values comma-separated (`news,blog`), OR-combined. |
