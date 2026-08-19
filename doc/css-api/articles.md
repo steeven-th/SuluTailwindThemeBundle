@@ -242,6 +242,16 @@ The category badge in the meta strip is the generic **`.iw-category-badge`** com
 
 Avatar (image or initials fallback) + name + optional role.
 
+The avatar comes from the author's own record: the contact of a Sulu user, a
+selected contact, or the picture of a custom author. Initials are only a
+fallback for an author without one. Two site-wide settings drive it, in the
+theme admin under **Articles**:
+
+| Setting | Effect |
+|---------|--------|
+| **Author avatars** | Off, every author renders as initials even when a picture exists. On (default), the picture wins. A caller passing `showAvatar` explicitly still overrides it |
+| **Author name format** | Full name, first name only, last name only, or first name + initial (`Marie D.`). An article can override it in its *Authors* section. There is no nickname option: a Sulu contact has no such field, and the only pseudonym in the system is the account login — a pen name goes through a "custom" author, whose name is free text |
+
 | Class | Role |
 |-------|------|
 | `.iw-article-author` | Block |
@@ -251,6 +261,7 @@ Avatar (image or initials fallback) + name + optional role.
 | `.iw-article-author__details` | Wrapper around name + role |
 | `.iw-article-author__name` | Author display name |
 | `.iw-article-author__role` | Optional role/title under the name |
+| `.iw-article-meta__avatar` | Small round avatar in the meta line, replacing the generic person icon when at least one author has a picture (`--iw-article-meta-avatar-size`, default `1.25rem`) |
 
 | Variable | Purpose |
 |----------|---------|

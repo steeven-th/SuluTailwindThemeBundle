@@ -47,6 +47,30 @@ class ArticleExtension extends AbstractExtension
      */
     private const WORDS_PER_MINUTE = 250;
 
+    /**
+     * How an author's name is written out.
+     *
+     * There is no "nickname" here on purpose: a Sulu contact has no such field
+     * — only first name, middle name and last name — and the one pseudonym in
+     * the system is the account's login username, which has no business being
+     * published. An author who needs a pen name is added as a "custom" author,
+     * whose name is free text.
+     */
+    public const AUTHOR_NAME_FORMAT_FULL = 'full';
+    public const AUTHOR_NAME_FORMAT_FIRST = 'first';
+    public const AUTHOR_NAME_FORMAT_LAST = 'last';
+    public const AUTHOR_NAME_FORMAT_FIRST_INITIAL = 'first_initial';
+
+    /**
+     * @var list<string>
+     */
+    private const AUTHOR_NAME_FORMATS = [
+        self::AUTHOR_NAME_FORMAT_FULL,
+        self::AUTHOR_NAME_FORMAT_FIRST,
+        self::AUTHOR_NAME_FORMAT_LAST,
+        self::AUTHOR_NAME_FORMAT_FIRST_INITIAL,
+    ];
+
     public function __construct(
         private readonly ThemeExtension $themeExtension,
         private readonly ?UserRepositoryInterface $userRepository = null,
@@ -166,15 +190,23 @@ class ArticleExtension extends AbstractExtension
      *
      * @return string The resolved author name, or empty string
      */
-    public function authorName(array $authorBlock): string
+    public function authorName(array $authorBlock, string $format = ''): string
     {
+        // articleAuthors() already resolved the name with the effective format.
+        if (isset($authorBlock['displayName']) && \is_string($authorBlock['displayName'])) {
+            return $authorBlock['displayName'];
+        }
+
         $type = $authorBlock['type'] ?? '';
+        $format = $this->resolveAuthorNameFormat($format);
 
         return match ($type) {
+            // A free-text name and an organization name are written as they
+            // should read: splitting them into first/last would be guesswork.
             'custom' => (string) ($authorBlock['name'] ?? ''),
-            'contact' => $this->resolveContactName($authorBlock),
             'organization' => $this->resolveOrganizationName($authorBlock),
-            'sulu_user' => $this->resolveSuluUserName($authorBlock),
+            'contact' => $this->resolveContactName($authorBlock, $format),
+            'sulu_user' => $this->resolveSuluUserName($authorBlock, $format),
             default => '',
         };
     }
@@ -307,7 +339,7 @@ class ArticleExtension extends AbstractExtension
      *
      * @return list<array{type: string, name: string, role?: string}> Normalized authors list
      */
-    public function articleAuthors(?int $authorId = null, array $additionalAuthors = []): array
+    public function articleAuthors(?int $authorId = null, array $additionalAuthors = [], string $nameFormat = ''): array
     {
         $authors = [];
 
@@ -327,7 +359,146 @@ class ArticleExtension extends AbstractExtension
             }
         }
 
+        // The name format is resolved once and baked into each entry as
+        // `displayName`. Every template that shows an author — the author
+        // component, the meta line, the JSON-LD, the OpenGraph tags — goes
+        // through authorName(), which prefers that value. Passing the format
+        // down instead would mean threading a variable through a dozen
+        // `include ... only` calls, and any template that forgot it would
+        // quietly show a differently formatted name.
+        $format = $this->resolveAuthorNameFormat($nameFormat);
+
+        foreach ($authors as $index => $author) {
+            $authors[$index]['displayName'] = $this->authorName($author, $format);
+            $authors[$index]['avatarId'] = $this->resolveAvatarId($author);
+        }
+
         return $authors;
+    }
+
+    /**
+     * Resolve the media id of an author's avatar.
+     *
+     * Only the "custom" author type used to expose one, so the primary author
+     * of an article — a Sulu user, by far the most common case — always fell
+     * back to initials even when their contact had a picture. Both Sulu-backed
+     * types carry an avatar on their contact record, so both are read here.
+     *
+     * @param array<string, mixed> $authorBlock The author block data
+     *
+     * @return int|null The media id, or null when the author has no avatar
+     */
+    private function resolveAvatarId(array $authorBlock): ?int
+    {
+        $type = $authorBlock['type'] ?? '';
+
+        if ('custom' === $type) {
+            $avatar = $authorBlock['avatar'] ?? null;
+
+            return is_numeric($avatar) ? (int) $avatar : null;
+        }
+
+        if ('contact' === $type) {
+            $contact = $authorBlock['contact'] ?? null;
+
+            return \is_array($contact) ? $this->avatarIdFromArray($contact) : null;
+        }
+
+        if ('sulu_user' !== $type || null === $this->userRepository) {
+            return null;
+        }
+
+        $authorId = $authorBlock['authorId'] ?? null;
+        if (null === $authorId) {
+            return null;
+        }
+
+        try {
+            $user = $this->userRepository->findUserById((int) $authorId);
+            $avatar = $user?->getContact()->getAvatar();
+
+            return null !== $avatar ? $avatar->getId() : null;
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
+    /**
+     * Extract an avatar media id from a resolved contact array.
+     *
+     * The shape depends on how the contact was resolved: a bare id, or a media
+     * array with its own id.
+     *
+     * @param array<string, mixed> $contact The resolved contact data
+     *
+     * @return int|null The media id, or null when there is none
+     */
+    private function avatarIdFromArray(array $contact): ?int
+    {
+        $avatar = $contact['avatar'] ?? null;
+
+        if (is_numeric($avatar)) {
+            return (int) $avatar;
+        }
+
+        if (\is_array($avatar) && is_numeric($avatar['id'] ?? null)) {
+            return (int) $avatar['id'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve the effective author name format.
+     *
+     * Article override first, then the theme default, then the full name.
+     *
+     * @param string $override The per-article value ('' when set to "theme default")
+     *
+     * @return string One of the self::AUTHOR_NAME_FORMATS keys
+     */
+    private function resolveAuthorNameFormat(string $override = ''): string
+    {
+        if (\in_array($override, self::AUTHOR_NAME_FORMATS, true)) {
+            return $override;
+        }
+
+        $tokens = $this->themeExtension->getTokens();
+        $themeFormat = (string) ($tokens['articles_authorNameFormat'] ?? '');
+
+        return \in_array($themeFormat, self::AUTHOR_NAME_FORMATS, true)
+            ? $themeFormat
+            : self::AUTHOR_NAME_FORMAT_FULL;
+    }
+
+    /**
+     * Apply a name format to a first/last name pair.
+     *
+     * Falls back to whichever part exists: a contact with only a last name
+     * still has to render something under the "first name" format, otherwise
+     * the article would show an author block with no name at all.
+     *
+     * @param string $firstName The first name
+     * @param string $lastName  The last name
+     * @param string $format    One of the self::AUTHOR_NAME_FORMATS keys
+     *
+     * @return string The formatted name
+     */
+    private function formatPersonName(string $firstName, string $lastName, string $format): string
+    {
+        $firstName = trim($firstName);
+        $lastName = trim($lastName);
+
+        $formatted = match ($format) {
+            self::AUTHOR_NAME_FORMAT_FIRST => $firstName,
+            self::AUTHOR_NAME_FORMAT_LAST => $lastName,
+            self::AUTHOR_NAME_FORMAT_FIRST_INITIAL => '' !== $lastName
+                ? trim($firstName . ' ' . mb_strtoupper(mb_substr($lastName, 0, 1)) . '.')
+                : $firstName,
+            default => trim($firstName . ' ' . $lastName),
+        };
+
+        return '' !== $formatted ? $formatted : trim($firstName . ' ' . $lastName);
     }
 
     /**
@@ -337,15 +508,16 @@ class ArticleExtension extends AbstractExtension
      *
      * @return string "firstName lastName"
      */
-    private function resolveContactName(array $authorBlock): string
+    private function resolveContactName(array $authorBlock, string $format = self::AUTHOR_NAME_FORMAT_FULL): string
     {
         $contact = $authorBlock['contact'] ?? null;
 
         if (\is_array($contact)) {
-            $firstName = (string) ($contact['firstName'] ?? '');
-            $lastName = (string) ($contact['lastName'] ?? '');
-
-            return trim("{$firstName} {$lastName}");
+            return $this->formatPersonName(
+                (string) ($contact['firstName'] ?? ''),
+                (string) ($contact['lastName'] ?? ''),
+                $format,
+            );
         }
 
         return '';
@@ -376,7 +548,7 @@ class ArticleExtension extends AbstractExtension
      *
      * @return string "firstName lastName"
      */
-    private function resolveSuluUserName(array $authorBlock): string
+    private function resolveSuluUserName(array $authorBlock, string $format = self::AUTHOR_NAME_FORMAT_FULL): string
     {
         $authorId = $authorBlock['authorId'] ?? null;
 
@@ -392,10 +564,12 @@ class ArticleExtension extends AbstractExtension
             }
 
             $contact = $user->getContact();
-            $firstName = $contact->getFirstName() ?? '';
-            $lastName = $contact->getLastName() ?? '';
 
-            return trim("{$firstName} {$lastName}");
+            return $this->formatPersonName(
+                $contact->getFirstName() ?? '',
+                $contact->getLastName() ?? '',
+                $format,
+            );
         } catch (\Exception) {
             return '';
         }

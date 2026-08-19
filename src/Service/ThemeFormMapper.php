@@ -89,6 +89,7 @@ class ThemeFormMapper
         'articles_listingStyle',
         'articles_showDates', 'articles_showAuthors', 'articles_showCategories',
         'articles_showTags', 'articles_showExcerpts',
+        'articles_authorNameFormat', 'articles_showAuthorAvatars',
         // Reading components (article pages): share buttons, reading
         // progress, table of contents.
         'articles_shareEnabled', 'articles_sharePosition',

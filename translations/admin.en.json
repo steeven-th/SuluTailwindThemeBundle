@@ -984,5 +984,16 @@
     "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color",
 
     "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
-    "iw_sulu_tailwind_theme.turnstile_title_info": "Optional label shown above the widget. The widget already displays its own verification wording, so leaving this empty is usually the right call."
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optional label shown above the widget. The widget already displays its own verification wording, so leaving this empty is usually the right call.",
+
+    "iw_sulu_tailwind_theme.articles_author_name_format": "Author name format",
+    "iw_sulu_tailwind_theme.articles_author_name_format_info": "How author names are written on the site. An author who needs a pen name is added as a \"custom\" author, whose name is free text.",
+    "iw_sulu_tailwind_theme.articles_author_name_full": "Full name (Marie Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first": "First name only (Marie)",
+    "iw_sulu_tailwind_theme.articles_author_name_last": "Last name only (Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first_initial": "First name and initial (Marie D.)",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars": "Author avatars",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars_info": "Shows the author's picture when there is one (contact record or custom author). Without a picture, initials are used. Turned off, every author shows initials.",
+    "iw_sulu_tailwind_theme.article.author_name_format_theme": "Theme setting",
+    "iw_sulu_tailwind_theme.article.author_name_format_info": "Overrides the theme setting for this article only."
 }

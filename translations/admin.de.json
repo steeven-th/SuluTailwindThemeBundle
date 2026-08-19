@@ -977,5 +977,16 @@
     "iw_sulu_tailwind_theme.components_maps_controls_text": "Farbe der Bedienelemente",
 
     "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
-    "iw_sulu_tailwind_theme.turnstile_title_info": "Optionale Beschriftung über dem Widget. Das Widget zeigt bereits einen eigenen Prüftext an - in der Regel kann das Feld leer bleiben."
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optionale Beschriftung über dem Widget. Das Widget zeigt bereits einen eigenen Prüftext an - in der Regel kann das Feld leer bleiben.",
+
+    "iw_sulu_tailwind_theme.articles_author_name_format": "Format des Autorennamens",
+    "iw_sulu_tailwind_theme.articles_author_name_format_info": "Wie Autorennamen auf der Website geschrieben werden. Wer ein Pseudonym braucht, wird als „benutzerdefinierter\" Autor mit freiem Namen erfasst.",
+    "iw_sulu_tailwind_theme.articles_author_name_full": "Vollständiger Name (Marie Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first": "Nur Vorname (Marie)",
+    "iw_sulu_tailwind_theme.articles_author_name_last": "Nur Nachname (Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first_initial": "Vorname und Initiale (Marie D.)",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars": "Autorenbilder",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars_info": "Zeigt das Bild des Autors, sofern vorhanden (Kontaktdatensatz oder benutzerdefinierter Autor). Ohne Bild werden die Initialen angezeigt. Deaktiviert erscheinen alle Autoren mit Initialen.",
+    "iw_sulu_tailwind_theme.article.author_name_format_theme": "Theme-Einstellung",
+    "iw_sulu_tailwind_theme.article.author_name_format_info": "Überschreibt die Theme-Einstellung nur für diesen Artikel."
 }

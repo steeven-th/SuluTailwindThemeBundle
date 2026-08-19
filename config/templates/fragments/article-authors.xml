@@ -6,6 +6,30 @@
     Supports three types: free text, Sulu contact, or Sulu organization.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
+    <!--
+        Per-article override of the site-wide name format (Articles tab).
+        It lives here, in the template, rather than in the article's Settings
+        tab next to the author field: Sulu only persists properties declared by
+        the template, so a select added to that tab would display and then be
+        dropped on save.
+    -->
+    <property name="authorNameFormat" type="single_select" colspan="6">
+        <meta>
+            <title>iw_sulu_tailwind_theme.articles_author_name_format</title>
+            <info_text>iw_sulu_tailwind_theme.article.author_name_format_info</info_text>
+        </meta>
+        <params>
+            <param name="default_value" value=""/>
+            <param name="values" type="collection">
+                <param name=""><meta><title>iw_sulu_tailwind_theme.article.author_name_format_theme</title></meta></param>
+                <param name="full"><meta><title>iw_sulu_tailwind_theme.articles_author_name_full</title></meta></param>
+                <param name="first"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first</title></meta></param>
+                <param name="last"><meta><title>iw_sulu_tailwind_theme.articles_author_name_last</title></meta></param>
+                <param name="first_initial"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first_initial</title></meta></param>
+            </param>
+        </params>
+    </property>
+
     <block name="additionalAuthors" default-type="custom" minOccurs="0" maxOccurs="5">
         <meta>
             <title>iw_sulu_tailwind_theme.article.additional_authors</title>

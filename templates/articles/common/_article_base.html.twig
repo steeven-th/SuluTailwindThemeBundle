@@ -26,7 +26,7 @@
 
 {% block seo_structured_data %}
     {# Auto-detect article type and include matching JSON-LD #}
-    {% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([])) %}
+    {% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([]), content.authorNameFormat|default('')) %}
     {% if content.startDate is defined %}
         {% include '@ItechWorldSuluTailwindTheme/seo/_jsonld_event.html.twig' %}
     {% elseif content.readingTime is defined %}
@@ -39,7 +39,7 @@
 {% block content %}
 {# Load article config + authors — must be inside block content for child template access #}
 {% set articleConfig = iw_sulu_tailwind_theme_article_config() %}
-{% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([])) %}
+{% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([]), content.authorNameFormat|default('')) %}
 
 {# Site breadcrumb — navigation, so it lives before the <article> landmark
    (not inside the redistributable article content). Styles whose fullwidth

@@ -42,13 +42,35 @@
     {% endif %}
 
     {% if showAuthors and authors is defined and authors is iterable and authors|length > 0 %}
+        {# Show real faces when there are any: the generic person icon is only a
+           stand-in for a missing picture, and every article style deserves the
+           avatar — not just the two that use the full author component.
+           Site-wide switch: Articles tab → author avatars. #}
+        {% set metaAvatars = (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true)
+            and authors|filter(a => a.avatarId is defined and a.avatarId is not empty)|length > 0 %}
+
         <span class="iw-article-meta__separator" aria-hidden="true">|</span>
         <span class="iw-article-meta__authors" itemprop="author" itemscope itemtype="https://schema.org/Person">
-            <svg class="iw-article-meta__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
+            {% if not metaAvatars %}
+                <svg class="iw-article-meta__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+            {% endif %}
             {% for author in authors %}
-                <span itemprop="name">{{ iw_sulu_tailwind_theme_author_name(author) }}</span>
+                {% set authorDisplayName = iw_sulu_tailwind_theme_author_name(author) %}
+                {% if metaAvatars and author.avatarId is defined and author.avatarId is not empty %}
+                    {% set metaAvatarMedia = sulu_resolve_media(author.avatarId, app.request.locale) %}
+                    {% if metaAvatarMedia %}
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: metaAvatarMedia,
+                            format: 'sulu-100x100',
+                            alt: authorDisplayName,
+                            raw: true,
+                            classes: 'iw-article-meta__avatar',
+                        }) }}
+                    {% endif %}
+                {% endif %}
+                <span itemprop="name">{{ authorDisplayName }}</span>
                 {% if not loop.last %}, {% endif %}
             {% endfor %}
         </span>
