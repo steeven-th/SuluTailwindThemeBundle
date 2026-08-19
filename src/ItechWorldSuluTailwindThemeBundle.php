@@ -23,6 +23,23 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
     private const ARTICLE_TYPES = ['news', 'event', 'blog_post'];
 
     /**
+     * Extension alias of pixelopen/cloudflare-turnstile-bundle.
+     */
+    private const TURNSTILE_EXTENSION = 'pixel_open_cloudflare_turnstile';
+
+    /**
+     * Cloudflare's "always passes" test keys.
+     *
+     * Used only as a boot-time placeholder while the feature is disabled: that
+     * bundle marks `key` and `secret` as required and non-empty, so a project
+     * that installs it without configuring it cannot start at all. They are
+     * never a fallback for an enabled Turnstile — a challenge validating
+     * everything is worse than no challenge, because it looks protected.
+     */
+    private const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
+    private const TURNSTILE_TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
+
+    /**
      * Define the bundle configuration schema.
      */
     public function configure(DefinitionConfigurator $definition): void
@@ -45,6 +62,24 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                             ->defaultValue(self::ARTICLE_TYPES)
                             ->scalarPrototype()->end()
                             ->info('Whitelist of article types to register (news, event, blog_post)')
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('turnstile')
+                    ->addDefaultsIfNotSet()
+                    ->info('Cloudflare Turnstile field for SuluFormBundle (requires pixelopen/cloudflare-turnstile-bundle)')
+                    ->children()
+                        ->booleanNode('enabled')
+                            ->defaultFalse()
+                            ->info('Offer the Turnstile field in the form builder and verify submitted tokens')
+                        ->end()
+                        ->scalarNode('site_key')
+                            ->defaultNull()
+                            ->info('Cloudflare site key (from env: %env(TURNSTILE_KEY)%)')
+                        ->end()
+                        ->scalarNode('secret_key')
+                            ->defaultNull()
+                            ->info('Cloudflare secret key (from env: %env(TURNSTILE_SECRET)%)')
                         ->end()
                     ->end()
                 ->end()
@@ -93,6 +128,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                 ],
             ]);
         }
+
+        // Feed the Turnstile credentials to pixelopen from this bundle's own
+        // config, so a project has a single place to configure the feature.
+        $this->prependTurnstileConfig($builder);
 
         // Register Doctrine ORM mapping for this bundle's entities
         if ($builder->hasExtension('doctrine')) {
@@ -245,8 +284,123 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             'itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed',
             $config['blocks']['code']['allow_unsandboxed'],
         );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.turnstile.enabled',
+            $config['turnstile']['enabled'],
+        );
 
         $container->import('../config/services.yaml');
+
+        // The Turnstile field bridges two optional bundles: it is only usable
+        // when both are present and the project opted in. Missing either one
+        // must leave the app booting normally, simply without the field.
+        //
+        // Registration is checked against kernel.bundles rather than
+        // class_exists(): a package can sit in vendor/ (so its classes
+        // autoload) while its bundle was never added to config/bundles.php.
+        // Its form type would then not exist as a service and every form
+        // holding the field would break at render time.
+        if ($config['turnstile']['enabled'] && $this->hasTurnstileDependencies($builder)) {
+            $container->import('../config/services_turnstile.yaml');
+        }
+    }
+
+    /**
+     * Whether both bundles backing the Turnstile field are registered.
+     *
+     * @param ContainerBuilder $builder The container builder
+     *
+     * @return bool True when the field can safely be offered
+     */
+    private function hasTurnstileDependencies(ContainerBuilder $builder): bool
+    {
+        $bundles = $builder->hasParameter('kernel.bundles') ? $builder->getParameter('kernel.bundles') : [];
+
+        if (!\is_array($bundles)) {
+            return false;
+        }
+
+        return \array_key_exists('SuluFormBundle', $bundles)
+            && \array_key_exists('PixelOpenCloudflareTurnstileBundle', $bundles);
+    }
+
+    /**
+     * Prepend the Turnstile credentials into pixelopen's extension.
+     *
+     * That bundle requires `key` and `secret` to be set and non-empty, so
+     * installing it without configuring it prevents the container from
+     * compiling at all. Prepending keeps a project's own
+     * config/packages/pixel_open_cloudflare_turnstile.yaml authoritative (a
+     * prepended value always loses against an explicitly configured one) while
+     * making this bundle's `turnstile` node enough on its own.
+     *
+     * @param ContainerBuilder $builder The container builder
+     */
+    private function prependTurnstileConfig(ContainerBuilder $builder): void
+    {
+        if (!$builder->hasExtension(self::TURNSTILE_EXTENSION)) {
+            return;
+        }
+
+        $turnstile = $this->resolveTurnstileConfig($builder);
+
+        // `enable: false` short-circuits both the widget and the token check in
+        // pixelopen, which is what "disabled" has to mean end to end.
+        $config = ['enable' => $turnstile['enabled']];
+
+        if (null !== $turnstile['site_key']) {
+            $config['key'] = $turnstile['site_key'];
+        }
+        if (null !== $turnstile['secret_key']) {
+            $config['secret'] = $turnstile['secret_key'];
+        }
+
+        if (!$turnstile['enabled']) {
+            // Nothing is verified while disabled, so placeholders are harmless
+            // here — and they are what keeps an unconfigured install bootable.
+            $config['key'] ??= self::TURNSTILE_TEST_SITE_KEY;
+            $config['secret'] ??= self::TURNSTILE_TEST_SECRET_KEY;
+        }
+
+        $builder->prependExtensionConfig(self::TURNSTILE_EXTENSION, $config);
+    }
+
+    /**
+     * Resolve the turnstile config from raw extension config arrays.
+     *
+     * prependExtension() runs before configuration processing, so the values
+     * have to be merged by hand — same approach as the code block above.
+     *
+     * @param ContainerBuilder $builder The container builder
+     *
+     * @return array{enabled: bool, site_key: string|null, secret_key: string|null}
+     */
+    private function resolveTurnstileConfig(ContainerBuilder $builder): array
+    {
+        $resolved = [
+            'enabled' => false,
+            'site_key' => null,
+            'secret_key' => null,
+        ];
+
+        foreach ($builder->getExtensionConfig('itech_world_sulu_tailwind_theme') as $config) {
+            if (!isset($config['turnstile']) || !\is_array($config['turnstile'])) {
+                continue;
+            }
+
+            $turnstile = $config['turnstile'];
+
+            if (isset($turnstile['enabled'])) {
+                $resolved['enabled'] = (bool) $turnstile['enabled'];
+            }
+            foreach (['site_key', 'secret_key'] as $key) {
+                if (isset($turnstile[$key]) && \is_string($turnstile[$key]) && '' !== $turnstile[$key]) {
+                    $resolved[$key] = $turnstile[$key];
+                }
+            }
+        }
+
+        return $resolved;
     }
 
     /**

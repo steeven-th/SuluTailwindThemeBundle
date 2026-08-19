@@ -47,6 +47,34 @@ The bridge template receives it as `formView` and renders it directly. A bare nu
 is still accepted and resolved through `sulu_form_get_by_id()`, for content stored by an
 earlier version.
 
+### Anti-spam
+
+SuluFormBundle ships no active protection out of the box: its honeypot defaults to `null`,
+and its reCAPTCHA field only registers when the Google EWZ bundle is installed. This bundle
+adds an opt-in **Cloudflare Turnstile** field, and the form theme already hides the honeypot
+field for you — see [Cloudflare Turnstile](turnstile.md).
+
+### The same form in several blocks
+
+A contact form at the top *and* at the bottom of a long page is a legitimate layout, and it
+works: put two form blocks on the page and pick the same form in both.
+
+This needs handling because Sulu hands every block the **same** `FormView` instance, and
+Symfony refuses to render one twice — it would emit duplicate HTML ids and break every
+`for` attribute on the page. The bridge template detects it and renders an independent copy
+with suffixed ids (`dynamic_form1_email`, then `dynamic_form1_email-2`), leaving the POST
+field names untouched.
+
+Two consequences worth knowing:
+
+- both copies submit to the same form, because they *are* the same form;
+- after a failed submission, every copy on the page shows the error — the browser sends no
+  hint about which one was filled in.
+
+A project that overrides the bridge template needs
+`{% set suluForm = iw_sulu_tailwind_theme_reusable_form(suluForm) %}` before rendering to
+keep this behaviour.
+
 ### Customising the rendering
 
 Override the bridge at the standard Symfony bundle path:
@@ -107,6 +135,8 @@ is broken — publish the target page before judging the rendering.
 
 ## See also
 
+- [Cloudflare Turnstile](turnstile.md) — the opt-in anti-spam field, its keys and its
+  light/dark handling
 - [Forms — CSS API](css-api/forms.md) — every `iw-form__*` class, the `--iw-form-*`
   variables, the combobox and file-input widgets, and the custom-template example
 - [Form block wrapper — CSS API](css-api/blocks/form.md) — the surrounding layout

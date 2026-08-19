@@ -1040,5 +1040,8 @@
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Links",
     "iw_sulu_tailwind_theme.live_editor_schema_error": "The settings of this screen could not be loaded.",
     "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Unsupported field type ({type}).",
-    "iw_sulu_tailwind_theme.live_editor_preview_error": "The preview could not be updated."
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "The preview could not be updated.",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optional label shown above the widget. The widget already displays its own verification wording, so leaving this empty is usually the right call."
 }

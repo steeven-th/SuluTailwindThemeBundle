@@ -1033,5 +1033,8 @@
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Links",
     "iw_sulu_tailwind_theme.live_editor_schema_error": "Die Einstellungen dieses Bildschirms konnten nicht geladen werden.",
     "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Nicht unterstützter Feldtyp ({type}).",
-    "iw_sulu_tailwind_theme.live_editor_preview_error": "Die Vorschau konnte nicht aktualisiert werden."
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "Die Vorschau konnte nicht aktualisiert werden.",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optionale Beschriftung über dem Widget. Das Widget zeigt bereits einen eigenen Prüftext an - in der Regel kann das Feld leer bleiben."
 }

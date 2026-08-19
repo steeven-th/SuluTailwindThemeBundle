@@ -1131,5 +1131,8 @@
     "iw_sulu_tailwind_theme.live_editor_variant_group_links": "Liens",
     "iw_sulu_tailwind_theme.live_editor_schema_error": "Impossible de charger les réglages de cet écran.",
     "iw_sulu_tailwind_theme.live_editor_unsupported_field": "Type de champ non pris en charge ({type}).",
-    "iw_sulu_tailwind_theme.live_editor_preview_error": "Impossible de mettre à jour l'aperçu."
+    "iw_sulu_tailwind_theme.live_editor_preview_error": "Impossible de mettre à jour l'aperçu.",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Libellé facultatif affiché au-dessus du widget. Le widget affiche déjà son propre texte de vérification : laissez vide dans la plupart des cas."
 }

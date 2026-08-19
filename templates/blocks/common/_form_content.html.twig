@@ -4,6 +4,10 @@
      - form: what single_form_selection resolves to — in Sulu 3, an already-built
        Symfony FormView (when useSuluFormBundle is true)
      - twigTemplate: path to a Twig template (when useSuluFormBundle is false)
+     - colorScheme: 'light' | 'dark' | 'auto' — the surface the form sits on, for
+       widgets that render in an iframe and cannot inherit the theme CSS
+       (Cloudflare Turnstile). Computed by the style templates from the block
+       variant; the card style forces 'light' since it paints its own surface.
 
    SuluFormBundle mode:
      Delegates to the bridge template shipped with the bundle. It is included
@@ -36,7 +40,8 @@
             formView: form,
             formId: form,
             formType: 'page',
-            formTypeId: page.id|default('')
+            formTypeId: page.id|default(''),
+            colorScheme: colorScheme|default('auto')
         } only %}
     {% elseif app.environment == 'dev' %}
         <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_not_selected'|trans }}</p>
