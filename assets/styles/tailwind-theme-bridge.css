@@ -203,8 +203,11 @@
   --font-link-style: normal;
 
   /* ─── Typography: Font sizes ──────────────────────────────────────────── */
-  /* Per-element sizes (generate text-h1, text-h2, etc. utilities) */
-  --font-size-h1: 2.5rem;
+  /* Per-element sizes (generate text-h1, text-h2, etc. utilities).
+     h1 mirrors what ThemeCompiler emits for the default 2.5rem: sizes above
+     2rem are compiled to a clamp() so a display heading fits a phone. The
+     other levels sit at or below the threshold and stay literal. */
+  --font-size-h1: clamp(2.175rem, 2.067rem + 0.542vw, 2.5rem);
   --font-size-h2: 2rem;
   --font-size-h3: 1.5rem;
   --font-size-h4: 1.25rem;

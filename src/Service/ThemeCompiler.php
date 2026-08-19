@@ -1011,6 +1011,42 @@ class ThemeCompiler
     ];
 
     /**
+     * Elements whose font size is emitted as a fluid `clamp()`.
+     *
+     * Only headings: they are the ones editors push to display sizes, and the
+     * only ones that overflow a phone viewport. Body and link sizes stay
+     * literal — `--font-size-base` is the reference every rem is measured
+     * against, so making it viewport-dependent would move the whole page.
+     */
+    private const FLUID_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    /**
+     * Largest heading size (rem) considered safe on a small screen.
+     *
+     * At or below this, the configured size is emitted as-is: themes with a
+     * sober typographic scale keep byte-for-byte the CSS they had before.
+     */
+    private const FLUID_COMFORT_REM = 2.0;
+
+    /**
+     * Share of the excess above FLUID_COMFORT_REM kept on the smallest screen.
+     *
+     * A 6rem heading therefore lands at 2 + (6 - 2) * 0.35 = 3.4rem on a phone:
+     * still a display size, but one that fits.
+     */
+    private const FLUID_COMPRESSION = 0.35;
+
+    /**
+     * Viewport (rem) at which the minimum size is reached — 320px.
+     */
+    private const FLUID_MIN_VIEWPORT_REM = 20.0;
+
+    /**
+     * Viewport (rem) at which the configured size is reached — 1280px.
+     */
+    private const FLUID_MAX_VIEWPORT_REM = 80.0;
+
+    /**
      * Generate CSS custom properties for typography tokens.
      *
      * Generates:
@@ -1045,6 +1081,9 @@ class ThemeCompiler
             $familyRole = $props['family'];
             $weight = $props['weight'];
             $size = $this->normalizeFontSize($props['size']);
+            if (\in_array($element, self::FLUID_ELEMENTS, true)) {
+                $size = $this->fluidFontSize($size);
+            }
             $style = $props['style'];
             $lineHeight = $props['lineHeight'];
 
@@ -1100,6 +1139,84 @@ class ThemeCompiler
 
         // Pure numeric value — append "rem"
         return $stringValue . 'rem';
+    }
+
+    /**
+     * Turn a heading size into a viewport-aware `clamp()`.
+     *
+     * The admin exposes a single size per heading level, which used to be
+     * emitted verbatim: an `h1` set to 6rem stayed 96px on a phone, overflowed
+     * the viewport and dragged the whole page into horizontal scrolling.
+     *
+     * The value the editor typed is kept as the *maximum*, reached at
+     * FLUID_MAX_VIEWPORT_REM and above — large screens render exactly what was
+     * configured. Below that the size scales down linearly to a floor that only
+     * compresses what exceeds FLUID_COMFORT_REM, so a restrained scale is left
+     * untouched while a display size is brought back into a phone.
+     *
+     * The middle term is `intercept + slope * 100vw`. The intercept is
+     * mathematically always positive here (it would take max > 4 * min, which
+     * the floor formula cannot produce), so the expression never needs a
+     * leading negative operand.
+     *
+     * @param string $size Normalized size, e.g. "6rem" or "96px"
+     *
+     * @return string A `clamp()` expression, or the input unchanged when it is
+     *                already small enough or expressed in a unit that cannot be
+     *                converted to rem (em, %, ch, …)
+     */
+    private function fluidFontSize(string $size): string
+    {
+        $max = $this->toRem($size);
+
+        if (null === $max || $max <= self::FLUID_COMFORT_REM) {
+            return $size;
+        }
+
+        $min = self::FLUID_COMFORT_REM + ($max - self::FLUID_COMFORT_REM) * self::FLUID_COMPRESSION;
+        $slope = ($max - $min) / (self::FLUID_MAX_VIEWPORT_REM - self::FLUID_MIN_VIEWPORT_REM);
+        $intercept = $min - $slope * self::FLUID_MIN_VIEWPORT_REM;
+
+        return \sprintf(
+            'clamp(%srem, %srem + %svw, %srem)',
+            $this->formatCssNumber($min),
+            $this->formatCssNumber($intercept),
+            $this->formatCssNumber($slope * 100),
+            $this->formatCssNumber($max)
+        );
+    }
+
+    /**
+     * Convert a CSS length to rem, assuming the standard 16px root size.
+     *
+     * @param string $value Normalized length, e.g. "2.5rem" or "40px"
+     *
+     * @return float|null The value in rem, or null when the unit is relative to
+     *                    something the compiler cannot know (em, %, ch, vw, …)
+     */
+    private function toRem(string $value): ?float
+    {
+        if (!preg_match('/^\s*(-?\d*\.?\d+)\s*(rem|px)\s*$/i', $value, $matches)) {
+            return null;
+        }
+
+        $number = (float) $matches[1];
+
+        return 'px' === strtolower($matches[2]) ? $number / 16 : $number;
+    }
+
+    /**
+     * Format a float for CSS output — three decimals, no trailing zeros.
+     *
+     * @param float $value The number to format
+     *
+     * @return string CSS-ready number, e.g. "3.4" or "4.333"
+     */
+    private function formatCssNumber(float $value): string
+    {
+        $formatted = rtrim(rtrim(number_format($value, 3, '.', ''), '0'), '.');
+
+        return '' === $formatted || '-' === $formatted ? '0' : $formatted;
     }
 
     /**

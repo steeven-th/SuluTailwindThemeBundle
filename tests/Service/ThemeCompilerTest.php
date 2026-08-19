@@ -154,4 +154,57 @@ final class ThemeCompilerTest extends TestCase
 
         self::assertStringNotContainsString('ref:', $css);
     }
+
+    #[Test]
+    public function itEmitsALargeHeadingSizeAsAFluidClamp(): void
+    {
+        // 6rem: floor at 2 + (6 - 2) * 0.35 = 3.4rem, ceiling at the configured
+        // 6rem, reached at 1280px — checked against a phone-sized viewport in
+        // the assertions below.
+        $css = $this->compileCss(['typography' => ['assignments' => ['h1' => ['size' => 6]]]]);
+
+        self::assertStringContainsString('--font-size-h1: clamp(3.4rem, 2.533rem + 4.333vw, 6rem);', $css);
+    }
+
+    #[Test]
+    public function itKeepsARestrainedHeadingSizeLiteral(): void
+    {
+        // At or below the comfort threshold there is nothing to compress, and
+        // themes with a sober scale must keep the exact CSS they had before.
+        $css = $this->compileCss(['typography' => ['assignments' => [
+            'h1' => ['size' => 2],
+            'h3' => ['size' => 1.5],
+        ]]]);
+
+        self::assertStringContainsString('--font-size-h1: 2rem;', $css);
+        self::assertStringContainsString('--font-size-h3: 1.5rem;', $css);
+    }
+
+    #[Test]
+    public function itNeverMakesTheBodySizeFluid(): void
+    {
+        // --font-size-base is the reference every rem is measured against.
+        $css = $this->compileCss(['typography' => ['assignments' => ['body' => ['size' => 3]]]]);
+
+        self::assertStringContainsString('--font-size-body: 3rem;', $css);
+        self::assertStringContainsString('--font-size-base: 3rem;', $css);
+    }
+
+    #[Test]
+    public function itClampsAHeadingSizeGivenInPixels(): void
+    {
+        // 96px = 6rem — same output as the rem form.
+        $css = $this->compileCss(['typography' => ['assignments' => ['h2' => ['size' => '96px']]]]);
+
+        self::assertStringContainsString('--font-size-h2: clamp(3.4rem, 2.533rem + 4.333vw, 6rem);', $css);
+    }
+
+    #[Test]
+    public function itLeavesAHeadingSizeInAnUnconvertibleUnitAlone(): void
+    {
+        // em/%/ch depend on a context the compiler cannot resolve.
+        $css = $this->compileCss(['typography' => ['assignments' => ['h1' => ['size' => '4em']]]]);
+
+        self::assertStringContainsString('--font-size-h1: 4em;', $css);
+    }
 }

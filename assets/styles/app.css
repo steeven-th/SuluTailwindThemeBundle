@@ -92,6 +92,21 @@ h6 {
     margin: 0 0 0.5em;
 }
 
+/* Last resort against horizontal scrolling. ThemeCompiler emits heading sizes
+   as a `clamp()`, which handles the common case, but a single long word —
+   a product name, a URL, a German compound — can still be wider than a phone
+   at any reasonable size. `break-word` only splits a word that would overflow
+   on its own, so normal text keeps wrapping at spaces. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.iw-block__title {
+    overflow-wrap: break-word;
+}
+
 /* ─── Links ─────────────────────────────────────────────────────────────── */
 a {
     color: var(--color-link, inherit);

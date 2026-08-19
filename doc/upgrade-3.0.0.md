@@ -499,3 +499,34 @@ Two behaviors worth knowing, both fixed by the move: the section had no margin
 setting of its own, and a smart content left unfiltered listed the current
 article among its own related ones. Blocks have per-instance margins and are
 scoped explicitly, so neither carries over.
+
+## Heading sizes compile to `clamp()` (breaking, visual)
+
+Heading sizes set in the theme admin were emitted verbatim, at every viewport: an
+`h1` at `6rem` stayed 96px on a phone, overflowed the screen and dragged the
+whole page into horizontal scrolling. `ThemeCompiler` now emits a fluid size for
+`--font-size-h1` … `--font-size-h6`:
+
+```css
+/* h1 configured at 6rem */
+--font-size-h1: clamp(3.4rem, 2.533rem + 4.333vw, 6rem);
+```
+
+The configured size is the **maximum**, reached from `1280px` up — large screens
+render exactly what was set. Below that it scales down to `2rem + (size - 2rem) × 0.35`
+at `320px`, so only what exceeds `2rem` is compressed. A size at or below `2rem`
+is emitted literally: a restrained typographic scale compiles to exactly the CSS
+it did before. Body and link sizes are never made fluid — `--font-size-base` is
+the reference every `rem` is measured against.
+
+Headings also gained `overflow-wrap: break-word`, so a single long word cannot
+overflow at any size.
+
+**Migration.** Nothing to change; recompile the themes
+(`php bin/console iw-sulu:theme:compile`) so the stylesheets pick up the new values. What
+changes visually is small screens, where large headings shrink. To keep a literal
+size on one level, redefine the variable after the theme stylesheet:
+
+```css
+:root { --font-size-h1: 6rem; }
+```

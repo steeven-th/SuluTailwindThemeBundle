@@ -158,13 +158,43 @@ Where `{el}` is `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `body`, or `link`.
 > font catalog is unavailable (no API key) or does not know the family, every
 > weight is offered and nothing is blocked.
 
+### Fluid heading sizes
+
+Heading sizes (`--font-size-h1` … `--font-size-h6`) are **not** emitted verbatim
+when the configured size exceeds `2rem`: they are compiled to a `clamp()` so a
+display-sized heading still fits a phone.
+
+```css
+/* h1 configured at 6rem in the admin */
+--font-size-h1: clamp(3.4rem, 2.533rem + 4.333vw, 6rem);
+```
+
+* **Maximum** — the size typed in the admin, reached from `1280px` up. Large
+  screens render exactly what was configured.
+* **Minimum** — `2rem + (size - 2rem) × 0.35`, reached at `320px`. Only the part
+  above `2rem` is compressed.
+* **At or below `2rem`** — emitted literally, no `clamp()`. A restrained
+  typographic scale compiles to exactly the CSS it did before.
+* **Body and link sizes are never made fluid.** `--font-size-base` is the
+  reference every `rem` on the page is measured against.
+* A size given in an unconvertible unit (`em`, `%`, `ch`) is left untouched.
+
+Headings also carry `overflow-wrap: break-word` in `app.css`, so a single long
+word cannot overflow the viewport at any size.
+
+To opt out for one level, redefine the variable after the theme stylesheet:
+
+```css
+:root { --font-size-h1: 6rem; }
+```
+
 **Full list of generated variables:**
 
 | Variable | Default |
 |----------|---------|
 | `--font-h1-family` | `var(--font-family-heading)` |
 | `--font-h1-weight` | `700` |
-| `--font-size-h1` | `2.5rem` |
+| `--font-size-h1` | `clamp(2.175rem, 2.067rem + 0.542vw, 2.5rem)` (from `2.5rem`) |
 | `--font-h1-style` | `normal` |
 | `--line-height-h1` | `1.2` |
 | `--font-h2-weight` | `600` |
