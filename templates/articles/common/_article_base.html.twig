@@ -24,6 +24,13 @@
 #}
 {% extends 'base.html.twig' %}
 
+{# Marks the page as an article for the SEO partials rendered in the <head>.
+   A `set` outside a block is evaluated before the parent template renders, so
+   it reaches them; `articleAuthors` cannot, being defined inside blocks.
+   Every article style extends this template, so the three article types — and
+   any project style built on it — are covered. #}
+{% set iwSeoIsArticle = true %}
+
 {% block seo_structured_data %}
     {# Auto-detect article type and include matching JSON-LD #}
     {% set articleAuthors = iw_sulu_tailwind_theme_article_authors(author|default(null), content.additionalAuthors|default([]), content.authorNameFormat|default(''), content.showAuthorAvatars|default('')) %}

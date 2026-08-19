@@ -62,6 +62,23 @@ class ArticleExtension extends AbstractExtension
     public const AUTHOR_NAME_FORMAT_FIRST_INITIAL = 'first_initial';
 
     /**
+     * Author lists already resolved during this request, keyed by their inputs.
+     *
+     * @var array<string, list<array<string, mixed>>>
+     */
+    private array $resolvedAuthors = [];
+
+    /**
+     * Sulu users already looked up during this request, keyed by id.
+     *
+     * Both the name and the avatar of a "sulu_user" author come from the same
+     * record, so without this each author costs two lookups instead of one.
+     *
+     * @var array<int, object|null>
+     */
+    private array $resolvedUsers = [];
+
+    /**
      * @var list<string>
      */
     private const AUTHOR_NAME_FORMATS = [
@@ -345,6 +362,14 @@ class ArticleExtension extends AbstractExtension
         string $nameFormat = '',
         string $showAvatars = '',
     ): array {
+        // An article page resolves its authors three times: the OpenGraph tags
+        // and the JSON-LD in the <head>, then the visible byline. Each pass
+        // would otherwise re-query the user and their avatar.
+        $cacheKey = json_encode([$authorId, $additionalAuthors, $nameFormat, $showAvatars]);
+        if (\is_string($cacheKey) && isset($this->resolvedAuthors[$cacheKey])) {
+            return $this->resolvedAuthors[$cacheKey];
+        }
+
         $authors = [];
 
         // Primary author from Sulu settings (user ID → contact name)
@@ -383,6 +408,10 @@ class ArticleExtension extends AbstractExtension
             // a display decision, and a template may still need the picture.
             $authors[$index]['avatarId'] = $this->resolveAvatarId($author);
             $authors[$index]['showAvatar'] = $avatarsOn;
+        }
+
+        if (\is_string($cacheKey)) {
+            $this->resolvedAuthors[$cacheKey] = $authors;
         }
 
         return $authors;
@@ -448,14 +477,9 @@ class ArticleExtension extends AbstractExtension
             return null;
         }
 
-        try {
-            $user = $this->userRepository->findUserById((int) $authorId);
-            $avatar = $user?->getContact()->getAvatar();
+        $avatar = $this->findUser((int) $authorId)?->getContact()->getAvatar();
 
-            return null !== $avatar ? $avatar->getId() : null;
-        } catch (\Exception) {
-            return null;
-        }
+        return null !== $avatar ? $avatar->getId() : null;
     }
 
     /**
@@ -591,22 +615,40 @@ class ArticleExtension extends AbstractExtension
             return '';
         }
 
-        try {
-            $user = $this->userRepository->findUserById((int) $authorId);
+        $user = $this->findUser((int) $authorId);
 
-            if (null === $user) {
-                return '';
-            }
-
-            $contact = $user->getContact();
-
-            return $this->formatPersonName(
-                $contact->getFirstName() ?? '',
-                $contact->getLastName() ?? '',
-                $format,
-            );
-        } catch (\Exception) {
+        if (null === $user) {
             return '';
         }
+
+        $contact = $user->getContact();
+
+        return $this->formatPersonName(
+            $contact->getFirstName() ?? '',
+            $contact->getLastName() ?? '',
+            $format,
+        );
+    }
+
+    /**
+     * Look up a Sulu user, once per request.
+     *
+     * @param int $userId The user id
+     *
+     * @return object|null The user, or null when unknown or unreachable
+     */
+    private function findUser(int $userId): ?object
+    {
+        if (\array_key_exists($userId, $this->resolvedUsers)) {
+            return $this->resolvedUsers[$userId];
+        }
+
+        try {
+            $user = $this->userRepository?->findUserById($userId);
+        } catch (\Exception) {
+            $user = null;
+        }
+
+        return $this->resolvedUsers[$userId] = $user;
     }
 }

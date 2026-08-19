@@ -60,11 +60,15 @@
     {% endif %}
 {% endif %}
 
-{# Determine og:type #}
+{# Determine og:type.
+   The article test used to be "the template key starts with iw_", which every
+   template of this bundle does — page templates included. Every page was
+   therefore announced as an article, and would now also carry article:author.
+   Article templates flag themselves instead (see _article_base). #}
 {% set ogType = 'website' %}
 {% if content.startDate is defined %}
     {% set ogType = 'event' %}
-{% elseif articleAuthors is defined or (template is defined and template starts with 'iw_') %}
+{% elseif iwSeoIsArticle|default(false) or articleAuthors is defined %}
     {% set ogType = 'article' %}
 {% endif %}
 
@@ -87,13 +91,23 @@
     {% if authored is defined and authored is not empty %}
         <meta property="article:published_time" content="{{ authored|date('c') }}">
     {% endif %}
-    {% if articleAuthors is defined and articleAuthors is iterable %}
-        {# Full name here too: a display format is a layout decision and must not
-           reach the metadata crawlers and shares read. #}
-        {% for author in articleAuthors %}
-            <meta property="article:author" content="{{ (author.fullName|default(iw_sulu_tailwind_theme_author_name(author)))|e('html_attr') }}">
-        {% endfor %}
-    {% endif %}
+    {# The author list is resolved here rather than expected from the caller:
+       this partial is included from the <head>, outside the blocks where an
+       article template defines `articleAuthors`, so the tag never came out at
+       all. Resolving it locally also means the tag survives a project that
+       ships its own base template. Guarded by ogType, so a page never gets it.
+       Full names on purpose: a display format is a layout decision and must not
+       reach the metadata crawlers and shares read. #}
+    {% set ogAuthors = articleAuthors|default(iw_sulu_tailwind_theme_article_authors(
+        author|default(null),
+        content.additionalAuthors|default([])
+    )) %}
+    {% for ogAuthor in ogAuthors %}
+        {% set ogAuthorName = ogAuthor.fullName|default(iw_sulu_tailwind_theme_author_name(ogAuthor)) %}
+        {% if ogAuthorName is not empty %}
+            <meta property="article:author" content="{{ ogAuthorName|e('html_attr') }}">
+        {% endif %}
+    {% endfor %}
     {% if extension.excerpt.categories is defined %}
         {% for category in extension.excerpt.categories|slice(0, 1) %}
             <meta property="article:section" content="{{ (category.name|default(category.title|default('')))|e('html_attr') }}">
