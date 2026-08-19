@@ -61,6 +61,11 @@
             <h1 class="font-[var(--font-h1-family)] text-4xl md:text-5xl lg:text-6xl font-[var(--font-h1-weight)] leading-tight text-white mt-4 mb-4" itemprop="headline">
                 {{ content.title }}
             </h1>
+            {% if content.subtitle is defined and content.subtitle is not empty %}
+                <p class="iw-article-page__subtitle iw-article-page__subtitle--light">
+                    {{ content.subtitle }}
+                </p>
+            {% endif %}
 
             {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
             {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}

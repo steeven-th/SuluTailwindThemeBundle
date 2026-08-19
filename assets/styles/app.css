@@ -3139,8 +3139,13 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-article-page__subtitle {
     font-size: var(--font-size-h4);
-    color: var(--color-secondary-600);
+    color: var(--iw-article-page-subtitle-color, var(--color-secondary-600));
     line-height: 1.5;
+}
+
+/* Light variant for dark heros (e.g. blog editorial), mirroring the excerpt. */
+.iw-article-page__subtitle--light {
+    --iw-article-page-subtitle-color: rgba(255, 255, 255, 0.85);
 }
 
 /* Lead paragraph — the excerpt description rendered in the article header
