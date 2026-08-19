@@ -981,5 +981,8 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup background",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Popup text",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Controls background",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optional label shown above the widget. The widget already displays its own verification wording, so leaving this empty is usually the right call."
 }

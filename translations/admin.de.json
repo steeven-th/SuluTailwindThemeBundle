@@ -974,5 +974,8 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup-Hintergrund",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Popup-Text",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Hintergrund der Bedienelemente",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Farbe der Bedienelemente"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Farbe der Bedienelemente",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Optionale Beschriftung über dem Widget. Das Widget zeigt bereits einen eigenen Prüftext an - in der Regel kann das Feld leer bleiben."
 }

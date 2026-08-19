@@ -243,6 +243,36 @@
     <div class="text-sm opacity-75 leading-relaxed">{{- label|raw -}}</div>
 {%- endblock freeText_widget -%}
 
+{# ── Cloudflare Turnstile (optional field, see doc/turnstile.md) ──
+   Rendered here rather than by pixelopen/cloudflare-turnstile-bundle: its own
+   template emits `class` twice on the same element (it hardcodes cf-turnstile
+   and re-emits the merged attr), which is invalid HTML and leaves no usable
+   styling hook. Behaviour is otherwise identical, including the `enable`
+   short-circuit that turns the whole field off. #}
+{%- block turnstile_row -%}
+    {% set row_attr = row_attr|merge({class: (block('sulu_form_row_class_name') ~ ' ' ~ row_attr.class|default(''))|trim }) %}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock turnstile_row -%}
+
+{%- block turnstile_widget -%}
+    {%- if enable -%}
+        {# The scheme comes from the block variant, resolved server-side and put
+           on the root form view by forms/_sulu_form.html.twig. A widget in an
+           iframe cannot inherit the theme, so without it a light challenge box
+           glares on a dark section. #}
+        {# `is not null`, not a truthiness test: a FormView is Countable, so an
+           empty one would read as false. #}
+        {%- set rootVars = form.parent is not null ? form.parent.vars : {} -%}
+        {%- set attr = attr|merge({'data-theme': attr['data-theme']|default(rootVars.iw_color_scheme|default('auto'))}) -%}
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+        <div class="iw-form__turnstile cf-turnstile" data-sitekey="{{ key }}"{{ block('attributes') }}></div>
+    {%- endif -%}
+{%- endblock turnstile_widget -%}
+
 {# ── Honeypot — hidden from users ── #}
 {%- block honeypot_row -%}
     <div class="!hidden" aria-hidden="true">

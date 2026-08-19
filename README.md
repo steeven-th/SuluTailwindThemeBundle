@@ -374,6 +374,28 @@ This does not disable the sandbox; it makes a *Run without isolation* checkbox a
 >
 > Turning it back to `false` is an immediate, safe rollback: a stored `unsandboxed` value is ignored without the opt-in, so every existing block returns to the sandbox with no migration.
 
+### Cloudflare Turnstile anti-spam field (optional, off by default)
+
+SuluFormBundle ships no active anti-spam protection: its honeypot defaults to `null` and its reCAPTCHA field only registers when the Google EWZ bundle is installed. This bundle adds an opt-in **Cloudflare Turnstile** field — free, privacy-friendly, and invisible for most visitors.
+
+```bash
+composer require pixelopen/cloudflare-turnstile-bundle
+```
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    turnstile:
+        enabled: true
+        site_key: '%env(TURNSTILE_KEY)%'
+        secret_key: '%env(TURNSTILE_SECRET)%'
+```
+
+Editors then pick **Cloudflare Turnstile** in the form builder, in the *special* group. Submissions without a valid token are rejected server-side: no mail is sent and nothing is stored. The widget follows the block variant (light or dark) and the form locale on its own.
+
+This is the only place to configure it — the bundle forwards the credentials to `pixelopen/cloudflare-turnstile-bundle`. Left disabled, or with the package absent, nothing changes and the field is simply not offered.
+
+> See **[Cloudflare Turnstile](doc/turnstile.md)** for the Cloudflare test keys, the appearance rules, and how to override the error message.
+
 ### Article templates (optional)
 
 The bundle provides ready-to-use article templates (News, Event, Blog Post) that integrate with [SuluArticleBundle](https://github.com/sulu/sulu). They are **opt-in** and disabled by default.
@@ -687,6 +709,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
 | [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, dev-only diagnostics |
+| [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 

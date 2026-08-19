@@ -26,7 +26,8 @@
         "symfony/debug-bundle": "^7.0"
     },
     "suggest": {
-        "sulu/form-bundle": "Required for SuluFormBundle integration in the form block (^3.0)"
+        "sulu/form-bundle": "Required for SuluFormBundle integration in the form block (^3.0)",
+        "pixelopen/cloudflare-turnstile-bundle": "Required for the Cloudflare Turnstile form field (^0.5)"
     },
     "autoload": {
         "psr-4": {

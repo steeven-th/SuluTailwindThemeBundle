@@ -15,7 +15,8 @@
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_form_content.html.twig' with {
                 useSuluFormBundle: useSuluFormBundle|default(false),
                 form: form|default(null),
-                twigTemplate: twigTemplate|default('')
+                twigTemplate: twigTemplate|default(''),
+                colorScheme: iw_sulu_tailwind_theme_color_scheme(variant|default(null), showBackground ?? true)
             } only %}
         </div>
     </div>

@@ -1,0 +1,184 @@
+# Cloudflare Turnstile
+
+An opt-in anti-spam field for forms built with SuluFormBundle. Once enabled, editors pick
+**Cloudflare Turnstile** in the form builder like any other field, and submissions without
+a valid token are rejected server-side — no mail sent, nothing stored.
+
+Turnstile is Cloudflare's captcha alternative: free, privacy-friendly, and invisible for
+most visitors. The widget and the token verification come from
+[`pixelopen/cloudflare-turnstile-bundle`](https://github.com/Pixel-Open/cloudflare-turnstile-bundle);
+this bundle adds the Sulu side (the field type, its admin definition and its rendering).
+
+> **Start with the honeypot.** SuluFormBundle ships a honeypot that costs nothing and stops
+> a good share of naive bots, but it is **off by default** (`sulu_form.honeypot.field` is
+> `null`). Set it and this theme already hides the field for you — the form theme defines a
+> `honeypot_row` block. It complements Turnstile rather than replacing it.
+>
+> ```yaml
+> # config/packages/sulu_form.yaml
+> sulu_form:
+>     honeypot:
+>         field: 'website_url'
+> ```
+
+---
+
+## Install
+
+```bash
+composer require pixelopen/cloudflare-turnstile-bundle
+```
+
+The package is a `suggest`, never a `require`: the feature stays optional and a project
+that does not want it installs nothing. Check that the bundle landed in
+`config/bundles.php` (its Flex recipe adds it):
+
+```php
+PixelOpen\CloudflareTurnstileBundle\PixelOpenCloudflareTurnstileBundle::class => ['all' => true],
+```
+
+Then get a site key and a secret key from the Cloudflare dashboard
+(*Turnstile → Add site*) and put them in `.env`:
+
+```dotenv
+TURNSTILE_KEY=0x4AAAAAAA...
+TURNSTILE_SECRET=0x4AAAAAAA...
+```
+
+Finally, enable the field:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    turnstile:
+        enabled: true
+        site_key: '%env(TURNSTILE_KEY)%'
+        secret_key: '%env(TURNSTILE_SECRET)%'
+```
+
+That is the only place to configure Turnstile. This bundle forwards the values to
+pixelopen itself, so **do not** also create `config/packages/pixel_open_cloudflare_turnstile.yaml`
+— its Flex recipe may have created one, and a project-level file wins over what this bundle
+forwards, which quietly splits the configuration in two.
+
+### Using the field
+
+In the admin, open a form, add a field, and pick **Cloudflare Turnstile** in the *special*
+group (next to the reCAPTCHA field). Only two settings, both optional:
+
+| Setting | What it does |
+|---------|--------------|
+| **Width** | Column width in the form grid, like every other field |
+| **Title** | A label above the widget. Usually best left empty: the widget already shows its own "verify you are human" wording |
+
+There is intentionally no *required* toggle and no *short title* — see
+[Design notes](#design-notes).
+
+---
+
+## Local development and CI
+
+Cloudflare publishes test keys that never call a real challenge. The pair below always
+passes, which is what you want in dev and in a test suite:
+
+| Key | Value |
+|-----|-------|
+| Site key | `1x00000000000000000000AA` |
+| Secret key | `1x0000000000000000000000000000000AA` |
+
+Two other site keys are useful when checking the rendering: `2x00000000000000000000AB`
+always blocks, and `3x00000000000000000000FF` forces the interactive challenge, which is
+the only way to see the full widget on screen. The matching "always fails" secret is
+`2x0000000000000000000000000000000AA`.
+
+These keys validate **everything**. They belong in `.env`, never in production.
+
+### Turning it off
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    turnstile:
+        enabled: false   # the default
+```
+
+Disabled means disabled end to end: the field is not offered in the form builder, no widget
+is rendered, and no token is verified. Existing forms that already hold a Turnstile field
+keep working — the field simply disappears from them.
+
+The app also boots normally when the feature is off and pixelopen is installed but not
+configured, which it otherwise refuses to do (that bundle marks its `key` and `secret` as
+required and non-empty). While disabled, this bundle feeds it Cloudflare's test keys as
+placeholders. It never does so when Turnstile is **enabled**: a challenge that validates
+everything is worse than no challenge, because it looks protected. Enabling without keys
+therefore fails at compile time, with pixelopen's own message:
+
+```
+The child config "key" under "pixel_open_cloudflare_turnstile" must be configured.
+```
+
+---
+
+## Appearance
+
+The widget renders inside an iframe, so it cannot inherit the theme through CSS. It only
+takes a light/dark hint, and the bundle computes it from the block the form sits in:
+
+- the block variant's background color is resolved to its final hex value (the same one
+  the theme compiler emits) and its luminance decides `light` or `dark`;
+- a block with its background turned off follows the theme's page background instead;
+- the `card` layout always gets `light` — it paints its own white surface;
+- when no color can be resolved, the hint falls back to `auto` and the widget follows the
+  visitor's `prefers-color-scheme`.
+
+The language follows the form locale, so a French page gets a French widget.
+
+The widget is wrapped in a `.iw-form__turnstile` element, which is the hook to size or
+center it:
+
+```css
+.iw-form__turnstile {
+    display: flex;
+    justify-content: center;
+}
+```
+
+To change the markup itself, override the `turnstile_widget` block of the form theme —
+see [Forms — CSS API](css-api/forms.md).
+
+---
+
+## Design notes
+
+**No *required* toggle.** The widget renders no input of its own: Cloudflare posts the
+token as a separate `cf-turnstile-response` parameter. A `NotBlank` on the field could
+therefore never pass and would make the form permanently unsubmittable. The token is always
+verified when the field is present, which is what "required" would have meant anyway.
+
+**No *short title*.** That property only ever labels a submitted value (a column in the
+submissions list, a line in the notification mail). The field is `mapped => false`, so it
+never produces one.
+
+**Its own error message.** The violation uses the
+`iw_sulu_tailwind_theme.turnstile_failed` key from this bundle's `validators` catalog
+rather than pixelopen's `invalid_turnstile`. Overriding another bundle's catalog entry
+depends on bundle registration order, and its French default ("Merci de cocher la case")
+describes a checkbox Turnstile usually does not show. Override it in your project like any
+translation:
+
+```json
+// translations/validators.fr.json
+{
+    "iw_sulu_tailwind_theme.turnstile_failed": "Votre message n'a pas pu être envoyé…"
+}
+```
+
+**Fails closed.** If Cloudflare cannot be reached, the verification returns false and the
+submission is rejected — the error is logged. A captcha that lets everything through when
+the network hiccups protects nothing.
+
+---
+
+## See also
+
+- [Form block](form-block.md) — the block that puts a form on a page
+- [Forms — CSS API](css-api/forms.md) — every `iw-form__*` class and form theme block

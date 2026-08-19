@@ -1072,5 +1072,8 @@
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Fond de l'infobulle",
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Texte de l'infobulle",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Fond des contrôles",
-    "iw_sulu_tailwind_theme.components_maps_controls_text": "Couleur des contrôles"
+    "iw_sulu_tailwind_theme.components_maps_controls_text": "Couleur des contrôles",
+
+    "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Libellé facultatif affiché au-dessus du widget. Le widget affiche déjà son propre texte de vérification : laissez vide dans la plupart des cas."
 }
