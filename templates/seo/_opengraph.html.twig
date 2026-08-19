@@ -88,8 +88,10 @@
         <meta property="article:published_time" content="{{ authored|date('c') }}">
     {% endif %}
     {% if articleAuthors is defined and articleAuthors is iterable %}
+        {# Full name here too: a display format is a layout decision and must not
+           reach the metadata crawlers and shares read. #}
         {% for author in articleAuthors %}
-            <meta property="article:author" content="{{ iw_sulu_tailwind_theme_author_name(author)|e('html_attr') }}">
+            <meta property="article:author" content="{{ (author.fullName|default(iw_sulu_tailwind_theme_author_name(author)))|e('html_attr') }}">
         {% endfor %}
     {% endif %}
     {% if extension.excerpt.categories is defined %}

@@ -32,11 +32,14 @@
     {% set description = content.subtitle|striptags|trim %}
 {% endif %}
 
-{# Build authors array #}
+{# Build authors array.
+   Always the full name, never the display format: shortening "Adam Ministrator"
+   to "Adam" in the markup search engines read would downgrade the article's
+   metadata over what is only a visual choice. #}
 {% set authorsList = [] %}
 {% if articleAuthors is defined and articleAuthors is iterable %}
     {% for author in articleAuthors %}
-        {% set authorName = iw_sulu_tailwind_theme_author_name(author) %}
+        {% set authorName = author.fullName|default(iw_sulu_tailwind_theme_author_name(author)) %}
         {% if authorName is not empty %}
             {% set authorType = author.type|default('custom') == 'organization' ? 'Organization' : 'Person' %}
             {% set authorsList = authorsList|merge([{'@type': authorType, 'name': authorName}]) %}

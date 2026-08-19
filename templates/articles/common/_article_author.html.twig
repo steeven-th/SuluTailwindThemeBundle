@@ -19,14 +19,18 @@
 
     Override via --iw-article-author-{gap,name-color,role-color,avatar-bg,avatar-text}.
 #}
-{# Avatars are a site-wide decision (Articles tab → author avatars): with them
-   off, every author falls back to initials even when a picture exists. An
-   explicit showAvatar passed by a caller still wins, for a style that has no
-   room for one. #}
+{# Avatars are a site-wide decision (Articles tab → author avatars) that an
+   article can override in its Meta section; both are already resolved into
+   author.showAvatar. With them off, every author falls back to initials even
+   when a picture exists. An explicit showAvatar passed by a caller still wins,
+   for a style that has no room for one. #}
 {% set showAvatar = showAvatar is defined
     ? showAvatar
-    : (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true) %}
+    : (author.showAvatar ?? (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true)) %}
 {% set size = size in ['sm', 'md', 'lg'] ? size : 'md' %}
+{# `light` flips the name and role to light tones, for a style that puts the
+   author over a dark hero (blog editorial). #}
+{% set light = light|default(false) %}
 
 {% set authorType = author.type|default('custom') %}
 {% set authorRole = author.role|default('') %}
@@ -35,7 +39,7 @@
 {% set authorName = iw_sulu_tailwind_theme_author_name(author) %}
 
 {% if authorName is not empty %}
-    <div class="iw-article-author iw-article-author--{{ size }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <div class="iw-article-author iw-article-author--{{ size }}{{ light ? ' iw-article-author--light' : '' }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
         {% if showAvatar %}
             {% set avatarMedia = null %}
             {# avatarId is resolved for every author type that has one — a Sulu

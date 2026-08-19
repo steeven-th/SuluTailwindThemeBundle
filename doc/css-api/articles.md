@@ -249,7 +249,7 @@ theme admin under **Articles**:
 
 | Setting | Effect |
 |---------|--------|
-| **Author avatars** | Off, every author renders as initials even when a picture exists. On (default), the picture wins. A caller passing `showAvatar` explicitly still overrides it |
+| **Author avatars** | Off, every author renders as initials even when a picture exists. On (default), the picture wins. An article can override it in its *Meta* section, and a caller passing `showAvatar` explicitly still wins over both |
 | **Author name format** | Full name, first name only, last name only, or first name + initial (`Marie D.`). An article can override it in its *Authors* section. There is no nickname option: a Sulu contact has no such field, and the only pseudonym in the system is the account login — a pen name goes through a "custom" author, whose name is free text |
 
 | Class | Role |
@@ -262,6 +262,12 @@ theme admin under **Articles**:
 | `.iw-article-author__name` | Author display name |
 | `.iw-article-author__role` | Optional role/title under the name |
 | `.iw-article-meta__avatar` | Small round avatar in the meta line, replacing the generic person icon when at least one author has a picture (`--iw-article-meta-avatar-size`, default `1.25rem`) |
+| `.iw-article-author--light` | Light name and role tones, for an author placed over a dark hero (blog editorial) |
+
+> Hiding avatars is **display only**. The author stays in the JSON-LD and in the
+> OpenGraph tags, and those always carry the **full** name whatever display
+> format is selected — shortening "Marie Dupont" to "Marie" in the markup search
+> engines read would downgrade the article's metadata over a layout choice.
 
 | Variable | Purpose |
 |----------|---------|

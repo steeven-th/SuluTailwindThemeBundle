@@ -46,8 +46,9 @@
            stand-in for a missing picture, and every article style deserves the
            avatar — not just the two that use the full author component.
            Site-wide switch: Articles tab → author avatars. #}
-        {% set metaAvatars = (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true)
-            and authors|filter(a => a.avatarId is defined and a.avatarId is not empty)|length > 0 %}
+        {% set metaAvatars = authors|filter(a =>
+            (a.showAvatar ?? (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true))
+            and a.avatarId is defined and a.avatarId is not empty)|length > 0 %}
 
         <span class="iw-article-meta__separator" aria-hidden="true">|</span>
         <span class="iw-article-meta__authors" itemprop="author" itemscope itemtype="https://schema.org/Person">
@@ -58,7 +59,7 @@
             {% endif %}
             {% for author in authors %}
                 {% set authorDisplayName = iw_sulu_tailwind_theme_author_name(author) %}
-                {% if metaAvatars and author.avatarId is defined and author.avatarId is not empty %}
+                {% if metaAvatars and (author.showAvatar ?? true) and author.avatarId is defined and author.avatarId is not empty %}
                     {% set metaAvatarMedia = sulu_resolve_media(author.avatarId, app.request.locale) %}
                     {% if metaAvatarMedia %}
                         {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {

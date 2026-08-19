@@ -995,5 +995,8 @@
     "iw_sulu_tailwind_theme.articles_show_author_avatars": "Author avatars",
     "iw_sulu_tailwind_theme.articles_show_author_avatars_info": "Shows the author's picture when there is one (contact record or custom author). Without a picture, initials are used. Turned off, every author shows initials.",
     "iw_sulu_tailwind_theme.article.author_name_format_theme": "Theme setting",
-    "iw_sulu_tailwind_theme.article.author_name_format_info": "Overrides the theme setting for this article only."
+    "iw_sulu_tailwind_theme.article.author_name_format_info": "Overrides the theme setting for this article only.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_info": "Overrides the theme's avatar setting for this article only. Purely visual: the author stays in the structured data for search engines.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_yes": "Show avatars",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_no": "Hide avatars"
 }

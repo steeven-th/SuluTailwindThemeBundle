@@ -988,5 +988,8 @@
     "iw_sulu_tailwind_theme.articles_show_author_avatars": "Autorenbilder",
     "iw_sulu_tailwind_theme.articles_show_author_avatars_info": "Zeigt das Bild des Autors, sofern vorhanden (Kontaktdatensatz oder benutzerdefinierter Autor). Ohne Bild werden die Initialen angezeigt. Deaktiviert erscheinen alle Autoren mit Initialen.",
     "iw_sulu_tailwind_theme.article.author_name_format_theme": "Theme-Einstellung",
-    "iw_sulu_tailwind_theme.article.author_name_format_info": "Überschreibt die Theme-Einstellung nur für diesen Artikel."
+    "iw_sulu_tailwind_theme.article.author_name_format_info": "Überschreibt die Theme-Einstellung nur für diesen Artikel.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_info": "Überschreibt die Avatar-Einstellung des Themes nur für diesen Artikel. Rein visuell: Der Autor bleibt für Suchmaschinen in den strukturierten Daten erhalten.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_yes": "Avatare anzeigen",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_no": "Avatare ausblenden"
 }

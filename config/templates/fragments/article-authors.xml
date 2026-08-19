@@ -30,6 +30,26 @@
         </params>
     </property>
 
+    <!--
+        Per-article override of the site-wide avatar setting. A select rather
+        than a checkbox: "inherit the theme" has to stay distinguishable from
+        an explicit "no", which a two-state toggle cannot express.
+    -->
+    <property name="showAuthorAvatars" type="single_select" colspan="6">
+        <meta>
+            <title>iw_sulu_tailwind_theme.articles_show_author_avatars</title>
+            <info_text>iw_sulu_tailwind_theme.article.show_author_avatars_info</info_text>
+        </meta>
+        <params>
+            <param name="default_value" value=""/>
+            <param name="values" type="collection">
+                <param name=""><meta><title>iw_sulu_tailwind_theme.article.author_name_format_theme</title></meta></param>
+                <param name="yes"><meta><title>iw_sulu_tailwind_theme.article.show_author_avatars_yes</title></meta></param>
+                <param name="no"><meta><title>iw_sulu_tailwind_theme.article.show_author_avatars_no</title></meta></param>
+            </param>
+        </params>
+    </property>
+
     <block name="additionalAuthors" default-type="custom" minOccurs="0" maxOccurs="5">
         <meta>
             <title>iw_sulu_tailwind_theme.article.additional_authors</title>

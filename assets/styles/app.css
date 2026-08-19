@@ -3693,6 +3693,13 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-article-author-role-color, var(--color-secondary-500));
 }
 
+/* Light variant for an author sitting on a dark hero (blog editorial), same
+   idea as the excerpt and subtitle light variants. */
+.iw-article-author--light {
+    --iw-article-author-name-color: rgba(255, 255, 255, 0.9);
+    --iw-article-author-role-color: rgba(255, 255, 255, 0.7);
+}
+
 /* ─── Article categories & tags ─────────────────────────────────────────── */
 /* Now provided by the generic transverse components .iw-tags / .iw-tag and
    .iw-categories / .iw-category-badge (see the "Transverse: tags" and

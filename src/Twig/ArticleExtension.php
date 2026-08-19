@@ -339,8 +339,12 @@ class ArticleExtension extends AbstractExtension
      *
      * @return list<array{type: string, name: string, role?: string}> Normalized authors list
      */
-    public function articleAuthors(?int $authorId = null, array $additionalAuthors = [], string $nameFormat = ''): array
-    {
+    public function articleAuthors(
+        ?int $authorId = null,
+        array $additionalAuthors = [],
+        string $nameFormat = '',
+        string $showAvatars = '',
+    ): array {
         $authors = [];
 
         // Primary author from Sulu settings (user ID → contact name)
@@ -367,13 +371,44 @@ class ArticleExtension extends AbstractExtension
         // `include ... only` calls, and any template that forgot it would
         // quietly show a differently formatted name.
         $format = $this->resolveAuthorNameFormat($nameFormat);
+        $avatarsOn = $this->resolveShowAvatars($showAvatars);
 
         foreach ($authors as $index => $author) {
             $authors[$index]['displayName'] = $this->authorName($author, $format);
+            // Structured data keeps the whole name whatever the display format:
+            // "Adam" instead of "Adam Ministrator" in schema.org would be a
+            // downgrade of the article's metadata, for a purely visual choice.
+            $authors[$index]['fullName'] = $this->authorName($author, self::AUTHOR_NAME_FORMAT_FULL);
+            // The avatar id is resolved even when avatars are hidden: hiding is
+            // a display decision, and a template may still need the picture.
             $authors[$index]['avatarId'] = $this->resolveAvatarId($author);
+            $authors[$index]['showAvatar'] = $avatarsOn;
         }
 
         return $authors;
+    }
+
+    /**
+     * Resolve whether author avatars are displayed.
+     *
+     * @param string $override The per-article value ('yes', 'no', or '' for the theme default)
+     *
+     * @return bool True when avatars must be displayed
+     */
+    private function resolveShowAvatars(string $override = ''): bool
+    {
+        if ('yes' === $override) {
+            return true;
+        }
+        if ('no' === $override) {
+            return false;
+        }
+
+        $tokens = $this->themeExtension->getTokens();
+
+        // Unset means "on": avatars are the richer default, and a theme saved
+        // before this setting existed should not lose them.
+        return (bool) ($tokens['articles_showAuthorAvatars'] ?? true);
     }
 
     /**

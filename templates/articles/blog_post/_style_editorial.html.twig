@@ -74,8 +74,14 @@
 
             <div class="flex flex-wrap items-center gap-4 text-white/80 text-sm">
                 {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}
+                    {# Same component as the other blog styles, so this one also
+                       shows the author's picture instead of a bare name. #}
                     {% for author in articleAuthors %}
-                        <span>{{ iw_sulu_tailwind_theme_author_name(author) }}</span>
+                        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_author.html.twig' with {
+                            author: author,
+                            size: 'sm',
+                            light: true,
+                        } only %}
                     {% endfor %}
                 {% endif %}
                 {% if articleConfig.showDates|iw_article_visible('page') and authored is defined and authored is not empty %}
