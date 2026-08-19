@@ -65,6 +65,7 @@ The column width is driven by the SuluFormBundle `width` field (`half`, `one-thi
 | `.iw-form__label--required` | Marker added when the field is required (override hook — add your own `::after { content: " *" }` if desired). |
 | `.iw-form__submit` | Submit button override hook (the variant styling is carried by `.iw-button--variant`). |
 | `.iw-form__headline` | SuluFormBundle headline field — owns the bottom border color. |
+| `.iw-form__turnstile` | Cloudflare Turnstile widget container (emitted alongside `.cf-turnstile`). No default styling — use it to size or center the widget. See [Cloudflare Turnstile](../turnstile.md). |
 
 > Labels are rendered as **rich content**, like SuluFormBundle does natively: a consent
 > checkbox can link to the privacy policy straight from its label in the admin. Expanded

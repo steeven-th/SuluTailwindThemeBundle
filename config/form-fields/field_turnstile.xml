@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!--
+    Admin definition of the Cloudflare Turnstile field.
+
+    The header properties (the width selector) are declared inline rather than
+    pulled from SuluFormBundle's header_without_required.xml: xi:include only
+    resolves relative paths, so reaching that file from here would mean walking
+    back through vendor/, which breaks as soon as the vendor directory moves or
+    the project is a monorepo. Duplicating one select is the cheaper trade.
+
+    Deliberately no "required" toggle, exactly like SuluFormBundle's reCAPTCHA
+    field: a challenge is always verified when present, and a NotBlank on it
+    could never pass — Cloudflare posts its token as a separate
+    cf-turnstile-response parameter, not as this field's value.
+
+    No "short title" either, unlike the reCAPTCHA field it is otherwise modelled
+    on: that property only ever labels a submitted value (a column in the
+    submissions list, a line in the notification mail). This field is
+    mapped => false, so it never produces one — the input would be dead weight.
+
+    The title is optional (SuluFormBundle marks its reCAPTCHA one mandatory):
+    the widget already renders its own "verify you are human" wording, so a
+    label above it is a duplicate more often than not. Left empty, Sulu passes
+    label => false and the row renders the widget alone.
+
+    The width and title labels reuse SuluFormBundle's own translation keys,
+    which are guaranteed to be loaded: this field is only registered when that
+    bundle is installed.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/properties-1.0.xsd">
+    <property name="width" type="single_select" mandatory="true" colspan="6">
+        <meta>
+            <title>sulu_form.width</title>
+        </meta>
+        <params>
+            <param name="label">
+                <meta>
+                    <title>sulu_form.width</title>
+                </meta>
+            </param>
+            <param name="default_value" value="0"/>
+            <param name="values" type="collection">
+                <param name="full">
+                    <meta>
+                        <title>sulu_form.width.full</title>
+                    </meta>
+                </param>
+                <param name="half">
+                    <meta>
+                        <title>sulu_form.width.half</title>
+                    </meta>
+                </param>
+                <param name="one-quarter">
+                    <meta>
+                        <title>sulu_form.width.one_quarter</title>
+                    </meta>
+                </param>
+                <param name="three-quarters">
+                    <meta>
+                        <title>sulu_form.width.three_quarters</title>
+                    </meta>
+                </param>
+                <param name="one-third">
+                    <meta>
+                        <title>sulu_form.width.one_third</title>
+                    </meta>
+                </param>
+                <param name="two-thirds">
+                    <meta>
+                        <title>sulu_form.width.two_thirds</title>
+                    </meta>
+                </param>
+                <param name="one-sixth">
+                    <meta>
+                        <title>sulu_form.width.one_sixth</title>
+                    </meta>
+                </param>
+                <param name="five-sixths">
+                    <meta>
+                        <title>sulu_form.width.five_sixths</title>
+                    </meta>
+                </param>
+            </param>
+        </params>
+    </property>
+
+    <property name="title" type="text_editor">
+        <meta>
+            <title>sulu_form.title</title>
+            <info_text>iw_sulu_tailwind_theme.turnstile_title_info</info_text>
+        </meta>
+    </property>
+</properties>

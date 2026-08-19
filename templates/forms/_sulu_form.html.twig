@@ -17,6 +17,11 @@
                     accepted and resolved through sulu_form_get_by_id().
       - formType:   content type context passed to sulu_form_get_by_id ('page')
       - formTypeId: the id of the page or article holding the block
+      - colorScheme: 'light' | 'dark' | 'auto' — surface the form sits on. Set on
+                    the root form view (not passed to form(), which would not
+                    survive to the children) so the Turnstile widget can read it
+                    through form.parent.vars: a widget inside an iframe cannot be
+                    themed with CSS, it only takes a light/dark hint.
 #}
 
 {% set suluForm = null %}
@@ -34,5 +39,5 @@
 {% if suluForm is not null %}
     {# The theme puts iw-form on the <form> element itself: no wrapper needed. #}
     {% form_theme suluForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}
-    {{ form(suluForm) }}
+    {{ form(iw_sulu_tailwind_theme_with_color_scheme(suluForm, colorScheme|default('auto'))) }}
 {% endif %}

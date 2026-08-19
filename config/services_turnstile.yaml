@@ -1,0 +1,11 @@
+services:
+    # Cloudflare Turnstile field for the SuluFormBundle form builder.
+    #
+    # Imported from the bundle extension only when SuluFormBundle AND
+    # pixelopen/cloudflare-turnstile-bundle are installed and the feature is
+    # enabled — the class type-hints both, so loading it unconditionally would
+    # break every project that does not use forms.
+    itech_world.sulu_tailwind_theme.form.turnstile_field_type:
+        class: ItechWorld\SuluTailwindThemeBundle\Form\Dynamic\TurnstileFieldType
+        tags:
+            - { name: 'sulu_form.dynamic.type', alias: 'turnstile' }

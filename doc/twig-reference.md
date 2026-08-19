@@ -231,6 +231,37 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_color_scheme(variant, hasBackground)`
+
+Tells whether a block variant renders on a **light** or a **dark** surface. Meant
+for third-party widgets that live in an iframe and therefore cannot inherit the
+theme through CSS — they only accept a light/dark hint. The variant's background
+color is resolved to its final hex value (the same one the compiler emits) and
+its luminance decides. When the color cannot be resolved (a translucent overlay,
+an unknown reference), the result is `auto` so the widget follows the visitor's
+own `prefers-color-scheme` rather than a wrong guess.
+
+The Cloudflare Turnstile field uses it — see [Cloudflare Turnstile](turnstile.md).
+
+```twig
+{% set scheme = iw_sulu_tailwind_theme_color_scheme(variant|default(null), showBackground ?? true) %}
+<div data-theme="{{ scheme }}">…</div>
+```
+
+**Parameters:**
+- `variant` (`mixed`) — The stored block variant (slug or legacy index)
+- `hasBackground` (`bool`, default `true`) — Whether the block actually paints the variant background; when `false` the page background decides instead
+
+**Returns:** `string` — `light`, `dark` or `auto`.
+
+> A companion function, `iw_sulu_tailwind_theme_with_color_scheme(formView, scheme)`,
+> attaches the resolved scheme to a Symfony `FormView` so the form theme's field
+> blocks can read it through `form.parent.vars.iw_color_scheme`. It exists because
+> variables passed to `form(view, {…})` do not reach child widgets. The shipped form
+> bridge calls it for you; you only need it in a custom bridge template.
+
+---
+
 ### `iw_sulu_tailwind_theme_focus_class(focusPointX, focusPointY, mode)`
 
 Builds the CSS focus class for a media focus point. Sulu stores the focus point

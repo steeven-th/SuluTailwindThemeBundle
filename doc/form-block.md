@@ -47,6 +47,13 @@ The bridge template receives it as `formView` and renders it directly. A bare nu
 is still accepted and resolved through `sulu_form_get_by_id()`, for content stored by an
 earlier version.
 
+### Anti-spam
+
+SuluFormBundle ships no active protection out of the box: its honeypot defaults to `null`,
+and its reCAPTCHA field only registers when the Google EWZ bundle is installed. This bundle
+adds an opt-in **Cloudflare Turnstile** field, and the form theme already hides the honeypot
+field for you — see [Cloudflare Turnstile](turnstile.md).
+
 ### Customising the rendering
 
 Override the bridge at the standard Symfony bundle path:
@@ -107,6 +114,8 @@ is broken — publish the target page before judging the rendering.
 
 ## See also
 
+- [Cloudflare Turnstile](turnstile.md) — the opt-in anti-spam field, its keys and its
+  light/dark handling
 - [Forms — CSS API](css-api/forms.md) — every `iw-form__*` class, the `--iw-form-*`
   variables, the combobox and file-input widgets, and the custom-template example
 - [Form block wrapper — CSS API](css-api/blocks/form.md) — the surrounding layout

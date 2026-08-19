@@ -10,6 +10,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Twig\Environment;
@@ -37,6 +38,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly BlockTemplateResolver $blockTemplateResolver,
         private readonly EmbedUrlValidator $embedUrlValidator,
         private readonly CodeBlockPolicy $codeBlockPolicy,
+        private readonly VariantColorSchemeResolver $colorSchemeResolver,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -67,6 +69,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
@@ -256,6 +260,50 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
     public function getVariantConfig(mixed $variant, array $variants): array
     {
         return VariantResolver::resolveConfig($variant, $variants);
+    }
+
+    /**
+     * Resolve the color scheme a block variant renders on.
+     *
+     * For third-party widgets that live in an iframe and cannot inherit the
+     * theme through CSS — they only accept a light/dark hint. Returns "auto"
+     * when the surface color cannot be resolved, so the widget follows the
+     * visitor's own preference instead of a wrong guess.
+     *
+     * @param mixed $variant       The stored variant value (slug or legacy index)
+     * @param bool  $hasBackground Whether the block paints the variant background
+     *
+     * @return string One of "light", "dark" or "auto"
+     */
+    public function getColorScheme(mixed $variant, bool $hasBackground = true): string
+    {
+        return $this->colorSchemeResolver->resolve($variant, $hasBackground);
+    }
+
+    /**
+     * Attach a color scheme to a form view, readable by its child widgets.
+     *
+     * Passing variables to `form(view, {...})` only fills the context of that
+     * one render call: the FormView itself is left untouched, so a child
+     * reading `form.parent.vars` would never see them. Writing to `vars`
+     * up front is what makes the value reach the Turnstile widget, which sits
+     * in an iframe and can only be told light or dark at render time.
+     *
+     * Typed as `object` on purpose: symfony/form is an optional dependency of
+     * this bundle, so the signature must not force it to be installed.
+     *
+     * @param object $formView A Symfony FormView
+     * @param string $scheme   One of "light", "dark" or "auto"
+     *
+     * @return object The same view, for chaining in a template
+     */
+    public function withColorScheme(object $formView, string $scheme): object
+    {
+        if (property_exists($formView, 'vars') && \is_array($formView->vars)) {
+            $formView->vars['iw_color_scheme'] = $scheme;
+        }
+
+        return $formView;
     }
 
     /**
