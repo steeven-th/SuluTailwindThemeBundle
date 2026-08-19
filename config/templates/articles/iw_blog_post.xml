@@ -48,8 +48,9 @@
         <section name="meta">
             <meta><title>iw_sulu_tailwind_theme.article.section_meta</title></meta>
             <properties>
+                <!-- Both the name-format property and the additional-authors block. -->
                 <xi:include href="../fragments/article-authors.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
 
                 <property name="readingTime" type="text_line" colspan="6">
                     <meta>

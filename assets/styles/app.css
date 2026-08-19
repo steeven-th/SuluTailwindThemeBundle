@@ -3139,8 +3139,13 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-article-page__subtitle {
     font-size: var(--font-size-h4);
-    color: var(--color-secondary-600);
+    color: var(--iw-article-page-subtitle-color, var(--color-secondary-600));
     line-height: 1.5;
+}
+
+/* Light variant for dark heros (e.g. blog editorial), mirroring the excerpt. */
+.iw-article-page__subtitle--light {
+    --iw-article-page-subtitle-color: rgba(255, 255, 255, 0.85);
 }
 
 /* Lead paragraph — the excerpt description rendered in the article header
@@ -3396,6 +3401,29 @@ section.block:has([data-slider-fullbleed-value]) {
     max-height: none;
 }
 
+/* Hero height, driven by the site-wide Page hero setting (Components → Page
+   hero) so an article banner carries the same visual weight as a page one —
+   same ratios and caps as .iw-page-hero--h-*. Only the height travels: a page
+   hero also owns a readability veil and title placement, which have no meaning
+   here since each article style renders its title below the image. */
+.iw-article-hero--h-sm { --iw-article-hero-ratio: 16 / 5; --iw-article-hero-max-height: 340px; }
+.iw-article-hero--h-md { --iw-article-hero-ratio: 16 / 9; --iw-article-hero-max-height: 560px; }
+.iw-article-hero--h-lg { --iw-article-hero-ratio: 16 / 11; --iw-article-hero-max-height: 720px; }
+
+.iw-article-hero--h-full.iw-article-hero--fullwidth,
+.iw-article-hero--h-full.iw-article-hero--parallax {
+    --iw-article-hero-ratio: auto;
+    height: 100svh;
+    max-height: none;
+}
+
+/* A viewport-tall banner makes no sense once the hero sits inside the page
+   container with rounded corners, so "full" falls back to the large preset. */
+.iw-article-hero--h-full.iw-article-hero--contained {
+    --iw-article-hero-ratio: 16 / 11;
+    --iw-article-hero-max-height: 720px;
+}
+
 /* ─── Page hero ─────────────────────────────────────────────────────────── */
 /* Full-width banner at the top of a page. The header (title + subtitle +
    breadcrumb) can be overlaid on the image (with a readability veil and
@@ -3586,6 +3614,17 @@ section.block:has([data-slider-fullbleed-value]) {
     flex-shrink: 0;
 }
 
+/* Author avatar inside the meta line — a round thumbnail replacing the generic
+   person icon when the author actually has a picture. Slightly larger than the
+   icon so a face stays readable at this size. */
+.iw-article-meta__avatar {
+    width: var(--iw-article-meta-avatar-size, 1.25rem);
+    height: var(--iw-article-meta-avatar-size, 1.25rem);
+    border-radius: 9999px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .iw-article-meta__separator {
     color: var(--iw-article-meta-separator-color, var(--color-border));
 }
@@ -3652,6 +3691,13 @@ section.block:has([data-slider-fullbleed-value]) {
 .iw-article-author__role {
     font-size: 0.875rem;
     color: var(--iw-article-author-role-color, var(--color-secondary-500));
+}
+
+/* Light variant for an author sitting on a dark hero (blog editorial), same
+   idea as the excerpt and subtitle light variants. */
+.iw-article-author--light {
+    --iw-article-author-name-color: rgba(255, 255, 255, 0.9);
+    --iw-article-author-role-color: rgba(255, 255, 255, 0.7);
 }
 
 /* ─── Article categories & tags ─────────────────────────────────────────── */

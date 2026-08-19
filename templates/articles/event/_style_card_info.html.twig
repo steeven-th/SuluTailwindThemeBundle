@@ -14,10 +14,12 @@
 
 {% block article_hero %}
     <div class="relative">
+        {# No maxHeight here on purpose: it used to be pinned at 450px, which
+           silently ignored the site-wide Page hero height and left this style
+           looking different from every other banner on the site. #}
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_hero.html.twig' with {
             image: content.heroImage|default(null),
             style: 'fullwidth',
-            maxHeight: '450px',
             breadcrumb: true,
             breadcrumbPageUuid: view.url.page.uuid|default(null),
             breadcrumbCurrentTitle: content.title|default(''),
@@ -52,7 +54,10 @@
         </h1>
 
         {% if content.subtitle is defined and content.subtitle is not empty %}
-            <p class="text-[var(--font-size-h4)] text-[var(--color-secondary-600)] leading-relaxed">
+            {# The public class rather than the same declarations inlined: a
+               project restyling .iw-article-page__subtitle must reach this one
+               too, otherwise one style out of eight silently ignores it. #}
+            <p class="iw-article-page__subtitle">
                 {{ content.subtitle }}
             </p>
         {% endif %}

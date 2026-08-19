@@ -27,6 +27,11 @@
         <h1 class="font-[var(--font-h1-family)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-6" itemprop="headline">
             {{ content.title }}
         </h1>
+        {% if content.subtitle is defined and content.subtitle is not empty %}
+            <p class="iw-article-page__subtitle">
+                {{ content.subtitle }}
+            </p>
+        {% endif %}
 
         {# Prominent author display #}
         {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}

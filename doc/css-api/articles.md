@@ -148,10 +148,12 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-hero__inner` | Inner wrapper, only present in `--contained` mode. Carries the `overflow: hidden` and the radius for the contained variant |
 | `.iw-article-hero__image` | The `<img>` element inside the hero. Its own radius is forced to `0` — the wrapper (or `__inner`) does the clipping |
 | `.iw-article-hero__breadcrumb` | Bottom overlay hosting the breadcrumb trail over a dark gradient (fullwidth-hero styles: news/blog classic, event card info). Forces light breadcrumb colors |
+| `.iw-article-hero--h-sm` / `--h-md` / `--h-lg` / `--h-full` | Hero height, emitted from the site-wide **Components → Page hero** height so an article banner matches a page one. Same ratios and caps as `.iw-page-hero--h-*`. `--h-full` falls back to the large preset in `contained` mode |
 
 | Variable | Purpose |
 |----------|---------|
-| `--iw-article-hero-max-height` | Max height of the hero (default `500px`). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
+| `--iw-article-hero-max-height` | Max height of the hero (default `500px`, overridden by the height modifier below). Can be passed inline via the Twig `maxHeight` parameter or overridden in user CSS |
+| `--iw-article-hero-ratio` | Crop ratio of the hero (default `16 / 9`, set by the height modifier) |
 | `--iw-article-hero-radius` | Image radius in `contained` mode (default falls back to `--border-imageRadius`) |
 | `--iw-article-hero-contained-max-width` | Max-width of the centered container in `contained` mode (default `1280px`) |
 | `--iw-article-hero-margin-bottom` | Bottom spacing of the `fullwidth` hero (default `1.5rem`) |
@@ -240,6 +242,16 @@ The category badge in the meta strip is the generic **`.iw-category-badge`** com
 
 Avatar (image or initials fallback) + name + optional role.
 
+The avatar comes from the author's own record: the contact of a Sulu user, a
+selected contact, or the picture of a custom author. Initials are only a
+fallback for an author without one. Two site-wide settings drive it, in the
+theme admin under **Articles**:
+
+| Setting | Effect |
+|---------|--------|
+| **Author avatars** | Off, every author renders as initials even when a picture exists. On (default), the picture wins. An article can override it in its *Meta* section, and a caller passing `showAvatar` explicitly still wins over both |
+| **Author name format** | Full name, first name only, last name only, or first name + initial (`Marie D.`). An article can override it in its *Authors* section. There is no nickname option: a Sulu contact has no such field, and the only pseudonym in the system is the account login — a pen name goes through a "custom" author, whose name is free text |
+
 | Class | Role |
 |-------|------|
 | `.iw-article-author` | Block |
@@ -249,6 +261,13 @@ Avatar (image or initials fallback) + name + optional role.
 | `.iw-article-author__details` | Wrapper around name + role |
 | `.iw-article-author__name` | Author display name |
 | `.iw-article-author__role` | Optional role/title under the name |
+| `.iw-article-meta__avatar` | Small round avatar in the meta line, replacing the generic person icon when at least one author has a picture (`--iw-article-meta-avatar-size`, default `1.25rem`) |
+| `.iw-article-author--light` | Light name and role tones, for an author placed over a dark hero (blog editorial) |
+
+> Hiding avatars is **display only**. The author stays in the JSON-LD and in the
+> OpenGraph tags, and those always carry the **full** name whatever display
+> format is selected — shortening "Marie Dupont" to "Marie" in the markup search
+> engines read would downgrade the article's metadata over a layout choice.
 
 | Variable | Purpose |
 |----------|---------|

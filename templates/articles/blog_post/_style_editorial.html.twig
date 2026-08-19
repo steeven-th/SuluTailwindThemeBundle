@@ -61,6 +61,11 @@
             <h1 class="font-[var(--font-h1-family)] text-4xl md:text-5xl lg:text-6xl font-[var(--font-h1-weight)] leading-tight text-white mt-4 mb-4" itemprop="headline">
                 {{ content.title }}
             </h1>
+            {% if content.subtitle is defined and content.subtitle is not empty %}
+                <p class="iw-article-page__subtitle iw-article-page__subtitle--light">
+                    {{ content.subtitle }}
+                </p>
+            {% endif %}
 
             {% set articleExcerpt = extension.excerpt.description|default('')|striptags|trim %}
             {% if articleConfig.showExcerpts|iw_article_visible('page') and articleExcerpt %}
@@ -69,8 +74,14 @@
 
             <div class="flex flex-wrap items-center gap-4 text-white/80 text-sm">
                 {% if articleConfig.showAuthors|iw_article_visible('page') and articleAuthors is defined and articleAuthors|length > 0 %}
+                    {# Same component as the other blog styles, so this one also
+                       shows the author's picture instead of a bare name. #}
                     {% for author in articleAuthors %}
-                        <span>{{ iw_sulu_tailwind_theme_author_name(author) }}</span>
+                        {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_author.html.twig' with {
+                            author: author,
+                            size: 'sm',
+                            light: true,
+                        } only %}
                     {% endfor %}
                 {% endif %}
                 {% if articleConfig.showDates|iw_article_visible('page') and authored is defined and authored is not empty %}

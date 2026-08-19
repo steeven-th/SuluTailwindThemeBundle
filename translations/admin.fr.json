@@ -1134,5 +1134,19 @@
     "iw_sulu_tailwind_theme.live_editor_preview_error": "Impossible de mettre à jour l'aperçu.",
 
     "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
-    "iw_sulu_tailwind_theme.turnstile_title_info": "Libellé facultatif affiché au-dessus du widget. Le widget affiche déjà son propre texte de vérification : laissez vide dans la plupart des cas."
+    "iw_sulu_tailwind_theme.turnstile_title_info": "Libellé facultatif affiché au-dessus du widget. Le widget affiche déjà son propre texte de vérification : laissez vide dans la plupart des cas.",
+
+    "iw_sulu_tailwind_theme.articles_author_name_format": "Format du nom des auteurs",
+    "iw_sulu_tailwind_theme.articles_author_name_format_info": "Comment le nom des auteurs s'affiche sur le site. Un auteur qui a besoin d'un pseudonyme s'ajoute en auteur « personnalisé », dont le nom est libre.",
+    "iw_sulu_tailwind_theme.articles_author_name_full": "Nom complet (Marie Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first": "Prénom seul (Marie)",
+    "iw_sulu_tailwind_theme.articles_author_name_last": "Nom seul (Dupont)",
+    "iw_sulu_tailwind_theme.articles_author_name_first_initial": "Prénom et initiale (Marie D.)",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars": "Avatars des auteurs",
+    "iw_sulu_tailwind_theme.articles_show_author_avatars_info": "Affiche la photo de l'auteur quand elle existe (fiche contact ou auteur personnalisé). Sans photo, les initiales restent affichées. Désactivé, tous les auteurs s'affichent en initiales.",
+    "iw_sulu_tailwind_theme.article.author_name_format_theme": "Réglage du thème",
+    "iw_sulu_tailwind_theme.article.author_name_format_info": "Remplace, pour cet article seulement, le format défini dans les réglages du thème.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_info": "Remplace, pour cet article seulement, le réglage d'avatars du thème. Purement visuel : l'auteur reste présent dans les données structurées pour le référencement.",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_yes": "Afficher les avatars",
+    "iw_sulu_tailwind_theme.article.show_author_avatars_no": "Masquer les avatars"
 }

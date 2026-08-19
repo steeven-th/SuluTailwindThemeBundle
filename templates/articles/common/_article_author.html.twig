@@ -19,8 +19,18 @@
 
     Override via --iw-article-author-{gap,name-color,role-color,avatar-bg,avatar-text}.
 #}
-{% set showAvatar = showAvatar is defined ? showAvatar : true %}
+{# Avatars are a site-wide decision (Articles tab → author avatars) that an
+   article can override in its Meta section; both are already resolved into
+   author.showAvatar. With them off, every author falls back to initials even
+   when a picture exists. An explicit showAvatar passed by a caller still wins,
+   for a style that has no room for one. #}
+{% set showAvatar = showAvatar is defined
+    ? showAvatar
+    : (author.showAvatar ?? (iw_sulu_tailwind_theme.articles_showAuthorAvatars ?? true)) %}
 {% set size = size in ['sm', 'md', 'lg'] ? size : 'md' %}
+{# `light` flips the name and role to light tones, for a style that puts the
+   author over a dark hero (blog editorial). #}
+{% set light = light|default(false) %}
 
 {% set authorType = author.type|default('custom') %}
 {% set authorRole = author.role|default('') %}
@@ -29,11 +39,18 @@
 {% set authorName = iw_sulu_tailwind_theme_author_name(author) %}
 
 {% if authorName is not empty %}
-    <div class="iw-article-author iw-article-author--{{ size }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <div class="iw-article-author iw-article-author--{{ size }}{{ light ? ' iw-article-author--light' : '' }}" itemprop="author" itemscope itemtype="https://schema.org/Person">
         {% if showAvatar %}
             {% set avatarMedia = null %}
-            {% if authorType == 'custom' and author.avatar is defined and author.avatar is not empty %}
-                {# single_media_selection stores a scalar media id #}
+            {# avatarId is resolved for every author type that has one — a Sulu
+               user and a contact both carry an avatar on their contact record,
+               not just a "custom" author. Reading it only for the custom type
+               is what used to leave the primary author of an article showing
+               initials while their picture sat unused in the media library. #}
+            {% if author.avatarId is defined and author.avatarId is not empty %}
+                {% set avatarMedia = sulu_resolve_media(author.avatarId, app.request.locale) %}
+            {% elseif authorType == 'custom' and author.avatar is defined and author.avatar is not empty %}
+                {# Direct include, outside iw_sulu_tailwind_theme_article_authors(). #}
                 {% set avatarMedia = sulu_resolve_media(author.avatar, app.request.locale) %}
             {% endif %}
 

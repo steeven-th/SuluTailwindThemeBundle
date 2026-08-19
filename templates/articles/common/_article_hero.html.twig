@@ -5,8 +5,10 @@
     - image: media ID or resolved media object
     - style: 'fullwidth' (default) | 'contained' | 'parallax'
     - maxHeight: optional CSS max-height value — emitted as an inline
-                 `--iw-article-hero-max-height` only when explicitly passed;
-                 otherwise the CSS fallback (500px) applies.
+                 `--iw-article-hero-max-height` only when explicitly passed.
+                 Prefer leaving it out: the height then follows the site-wide
+                 Page hero setting, which is what keeps an article banner
+                 consistent with a page one. Passing it opts that style out.
     - breadcrumb: render the site breadcrumb as an overlay pinned to the bottom
                   of the image, over a dark gradient (designed for the fullwidth
                   style). The caller should override the article_breadcrumb
@@ -45,6 +47,22 @@
         {# Whitelist the modifier so legacy values fall back to fullwidth #}
         {% set heroStyle = style|default('fullwidth') %}
         {% set modifier = heroStyle in ['fullwidth', 'contained', 'parallax'] ? heroStyle : 'fullwidth' %}
+
+        {# An article banner used to be a fixed 16/9 image capped at 500px, while
+           a page banner had a configurable height — which is what made an article
+           look like it belonged to another site. Height and parallax now come
+           from the same site-wide Page hero settings. The veil and title
+           placement do not: this hero carries no text, so a veil would only
+           darken the picture for nothing. #}
+        {% set heroHeight = iw_sulu_tailwind_theme.pageHero_height|default('md') %}
+        {% set heroHeight = heroHeight in ['sm', 'md', 'lg', 'full'] ? heroHeight : 'md' %}
+
+        {# Parallax only promotes a full-width hero: inside the contained style
+           the image is clipped by a rounded wrapper, where it reads as a glitch. #}
+        {% set globalParallax = iw_sulu_tailwind_theme.pageHero_parallax is defined
+            ? iw_sulu_tailwind_theme.pageHero_parallax : false %}
+        {% set modifier = (globalParallax and modifier == 'fullwidth') ? 'parallax' : modifier %}
+
         {% set imgClass = 'iw-article-hero__image' ~ (modifier == 'parallax' ? ' parallax-slide-img' : '') %}
 
         {# Breadcrumb overlay: only when requested AND breadcrumbs are enabled
@@ -52,7 +70,7 @@
         {% set showBreadcrumb = breadcrumb|default(false)
             and iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
 
-        <div class="iw-article-hero iw-article-hero--{{ modifier }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
+        <div class="iw-article-hero iw-article-hero--{{ modifier }} iw-article-hero--h-{{ heroHeight }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
             {% set heroImageParams = {
                 media: media,
                 format: heroFormat,

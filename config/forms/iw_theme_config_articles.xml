@@ -193,6 +193,37 @@
                     </params>
                 </property>
 
+                <!-- How an author's name is written out. No "nickname" option:
+                     a Sulu contact has no such field, and the only pseudonym in
+                     the system is the account login. A pen name goes through a
+                     "custom" additional author, whose name is free text. -->
+                <property name="articles_authorNameFormat" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.articles_author_name_format</title>
+                        <info_text>iw_sulu_tailwind_theme.articles_author_name_format_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="full"/>
+                        <param name="values" type="collection">
+                            <param name="full"><meta><title>iw_sulu_tailwind_theme.articles_author_name_full</title></meta></param>
+                            <param name="first"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first</title></meta></param>
+                            <param name="last"><meta><title>iw_sulu_tailwind_theme.articles_author_name_last</title></meta></param>
+                            <param name="first_initial"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first_initial</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="articles_showAuthorAvatars" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.articles_show_author_avatars</title>
+                        <info_text>iw_sulu_tailwind_theme.articles_show_author_avatars_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+
                 <property name="articles_showCategories" type="single_select" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.articles_show_categories</title></meta>
                     <params>
