@@ -254,11 +254,17 @@ The Cloudflare Turnstile field uses it — see [Cloudflare Turnstile](turnstile.
 
 **Returns:** `string` — `light`, `dark` or `auto`.
 
-> A companion function, `iw_sulu_tailwind_theme_with_color_scheme(formView, scheme)`,
-> attaches the resolved scheme to a Symfony `FormView` so the form theme's field
-> blocks can read it through `form.parent.vars.iw_color_scheme`. It exists because
-> variables passed to `form(view, {…})` do not reach child widgets. The shipped form
-> bridge calls it for you; you only need it in a custom bridge template.
+> Two companion functions exist for the form bridge, and you only need them when you
+> override it with your own template:
+>
+> - `iw_sulu_tailwind_theme_with_color_scheme(formView, scheme)` attaches the resolved
+>   scheme to a Symfony `FormView`, so the form theme's field blocks can read it through
+>   `form.parent.vars.iw_color_scheme`. It exists because variables passed to
+>   `form(view, {…})` never reach child widgets.
+> - `iw_sulu_tailwind_theme_reusable_form(formView)` returns a view that can be rendered
+>   right now: unchanged the first time, and an independent copy with suffixed HTML ids
+>   afterwards. This is what lets two blocks of a page show the same form — see
+>   [The same form in several blocks](form-block.md#the-same-form-in-several-blocks).
 
 ---
 

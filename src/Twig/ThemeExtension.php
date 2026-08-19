@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
+use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -39,6 +40,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly EmbedUrlValidator $embedUrlValidator,
         private readonly CodeBlockPolicy $codeBlockPolicy,
         private readonly VariantColorSchemeResolver $colorSchemeResolver,
+        private readonly FormViewDuplicator $formViewDuplicator,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -71,6 +73,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
@@ -304,6 +307,23 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         }
 
         return $formView;
+    }
+
+    /**
+     * Return a form view that can be rendered now, even if it already was.
+     *
+     * Two blocks of a page may point at the same form, and Sulu hands both the
+     * same FormView — which Symfony refuses to render twice. Returns the view
+     * untouched the first time, and an independent copy with suffixed HTML ids
+     * afterwards.
+     *
+     * @param object $formView A Symfony FormView
+     *
+     * @return object A renderable view
+     */
+    public function reusableForm(object $formView): object
+    {
+        return $this->formViewDuplicator->makeRenderable($formView);
     }
 
     /**

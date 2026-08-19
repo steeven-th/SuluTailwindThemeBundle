@@ -107,6 +107,12 @@ services:
             - '@itech_world.sulu_tailwind_theme.provider'
             - '@itech_world.sulu_tailwind_theme.palette_generator'
 
+    # Lets two blocks of the same page render the same form. Its counter only
+    # has to stay consistent within one page render; a long-lived worker just
+    # keeps counting up, which still yields unique ids.
+    itech_world.sulu_tailwind_theme.form_view_duplicator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator
+
     itech_world.sulu_tailwind_theme.embed_url_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator
         arguments:
@@ -165,6 +171,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.embed_url_validator'
             - '@itech_world.sulu_tailwind_theme.code_block_policy'
             - '@itech_world.sulu_tailwind_theme.variant_color_scheme_resolver'
+            - '@itech_world.sulu_tailwind_theme.form_view_duplicator'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }
@@ -258,6 +265,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator: '@itech_world.sulu_tailwind_theme.typography_weight_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver: '@itech_world.sulu_tailwind_theme.variant_color_scheme_resolver'
+    ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator: '@itech_world.sulu_tailwind_theme.form_view_duplicator'
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'

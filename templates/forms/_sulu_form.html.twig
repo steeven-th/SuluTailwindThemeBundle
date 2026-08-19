@@ -38,6 +38,11 @@
 
 {% if suluForm is not null %}
     {# The theme puts iw-form on the <form> element itself: no wrapper needed. #}
+    {# Two blocks of a page may point at the same form, and Sulu hands both the
+       very same FormView — which Symfony refuses to render twice. This returns
+       the view untouched the first time, and an id-suffixed copy afterwards. #}
+    {% set suluForm = iw_sulu_tailwind_theme_reusable_form(suluForm) %}
+
     {% form_theme suluForm '@ItechWorldSuluTailwindTheme/form/theme.html.twig' %}
     {{ form(iw_sulu_tailwind_theme_with_color_scheme(suluForm, colorScheme|default('auto'))) }}
 {% endif %}
