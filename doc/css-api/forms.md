@@ -38,11 +38,32 @@ for the wrapper. This page documents the **fields inside** the form.
 | `.iw-form__col--two-third` | 66 % column at `md+`. |
 | `.iw-form__col--quarter` | 25 % column at `md+`. |
 | `.iw-form__col--three-quarter` | 75 % column at `md+`. |
+| `.iw-form__col--sixth` | 16 % column at `md+`. |
+| `.iw-form__col--five-sixth` | 83 % column at `md+`. |
 | `.iw-form__col--full` | Full width (marker; the base is already full width). |
 | `.iw-form__actions` | Wrapper around the submit row (override hook, no default styling). |
 
-The column width is driven by the SuluFormBundle `width` field (`half`, `one-third`,
-`two-third`, `one-quarter`, `three-quarter`, default `full`).
+The column width is driven by the SuluFormBundle `width` field. All eight values
+of its `header.xml` are supported:
+
+| `width` value | Class |
+|---------------|-------|
+| `full` (default) | `.iw-form__col--full` |
+| `half` | `.iw-form__col--half` |
+| `one-third` | `.iw-form__col--third` |
+| `two-thirds` | `.iw-form__col--two-third` |
+| `one-quarter` | `.iw-form__col--quarter` |
+| `three-quarters` | `.iw-form__col--three-quarter` |
+| `one-sixth` | `.iw-form__col--sixth` |
+| `five-sixths` | `.iw-form__col--five-sixth` |
+
+The singular spellings (`two-third`, `three-quarter`, `five-sixth`) are accepted
+as aliases: releases up to 2.4 matched on those, so a project that copied them
+into a custom form definition keeps working. Sulu itself only ever emits the
+plural forms.
+
+Each basis subtracts the share of the `1.25rem` column gap that its fraction
+gives up (`gap × (1 - fraction)`), so a full row adds up to exactly 100 %.
 
 ### Fields
 

@@ -2123,13 +2123,18 @@ class ThemeCompiler
         // Base is full width on mobile; width modifiers only kick in at md.
         $css .= ".iw-form__col { flex: 0 0 100%; min-width: 0; }\n";
 
-        // Responsive: column widths activate at md breakpoint
+        // Responsive: column widths activate at md breakpoint.
+        // Each basis subtracts the share of the 1.25rem column gap that this
+        // fraction has to give up, so a full row adds up to exactly 100%:
+        // reduction = gap * (1 - fraction).
         $css .= "@media (min-width: 768px) {\n";
         $css .= "  .iw-form__col--half { flex: 0 0 calc(50% - 0.625rem); }\n";
         $css .= "  .iw-form__col--third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
         $css .= "  .iw-form__col--two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
         $css .= "  .iw-form__col--quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
         $css .= "  .iw-form__col--three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
+        $css .= "  .iw-form__col--sixth { flex: 0 0 calc(16.666% - 1.042rem); }\n";
+        $css .= "  .iw-form__col--five-sixth { flex: 0 0 calc(83.333% - 0.208rem); }\n";
         $css .= "}\n\n";
 
         $css .= "/* Form field */\n";

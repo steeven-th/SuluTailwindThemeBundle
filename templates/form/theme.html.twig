@@ -202,19 +202,29 @@
 
 {# ── Grid column classes — map SuluFormBundle widths to flex-basis ──
    Each column emits the base class iw-form__col plus a width modifier so users
-   can target every column with iw-form__col and a specific width with the modifier. #}
+   can target every column with iw-form__col and a specific width with the modifier.
+
+   The keys come from SuluFormBundle's header.xml width parameter, which spells
+   the fractions in the plural: one-quarter, three-quarters, one-third,
+   two-thirds, one-sixth, five-sixths. The singular spellings are kept as
+   aliases so a project that copied the previous (incorrect) keys into a custom
+   form definition keeps working. #}
 {%- block sulu_form_row_class_name -%}
     {%- set width = attr.width|default('full') -%}
     {%- if width == 'half' -%}
         {{- 'iw-form__col iw-form__col--half' -}}
     {%- elseif width == 'one-third' -%}
         {{- 'iw-form__col iw-form__col--third' -}}
-    {%- elseif width == 'two-third' -%}
+    {%- elseif width in ['two-thirds', 'two-third'] -%}
         {{- 'iw-form__col iw-form__col--two-third' -}}
     {%- elseif width == 'one-quarter' -%}
         {{- 'iw-form__col iw-form__col--quarter' -}}
-    {%- elseif width == 'three-quarter' -%}
+    {%- elseif width in ['three-quarters', 'three-quarter'] -%}
         {{- 'iw-form__col iw-form__col--three-quarter' -}}
+    {%- elseif width == 'one-sixth' -%}
+        {{- 'iw-form__col iw-form__col--sixth' -}}
+    {%- elseif width in ['five-sixths', 'five-sixth'] -%}
+        {{- 'iw-form__col iw-form__col--five-sixth' -}}
     {%- else -%}
         {{- 'iw-form__col iw-form__col--full' -}}
     {%- endif -%}
