@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.4.1] - 2026-08-20
+
+### Fixed
+
+- keep SVG logos from collapsing in the menu bar ([602720a](https://github.com/steeven-th/SuluTailwindThemeBundle/commit/602720a9bfddec72a96630e15b244d54a65ba964))
+- map every SuluFormBundle column width, including the sixths ([39b346e](https://github.com/steeven-th/SuluTailwindThemeBundle/commit/39b346eb2725cb0085fa1d15b1b3aeb430d4509b))
+- point the theme check at the real bridge CSS file name ([7ee1cf8](https://github.com/steeven-th/SuluTailwindThemeBundle/commit/7ee1cf8059287399585bce52352ea3802358d21d))
+
+### Changed
+
+- ignore .DS_Store anywhere in the tree ([d273955](https://github.com/steeven-th/SuluTailwindThemeBundle/commit/d273955ca79d16e654281c3df68b65ffa5fb92ca))
+
 ## [2.4.0] - 2026-05-03
 
 ### Added
@@ -154,6 +167,7 @@ php bin/adminconsole cache:clear
 - Auto-recompile via Doctrine listener
 - Translations (English, French, German)
 
+[2.4.1]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.4.0...v2.4.1
 [2.4.0]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/steeven-th/SuluTailwindThemeBundle/compare/v2.2.0...v2.2.1
