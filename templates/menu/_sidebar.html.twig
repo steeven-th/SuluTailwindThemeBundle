@@ -180,8 +180,13 @@
                 {{ _self.render_logo(config) }}
             </div>
 
-            {# RIGHT — Social media + Burger #}
+            {# RIGHT — Language switcher + Social media + Burger #}
             <div class="flex items-center gap-3">
+                {# Language switcher — in the bar, so it is reachable in both
+                   the accordion and the drill-down panels mode. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, align: 'right', slot: 'bar'} %}
+
                 {# Social media icons — shown on every breakpoint #}
                 {% if socialLinks|length > 0 %}
                     <div class="flex items-center gap-2">
@@ -231,7 +236,7 @@
        the page). Stack: navbar (z-50) > sidebar (z-40) > backdrop (z-30) > page. #}
     <aside data-menu-target="sidebar"
            class="fixed top-0 {{ isLeft ? 'left-0' : 'right-0' }} h-screen z-40
-                  iw-menu__sidebar w-full lg:w-72 flex flex-col transition-transform duration-300
+                  iw-menu__sidebar w-full flex flex-col transition-transform duration-300
                   {{ isLeft ? '-translate-x-full' : 'translate-x-full' }}">
 
         {% if config.subMenuPanels|default(false) %}
@@ -244,6 +249,8 @@
                     direction: position,
                     animation: 'slide',
                     socialLinks: [],
+                    config: config,
+                    localizations: localizations|default([]),
                     context: 'sidebar',
                 } only %}
             {% endif %}
@@ -255,6 +262,12 @@
                     {{ _self.render_nav_items(navItems, clickMode) }}
                 </nav>
             {% endif %}
+            {# Also inline at the foot of the panel: once the sidebar is open it
+               covers the bar on mobile. #}
+            <div class="px-4 py-3">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, display: 'inline', slot: 'panel'} %}
+            </div>
         {% endif %}
     </aside>
 </header>

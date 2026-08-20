@@ -185,9 +185,10 @@ class ThemeFormMapper
     public const MENU_SCALAR_KEYS = [
         'type', 'animation', 'slideDirection', 'navPosition', 'clickParentPage', 'childLevels',
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
+        'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition',
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
         'fullscreenImage', 'twoColumns',
-        'sidebarPosition', 'transparentNavbar', 'scrollBg', 'scrollHide',
+        'sidebarPosition', 'sidebarWidth', 'transparentNavbar', 'scrollBg', 'scrollHide',
         'clickParentPageNavbar',
         'megamenuSource',
         'subMenuPanels', 'clickParentPagePanels',

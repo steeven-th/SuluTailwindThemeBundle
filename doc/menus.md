@@ -27,6 +27,9 @@ These options are available regardless of the menu type:
 | **Logo height desktop / mobile** | (Shown when the matching logo is displayed) Logo height in pixels, 12 to 200, defaulting to 40 desktop / 32 mobile. Raster logos are capped at that height and never upscaled; SVG logos are rendered at exactly that height. Compiled to `--iw-menu-logo-height-desktop` / `--iw-menu-logo-height-mobile`. |
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
+| **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
+| **Switcher placement** | (`burger`, `fullscreen`, `sidebar` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
+| **Label format** | (Language switcher only) How each language is named: short code (`FR`), native name (`Français`), or the name written in the language currently being browsed. |
 | **Transparent navbar** | Makes the navbar background transparent (useful for hero sections). Only applies to `navbar` and `megamenu` types. |
 | **Background on scroll** | (Transparent navbar only) The navbar takes its configured background color once the page is scrolled past ~50px, and turns transparent again at the top. Adds `.iw-menu--scrolled`. |
 | **Hide on scroll** | Smart hide — the navbar slides out of view on scroll down and reappears on scroll up (with its background if *Background on scroll* is on). Works on any background. Adds `.iw-menu--hidden`. Never hides near the top of the page or while the mobile menu is open; respects `prefers-reduced-motion`. |
@@ -83,6 +86,7 @@ Same behavior on every breakpoint: the navbar (logo + social + burger) stays vis
 | Setting | Description |
 |---------|-------------|
 | **Position** | Panel side: `left` or `right`. |
+| **Panel width** | Panel width in pixels on large screens (200-640, default 288). Full width below `lg`. Worth raising when the bar carries social icons and a language switcher: the bar stays visible above the open panel, and a narrow panel leaves that row hanging over the page. Compiled to `--iw-menu-sidebar-width`. |
 | **Parent page access** | In accordion mode: `none`, `split`, or `selflink`. In panels mode: a simple on/off toggle. |
 | **Sub-menus as panels** | Same as the burger (see below): drill-down sliding panels instead of inline accordions. |
 
@@ -242,6 +246,94 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Social media | `--iw-menu-social-media` | Social media icon color. |
 | Social media hover | `--iw-menu-social-media-hover` | Social media icon hover color. |
 
+## Language switcher
+
+Turn on **Show language switcher** in *Themes > Menu* and every menu type gains a
+way to change language.
+
+### Where the languages come from
+
+Not from the theme. They are read from Sulu's `localizations` view parameter,
+which the framework builds from the `<localizations>` block of the webspace XML:
+
+```xml
+<localizations>
+    <localization language="en" default="true"/>
+    <localization language="fr"/>
+</localizations>
+```
+
+Adding a language there is enough for it to appear in the menu. Nothing to
+declare twice, nothing to keep in sync.
+
+Each entry carries the URL of the **current page** in that language, so a visitor
+reading an article and switching to French lands on that same article, not on the
+home page.
+
+### Pages that are not translated
+
+When the current page has no version in a language, Sulu marks that entry
+`alternate: false` and points its URL at the language's home page. The switcher
+still lists it, dimmed and carrying a `title` explaining where it leads.
+
+Listing it is deliberate: hiding it would make the switcher change shape from one
+page to the next, and a visitor who cannot find their language usually concludes
+the site does not have it.
+
+### How it renders per menu type
+
+The form follows the context rather than being uniform, because a popup inside a
+full-screen overlay reads badly:
+
+| Menu type | Bar | Panel / overlay | Placement configurable |
+|-----------|-----|-----------------|------------------------|
+| `navbar` | dropdown (desktop) | inline (mobile) | no |
+| `megamenu` | dropdown (desktop) | inline (mobile) | no |
+| `sidebar` | dropdown | inline | yes |
+| `burger` | dropdown | inline | yes |
+| `fullscreen` | dropdown | inline | yes |
+
+The dropdown reuses the `menu_controller` Stimulus already driving the navigation
+dropdowns, so it closes when another one opens, with no extra JavaScript.
+
+Those three menu types keep their bar visible next to an open panel, so the
+switcher can live in either place: **Switcher placement** offers *bar and open
+menu* (default), *bar only*, or *open menu only*. Keeping it in the bar means a
+visitor changes language without opening the menu at all.
+
+`navbar` and `megamenu` are not configurable here: they show the bar on desktop
+and the overlay on mobile, never both at once, so the placement follows the
+breakpoint rather than a preference.
+
+### Label format
+
+| Format | Renders as |
+|--------|-----------|
+| Short code (default) | `FR` `EN` `PT-BR` |
+| Native name | `Français` `English` `Português (Brasil)` |
+| Name in the current language | `Français` `Anglais` `Portugais (Brésil)` |
+
+Names come from ICU through `symfony/intl`. A locale ICU does not know falls back
+to its short code, so a switcher entry is never blank.
+
+### Overriding it
+
+The markup lives in one partial, `menu/_language_switcher.html.twig`, included by
+all five menu templates. Override that single file and every menu type follows.
+
+It can also be rendered on its own, outside a menu:
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig' with {
+    config: iw_sulu_tailwind_theme_menu_config(),
+    display: 'inline',
+} %}
+```
+
+Note that it reads `localizations` from the surrounding context. If you include
+it with `only`, forward that variable explicitly, the way `_nav_panels.html.twig`
+does.
+
 ## CSS Classes Reference
 
 Classes generated by `ThemeCompiler` for the menu, following the strict BEM convention (`iw-menu__{element}--{modifier}`). The mega menu lives under its own `iw-mega-menu` sub-namespace.
@@ -262,6 +354,10 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__dropdown--level-3` | Level 3 dropdown background. |
 | `.iw-menu__divider` | Divider border color. |
 | `.iw-menu__burger` | Burger button (3 lines). Toggle `.iw-menu__burger--open` to animate into an X. Controlled by the `menu_controller` Stimulus. |
+| `.iw-menu__lang` | Language switcher root, with `--dropdown` or `--inline` telling you which form it took. |
+| `.iw-menu__lang-toggle` | The dropdown button (globe icon, current language, chevron). |
+| `.iw-menu__lang-panel` | The dropdown panel. Also carries `.iw-menu__dropdown--level-2`, so it inherits the dropdown background. |
+| `.iw-menu__lang-item` | One language link. `--current` marks the active one; a `title` attribute marks a language the current page is not translated into. |
 | `.iw-menu__burger--open` | Open state — rotates the lines into a close icon. |
 | `.iw-menu__burger-line` | Single line inside the burger. |
 | `.iw-menu__logo--desktop` | Logo image, capped at `var(--iw-menu-logo-height-desktop, 40px)`. |

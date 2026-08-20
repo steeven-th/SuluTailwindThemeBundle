@@ -56,8 +56,13 @@
                 </a>
             </div>
 
-            {# RIGHT — Social media + Burger #}
+            {# RIGHT — Language switcher + Social media + Burger #}
             <div class="flex items-center gap-3">
+                {# Language switcher — in the bar, reachable without opening the
+                   overlay. Hidden when the theme places it in the panel only. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, align: 'right', slot: 'bar'} %}
+
                 {# Social media icons #}
                 {% if socialLinks|length > 0 %}
                     <div class="hidden md:flex items-center gap-2">
@@ -258,6 +263,8 @@
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
                     {{ _self.render_overlay_logo(config) }}
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                        with {config: config, display: 'inline', slot: 'panel'} %}
                     {{ _self.render_social_links(socialLinks) }}
                 </div>
             </div>
@@ -273,6 +280,8 @@
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
             {% endif %}
             {{ _self.render_overlay_logo(config) }}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, display: 'inline', slot: 'panel'} %}
             {{ _self.render_social_links(socialLinks) }}
         </div>
     {% endif %}

@@ -134,8 +134,15 @@
                 {% endif %}
             </div>
 
-            {# RIGHT — Social media (desktop + mobile) + Burger #}
+            {# RIGHT — Language switcher + Social media (desktop + mobile) + Burger #}
             <div class="flex items-center gap-3">
+                {# Language switcher — desktop. Anchored right: it sits at the
+                   end of the bar, so a left-anchored panel would overflow. #}
+                <div class="hidden md:block">
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                        with {config: config, align: 'right'} %}
+                </div>
+
                 {# Social media icons — desktop #}
                 {% if socialLinks|length > 0 %}
                     <div class="hidden md:flex items-center gap-2">
@@ -255,6 +262,11 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
+
+            {# Language switcher — mobile overlay, inline: a popup inside a
+               panel that already covers the page reads badly. #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, display: 'inline'} %}
 
             {# Social media icons in mobile overlay #}
             {% if socialLinks|length > 0 %}

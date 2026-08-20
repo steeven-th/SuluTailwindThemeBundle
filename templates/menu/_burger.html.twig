@@ -44,8 +44,13 @@
                 </a>
             </div>
 
-            {# RIGHT — Social media + Burger #}
+            {# RIGHT — Language switcher + Social media + Burger #}
             <div class="flex items-center gap-3">
+                {# Language switcher — in the bar, reachable without opening the
+                   menu. Hidden when the theme places it in the panel only. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, align: 'right', slot: 'bar'} %}
+
                 {# Social media icons #}
                 {% if socialLinks|length > 0 %}
                     <div class="hidden md:flex items-center gap-2">
@@ -100,6 +105,8 @@
             direction: slideDirection,
             animation: animation,
             socialLinks: socialLinks,
+            config: config,
+            localizations: localizations|default([]),
         } only %}
         {% else %}
         <nav class="iw-menu__overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
@@ -215,6 +222,14 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
+
+            {# Language switcher — inline: the overlay already covers the page,
+               a dropdown on top of it would read badly. The vertical padding
+               keeps it off the last nav item and the social row. #}
+            <div class="pt-6 pb-2">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, display: 'inline', slot: 'panel'} %}
+            </div>
 
             {# Social media icons in overlay #}
             {% if socialLinks|length > 0 %}

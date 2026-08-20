@@ -292,6 +292,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#ffffff',
                     'text' => 'ref:secondary-950',
@@ -511,6 +514,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#ffffff',
                     'text' => 'ref:background-950',
@@ -727,6 +733,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#ffffff',
                     'text' => 'ref:primary-950',
@@ -943,6 +952,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#fefdf8',
                     'text' => 'ref:primary-950',
@@ -1162,6 +1174,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => false,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#1c1917',
                     'text' => 'ref:background-50',
@@ -1381,6 +1396,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'colors' => [
                     'bg' => '#fef2f2',
                     'text' => 'ref:background-950',
@@ -1703,6 +1721,9 @@ class ThemeFixtures
                 'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
+                'displayLanguageSwitcher' => false,
+                'languageSwitcherLabel' => 'code',
+                'languageSwitcherPosition' => 'both',
                 'transparentNavbar' => false,
                 'colors' => [
                     'bg' => '#0f172a',

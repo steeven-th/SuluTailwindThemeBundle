@@ -10,6 +10,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\FormSuccessResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
@@ -43,6 +44,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly VariantColorSchemeResolver $colorSchemeResolver,
         private readonly FormViewDuplicator $formViewDuplicator,
         private readonly FormSuccessResolver $formSuccessResolver,
+        private readonly LanguageLabelResolver $languageLabelResolver,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -62,6 +64,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_block_style_template', $this->getBlockStyleTemplate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_template', $this->getBlockTemplate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_menu_config', $this->getMenuConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_language_label', $this->getLanguageLabel(...)),
             new TwigFunction('iw_sulu_tailwind_theme_footer_config', $this->getFooterConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_tokens', $this->getTokens(...)),
             new TwigFunction('iw_sulu_tailwind_theme_block_styles', $this->getBlockStyles(...)),
@@ -675,6 +678,28 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         }
 
         return $config;
+    }
+
+    /**
+     * Label a locale for the language switcher.
+     *
+     * The locales themselves come from Sulu's `localizations` view parameter,
+     * which is built from the webspace XML - adding a language there is all it
+     * takes for it to appear in the menu.
+     *
+     * @param string      $locale        The locale to label (e.g. "fr", "pt_BR")
+     * @param string      $format        "code" (FR), "native" (Français) or "translated"
+     * @param string|null $displayLocale Locale to translate into; defaults to the current request
+     *
+     * @return string A displayable label, never empty for a non-empty locale
+     */
+    public function getLanguageLabel(string $locale, string $format = LanguageLabelResolver::FORMAT_CODE, ?string $displayLocale = null): string
+    {
+        return $this->languageLabelResolver->resolve(
+            $locale,
+            $format,
+            $displayLocale ?? $this->requestAnalyzer?->getCurrentLocalization()?->getLocale(),
+        );
     }
 
     /**
