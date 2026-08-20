@@ -939,9 +939,18 @@ class ThemeCompiler
         $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(2) { opacity: 0; }\n";
         $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
 
-        // Logo sizing
+        // Logo sizing. Raster logos keep a bare `max-height` so a small file is
+        // never upscaled into a blurry one.
         $css .= ".iw-menu-logo-desktop { max-height: 40px; }\n";
         $css .= ".iw-menu-logo-mobile { max-height: 32px; }\n";
+        // SVG logos need a firm height on top of that: a vector file whose markup
+        // carries only a viewBox has no intrinsic size, so `width: auto` with
+        // nothing but a max-height to go on resolves to 0x0 inside the flex bar
+        // and the logo disappears. Matching on the file name is what lets this
+        // stay a pure CSS fix; `*=` rather than `$=` because Sulu appends a
+        // version query string to media URLs.
+        $css .= "img.iw-menu-logo-desktop[src*=\".svg\"] { height: 40px; object-fit: contain; }\n";
+        $css .= "img.iw-menu-logo-mobile[src*=\".svg\"] { height: 32px; object-fit: contain; }\n";
 
         // Fullscreen overlay (transition is handled by JS, not CSS, to avoid conflicts)
         $css .= ".iw-menu-overlay {\n";
