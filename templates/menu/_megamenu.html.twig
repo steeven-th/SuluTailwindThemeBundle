@@ -108,8 +108,14 @@
                 {% endif %}
             </div>
 
-            {# RIGHT — Social media + CTA (snippet) + Burger (mobile) #}
+            {# RIGHT — Language switcher + Social media + CTA (snippet) + Burger (mobile) #}
             <div class="flex items-center gap-3">
+                {# Language switcher — desktop, anchored right (end of the bar) #}
+                <div class="hidden md:block">
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                        with {config: config, align: 'right'} %}
+                </div>
+
                 {# Social media icons — desktop #}
                 {% if socialLinks|length > 0 %}
                     <div class="hidden md:flex items-center gap-2">
@@ -459,6 +465,10 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
+
+            {# Language switcher — mobile overlay, inline #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, display: 'inline'} %}
 
             {# Social media icons in mobile overlay #}
             {% if socialLinks|length > 0 %}

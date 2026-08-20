@@ -1798,6 +1798,28 @@ class ThemeCompiler
         // Dividers
         $css .= ".iw-menu__divider { border-color: var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
 
+        // Language switcher. Colors are inherited rather than redeclared: the
+        // switcher sits in the bar in one place and inside an overlay in
+        // another, and each already paints the right text color. Only the
+        // current-language marker and the untranslated hint are its own.
+        $css .= ".iw-menu__lang-item { color: inherit; }\n";
+        $css .= ".iw-menu__lang-item--current { font-weight: 600; opacity: 1; }\n";
+        // Inline variant: the languages sit side by side, so the current one
+        // needs a marker that survives at a glance.
+        $css .= ".iw-menu__lang--inline .iw-menu__lang-item {\n";
+        $css .= "  border-radius: var(--border-radius, 0.375rem);\n";
+        $css .= "  opacity: 0.7;\n";
+        $css .= "}\n";
+        $css .= ".iw-menu__lang--inline .iw-menu__lang-item:hover { opacity: 1; }\n";
+        $css .= ".iw-menu__lang--inline .iw-menu__lang-item--current {\n";
+        $css .= "  opacity: 1;\n";
+        $css .= "  background-color: var(--iw-menu-second-bg, transparent);\n";
+        $css .= "}\n";
+        // A language the current page has no translation for still links out,
+        // to that language's home page. Dimming it sets the expectation.
+        $css .= ".iw-menu__lang-item[title] { opacity: 0.6; }\n";
+        $css .= ".iw-menu__lang-item[title]:hover { opacity: 0.85; }\n";
+
         // Animated burger button (3 lines → X). State is controlled by
         // toggling .iw-menu__burger--open via the menu_controller Stimulus.
         $css .= ".iw-menu__burger { color: var(--iw-menu-burger-open, var(--iw-menu-text)); }\n";

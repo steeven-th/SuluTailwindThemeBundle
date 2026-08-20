@@ -1,0 +1,98 @@
+{#
+    Language switcher — one partial, five menu templates.
+
+    The languages are never configured in the theme: they come from Sulu's
+    `localizations` view parameter, which is built from the webspace XML. Adding
+    a <localization> there is all it takes for it to appear here. Each entry
+    carries the URL of the *current page* in that language, so switching keeps
+    the visitor where they were.
+
+    Sulu marks an entry `alternate: false` when the current page has no version
+    in that language; its URL then points at the language's home page. Those are
+    still listed - dropping them would make the switcher change shape from one
+    page to the next - but they get a title attribute saying where they lead.
+
+    Parameters:
+    - config: the menuConfig object (required)
+    - localizations: Sulu's localizations map (optional; falls back to the
+      ambient variable, which is what every menu template relies on)
+    - display: 'dropdown' (default) or 'inline'. Inline suits overlays and side
+      panels, where a popup over a popup reads badly.
+    - align: 'left' (default) or 'right', dropdown only — which edge the panel
+      is anchored to, so it never opens off-screen.
+#}
+{% set switcherConfig = config|default({}) %}
+
+{% if switcherConfig.displayLanguageSwitcher|default(false) %}
+    {% set entries = localizations|default([]) %}
+
+    {# One language is not a choice, so the switcher stays out of the way. #}
+    {% if entries|length > 1 %}
+        {% set labelFormat = switcherConfig.languageSwitcherLabel|default('code') %}
+        {% set currentLocale = app.request.locale %}
+        {% set switcherDisplay = display|default('dropdown') %}
+        {% set switcherAlign = align|default('left') %}
+
+        {# Sulu keys the map by locale, but the current one may be spelled with
+           a region (fr_FR) while the map uses the short form, or the reverse. #}
+        {% set currentEntry = entries[currentLocale]|default(entries[currentLocale|split('_')[0]]|default(null)) %}
+        {% set currentLabel = iw_sulu_tailwind_theme_language_label(currentEntry.locale|default(currentLocale), labelFormat) %}
+
+        {% if switcherDisplay == 'inline' %}
+            <div class="iw-menu__lang iw-menu__lang--inline flex items-center gap-1 flex-wrap">
+                {% for entry in entries %}
+                    {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}
+                    <a
+                        href="{{ entry.url }}"
+                        hreflang="{{ entry.locale|replace({'_': '-'}) }}"
+                        lang="{{ entry.locale|replace({'_': '-'}) }}"
+                        class="iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} px-2 py-1 text-sm font-medium no-underline transition-opacity"
+                        {% if isCurrent %}aria-current="true"{% endif %}
+                        {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
+                    >
+                        {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            {# Reuses the menu controller's dropdown machinery: same toggle, same
+               mutual closing as the navigation dropdowns, no extra JS. #}
+            <div class="iw-menu__lang iw-menu__lang--dropdown relative" data-menu-target="dropdownParent">
+                <button
+                    type="button"
+                    data-action="menu#toggleDropdown"
+                    class="iw-menu__text iw-menu__lang-toggle flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-opacity"
+                    aria-haspopup="true"
+                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_languageSwitcher'|trans({}, 'messages') }}"
+                >
+                    <svg class="iw-menu__lang-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
+                    </svg>
+                    <span class="iw-menu__lang-current">{{ currentLabel }}</span>
+                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div
+                    data-menu-target="dropdown"
+                    class="iw-menu__dropdown--level-2 iw-menu__lang-panel hidden absolute top-full mt-1 min-w-[8rem] shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
+                >
+                    {% for entry in entries %}
+                        {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}
+                        <a
+                            href="{{ entry.url }}"
+                            hreflang="{{ entry.locale|replace({'_': '-'}) }}"
+                            lang="{{ entry.locale|replace({'_': '-'}) }}"
+                            class="iw-menu__text--level-2 iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} block px-4 py-2 text-sm font-medium no-underline transition-opacity hover:opacity-80"
+                            {% if isCurrent %}aria-current="true"{% endif %}
+                            {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
+                        >
+                            {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}

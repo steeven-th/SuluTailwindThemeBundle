@@ -302,6 +302,43 @@
                     </meta>
                 </property>
 
+                <!-- Language switcher. The languages themselves are never
+                     configured here: they come from the webspace XML, so adding
+                     a localization there is enough for it to show up. -->
+                <property name="menuConfig_displayLanguageSwitcher" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_displayLanguageSwitcher</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_displayLanguageSwitcher_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="menuConfig_languageSwitcherLabel" type="single_select" colspan="6"
+                          visibleCondition="menuConfig_displayLanguageSwitcher == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="code"/>
+                        <param name="values" type="collection">
+                            <param name="code">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_code</title>
+                                </meta>
+                            </param>
+                            <param name="native">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_native</title>
+                                </meta>
+                            </param>
+                            <param name="translated">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_translated</title>
+                                </meta>
+                            </param>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="menuConfig_transparentNavbar" type="checkbox" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.menu_transparentNavbar</title>

@@ -180,8 +180,13 @@
                 {{ _self.render_logo(config) }}
             </div>
 
-            {# RIGHT — Social media + Burger #}
+            {# RIGHT — Language switcher + Social media + Burger #}
             <div class="flex items-center gap-3">
+                {# Language switcher — in the bar, so it is reachable in both
+                   the accordion and the drill-down panels mode. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, align: 'right'} %}
+
                 {# Social media icons — shown on every breakpoint #}
                 {% if socialLinks|length > 0 %}
                     <div class="flex items-center gap-2">
@@ -244,6 +249,8 @@
                     direction: position,
                     animation: 'slide',
                     socialLinks: [],
+                    config: config,
+                    localizations: localizations|default([]),
                     context: 'sidebar',
                 } only %}
             {% endif %}
@@ -255,6 +262,12 @@
                     {{ _self.render_nav_items(navItems, clickMode) }}
                 </nav>
             {% endif %}
+            {# Also inline at the foot of the panel: once the sidebar is open it
+               covers the bar on mobile. #}
+            <div class="px-4 py-3">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {config: config, display: 'inline'} %}
+            </div>
         {% endif %}
     </aside>
 </header>

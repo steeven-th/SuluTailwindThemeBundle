@@ -109,6 +109,10 @@ services:
     itech_world.sulu_tailwind_theme.block_template_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver
 
+    # Labels the webspace locales shown in the menu language switcher.
+    itech_world.sulu_tailwind_theme.language_label_resolver:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver
+
     # Light/dark hint for iframe-based widgets (Cloudflare Turnstile and
     # anything else that cannot be styled through the theme CSS).
     itech_world.sulu_tailwind_theme.variant_color_scheme_resolver:
@@ -200,6 +204,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.variant_color_scheme_resolver'
             - '@itech_world.sulu_tailwind_theme.form_view_duplicator'
             - '@itech_world.sulu_tailwind_theme.form_success_resolver'
+            - '@itech_world.sulu_tailwind_theme.language_label_resolver'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }

@@ -78,10 +78,38 @@ Returns the menu configuration for the active theme.
 | `displayLogoDesktop` | `bool` | Show logo on desktop |
 | `displayLogoMobile` | `bool` | Show logo on mobile |
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
+| `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
+| `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
 | `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
 | `logo` | `string\|null` | Path to logo image |
 | `siteName` | `string\|null` | Site name for display |
+
+---
+
+### `iw_sulu_tailwind_theme_language_label(locale, format, displayLocale)`
+
+Labels a locale for display, used by the menu language switcher.
+
+```twig
+{{ iw_sulu_tailwind_theme_language_label('fr') }}                     {# FR #}
+{{ iw_sulu_tailwind_theme_language_label('fr', 'native') }}           {# Français #}
+{{ iw_sulu_tailwind_theme_language_label('en', 'translated', 'fr') }} {# Anglais #}
+```
+
+**Arguments:**
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `locale` | `string` | The locale to label (`fr`, `pt_BR`, ...) |
+| `format` | `string` | `code` (default), `native`, or `translated` |
+| `displayLocale` | `string\|null` | For `translated`: the locale to translate into. Defaults to the current request |
+
+**Returns:** `string` — never empty for a non-empty locale. A locale ICU does not
+know falls back to its uppercase short code.
+
+The locales themselves come from Sulu's `localizations` view parameter, built from
+the webspace XML. See [Language switcher](menus.md#language-switcher).
 
 ---
 

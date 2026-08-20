@@ -16,6 +16,9 @@
     - direction: menu slide direction ('top' | 'right' | 'bottom' | 'left')
     - animation: 'none' | 'slide' | 'fade'
     - socialLinks: resolved social media links (rendered at the bottom of the root)
+    - config: the menuConfig object, for the language switcher (optional)
+    - localizations: Sulu's localizations map, forwarded explicitly because this
+      partial is included with `only` (optional)
     - context: 'burger' (default) | 'sidebar'. Both fill their container and push
       the panels below the navbar via --iw-menu-panels-offset; 'sidebar' uses a
       responsive offset (the sidebar navbar is taller on desktop, h-16 md:h-20).
@@ -97,6 +100,15 @@
                     </a>
                 {% endif %}
             {% endfor %}
+
+            {# Language switcher, above the social icons. Inline: the panels
+               already fill the screen. #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {
+                    config: config|default({}),
+                    localizations: localizations|default([]),
+                    display: 'inline',
+                } %}
 
             {# Social media icons, at the bottom of the root panel. #}
             {% if socialLinks|length > 0 %}

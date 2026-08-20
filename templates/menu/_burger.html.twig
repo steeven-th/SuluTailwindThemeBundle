@@ -100,6 +100,8 @@
             direction: slideDirection,
             animation: animation,
             socialLinks: socialLinks,
+            config: config,
+            localizations: localizations|default([]),
         } only %}
         {% else %}
         <nav class="iw-menu__overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
@@ -215,6 +217,11 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
+
+            {# Language switcher — inline: the overlay already covers the page,
+               a dropdown on top of it would read badly. #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, display: 'inline'} %}
 
             {# Social media icons in overlay #}
             {% if socialLinks|length > 0 %}

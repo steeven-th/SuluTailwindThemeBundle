@@ -258,6 +258,8 @@
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
                     {{ _self.render_overlay_logo(config) }}
+                    {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                        with {config: config, display: 'inline'} %}
                     {{ _self.render_social_links(socialLinks) }}
                 </div>
             </div>
@@ -273,6 +275,8 @@
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
             {% endif %}
             {{ _self.render_overlay_logo(config) }}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, display: 'inline'} %}
             {{ _self.render_social_links(socialLinks) }}
         </div>
     {% endif %}
