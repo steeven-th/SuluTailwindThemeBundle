@@ -1656,9 +1656,27 @@ class ThemeCompiler
         $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(2) { opacity: 0; }\n";
         $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
 
-        // Logo sizing
-        $css .= ".iw-menu__logo--desktop { max-height: 40px; }\n";
-        $css .= ".iw-menu__logo--mobile { max-height: 32px; }\n";
+        // Logo sizing. Raster logos keep a `max-height` so a small file is never
+        // upscaled into a blurry one; they simply cap out at the configured
+        // height. Vector logos get that same height as a firm `height`, because
+        // an SVG whose markup carries only a viewBox has no intrinsic size: with
+        // `width: auto` and nothing but a max-height to go on, the flex bar
+        // resolves it to 0x0 and the logo disappears. `object-fit: contain`
+        // keeps the aspect ratio honest for the rare SVG that does declare its
+        // own dimensions. The --vector modifier is applied by the Twig partials,
+        // which know the media's mime type.
+        $css .= ".iw-menu__logo--desktop { max-height: var(--iw-menu-logo-height-desktop, 40px); }\n";
+        $css .= ".iw-menu__logo--mobile { max-height: var(--iw-menu-logo-height-mobile, 32px); }\n";
+        $css .= ".iw-menu__logo--desktop.iw-menu__logo--vector {\n";
+        $css .= "  height: var(--iw-menu-logo-height-desktop, 40px);\n";
+        $css .= "  width: auto;\n";
+        $css .= "  object-fit: contain;\n";
+        $css .= "}\n";
+        $css .= ".iw-menu__logo--mobile.iw-menu__logo--vector {\n";
+        $css .= "  height: var(--iw-menu-logo-height-mobile, 32px);\n";
+        $css .= "  width: auto;\n";
+        $css .= "  object-fit: contain;\n";
+        $css .= "}\n";
 
         // Transparent-mode logo swap. Both variants are stacked in the same grid
         // cell and cross-faded, rather than toggled with `display`: the images
@@ -2066,6 +2084,11 @@ class ThemeCompiler
             $logoHeight = 40;
         }
         $css .= ".iw-footer__logo { max-height: {$logoHeight}px; width: auto; max-width: 100%; }\n";
+        // Vector logos need a firm height: an SVG carrying only a viewBox has no
+        // intrinsic size and collapses to 0x0 under a bare max-height. The
+        // --vector modifier is applied by the footer Twig partials, which know
+        // the media's mime type.
+        $css .= ".iw-footer__logo--vector { height: {$logoHeight}px; object-fit: contain; }\n";
         $css .= ".iw-footer__site-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }\n";
         $css .= ".iw-footer__tagline { font-size: 0.875rem; line-height: 1.6; opacity: 0.7; }\n";
 

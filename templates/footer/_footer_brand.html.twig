@@ -10,11 +10,17 @@
 {% set align = align|default('left') %}
 {% set namePosition = config.siteNamePosition|default('beside') %}
 
+{# A raw SVG logo (no thumbnail, no intrinsic size) collapses to zero width
+   under a bare max-height, so it gets the --vector modifier and an explicit
+   height. See _logo_images.html.twig for the full rationale. #}
 {% set logoUrl = null %}
+{% set logoVector = false %}
 {% if config.displayLogo|default(false) and config.logo is defined and config.logo.id|default(null) is not null %}
     {% set logoMedia = sulu_resolve_media(config.logo.id, app.request.locale) %}
     {% if logoMedia is not null %}
-        {% set logoUrl = logoMedia.thumbnails['iw_theme_logo_desktop']|default(logoMedia.url)|default(null) %}
+        {% set logoThumbnail = logoMedia.thumbnails['iw_theme_logo_desktop']|default(null) %}
+        {% set logoUrl = logoThumbnail|default(logoMedia.url)|default(null) %}
+        {% set logoVector = logoThumbnail is null and 'image/svg+xml' == logoMedia.mimeType|default('') %}
     {% endif %}
 {% endif %}
 
@@ -29,7 +35,7 @@
                     ? 'flex-col gap-2 ' ~ (align == 'center' ? 'items-center' : 'items-start')
                     : 'items-center gap-2.5' }}">
                 {% if logoUrl %}
-                    <img src="{{ logoUrl }}" alt="" class="iw-footer__logo">
+                    <img src="{{ logoUrl }}" alt="" class="iw-footer__logo{{ logoVector ? ' iw-footer__logo--vector' }}">
                 {% endif %}
                 {% if showName %}
                     <span class="iw-footer__site-name">{{ config.siteName }}</span>
