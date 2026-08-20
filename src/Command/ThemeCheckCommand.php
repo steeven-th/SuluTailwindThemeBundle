@@ -94,7 +94,7 @@ class ThemeCheckCommand extends Command
 
         // ── Check 4: Bridge CSS file ──
         $bundleDir = dirname(__DIR__, 2);
-        $bridgePath = $bundleDir . '/assets/styles/bridge.css';
+        $bridgePath = $bundleDir . '/assets/styles/tailwind-theme-bridge.css';
         if (file_exists($bridgePath)) {
             $checks[] = ['<fg=green>✓</>', 'Bridge CSS', $bridgePath];
         } else {
