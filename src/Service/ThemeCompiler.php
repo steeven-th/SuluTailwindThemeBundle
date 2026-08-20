@@ -939,9 +939,18 @@ class ThemeCompiler
         $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(2) { opacity: 0; }\n";
         $css .= ".iw-menu-burger.is-open .iw-menu-burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
 
-        // Logo sizing
+        // Logo sizing. Raster logos keep a bare `max-height` so a small file is
+        // never upscaled into a blurry one.
         $css .= ".iw-menu-logo-desktop { max-height: 40px; }\n";
         $css .= ".iw-menu-logo-mobile { max-height: 32px; }\n";
+        // SVG logos need a firm height on top of that: a vector file whose markup
+        // carries only a viewBox has no intrinsic size, so `width: auto` with
+        // nothing but a max-height to go on resolves to 0x0 inside the flex bar
+        // and the logo disappears. Matching on the file name is what lets this
+        // stay a pure CSS fix; `*=` rather than `$=` because Sulu appends a
+        // version query string to media URLs.
+        $css .= "img.iw-menu-logo-desktop[src*=\".svg\"] { height: 40px; object-fit: contain; }\n";
+        $css .= "img.iw-menu-logo-mobile[src*=\".svg\"] { height: 32px; object-fit: contain; }\n";
 
         // Fullscreen overlay (transition is handled by JS, not CSS, to avoid conflicts)
         $css .= ".iw-menu-overlay {\n";
@@ -1281,14 +1290,20 @@ class ThemeCompiler
         $css .= ".iw-form-col-two-third { flex: 0 0 100%; min-width: 0; }\n";
         $css .= ".iw-form-col-quarter { flex: 0 0 100%; min-width: 0; }\n";
         $css .= ".iw-form-col-three-quarter { flex: 0 0 100%; min-width: 0; }\n";
+        $css .= ".iw-form-col-sixth { flex: 0 0 100%; min-width: 0; }\n";
+        $css .= ".iw-form-col-five-sixth { flex: 0 0 100%; min-width: 0; }\n";
 
-        // Responsive: columns activate at md breakpoint
+        // Responsive: columns activate at md breakpoint. Each basis subtracts
+        // the share of the 1.25rem column gap that this fraction gives up
+        // (gap * (1 - fraction)), so a full row adds up to exactly 100%.
         $css .= "@media (min-width: 768px) {\n";
         $css .= "  .iw-form-col-half { flex: 0 0 calc(50% - 0.625rem); }\n";
         $css .= "  .iw-form-col-third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
         $css .= "  .iw-form-col-two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
         $css .= "  .iw-form-col-quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
         $css .= "  .iw-form-col-three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
+        $css .= "  .iw-form-col-sixth { flex: 0 0 calc(16.666% - 1.042rem); }\n";
+        $css .= "  .iw-form-col-five-sixth { flex: 0 0 calc(83.333% - 0.208rem); }\n";
         $css .= "}\n\n";
 
         $css .= "/* Form field utility class */\n";

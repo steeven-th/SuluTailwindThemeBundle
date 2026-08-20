@@ -6,3 +6,6 @@
 /composer.lock
 /package-lock.json
 PROMPT-CLAUDE-CODE-*.md
+
+# macOS finder metadata, anywhere in the tree
+.DS_Store
