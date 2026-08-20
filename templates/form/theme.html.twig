@@ -187,19 +187,28 @@
     {{- parent() -}}
 {%- endblock radio_widget -%}
 
-{# ── Grid column classes — map SuluFormBundle widths to flex-basis ── #}
+{# ── Grid column classes — map SuluFormBundle widths to flex-basis ──
+   The keys come from SuluFormBundle's header.xml, which spells the fractions in
+   the plural: one-quarter, three-quarters, one-third, two-thirds, one-sixth,
+   five-sixths. The singular spellings are kept as aliases so a project that
+   copied the previous (incorrect) keys into a custom form definition keeps
+   working. #}
 {%- block sulu_form_row_class_name -%}
     {%- set width = attr.width|default('full') -%}
     {%- if width == 'half' -%}
         {{- 'iw-form-col-half' -}}
     {%- elseif width == 'one-third' -%}
         {{- 'iw-form-col-third' -}}
-    {%- elseif width == 'two-third' -%}
+    {%- elseif width in ['two-thirds', 'two-third'] -%}
         {{- 'iw-form-col-two-third' -}}
     {%- elseif width == 'one-quarter' -%}
         {{- 'iw-form-col-quarter' -}}
-    {%- elseif width == 'three-quarter' -%}
+    {%- elseif width in ['three-quarters', 'three-quarter'] -%}
         {{- 'iw-form-col-three-quarter' -}}
+    {%- elseif width == 'one-sixth' -%}
+        {{- 'iw-form-col-sixth' -}}
+    {%- elseif width in ['five-sixths', 'five-sixth'] -%}
+        {{- 'iw-form-col-five-sixth' -}}
     {%- else -%}
         {{- 'iw-form-col-full' -}}
     {%- endif -%}

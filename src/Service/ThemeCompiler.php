@@ -1281,14 +1281,20 @@ class ThemeCompiler
         $css .= ".iw-form-col-two-third { flex: 0 0 100%; min-width: 0; }\n";
         $css .= ".iw-form-col-quarter { flex: 0 0 100%; min-width: 0; }\n";
         $css .= ".iw-form-col-three-quarter { flex: 0 0 100%; min-width: 0; }\n";
+        $css .= ".iw-form-col-sixth { flex: 0 0 100%; min-width: 0; }\n";
+        $css .= ".iw-form-col-five-sixth { flex: 0 0 100%; min-width: 0; }\n";
 
-        // Responsive: columns activate at md breakpoint
+        // Responsive: columns activate at md breakpoint. Each basis subtracts
+        // the share of the 1.25rem column gap that this fraction gives up
+        // (gap * (1 - fraction)), so a full row adds up to exactly 100%.
         $css .= "@media (min-width: 768px) {\n";
         $css .= "  .iw-form-col-half { flex: 0 0 calc(50% - 0.625rem); }\n";
         $css .= "  .iw-form-col-third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
         $css .= "  .iw-form-col-two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
         $css .= "  .iw-form-col-quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
         $css .= "  .iw-form-col-three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
+        $css .= "  .iw-form-col-sixth { flex: 0 0 calc(16.666% - 1.042rem); }\n";
+        $css .= "  .iw-form-col-five-sixth { flex: 0 0 calc(83.333% - 0.208rem); }\n";
         $css .= "}\n\n";
 
         $css .= "/* Form field utility class */\n";
