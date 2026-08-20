@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Service\CustomFieldSanitizer;
 use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,7 @@ class ThemeFormMapperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mapper = new ThemeFormMapper(new SlugValidator());
+        $this->mapper = new ThemeFormMapper(new SlugValidator(), new CustomFieldSanitizer());
     }
 
     public function testRoundTripIsAFixedPoint(): void
@@ -70,6 +71,94 @@ class ThemeFormMapperTest extends TestCase
             $target->getTokens()['blockVariants'][0]['slug'],
             'Block variants are addressed by slug, never by position.'
         );
+    }
+
+    /**
+     * The whole point of the custom namespaces: a key the bundle has never
+     * heard of still survives a save. Before they existed such a key was
+     * dropped without a word, so a project extending the admin forms saw its
+     * field render, accept input, and silently lose it.
+     */
+    public function testProjectDefinedFieldsArePersistedInEveryColumn(): void
+    {
+        $theme = new ThemeConfig();
+
+        $this->mapper->mapDataToEntity([
+            'custom_brandMotto' => 'Always shipping',
+            'menuConfig_custom_navbarHeight' => 64,
+            'footerConfig_custom_showBackToTop' => true,
+        ], $theme);
+
+        $this->assertSame('Always shipping', $theme->getTokens()['custom']['brandMotto']);
+        $this->assertSame(64, $theme->getMenuConfig()['custom']['navbarHeight']);
+        $this->assertTrue($theme->getFooterConfig()['custom']['showBackToTop']);
+    }
+
+    public function testProjectDefinedFieldsSurviveTheRoundTrip(): void
+    {
+        $theme = $this->buildTheme();
+        $theme->setMenuConfig($theme->getMenuConfig() + ['custom' => ['navbarHeight' => 64]]);
+
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($this->mapper->serializeTheme($theme), $target);
+
+        $this->assertSame(
+            64,
+            $target->getMenuConfig()['custom']['navbarHeight'],
+            'A custom field must come back out to the form, or the editor would see an empty input on every reload.'
+        );
+    }
+
+    /**
+     * The core keys are the reason the namespaces are separate rather than the
+     * whitelists being opened: a project must not be able to reach a bundle key
+     * by naming a custom field after it.
+     */
+    public function testProjectDefinedFieldsCannotReachCoreKeys(): void
+    {
+        $theme = new ThemeConfig();
+        $theme->setMenuConfig(['type' => 'navbar']);
+
+        $this->mapper->mapDataToEntity([
+            'menuConfig_type' => 'burger',
+            'menuConfig_custom_type' => 'hijacked',
+        ], $theme);
+
+        $menuConfig = $theme->getMenuConfig();
+
+        $this->assertSame('burger', $menuConfig['type'], 'The core key answers to its own form field only.');
+        $this->assertSame('hijacked', $menuConfig['custom']['type'], 'The custom entry stays inside its namespace.');
+    }
+
+    /**
+     * A payload carrying no custom key at all must leave the namespace alone.
+     * Partial updates and forms rendered before the project added its fields
+     * both look like this, and neither should wipe stored data.
+     */
+    public function testAnAbsentNamespaceLeavesStoredFieldsUntouched(): void
+    {
+        $theme = new ThemeConfig();
+        $theme->setMenuConfig(['type' => 'navbar', 'custom' => ['navbarHeight' => 64]]);
+
+        $this->mapper->mapDataToEntity(['menuConfig_type' => 'burger'], $theme);
+
+        $this->assertSame(64, $theme->getMenuConfig()['custom']['navbarHeight']);
+    }
+
+    /**
+     * Conversely, a field removed from the project's form definition must
+     * disappear from storage rather than linger forever.
+     */
+    public function testRemovedFieldsAreDroppedFromTheNamespace(): void
+    {
+        $theme = new ThemeConfig();
+        $theme->setMenuConfig(['type' => 'navbar', 'custom' => ['gone' => 'x', 'kept' => 'y']]);
+
+        $this->mapper->mapDataToEntity(['menuConfig_custom_kept' => 'y'], $theme);
+
+        $custom = $theme->getMenuConfig()['custom'];
+
+        $this->assertSame(['kept' => 'y'], $custom);
     }
 
     /**

@@ -25,6 +25,7 @@ class ThemeFormMapper
 {
     public function __construct(
         private readonly SlugValidator $slugValidator,
+        private readonly CustomFieldSanitizer $customFieldSanitizer,
     ) {
     }
 
@@ -62,6 +63,37 @@ class ThemeFormMapper
      * Prefix used for footer config form fields.
      */
     public const PREFIX_FOOTER = 'footerConfig_';
+
+    /**
+     * Prefixes of the open `custom` namespaces, one per JSON column.
+     *
+     * Everything else in this class is a closed list: a key the bundle does not
+     * know is dropped, which is what a project extending the admin forms runs
+     * into. These three prefixes are the way in. A field declared as
+     * `menuConfig_custom_navbarHeight` lands in `menuConfig['custom']
+     * ['navbarHeight']` and comes back out to Twig as
+     * `menuConfig.custom.navbarHeight`, without the core keys ever losing their
+     * strict contract.
+     *
+     * PREFIX_CUSTOM must be tested last when matching, since the other two
+     * start with their column prefix and would otherwise never be reached.
+     */
+    public const PREFIX_CUSTOM = 'custom_';
+
+    /**
+     * Prefix used for project-defined menu fields.
+     */
+    public const PREFIX_MENU_CUSTOM = 'menuConfig_custom_';
+
+    /**
+     * Prefix used for project-defined footer fields.
+     */
+    public const PREFIX_FOOTER_CUSTOM = 'footerConfig_custom_';
+
+    /**
+     * Key under which project-defined fields are nested in each JSON column.
+     */
+    public const CUSTOM_NAMESPACE = 'custom';
 
     /**
      * Button-level global properties (shared across all buttons).
@@ -249,6 +281,11 @@ class ThemeFormMapper
             }
         }
 
+        // Project-defined fields, one namespace per JSON column
+        $this->flattenCustom($data, self::PREFIX_CUSTOM, $tokens);
+        $this->flattenCustom($data, self::PREFIX_MENU_CUSTOM, $menuConfig);
+        $this->flattenCustom($data, self::PREFIX_FOOTER_CUSTOM, $footerConfig);
+
         return $data;
     }
 
@@ -266,6 +303,76 @@ class ThemeFormMapper
                 $data[$prefix . $key] = $value;
             }
         }
+    }
+
+    /**
+     * Expose a `custom` namespace back to the admin form.
+     *
+     * The counterpart of {@see unflattenCustom}. Values are re-emitted as they
+     * were stored: they went through the sanitizer on the way in, and the
+     * project's own form definition is what gives them meaning.
+     *
+     * @param array<string, mixed> $data   Target array (mutated)
+     * @param string               $prefix Custom prefix (e.g. "menuConfig_custom_")
+     * @param array<string, mixed> $source The JSON column holding the namespace
+     */
+    private function flattenCustom(array &$data, string $prefix, array $source): void
+    {
+        $custom = $source[self::CUSTOM_NAMESPACE] ?? null;
+
+        if (!is_array($custom)) {
+            return;
+        }
+
+        foreach ($custom as $key => $value) {
+            $data[$prefix . $key] = $value;
+        }
+    }
+
+    /**
+     * Collect the project-defined fields of one namespace from the posted data.
+     *
+     * Unlike the core groups, there is no key list to iterate: any prefixed key
+     * is a candidate, and the sanitizer decides what survives. The namespace is
+     * rebuilt from scratch on every save rather than merged into the existing
+     * one, so a field removed from the project's form definition disappears
+     * from storage instead of lingering forever.
+     *
+     * An absent namespace is left untouched: a payload that carries no custom
+     * key at all (a partial update, or a form rendered before the project added
+     * its fields) must not wipe what is already stored.
+     *
+     * @param array<string, mixed> $data     Source flat data
+     * @param string               $prefix   Custom prefix (e.g. "menuConfig_custom_")
+     * @param array<string, mixed> $existing The JSON column as currently stored
+     *
+     * @return array<string, mixed> The column, with its `custom` namespace refreshed
+     */
+    private function unflattenCustom(array $data, string $prefix, array $existing): array
+    {
+        $posted = [];
+
+        foreach ($data as $key => $value) {
+            if (\is_string($key) && \str_starts_with($key, $prefix)) {
+                $posted[\substr($key, \strlen($prefix))] = $value;
+            }
+        }
+
+        if ([] === $posted) {
+            return $existing;
+        }
+
+        $clean = $this->customFieldSanitizer->sanitize($posted);
+
+        if ([] === $clean) {
+            unset($existing[self::CUSTOM_NAMESPACE]);
+
+            return $existing;
+        }
+
+        $existing[self::CUSTOM_NAMESPACE] = $clean;
+
+        return $existing;
     }
 
     /**
@@ -446,14 +553,21 @@ class ThemeFormMapper
             }
         }
 
+        // Project-defined token fields (custom_*). Collected last so a project
+        // cannot shadow a core key: the closed lists above have already written
+        // theirs, and these land in a namespace of their own.
+        $tokens = $this->unflattenCustom($data, self::PREFIX_CUSTOM, $tokens);
+
         $theme->setTokens($tokens);
 
         // Reconstruct menuConfig from flat keys
         $menuConfig = $this->unflattenMenuConfig($data, $theme->getMenuConfig());
+        $menuConfig = $this->unflattenCustom($data, self::PREFIX_MENU_CUSTOM, $menuConfig);
         $theme->setMenuConfig($menuConfig);
 
         // Reconstruct footerConfig from flat keys
         $footerConfig = $this->unflattenFooterConfig($data, $theme->getFooterConfig());
+        $footerConfig = $this->unflattenCustom($data, self::PREFIX_FOOTER_CUSTOM, $footerConfig);
         $theme->setFooterConfig($footerConfig);
     }
 
