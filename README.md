@@ -708,6 +708,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
+| [Extending the theme configuration](doc/extensibility.md) | Adding your own admin fields (`custom_*` namespaces) and contributing CSS through `ThemeCompileEvent` |
 | [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
 | [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, dev-only diagnostics |

@@ -72,6 +72,9 @@ services:
         arguments:
             $cssOutputDir: '%itech_world_sulu_tailwind_theme.css_output_dir%'
             $paletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'
+            # Lets a project contribute CSS variables and rules to the compiled
+            # theme, via ThemeCompileEvent.
+            $eventDispatcher: '@event_dispatcher'
 
     itech_world.sulu_tailwind_theme.provider:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider
@@ -89,12 +92,19 @@ services:
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator
 
+    # Guards the open `custom` namespaces: project-defined fields are the only
+    # keys the bundle does not know in advance, so nothing else protects the
+    # JSON columns they land in.
+    itech_world.sulu_tailwind_theme.custom_field_sanitizer:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\CustomFieldSanitizer
+
     # Flat form properties ⇄ nested JSON columns. Shared by the theme form
     # controller and anything that needs to build a theme from form data.
     itech_world.sulu_tailwind_theme.form_mapper:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper
         arguments:
             - '@itech_world.sulu_tailwind_theme.slug_validator'
+            - '@itech_world.sulu_tailwind_theme.custom_field_sanitizer'
 
     itech_world.sulu_tailwind_theme.block_template_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver

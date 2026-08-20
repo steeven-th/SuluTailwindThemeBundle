@@ -7,6 +7,8 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Event\ThemeCompileEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Compiles ThemeConfig design tokens into CSS custom properties.
@@ -45,6 +47,18 @@ class ThemeCompiler
     private array $buttonsGlobal = [];
 
     /**
+     * Fingerprint of what listeners contributed during the current compile().
+     *
+     * The compiled filename is derived from the theme's updatedAt, which does
+     * not move when a project edits its own listener: the file would be
+     * rewritten under the very same URL, and browsers and CDNs would keep
+     * serving the previous one. Folding the contributions into the hash gives
+     * them their own cache-busting. Empty when nothing was contributed, which
+     * leaves the filename of a listener-less theme exactly as it was.
+     */
+    private string $contributionFingerprint = '';
+
+    /**
      * Mapping from Tailwind rounded-* class suffixes to CSS border-radius values.
      */
     private const RADIUS_MAP = [
@@ -64,6 +78,7 @@ class ThemeCompiler
         private readonly string $cssOutputDir,
         private readonly GoogleFontsResolver $googleFontsResolver,
         private readonly OklchPaletteGenerator $paletteGenerator,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -218,6 +233,15 @@ class ThemeCompiler
         $css .= $this->generateBackToTopVariables($tokens);
         $css .= $this->generateReadingProgressVariables($tokens);
         $css .= $this->generateLocationMapVariables($tokens);
+
+        // Project contributions. Dispatched once, here, while :root is still
+        // open: variables land in the block being closed just below, rules are
+        // held back and appended after every built-in class. A listener never
+        // has to know where it sits in the generated file.
+        $contributions = $this->dispatchCompileEvent($theme);
+        $this->contributionFingerprint = $this->fingerprintContributions($contributions);
+        $css .= $this->renderContributedVariables($contributions);
+
         $css .= "}\n\n";
 
         // Per-component surface overrides (scoped redefinitions of the surface tokens)
@@ -248,12 +272,101 @@ class ThemeCompiler
         // Block variant classes
         $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $buttonList);
 
-        // Reset class-level state after compilation
+        // Project-contributed rules, last so they win over a built-in rule of
+        // equal specificity — which is the whole point of contributing one.
+        $css .= $this->renderContributedRules($contributions);
+
+        // Reset class-level state after compilation. The fingerprint is the one
+        // exception: buildFilename() reads it after generateCss() has returned.
         $this->colorSet = null;
         $this->resolvedPalettes = [];
         $this->buttonsGlobal = [];
 
         return $css;
+    }
+
+    /**
+     * Give listeners a chance to contribute to the theme being compiled.
+     *
+     * Returns an event with no contributions when no dispatcher is wired, so
+     * the compiler stays usable standalone (tests, scripts) without a container.
+     *
+     * @param ThemeConfig $theme The theme being compiled
+     *
+     * @return ThemeCompileEvent The event, carrying whatever listeners added
+     */
+    private function dispatchCompileEvent(ThemeConfig $theme): ThemeCompileEvent
+    {
+        $event = new ThemeCompileEvent($theme);
+
+        $this->eventDispatcher?->dispatch($event);
+
+        return $event;
+    }
+
+    /**
+     * Render contributed custom properties, for inclusion in the :root block.
+     *
+     * @param ThemeCompileEvent $event The dispatched event
+     *
+     * @return string CSS variable declarations, empty when nothing was contributed
+     */
+    private function renderContributedVariables(ThemeCompileEvent $event): string
+    {
+        $variables = $event->getVariables();
+
+        if ([] === $variables) {
+            return '';
+        }
+
+        $css = "\n  /* Project contributions */\n";
+
+        foreach ($variables as $name => $value) {
+            $css .= "  {$name}: {$value};\n";
+        }
+
+        return $css;
+    }
+
+    /**
+     * Render contributed rules, for appending after the built-in classes.
+     *
+     * @param ThemeCompileEvent $event The dispatched event
+     *
+     * @return string CSS rules, empty when nothing was contributed
+     */
+    private function renderContributedRules(ThemeCompileEvent $event): string
+    {
+        $rules = $event->getRules();
+
+        if ([] === $rules) {
+            return '';
+        }
+
+        return "\n/* Project contributions */\n" . \implode("\n", $rules) . "\n";
+    }
+
+    /**
+     * Reduce the contributions to a short, stable fingerprint.
+     *
+     * Deliberately empty when nothing was contributed: an untouched install
+     * then keeps producing the exact same filenames as before this hook
+     * existed, so no cache is needlessly busted on upgrade.
+     *
+     * @param ThemeCompileEvent $event The dispatched event
+     *
+     * @return string A short hash, or an empty string when there is nothing to fingerprint
+     */
+    private function fingerprintContributions(ThemeCompileEvent $event): string
+    {
+        $variables = $event->getVariables();
+        $rules = $event->getRules();
+
+        if ([] === $variables && [] === $rules) {
+            return '';
+        }
+
+        return md5(serialize([$variables, $rules]));
     }
 
     /**
@@ -3168,7 +3281,9 @@ class ThemeCompiler
      */
     private function buildFilename(ThemeConfig $theme): string
     {
-        $hash = md5($theme->getUpdatedAt()->format('U.u'));
+        // Concatenating an empty fingerprint is a no-op, so a theme without
+        // project contributions keeps the filename it has always had.
+        $hash = md5($theme->getUpdatedAt()->format('U.u') . $this->contributionFingerprint);
 
         return sprintf('theme-%d-%s.css', $theme->getId() ?? 0, substr($hash, 0, 8));
     }
