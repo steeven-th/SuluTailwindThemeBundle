@@ -20,11 +20,20 @@
       panels, where a popup over a popup reads badly.
     - align: 'left' (default) or 'right', dropdown only — which edge the panel
       is anchored to, so it never opens off-screen.
+    - slot: 'bar' or 'panel' — where this particular call sits. Checked against
+      the theme's `languageSwitcherPosition` so an editor can keep the switcher
+      out of the bar, out of the open menu, or in both. Omit it on menu types
+      that place the switcher by breakpoint (navbar, megamenu): there the
+      position is dictated by the layout, not by taste, and the setting does
+      not apply.
 #}
 {% set switcherConfig = config|default({}) %}
 
 {% if switcherConfig.displayLanguageSwitcher|default(false) %}
-    {% set entries = localizations|default([]) %}
+    {# 'both' is the default: the sidebar shipped that way and it reads well. #}
+    {% set wantedPosition = switcherConfig.languageSwitcherPosition|default('both') %}
+    {% set slotAllowed = slot is not defined or wantedPosition == 'both' or wantedPosition == slot %}
+    {% set entries = slotAllowed ? localizations|default([]) : [] %}
 
     {# One language is not a choice, so the switcher stays out of the way. #}
     {% if entries|length > 1 %}

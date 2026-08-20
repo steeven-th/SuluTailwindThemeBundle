@@ -1592,6 +1592,11 @@ class ThemeCompiler
      * `logoHeightDesktop` / `logoHeightMobile` became configurable, so an
      * untouched theme keeps rendering exactly as it did.
      */
+    /**
+     * Default sidebar width in pixels — the `lg:w-72` the panel shipped with.
+     */
+    private const SIDEBAR_WIDTH_DEFAULT = 288;
+
     private const MENU_LOGO_HEIGHT_DESKTOP = 40;
     private const MENU_LOGO_HEIGHT_MOBILE = 32;
 
@@ -1661,10 +1666,38 @@ class ThemeCompiler
         // a variable stays overridable from the project's own stylesheet.
         $logoHeightDesktop = $this->normalizeLogoHeight($menuConfig['logoHeightDesktop'] ?? null, self::MENU_LOGO_HEIGHT_DESKTOP);
         $logoHeightMobile = $this->normalizeLogoHeight($menuConfig['logoHeightMobile'] ?? null, self::MENU_LOGO_HEIGHT_MOBILE);
+        $sidebarWidth = $this->normalizeSidebarWidth($menuConfig['sidebarWidth'] ?? null);
+        $css .= "  --iw-menu-sidebar-width: {$sidebarWidth}px;\n";
         $css .= "  --iw-menu-logo-height-desktop: {$logoHeightDesktop}px;\n";
         $css .= "  --iw-menu-logo-height-mobile: {$logoHeightMobile}px;\n";
 
         return $css . "\n";
+    }
+
+    /**
+     * Clamp the configured sidebar width to a usable pixel value.
+     *
+     * Mirrors the bounds of the admin number field (200-640). Anything outside
+     * that range falls back to the 288px the sidebar shipped with, so a theme
+     * saved before the setting existed renders exactly as it did.
+     *
+     * @param mixed $value Raw width value from the configuration
+     *
+     * @return int Width in pixels, between 200 and 640
+     */
+    private function normalizeSidebarWidth(mixed $value): int
+    {
+        if (!is_numeric($value)) {
+            return self::SIDEBAR_WIDTH_DEFAULT;
+        }
+
+        $width = (int) $value;
+
+        if ($width < 200 || $width > 640) {
+            return self::SIDEBAR_WIDTH_DEFAULT;
+        }
+
+        return $width;
     }
 
     /**
@@ -1887,6 +1920,13 @@ class ThemeCompiler
 
         // Sidebar panel
         $css .= ".iw-menu__sidebar { background-color: var(--iw-menu-bg); }\n";
+        // Width is configurable because the bar stays visible above the open
+        // panel: social icons plus a language switcher easily outgrow a narrow
+        // sidebar, and the row then hangs over the page. Full width below lg,
+        // where the panel covers the screen anyway.
+        $css .= "@media (min-width: 1024px) {\n";
+        $css .= "  .iw-menu__sidebar { width: var(--iw-menu-sidebar-width, 18rem); }\n";
+        $css .= "}\n";
 
         // Backdrop overlay — hidden by default, faded in via --visible (sidebar).
         $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }\n";

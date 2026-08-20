@@ -80,6 +80,8 @@ Returns the menu configuration for the active theme.
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
 | `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
 | `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
+| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger`, `fullscreen` and `sidebar` |
+| `sidebarWidth` | `int` | Sidebar panel width in pixels on large screens (default: `288`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
 | `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
 | `logo` | `string\|null` | Path to logo image |

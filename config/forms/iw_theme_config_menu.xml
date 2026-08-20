@@ -231,6 +231,22 @@
                         </param>
                     </params>
                 </property>
+
+                <!-- The open sidebar sits under the bar, which keeps showing the
+                     social icons and the language switcher. A panel narrower
+                     than that row leaves them hanging over the page. -->
+                <property name="menuConfig_sidebarWidth" type="number" colspan="6"
+                          visibleCondition="menuConfig_type == 'sidebar'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_sidebarWidth</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_sidebarWidth_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="288"/>
+                        <param name="min" value="200"/>
+                        <param name="max" value="640"/>
+                    </params>
+                </property>
             </properties>
         </section>
 
@@ -310,6 +326,38 @@
                         <title>iw_sulu_tailwind_theme.menu_displayLanguageSwitcher</title>
                         <info_text>iw_sulu_tailwind_theme.menu_displayLanguageSwitcher_info</info_text>
                     </meta>
+                </property>
+
+                <!-- Only the menu types whose bar stays visible next to an open
+                     panel. navbar and megamenu place the switcher by breakpoint
+                     instead (bar on desktop, panel on mobile), which is dictated
+                     by the layout rather than by taste. -->
+                <property name="menuConfig_languageSwitcherPosition" type="single_select" colspan="6"
+                          visibleCondition="menuConfig_displayLanguageSwitcher == true AND (menuConfig_type == 'burger' OR menuConfig_type == 'fullscreen' OR menuConfig_type == 'sidebar')">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="both"/>
+                        <param name="values" type="collection">
+                            <param name="both">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_both</title>
+                                </meta>
+                            </param>
+                            <param name="bar">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_bar</title>
+                                </meta>
+                            </param>
+                            <param name="panel">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_panel</title>
+                                </meta>
+                            </param>
+                        </param>
+                    </params>
                 </property>
 
                 <property name="menuConfig_languageSwitcherLabel" type="single_select" colspan="6"

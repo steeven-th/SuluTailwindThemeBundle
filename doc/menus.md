@@ -28,6 +28,7 @@ These options are available regardless of the menu type:
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
+| **Switcher placement** | (`burger`, `fullscreen`, `sidebar` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
 | **Label format** | (Language switcher only) How each language is named: short code (`FR`), native name (`Français`), or the name written in the language currently being browsed. |
 | **Transparent navbar** | Makes the navbar background transparent (useful for hero sections). Only applies to `navbar` and `megamenu` types. |
 | **Background on scroll** | (Transparent navbar only) The navbar takes its configured background color once the page is scrolled past ~50px, and turns transparent again at the top. Adds `.iw-menu--scrolled`. |
@@ -85,6 +86,7 @@ Same behavior on every breakpoint: the navbar (logo + social + burger) stays vis
 | Setting | Description |
 |---------|-------------|
 | **Position** | Panel side: `left` or `right`. |
+| **Panel width** | Panel width in pixels on large screens (200-640, default 288). Full width below `lg`. Worth raising when the bar carries social icons and a language switcher: the bar stays visible above the open panel, and a narrow panel leaves that row hanging over the page. Compiled to `--iw-menu-sidebar-width`. |
 | **Parent page access** | In accordion mode: `none`, `split`, or `selflink`. In panels mode: a simple on/off toggle. |
 | **Sub-menus as panels** | Same as the burger (see below): drill-down sliding panels instead of inline accordions. |
 
@@ -283,16 +285,25 @@ the site does not have it.
 The form follows the context rather than being uniform, because a popup inside a
 full-screen overlay reads badly:
 
-| Menu type | Bar | Panel / overlay |
-|-----------|-----|-----------------|
-| `navbar` | dropdown (desktop) | inline |
-| `megamenu` | dropdown (desktop) | inline |
-| `sidebar` | dropdown | inline |
-| `burger` | — | inline |
-| `fullscreen` | — | inline |
+| Menu type | Bar | Panel / overlay | Placement configurable |
+|-----------|-----|-----------------|------------------------|
+| `navbar` | dropdown (desktop) | inline (mobile) | no |
+| `megamenu` | dropdown (desktop) | inline (mobile) | no |
+| `sidebar` | dropdown | inline | yes |
+| `burger` | dropdown | inline | yes |
+| `fullscreen` | dropdown | inline | yes |
 
 The dropdown reuses the `menu_controller` Stimulus already driving the navigation
 dropdowns, so it closes when another one opens, with no extra JavaScript.
+
+Those three menu types keep their bar visible next to an open panel, so the
+switcher can live in either place: **Switcher placement** offers *bar and open
+menu* (default), *bar only*, or *open menu only*. Keeping it in the bar means a
+visitor changes language without opening the menu at all.
+
+`navbar` and `megamenu` are not configurable here: they show the bar on desktop
+and the overlay on mobile, never both at once, so the placement follows the
+breakpoint rather than a preference.
 
 ### Label format
 
