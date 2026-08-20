@@ -24,6 +24,7 @@ These options are available regardless of the menu type:
 | **Logo desktop / mobile** | Media selection for logo images. Separate logos for each breakpoint. |
 | **Logo desktop / mobile in transparent mode** | (Transparent navbar only) Alternate logos shown while the bar is transparent — typically light ones over a dark hero. Both variants are rendered and cross-faded on the same state as the background, so the logo never sits on the wrong surface mid-transition. Left empty, the regular logo is kept. Never applied inside overlays and side panels, which paint their own opaque background. |
 | **Display logo desktop / mobile** | Toggle logo visibility per breakpoint. |
+| **Logo height desktop / mobile** | (Shown when the matching logo is displayed) Logo height in pixels, 12 to 200, defaulting to 40 desktop / 32 mobile. Raster logos are capped at that height and never upscaled; SVG logos are rendered at exactly that height. Compiled to `--iw-menu-logo-height-desktop` / `--iw-menu-logo-height-mobile`. |
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Transparent navbar** | Makes the navbar background transparent (useful for hero sections). Only applies to `navbar` and `megamenu` types. |

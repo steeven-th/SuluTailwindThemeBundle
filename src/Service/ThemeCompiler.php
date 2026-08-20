@@ -1474,6 +1474,15 @@ class ThemeCompiler
     ];
 
     /**
+     * Default menu logo heights, in pixels, used when the theme does not
+     * configure them. These are the sizes the bar shipped with before
+     * `logoHeightDesktop` / `logoHeightMobile` became configurable, so an
+     * untouched theme keeps rendering exactly as it did.
+     */
+    private const MENU_LOGO_HEIGHT_DESKTOP = 40;
+    private const MENU_LOGO_HEIGHT_MOBILE = 32;
+
+    /**
      * Generate CSS custom properties for menu colors and bar chrome.
      *
      * Two families are emitted:
@@ -1534,7 +1543,42 @@ class ThemeCompiler
             ?? self::MENU_BACKDROPS['none'];
         $css .= "  --iw-menu-backdrop: {$backdrop};\n";
 
+        // Logo heights are emitted as variables rather than baked into the
+        // logo classes: generateMenuClasses() has no access to the config, and
+        // a variable stays overridable from the project's own stylesheet.
+        $logoHeightDesktop = $this->normalizeLogoHeight($menuConfig['logoHeightDesktop'] ?? null, self::MENU_LOGO_HEIGHT_DESKTOP);
+        $logoHeightMobile = $this->normalizeLogoHeight($menuConfig['logoHeightMobile'] ?? null, self::MENU_LOGO_HEIGHT_MOBILE);
+        $css .= "  --iw-menu-logo-height-desktop: {$logoHeightDesktop}px;\n";
+        $css .= "  --iw-menu-logo-height-mobile: {$logoHeightMobile}px;\n";
+
         return $css . "\n";
+    }
+
+    /**
+     * Clamp a configured logo height to a usable pixel value.
+     *
+     * Mirrors the bounds of the admin number fields (12-200). Anything outside
+     * that range, or unusable (null, empty, non-numeric), falls back to the
+     * default height, which is what themes saved before the setting existed do.
+     *
+     * @param mixed $value    Raw height value from the configuration
+     * @param int   $fallback Default height in pixels
+     *
+     * @return int Height in pixels, between 12 and 200
+     */
+    private function normalizeLogoHeight(mixed $value, int $fallback): int
+    {
+        if (!is_numeric($value)) {
+            return $fallback;
+        }
+
+        $height = (int) $value;
+
+        if ($height < 12 || $height > 200) {
+            return $fallback;
+        }
+
+        return $height;
     }
 
     /**
