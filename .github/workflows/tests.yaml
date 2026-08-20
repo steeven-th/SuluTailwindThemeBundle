@@ -1,0 +1,49 @@
+name: ✅ Tests
+
+on:
+  push:
+    branches: [ main, dev, 'feat/**', 'fix/**', 'ci/**' ]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to a branch makes the run in flight pointless.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpunit:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      # One version failing is worth knowing about on the others too, so the
+      # matrix reports the full picture instead of stopping at the first red.
+      fail-fast: false
+      matrix:
+        # The range declared in composer.json (php: ^8.2). 8.2 resolves to
+        # PHPUnit 11, the others to PHPUnit 12 — which is the point of the
+        # alternative constraint, and worth actually exercising.
+        php: [ '8.2', '8.3', '8.4', '8.5' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        # No committed lock file: the bundle is a library, so the point is to
+        # test against what a consumer would actually resolve today.
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Report the resolved PHPUnit version
+        run: vendor/bin/phpunit --version
+
+      - name: Run the test suite
+        run: vendor/bin/phpunit
