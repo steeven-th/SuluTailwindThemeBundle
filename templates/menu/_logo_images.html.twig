@@ -26,23 +26,40 @@
 {% set allowSwap = transparentSwap ?? true %}
 
 {# Resolve the four medias. A media deleted from the library resolves to null:
-   skip that variant rather than rendering a broken image. #}
+   skip that variant rather than rendering a broken image.
+
+   Each variant also tracks whether the URL we ended up with is a raw vector
+   file. Sulu does not rasterize SVG uploads, so an SVG logo has no thumbnail
+   and is served as-is; if that file declares only a viewBox (no width/height
+   attributes) it has no intrinsic size, and `width: auto` next to a bare
+   `max-height` resolves to zero inside the flex bar — the logo vanishes. The
+   `--vector` modifier gives those an explicit height. The check is deliberately
+   "no thumbnail AND svg" rather than just "svg": should a raster thumbnail ever
+   exist for an SVG source, we are serving the raster and must not force it. #}
 {% set logoDesktopUrl = null %}
 {% set logoMobileUrl = null %}
 {% set logoDesktopTransparentUrl = null %}
 {% set logoMobileTransparentUrl = null %}
+{% set logoDesktopVector = false %}
+{% set logoMobileVector = false %}
+{% set logoDesktopTransparentVector = false %}
+{% set logoMobileTransparentVector = false %}
 
 {% if showDesktop and config.logoDesktop.id|default(null) is not null %}
     {% set media = sulu_resolve_media(config.logoDesktop.id, app.request.locale) %}
     {% if media is not null %}
-        {% set logoDesktopUrl = media.thumbnails['iw_theme_logo_desktop']|default(media.url)|default(null) %}
+        {% set thumbnail = media.thumbnails['iw_theme_logo_desktop']|default(null) %}
+        {% set logoDesktopUrl = thumbnail|default(media.url)|default(null) %}
+        {% set logoDesktopVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
     {% endif %}
 {% endif %}
 
 {% if showMobile and config.logoMobile.id|default(null) is not null %}
     {% set media = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
     {% if media is not null %}
-        {% set logoMobileUrl = media.thumbnails['iw_theme_logo_mobile']|default(media.url)|default(null) %}
+        {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
+        {% set logoMobileUrl = thumbnail|default(media.url)|default(null) %}
+        {% set logoMobileVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
     {% endif %}
 {% endif %}
 
@@ -51,13 +68,17 @@
     {% if showDesktop and config.logoTransparentDesktop.id|default(null) is not null %}
         {% set media = sulu_resolve_media(config.logoTransparentDesktop.id, app.request.locale) %}
         {% if media is not null %}
-            {% set logoDesktopTransparentUrl = media.thumbnails['iw_theme_logo_desktop']|default(media.url)|default(null) %}
+            {% set thumbnail = media.thumbnails['iw_theme_logo_desktop']|default(null) %}
+            {% set logoDesktopTransparentUrl = thumbnail|default(media.url)|default(null) %}
+            {% set logoDesktopTransparentVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
         {% endif %}
     {% endif %}
     {% if showMobile and config.logoTransparentMobile.id|default(null) is not null %}
         {% set media = sulu_resolve_media(config.logoTransparentMobile.id, app.request.locale) %}
         {% if media is not null %}
-            {% set logoMobileTransparentUrl = media.thumbnails['iw_theme_logo_mobile']|default(media.url)|default(null) %}
+            {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
+            {% set logoMobileTransparentUrl = thumbnail|default(media.url)|default(null) %}
+            {% set logoMobileTransparentVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
         {% endif %}
     {% endif %}
 {% endif %}
@@ -66,12 +87,12 @@
     {% if logoDesktopTransparentUrl %}
         <span class="iw-menu__logo-swap hidden md:grid">
             <img src="{{ logoDesktopUrl }}" alt=""
-                 class="iw-menu__logo--desktop iw-menu__logo-state iw-menu__logo-state--default w-auto">
+                 class="iw-menu__logo--desktop{{ logoDesktopVector ? ' iw-menu__logo--vector' }} iw-menu__logo-state iw-menu__logo-state--default w-auto">
             <img src="{{ logoDesktopTransparentUrl }}" alt=""
-                 class="iw-menu__logo--desktop iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
+                 class="iw-menu__logo--desktop{{ logoDesktopTransparentVector ? ' iw-menu__logo--vector' }} iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
         </span>
     {% else %}
-        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop hidden md:block w-auto">
+        <img src="{{ logoDesktopUrl }}" alt="" class="iw-menu__logo--desktop{{ logoDesktopVector ? ' iw-menu__logo--vector' }} hidden md:block w-auto">
     {% endif %}
 {% endif %}
 
@@ -79,11 +100,11 @@
     {% if logoMobileTransparentUrl %}
         <span class="iw-menu__logo-swap grid md:hidden">
             <img src="{{ logoMobileUrl }}" alt=""
-                 class="iw-menu__logo--mobile iw-menu__logo-state iw-menu__logo-state--default w-auto">
+                 class="iw-menu__logo--mobile{{ logoMobileVector ? ' iw-menu__logo--vector' }} iw-menu__logo-state iw-menu__logo-state--default w-auto">
             <img src="{{ logoMobileTransparentUrl }}" alt=""
-                 class="iw-menu__logo--mobile iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
+                 class="iw-menu__logo--mobile{{ logoMobileTransparentVector ? ' iw-menu__logo--vector' }} iw-menu__logo-state iw-menu__logo-state--transparent w-auto">
         </span>
     {% else %}
-        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile block md:hidden w-auto">
+        <img src="{{ logoMobileUrl }}" alt="" class="iw-menu__logo--mobile{{ logoMobileVector ? ' iw-menu__logo--vector' }} block md:hidden w-auto">
     {% endif %}
 {% endif %}

@@ -288,6 +288,8 @@ class ThemeFixtures
                 'childLevels' => 3,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
                 'colors' => [
@@ -505,6 +507,8 @@ class ThemeFixtures
                 'childLevels' => 2,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
                 'colors' => [
@@ -719,6 +723,8 @@ class ThemeFixtures
                 'childLevels' => 2,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
                 'colors' => [
@@ -933,6 +939,8 @@ class ThemeFixtures
                 'childLevels' => 3,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
                 'colors' => [
@@ -1150,6 +1158,8 @@ class ThemeFixtures
                 'childLevels' => 2,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => false,
                 'colors' => [
@@ -1367,6 +1377,8 @@ class ThemeFixtures
                 'childLevels' => 3,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => true,
                 'displaySocialMedia' => true,
                 'colors' => [
@@ -1687,6 +1699,8 @@ class ThemeFixtures
                 'childLevels' => 3,
                 'displayLogoDesktop' => true,
                 'displayLogoMobile' => true,
+                'logoHeightDesktop' => 40,
+                'logoHeightMobile' => 32,
                 'displaySiteName' => false,
                 'displaySocialMedia' => false,
                 'transparentNavbar' => false,

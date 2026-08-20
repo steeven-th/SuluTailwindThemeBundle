@@ -1474,6 +1474,15 @@ class ThemeCompiler
     ];
 
     /**
+     * Default menu logo heights, in pixels, used when the theme does not
+     * configure them. These are the sizes the bar shipped with before
+     * `logoHeightDesktop` / `logoHeightMobile` became configurable, so an
+     * untouched theme keeps rendering exactly as it did.
+     */
+    private const MENU_LOGO_HEIGHT_DESKTOP = 40;
+    private const MENU_LOGO_HEIGHT_MOBILE = 32;
+
+    /**
      * Generate CSS custom properties for menu colors and bar chrome.
      *
      * Two families are emitted:
@@ -1534,7 +1543,42 @@ class ThemeCompiler
             ?? self::MENU_BACKDROPS['none'];
         $css .= "  --iw-menu-backdrop: {$backdrop};\n";
 
+        // Logo heights are emitted as variables rather than baked into the
+        // logo classes: generateMenuClasses() has no access to the config, and
+        // a variable stays overridable from the project's own stylesheet.
+        $logoHeightDesktop = $this->normalizeLogoHeight($menuConfig['logoHeightDesktop'] ?? null, self::MENU_LOGO_HEIGHT_DESKTOP);
+        $logoHeightMobile = $this->normalizeLogoHeight($menuConfig['logoHeightMobile'] ?? null, self::MENU_LOGO_HEIGHT_MOBILE);
+        $css .= "  --iw-menu-logo-height-desktop: {$logoHeightDesktop}px;\n";
+        $css .= "  --iw-menu-logo-height-mobile: {$logoHeightMobile}px;\n";
+
         return $css . "\n";
+    }
+
+    /**
+     * Clamp a configured logo height to a usable pixel value.
+     *
+     * Mirrors the bounds of the admin number fields (12-200). Anything outside
+     * that range, or unusable (null, empty, non-numeric), falls back to the
+     * default height, which is what themes saved before the setting existed do.
+     *
+     * @param mixed $value    Raw height value from the configuration
+     * @param int   $fallback Default height in pixels
+     *
+     * @return int Height in pixels, between 12 and 200
+     */
+    private function normalizeLogoHeight(mixed $value, int $fallback): int
+    {
+        if (!is_numeric($value)) {
+            return $fallback;
+        }
+
+        $height = (int) $value;
+
+        if ($height < 12 || $height > 200) {
+            return $fallback;
+        }
+
+        return $height;
     }
 
     /**
@@ -1656,9 +1700,27 @@ class ThemeCompiler
         $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(2) { opacity: 0; }\n";
         $css .= ".iw-menu__burger--open .iw-menu__burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }\n";
 
-        // Logo sizing
-        $css .= ".iw-menu__logo--desktop { max-height: 40px; }\n";
-        $css .= ".iw-menu__logo--mobile { max-height: 32px; }\n";
+        // Logo sizing. Raster logos keep a `max-height` so a small file is never
+        // upscaled into a blurry one; they simply cap out at the configured
+        // height. Vector logos get that same height as a firm `height`, because
+        // an SVG whose markup carries only a viewBox has no intrinsic size: with
+        // `width: auto` and nothing but a max-height to go on, the flex bar
+        // resolves it to 0x0 and the logo disappears. `object-fit: contain`
+        // keeps the aspect ratio honest for the rare SVG that does declare its
+        // own dimensions. The --vector modifier is applied by the Twig partials,
+        // which know the media's mime type.
+        $css .= ".iw-menu__logo--desktop { max-height: var(--iw-menu-logo-height-desktop, 40px); }\n";
+        $css .= ".iw-menu__logo--mobile { max-height: var(--iw-menu-logo-height-mobile, 32px); }\n";
+        $css .= ".iw-menu__logo--desktop.iw-menu__logo--vector {\n";
+        $css .= "  height: var(--iw-menu-logo-height-desktop, 40px);\n";
+        $css .= "  width: auto;\n";
+        $css .= "  object-fit: contain;\n";
+        $css .= "}\n";
+        $css .= ".iw-menu__logo--mobile.iw-menu__logo--vector {\n";
+        $css .= "  height: var(--iw-menu-logo-height-mobile, 32px);\n";
+        $css .= "  width: auto;\n";
+        $css .= "  object-fit: contain;\n";
+        $css .= "}\n";
 
         // Transparent-mode logo swap. Both variants are stacked in the same grid
         // cell and cross-faded, rather than toggled with `display`: the images
@@ -2066,6 +2128,11 @@ class ThemeCompiler
             $logoHeight = 40;
         }
         $css .= ".iw-footer__logo { max-height: {$logoHeight}px; width: auto; max-width: 100%; }\n";
+        // Vector logos need a firm height: an SVG carrying only a viewBox has no
+        // intrinsic size and collapses to 0x0 under a bare max-height. The
+        // --vector modifier is applied by the footer Twig partials, which know
+        // the media's mime type.
+        $css .= ".iw-footer__logo--vector { height: {$logoHeight}px; object-fit: contain; }\n";
         $css .= ".iw-footer__site-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }\n";
         $css .= ".iw-footer__tagline { font-size: 0.875rem; line-height: 1.6; opacity: 0.7; }\n";
 
@@ -2123,13 +2190,18 @@ class ThemeCompiler
         // Base is full width on mobile; width modifiers only kick in at md.
         $css .= ".iw-form__col { flex: 0 0 100%; min-width: 0; }\n";
 
-        // Responsive: column widths activate at md breakpoint
+        // Responsive: column widths activate at md breakpoint.
+        // Each basis subtracts the share of the 1.25rem column gap that this
+        // fraction has to give up, so a full row adds up to exactly 100%:
+        // reduction = gap * (1 - fraction).
         $css .= "@media (min-width: 768px) {\n";
         $css .= "  .iw-form__col--half { flex: 0 0 calc(50% - 0.625rem); }\n";
         $css .= "  .iw-form__col--third { flex: 0 0 calc(33.333% - 0.834rem); }\n";
         $css .= "  .iw-form__col--two-third { flex: 0 0 calc(66.666% - 0.417rem); }\n";
         $css .= "  .iw-form__col--quarter { flex: 0 0 calc(25% - 0.938rem); }\n";
         $css .= "  .iw-form__col--three-quarter { flex: 0 0 calc(75% - 0.313rem); }\n";
+        $css .= "  .iw-form__col--sixth { flex: 0 0 calc(16.666% - 1.042rem); }\n";
+        $css .= "  .iw-form__col--five-sixth { flex: 0 0 calc(83.333% - 0.208rem); }\n";
         $css .= "}\n\n";
 
         $css .= "/* Form field */\n";

@@ -28,7 +28,7 @@ To disable the bundle footer entirely, simply leave the footer block out of your
 |---------|-------------|
 | **Color variant** | The named color variant applied to the whole footer (`.iw-variant--<slug>` on the `<footer>`). Empty falls back to the first variant. |
 | **Show logo** / **Footer logo** | Optional footer-specific logo, independent from the menu logo. Shown in all three layouts. |
-| **Logo max height** | Caps the logo height (in px) while keeping its aspect ratio; never upscales a small logo. Applied via the compiled `.iw-footer__logo` rule. |
+| **Logo max height** | Caps the logo height (in px) while keeping its aspect ratio; never upscales a small logo. Applied via the compiled `.iw-footer__logo` rule. A raw SVG logo (served without an image format) also gets `.iw-footer__logo--vector`, which turns that cap into a firm height so a `viewBox`-only file cannot collapse to `0x0`. |
 | **Show site name** | Display the webspace name alongside the logo. |
 | **Name position** | (when both logo and name are shown) Place the site name **beside** or **below** the logo. |
 | **Tagline** | (`columns` / `centered`) Short description shown under the brand. |

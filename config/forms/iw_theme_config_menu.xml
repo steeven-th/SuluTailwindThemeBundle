@@ -258,10 +258,36 @@
                     </meta>
                 </property>
 
+                <property name="menuConfig_logoHeightDesktop" type="number" colspan="6"
+                          visibleCondition="menuConfig_displayLogoDesktop == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_logoHeightDesktop</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_logoHeightDesktop_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="40"/>
+                        <param name="min" value="12"/>
+                        <param name="max" value="200"/>
+                    </params>
+                </property>
+
                 <property name="menuConfig_displayLogoMobile" type="checkbox" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.menu_displayLogoMobile</title>
                     </meta>
+                </property>
+
+                <property name="menuConfig_logoHeightMobile" type="number" colspan="6"
+                          visibleCondition="menuConfig_displayLogoMobile == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_logoHeightMobile</title>
+                        <info_text>iw_sulu_tailwind_theme.menu_logoHeightMobile_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="32"/>
+                        <param name="min" value="12"/>
+                        <param name="max" value="200"/>
+                    </params>
                 </property>
 
                 <property name="menuConfig_displaySiteName" type="checkbox" colspan="6">
