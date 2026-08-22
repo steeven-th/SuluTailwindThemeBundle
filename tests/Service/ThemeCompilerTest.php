@@ -207,4 +207,31 @@ final class ThemeCompilerTest extends TestCase
 
         self::assertStringContainsString('--font-size-h1: 4em;', $css);
     }
+
+    /**
+     * Dropdown entries in the language switcher carry both
+     * .iw-menu__text--level-2 and .iw-menu__lang-item. Both are single-class
+     * selectors, so an unscoped `color` on the latter wins on source order
+     * alone and repaints them in the bar's text color — over the dropdown
+     * panel's own background. That shipped once and made the entries
+     * unreadable on a light panel.
+     */
+    #[Test]
+    public function itDoesNotOverrideTheDropdownTextColorOfLanguageEntries(): void
+    {
+        $css = $this->compileCss([]);
+
+        self::assertStringNotContainsString(
+            '.iw-menu__lang-item { color:',
+            $css,
+            'A color on the bare .iw-menu__lang-item outranks .iw-menu__text--level-2 by source order.',
+        );
+        // The inline variant does inherit: it sits directly in the bar or in an
+        // overlay, both of which already paint the right color.
+        self::assertStringContainsString('.iw-menu__lang--inline .iw-menu__lang-item {', $css);
+        self::assertMatchesRegularExpression(
+            '/\.iw-menu__lang--inline \.iw-menu__lang-item \{[^}]*color: inherit;/',
+            $css,
+        );
+    }
 }
