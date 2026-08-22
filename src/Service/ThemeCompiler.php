@@ -1831,15 +1831,18 @@ class ThemeCompiler
         // Dividers
         $css .= ".iw-menu__divider { border-color: var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
 
-        // Language switcher. Colors are inherited rather than redeclared: the
-        // switcher sits in the bar in one place and inside an overlay in
-        // another, and each already paints the right text color. Only the
-        // current-language marker and the untranslated hint are its own.
-        $css .= ".iw-menu__lang-item { color: inherit; }\n";
+        // Language switcher.
         $css .= ".iw-menu__lang-item--current { font-weight: 600; opacity: 1; }\n";
-        // Inline variant: the languages sit side by side, so the current one
-        // needs a marker that survives at a glance.
+        // Inline variant: it sits directly in the bar or in an overlay, both of
+        // which already paint the right text color, so it inherits. The
+        // dropdown must NOT: its panel is its own surface, colored by
+        // .iw-menu__text--level-2 like every other dropdown entry. Scoping this
+        // to the inline variant is what keeps the two apart — an unscoped
+        // `color: inherit` has the same specificity as that rule and, coming
+        // later in the file, silently won, leaving dropdown entries painted in
+        // the bar's text color over the panel's background.
         $css .= ".iw-menu__lang--inline .iw-menu__lang-item {\n";
+        $css .= "  color: inherit;\n";
         $css .= "  border-radius: var(--border-radius, 0.375rem);\n";
         $css .= "  opacity: 0.7;\n";
         $css .= "}\n";
