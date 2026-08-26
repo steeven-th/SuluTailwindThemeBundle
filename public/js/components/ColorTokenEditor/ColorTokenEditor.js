@@ -7,6 +7,7 @@ import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
+import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
 
 /**
@@ -18,33 +19,6 @@ const HEX_COLOR_PATTERN = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
  * Check if the EyeDropper API is available in the browser.
  */
 const EYEDROPPER_SUPPORTED = typeof window !== 'undefined' && 'EyeDropper' in window;
-
-/**
- * Shade levels matching Tailwind CSS v4.
- */
-const SHADE_LEVELS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-
-/**
- * The stable id (role for base colors, slug for brand colors) used to build
- * ref: values, so a ref survives a slug rename of a base role.
- *
- * @param {Object} color A store color entry {role, slug, value, labelKey}
- * @returns {string} The reference key
- */
-function colorRefKey(color) {
-    return color.role || color.slug;
-}
-
-/**
- * The human-facing label of a palette color: translated role label, or the
- * slug for brand colors.
- *
- * @param {Object} color A store color entry {role, slug, value, labelKey}
- * @returns {string} The display label
- */
-function colorLabel(color) {
-    return color.labelKey ? translate(color.labelKey) : color.slug;
-}
 
 /**
  * Inline CSS injected once for the ChromePicker overrides inside the popover.
@@ -99,58 +73,6 @@ function ensurePickerStyles() {
         .iw-palette-tab--active {
             color: #1a56db;
             border-bottom-color: #1a56db;
-        }
-        .iw-palette-row {
-            padding: 4px 8px;
-        }
-        .iw-palette-row-label {
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 2px;
-            text-transform: capitalize;
-        }
-        .iw-palette-swatches {
-            display: flex;
-            gap: 2px;
-        }
-        .iw-palette-swatch {
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.12s, box-shadow 0.12s;
-            position: relative;
-        }
-        .iw-palette-swatch:hover {
-            transform: scale(1.15);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        /* The configured color, set apart from the generated shades: larger,
-           darker outline, and separated by a rule. It is what a brand guideline
-           asks for, so it must not read as one shade among eleven. */
-        .iw-palette-swatch--base {
-            width: 36px;
-            height: 36px;
-            margin-right: 8px;
-            align-self: center;
-            border: 2px solid rgba(0,0,0,0.35);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-        }
-        .iw-palette-swatch--base::after {
-            content: '';
-            position: absolute;
-            top: -4px;
-            bottom: -4px;
-            right: -5px;
-            border-right: 1px solid rgba(0,0,0,0.12);
-        }
-        .iw-palette-swatch--selected {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db;
-        }
-        .iw-palette-swatch--selected:hover {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db, 0 2px 8px rgba(0,0,0,0.2);
         }
         .iw-color-picker-tabbed {
             background: #fff;
@@ -433,78 +355,36 @@ export default class ColorTokenEditor extends React.Component {
      * Colors are derived dynamically from the theme config store (all 10 base
      * roles + unlimited brand colors), not a hard-coded list.
      */
+    /**
+     * Tell whether a swatch matches the current value.
+     *
+     * A base color is stored as `ref:<key>` (no level): it resolves to the
+     * exact configured value, where `ref:<key>-500` is a generated shade that
+     * almost never matches it. Legacy values stored as a raw hex still light
+     * up their swatch.
+     *
+     * @param {string} colorKey The palette color key
+     * @param {number|null} shade The shade level, or null for the base color
+     * @param {string} hex The swatch color
+     * @returns {boolean} True when the swatch is the current value
+     */
+    isSwatchSelected = (colorKey, shade, hex) => {
+        const normalizedValue = (this.state.internalValue || '').toLowerCase();
+        const refValue = null === shade ? `ref:${colorKey}` : `ref:${colorKey}-${shade}`;
+
+        return normalizedValue === refValue || normalizedValue === (hex || '').toLowerCase();
+    };
+
+    /**
+     * Render the palette tab.
+     */
     renderPaletteTab() {
-        const palette = this.state.localPalette || themeConfigStore.palette;
-        const {internalValue} = this.state;
-        const normalizedValue = (internalValue || '').toLowerCase();
-
         return (
-            <div style={{padding: '6px 0', maxHeight: '280px', overflowY: 'auto'}}>
-                {themeConfigStore.colors.map((color) => {
-                    const key = colorRefKey(color);
-                    const shades = palette[key];
-                    if (!shades || Object.keys(shades).length === 0) {
-                        return null;
-                    }
-
-                    const label = colorLabel(color);
-
-                    return (
-                        <div key={key} className="iw-palette-row">
-                            <div className="iw-palette-row-label">
-                                {label}
-                            </div>
-                            <div className="iw-palette-swatches">
-                                {/* The configured color itself, before the generated
-                                    shades and visually set apart: it is the one a
-                                    brand guideline asks for, and no shade reproduces
-                                    it. Emits `ref:<key>` without a level. */}
-                                {(() => {
-                                    const baseHex = color.value;
-                                    if (!baseHex) {
-                                        return null;
-                                    }
-
-                                    const baseRef = 'ref:' + key;
-                                    const isSelected = normalizedValue === baseRef
-                                        || normalizedValue === baseHex.toLowerCase();
-
-                                    return (
-                                        <div
-                                            className={'iw-palette-swatch iw-palette-swatch--base'
-                                                + (isSelected ? ' iw-palette-swatch--selected' : '')}
-                                            style={{backgroundColor: baseHex}}
-                                            onClick={() => this.handleSwatchClick(baseHex, key, null)}
-                                            title={`${label} - ${translate('iw_sulu_tailwind_theme.palette_base')} (${baseHex})`}
-                                        />
-                                    );
-                                })()}
-
-                                {SHADE_LEVELS.map((shade) => {
-                                    const hex = shades[shade];
-                                    if (!hex) return null;
-
-                                    const refStr = 'ref:' + key + '-' + shade;
-                                    const isSelected = normalizedValue === refStr
-                                        || normalizedValue === hex.toLowerCase();
-                                    const swatchClass = 'iw-palette-swatch'
-                                        + (isSelected ? ' iw-palette-swatch--selected' : '');
-
-                                    return (
-                                        <div
-                                            key={shade}
-                                            className={swatchClass}
-                                            style={{backgroundColor: hex}}
-                                            onClick={() => this.handleSwatchClick(hex, key, shade)}
-                                            title={`${label} ${shade} (${hex})`}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+            <PaletteGrid
+                isSelected={this.isSwatchSelected}
+                onSelect={this.handleSwatchClick}
+                palette={this.state.localPalette || themeConfigStore.palette}
+            />
         );
     }
 
