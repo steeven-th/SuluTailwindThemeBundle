@@ -25,7 +25,7 @@
 {# Resolve description #}
 {% set description = extension.excerpt.description|default('')|striptags|trim %}
 {% if description is empty and content.subtitle is defined %}
-    {% set description = content.subtitle|striptags|trim %}
+    {% set description = iw_sulu_tailwind_theme_title_text(content.subtitle)|striptags|trim %}
 {% endif %}
 
 {# Attendance mode #}

@@ -272,6 +272,11 @@ class ThemeCompiler
         // Block variant classes
         $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $buttonList);
 
+        // Text color utility classes. After the variant classes on purpose: a
+        // color the editor picked explicitly must win over `.iw-highlight`,
+        // and both sit at the same specificity.
+        $css .= $this->generateTextColorClasses();
+
         // Project-contributed rules, last so they win over a built-in rule of
         // equal specificity — which is the whole point of contributing one.
         $css .= $this->renderContributedRules($contributions);
@@ -1060,6 +1065,61 @@ class ThemeCompiler
         }
 
         return $css . "\n";
+    }
+
+    /**
+     * Generate text color utility classes from the theme palette.
+     *
+     * One class per palette color and per shade, emitted under both the role
+     * alias and the slug, mirroring generatePaletteVariables(). Editors pick a
+     * color by NAME in the title editor, so what ends up stored in the content
+     * is the role (`primary`), never a hex value: recoloring the theme
+     * recolors every title that already uses it, with no content migration.
+     *
+     * The rules reference the palette variables rather than repeating the hex,
+     * so there is a single source of truth for a given shade.
+     *
+     * @return string CSS class declarations (e.g. `.iw-text--primary-500 { ... }`)
+     */
+    private function generateTextColorClasses(): string
+    {
+        if (null === $this->colorSet) {
+            return '';
+        }
+
+        $css = "/* Text color utility classes */\n";
+
+        // A base color and its role can carry the same name; emit each name
+        // once so the same rule is not repeated.
+        $emitted = [];
+
+        foreach ($this->colorSet->getColors() as $color) {
+            $value = $color['value'];
+            if (!$this->isHexColor($value)) {
+                continue;
+            }
+
+            $shades = array_keys($this->paletteFor($value));
+
+            foreach ([$color['role'], $color['slug']] as $name) {
+                if (null === $name || isset($emitted[$name])) {
+                    continue;
+                }
+                $emitted[$name] = true;
+
+                $css .= ".iw-text--{$name} {\n";
+                $css .= "  color: var(--color-{$name});\n";
+                $css .= "}\n";
+
+                foreach ($shades as $shade) {
+                    $css .= ".iw-text--{$name}-{$shade} {\n";
+                    $css .= "  color: var(--color-{$name}-{$shade});\n";
+                    $css .= "}\n";
+                }
+            }
+        }
+
+        return [] === $emitted ? '' : $css . "\n";
     }
 
     /**
@@ -2742,11 +2802,21 @@ class ThemeCompiler
     {
         $css = "/* Block variant classes */\n";
 
+        // Highlighted words inside a title or subtitle. Emitted once, not per
+        // variant: `--iw-variant-highlight` is already scoped by the
+        // `.iw-variant--<slug>` rule below, so the span inherits the right value
+        // wherever it sits. Outside any variant (a page hero, for instance) the
+        // fallback keeps the word visible instead of silently unstyled.
+        $css .= ".iw-highlight {\n";
+        $css .= "  color: var(--iw-variant-highlight, var(--color-accent));\n";
+        $css .= "}\n";
+
         // Map from token keys to CSS custom property names
         $propertyMap = [
             'blockBg' => 'background-color',
             'title' => '--iw-variant-title-color',
             'subtitle' => '--iw-variant-subtitle-color',
+            'highlight' => '--iw-variant-highlight',
             'paragraph' => '--iw-variant-paragraph-color',
             'link' => '--iw-variant-link-color',
             'linkHover' => '--iw-variant-link-hover',

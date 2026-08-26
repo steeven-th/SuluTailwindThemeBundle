@@ -14,13 +14,13 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
-                <property name="title" type="text_line">
+                <property name="title" type="iw_theme_title_editor">
                     <meta>
                         <title>iw_sulu_tailwind_theme.title</title>
                         <info_text>iw_sulu_tailwind_theme.title_info</info_text>
                     </meta>
                 </property>
-                <property name="subTitle" type="text_line">
+                <property name="subTitle" type="iw_theme_title_editor">
                     <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
                 </property>
                 <property name="titleTag" type="single_select">

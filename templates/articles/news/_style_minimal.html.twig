@@ -24,7 +24,7 @@
 
         {% if content.subtitle is defined and content.subtitle is not empty %}
             <p class="iw-article-page__subtitle iw-article-page__subtitle--lg">
-                {{ content.subtitle }}
+                {{ iw_sulu_tailwind_theme_title_markup(content.subtitle) }}
             </p>
         {% endif %}
 

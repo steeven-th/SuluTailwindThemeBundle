@@ -51,10 +51,10 @@
 
         <div class="iw-block-cta__content relative z-10 container mx-auto py-16 md:py-20 lg:py-24 px-6 md:px-8 {{ titleAlignClass }} text-white">
             {% if title is defined and title is not empty %}
-                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] {{ titleAlignClass }} text-white">{{ title }}</{{ titleTag }}>
+                <{{ titleTag }} class="iw-block__title iw-block-cta__title text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-[var(--font-h2-weight)] {{ titleAlignClass }} text-white">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</{{ titleTag }}>
             {% endif %}
             {% if subTitle is defined and subTitle is not empty %}
-                <p class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 {{ titleAlignClass }} text-white/80">{{ subTitle }}</p>
+                <p class="iw-block__subtitle iw-block-cta__subtitle text-xl md:text-2xl mt-4 {{ titleAlignClass }} text-white/80">{{ iw_sulu_tailwind_theme_title_markup(subTitle, false) }}</p>
             {% endif %}
             {% if text is defined and text is not empty %}
                 <div class="iw-block__text iw-block-cta__text prose prose-invert max-w-2xl {{ textInsetClass }} mt-8">

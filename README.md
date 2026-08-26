@@ -554,7 +554,7 @@ The bundle ships with a ready-to-use page template (`iw_theme_default`) that inc
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
-The default template also exposes an optional **Hero** section per page — a full-width banner image (`heroImage`, focus-aware), a `heroTitle` that, when set, overrides the page title as the H1 (keep a short page name for menus and a longer editorial headline on the page), and a `heroSubtitle`. Its **appearance** (height, parallax, title/breadcrumb placement, positioning, readability veil) is configured **site-wide** in the theme admin under **Components → Page hero**, so every page shares one consistent banner style. See **[Page Templates → Page hero](doc/page-templates.md#page-hero-optional-banner)**.
+The default template also exposes an optional **Hero** section per page — a full-width banner image (`heroImage`, focus-aware), a `heroTitle` that, when set, overrides the page title as the H1 (keep a short page name for menus and a longer editorial headline on the page), and a `heroSubtitle`. Both accept several lines and let an editor put a few words forward in a palette color - see **[Title editor](doc/title-editor.md)**. Its **appearance** (height, parallax, title/breadcrumb placement, positioning, readability veil) is configured **site-wide** in the theme admin under **Components → Page hero**, so every page shares one consistent banner style. See **[Page Templates → Page hero](doc/page-templates.md#page-hero-optional-banner)**.
 
 The template system uses a **modular architecture** with global block types registered via `sulu_admin.templates.block.directories`. You can create your own page templates referencing any subset of blocks, use XInclude fragments to reuse shared properties, and exclude the default template from specific webspaces.
 
@@ -706,6 +706,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
 | [Button Hover Effects](doc/button-effects.md) | Catalog of composable hover effects (shadow, transform, opacity, duration, easing) |
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
+| [Title editor](doc/title-editor.md) | Multi-line titles with highlighted words: the `iw_theme_title_editor` field type, its stored syntax, and the classes behind it |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
 | [Extending the theme configuration](doc/extensibility.md) | Adding your own admin fields (`custom_*` namespaces) and contributing CSS through `ThemeCompileEvent` |

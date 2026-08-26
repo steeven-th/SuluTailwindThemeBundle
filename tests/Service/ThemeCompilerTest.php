@@ -97,6 +97,75 @@ final class ThemeCompilerTest extends TestCase
     }
 
     #[Test]
+    public function itEmitsTextColorClassesForTheRoleTheSlugAndEveryShade(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'marine', 'value' => '#1a3a6b'],
+        ]]);
+
+        // Both aliases get a base class...
+        self::assertStringContainsString(".iw-text--primary {\n  color: var(--color-primary);\n}", $css);
+        self::assertStringContainsString(".iw-text--marine {\n  color: var(--color-marine);\n}", $css);
+
+        // ...and the full 11-shade range, referencing the palette variables
+        // rather than repeating the hex.
+        self::assertStringContainsString(".iw-text--primary-500 {\n  color: var(--color-primary-500);\n}", $css);
+        self::assertStringContainsString(".iw-text--marine-950 {\n  color: var(--color-marine-950);\n}", $css);
+        self::assertSame(11, substr_count($css, '.iw-text--primary-'));
+    }
+
+    #[Test]
+    public function itEmitsATextColorClassOnceWhenTheRoleAndTheSlugMatch(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'accent', 'slug' => 'accent', 'value' => '#ff6600'],
+        ]]);
+
+        self::assertSame(1, substr_count($css, '.iw-text--accent {'));
+        self::assertSame(1, substr_count($css, '.iw-text--accent-500 {'));
+    }
+
+    #[Test]
+    public function itLetsAnExplicitTextColorWinOverTheGenericHighlight(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'blockVariants' => [['slug' => 'dark', 'label' => 'Dark', 'highlight' => '#00ff88']],
+        ]);
+
+        // Same specificity (0,1,0), so source order decides: the explicit color
+        // must be emitted after the highlight rule.
+        self::assertLessThan(
+            strpos($css, '.iw-text--primary {'),
+            strpos($css, '.iw-highlight {'),
+        );
+    }
+
+    #[Test]
+    public function itEmitsTheHighlightRuleOnceAndScopesItsValuePerVariant(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'accent', 'slug' => 'accent', 'value' => '#ff6600']],
+            'blockVariants' => [
+                ['slug' => 'dark', 'label' => 'Dark', 'title' => '#ffffff', 'highlight' => '#00ff88'],
+                ['slug' => 'light', 'label' => 'Light', 'title' => '#000000'],
+            ],
+        ]);
+
+        // The class itself is emitted once: the custom property carries the
+        // per-variant value, so a rule per variant would be dead weight.
+        self::assertSame(1, substr_count($css, '.iw-highlight {'));
+        self::assertStringContainsString('color: var(--iw-variant-highlight, var(--color-accent));', $css);
+
+        // A variant that sets the token publishes it...
+        self::assertStringContainsString('--iw-variant-highlight: #00ff88;', $css);
+
+        // ...and one that leaves it empty publishes nothing, so the rule falls
+        // back to the theme accent instead of inheriting the previous variant.
+        self::assertSame(1, substr_count($css, '--iw-variant-highlight:'));
+    }
+
+    #[Test]
     public function itGeneratesButtonClassesBySlugWithSeparateGlobalPadding(): void
     {
         $css = $this->compileCss([

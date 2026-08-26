@@ -34,6 +34,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 |----------|-----------|---------|
 | `--iw-variant-title-color` | `title` | Color for `h1`–`h6` |
 | `--iw-variant-subtitle-color` | `subtitle` | Color for `.iw-block__subtitle` / blockquote text |
+| `--iw-variant-highlight` | `highlight` | Color for words highlighted inside a title or subtitle (`.iw-highlight`). Falls back to `--color-accent` when the variant leaves it empty |
 | `--iw-variant-paragraph-color` | `paragraph` | Color for every text-bearing element of the content: `<p>`, list items, definition lists, captions, table cells |
 | `--iw-variant-link-color` | `link` | Color for links (excluding `.iw-button--*`) |
 | `--iw-variant-link-hover` | `linkHover` | Link hover color |
@@ -62,6 +63,7 @@ The compiled CSS automatically styles these HTML elements inside any `.iw-varian
 |---------|---------|
 | `h1`–`h6` | `color: var(--iw-variant-title-color)` |
 | `.iw-block__subtitle` | `color: var(--iw-variant-subtitle-color)` |
+| `.iw-highlight` | `color: var(--iw-variant-highlight, var(--color-accent))` - see the note below |
 | `p`, `li`, `dt`, `dd`, `figcaption` | `color: var(--iw-variant-paragraph-color)` |
 | `a` (excluding `[class*="iw-button--"]`) | `color: var(--iw-variant-link-color)`, hover → `--iw-variant-link-hover` |
 | `ul li::marker`, `ol li::marker` | `color: var(--iw-variant-list-color)` - the marker only; the item text takes the paragraph color from the rule above |
@@ -72,6 +74,13 @@ The compiled CSS automatically styles these HTML elements inside any `.iw-varian
 | `blockquote` | Left border `--iw-variant-hr-color`, italic, `--iw-variant-subtitle-color` |
 | `.todo-list input[type="checkbox"]` | `accent-color: var(--iw-variant-list-color)` - a to-do list has no marker, its checkbox plays that role |
 | `hr` | Styled based on `separatorMode` / `separatorStyle` (solid, dashed, dotted, double, gradient, wave, zigzag, dots, diamond) |
+
+`.iw-highlight` is the one exception to that scoping: the rule is emitted **once**,
+outside any variant selector, because `--iw-variant-highlight` is already scoped by
+the `.iw-variant--{slug}` block. A highlighted word therefore picks up the right
+color wherever it sits, and still renders in the theme accent outside any variant
+(a page hero, for instance). The class wins over the inherited heading color because
+a matching declaration always beats inheritance, whatever its specificity.
 
 All rules are scoped via the `.iw-variant--{slug}` selector and therefore sit at specificity 0,2,0. They can be overridden with a single custom property without rewriting selectors.
 

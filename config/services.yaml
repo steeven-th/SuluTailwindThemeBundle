@@ -113,6 +113,11 @@ services:
     itech_world.sulu_tailwind_theme.language_label_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver
 
+    # Renders the lightweight markup of the title editor (highlighted words,
+    # palette colors, line breaks) to HTML.
+    itech_world.sulu_tailwind_theme.title_markup_renderer:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer
+
     # Light/dark hint for iframe-based widgets (Cloudflare Turnstile and
     # anything else that cannot be styled through the theme CSS).
     itech_world.sulu_tailwind_theme.variant_color_scheme_resolver:
@@ -205,6 +210,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.form_view_duplicator'
             - '@itech_world.sulu_tailwind_theme.form_success_resolver'
             - '@itech_world.sulu_tailwind_theme.language_label_resolver'
+            - '@itech_world.sulu_tailwind_theme.title_markup_renderer'
             - '@?sulu_core.webspace.request_analyzer'
         tags:
             - { name: 'twig.extension' }
@@ -304,6 +310,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+    ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer: '@itech_world.sulu_tailwind_theme.title_markup_renderer'
     ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension: '@itech_world.sulu_tailwind_theme.twig_extension'
     ItechWorld\SuluTailwindThemeBundle\Twig\ArticleExtension: '@itech_world.sulu_tailwind_theme.article_twig_extension'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog: '@itech_world.sulu_tailwind_theme.google_fonts_catalog'

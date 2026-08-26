@@ -351,6 +351,67 @@ heading typography is restored via CSS.
 
 ---
 
+### `iw_sulu_tailwind_theme_title_markup(text, allowColor)`
+
+Renders a title stored by the `iw_theme_title_editor` field type. Titles are
+stored as **plain text** carrying a small, closed syntax:
+
+| Stored | Rendered | Color source |
+|--------|----------|--------------|
+| `[[word]]` | `<span class="iw-highlight">word</span>` | `highlight` token of the block variant, falling back to `--color-accent` |
+| `[[accent:word]]` | `<span class="iw-text--accent">word</span>` | the named palette color |
+| `[[primary-700:word]]` | `<span class="iw-text--primary-700">word</span>` | the named palette color, at that shade |
+| a real newline | `<br>` | n/a |
+
+Everything else is literal. The function escapes the stored text **before**
+inserting any tag, so no user-supplied HTML can reach the page: there is no
+incoming markup to sanitize, and content coming from the API or an import is
+as safe as content typed in the admin. That is why it is declared
+`is_safe: html` and templates never need `|raw`.
+
+The color NAME is what gets stored, never a hex value. Recoloring `primary` in
+the admin therefore recolors every title already using it, with no content
+migration. See [`css-api/transverse.md`](./css-api/transverse.md#text-color-utilities)
+for the generated classes.
+
+```twig
+{# A page title: the editor picks colors from the palette #}
+<h1 class="iw-page-hero__title">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
+
+{# A block title: the accent color comes from the variant, not from the editor #}
+<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</h2>
+```
+
+**Parameters:**
+- `text` (`string|null`) - The stored title
+- `allowColor` (`bool`) - Whether `[[color:word]]` markers keep their explicit
+  color (default `true`). Pass `false` on a block title: a colored marker then
+  degrades to a plain highlight rather than being dropped.
+
+**Returns:** `string` - HTML, safe to print unescaped.
+
+---
+
+### `iw_sulu_tailwind_theme_title_text(text)`
+
+Strips a title down to its bare text: markers are removed (their content is
+kept) and line breaks collapse to single spaces. For anywhere a title must be
+plain - a `<title>` tag, a meta description, an `alt` attribute, an aria-label.
+
+```twig
+<title>{{ iw_sulu_tailwind_theme_title_text(heroTitle) }}</title>
+```
+
+The result is **not** escaped: it feeds attributes and meta tags, which Twig
+escapes on its own, and escaping here would double-encode them.
+
+**Parameters:**
+- `text` (`string|null`) - The stored title
+
+**Returns:** `string` - The title without markers or line breaks.
+
+---
+
 ### `iw_sulu_tailwind_theme_unique_id(prefix)`
 
 Generates an id that is unique within the current rendering. Sulu content blocks
