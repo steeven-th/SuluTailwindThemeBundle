@@ -21,17 +21,25 @@
         </params>
     </property>
 
-    <property name="heroTitle" type="text_line" colspan="12">
+    <property name="heroTitle" type="iw_theme_title_editor" colspan="12">
         <meta>
             <title>iw_sulu_tailwind_theme.page.hero_title</title>
             <info_text>iw_sulu_tailwind_theme.page.hero_title_info</info_text>
         </meta>
+        <params>
+            <param name="color" value="true"/>
+            <param name="highlight" value="false"/>
+        </params>
     </property>
 
-    <property name="heroSubtitle" type="text_line" colspan="12">
+    <property name="heroSubtitle" type="iw_theme_title_editor" colspan="12">
         <meta>
             <title>iw_sulu_tailwind_theme.page.hero_subtitle</title>
             <info_text>iw_sulu_tailwind_theme.page.hero_subtitle_info</info_text>
         </meta>
+        <params>
+            <param name="color" value="true"/>
+            <param name="highlight" value="false"/>
+        </params>
     </property>
 </properties>

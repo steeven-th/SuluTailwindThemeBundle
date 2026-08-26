@@ -61,7 +61,7 @@
          data-location-map-scroll-zoom-value="{{ iw_sulu_tailwind_theme.components_mapsScrollZoom|default('ctrl') }}"
          data-location-map-marker-url-value="{{ markerUrl ?? '' }}"
          data-location-map-popup-value="{{ (popup ?? true) ? 'true' : 'false' }}"
-         data-location-map-popup-title-value="{{ title|default('') }}"
+         data-location-map-popup-title-value="{{ iw_sulu_tailwind_theme_title_text(title|default('')) }}"
          data-location-map-popup-address-value="{{ address|default('') }}"
          data-location-map-external-url-value="{{ externalUrl }}"
          data-location-map-external-label-value="{{ 'iw_sulu_tailwind_theme.open_map'|trans }}"

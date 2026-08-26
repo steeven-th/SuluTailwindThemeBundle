@@ -77,6 +77,37 @@ final class ThemeFixturesTest extends TestCase
         self::assertStringNotContainsString('ref:', $css);
     }
 
+    #[Test]
+    #[DataProvider('presetProvider')]
+    public function itGivesEveryVariantAHighlightColor(string $name): void
+    {
+        $preset = ThemeFixtures::getPresets()[$name];
+        $variants = $preset['tokens']['blockVariants'] ?? [];
+
+        self::assertNotEmpty($variants, "$name should ship variants");
+
+        foreach ($variants as $variant) {
+            self::assertArrayHasKey(
+                'highlight',
+                $variant,
+                sprintf('%s variant "%s" needs a highlight color', $name, $variant['slug'] ?? '?'),
+            );
+            self::assertNotSame(
+                '',
+                trim((string) $variant['highlight']),
+                sprintf('%s variant "%s" has an empty highlight color', $name, $variant['slug'] ?? '?'),
+            );
+        }
+
+        // And it reaches the compiled CSS as a resolved value, once per variant.
+        $css = $this->compile($preset['tokens']);
+        self::assertSame(
+            \count($variants),
+            substr_count($css, '--iw-variant-highlight:'),
+            "$name should publish one highlight value per variant",
+        );
+    }
+
     /**
      * Compile theme tokens to CSS via the pure generateCss() method.
      *

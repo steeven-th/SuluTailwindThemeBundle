@@ -13,6 +13,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
+use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
@@ -45,6 +46,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         private readonly FormViewDuplicator $formViewDuplicator,
         private readonly FormSuccessResolver $formSuccessResolver,
         private readonly LanguageLabelResolver $languageLabelResolver,
+        private readonly TitleMarkupRenderer $titleMarkupRenderer,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
     ) {
     }
@@ -74,6 +76,10 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_title_markup', $this->getTitleMarkup(...), [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('iw_sulu_tailwind_theme_title_text', $this->getTitleText(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
@@ -398,6 +404,41 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         $tag = strtolower(trim((string) $tag));
 
         return \in_array($tag, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], true) ? $tag : $default;
+    }
+
+    /**
+     * Render a title stored by the title editor to HTML.
+     *
+     * The stored value is plain text carrying `[[word]]` markers and real line
+     * breaks. The renderer escapes it before inserting any tag, so the result
+     * is safe to print unescaped - which is why this function is declared
+     * `is_safe: html` and templates never need `|raw`.
+     *
+     * @param string|null $text       The stored title
+     * @param bool        $allowColor Whether `[[color:word]]` markers keep their
+     *                                explicit color. Pass false on a block title,
+     *                                whose accent color comes from its variant.
+     *
+     * @return string HTML
+     */
+    public function getTitleMarkup(?string $text, bool $allowColor = true): string
+    {
+        return $this->titleMarkupRenderer->render($text, $allowColor);
+    }
+
+    /**
+     * Strip a title down to its bare text.
+     *
+     * For anywhere a title must be plain: a `<title>` tag, a meta description,
+     * an `alt` attribute, an aria-label.
+     *
+     * @param string|null $text The stored title
+     *
+     * @return string The title without markers or line breaks
+     */
+    public function getTitleText(?string $text): string
+    {
+        return $this->titleMarkupRenderer->toPlainText($text);
     }
 
     /**

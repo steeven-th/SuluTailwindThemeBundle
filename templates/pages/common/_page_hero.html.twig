@@ -76,7 +76,7 @@
 {% set renderBanner = hasImage or (display != 'hidden' and hasHeader) %}
 
 {% if display == 'hidden' and heroTitle is not empty and not renderBanner %}
-    <h1 class="iw-visually-hidden">{{ heroTitle }}</h1>
+    <h1 class="iw-visually-hidden">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
 {% endif %}
 
 {% if renderBanner %}
@@ -87,7 +87,7 @@
         {# "hidden" hides the title visually, not semantically: the page
            would otherwise ship without any <h1>. #}
         {% if display == 'hidden' and heroTitle is not empty %}
-            <h1 class="iw-visually-hidden">{{ heroTitle }}</h1>
+            <h1 class="iw-visually-hidden">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
         {% endif %}
 
         {% if hasImage %}
@@ -107,10 +107,10 @@
             <div class="iw-page-hero__overlay iw-page-hero--y-{{ alignY }}{{ hasImage ? ' iw-page-hero--shade-' ~ shade : '' }}">
                 <div class="iw-page-hero__inner iw-page-hero--x-{{ alignX }} container mx-auto px-4 sm:px-6 lg:px-8">
                     {% if heroTitle is not empty %}
-                        <h1 class="iw-page-hero__title">{{ heroTitle }}</h1>
+                        <h1 class="iw-page-hero__title">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
                     {% endif %}
                     {% if heroSubtitle is not empty %}
-                        <p class="iw-page-hero__subtitle">{{ heroSubtitle }}</p>
+                        <p class="iw-page-hero__subtitle">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
                     {% endif %}
                     {# Overlay: breadcrumb sits below the text, aligned with it. #}
                     {% if showBreadcrumb %}
@@ -142,10 +142,10 @@
                 </div>
             {% endif %}
             {% if heroTitle is not empty %}
-                <h1 class="iw-page-hero__title iw-page-hero__title--below">{{ heroTitle }}</h1>
+                <h1 class="iw-page-hero__title iw-page-hero__title--below">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
             {% endif %}
             {% if heroSubtitle is not empty %}
-                <p class="iw-page-hero__subtitle iw-page-hero__subtitle--below">{{ heroSubtitle }}</p>
+                <p class="iw-page-hero__subtitle iw-page-hero__subtitle--below">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
             {% endif %}
         </div>
     {% endif %}

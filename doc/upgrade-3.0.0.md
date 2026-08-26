@@ -547,3 +547,73 @@ confirms the one that was posted, and the visitor lands on the confirmation.
 `forms/_sulu_form.html.twig`: such an override renders the form unconditionally
 and therefore keeps the old silent behaviour. Add the branch — see
 [Form block](form-block.md#after-a-successful-submission).
+
+## Multi-line titles with highlighted words (new)
+
+Titles can now span several lines and put a few words forward in another color.
+Editors select words and press a button; the value stays plain text.
+
+### Field type change (breaking for custom templates)
+
+Block titles, page hero titles and the article subtitle move from `text_line`
+to `iw_theme_title_editor`:
+
+| Property | Where | Params used |
+|----------|-------|-------------|
+| `title`, `subTitle` | the 13 blocks that have a block heading | none (highlight button only) |
+| `heroTitle`, `heroSubtitle` | `fragments/page-hero.xml` | `color="true"`, `highlight="false"` |
+| `subtitle` | `fragments/article-hero.xml` | `color="true"`, `highlight="false"` |
+
+**Existing content needs no migration**: a title without a marker is already
+valid input, and the renderer leaves it untouched apart from escaping it,
+exactly as Twig did before.
+
+Two properties deliberately keep `text_line`, because neither is a heading:
+
+- the page `title` and the article title, which feed the URL (`sulu.rlp.part`),
+  the menus and the breadcrumb
+- the `title` / `subTitle` of a **key figure**, which are the caption of a
+  number and render as `<span>`, not as a heading
+
+If you wrote your own page or block template, switch the type and add the
+params you want. See [Title editor](./title-editor.md).
+
+### Template overrides (breaking)
+
+If you override a template that prints a title, the raw variable no longer
+renders the markers. Replace:
+
+```twig
+{# before #}
+<h2 class="iw-block__title">{{ title }}</h2>
+
+{# after: false = an explicit color degrades to the variant highlight #}
+<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</h2>
+```
+
+`iw_sulu_tailwind_theme_title_markup()` is declared `is_safe: html`, so no
+`|raw` is needed - and none should be added.
+
+Anywhere the title must be **plain** (a `<title>` tag, a meta description, an
+`alt`, an aria-label, a `data-*` attribute), use
+`iw_sulu_tailwind_theme_title_text()` instead. Note that `|striptags` is NOT
+enough: it removes tags, and a marker is not a tag.
+
+### New variant token: `highlight`
+
+Block variants gain a **Highlight color**, compiled to `--iw-variant-highlight`
+and consumed by the `.iw-highlight` class. A variant that leaves it empty falls
+back to `--color-accent`, so nothing has to be configured for the feature to
+work. The shipped theme presets set it on all their variants.
+
+### New CSS classes
+
+| Class | Color source |
+|-------|--------------|
+| `.iw-highlight` | `--iw-variant-highlight`, falling back to `--color-accent` |
+| `.iw-text--{color}` | the named palette color |
+| `.iw-text--{color}-{shade}` | the named palette color at that shade |
+
+The `.iw-text--*` set is generated from the palette, one class per color and per
+shade, under both the role alias and the slug. It adds roughly 9 KB to the
+compiled CSS, under 1 KB once compressed.

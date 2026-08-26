@@ -19,8 +19,8 @@ Exposed by the `page-hero.xml` fragment on the page template. Every field is opt
 | Field | Type | Behavior |
 |-------|------|----------|
 | `heroImage` | `single_media_selection` | Full-width banner at the top of the page. Focus-aware crop, `loading="eager"`, served as `<picture>` avif/webp via the shared `_image` partial (`iw_theme_hero` format, 1920×800). |
-| `heroTitle` | `text_line` | Rendered as the page **H1**. When set, it **overrides the page title** as the H1 — so an editor can keep a short page name (menus, breadcrumb) and a longer editorial headline here. |
-| `heroSubtitle` | `text_line` | Optional tagline shown below the title. |
+| `heroTitle` | `iw_theme_title_editor` | Rendered as the page **H1**. When set, it **overrides the page title** as the H1, so an editor can keep a short page name (menus, breadcrumb) and a longer editorial headline here. Spans several lines and can put words forward in a palette color - see [Title editor](./title-editor.md). |
+| `heroSubtitle` | `iw_theme_title_editor` | Optional tagline shown below the title, with the same multi-line and colored-words support. |
 
 ### Site-wide appearance — admin **Components → Page hero**
 
@@ -237,7 +237,7 @@ Instead of manually writing header properties and block lists, you can **include
 | Fragment | Path | Description |
 |----------|------|-------------|
 | Header | `fragments/header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
-| Page hero | `fragments/page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (text_line, overrides the H1) |
+| Page hero | `fragments/page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
 | Blocks | `fragments/blocks.xml` | `<block>` container with all 14 `<type ref="..."/>` |
 | Title group | `fragments/components/title_group.xml` | `title` + `subTitle` + `titleAlignment` (single_select) |
 | Variant | `fragments/components/variant.xml` | `variant` (iw_theme_variant_picker) |

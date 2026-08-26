@@ -48,6 +48,16 @@
                             </params>
                         </property>
 
+                        <property name="highlight" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_highlight_color</title>
+                                <info_text>iw_sulu_tailwind_theme.variant_highlight_color_info</info_text>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
                         <property name="paragraph" type="iw_theme_color_token_editor" colspan="4">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.variant_paragraph_color</title>
