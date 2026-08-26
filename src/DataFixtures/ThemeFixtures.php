@@ -1380,6 +1380,14 @@ class ThemeFixtures
                     ['key' => 'default', 'label' => 'Par defaut', 'twig' => '_style_default.html.twig', 'default' => true],
                 ],
             ],
+            'grid' => [
+                'enabled' => true,
+                'styles' => [
+                    ['key' => 'two_columns', 'label' => '2 Colonnes', 'twig' => '_style_two_columns.html.twig', 'default' => true],
+                    ['key' => 'three_columns', 'label' => '3 Colonnes', 'twig' => '_style_three_columns.html.twig'],
+                    ['key' => 'four_columns', 'label' => '4 Colonnes', 'twig' => '_style_four_columns.html.twig'],
+                ],
+            ],
         ];
     }
 

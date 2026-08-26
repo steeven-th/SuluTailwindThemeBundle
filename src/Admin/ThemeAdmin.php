@@ -135,6 +135,11 @@ class ThemeAdmin extends Admin
             ['key' => 'side_by_side', 'label' => 'iw_sulu_tailwind_theme.style.side_by_side'],
             ['key' => 'spotlight', 'label' => 'iw_sulu_tailwind_theme.style.spotlight'],
         ],
+        'grid' => [
+            ['key' => 'two_columns', 'label' => 'iw_sulu_tailwind_theme.style.two_columns'],
+            ['key' => 'three_columns', 'label' => 'iw_sulu_tailwind_theme.style.three_columns'],
+            ['key' => 'four_columns', 'label' => 'iw_sulu_tailwind_theme.style.four_columns'],
+        ],
     ];
 
     /**

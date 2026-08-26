@@ -49,7 +49,8 @@
 {% endif %}
 
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
+    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %} {{ customClasses|default('') }}"
+    {% if customId is defined and customId %}id="{{ customId|e('html_attr') }}"{% endif %}
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >

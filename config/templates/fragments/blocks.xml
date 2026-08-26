@@ -23,6 +23,7 @@
             <type ref="article_list"/>
             <type ref="article_carousel"/>
             <type ref="article_featured"/>
+            <type ref="grid"/>
         </types>
     </block>
 </properties>

@@ -683,5 +683,21 @@
     "iw_sulu_tailwind_theme.style.article_blog_sidebar": "Barre latérale",
     "iw_sulu_tailwind_theme.style.article_listing_grid": "Grille",
     "iw_sulu_tailwind_theme.style.article_listing_list": "Liste",
-    "iw_sulu_tailwind_theme.style.article_listing_cards": "Cartes"
+    "iw_sulu_tailwind_theme.style.article_listing_cards": "Cartes",
+
+    "iw_sulu_tailwind_theme.custom_id": "ID HTML",
+    "iw_sulu_tailwind_theme.custom_classes": "Classes CSS",
+
+    "iw_sulu_tailwind_theme.block.grid": "Grille / Colonnes",
+    "iw_sulu_tailwind_theme.grid_items": "Éléments de grille",
+    "iw_sulu_tailwind_theme.grid_item": "Élément de grille",
+    "iw_sulu_tailwind_theme.gap_size": "Espacement entre colonnes",
+    "iw_sulu_tailwind_theme.gap_none": "Aucun espacement",
+    "iw_sulu_tailwind_theme.gap_sm": "Petit",
+    "iw_sulu_tailwind_theme.gap_md": "Moyen",
+    "iw_sulu_tailwind_theme.gap_lg": "Grand",
+    "iw_sulu_tailwind_theme.gap_xl": "Très grand",
+    "iw_sulu_tailwind_theme.style.two_columns": "2 colonnes",
+    "iw_sulu_tailwind_theme.style.three_columns": "3 colonnes",
+    "iw_sulu_tailwind_theme.style.four_columns": "4 colonnes"
 }

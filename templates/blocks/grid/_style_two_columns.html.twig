@@ -1,0 +1,20 @@
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% set defaultCellStyles = {
+        'text': 'one_column', 'text_images': 'classic', 'gallery': 'grid',
+        'key_figures': 'inline', 'cta': 'centered', 'testimonial': 'cards',
+        'separator': 'line', 'document': 'default'
+    } %}
+    <div class="grid grid-cols-1 md:grid-cols-2 {{ gapSize|default('gap-6') }}">
+        {% for item in items %}
+            {% set cellType = item.type %}
+            {% set cellStyle = item.style|default('') %}
+            {% if cellStyle is empty %}{% set cellStyle = defaultCellStyles[cellType]|default('default') %}{% endif %}
+            {% include [
+                '@ItechWorldSuluTailwindTheme/blocks/' ~ cellType ~ '/_style_' ~ cellStyle ~ '.html.twig',
+                '@ItechWorldSuluTailwindTheme/blocks/' ~ cellType ~ '/_style_' ~ (defaultCellStyles[cellType]|default('default')) ~ '.html.twig'
+            ] ignore missing with item %}
+        {% endfor %}
+    </div>
+{% endblock %}

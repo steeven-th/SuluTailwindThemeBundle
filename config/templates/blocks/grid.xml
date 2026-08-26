@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<!-- Global block type: Text -->
+<!-- Global block type: Grid / Columns -->
 <template xmlns="http://schemas.sulu.io/template/template"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
-    <key>text</key>
+    <key>grid</key>
     <meta>
-        <title>iw_sulu_tailwind_theme.block.text</title>
+        <title>iw_sulu_tailwind_theme.block.grid</title>
     </meta>
 
     <properties>
@@ -14,26 +14,21 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
-                <property name="title" type="text_line">
-                    <meta><title>iw_sulu_tailwind_theme.title</title></meta>
-                </property>
-                <property name="subTitle" type="text_line">
-                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
-                </property>
-                <property name="titleAlignment" type="single_select">
-                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
-                    <params>
-                        <param name="default_value" value="left"/>
-                        <param name="values" type="collection">
-                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
-                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
-                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="text" type="text_editor">
-                    <meta><title>iw_sulu_tailwind_theme.text</title></meta>
-                </property>
+                <block name="items" default-type="text" minOccurs="1">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.grid_items</title>
+                    </meta>
+                    <types>
+                        <type ref="text"/>
+                        <type ref="text_images"/>
+                        <type ref="gallery"/>
+                        <type ref="cta"/>
+                        <type ref="key_figures"/>
+                        <type ref="testimonial"/>
+                        <type ref="separator"/>
+                        <type ref="document"/>
+                    </types>
+                </block>
             </properties>
         </section>
 
@@ -47,7 +42,7 @@
                 <property name="style" type="iw_theme_style_picker" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
                     <params>
-                        <param name="block_type" value="text"/>
+                        <param name="block_type" value="grid"/>
                     </params>
                 </property>
             </properties>
@@ -57,6 +52,19 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <property name="gapSize" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.gap_size</title></meta>
+                    <params>
+                        <param name="default_value" value="gap-6"/>
+                        <param name="values" type="collection">
+                            <param name="gap-0"><meta><title>iw_sulu_tailwind_theme.gap_none</title></meta></param>
+                            <param name="gap-2"><meta><title>iw_sulu_tailwind_theme.gap_sm</title></meta></param>
+                            <param name="gap-6"><meta><title>iw_sulu_tailwind_theme.gap_md</title></meta></param>
+                            <param name="gap-10"><meta><title>iw_sulu_tailwind_theme.gap_lg</title></meta></param>
+                            <param name="gap-16"><meta><title>iw_sulu_tailwind_theme.gap_xl</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
                     <params>
@@ -105,11 +113,8 @@
                         <param name="default_value" value="rounded-none"/>
                     </params>
                 </property>
-                <property name="paragraphImageRadius" type="iw_theme_radius_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.paragraph_image_radius</title></meta>
-                    <params>
-                        <param name="default_value" value="rounded-none"/>
-                    </params>
+                <property name="showBackground" type="checkbox">
+                    <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
                 </property>
                 <property name="customId" type="text_line" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.custom_id</title></meta>

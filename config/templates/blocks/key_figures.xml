@@ -120,6 +120,12 @@
                 <property name="showBackground" type="checkbox">
                     <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
                 </property>
+                <property name="customId" type="text_line" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.custom_id</title></meta>
+                </property>
+                <property name="customClasses" type="text_line" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.custom_classes</title></meta>
+                </property>
             </properties>
         </section>
     </properties>

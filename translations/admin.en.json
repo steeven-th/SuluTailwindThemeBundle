@@ -592,5 +592,21 @@
     "iw_sulu_tailwind_theme.style.article_blog_sidebar": "Sidebar",
     "iw_sulu_tailwind_theme.style.article_listing_grid": "Grid",
     "iw_sulu_tailwind_theme.style.article_listing_list": "List",
-    "iw_sulu_tailwind_theme.style.article_listing_cards": "Cards"
+    "iw_sulu_tailwind_theme.style.article_listing_cards": "Cards",
+
+    "iw_sulu_tailwind_theme.custom_id": "HTML ID",
+    "iw_sulu_tailwind_theme.custom_classes": "CSS classes",
+
+    "iw_sulu_tailwind_theme.block.grid": "Grid / Columns",
+    "iw_sulu_tailwind_theme.grid_items": "Grid items",
+    "iw_sulu_tailwind_theme.grid_item": "Grid item",
+    "iw_sulu_tailwind_theme.gap_size": "Gap between columns",
+    "iw_sulu_tailwind_theme.gap_none": "No gap",
+    "iw_sulu_tailwind_theme.gap_sm": "Small",
+    "iw_sulu_tailwind_theme.gap_md": "Medium",
+    "iw_sulu_tailwind_theme.gap_lg": "Large",
+    "iw_sulu_tailwind_theme.gap_xl": "Extra large",
+    "iw_sulu_tailwind_theme.style.two_columns": "2 columns",
+    "iw_sulu_tailwind_theme.style.three_columns": "3 columns",
+    "iw_sulu_tailwind_theme.style.four_columns": "4 columns"
 }

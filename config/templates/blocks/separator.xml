@@ -141,6 +141,12 @@
                         <param name="default_value" value="px-5"/>
                     </params>
                 </property>
+                <property name="customId" type="text_line" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.custom_id</title></meta>
+                </property>
+                <property name="customClasses" type="text_line" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.custom_classes</title></meta>
+                </property>
             </properties>
         </section>
     </properties>
