@@ -49,5 +49,14 @@
 {# Anchor target of the redirect, so the visitor lands on the form rather than
    at the top of a long page. Rendered here rather than expected on the <form>
    element: the handler builds the anchor on its own and cannot know what id a
-   project gave its form. #}
-<span id="iw-form-block-{{ index }}" aria-hidden="true"></span>
+   project gave its form.
+
+   `iw-visually-hidden` is what keeps it out of the layout. The <form> carries
+   `iw-form__grid`, so it is a flex container: an empty inline <span> is still a
+   flex item, and an item with no width still eats one column gap - enough to
+   shift the whole grid. The hidden inputs above escape this only because the
+   user agent stylesheet gives them `display: none`.
+
+   `position: absolute` takes it out of the flow without `display: none`, which
+   would make it unreachable as a scroll target - the one thing it exists for. #}
+<span id="iw-form-block-{{ index }}" class="iw-visually-hidden" aria-hidden="true"></span>
