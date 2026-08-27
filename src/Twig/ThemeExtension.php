@@ -17,6 +17,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
@@ -28,12 +29,17 @@ use Twig\TwigFunction;
  * Exposes theme data (CSS path, fonts, tokens, menu config, block styles)
  * to Twig templates for rendering themed website pages.
  */
-class ThemeExtension extends AbstractExtension implements GlobalsInterface
+class ThemeExtension extends AbstractExtension implements GlobalsInterface, ResetInterface
 {
     /**
-     * Sequence backing getUniqueId(), reset on every request with the service.
+     * Sequence backing getUniqueId(), reset between requests by reset().
      */
     private int $uniqueIdCounter = 0;
+
+    /**
+     * Sequence backing getNextFormIndex(), reset between requests by reset().
+     */
+    private int $formIndexCounter = 0;
 
     public function __construct(
         private readonly ThemeProvider $themeProvider,
@@ -89,6 +95,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('iw_sulu_tailwind_theme_form_success_text', $this->getFormSuccessText(...)),
             new TwigFunction('iw_sulu_tailwind_theme_form_id', $this->getFormId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_next_form_index', $this->getNextFormIndex(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
@@ -247,6 +254,46 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface
         $prefix = preg_replace('/[^a-z0-9-]/', '', strtolower($prefix)) ?: 'iw';
 
         return \sprintf('iw-%s-%d', $prefix, ++$this->uniqueIdCounter);
+    }
+
+    /**
+     * Number the form block about to render.
+     *
+     * A page may hold several form blocks, and in Twig template mode they can
+     * all point at the same project template. Rendered as is, that template
+     * emits the same HTML ids twice: every `for` attribute then targets the
+     * first field of the page, `aria-describedby` points at the wrong error,
+     * and a post-submission anchor is ambiguous. The project cannot fix that on
+     * its own, since nothing in the include context tells one block from
+     * another, so the block hands its template this index to prefix ids with.
+     *
+     * The number is the rank of the form block on the page whatever mode each
+     * block uses: mixing the two modes still yields 1, 2, 3. SuluFormBundle
+     * mode has no use for it - FormViewDuplicator already suffixes the ids of a
+     * form view rendered twice - but counting there too is what keeps the rank
+     * predictable.
+     *
+     * @return int The 1-based rank of the form block in the current rendering
+     */
+    public function getNextFormIndex(): int
+    {
+        return ++$this->formIndexCounter;
+    }
+
+    /**
+     * Start both per-request sequences over.
+     *
+     * Called by Symfony's services resetter between requests. Under php-fpm the
+     * extension is rebuilt anyway, but a worker runtime (FrankenPHP,
+     * RoadRunner) keeps the same instance alive: without this, ids would drift
+     * from one request to the next and the same page would render differently
+     * every time - straight into a shared cache, on this theme's page
+     * templates.
+     */
+    public function reset(): void
+    {
+        $this->uniqueIdCounter = 0;
+        $this->formIndexCounter = 0;
     }
 
     /**

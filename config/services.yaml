@@ -213,6 +213,11 @@ services:
             - '@itech_world.sulu_tailwind_theme.language_label_resolver'
             - '@itech_world.sulu_tailwind_theme.title_markup_renderer'
             - '@?sulu_core.webspace.request_analyzer'
+        # The extension holds per-request counters (unique ids, form block
+        # index) that end up in HTML served from a long-lived proxy cache, so it
+        # implements ResetInterface: autoconfiguration tags it kernel.reset and
+        # a worker runtime (FrankenPHP, RoadRunner), which keeps the very same
+        # instance across requests, starts each page over at 1.
         tags:
             - { name: 'twig.extension' }
 

@@ -24,6 +24,10 @@
    nothing with no explanation is the hardest kind of bug to chase.
 #}
 
+{# Rank of this form block in the page, counted across both modes. Read before
+   anything else so the number follows the order the blocks render in. #}
+{% set formIndex = iw_sulu_tailwind_theme_next_form_index() %}
+
 {% if useSuluFormBundle|default(false) %}
     {% if not iw_sulu_tailwind_theme_has_form_bundle() %}
         {% if app.environment == 'dev' %}
@@ -50,7 +54,14 @@
     {# Custom Twig template include — user provides the template path from their project #}
     {% if twigTemplate is defined and twigTemplate is not empty %}
         {% if iw_sulu_tailwind_theme_template_exists(twigTemplate) %}
-            {% include twigTemplate %}
+            {# Deliberately without `only`: the included template keeps seeing the
+               context it has always seen (useSuluFormBundle, form, twigTemplate,
+               colorScheme), so projects written against earlier versions are
+               untouched. formIndex is added on top, and is what lets the same
+               template be used by two blocks of a page without emitting the same
+               HTML ids twice. The full list is documented in doc/form-block.md,
+               under "What the included template receives". #}
+            {% include twigTemplate with { formIndex: formIndex } %}
         {% elseif app.environment == 'dev' %}
             {# A typo in the path used to render nothing at all, with no hint. #}
             <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.form_template_missing'|trans({'%template%': twigTemplate}) }}</p>
