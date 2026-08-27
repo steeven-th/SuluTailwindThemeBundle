@@ -79,11 +79,54 @@ marker is already valid input.
 
 | Param | Default | Effect |
 |-------|---------|--------|
-| `highlight` | `true` | Show the highlight button |
-| `color` | `false` | Show the palette button |
+| `context` | `blocks` | Which set of project defaults applies: `blocks` or `pages` |
+| `highlight` | from the config | Force the highlight button on or off for THIS field |
+| `color` | from the config | Force the palette button on or off for THIS field |
 
-They are independent: turning both on gives an editor both buttons on the same
-field.
+`highlight` and `color` are independent: turning both on gives an editor both
+buttons on the same field.
+
+Set them only for a field that must differ from the rest of its context. Leaving
+them out is the normal case: the field then follows the project configuration
+below, which is what makes the setting site-wide.
+
+---
+
+## Configuring which buttons appear
+
+Which buttons the editor gets is a **project** decision, not a bundle one. Set it
+in your YAML:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    title_editor:
+        blocks:
+            highlight: true
+            color: false
+        pages:
+            highlight: false
+            color: true
+```
+
+Those are the defaults, so **a project that configures nothing keeps the shipped
+behavior**. Values merge key by key: setting only `blocks.color` leaves
+everything else untouched.
+
+Two contexts:
+
+| Context | Covers | Why that default |
+|---------|--------|------------------|
+| `blocks` | block headings and subheadings | their accent color comes from the block variant, so a per-word palette would compete with it |
+| `pages` | page hero titles and subtitles, article subtitles | they sit outside any variant, so there is no variant color to inherit and the editor picks one |
+
+Resolution goes from most specific to least: **an explicit XML param**, then
+**the project config for the declared context**, then **the shipped default**. A
+project can therefore turn the palette on everywhere and still force it off on
+one particular field.
+
+The setting is global per context, not per block. Wanting the palette on the CTA
+block but nowhere else means overriding that block's XML, not configuring it.
 
 ---
 

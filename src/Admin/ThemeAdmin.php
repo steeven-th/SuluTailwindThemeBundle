@@ -196,6 +196,8 @@ class ThemeAdmin extends Admin
         private WebspaceManagerInterface $webspaceManager,
         private ThemeConfigResolver $themeConfigResolver,
         private bool $articleTemplatesEnabled = false,
+        /** @var array<string, array<string, bool>> Buttons the title editor offers, per context */
+        private array $titleEditorConfig = [],
     ) {
     }
 
@@ -453,6 +455,11 @@ class ThemeAdmin extends Admin
             'articleStyles' => self::ARTICLE_STYLE_OPTIONS,
             'collapsibleSections' => self::COLLAPSIBLE_SECTIONS,
             'hasApiKey' => $this->googleFontsCatalog->hasApiKey(),
+            // Which buttons the title editor offers, per context. The field type
+            // reads this as its DEFAULT: an explicit param in a template's XML
+            // still wins, so a project can override one field without giving up
+            // the site-wide setting.
+            'titleEditor' => $this->titleEditorConfig,
         ]);
     }
 

@@ -19,9 +19,15 @@
                         <title>iw_sulu_tailwind_theme.title</title>
                         <info_text>iw_sulu_tailwind_theme.title_info</info_text>
                     </meta>
+                    <params>
+                        <param name="context" value="blocks"/>
+                    </params>
                 </property>
                 <property name="subTitle" type="iw_theme_title_editor">
                     <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                    <params>
+                        <param name="context" value="blocks"/>
+                    </params>
                 </property>
                 <property name="titleTag" type="single_select">
                     <meta>

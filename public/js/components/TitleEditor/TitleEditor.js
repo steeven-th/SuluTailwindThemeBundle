@@ -88,6 +88,18 @@ function boolOption(schemaOptions: ?Object, name: string, fallback: boolean): bo
 }
 
 /**
+ * Button defaults when the project configured nothing.
+ *
+ * Mirrors the bundle's own configuration tree: a block heading takes its accent
+ * color from its variant, so it needs no palette; a page title sits outside any
+ * variant, so it does.
+ */
+const SHIPPED_DEFAULTS = {
+    blocks: {highlight: true, color: false},
+    pages: {highlight: false, color: true},
+};
+
+/**
  * Locate every marker in a stored title.
  *
  * @param {string} value The stored title
@@ -171,13 +183,28 @@ export function classifySelection(value: string, start: number, end: number): Ob
  * does not try to preview anything.
  *
  * XML params:
- * - `highlight` (default true)  show the highlight button
- * - `color`     (default false) show the palette button; leave it off on a
- *                               block title, whose accent color comes from
- *                               its variant
+ * - `context`   which set of project defaults applies: `blocks` (a block
+ *               heading, the default) or `pages` (a page hero title or an
+ *               article subtitle)
+ * - `highlight` force the highlight button on or off for THIS field, whatever
+ *               the project configured
+ * - `color`     same, for the palette button
+ *
+ * Which buttons show up is resolved in three steps, most specific first: an
+ * explicit XML param, then the project's `title_editor` config for the
+ * declared context, then the shipped default. A project that configures
+ * nothing keeps the behavior it had.
  */
 @observer
 class TitleEditor extends React.Component<*> {
+    /**
+     * Per-context button defaults, from the project's YAML config.
+     *
+     * Filled once at boot by the admin config hook (see index.js). Empty when a
+     * project runs an older config: SHIPPED_DEFAULTS then applies.
+     */
+    static contextDefaults: Object = {};
+
     containerRef: ?HTMLElement = null;
 
     /** Anchor the color popover is positioned against. */
@@ -399,8 +426,20 @@ class TitleEditor extends React.Component<*> {
         const {disabled, schemaOptions, valid} = this.props;
         const {colorOpen, selection} = this.state;
 
-        const showHighlight = boolOption(schemaOptions, 'highlight', true);
-        const showColor = boolOption(schemaOptions, 'color', false);
+        const context = schemaOptions?.context?.value || 'blocks';
+        const shipped = SHIPPED_DEFAULTS[context] || SHIPPED_DEFAULTS.blocks;
+        const configured = TitleEditor.contextDefaults[context] || {};
+
+        const showHighlight = boolOption(
+            schemaOptions,
+            'highlight',
+            undefined === configured.highlight ? shipped.highlight : configured.highlight,
+        );
+        const showColor = boolOption(
+            schemaOptions,
+            'color',
+            undefined === configured.color ? shipped.color : configured.color,
+        );
 
         const {state, marker} = classifySelection(this.value, selection.start, selection.end);
         const actionable = !disabled && 'blocked' !== state;

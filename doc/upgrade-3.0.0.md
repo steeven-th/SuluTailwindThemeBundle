@@ -558,11 +558,16 @@ Editors select words and press a button; the value stays plain text.
 Block titles, page hero titles and the article subtitle move from `text_line`
 to `iw_theme_title_editor`:
 
-| Property | Where | Params used |
-|----------|-------|-------------|
-| `title`, `subTitle` | the 13 blocks that have a block heading | none (highlight button only) |
-| `heroTitle`, `heroSubtitle` | `fragments/page-hero.xml` | `color="true"`, `highlight="false"` |
-| `subtitle` | `fragments/article-hero.xml` | `color="true"`, `highlight="false"` |
+| Property | Where | Context declared |
+|----------|-------|------------------|
+| `title`, `subTitle` | the 13 blocks that have a block heading | `blocks` |
+| `heroTitle`, `heroSubtitle` | `fragments/page-hero.xml` | `pages` |
+| `subtitle` | `fragments/article-hero.xml` | `pages` |
+
+Which buttons each context offers is a project setting, see
+[Title editor](./title-editor.md#configuring-which-buttons-appear). The defaults
+are the highlight button on block headings and the palette button on page
+titles.
 
 **Existing content needs no migration**: a title without a marker is already
 valid input, and the renderer leaves it untouched apart from escaping it,

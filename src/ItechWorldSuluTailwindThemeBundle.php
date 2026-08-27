@@ -83,6 +83,40 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('title_editor')
+                    ->addDefaultsIfNotSet()
+                    ->info('Which buttons the title editor field offers, per context. Defaults reproduce the shipped behavior, so leaving this out changes nothing.')
+                    ->children()
+                        ->arrayNode('blocks')
+                            ->addDefaultsIfNotSet()
+                            ->info('Block headings. Their accent color comes from the block variant, so the palette button is off by default.')
+                            ->children()
+                                ->booleanNode('highlight')
+                                    ->defaultTrue()
+                                    ->info('Offer the highlight button, which colors the selection with the variant highlight color')
+                                ->end()
+                                ->booleanNode('color')
+                                    ->defaultFalse()
+                                    ->info('Offer the palette button, letting an editor pick an explicit color per word')
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('pages')
+                            ->addDefaultsIfNotSet()
+                            ->info('Page hero titles and article subtitles. They sit outside any variant, so the palette button is on by default.')
+                            ->children()
+                                ->booleanNode('highlight')
+                                    ->defaultFalse()
+                                    ->info('Offer the highlight button')
+                                ->end()
+                                ->booleanNode('color')
+                                    ->defaultTrue()
+                                    ->info('Offer the palette button')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('blocks')
                     ->addDefaultsIfNotSet()
                     ->info('Per-block security settings')
@@ -275,6 +309,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.article_templates_types',
             $config['article_templates']['types'],
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.title_editor',
+            $config['title_editor'],
         );
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts',
