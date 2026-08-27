@@ -89,10 +89,20 @@ final class FormBlockContractTest extends TestCase
             'An explicit id must still win, so the SuluFormBundle bridge keeps its own anchor.',
         );
 
+        $fields = self::read('forms/_fields.html.twig');
+
         self::assertStringContainsString(
             'iw-form-block-{{ index }}',
-            self::read('forms/_fields.html.twig'),
+            $fields,
             'Both sides must agree on the anchor: the marker in the form, and the id on the confirmation.',
+        );
+
+        // The <form> is a flex container (iw-form__grid): an empty span left in
+        // the flow is still a flex item, and eats a column gap.
+        self::assertMatchesRegularExpression(
+            '/<span id="iw-form-block-\{\{ index \}\}" class="[^"]*iw-visually-hidden/',
+            $fields,
+            'The anchor marker must stay out of the flex layout, without display:none - it has to remain a scroll target.',
         );
     }
 
