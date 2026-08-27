@@ -453,6 +453,23 @@ page always renders the same numbers, worker runtimes included.
 
 ---
 
+### `iw_sulu_tailwind_theme_turnstile_site_key()`
+
+The Cloudflare Turnstile site key, for a form written in Twig template mode. The
+SuluFormBundle mode gets its widget from a form field, which a hand-written
+form cannot use; without this, a project would have to declare the key a second
+time next to the one the bundle already forwards to pixelopen.
+
+You rarely call it directly - include
+`@ItechWorldSuluTailwindTheme/forms/_turnstile.html.twig`, which uses it and
+renders the widget - see [Cloudflare Turnstile](turnstile.md#in-twig-template-mode).
+
+Only the public site key is exposed, never the secret one.
+
+**Returns:** `string|null` - The site key, or `null` when Turnstile is off or unconfigured.
+
+---
+
 ### `iw_sulu_tailwind_theme_embed_url(url)`
 
 Validates the URL of an embedded frame **before it reaches an `src` attribute**.

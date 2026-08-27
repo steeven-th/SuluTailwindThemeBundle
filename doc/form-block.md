@@ -205,10 +205,57 @@ follows them when they change:
 | `colorScheme` | `light` / `dark` / `auto`. `dark` adds the `--dark` modifier, so pass the block's own value straight through. |
 | `id` | The element id, and the anchor a redirect can point at. Optional: omit it and no id is emitted. |
 
+The bundle's own default message is available too, translated in the page locale, when the
+project would rather not write one:
+
+```twig
+text: 'iw_sulu_tailwind_theme.form_success_default'|trans
+```
+
 Restyling goes through the CSS API (`--iw-form-success-*`, see
 [Forms - CSS API → Success message](css-api/forms.md#success-message)). To change the
 markup itself, override the partial at the standard bundle path:
 `templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_success.html.twig`.
+
+### Anti-spam
+
+A form the bundle does not build cannot get the SuluFormBundle protections, but the two
+that matter are available.
+
+**A honeypot** costs three lines and stops the robots that fill in everything they find.
+Hide it from sight, from the keyboard and from screen readers, then treat a submission that
+filled it as a success without sending anything - answering with an error teaches the robot
+which field to avoid next time:
+
+```twig
+<div hidden aria-hidden="true">
+    <label for="{{ uid }}-website">{{ 'Do not fill in this field'|trans }}</label>
+    <input type="text" id="{{ uid }}-website" name="website" tabindex="-1" autocomplete="off">
+</div>
+```
+
+**Cloudflare Turnstile** is a form field in SuluFormBundle mode, which a hand-written form
+cannot use. Include the partial instead, and the widget uses the key already configured for
+the bundle - no second declaration:
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/forms/_turnstile.html.twig' with {
+    colorScheme: colorScheme|default('auto')
+} only %}
+```
+
+| Parameter | Role |
+|-----------|------|
+| `colorScheme` | `light` / `dark` / `auto`. The widget renders in an iframe and cannot inherit the theme CSS, it only takes this hint. Pass the block's own value. |
+| `attributes` | Optional map of extra data attributes (`{ 'data-action': 'contact' }`) for the Turnstile options the partial does not cover. |
+
+It renders nothing when Turnstile is off or unconfigured, so the include is safe to leave in
+place. Setup and keys are in [Cloudflare Turnstile](turnstile.md).
+
+> **The widget alone stops nothing.** Cloudflare answers it with a token in the
+> `cf-turnstile-response` field of the POST, and your handler has to verify that token
+> server-side - see [Verifying the token yourself](turnstile.md#verifying-the-token-yourself).
+> A widget nobody checks is decoration.
 
 ### Handling the submission
 
@@ -257,6 +304,10 @@ framework:
         # page, where a session-bound token would be the first visitor's.
         stateless_token_ids: ['contact']
 ```
+
+Symfony already ships `submit`, `authenticate` and `logout` in that list, so naming the token
+`submit` needs no configuration at all. Declare an id of your own when you want the form's
+token named after the form.
 
 Every other token of the application, the admin login form included, keeps its session
 behaviour. Two things to check:
