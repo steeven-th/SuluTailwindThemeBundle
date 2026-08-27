@@ -128,6 +128,15 @@ final class FormBlockContractTest extends TestCase
             $partial,
             'Only the public site key belongs in the HTML, never the secret one.',
         );
+
+        // Enabled without a key renders no widget while the server-side check
+        // keeps refusing every submission - a state that only appears once
+        // deployed, so it has to be said out loud somewhere.
+        self::assertStringContainsString(
+            "iw_sulu_tailwind_theme_turnstile_status() == 'missing_key'",
+            $partial,
+            'A Turnstile enabled without a key must be reported, not silently render nothing.',
+        );
     }
 
     #[Test]

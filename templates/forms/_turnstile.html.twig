@@ -29,6 +29,15 @@
 
 {% set siteKey = iw_sulu_tailwind_theme_turnstile_site_key() %}
 
+{# Enabled but unconfigured is the worst of both worlds: no widget, and a
+   server-side check that refuses every submission because the token is always
+   empty. It only happens once deployed - locally the keys are in .env - so it
+   is said out loud in dev rather than left to be discovered in production. In
+   prod the same case is logged, see ThemeExtension::getTurnstileStatus(). #}
+{% if iw_sulu_tailwind_theme_turnstile_status() == 'missing_key' and app.environment == 'dev' %}
+    <p class="iw-block-form__notice">{{ 'iw_sulu_tailwind_theme.turnstile_key_missing'|trans }}</p>
+{% endif %}
+
 {% if siteKey is not null %}
     {# `defer`: the script is only needed once the widget is in the DOM, and a
        blocking third-party request in the middle of a page is a needless delay.

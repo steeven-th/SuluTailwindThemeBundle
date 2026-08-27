@@ -495,6 +495,23 @@ Only the public site key is exposed, never the secret one.
 
 ---
 
+### `iw_sulu_tailwind_theme_turnstile_status()`
+
+How usable the Turnstile configuration actually is: `off`, `ready`, `missing_key`
+(enabled with no key: no widget, and a server-side check that refuses every
+submission) or `test_key` (enabled with Cloudflare's "always passes" key: a
+challenge that protects nothing). The last two are logged as warnings in
+production, and `missing_key` is also shown on the page in `dev`.
+
+The widget partial calls it for you - reach for it directly only to render
+something of your own around it.
+
+**Returns:** `string` - `off`, `ready`, `missing_key` or `test_key`.
+
+See [Keys in production](turnstile.md#keys-in-production-and-the-two-ways-it-goes-wrong-silently).
+
+---
+
 ### `iw_sulu_tailwind_theme_embed_url(url)`
 
 Validates the URL of an embedded frame **before it reaches an `src` attribute**.

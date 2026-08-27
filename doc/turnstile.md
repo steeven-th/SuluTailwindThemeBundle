@@ -146,6 +146,41 @@ the only way to see the full widget on screen. The matching "always fails" secre
 
 These keys validate **everything**. They belong in `.env`, never in production.
 
+### Keys in production, and the two ways it goes wrong silently
+
+Both failures below are invisible locally - the keys sit in `.env` - and appear only once
+deployed, on the environment where nobody is watching the logs. The theme names them rather
+than rendering nothing.
+
+**The site key never reaches the application** (the variable is named differently on the
+host, or set empty). No widget renders, while the server-side check keeps running: the token
+is always empty, so **every submission is refused**, with an error the visitor cannot act on.
+
+- In `dev`: a `.iw-block-form__notice` says so, right where the widget would be.
+- In `prod`: a warning is logged, once per request.
+- `iw_sulu_tailwind_theme_turnstile_status()` returns `missing_key`.
+
+**The test keys reach production.** A committed `.env` that carries Cloudflare's test values
+is enough: nothing is overridden on the host, so the application boots happily with a
+challenge that validates *every* visitor, robots included. The form works, the anti-spam is
+decoration - which is worse than the previous case, because nothing looks wrong.
+
+- In `prod`: a warning is logged, once per request.
+- In `dev` and CI: nothing, this is the documented way to work locally.
+- `iw_sulu_tailwind_theme_turnstile_status()` returns `test_key`.
+
+Before deploying, check the four states apart:
+
+| `turnstile.enabled` | Site key reaching the app | Status | What the visitor gets |
+|---|---|---|---|
+| `false` | anything | `off` | No widget, no check. |
+| `true` | none or empty | `missing_key` | No widget, and every submission refused. |
+| `true` | Cloudflare's test key | `test_key` | A widget that passes everyone. |
+| `true` | the real key | `ready` | The challenge, doing its job. |
+
+The check is worth running against the deployed environment rather than the config file: the
+value only exists once the environment variables are resolved.
+
 ### Turning it off
 
 ```yaml

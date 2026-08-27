@@ -236,6 +236,10 @@ services:
             - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
             - '%itech_world_sulu_tailwind_theme.turnstile.site_key%'
             - '@request_stack'
+            # Turnstile misconfigurations only show up once deployed, so they are
+            # logged there rather than rendered on the page.
+            - '@logger'
+            - '%kernel.debug%'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and
