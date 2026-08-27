@@ -53,6 +53,14 @@ Everything else is literal text. Two things follow from that:
 An existing `text_line` title needs no migration either: a title without a
 marker is already valid input.
 
+> **One thing to know before renaming a color.** The name written in a title is
+> the *role* when the color has one (`primary`, `accent`…), and the *slug* for a
+> brand color, which has none. Renaming a brand color slug therefore breaks the
+> titles that used it: the class stops being generated and the word falls back
+> to the color of its heading. Nothing crashes, but the highlight is silently
+> lost. See
+> [Renaming a slug is breaking](./upgrade-3.0.0.md#renaming-a-slug-is-breaking).
+
 ---
 
 ## Using it in a template

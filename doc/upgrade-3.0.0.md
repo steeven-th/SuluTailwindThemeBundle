@@ -62,6 +62,43 @@ A slug is the stable identifier stored in content and refs. Renaming a brand
 color, variant or button slug **breaks** the content and `ref:` values that
 point to it. Rename deliberately.
 
+Where those identifiers live:
+
+| Kind | Stored as | Where |
+|------|-----------|-------|
+| variant | `variant: "dark"` | one field per block |
+| button style | `buttonStyle: "primary"` | one field per block |
+| palette color in a theme setting | `ref:accent-500` | the theme config |
+| palette color in a **title** | `[[accent-500:word]]` | inside the text itself |
+
+The last one is the one to watch. The first three are structured fields: a
+migration replaces a value and is done. A color used in a title sits **inside a
+sentence**, possibly several times per title, across every page and article, so
+rewriting it means a search and replace through `templateData`, not a field
+update.
+
+**What limits the damage.** The title editor stores the *role* when the color
+has one, and only falls back to the slug for a brand color:
+
+```js
+// public/js/components/PaletteGrid/PaletteGrid.js
+export function colorRefKey(color) {
+    return color.role || color.slug;
+}
+```
+
+So a title using `primary`, `secondary`, `accent` or `background` survives a
+slug rename untouched - the same trade-off `ref:` values already make. Only
+brand colors, which have no role, are stored by slug and therefore exposed.
+
+**What breaking looks like.** It degrades quietly rather than blowing up: the
+`.iw-text--<name>` class is no longer generated, the `<span>` stays in the HTML
+with no rule attached, and the word simply inherits the color of its heading.
+The highlight is lost, the layout and the copy are not.
+
+If you rename a brand color slug that editors have used in titles, plan a
+migration pass over `templateData` alongside the theme config one.
+
 ## Radius split: `paragraphImageRadius` → `paragraphRadius` / `cardRadius` / `imageRadius`
 
 The single per-block "Paragraph / Image radius" field coupled three different
