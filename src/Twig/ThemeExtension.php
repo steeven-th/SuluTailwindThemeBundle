@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
+use ItechWorld\SuluTailwindThemeBundle\ItechWorldSuluTailwindThemeBundle;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
@@ -17,6 +18,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
+use Psr\Log\LoggerInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
@@ -43,6 +45,14 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      */
     private int $formIndexCounter = 0;
 
+    /**
+     * Configuration warnings already logged, so a page holding several forms
+     * does not repeat the same line. Reset between requests by reset().
+     *
+     * @var array<int, string>
+     */
+    private array $loggedWarnings = [];
+
     public function __construct(
         private readonly ThemeProvider $themeProvider,
         private readonly ThemeCompiler $compiler,
@@ -59,6 +69,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly bool $turnstileEnabled = false,
         private readonly ?string $turnstileSiteKey = null,
         private readonly ?RequestStack $requestStack = null,
+        private readonly ?LoggerInterface $logger = null,
+        private readonly bool $debug = false,
     ) {
     }
 
@@ -106,6 +118,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
             new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
             new TwigFunction('iw_sulu_tailwind_theme_turnstile_site_key', $this->getTurnstileSiteKey(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_turnstile_status', $this->getTurnstileStatus(...)),
             new TwigFunction('iw_sulu_tailwind_theme_form_status', $this->getFormStatus(...)),
             new TwigFunction('iw_sulu_tailwind_theme_template_exists', $this->templateExists(...), [
                 'needs_environment' => true,
@@ -154,6 +167,65 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         return \in_array($status, [FormSubmissionHandler::STATUS_SENT, FormSubmissionHandler::STATUS_ERROR], true)
             ? $status
             : null;
+    }
+
+    /**
+     * How usable the Turnstile configuration actually is.
+     *
+     * Both broken states below are invisible locally and only show up once
+     * deployed, which is why the theme names them instead of rendering nothing:
+     *
+     *   - `missing_key`: the feature is on but no site key reached the app, so
+     *     no widget renders - while the server-side check keeps running. The
+     *     token is then always empty and *every* submission is refused. This is
+     *     what an environment variable named differently on the host looks like.
+     *   - `test_key`: the feature is on with Cloudflare's "always passes" test
+     *     key. Normal in dev and CI, a decoy in production: the challenge
+     *     validates every visitor, robots included.
+     *
+     * In production both are logged as warnings, once per request. In dev the
+     * widget partial turns `missing_key` into a visible notice; `test_key` says
+     * nothing there, since that is the documented way to work locally.
+     *
+     * @return string 'off', 'ready', 'missing_key' or 'test_key'
+     */
+    public function getTurnstileStatus(): string
+    {
+        if (!$this->turnstileEnabled) {
+            return 'off';
+        }
+
+        if (null === $this->turnstileSiteKey || '' === $this->turnstileSiteKey) {
+            $this->warnOnce('Cloudflare Turnstile is enabled but no site key is configured: no widget is rendered, while the server-side check still runs - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key.');
+
+            return 'missing_key';
+        }
+
+        if (ItechWorldSuluTailwindThemeBundle::TURNSTILE_TEST_SITE_KEY === $this->turnstileSiteKey) {
+            $this->warnOnce('Cloudflare Turnstile is enabled with the test site key, which validates every visitor: the challenge protects nothing. Set the real key in this environment.');
+
+            return 'test_key';
+        }
+
+        return 'ready';
+    }
+
+    /**
+     * Log a configuration warning once per request, in production only.
+     *
+     * In dev the same problems are shown on the page, where they cannot be
+     * missed; here the point is to leave a trace on a server nobody is watching.
+     *
+     * @param string $message The warning to log
+     */
+    private function warnOnce(string $message): void
+    {
+        if ($this->debug || null === $this->logger || \in_array($message, $this->loggedWarnings, true)) {
+            return;
+        }
+
+        $this->loggedWarnings[] = $message;
+        $this->logger->warning($message);
     }
 
     /**
@@ -353,6 +425,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     {
         $this->uniqueIdCounter = 0;
         $this->formIndexCounter = 0;
+        $this->loggedWarnings = [];
     }
 
     /**

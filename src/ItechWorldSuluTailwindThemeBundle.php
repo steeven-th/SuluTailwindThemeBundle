@@ -37,7 +37,15 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * never a fallback for an enabled Turnstile — a challenge validating
      * everything is worse than no challenge, because it looks protected.
      */
-    private const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
+    /**
+     * Cloudflare's "always passes" test site key.
+     *
+     * Public so the theme can recognise it at runtime: used while the feature is
+     * disabled it is a harmless placeholder, but reaching production with the
+     * feature enabled means the challenge validates every visitor, robots
+     * included - see ThemeExtension::getTurnstileStatus().
+     */
+    public const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
     private const TURNSTILE_TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
 
     /**

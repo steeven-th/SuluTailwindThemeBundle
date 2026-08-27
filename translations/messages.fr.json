@@ -65,5 +65,6 @@
     "iw_sulu_tailwind_theme.menu_languageNotTranslated": "Cette page n'existe pas dans cette langue, vous serez redirigé vers l'accueil",
     "iw_sulu_tailwind_theme.form_csrf_invalid": "Votre session a expiré. Merci de renvoyer le message.",
     "iw_sulu_tailwind_theme.form_technical_error": "Votre message n'a pas pu être envoyé pour une raison technique. Merci de réessayer plus tard.",
-    "iw_sulu_tailwind_theme.form_honeypot_label": "Ne remplissez pas ce champ"
+    "iw_sulu_tailwind_theme.form_honeypot_label": "Ne remplissez pas ce champ",
+    "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile est activé mais aucune clé de site n'est configurée : le widget ne s'affiche pas, alors que la vérification serveur continue de tourner - tous les envois seront refusés. Vérifiez la variable d'environnement derrière itech_world_sulu_tailwind_theme.turnstile.site_key."
 }
