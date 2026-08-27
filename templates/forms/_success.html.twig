@@ -1,0 +1,34 @@
+{#
+    Confirmation box shown in place of a form after a successful submission.
+
+    Shared entry point for both modes of the form block: the SuluFormBundle
+    bridge includes it with the success text authored in the admin, and a
+    project rendering its own form in Twig template mode includes it exactly the
+    same way. Nothing has to be copied, so a change to the markup or to the CSS
+    API reaches every project instead of leaving hand-made copies behind.
+
+    Override it in your project at the standard Symfony bundle path:
+    templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_success.html.twig
+
+    Parameters:
+      - text:        the message. Rendered `raw`, because the SuluFormBundle
+                     text is authored in a rich text editor - same trust level
+                     as any other block text. A project passing visitor input
+                     here escapes it itself.
+      - colorScheme: 'light' | 'dark' | 'auto' - 'dark' adds the `--dark`
+                     modifier, so the box follows the surface it sits on. The
+                     form block computes it and hands it to the included
+                     template.
+      - id:          the element id, used as the anchor a post-submission
+                     redirect points at. Optional: omit it and no id is emitted.
+#}
+
+<div class="iw-form-success{{ colorScheme|default('auto') == 'dark' ? ' iw-form-success--dark' }}"
+     {% if id|default('') is not empty %}id="{{ id }}"{% endif %}
+     role="status">
+    <svg class="iw-form-success__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"/>
+    </svg>
+    <div class="iw-form-success__text">{{ text|default('')|raw }}</div>
+</div>
