@@ -435,6 +435,24 @@ ever compared within one document; they are not stable across requests.
 
 ---
 
+### `iw_sulu_tailwind_theme_next_form_index()`
+
+Numbers the form block about to render, starting at `1`. The form block calls it
+for you and hands the result to the included template as `formIndex`, so you only
+need this function when you render the block's content yourself.
+
+The number is the rank of the form block in the page, counted across both modes
+of the block. It exists because a page can hold two form blocks pointing at the
+same project template, which would otherwise emit the same HTML ids twice - see
+[Form block → What the included template receives](form-block.md#what-the-included-template-receives).
+
+Like `iw_sulu_tailwind_theme_unique_id()`, the counter is per-request: the same
+page always renders the same numbers, worker runtimes included.
+
+**Returns:** `int` - The 1-based rank of the form block in the current rendering.
+
+---
+
 ### `iw_sulu_tailwind_theme_embed_url(url)`
 
 Validates the URL of an embedded frame **before it reaches an `src` attribute**.

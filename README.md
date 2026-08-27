@@ -731,7 +731,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Extending the theme configuration](doc/extensibility.md) | Adding your own admin fields (`custom_*` namespaces) and contributing CSS through `ThemeCompileEvent` |
 | [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
 | [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
-| [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, dev-only diagnostics |
+| [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, handling a submission on a cached page, dev-only diagnostics |
 | [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
