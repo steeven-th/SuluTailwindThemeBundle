@@ -195,7 +195,7 @@ follows them when they change:
 {% include '@ItechWorldSuluTailwindTheme/forms/_success.html.twig' with {
     text: 'Thank you, your message has been sent.'|trans,
     colorScheme: colorScheme|default('auto'),
-    id: 'contact-' ~ formIndex|default(1)
+    formIndex: formIndex|default(1)
 } only %}
 ```
 
@@ -203,7 +203,13 @@ follows them when they change:
 |-----------|------|
 | `text` | The message. Rendered `raw`, since the SuluFormBundle text comes from a rich text editor: escape it yourself if it ever carries visitor input. |
 | `colorScheme` | `light` / `dark` / `auto`. `dark` adds the `--dark` modifier, so pass the block's own value straight through. |
-| `id` | The element id, and the anchor a redirect can point at. Optional: omit it and no id is emitted. |
+| `formIndex` | The rank of the form block. The box then carries the id a post-submission redirect points at, so the visitor lands on the confirmation. |
+| `id` | An explicit id, when the project drives the anchor itself. Wins over `formIndex`. Optional: with neither, no id is emitted. |
+
+Pass `formIndex` rather than an id of your own: the anchor of a successful submission has to
+survive the form being replaced. The marker the hidden fields render lives **inside** the
+`<form>`, so it is gone by the time the confirmation shows - and the visitor would land at
+the top of the page, which is what the anchor exists to avoid.
 
 The bundle's own default message is available too, translated in the page locale, when the
 project would rather not write one:
@@ -340,10 +346,12 @@ behind a polite message.
 {% set uid = 'contact-' ~ index %}
 
 {% if iw_sulu_tailwind_theme_form_status(index) == 'sent' %}
+    {# formIndex, not an id of your own: the box then carries the anchor the
+       redirect points at, which the marker inside the <form> can no longer be. #}
     {% include '@ItechWorldSuluTailwindTheme/forms/_success.html.twig' with {
         text: 'iw_sulu_tailwind_theme.form_success_default'|trans,
         colorScheme: colorScheme|default('auto'),
-        id: uid
+        formIndex: index
     } only %}
 {% else %}
     {# Flashes are consumed as they are read: read them once, at the top. #}

@@ -19,12 +19,25 @@
                      modifier, so the box follows the surface it sits on. The
                      form block computes it and hands it to the included
                      template.
-      - id:          the element id, used as the anchor a post-submission
-                     redirect points at. Optional: omit it and no id is emitted.
+      - formIndex:   rank of the form block in the page, as handed to the included
+                     template. Enough on its own: the box then carries the id
+                     FormSubmissionHandler redirects to, so the visitor lands on
+                     the confirmation instead of at the top of the page. Without
+                     it the anchor points at the marker inside the <form>, which
+                     no longer exists once the form is replaced by this box.
+      - id:          an explicit element id, when the project drives the anchor
+                     itself. Wins over formIndex. Optional: with neither, no id
+                     is emitted.
 #}
 
+{# The anchor the post-submission redirect points at. An explicit id wins, so
+   the SuluFormBundle bridge keeps pointing at its own `iw-form-{formId}`. #}
+{% set anchorId = id|default('') is not empty
+    ? id
+    : (formIndex|default('') is not empty ? 'iw-form-block-' ~ formIndex : '') %}
+
 <div class="iw-form-success{{ colorScheme|default('auto') == 'dark' ? ' iw-form-success--dark' }}"
-     {% if id|default('') is not empty %}id="{{ id }}"{% endif %}
+     {% if anchorId is not empty %}id="{{ anchorId }}"{% endif %}
      role="status">
     <svg class="iw-form-success__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
