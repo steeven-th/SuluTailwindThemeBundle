@@ -1,0 +1,42 @@
+{#
+    Cloudflare Turnstile widget for a form written in Twig template mode.
+
+    The SuluFormBundle mode gets its widget from a form field, which a
+    hand-written form cannot use: without this partial, the anti-spam field
+    shipped by the bundle is simply out of reach in Twig template mode, and the
+    project ends up declaring the site key a second time to render its own.
+
+    IMPORTANT - this only renders the widget. Cloudflare answers it with a token
+    in the `cf-turnstile-response` field of the POST, and **the project must
+    verify that token server-side**: a widget nobody checks stops no robot at
+    all. See doc/turnstile.md.
+
+    Renders nothing when the feature is off or unconfigured, so a template can
+    include it unconditionally and a missing key never breaks a page.
+
+    Parameters:
+      - colorScheme: 'light' | 'dark' | 'auto' - the surface the form sits on.
+                     A widget inside an iframe cannot inherit the theme CSS, it
+                     only takes a light/dark hint, so pass the block's value
+                     straight through.
+      - attributes:  optional map of extra data attributes (e.g. { 'data-action':
+                     'contact' }), for the Turnstile options this partial does
+                     not cover.
+
+    Override it in your project at the standard Symfony bundle path:
+    templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_turnstile.html.twig
+#}
+
+{% set siteKey = iw_sulu_tailwind_theme_turnstile_site_key() %}
+
+{% if siteKey is not null %}
+    {# `defer`: the script is only needed once the widget is in the DOM, and a
+       blocking third-party request in the middle of a page is a needless delay.
+       Twig deduplicates nothing here, so a page holding two forms loads it
+       twice - the browser serves the second from its cache. #}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    <div class="iw-form__turnstile cf-turnstile"
+         data-sitekey="{{ siteKey }}"
+         data-theme="{{ colorScheme|default('auto') }}"
+         {%- for name, value in attributes|default({}) %} {{ name }}="{{ value }}"{% endfor %}></div>
+{% endif %}

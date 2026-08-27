@@ -133,6 +133,26 @@ services:
     itech_world.sulu_tailwind_theme.form_view_duplicator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator
 
+    # Form submissions written in the block's Twig template mode. csrf and
+    # validator are optional: a project that never handles a submission through
+    # the bundle must not be forced to install them, and the handler says which
+    # one is missing rather than fataling.
+    itech_world.sulu_tailwind_theme.request_data_mapper:
+        class: ItechWorld\SuluTailwindThemeBundle\Form\RequestDataMapper
+
+    itech_world.sulu_tailwind_theme.form_submission_handler:
+        class: ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler
+        arguments:
+            - '@request_stack'
+            - '@translator'
+            - '@itech_world.sulu_tailwind_theme.request_data_mapper'
+            - '@logger'
+            # Lets a broken project callback surface in dev instead of hiding
+            # behind the polite message the visitor gets in production.
+            - '%kernel.debug%'
+            - '@?security.csrf.token_manager'
+            - '@?validator'
+
     # Post-submission confirmation. The form repository is optional: without
     # SuluFormBundle there is no form to confirm, and the resolver falls back to
     # the translated default rather than failing to boot.
@@ -213,6 +233,9 @@ services:
             - '@itech_world.sulu_tailwind_theme.language_label_resolver'
             - '@itech_world.sulu_tailwind_theme.title_markup_renderer'
             - '@?sulu_core.webspace.request_analyzer'
+            - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
+            - '%itech_world_sulu_tailwind_theme.turnstile.site_key%'
+            - '@request_stack'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and
@@ -312,6 +335,8 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver: '@itech_world.sulu_tailwind_theme.variant_color_scheme_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator: '@itech_world.sulu_tailwind_theme.form_view_duplicator'
     ItechWorld\SuluTailwindThemeBundle\Service\FormSuccessResolver: '@itech_world.sulu_tailwind_theme.form_success_resolver'
+    ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler: '@itech_world.sulu_tailwind_theme.form_submission_handler'
+    ItechWorld\SuluTailwindThemeBundle\Form\RequestDataMapper: '@itech_world.sulu_tailwind_theme.request_data_mapper'
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'

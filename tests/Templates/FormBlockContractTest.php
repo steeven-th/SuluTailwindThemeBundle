@@ -67,6 +67,30 @@ final class FormBlockContractTest extends TestCase
     }
 
     #[Test]
+    public function theTurnstileWidgetIsReachableFromATwigTemplate(): void
+    {
+        $partial = self::read('forms/_turnstile.html.twig');
+
+        self::assertStringContainsString(
+            'iw_sulu_tailwind_theme_turnstile_site_key()',
+            $partial,
+            'The widget must read the key the bundle already holds, not one the project declares a second time.',
+        );
+
+        self::assertStringContainsString(
+            'siteKey is not null',
+            $partial,
+            'An unconfigured or disabled Turnstile must render nothing, so a template can include it unconditionally.',
+        );
+
+        self::assertStringNotContainsString(
+            'secret',
+            $partial,
+            'Only the public site key belongs in the HTML, never the secret one.',
+        );
+    }
+
+    #[Test]
     public function theConfirmationBoxStaysASharedPartial(): void
     {
         $partial = self::read('forms/_success.html.twig');

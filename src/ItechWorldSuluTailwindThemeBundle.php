@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle;
 
+use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -159,6 +160,21 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             $builder->prependExtensionConfig('sulu_media', [
                 'image_format_files' => [
                     __DIR__ . '/../config/image-formats.xml',
+                ],
+            ]);
+        }
+
+        // A form handled by FormSubmissionHandler lives in a page served from a
+        // long-lived proxy cache, where a session-bound CSRF token would be the
+        // one of whoever warmed that cache - so every later submission would
+        // fail, in production only. Declaring the id stateless makes Symfony
+        // validate it on the origin of the request instead, and doing it here
+        // means a project has nothing to configure. Prepended, so the value
+        // adds itself to Symfony's own ids and to the project's.
+        if ($builder->hasExtension('framework')) {
+            $builder->prependExtensionConfig('framework', [
+                'csrf_protection' => [
+                    'stateless_token_ids' => [FormSubmissionHandler::CSRF_TOKEN_ID],
                 ],
             ]);
         }
@@ -325,6 +341,14 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.turnstile.enabled',
             $config['turnstile']['enabled'],
+        );
+        // The site key is public by design (it ships in the HTML), and a form
+        // written in Twig template mode has no other way to reach it: the
+        // widget of the SuluFormBundle mode is a form field, out of reach
+        // there. Exposing it here keeps the credentials declared in one place.
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.turnstile.site_key',
+            $config['turnstile']['site_key'],
         );
 
         $container->import('../config/services.yaml');

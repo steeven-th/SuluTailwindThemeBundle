@@ -310,6 +310,13 @@ wiring a handler.
 {% set uid = 'contact-' ~ formIndex|default(1) %}
 
 <form method="post" action="{{ path('app_contact_send') }}" id="{{ uid }}" class="iw-form iw-form__grid">
+    {# Honeypot: hidden from sight, from the keyboard and from screen readers.
+       A submission that fills it in is answered as a success and sent nowhere. #}
+    <div hidden aria-hidden="true">
+        <label for="{{ uid }}-website">{{ 'Do not fill in this field'|trans }}</label>
+        <input type="text" id="{{ uid }}-website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
     <div class="iw-form__col iw-form__col--half">
         <label for="{{ uid }}-name" class="iw-form__label iw-form__label--required block text-sm font-medium mb-1.5">{{ 'Name'|trans }}</label>
         <input type="text" id="{{ uid }}-name" name="name" required class="iw-form__field">
@@ -339,4 +346,6 @@ like a SuluFormBundle form, without a single hardcoded color.
 
 The route it posts to, the CSRF token it needs and the confirmation it shows afterwards are
 covered in [Form block → Handling the submission](../form-block.md#handling-the-submission).
+The bundle can do that part for you: see
+[Hand the submission to the bundle](../form-block.md#hand-the-submission-to-the-bundle).
 

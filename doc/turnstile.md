@@ -74,6 +74,59 @@ group (next to the reCAPTCHA field). Only two settings, both optional:
 There is intentionally no *required* toggle and no *short title* — see
 [Design notes](#design-notes).
 
+### In Twig template mode
+
+The field above only exists inside SuluFormBundle forms. A form rendered by the block's
+**Twig template mode** is hand-written, so it includes the widget itself:
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/forms/_turnstile.html.twig' with {
+    colorScheme: colorScheme|default('auto')
+} only %}
+```
+
+The partial reads the site key from this bundle's own `turnstile` configuration, so the
+credential stays declared in one place - it is not passed in, and there is nothing to add to
+the project's configuration. It renders nothing when the feature is off or unconfigured,
+which makes the include safe to leave in a template whatever the environment. The optional
+`attributes` parameter takes extra data attributes for the Turnstile options the partial does
+not cover.
+
+Only the **site key** is exposed: it ships in the HTML of every page carrying a widget, which
+is what it is for. The secret key never leaves the server.
+
+### Verifying the token yourself
+
+In SuluFormBundle mode the token is verified for you. In Twig template mode it is not, and a
+widget whose token nobody checks stops nothing at all - it only looks like it does.
+
+Cloudflare puts the token in the `cf-turnstile-response` field of the POST. With pixelopen
+installed, the shortest path is its constraint, on the property your DTO holds it in:
+
+```php
+use PixelOpen\CloudflareTurnstileBundle\Validator\CloudflareTurnstile;
+
+final class ContactRequest
+{
+    public function __construct(
+        // …
+        #[CloudflareTurnstile]
+        public string $cfTurnstileResponse = '',
+    ) {
+    }
+}
+```
+
+Read it from the request under its real name, which is not a valid PHP property name:
+
+```php
+$token = (string) $request->request->get('cf-turnstile-response');
+```
+
+Without pixelopen, POST the token and your secret key to
+`https://challenges.cloudflare.com/turnstile/v0/siteverify` and refuse the submission unless
+the answer says `success`. Never do that check client-side.
+
 ---
 
 ## Local development and CI
