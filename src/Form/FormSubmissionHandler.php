@@ -101,11 +101,18 @@ class FormSubmissionHandler
     /**
      * Handle a submission and answer with the redirect to send back.
      *
-     * @param Request              $request  The submitted request
-     * @param class-string         $dtoClass The project DTO holding the fields and their constraints
-     * @param callable(object):void $onValid  What to do with a valid DTO - send the mail, call an API.
-     *                                       An exception it throws is logged and reported as a
-     *                                       technical failure, so the visitor knows nothing left.
+     * Generic on the DTO so that static analysis ties the class to the callback:
+     * without it, `$handler->handle($request, ContactRequest::class, $mailer->send(...))`
+     * is reported as a contravariance error by PHPStan, since a callable typed
+     * on ContactRequest does not satisfy a callable accepting any object.
+     *
+     * @template T of object
+     *
+     * @param Request          $request  The submitted request
+     * @param class-string<T>  $dtoClass The project DTO holding the fields and their constraints
+     * @param callable(T):void $onValid  What to do with a valid DTO - send the mail, call an API.
+     *                                   An exception it throws is logged and reported as a
+     *                                   technical failure, so the visitor knows nothing left.
      *
      * @throws \LogicException When symfony/validator or symfony/security-csrf is missing
      *
@@ -142,9 +149,11 @@ class FormSubmissionHandler
     /**
      * Run the submission through the honeypot, the mapper and the validator.
      *
-     * @param Request              $request  The submitted request
-     * @param class-string         $dtoClass The project DTO
-     * @param callable(object):void $onValid  What to do with a valid DTO
+     * @template T of object
+     *
+     * @param Request          $request  The submitted request
+     * @param class-string<T>  $dtoClass The project DTO
+     * @param callable(T):void $onValid  What to do with a valid DTO
      *
      * @return FormSubmissionResult What to answer the visitor
      */

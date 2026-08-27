@@ -66,6 +66,36 @@ final class FormBlockContractTest extends TestCase
         );
     }
 
+    /**
+     * The marker the hidden fields render lives inside the <form>, so it is gone
+     * the moment the confirmation replaces it. On the most common path - a
+     * successful submission - the anchor would then point at nothing and the
+     * visitor would land at the top of the page.
+     */
+    #[Test]
+    public function theConfirmationCarriesTheAnchorTheRedirectPointsAt(): void
+    {
+        $partial = self::read('forms/_success.html.twig');
+
+        self::assertStringContainsString(
+            "'iw-form-block-' ~ formIndex",
+            $partial,
+            'Given a formIndex, the confirmation must carry the id FormSubmissionHandler redirects to.',
+        );
+
+        self::assertStringContainsString(
+            '? id',
+            $partial,
+            'An explicit id must still win, so the SuluFormBundle bridge keeps its own anchor.',
+        );
+
+        self::assertStringContainsString(
+            'iw-form-block-{{ index }}',
+            self::read('forms/_fields.html.twig'),
+            'Both sides must agree on the anchor: the marker in the form, and the id on the confirmation.',
+        );
+    }
+
     #[Test]
     public function theTurnstileWidgetIsReachableFromATwigTemplate(): void
     {
