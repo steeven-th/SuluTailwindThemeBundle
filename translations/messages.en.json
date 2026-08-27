@@ -62,5 +62,8 @@
     "iw_sulu_tailwind_theme.form_template_empty": "No Twig template is set on this block: enter a path, or tick the SuluFormBundle option.",
     "iw_sulu_tailwind_theme.form_success_default": "Thank you, your message has been sent. We will get back to you shortly.",
     "iw_sulu_tailwind_theme.menu_languageSwitcher": "Choose a language",
-    "iw_sulu_tailwind_theme.menu_languageNotTranslated": "This page is not available in that language, you will be taken to the home page"
+    "iw_sulu_tailwind_theme.menu_languageNotTranslated": "This page is not available in that language, you will be taken to the home page",
+    "iw_sulu_tailwind_theme.form_csrf_invalid": "Your session expired. Please send the message again.",
+    "iw_sulu_tailwind_theme.form_technical_error": "Your message could not be sent for technical reasons. Please try again later.",
+    "iw_sulu_tailwind_theme.form_honeypot_label": "Do not fill in this field"
 }

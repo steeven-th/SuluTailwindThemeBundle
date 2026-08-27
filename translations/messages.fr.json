@@ -62,5 +62,8 @@
     "iw_sulu_tailwind_theme.form_template_empty": "Aucun template Twig n'est renseigné dans ce bloc : indiquez un chemin, ou cochez l'option SuluFormBundle.",
     "iw_sulu_tailwind_theme.form_success_default": "Merci, votre message a bien été envoyé. Nous vous répondrons dans les meilleurs délais.",
     "iw_sulu_tailwind_theme.menu_languageSwitcher": "Choisir la langue",
-    "iw_sulu_tailwind_theme.menu_languageNotTranslated": "Cette page n'existe pas dans cette langue, vous serez redirigé vers l'accueil"
+    "iw_sulu_tailwind_theme.menu_languageNotTranslated": "Cette page n'existe pas dans cette langue, vous serez redirigé vers l'accueil",
+    "iw_sulu_tailwind_theme.form_csrf_invalid": "Votre session a expiré. Merci de renvoyer le message.",
+    "iw_sulu_tailwind_theme.form_technical_error": "Votre message n'a pas pu être envoyé pour une raison technique. Merci de réessayer plus tard.",
+    "iw_sulu_tailwind_theme.form_honeypot_label": "Ne remplissez pas ce champ"
 }

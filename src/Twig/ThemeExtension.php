@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
+use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
@@ -17,6 +18,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
@@ -56,6 +58,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
         private readonly bool $turnstileEnabled = false,
         private readonly ?string $turnstileSiteKey = null,
+        private readonly ?RequestStack $requestStack = null,
     ) {
     }
 
@@ -103,6 +106,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
             new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
             new TwigFunction('iw_sulu_tailwind_theme_turnstile_site_key', $this->getTurnstileSiteKey(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_form_status', $this->getFormStatus(...)),
             new TwigFunction('iw_sulu_tailwind_theme_template_exists', $this->templateExists(...), [
                 'needs_environment' => true,
             ]),
@@ -121,6 +125,35 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function hasFormBundle(): bool
     {
         return class_exists(\Sulu\Bundle\FormBundle\SuluFormBundle::class);
+    }
+
+    /**
+     * The outcome of the submission a form block is showing, if any.
+     *
+     * FormSubmissionHandler answers a submission by redirecting back to the
+     * page with `?iw_form=<index>&iw_form_status=sent|error`, which is what
+     * gets the request past the proxy cache. This reads that back for the block
+     * being rendered, so a template asks "was I just submitted?" instead of
+     * parsing the query string - and a page holding two forms only confirms the
+     * one that was posted.
+     *
+     * @param int $formIndex The rank of the form block, as handed to the template
+     *
+     * @return string|null 'sent', 'error', or null when this block was not the one submitted
+     */
+    public function getFormStatus(int $formIndex): ?string
+    {
+        $request = $this->requestStack?->getMainRequest();
+
+        if (null === $request || $formIndex !== $request->query->getInt(FormSubmissionHandler::FORM_PARAM)) {
+            return null;
+        }
+
+        $status = $request->query->get(FormSubmissionHandler::STATUS_PARAM);
+
+        return \in_array($status, [FormSubmissionHandler::STATUS_SENT, FormSubmissionHandler::STATUS_ERROR], true)
+            ? $status
+            : null;
     }
 
     /**

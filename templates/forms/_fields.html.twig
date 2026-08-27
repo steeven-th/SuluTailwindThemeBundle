@@ -1,0 +1,53 @@
+{#
+    The hidden fields FormSubmissionHandler reads, plus the honeypot and the
+    anchor the post-submission redirect points at.
+
+    One include instead of five things to remember: the CSRF token under the id
+    the bundle declares stateless, the page to return to, the rank of this form
+    block, a honeypot, and a marker to scroll back to. Getting any of them
+    subtly wrong is what copying a controller and its template into each project
+    used to cost.
+
+    Put it right inside the <form> element, before the visible fields:
+
+        <form method="post" action="{{ path('app_contact_send') }}" class="iw-form iw-form__grid">
+            {% include '@ItechWorldSuluTailwindTheme/forms/_fields.html.twig' with {
+                formIndex: formIndex|default(1)
+            } only %}
+            …
+
+    Parameters:
+      - formIndex: rank of the form block in the page, as handed to the included
+                   template by the form block. Defaults to 1, which is what a
+                   template included outside the block gets.
+
+    Override it in your project at the standard Symfony bundle path:
+    templates/bundles/ItechWorldSuluTailwindThemeBundle/forms/_fields.html.twig
+#}
+
+{% set index = formIndex|default(1) %}
+
+{# The token is validated without a session: the form lives in a page served
+   from a seven-day proxy cache, where a session-bound token would be the one of
+   whoever warmed that cache. The id is declared stateless by the bundle itself,
+   so there is nothing to configure in the project. #}
+<input type="hidden" name="_csrf_token" value="{{ csrf_token('iw_form') }}">
+
+{# Where to send the visitor back. pathInfo only: the handler refuses anything
+   that is not an absolute path of this site anyway. #}
+<input type="hidden" name="_redirect" value="{{ app.request.pathInfo }}">
+
+<input type="hidden" name="_form_index" value="{{ index }}">
+
+{# Honeypot: hidden from sight, from the keyboard and from screen readers. A
+   submission that fills it in is answered as a success and sent nowhere. #}
+<div hidden aria-hidden="true">
+    <label for="iw-form-website-{{ index }}">{{ 'iw_sulu_tailwind_theme.form_honeypot_label'|trans }}</label>
+    <input type="text" id="iw-form-website-{{ index }}" name="_iw_website" tabindex="-1" autocomplete="off">
+</div>
+
+{# Anchor target of the redirect, so the visitor lands on the form rather than
+   at the top of a long page. Rendered here rather than expected on the <form>
+   element: the handler builds the anchor on its own and cannot know what id a
+   project gave its form. #}
+<span id="iw-form-block-{{ index }}" aria-hidden="true"></span>
