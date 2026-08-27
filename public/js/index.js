@@ -34,6 +34,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         ArticleStylePicker.articleStyles = config.articleStyles || {};
         collapsibleSections.init(config.collapsibleSections || {});
         FontPicker.hasApiKey = config.hasApiKey || false;
+        TitleEditor.contextDefaults = config.titleEditor || {};
     }
 
     if (initialized) {

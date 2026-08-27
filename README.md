@@ -396,6 +396,25 @@ This is the only place to configure it — the bundle forwards the credentials t
 
 > See **[Cloudflare Turnstile](doc/turnstile.md)** for the Cloudflare test keys, the appearance rules, and how to override the error message.
 
+### Title editor buttons (optional)
+
+Block, page and article titles are edited with a small field that spans several lines and can put a few words forward in another color. Which buttons an editor gets is a project decision:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    title_editor:
+        blocks:
+            highlight: true    # colors the selection with the variant highlight color
+            color: false       # lets the editor pick a palette color per word
+        pages:
+            highlight: false
+            color: true
+```
+
+Those are the defaults, so leaving this out changes nothing. Values merge key by key: setting only `blocks.color` leaves the rest alone.
+
+> See **[Title editor](doc/title-editor.md)** for the stored syntax, the per-field XML override, and the CSS classes behind it.
+
 ### Article templates (optional)
 
 The bundle provides ready-to-use article templates (News, Event, Blog Post) that integrate with [SuluArticleBundle](https://github.com/sulu/sulu). They are **opt-in** and disabled by default.

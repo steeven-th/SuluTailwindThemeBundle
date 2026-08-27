@@ -27,8 +27,7 @@
             <info_text>iw_sulu_tailwind_theme.page.hero_title_info</info_text>
         </meta>
         <params>
-            <param name="color" value="true"/>
-            <param name="highlight" value="false"/>
+            <param name="context" value="pages"/>
         </params>
     </property>
 
@@ -38,8 +37,7 @@
             <info_text>iw_sulu_tailwind_theme.page.hero_subtitle_info</info_text>
         </meta>
         <params>
-            <param name="color" value="true"/>
-            <param name="highlight" value="false"/>
+            <param name="context" value="pages"/>
         </params>
     </property>
 </properties>

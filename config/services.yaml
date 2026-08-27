@@ -15,6 +15,7 @@ services:
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.config_resolver'
             - '%itech_world_sulu_tailwind_theme.article_templates_enabled%'
+            - '%itech_world_sulu_tailwind_theme.title_editor%'
         tags:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
