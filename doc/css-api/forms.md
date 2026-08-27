@@ -346,4 +346,6 @@ like a SuluFormBundle form, without a single hardcoded color.
 
 The route it posts to, the CSRF token it needs and the confirmation it shows afterwards are
 covered in [Form block → Handling the submission](../form-block.md#handling-the-submission).
+The bundle can do that part for you: see
+[Hand the submission to the bundle](../form-block.md#hand-the-submission-to-the-bundle).
 

@@ -453,6 +453,31 @@ page always renders the same numbers, worker runtimes included.
 
 ---
 
+### `iw_sulu_tailwind_theme_form_status(formIndex)`
+
+The outcome of the submission a form block is showing, when it is showing one.
+
+`FormSubmissionHandler` answers a submission by redirecting back to the page with
+`?iw_form=<index>&iw_form_status=sent|error`, which is what gets the request past
+the proxy cache. This reads it back for the block being rendered, so a template
+asks "was I just submitted?" instead of parsing the query string - and a page
+holding two forms only confirms the one that was posted.
+
+```twig
+{% if iw_sulu_tailwind_theme_form_status(formIndex|default(1)) == 'sent' %}
+    {% include '@ItechWorldSuluTailwindTheme/forms/_success.html.twig' with { … } only %}
+{% endif %}
+```
+
+**Parameters:**
+- `formIndex` (`int`) - The rank of the form block, as handed to the included template
+
+**Returns:** `string|null` - `sent`, `error`, or `null` when this block was not the one submitted.
+
+See [Hand the submission to the bundle](form-block.md#hand-the-submission-to-the-bundle).
+
+---
+
 ### `iw_sulu_tailwind_theme_turnstile_site_key()`
 
 The Cloudflare Turnstile site key, for a form written in Twig template mode. The

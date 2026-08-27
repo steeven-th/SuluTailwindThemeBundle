@@ -278,7 +278,151 @@ The bundle hits the second one in SuluFormBundle mode too, and answers it the sa
 `FormSubmissionRedirectSubscriber` turns Sulu's `?send=true` redirect into
 `?send=true&iw_form=12#iw-form-12`.
 
-#### The shape that works
+Both are handled for you by `FormSubmissionHandler`, below. Writing the handling yourself is
+still perfectly supported - see [Doing it by hand](#doing-it-by-hand) for what it takes.
+
+#### Hand the submission to the bundle
+
+Three files, none of which contains anything about tokens, redirects or caches.
+
+**The DTO** - your fields and their rules, and the only place messages are written:
+
+```php
+// src/Form/ContactRequest.php
+namespace App\Form;
+
+use Symfony\Component\Validator\Constraints as Assert;
+
+final class ContactRequest
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 2, max: 100)]
+        public string $name = '',
+
+        #[Assert\NotBlank]
+        #[Assert\Email]
+        public string $email = '',
+
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 10, max: 5000)]
+        public string $message = '',
+
+        #[Assert\IsTrue(message: 'Please accept the terms.')]
+        public bool $consent = false,
+    ) {
+    }
+}
+```
+
+The handler fills it from the POST fields carrying the same names. Strings, booleans,
+integers and floats are mapped; a checkbox that was not ticked posts nothing and reads as
+`false`. Anything richer stays yours to build.
+
+**The controller** - your route, your business, five lines:
+
+```php
+#[Route('/contact/send', name: 'app_contact_send', methods: ['POST'])]
+public function send(Request $request, FormSubmissionHandler $handler): RedirectResponse
+{
+    return $handler->handle($request, ContactRequest::class, $this->mailer->send(...));
+}
+```
+
+The callable receives the **valid** DTO. An exception it throws is logged and reported to
+the visitor as a technical failure - except in `dev`, where it surfaces instead of hiding
+behind a polite message.
+
+**The template** - one include for the hidden fields, one function for the outcome:
+
+```twig
+{% set index = formIndex|default(1) %}
+{% set uid = 'contact-' ~ index %}
+
+{% if iw_sulu_tailwind_theme_form_status(index) == 'sent' %}
+    {% include '@ItechWorldSuluTailwindTheme/forms/_success.html.twig' with {
+        text: 'iw_sulu_tailwind_theme.form_success_default'|trans,
+        colorScheme: colorScheme|default('auto'),
+        id: uid
+    } only %}
+{% else %}
+    {# Flashes are consumed as they are read: read them once, at the top. #}
+    {% set errors = app.flashes('iw_form_errors')|first|default({}) %}
+    {% set values = app.flashes('iw_form_values')|first|default({}) %}
+    {% set globalError = app.flashes('iw_form_error')|first|default('') %}
+
+    <form method="post" action="{{ path('app_contact_send') }}" id="{{ uid }}" class="iw-form iw-form__grid">
+        {% include '@ItechWorldSuluTailwindTheme/forms/_fields.html.twig' with { formIndex: index } only %}
+
+        {% if globalError %}
+            <div class="iw-form__col iw-form__col--full">
+                <ul class="iw-form__errors text-sm" role="alert"><li>{{ globalError }}</li></ul>
+            </div>
+        {% endif %}
+
+        <div class="iw-form__col iw-form__col--half">
+            <label for="{{ uid }}-email" class="iw-form__label iw-form__label--required">{{ 'Email'|trans }}</label>
+            <input type="email" id="{{ uid }}-email" name="email" required
+                   value="{{ values.email|default('') }}"
+                   class="iw-form__field{{ errors.email is defined ? ' iw-form__field--error' }}"
+                   {% if errors.email is defined %}aria-invalid="true" aria-describedby="{{ uid }}-email-error"{% endif %}>
+            {% if errors.email is defined %}
+                <ul class="iw-form__errors mt-1.5 text-sm" id="{{ uid }}-email-error"><li>{{ errors.email }}</li></ul>
+            {% endif %}
+        </div>
+
+        {# … the other fields, same shape … #}
+
+        <div class="iw-form__col iw-form__col--full iw-form__actions pt-2">
+            <button type="submit" class="iw-form__submit iw-button--variant">{{ 'Send'|trans }}</button>
+        </div>
+    </form>
+{% endif %}
+```
+
+`_fields.html.twig` renders the CSRF token, the return path, the block index, the honeypot
+and the anchor the redirect points at. `iw_sulu_tailwind_theme_form_status(index)` returns
+`sent`, `error`, or `null` when this block was not the one submitted - so a page holding two
+forms only confirms the right one.
+
+#### What each side does
+
+| Done by the bundle | Left to you |
+|--------------------|-------------|
+| CSRF token, declared stateless so a cached page never serves a stale one | The fields and their constraints, in the DTO |
+| Honeypot, answered as a success so robots learn nothing | The template and its markup |
+| Filling the DTO from the POST body | What happens on success: mail, API call, database |
+| Validation, and one error message per field | The route and its URL |
+| Redirect with a query parameter and an anchor, and a return path that cannot leave the site | The confirmation wording |
+| Errors and submitted values carried back as flash messages | |
+
+Reading a flash starts the session, which switches the response to `Cache-Control: private`.
+The page with an error is therefore never stored by the proxy, while the plain page URL keeps
+being cached for everyone.
+
+Two dependencies are only needed once you handle a submission this way, and the handler names
+the missing one rather than fataling:
+
+```bash
+composer require symfony/validator symfony/security-csrf
+```
+
+#### What it deliberately does not do
+
+Stored submissions, file uploads, conditional fields, rate limiting, an acknowledgement mail
+to the visitor, field labels and error messages managed from the admin. For any of those, the
+answer is **SuluFormBundle** - it is a form engine, this is the plumbing around a form you
+wrote yourself.
+
+Behind a reverse proxy, `trusted_proxies` must be set. The stateless token is validated by
+comparing the request's own scheme and host with the `Origin` header: without trusted proxies
+Symfony ignores `X-Forwarded-Proto`, believes it answers in `http://` while the site is served
+in `https://`, and rejects every submission.
+
+#### Doing it by hand
+
+Nothing forces you through the handler - the block includes a template, and what posts where
+is yours to decide. The shape that works:
 
 ```
 POST /contact/send        your own route, never the page URL
@@ -288,13 +432,11 @@ POST /contact/send        your own route, never the page URL
 ```
 
 The query parameter is not a convenience, it is what guarantees the request reaches the
-application at all. Add the anchor too, so a visitor lands on the confirmation instead of
-at the top of a long page.
+application at all. Add the anchor too, so a visitor lands on the confirmation instead of at
+the top of a long page.
 
-#### A CSRF token without a session
-
-Symfony validates *stateless* tokens on the origin of the request (`Sec-Fetch-Site`, then
-`Origin` / `Referer`) instead of on a session, which is exactly what a cached page needs:
+The CSRF token has to be validated without a session, which Symfony does on the origin of the
+request (`Sec-Fetch-Site`, then `Origin` / `Referer`):
 
 ```yaml
 # config/packages/framework.yaml
@@ -306,19 +448,10 @@ framework:
 ```
 
 Symfony already ships `submit`, `authenticate` and `logout` in that list, so naming the token
-`submit` needs no configuration at all. Declare an id of your own when you want the form's
-token named after the form.
+`submit` needs no configuration at all. Every other token of the application, the admin login
+form included, keeps its session behaviour.
 
-Every other token of the application, the admin login form included, keeps its session
-behaviour. Two things to check:
-
-- **Behind a reverse proxy, `trusted_proxies` must be set.** The origin check compares the
-  request's own scheme and host with the `Origin` header. Without trusted proxies Symfony
-  ignores `X-Forwarded-Proto`, believes it answers in `http://` while the site is served in
-  `https://`, and rejects every submission.
-- In the template, nothing changes: `{{ csrf_token('contact') }}`.
-
-#### The controller
+Then the controller, with the parts that are easy to get subtly wrong:
 
 ```php
 #[Route('/contact/send', name: 'app_contact_send', methods: ['POST'])]
@@ -326,13 +459,15 @@ public function send(Request $request): RedirectResponse
 {
     // The page to return to comes from a hidden field, so from the visitor:
     // only an absolute path of this site is accepted. Browsers read `//host`
-    // and `/\host` as external URLs, hence the second test.
+    // and `/\host` as external URLs, hence the second and third tests.
     $target = (string) $request->request->get('_redirect');
     if (!str_starts_with($target, '/') || str_starts_with($target, '//') || str_starts_with($target, '/\\')) {
         $target = '/';
     }
 
-    $anchor = '#contact-' . (int) $request->request->get('_form_index', 1);
+    // A plain cast, not getInt(): that one answers a tampered hidden field with
+    // a 400, for a value that only ever builds an anchor.
+    $anchor = '#contact-' . max(1, (int) $request->request->get('_form_index', 1));
 
     if (!$this->isCsrfTokenValid('contact', (string) $request->request->get('_csrf_token'))) {
         $this->addFlash('contact_error', 'Your session expired. Please send the message again.');
@@ -340,7 +475,8 @@ public function send(Request $request): RedirectResponse
         return new RedirectResponse($target . '?contact=error' . $anchor);
     }
 
-    // Honeypot: a hidden field a human never fills in.
+    // Honeypot: a hidden field a human never fills in. Answered as a success,
+    // since an error would tell the robot which field to avoid next time.
     if ('' !== (string) $request->request->get('website')) {
         return new RedirectResponse($target . '?contact=sent' . $anchor);
     }
@@ -358,43 +494,14 @@ public function send(Request $request): RedirectResponse
 }
 ```
 
-The template posts the two hidden fields the controller reads, next to the CSRF one:
-
-```twig
-<input type="hidden" name="_csrf_token" value="{{ csrf_token('contact') }}">
-<input type="hidden" name="_redirect" value="{{ app.request.pathInfo }}">
-<input type="hidden" name="_form_index" value="{{ formIndex|default(1) }}">
-```
-
-#### Giving the errors and the values back
-
-Flash messages carry the errors and what the visitor typed across the redirect, and they
-cost nothing to the shared cache: **reading a flash starts the session**, which makes
-Symfony answer `Cache-Control: private`. The page with `?contact=error` is therefore never
-stored by the proxy, while the plain page URL keeps being cached for everyone.
-
-Read them once, at the top of the template, since reading consumes them:
-
-```twig
-{% set errors = app.flashes('contact_errors')|first|default({}) %}
-{% set values = app.flashes('contact_values')|first|default({}) %}
-
-<input type="email" id="{{ uid }}-email" name="email" required
-       value="{{ values.email|default('') }}"
-       class="iw-form__field{{ errors.email is defined ? ' iw-form__field--error' }}"
-       {% if errors.email is defined %}aria-invalid="true" aria-describedby="{{ uid }}-email-error"{% endif %}>
-{% if errors.email is defined %}
-    <ul class="iw-form__errors mt-1.5 text-sm" id="{{ uid }}-email-error">
-        <li>{{ errors.email }}</li>
-    </ul>
-{% endif %}
-```
+The template then posts the hidden fields the controller reads, and renders the errors and
+values back from the flashes, exactly as in the section above.
 
 #### Checklist
 
 - [ ] The `<form>` posts to a route of your own, never to the page URL.
 - [ ] The redirect back always carries a query parameter, on success *and* on error.
-- [ ] The CSRF token id is listed in `stateless_token_ids`.
+- [ ] The CSRF token is validated without a session (automatic with `FormSubmissionHandler`).
 - [ ] `trusted_proxies` is set if a reverse proxy sits in front of the application.
 - [ ] Ids are prefixed with `formIndex`.
 - [ ] The confirmation comes from `forms/_success.html.twig`, not from a copy.
