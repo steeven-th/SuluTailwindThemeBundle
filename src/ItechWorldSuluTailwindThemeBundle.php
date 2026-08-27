@@ -326,6 +326,14 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             'itech_world_sulu_tailwind_theme.turnstile.enabled',
             $config['turnstile']['enabled'],
         );
+        // The site key is public by design (it ships in the HTML), and a form
+        // written in Twig template mode has no other way to reach it: the
+        // widget of the SuluFormBundle mode is a form field, out of reach
+        // there. Exposing it here keeps the credentials declared in one place.
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.turnstile.site_key',
+            $config['turnstile']['site_key'],
+        );
 
         $container->import('../config/services.yaml');
 

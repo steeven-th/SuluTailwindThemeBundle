@@ -213,6 +213,8 @@ services:
             - '@itech_world.sulu_tailwind_theme.language_label_resolver'
             - '@itech_world.sulu_tailwind_theme.title_markup_renderer'
             - '@?sulu_core.webspace.request_analyzer'
+            - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
+            - '%itech_world_sulu_tailwind_theme.turnstile.site_key%'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and

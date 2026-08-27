@@ -54,6 +54,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly LanguageLabelResolver $languageLabelResolver,
         private readonly TitleMarkupRenderer $titleMarkupRenderer,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
+        private readonly bool $turnstileEnabled = false,
+        private readonly ?string $turnstileSiteKey = null,
     ) {
     }
 
@@ -100,6 +102,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
             new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_turnstile_site_key', $this->getTurnstileSiteKey(...)),
             new TwigFunction('iw_sulu_tailwind_theme_template_exists', $this->templateExists(...), [
                 'needs_environment' => true,
             ]),
@@ -118,6 +121,29 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function hasFormBundle(): bool
     {
         return class_exists(\Sulu\Bundle\FormBundle\SuluFormBundle::class);
+    }
+
+    /**
+     * The Cloudflare Turnstile site key to render a widget with.
+     *
+     * Only for forms written in Twig template mode: the SuluFormBundle mode
+     * gets its widget from a form field, which a hand-written form cannot use.
+     * Without this, a project would have to declare the key a second time in
+     * its own configuration, next to the one this bundle already forwards to
+     * pixelopen - two places to keep in sync for one credential.
+     *
+     * The key is public by design, it ships in the HTML of every page carrying
+     * the widget. The secret key is deliberately not exposed.
+     *
+     * @return string|null The site key, or null when the feature is off or unconfigured
+     */
+    public function getTurnstileSiteKey(): ?string
+    {
+        if (!$this->turnstileEnabled || null === $this->turnstileSiteKey || '' === $this->turnstileSiteKey) {
+            return null;
+        }
+
+        return $this->turnstileSiteKey;
     }
 
     /**
