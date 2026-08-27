@@ -32,12 +32,17 @@ class RequestDataMapper
     /**
      * Build a DTO from raw submitted values.
      *
-     * @param class-string          $dtoClass The project DTO to fill
+     * Generic so the class handed in is the type that comes out, which is what
+     * lets the handler stay generic all the way to the project's callback.
+     *
+     * @template T of object
+     *
+     * @param class-string<T>       $dtoClass The project DTO to fill
      * @param array<string, string> $values   Submitted values, keyed by field name
      *
      * @throws \LogicException When the DTO cannot be filled from a form payload
      *
-     * @return object The filled DTO
+     * @return T The filled DTO
      */
     public function map(string $dtoClass, array $values): object
     {
