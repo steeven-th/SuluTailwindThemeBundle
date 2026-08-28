@@ -158,7 +158,7 @@ class ThemeFormMapper
         'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
         'components_paginationText', 'components_paginationAccent',
         'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
-        // Leaflet maps (location block, CTA accessory, form widget).
+        // Leaflet maps (location block, form widget).
         'components_mapsTileProvider', 'components_mapsCustomTileUrl', 'components_mapsCustomAttribution',
         'components_mapsScrollZoom', 'components_mapsMarkerColor', 'components_mapsMarkerMedia',
         'components_mapsPopupBg', 'components_mapsPopupText',

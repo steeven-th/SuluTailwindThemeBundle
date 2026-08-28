@@ -31,7 +31,7 @@ A standalone component.
 iw-button
 iw-article-card
 iw-menu
-iw-block-cta
+iw-block-text-images
 ```
 
 ### Element
@@ -94,7 +94,7 @@ renames variant `1` from "Dark" to "Night", all CSS overrides targeting
 Variants are typically applied at the block wrapper level:
 
 ```html
-<section class="iw-block-cta iw-variant--2">
+<section class="iw-block-text-images iw-variant--2">
     ...
 </section>
 ```

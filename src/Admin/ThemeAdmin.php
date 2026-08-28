@@ -85,6 +85,7 @@ class ThemeAdmin extends Admin
             ['key' => 'grid_2x2', 'label' => 'iw_sulu_tailwind_theme.style.grid_2x2'],
             ['key' => 'progress', 'label' => 'iw_sulu_tailwind_theme.style.progress'],
             ['key' => 'timeline', 'label' => 'iw_sulu_tailwind_theme.style.timeline'],
+            ['key' => 'split', 'label' => 'iw_sulu_tailwind_theme.style.split'],
         ],
         'linked_pages' => [
             ['key' => 'cards', 'label' => 'iw_sulu_tailwind_theme.style.cards'],
@@ -106,11 +107,6 @@ class ThemeAdmin extends Admin
         'document' => [
             ['key' => 'default', 'label' => 'iw_sulu_tailwind_theme.style.default'],
             ['key' => 'grid', 'label' => 'iw_sulu_tailwind_theme.style.grid'],
-        ],
-        'cta' => [
-            ['key' => 'banner', 'label' => 'iw_sulu_tailwind_theme.style.banner'],
-            ['key' => 'centered', 'label' => 'iw_sulu_tailwind_theme.style.centered'],
-            ['key' => 'split', 'label' => 'iw_sulu_tailwind_theme.style.split'],
         ],
         'testimonial' => [
             ['key' => 'cards', 'label' => 'iw_sulu_tailwind_theme.style.cards'],

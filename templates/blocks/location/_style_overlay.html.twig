@@ -1,6 +1,10 @@
 {# Location block — map with collapsible floating info card #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaInline = true %}
+{% set ctaBlockKey = _key|default(null) %}
+
 {% block block_content %}
     {% if location is defined and location.lat is defined and location.long is defined %}
         {% set zoom = location.zoom|default(15) %}
@@ -66,6 +70,15 @@
                                 {{ text|raw }}
                             </div>
                         {% endif %}
+
+                        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                            buttons: ctaButtons|default([]),
+                            buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                            alignment: ctaAlignment|default('title'),
+                            direction: ctaDirection|default('row'),
+                            titleAlignment: titleAlignment|default('left')
+                        } only %}
+
 
                         <a
                             href="https://www.openstreetmap.org/?mlat={{ location.lat }}&mlon={{ location.long }}#map={{ zoom }}/{{ location.lat }}/{{ location.long }}"

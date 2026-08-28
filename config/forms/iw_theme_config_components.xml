@@ -439,9 +439,9 @@
             </properties>
         </section>
 
-        <!-- Maps section: Leaflet maps used by the location block, the CTA
-             location accessory and the form location widget. Attribution is
-             always displayed (OSM/Carto tile usage policies). -->
+        <!-- Maps section: Leaflet maps used by the location block and the
+             form location widget. Attribution is always displayed (OSM/Carto
+             tile usage policies). -->
         <section name="componentsMaps">
             <meta>
                 <title>iw_sulu_tailwind_theme.components_section_maps</title>

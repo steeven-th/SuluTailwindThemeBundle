@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <!-- Global block type: Location -->
 <template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
@@ -60,6 +61,9 @@
                 <property name="location" type="location">
                     <meta><title>iw_sulu_tailwind_theme.location</title></meta>
                 </property>
+                <!-- Call-to-action buttons, shared by every block that can carry actions. -->
+                <xi:include href="../fragments/cta-buttons.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
             </properties>
         </section>
 

@@ -1,4 +1,7 @@
 {# Text + Images block — full-width image with text content #}
+
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaBlockKey = _key|default(null) %}
 {# Custom section: image always edge-to-edge, padding applies to content only. #}
 {# Does NOT extend _block_wrapper because padding must not affect the image, #}
 {# so the image always fills the full block width (top/left/right or bottom/left/right). #}
@@ -152,6 +155,14 @@
                     paragraphRadius: paragraphRadiusClass
                 } only %}
             {% endif %}
+
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                buttons: ctaButtons|default([]),
+                buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                alignment: ctaAlignment|default('title'),
+                direction: ctaDirection|default('row'),
+                titleAlignment: titleAlignment|default('left')
+            } only %}
 
         {% if lateralMode == 'interior' %}
         </div>

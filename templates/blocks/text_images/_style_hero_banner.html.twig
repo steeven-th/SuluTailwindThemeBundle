@@ -1,4 +1,7 @@
 {# Text + Images block — hero banner with full-background single image #}
+
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaBlockKey = _key|default(null) %}
 {# Based on fullwidth wrapper conditions but image covers the full section as background.
    Content is always centered (interior container forced).
    Does NOT extend _block_wrapper for full control over padding and overflow. #}
@@ -76,6 +79,15 @@
                             {{ text|raw }}
                         </div>
                     {% endif %}
+
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                        buttons: ctaButtons|default([]),
+                        buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                        alignment: ctaAlignment|default('title'),
+                        direction: ctaDirection|default('row'),
+                        titleAlignment: titleAlignment|default('left')
+                    } only %}
+
                 </div>
             </div>
         </div>

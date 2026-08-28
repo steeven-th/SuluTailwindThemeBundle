@@ -774,3 +774,88 @@ grid aligned - that is the breaking part.
 
 Custom CSS reading `--iw-cards-gap` to restyle a non-article grid must switch
 to the matching token; the per-block variables are unchanged.
+
+---
+
+## The CTA block is gone, every block carries its own buttons (breaking)
+
+A call to action was a block type: to put two buttons under a text, an editor
+added a second block and repeated the title, the text and the settings. Buttons
+are now a property of the blocks themselves.
+
+**`config/templates/fragments/cta-buttons.xml`** holds the whole thing: a Sulu
+block listing the buttons (no fixed number of slots any more), an alignment
+select that follows the block title by default, and a layout select for side by
+side or stacked. Sixteen block templates include it - everything except `form`
+and `separator`:
+
+```xml
+<xi:include href="../fragments/cta-buttons.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
+```
+
+The buttons render at the end of the block through `_block_wrapper`, or under
+the text column in a two-zone layout (text + images, map + info, text + key
+figures), where the CTA belongs to the copy that leads to it. See
+[`css-api/transverse.md#block-actions-cta`](./css-api/transverse.md#block-actions-cta).
+
+### What replaces each CTA style
+
+| CTA style | Replacement |
+|---|---|
+| `--banner` | `text_images` in `--hero-banner` or `--overlay`, plus its buttons |
+| `--centered` | `text` in `--one-column`, plus its buttons |
+| `--split` + image accessory | `text_images` in `--classic` |
+| `--split` + location accessory | `location` in `--map-with-info` |
+| `--split` + video accessory | `text_images` in `--classic` with the new **Video** media type |
+| `--split` + counter accessory | `key_figures` in the new `--split` style |
+
+### Existing content is not migrated (breaking)
+
+A page holding a CTA block keeps the data in its blocks list, but the type no
+longer exists, and Sulu's block resolver reacts to that before this bundle ever
+sees the block:
+
+| Environment | What happens |
+|---|---|
+| `dev` (and the admin preview) | `UnexpectedValueException: Metadata type "cta" in "blocks" not found` - the page fails to render |
+| `prod` | the error is logged, then the block falls back to the container's `default-type`, `text`: the title and the rich text still render, the buttons and the accessory are lost |
+
+There is no migration command: **rebuild those blocks before deploying 3.0.0**,
+using the table above. Find them first - a CTA block is stored as
+`"type": "cta"` in the `blocks` property of the content, so one query per
+content table lists everything still holding one:
+
+```sql
+SELECT id, locale, stage FROM pa_page_dimension_contents
+WHERE JSON_SEARCH(templateData, 'one', 'cta', NULL, '$.blocks[*].type') IS NOT NULL;
+
+SELECT id, locale, stage FROM ar_article_dimension_contents
+WHERE JSON_SEARCH(templateData, 'one', 'cta', NULL, '$.blocks[*].type') IS NOT NULL;
+
+SELECT id, locale, stage FROM sn_snippet_dimension_contents
+WHERE JSON_SEARCH(templateData, 'one', 'cta', NULL, '$.blocks[*].type') IS NOT NULL;
+```
+
+Both stages matter: fixing only the `live` rows leaves the block in the `draft`,
+where it resurfaces the day the page is published again. Edit the draft and
+republish.
+
+### Two blocks gained what the CTA accessories did
+
+`text_images` in `--classic` gets a **Media type** field: *Images* (unchanged)
+or *Video*, with a YouTube id, a Vimeo id or a hosted file plus its poster. The
+media zone then renders the player instead of the image slider.
+
+`key_figures` gets titles, a subtitle and a rich text - it was the only block
+without them - and a `--split` style putting that text beside the figures. The
+existing styles render the new title group above their figures, so a block that
+leaves those fields empty is unchanged.
+
+### CSS
+
+`.iw-block-cta*` is gone in full. The button row is now
+`.iw-block__actions` with `--row` / `--column`, `--align-*` and `--flush`
+modifiers, and `.iw-block__action` on each button; `--iw-block-cta-actions-gap`
+and `--iw-block-cta-actions-margin-top` become `--iw-block-actions-gap` and
+`--iw-block-actions-margin-top`.

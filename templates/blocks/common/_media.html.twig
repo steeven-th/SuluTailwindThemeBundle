@@ -1,0 +1,69 @@
+{# Media zone of a two-zone block - an image slider or an embedded video.
+
+   The video half comes from the CTA block's video accessory, removed in 3.0.0:
+   pairing a text with a video is now a media type of `text_images` rather than
+   a block type of its own.
+
+   Expected variables:
+     - mediaType: 'images' (default) | 'video'
+     - images, imageFormat, showName, autoplay, aspectRatio: forwarded to the
+       image slider
+     - videoProvider: 'youtube' | 'vimeo' | 'file'
+     - youtubeId / vimeoId: the video id for the matching provider
+     - videoFile: Sulu media object (provider = file)
+     - videoPoster: Sulu media object, the `poster` of a self-hosted video
+     - videoRadius: optional radius class applied to the video frame
+#}
+{% if mediaType|default('images') == 'video' %}
+    {% set provider = videoProvider|default('youtube') %}
+
+    <div class="iw-block__video-wrap{% if videoRadius|default('') %} {{ videoRadius }} overflow-hidden{% endif %}">
+        {% if provider == 'youtube' and youtubeId|default('') is not empty %}
+            <iframe
+                src="https://www.youtube.com/embed/{{ youtubeId }}"
+                class="iw-block__video w-full border-0 iw-ratio--16-9"
+                loading="lazy"
+                title="{{ 'iw_sulu_tailwind_theme.media_video'|trans }}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+            ></iframe>
+        {% elseif provider == 'vimeo' and vimeoId|default('') is not empty %}
+            <iframe
+                src="https://player.vimeo.com/video/{{ vimeoId }}"
+                class="iw-block__video w-full border-0 iw-ratio--16-9"
+                loading="lazy"
+                title="{{ 'iw_sulu_tailwind_theme.media_video'|trans }}"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+            ></iframe>
+        {% elseif provider == 'file' and videoFile is defined and videoFile.id is defined %}
+            {% set resolvedVideo = sulu_resolve_media(videoFile.id, app.request.locale) %}
+            {% set posterUrl = '' %}
+            {% if videoPoster is defined and videoPoster.id is defined %}
+                {% set resolvedPoster = sulu_resolve_media(videoPoster.id, app.request.locale) %}
+                {# A deleted poster costs the still frame, not the video. #}
+                {% if resolvedPoster is not null %}
+                    {% set posterUrl = resolvedPoster.thumbnails['iw_theme_16_9']|default(resolvedPoster.url) %}
+                {% endif %}
+            {% endif %}
+            {# A deleted video file leaves nothing to play: render no player at all. #}
+            {% if resolvedVideo is not null %}
+                <video
+                    src="{{ resolvedVideo.url }}"
+                    class="iw-block__video w-full iw-ratio--16-9"
+                    controls
+                    preload="metadata"
+                    {% if posterUrl %}poster="{{ posterUrl }}"{% endif %}
+                ></video>
+            {% endif %}
+        {% endif %}
+    </div>
+{% else %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+        images: images|default([]),
+        imageFormat: imageFormat|default('iw_theme_16_9'),
+        showName: showName|default(false),
+        autoplay: autoplay|default(true),
+        aspectRatio: aspectRatio|default('16/9')
+    } only %}
+{% endif %}

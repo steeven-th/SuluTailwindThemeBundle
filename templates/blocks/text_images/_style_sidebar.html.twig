@@ -1,4 +1,7 @@
 {# Text + Images block — sticky sidebar with image, scrollable text area #}
+
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaBlockKey = _key|default(null) %}
 {# Does NOT extend _block_wrapper so we can enforce minimum padding defaults
    (padding always present even when explicitly set to 0). #}
 
@@ -79,6 +82,15 @@
                         {{ text|raw }}
                     </div>
                 {% endif %}
+
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    buttons: ctaButtons|default([]),
+                    buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                    alignment: ctaAlignment|default('title'),
+                    direction: ctaDirection|default('row'),
+                    titleAlignment: titleAlignment|default('left')
+                } only %}
+
             </div>
 
             {# Sidebar images — 2/5 = 40%.

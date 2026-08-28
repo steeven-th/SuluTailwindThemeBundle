@@ -145,7 +145,7 @@ tuned without losing the site-wide harmonization:
 | Block / layout | Per-block variable |
 |---|---|
 | Text + images (classic, mosaic, sidebar, split-screen, fullwidth) | `--iw-block-text-images-gap` |
-| CTA (`--split`) | `--iw-block-cta-split-gap` |
+| Key figures (`--split`) | `--iw-block-key-figures-split-gap` |
 | Form (`--split`) | `--iw-block-form-split-gap` |
 | Location (`--map-with-info`) | `--iw-block-location-map-with-info-gap` |
 | Location (`--fullwidth`, map above info) | `--iw-block-location-fullwidth-gap` |
@@ -160,7 +160,7 @@ tuned without losing the site-wide harmonization:
 .theme-dense { --iw-blocks-gap: 1rem; }
 
 /* Opt one wrapper out of the mobile halving */
-.my-page .iw-block-cta--split { --iw-split-gap: 2rem; gap: 2rem; }
+.my-page .iw-block-key-figures--split { --iw-split-gap: 2rem; gap: 2rem; }
 ```
 
 In `--split-screen` the gap becomes a gutter between the two halves, letting the
@@ -224,8 +224,8 @@ space below the group as well, which meant a variant configured with
 against the content.
 
 Blocks that render their own titles inline rather than through the partial
-(`cta` in all three styles, `text_images` in `--hero-banner`, `--overlay` and
-`--split-screen`, `text` in `--quote`) keep their internal typographic rhythm:
+(`text_images` in `--hero-banner`, `--overlay` and `--split-screen`, `text` in
+`--quote`) keep their internal typographic rhythm:
 there the title and the text belong to the same zone.
 
 **Override examples:**
@@ -237,6 +237,47 @@ there the title and the text belong to the same zone.
 /* Site-wide default for a theme scope */
 .theme-dense { --iw-blocks-title-gap: 1rem; }
 ```
+
+---
+
+## Block actions (CTA)
+
+Call-to-action buttons are not a block type: any block can carry a list of
+them, through the `config/templates/fragments/cta-buttons.xml` fragment
+included in its `content` section. The editor adds and removes buttons with
+Sulu's block UI, so there is no fixed number of slots.
+
+Two settings sit next to the list: **alignment** (`ctaAlignment` - follows the
+block title by default, or left / center / right) and **layout**
+(`ctaDirection` - side by side or stacked).
+
+**Where they render.** A block extending `blocks/common/_block_wrapper.html.twig`
+renders them at the end of the block, for free. A two-zone layout - text +
+images, map + info, text + key figures - sets `ctaInline` before extending the
+wrapper and includes `blocks/common/_cta_buttons.html.twig` under its text
+column instead, so the buttons stay attached to the copy that leads to them.
+
+```html
+<div class="iw-block__actions iw-block__actions--row iw-block__actions--align-left">
+    <a class="iw-button--primary iw-block__action" href="...">Label</a>
+</div>
+```
+
+| Class | Role |
+|---|---|
+| `.iw-block__actions` | The row itself: flex, wrapping, with its own gap and top margin. |
+| `.iw-block__actions--row` / `--column` | Side by side, or stacked. |
+| `.iw-block__actions--align-{left\|center\|right}` | Resolved alignment - `title` is replaced by the block's own title alignment at render time. |
+| `.iw-block__actions--flush` | Drops the top margin, for a flex parent whose gap already spaces the buttons. |
+| `.iw-block__action` | A single button. The colors, padding and radius come from the theme's `.iw-button--<slug>` class. |
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `--iw-block-actions-gap` | `1rem` | Space between two buttons. |
+| `--iw-block-actions-margin-top` | `1.5rem` | Space between the content above and the row. |
+
+The button label comes from the title set in the link attributes, then the
+linked page or media title, then the raw URL.
 
 ---
 

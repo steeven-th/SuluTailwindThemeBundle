@@ -1460,7 +1460,8 @@ class ThemeCompiler
      * These are the theme-level defaults shared by every block that are not
      * tied to a single component (components own their tab). Currently:
      *   - --iw-blocks-gap: gap between the two content zones of split blocks
-     *     (text + images, form + widget, map + info, CTA + accessory). Halved
+     *     (text + images, form + widget, map + info, text + key figures).
+     *     Halved
      *     below the `md` breakpoint by the rules in `assets/styles/app.css`.
      *   - --iw-blocks-title-gap: space between a block's titles group and its
      *     content, consumed by `.iw-block__titles`.

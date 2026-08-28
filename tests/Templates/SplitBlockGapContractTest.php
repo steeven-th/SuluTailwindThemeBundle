@@ -32,7 +32,7 @@ final class SplitBlockGapContractTest extends TestCase
             'text + images (stacked)' => ['blocks/text_images/_style_classic.html.twig', 'iw-block-text-images__stack'],
             'text + images (mosaic)' => ['blocks/text_images/_style_mosaic.html.twig', 'iw-block-text-images__grid'],
             'text + images (sidebar)' => ['blocks/text_images/_style_sidebar.html.twig', 'iw-block-text-images__grid'],
-            'cta + accessory' => ['blocks/cta/_style_split.html.twig', 'iw-block-cta--split'],
+            'text + key figures' => ['blocks/key_figures/_style_split.html.twig', 'iw-block-key-figures--split'],
             'form + widget' => ['blocks/form/_style_split.html.twig', 'iw-block-form--split'],
             'map + info (side by side)' => ['blocks/location/_style_map_with_info.html.twig', 'iw-block-location--map-with-info'],
             'map + info (stacked)' => ['blocks/location/_style_fullwidth.html.twig', 'iw-block-location--fullwidth'],

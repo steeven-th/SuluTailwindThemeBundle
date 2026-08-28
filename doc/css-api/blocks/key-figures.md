@@ -20,7 +20,10 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `.iw-block-key-figures--progress` | Stack of horizontal progress bars. |
 | `.iw-block-key-figures--timeline` | Vertical timeline with dots and alternating cards. |
 | `.iw-block-key-figures--with-icons` | Grid with large icons (1–4 columns on desktop). |
+| `.iw-block-key-figures--split` | Text (titles, rich text, action buttons) on one side, figures stacked on the other from `lg`. Replaces the CTA block's counter accessory, removed in 3.0.0. |
 | `.iw-block-key-figures--cols-1` to `--cols-4` | Column-count modifier used together with `--with-icons` to select the desktop layout. |
+| `.iw-block-key-figures__content` | Text zone of `--split`; `--last` moves it after the figures on desktop. |
+| `.iw-block-key-figures__figures` | Figures zone of `--split`; `--first` moves it before the text on desktop. |
 | `.iw-block-key-figures__timeline-line` | Vertical line in the `--timeline` mode. |
 | `.iw-block-key-figures__timeline-items` | Wrapper around timeline items (controls the vertical gap). |
 
@@ -97,6 +100,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
+| `--iw-block-key-figures-split-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the text zone and the figures in `--split`. |
 | `--iw-block-key-figures-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. |
 | `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Max-width of the grid (centered). |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |

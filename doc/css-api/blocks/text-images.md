@@ -35,6 +35,7 @@ Text + image block with seven layout styles selectable from the admin. The block
 
 | Class | Role |
 |-------|------|
+| `.iw-block__video-wrap` / `.iw-block__video` | The video frame of `--classic` when the media type is *Video* (YouTube, Vimeo or a hosted file). Carried over from the CTA block's video accessory, removed in 3.0.0. |
 | `.iw-block-text-images__image` | The `<img>` background in `--hero-banner` and `--overlay` (positioned `absolute inset-0 w-full h-full object-cover`). |
 | `.iw-block-text-images__bg-overlay` | Dark overlay above the background image. Default color is `rgb(0 0 0 / 0.6)`. In `--overlay`, paired with sub-modifiers `--mobile` (uniform on `<lg`) and `--gradient` (directional gradient on `lg+`). |
 | `.iw-block-text-images__content-wrap` | Outer content wrapper that carries the per-section padding utilities (`pt-*`, `pb-*`, `pl-*`, `pr-*`) when the section is custom-wrapper (`--hero-banner`, `--overlay`). |
