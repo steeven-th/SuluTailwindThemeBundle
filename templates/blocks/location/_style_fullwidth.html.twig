@@ -6,7 +6,7 @@
         {% set zoom = location.zoom|default(15) %}
         {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
-        <div class="iw-block-location iw-block-location--fullwidth">
+        <div class="iw-block-location iw-block-location--fullwidth iw-split-gap">
             {# Map #}
             <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
@@ -19,7 +19,7 @@
 
             {# Info below the map #}
             {% if (title is defined and title is not empty) or formattedAddress is not empty or (text is defined and text is not empty) %}
-                <div class="iw-block-location__info mt-6 space-y-4">
+                <div class="iw-block-location__info space-y-4">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),
                         subTitle: subTitle|default(''),

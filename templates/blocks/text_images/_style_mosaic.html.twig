@@ -75,7 +75,7 @@
         {% set isSideBySide = mosaicPos in ['left', 'right'] %}
         {% set imageFirst = mosaicPos in ['left', 'top'] %}
 
-        <div class="iw-block-text-images__grid {{ isSideBySide ? 'grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-5' : 'flex flex-col gap-2 md:gap-5' }}">
+        <div class="iw-block-text-images__grid iw-split-gap {{ isSideBySide ? 'grid grid-cols-1 lg:grid-cols-3' : 'flex flex-col' }}">
             {# Text area — full width when stacked, 1 column when side-by-side #}
             <div class="iw-block-text-images__content {{ isSideBySide ? 'lg:col-span-1' : '' }} {{ imageFirst ? 'order-2' : 'order-1' }} {{ isSideBySide ? (imageFirst ? 'lg:order-2' : 'lg:order-1') : '' }}">
                 {% if text is defined and text is not empty %}
@@ -98,7 +98,7 @@
                     {% endif %}
                 {% endfor %}
 
-                <div class="iw-block-text-images__mosaic-grid {{ isSideBySide ? 'lg:col-span-2' : '' }} {{ imageFirst ? 'order-1' : 'order-2' }} {{ isSideBySide ? (imageFirst ? 'lg:order-1' : 'lg:order-2') : '' }} grid grid-cols-2 gap-2 md:gap-5">
+                <div class="iw-block-text-images__mosaic-grid {{ mosaicGap|default('') }} {{ isSideBySide ? 'lg:col-span-2' : '' }} {{ imageFirst ? 'order-1' : 'order-2' }} {{ isSideBySide ? (imageFirst ? 'lg:order-1' : 'lg:order-2') : '' }} grid grid-cols-2">
                     {% for media in resolvedImages %}
                         {# First image spans full width in 16:9, others use selected format #}
                         {% set isHero = loop.first %}

@@ -40,6 +40,11 @@ class ThemeFormMapper
     public const PREFIX_BORDERS = 'borders_';
 
     /**
+     * Prefix used for site-wide default form fields (Defaults tab).
+     */
+    public const PREFIX_DEFAULTS = 'defaults_';
+
+    /**
      * Prefix used for buttons form fields.
      */
     public const PREFIX_BUTTONS = 'buttons_';
@@ -248,6 +253,10 @@ class ThemeFormMapper
         }
         unset($borders['radius']);
         $this->flattenDepth1($data, self::PREFIX_BORDERS, $borders);
+
+        // Flatten site-wide block defaults (depth 1): tokens.defaults.blockGap
+        // → defaults_blockGap. Shares the Defaults tab with the border radii.
+        $this->flattenDepth1($data, self::PREFIX_DEFAULTS, $tokens['defaults'] ?? []);
 
         // Buttons: repeatable block (tokens.buttons list → data.buttons) + flat
         // global padding (tokens.buttonsGlobal.paddingX → buttons_paddingX).
@@ -530,6 +539,8 @@ class ThemeFormMapper
         if (isset($tokens['borders']['cardRadius'])) {
             unset($tokens['borders']['radius']);
         }
+        // Site-wide block defaults (Defaults tab), stored next to the borders.
+        $tokens['defaults'] = $this->unflattenDepth1($data, self::PREFIX_DEFAULTS, $tokens['defaults'] ?? []);
         // Buttons: repeatable list of {slug, label, ...} + separate global padding.
         // Validate slug uniqueness at save (collision rejected, not deduplicated).
         $legacyGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);

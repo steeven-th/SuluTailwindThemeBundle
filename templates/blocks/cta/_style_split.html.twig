@@ -15,7 +15,7 @@
     {# HTML order determines mobile order:
        contentRight=false → text first, accessory below (mobile) / accessory right (desktop)
        contentRight=true  → accessory first, accessory above (mobile) / accessory left (desktop) #}
-    <div class="iw-block-cta iw-block-cta--split grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-5 items-center">
+    <div class="iw-block-cta iw-block-cta--split iw-split-gap grid grid-cols-1 lg:grid-cols-2 items-center">
         {% if isContentRight %}
             {# Accessory LEFT (desktop) / Accessory TOP (mobile) #}
             {% include '@ItechWorldSuluTailwindTheme/blocks/cta/accessories/_accessory_' ~ accessoryKind ~ '.html.twig' with {

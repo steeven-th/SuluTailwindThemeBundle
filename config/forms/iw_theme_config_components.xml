@@ -167,9 +167,14 @@
                     </params>
                 </property>
 
-                <!-- Global gap between cards in every card grid/list/carousel -->
+                <!-- Gap between article cards, in every card grid/list/carousel.
+                     Image grids and the other component grids have their own
+                     settings under Defaults > Blocks. -->
                 <property name="cardGap" type="single_select" colspan="4">
-                    <meta><title>iw_sulu_tailwind_theme.card_gap</title></meta>
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.card_gap</title>
+                        <info_text>iw_sulu_tailwind_theme.card_gap_info</info_text>
+                    </meta>
                     <params>
                         <param name="default_value" value="1.5rem"/>
                         <param name="values" type="collection">

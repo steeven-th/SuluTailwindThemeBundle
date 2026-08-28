@@ -58,7 +58,7 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `--iw-accordion-summary-padding-x` | `0` | Horizontal padding of the row (the `--cards` and `--bordered` modes add their own inline padding on the item). |
 | `--iw-accordion-panel-padding-bottom` | `1rem` | Space under the answer. |
 | `--iw-accordion-card-padding-x` | `1.25rem` | Inline padding of an item in `--cards` and `--bordered`. |
-| `--iw-block-accordion-cards-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards. Falls back to the site-wide cards gap set in the admin (Components > Cards). |
+| `--iw-block-accordion-cards-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. Falls back to the site-wide component gap set in the admin (Defaults > Blocks). |
 
 ### Colors and rules
 

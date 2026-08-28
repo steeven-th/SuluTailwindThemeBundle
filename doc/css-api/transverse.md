@@ -40,41 +40,56 @@ declaration always beats inheritance whatever its specificity.
 
 ---
 
-## Card grid spacing
+## Grid spacing
 
-A single global token harmonizes the gap between cards across every card grid, list and carousel. It is set in the admin under **Settings > Themes > Components > Cards > Card spacing** (`cardGap`) and compiled to `--iw-cards-gap`.
+Three site-wide tokens harmonize the spacing inside grids, one per family. A
+grid reads the token of its own family, so an admin setting only moves what it
+names.
 
-| Level (admin) | Tailwind | Value |
-|---|---|---|
-| Very compact | `gap-2` | `0.5rem` |
-| Compact | `gap-4` | `1rem` |
-| Compact + | `gap-5` | `1.25rem` |
-| Normal (default) | `gap-6` | `1.5rem` |
-| Spacious | `gap-8` | `2rem` |
-| Large | `gap-10` | `2.5rem` |
+| Family | Admin setting | Token | Applies to |
+|---|---|---|---|
+| Article cards | Components > Cards > **Card spacing** (`cardGap`) | `--iw-cards-gap` | Article list (cards / grid / list), article carousel, article featured |
+| Images | Defaults > Blocks > **Gap between images** (`defaults.imageGap`) | `--iw-blocks-image-gap` | Text + images mosaic, gallery grid / masonry / slider |
+| Other components | Defaults > Blocks > **Gap between components** (`defaults.componentGap`) | `--iw-blocks-component-gap` | Accordion, documents, linked pages, testimonials, key figures |
 
-Every card grid keeps a dedicated per-block variable that **falls back** to the global token, so you can override one block without losing the global harmonization:
+All three offer the same scale:
+
+| Level (admin) | Value |
+|---|---|
+| None | `0` |
+| Very compact | `0.5rem` |
+| Compact | `1rem` |
+| Compact + | `1.25rem` |
+| Normal (default) | `1.5rem` |
+| Spacious | `2rem` |
+| Large | `2.5rem` |
+| Extra large | `3rem` |
+
+Every grid keeps a dedicated per-block variable that **falls back** to its
+family token, so you can override one block without losing the harmonization:
 
 ```css
-gap: var(--iw-block-<name>-gap, var(--iw-cards-gap, 1.5rem));
+gap: var(--iw-block-<name>-gap, var(--iw-blocks-component-gap, 1.5rem));
 ```
 
-| Block / layout | Per-block variable |
-|---|---|
-| Document (grid) | `--iw-block-document-grid-gap` |
-| Gallery (grid) | `--iw-block-gallery-grid-gap` |
-| Gallery (masonry — column & row) | `--iw-block-gallery-masonry-gap` |
-| Gallery (slider track) | `--iw-block-gallery-slider-gap` |
-| Linked pages (cards) | `--iw-block-linked-pages-cards-gap` |
-| Testimonial (cards) | `--iw-block-testimonial-cards-gap` |
-| Key figures (2×2 grid) | `--iw-block-key-figures-gap` |
-| Article list (cards) | `--iw-block-article-list-cards-gap` |
-| Article list (grid) | `--iw-block-article-list-grid-gap` |
-| Article list (list) | `--iw-block-article-list-list-gap` |
-| Article carousel (track) | `--iw-block-article-carousel-track-gap` |
-| Article featured (side-by-side / spotlight / secondary) | `--iw-block-article-featured-*-gap` |
+| Block / layout | Per-block variable | Family token |
+|---|---|---|
+| Document (grid) | `--iw-block-document-grid-gap` | component |
+| Linked pages (cards) | `--iw-block-linked-pages-cards-gap` | component |
+| Testimonial (cards) | `--iw-block-testimonial-cards-gap` | component |
+| Key figures (2×2 grid) | `--iw-block-key-figures-gap` | component |
+| Accordion (cards) | `--iw-block-accordion-cards-gap` | component |
+| Text + images (mosaic) | `--iw-block-text-images-mosaic-gap` | image |
+| Gallery (grid) | `--iw-block-gallery-grid-gap` | image |
+| Gallery (masonry - column & row) | `--iw-block-gallery-masonry-gap` | image |
+| Gallery (slider track) | `--iw-block-gallery-slider-gap` | image |
+| Article list (cards) | `--iw-block-article-list-cards-gap` | cards |
+| Article list (grid) | `--iw-block-article-list-grid-gap` | cards |
+| Article list (list) | `--iw-block-article-list-list-gap` | cards |
+| Article carousel (track) | `--iw-block-article-carousel-track-gap` | cards |
+| Article featured (side-by-side / spotlight / secondary) | `--iw-block-article-featured-*-gap` | cards |
 
-The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery--gap-none` (seamless, edge-to-edge) and `.iw-block-gallery--gap-from-sm` (edge-to-edge on mobile, gap from the `sm` breakpoint, used in interior mode).
+The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery--gap-none` (seamless, edge-to-edge) and `.iw-block-gallery--gap-from-sm` (edge-to-edge on mobile, gap from the `sm` breakpoint, used in interior mode). Both are deduced from the lateral padding and only apply while the block's own image spacing field stays on *Theme default*.
 
 **Override examples:**
 
@@ -82,8 +97,145 @@ The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery
 /* Tighten one block only */
 .my-page .iw-block-article-list--cards { --iw-block-article-list-cards-gap: 1rem; }
 
+/* Change a site-wide default for a specific theme scope */
+.theme-dense { --iw-blocks-component-gap: 1rem; --iw-cards-gap: 1rem; }
+```
+
+---
+
+## Split block gap
+
+Blocks built from two content zones - text + images, form + widget, map + info,
+CTA + accessory - share a single gap token so the whole site breathes the same
+way. It is set in the admin under **Settings > Themes > Defaults > Blocks >
+Gap between zones** (`defaults.blockGap`) and compiled to `--iw-blocks-gap`.
+
+| Level (admin) | Tailwind | Value |
+|---|---|---|
+| None | `gap-0` | `0` |
+| Very compact | `gap-2` | `0.5rem` |
+| Compact | `gap-4` | `1rem` |
+| Compact + | `gap-5` | `1.25rem` |
+| Normal (default) | `gap-6` | `1.5rem` |
+| Spacious | `gap-8` | `2rem` |
+| Large | `gap-10` | `2.5rem` |
+| Extra large | `gap-12` | `3rem` |
+
+The layout wrapper of each of those blocks carries the `.iw-split-gap` utility,
+which halves the gap below the `md` breakpoint (48rem): once the two zones are
+stacked, a desktop-sized gap reads as a hole in the page.
+
+Where a block's own padding already sits between the two zones - `text_images`
+in `--fullwidth`, whose image is edge to edge so the content padding faces it -
+**the two add up**: the theme sets the floor, the block's padding adds to it.
+The side of the padding that faces the image is no longer forced to a minimum,
+so an editor who wants the gap alone can set that padding to 0.
+
+```css
+.iw-split-gap { gap: calc(var(--iw-split-gap, var(--iw-blocks-gap, 1.5rem)) * 0.5); }
+
+@media (min-width: 48rem) {
+    .iw-split-gap { gap: var(--iw-split-gap, var(--iw-blocks-gap, 1.5rem)); }
+}
+```
+
+Each block feeds `--iw-split-gap` from its own variable, so one block can be
+tuned without losing the site-wide harmonization:
+
+| Block / layout | Per-block variable |
+|---|---|
+| Text + images (classic, mosaic, sidebar, split-screen, fullwidth) | `--iw-block-text-images-gap` |
+| CTA (`--split`) | `--iw-block-cta-split-gap` |
+| Form (`--split`) | `--iw-block-form-split-gap` |
+| Location (`--map-with-info`) | `--iw-block-location-map-with-info-gap` |
+| Location (`--fullwidth`, map above info) | `--iw-block-location-fullwidth-gap` |
+
+**Override examples:**
+
+```css
+/* Tighten the text + images blocks of one page only */
+.my-page .iw-block-text-images__grid { --iw-block-text-images-gap: 1rem; }
+
 /* Change the site-wide default for a specific theme scope */
-.theme-dense { --iw-cards-gap: 1rem; }
+.theme-dense { --iw-blocks-gap: 1rem; }
+
+/* Opt one wrapper out of the mobile halving */
+.my-page .iw-block-cta--split { --iw-split-gap: 2rem; gap: 2rem; }
+```
+
+In `--split-screen` the gap becomes a gutter between the two halves, letting the
+block background show through; set the theme to **None** to get the edge-to-edge
+look back. The mosaic image grid keeps its own rhythm - it spaces images inside
+one zone, not the two zones apart.
+
+### Editor-picked spacing (`iw-gap--*`)
+
+Three image grids let the editor set their own spacing from the block form,
+instead of following the theme: the mosaic images of `text_images`
+(**Content > Image spacing**, `mosaicGap`) and the gallery in `--grid` and
+`--masonry` (**Content > Image spacing**, `galleryGap`). Leaving the field on
+*Theme default* keeps the site-wide card spacing.
+
+The stored value **is** the class name (`iw-gap--4`, like the `rounded-*` and
+`mt-*` values stored elsewhere). The class only sets `--iw-gap-choice`; the
+block's own rule keeps ownership of the `gap` property and reads the choice
+first:
+
+```css
+gap: var(--iw-gap-choice, var(--iw-block-<name>-gap, var(--iw-cards-gap, 1.5rem)));
+```
+
+| Class | Value |
+|---|---|
+| `.iw-gap--0` | `0` |
+| `.iw-gap--2` | `0.5rem` |
+| `.iw-gap--4` | `1rem` |
+| `.iw-gap--5` | `1.25rem` |
+| `.iw-gap--6` | `1.5rem` |
+| `.iw-gap--8` | `2rem` |
+| `.iw-gap--10` | `2.5rem` |
+| `.iw-gap--12` | `3rem` |
+
+Tailwind's own `gap-*` utilities cannot play this role: `app.css` sits outside
+`@layer`, so its rules beat the utility layer whatever the specificity, and the
+editor's choice would never apply.
+
+On the gallery, an explicit choice also wins over the seamless layout otherwise
+deduced from a lateral padding of 0.
+
+---
+
+## Block titles gap
+
+The space between a block's titles group (title, subtitle, separator) and its
+content is a second site-wide token: **Settings > Themes > Defaults > Blocks >
+Gap between titles and content** (`defaults.titleGap`), compiled to
+`--iw-blocks-title-gap` and consumed by `.iw-block__titles`, the wrapper emitted
+by `blocks/common/_titles.html.twig` for all 43 block templates that use it.
+
+```css
+.iw-block__titles { margin-bottom: var(--iw-block-titles-gap, var(--iw-blocks-title-gap, 1.5rem)); }
+.iw-block__titles:last-child { margin-bottom: 0; }
+```
+
+The separator inside the group keeps its top margin only. It used to own the
+space below the group as well, which meant a variant configured with
+`separatorMode: none` lost that spacing entirely - the titles then sat flush
+against the content.
+
+Blocks that render their own titles inline rather than through the partial
+(`cta` in all three styles, `text_images` in `--hero-banner`, `--overlay` and
+`--split-screen`, `text` in `--quote`) keep their internal typographic rhythm:
+there the title and the text belong to the same zone.
+
+**Override examples:**
+
+```css
+/* One block only */
+.my-page .iw-block-accordion .iw-block__titles { --iw-block-titles-gap: 0.5rem; }
+
+/* Site-wide default for a theme scope */
+.theme-dense { --iw-blocks-title-gap: 1rem; }
 ```
 
 ---

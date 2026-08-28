@@ -163,6 +163,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-lg',
                 ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '2rem',
+                    'titleGap' => '1.5rem',
+                    'imageGap' => '1rem',
+                    'componentGap' => '1.5rem',
+                ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
                     'paddingY' => '0.75rem',
@@ -384,6 +391,13 @@ class ThemeFixtures
                     'radiusLg' => 'rounded-3xl',
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-2xl',
+                ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '2.5rem',
+                    'titleGap' => '2rem',
+                    'imageGap' => '1.5rem',
+                    'componentGap' => '2rem',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '2rem',
@@ -610,6 +624,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-none',
                 ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '3rem',
+                    'titleGap' => '2.5rem',
+                    'imageGap' => '2rem',
+                    'componentGap' => '2rem',
+                ],
                 'buttonsGlobal' => [
                     'paddingX' => '1rem',
                     'paddingY' => '0.5rem',
@@ -832,6 +853,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '2rem',
+                    'titleGap' => '1.5rem',
+                    'imageGap' => '1rem',
+                    'componentGap' => '1.5rem',
+                ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
                     'paddingY' => '0.75rem',
@@ -1053,6 +1081,13 @@ class ThemeFixtures
                     'radiusLg' => 'rounded-2xl',
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
+                ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '1.5rem',
+                    'titleGap' => '1.5rem',
+                    'imageGap' => '1rem',
+                    'componentGap' => '1.5rem',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -1278,6 +1313,13 @@ class ThemeFixtures
                     'radiusLg' => 'rounded-xl',
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
+                ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '1.5rem',
+                    'titleGap' => '1.5rem',
+                    'imageGap' => '1rem',
+                    'componentGap' => '1.5rem',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -1604,6 +1646,13 @@ class ThemeFixtures
                 'borders' => [
                     'radius' => 'rounded-lg',
                     'imageRadius' => 'rounded-lg',
+                ],
+                // Site-wide block defaults (gap between the two zones of split blocks)
+                'defaults' => [
+                    'blockGap' => '2rem',
+                    'titleGap' => '1.5rem',
+                    'imageGap' => '1.5rem',
+                    'componentGap' => '1.5rem',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',

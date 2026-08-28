@@ -40,11 +40,12 @@ Text + image block with seven layout styles selectable from the admin. The block
 | `.iw-block-text-images__content-wrap` | Outer content wrapper that carries the per-section padding utilities (`pt-*`, `pb-*`, `pl-*`, `pr-*`) when the section is custom-wrapper (`--hero-banner`, `--overlay`). |
 | `.iw-block-text-images__content` | Inner content wrapper (titles + paragraph + actions). Present on every style with appropriate semantics. |
 | `.iw-block-text-images__text` | Wrapper around the rich-text content (admin `text` field). Also carries `.iw-block__text` so variant rules apply. |
-| `.iw-block-text-images__grid` | The CSS grid container that holds text + image columns (`--sidebar`, `--mosaic`, `--split-screen`). |
+| `.iw-block-text-images__grid` | The CSS grid container that holds text + image columns (`--classic` left/right, `--sidebar`, `--mosaic`, `--split-screen`). Carries `.iw-split-gap`; in `--split-screen` the gap shows as a gutter between the two halves. |
+| `.iw-block-text-images__stack` | The vertical wrapper holding text + image stacked (`--classic` top/bottom). Carries `.iw-split-gap`. |
 | `.iw-block-text-images__image-wrap` | Wrapper around the image slider (`--sidebar`, sometimes the image column elsewhere). Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-text-images__image-column` | The grid cell holding the sticky image strip (`--sidebar`). |
 | `.iw-block-text-images__image-side` | The grid cell holding the full-height image (`--split-screen`). |
-| `.iw-block-text-images__mosaic-grid` | The 2-column grid of image tiles inside `--mosaic`. |
+| `.iw-block-text-images__mosaic-grid` | The 2-column grid of image tiles inside `--mosaic`. Its spacing follows the site-wide cards gap, or the value the editor picks in **Content > Image spacing** (`mosaicGap`). |
 
 ---
 
@@ -53,6 +54,8 @@ Text + image block with seven layout styles selectable from the admin. The block
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-block-text-images-bg-overlay-color` | `rgb(0 0 0 / 0.6)` | Background color of the dark `__bg-overlay` above the hero image (applies to `--hero-banner`, `--overlay` mobile, `--classic` background mode). |
+| `--iw-block-text-images-mosaic-gap` | `var(--iw-cards-gap, 1.5rem)` | Spacing between the images of the mosaic grid. Overridden per block by the editor's `iw-gap--*` choice; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
+| `--iw-block-text-images-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the text zone and the image zone, side by side or stacked. Halved below the `md` breakpoint. Falls back to the site-wide block gap set in the admin (Defaults > Blocks). In `--fullwidth` the section itself is the flex column carrying the gap, and the content padding adds to it. |
 
 Other layout/spacing/typography choices are driven by Tailwind utilities composed in Twig — override them by targeting the BEM hooks above.
 

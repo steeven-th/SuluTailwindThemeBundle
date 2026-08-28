@@ -1,7 +1,12 @@
-{# Block titles — renders a configurable-level title, a paragraph subtitle,
+{# Block titles - renders a configurable-level title, a paragraph subtitle,
    and an optional separator. The title tag is editor-configurable (h2 by
    default) so a block can fit the page outline; the subtitle is a <p> (a
-   tagline is not a heading, which avoids an orphan h3 in the document outline). #}
+   tagline is not a heading, which avoids an orphan h3 in the document outline).
+
+   The space below the whole group is owned by `.iw-block__titles`, driven by
+   the theme's title gap (Defaults > Blocks). The separator only carries its
+   top margin: it used to own the space below too, which vanished whenever a
+   variant hid it. #}
 {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
 {% set alignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
 {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
@@ -12,7 +17,7 @@
 {% set separatorMode = variantConfig.separatorMode|default('style') %}
 
 {% if (title is defined and title is not empty) or (subTitle is defined and subTitle is not empty) %}
-<div class="{{ alignClass }}">
+<div class="iw-block__titles {{ alignClass }}">
     {% if title is defined and title is not empty %}
         <{{ titleTag }} class="iw-block__title text-2xl md:text-3xl lg:text-4xl font-[var(--font-h2-weight)] {{ alignClass }}">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</{{ titleTag }}>
     {% endif %}
@@ -22,21 +27,21 @@
 
     {# Separator: style mode → CSS handles rendering via .iw-variant--* hr rules #}
     {% if separatorMode == 'style' or separatorMode is empty %}
-        <hr class="my-6">
+        <hr class="mt-6">
     {% elseif separatorMode == 'image' and variantConfig.separatorImage is defined and variantConfig.separatorImage.id is defined %}
         {# Image mode → render custom image separator. A media deleted from the
            library resolves to null: fall back to the plain rule. #}
         {% set separatorMedia = sulu_resolve_media(variantConfig.separatorImage.id, app.request.locale) %}
         {% if separatorMedia is not null %}
-            <div class="iw-block__separator my-6">
+            <div class="iw-block__separator mt-6">
                 <img src="{{ separatorMedia.url }}" alt="" loading="lazy" class="mx-auto max-h-8 w-auto">
             </div>
         {% else %}
-            <hr class="my-6">
+            <hr class="mt-6">
         {% endif %}
     {% elseif separatorMode != 'none' %}
         {# Fallback to default hr if image is missing #}
-        <hr class="my-6">
+        <hr class="mt-6">
     {% endif %}
 </div>
 {% endif %}

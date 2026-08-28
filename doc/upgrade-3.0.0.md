@@ -659,3 +659,118 @@ work. The shipped theme presets set it on all their variants.
 The `.iw-text--*` set is generated from the palette, one class per color and per
 shade, under both the role alias and the slug. It adds roughly 9 KB to the
 compiled CSS, under 1 KB once compressed.
+
+---
+
+## Borders tab becomes Defaults, with a site-wide block gap (breaking, admin)
+
+The **Borders** tab of a theme is renamed **Defaults**: it now hosts every
+site-wide default that is not tied to a single component (components already
+have their own tab). The border radii keep their own section inside it, with the
+same field names and the same storage - no data migration.
+
+What changes for an integration:
+
+| 2.x / earlier 3.0 dev | 3.0.0 |
+|---|---|
+| Form key `iw_theme_config_borders` | `iw_theme_config_defaults` |
+| Admin route `/admin/themes/:id/borders` | `/admin/themes/:id/defaults` |
+| View `iw_sulu_tailwind_theme.edit_form.borders` | `iw_sulu_tailwind_theme.edit_form.defaults` |
+| Translation key `iw_sulu_tailwind_theme.borders` | `iw_sulu_tailwind_theme.defaults` |
+
+Only bookmarks and code that referenced the form key or the view name are
+affected. Themes stored in the database are untouched: the radii still live in
+`tokens.borders`, and the new settings live in `tokens.defaults`.
+
+### New setting: gap between the two zones of a split block
+
+**Defaults > Blocks > Gap between zones** (`defaults.blockGap`, default
+`1.5rem`) drives the space between the two content zones of every split block:
+text + images, form + widget, map + info, CTA + accessory. It compiles to
+`--iw-blocks-gap` and is applied through the new `.iw-split-gap` utility, which
+halves the value below the `md` breakpoint so a spacious desktop gap does not
+turn into a hole once the zones are stacked.
+
+This replaces the hardcoded per-template values, so some blocks shift visually
+on upgrade with the default setting:
+
+| Block / layout | Before | After (default `1.5rem`) |
+|---|---|---|
+| Text + images (classic, mosaic, sidebar) | `0.5rem`, `1.25rem` from `md` | `0.75rem`, `1.5rem` from `md` |
+| CTA `--split` | `0.5rem`, `1.25rem` from `md` | `0.75rem`, `1.5rem` from `md` |
+| Form `--split` | `2rem` | `0.75rem`, `1.5rem` from `md` |
+| Location `--map-with-info` | `2rem` | `0.75rem`, `1.5rem` from `md` |
+| Location `--fullwidth` | `1.5rem` margin below the map | `0.75rem`, `1.5rem` from `md` |
+| Text + images `--fullwidth` | `0.75rem` of content padding, and an explicit `0` was ignored | the gap **plus** the content padding, the side facing the image now honouring `0` |
+| Text + images `--split-screen` | halves edge to edge, the spacing came from the text padding | a gutter between the halves, the padding adding to it |
+
+Set the theme to **Spacious (32 px)** to keep the previous spacing of the form
+and location blocks, and to **None** to get the edge-to-edge `--split-screen`
+back. Per-block variables (`--iw-block-text-images-gap`,
+`--iw-block-cta-split-gap`, `--iw-block-form-split-gap`,
+`--iw-block-location-map-with-info-gap`, `--iw-block-location-fullwidth-gap`)
+override the token for a single block - see
+[`css-api/transverse.md#split-block-gap`](./css-api/transverse.md#split-block-gap).
+
+### New setting: gap between a block's titles and its content
+
+**Defaults > Blocks > Gap between titles and content** (`defaults.titleGap`,
+default `1.5rem`) drives the space below the titles group of every block that
+renders it through `blocks/common/_titles.html.twig` - 43 templates. It compiles
+to `--iw-blocks-title-gap` and is consumed by the new `.iw-block__titles`
+wrapper.
+
+That space used to be the separator's own `my-6`, which means a block variant
+configured with `separatorMode: none` had **no** spacing at all between its
+titles and its content. It now keeps the theme's gap whether the separator is
+shown or not - a visible fix on those variants.
+
+Two form styles carried their own margin on top of that and no longer do:
+
+| Style | Before | After |
+|---|---|---|
+| Form `--centered` | `2rem` (`mt-8`) below the titles | the theme title gap |
+| Form `--card` | `1.5rem` (`mt-6`) inside the card, below nothing, adding to its `p-8` | removed, the card's own padding stands alone |
+
+Blocks that render their titles inline instead of through the partial (`cta` in
+its three styles, `text_images` in `--hero-banner`, `--overlay` and
+`--split-screen`, `text` in `--quote`) are untouched: there the title and the
+text are one zone, and the spacing between them is typographic rhythm.
+
+### New block field: image spacing (mosaic, gallery grid & masonry)
+
+Three image grids gain a per-block **Image spacing** field, left on *Theme
+default* out of the box: `text_images` in `--mosaic` (`mosaicGap`) and the
+gallery in `--grid` and `--masonry` (`galleryGap`). The stored value is the
+class name (`iw-gap--4`), consistent with the `rounded-*` and `mt-*` values
+stored by the other pickers.
+
+On the mosaic, the default also changes: its images used to sit `0.5rem` apart
+(`1.25rem` from `md`) and now follow the site-wide image gap, `1.5rem` by
+default. Pick **Very compact** on the block, or lower the theme's image gap, to
+get the previous rhythm back.
+
+On the gallery, an explicit choice now wins over the seamless layout deduced
+from a lateral padding of 0 - that deduction is unchanged when the field stays
+on *Theme default*.
+
+### Grid spacing splits into three settings (breaking)
+
+**Components > Cards > Card spacing** (`cardGap`, `--iw-cards-gap`) used to
+drive the spacing of every grid in the theme, cards or not. It now covers the
+article card grids only - the ones the Cards section actually styles - and two
+new settings take the rest, both under **Defaults > Blocks**:
+
+| Grid | Was | Now |
+|---|---|---|
+| Article list (cards / grid / list), article carousel, article featured | `cardGap` | `cardGap`, unchanged |
+| Text + images mosaic, gallery grid / masonry / slider | `cardGap` | **Gap between images** (`defaults.imageGap`, `--iw-blocks-image-gap`) |
+| Accordion, documents, linked pages, testimonials, key figures | `cardGap` | **Gap between components** (`defaults.componentGap`, `--iw-blocks-component-gap`) |
+
+Both new settings default to `1.5rem`, which is also the old fallback, so a
+theme that never touched the card spacing renders identically. A theme that
+**did** set it now has to set the two new ones to the same value to keep every
+grid aligned - that is the breaking part.
+
+Custom CSS reading `--iw-cards-gap` to restyle a non-article grid must switch
+to the matching token; the per-block variables are unchanged.

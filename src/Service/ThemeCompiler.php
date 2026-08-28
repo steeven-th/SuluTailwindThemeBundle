@@ -226,6 +226,7 @@ class ThemeCompiler
         $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
+        $css .= $this->generateBlockDefaultVariables($tokens['defaults'] ?? []);
         $css .= $this->generateButtonVariables($buttonList);
         $css .= $this->generateMenuVariables($menuConfig);
         $css .= $this->generateArticleVariables($tokens);
@@ -1449,6 +1450,42 @@ class ThemeCompiler
 
         // Alias for app.css compatibility (img global rule uses --radius-img)
         $css .= "  --radius-img: var(--border-imageRadius, var(--border-cardRadius));\n";
+
+        return $css . "\n";
+    }
+
+    /**
+     * Generate CSS custom properties for the site-wide block defaults.
+     *
+     * These are the theme-level defaults shared by every block that are not
+     * tied to a single component (components own their tab). Currently:
+     *   - --iw-blocks-gap: gap between the two content zones of split blocks
+     *     (text + images, form + widget, map + info, CTA + accessory). Halved
+     *     below the `md` breakpoint by the rules in `assets/styles/app.css`.
+     *   - --iw-blocks-title-gap: space between a block's titles group and its
+     *     content, consumed by `.iw-block__titles`.
+     *   - --iw-blocks-image-gap: spacing between the images of an image grid
+     *     (mosaic, gallery grid / masonry / slider), overridable per block.
+     *   - --iw-blocks-component-gap: spacing inside the component grids that
+     *     are not article cards (accordion, documents, linked pages,
+     *     testimonials, key figures).
+     *
+     * @param array<string, mixed> $defaults Site-wide default token values
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateBlockDefaultVariables(array $defaults): string
+    {
+        $gap = (string) ($defaults['blockGap'] ?? '1.5rem');
+        $titleGap = (string) ($defaults['titleGap'] ?? '1.5rem');
+        $imageGap = (string) ($defaults['imageGap'] ?? '1.5rem');
+        $componentGap = (string) ($defaults['componentGap'] ?? '1.5rem');
+
+        $css = "  /* Block defaults (site-wide) */\n";
+        $css .= "  --iw-blocks-gap: {$gap};\n";
+        $css .= "  --iw-blocks-title-gap: {$titleGap};\n";
+        $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
+        $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
 
         return $css . "\n";
     }

@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_defaults</key>
+
+    <properties>
+        <section name="borderRadii">
+            <meta>
+                <title>iw_sulu_tailwind_theme.borders_radii</title>
+            </meta>
+            <properties>
+                <property name="borders_cardRadius" type="iw_theme_radius_selector" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.borders_cardRadius</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="rounded-none"/>
+                    </params>
+                </property>
+
+                <property name="borders_imageRadius" type="iw_theme_radius_selector" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.borders_imageRadius</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="rounded-none"/>
+                    </params>
+                </property>
+
+                <property name="borders_paragraphRadius" type="iw_theme_radius_selector" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.borders_paragraphRadius</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="rounded-none"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Site-wide block defaults: settings shared by every block that are
+             not tied to a single component (components have their own tab). -->
+        <section name="blockDefaults">
+            <meta>
+                <title>iw_sulu_tailwind_theme.defaults_section_blocks</title>
+            </meta>
+            <properties>
+                <!-- Gap between the two content zones of split blocks
+                     (text + images, form + widget, map + info, CTA + accessory).
+                     Halved below the md breakpoint, see app.css. -->
+                <property name="defaults_blockGap" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_blockGap</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_blockGap_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Space between a block's titles group and its content.
+                     Owned by `.iw-block__titles`; the separator only carries
+                     its top margin, so a variant hiding it keeps the spacing. -->
+                <property name="defaults_titleGap" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_titleGap</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_titleGap_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Spacing between the images of an image grid (text + images
+                     mosaic, gallery grid, masonry and slider). Each block can
+                     override it from its own Image spacing field. -->
+                <property name="defaults_imageGap" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_imageGap</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_imageGap_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Spacing inside the component grids that are not article
+                     cards (accordion, documents, linked pages, testimonials,
+                     key figures). Article card grids follow the card spacing
+                     of the Components tab instead. -->
+                <property name="defaults_componentGap" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_componentGap</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_componentGap_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>
