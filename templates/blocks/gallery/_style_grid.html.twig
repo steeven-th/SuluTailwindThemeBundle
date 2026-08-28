@@ -22,11 +22,16 @@
         {# Image radius from admin selector #}
         {% set imageRadiusVal = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
-        {# If paddingLateral is 0 or empty: seamless layout — no gap.
-           Interior mode: restore gap from sm: breakpoint. #}
+        {# Image spacing: an explicit choice from the admin (Content > Image
+           spacing) wins. Otherwise it is deduced from paddingLateral: 0 or
+           empty means a seamless layout - no gap - which interior mode
+           restores from the sm: breakpoint. #}
+        {% set explicitGap = galleryGap|default('') %}
         {% set pxVal = paddingLateral|default('') %}
-        {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
-        {% if noGap and lateralMode == 'interior' %}
+        {% set noGap = explicitGap is empty and (pxVal is empty or pxVal == 'px-0') %}
+        {% if explicitGap is not empty %}
+            {% set gapClass = explicitGap %}
+        {% elseif noGap and lateralMode == 'interior' %}
             {% set gapClass = 'iw-block-gallery--gap-from-sm' %}
         {% elseif noGap %}
             {% set gapClass = 'iw-block-gallery--gap-none' %}

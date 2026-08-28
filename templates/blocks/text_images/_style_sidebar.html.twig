@@ -71,7 +71,7 @@
             variant: variant|default(0)
         } only %}
 
-        <div class="iw-block-text-images__grid grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-5">
+        <div class="iw-block-text-images__grid iw-split-gap grid grid-cols-1 md:grid-cols-5">
             {# Main text area — 3/5 = 60% #}
             <div class="iw-block-text-images__content md:col-span-3{{ isRight ? ' md:order-2' : ' md:order-1' }}">
                 {% if text is defined and text is not empty %}

@@ -165,6 +165,22 @@ class ThemeFormMapperTest extends TestCase
      * A theme exercising every shape the mapper handles: prefixed scalars,
      * two-level nesting, lists addressed by slug, and a separate column.
      */
+    public function testBlockGapTravelsBetweenTheFormAndTheTokens(): void
+    {
+        $data = $this->mapper->serializeTheme($this->buildTheme());
+
+        $this->assertSame('2rem', $data['defaults_blockGap']);
+        $this->assertSame('1.5rem', $data['defaults_titleGap']);
+        $this->assertSame('1rem', $data['defaults_imageGap']);
+        $this->assertSame('2rem', $data['defaults_componentGap']);
+
+        $data['defaults_blockGap'] = '3rem';
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertSame('3rem', $target->getTokens()['defaults']['blockGap']);
+    }
+
     private function buildTheme(): ThemeConfig
     {
         $theme = new ThemeConfig();
@@ -176,6 +192,7 @@ class ThemeFormMapperTest extends TestCase
                 ['role' => 'secondary', 'slug' => 'secondary', 'value' => '#22aa88'],
             ],
             'borders' => ['radius' => '0.5rem', 'cardRadius' => '1rem'],
+            'defaults' => ['blockGap' => '2rem', 'titleGap' => '1.5rem', 'imageGap' => '1rem', 'componentGap' => '2rem'],
             'buttons' => [
                 ['slug' => 'primary', 'label' => 'Primary', 'bg' => '#3366ff', 'text' => '#ffffff'],
             ],

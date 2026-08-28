@@ -47,9 +47,12 @@
 {% set hasBotPad = paddingBottom is defined and paddingBottom is not empty and paddingBottom != 'pb-0' %}
 {% set hasLatPad = paddingLateral is defined and paddingLateral is not empty and paddingLateral != 'px-0' %}
 
-{# Vertical padding for content area #}
-{% set ptClass = hasTopPad ? paddingTop : 'pt-3' %}
-{% set pbClass = hasBotPad ? paddingBottom : 'pb-3' %}
+{# Vertical padding for content area. The side facing the image is separated
+   by the shared block gap (`.iw-split-gap` on the section), so an explicit 0
+   is honoured there; the side facing the block edge keeps its minimum so the
+   text never touches it. Both add up to the gap when set. #}
+{% set ptClass = hasTopPad ? paddingTop : (isBottom ? 'pt-3' : 'pt-0') %}
+{% set pbClass = hasBotPad ? paddingBottom : (isBottom ? 'pb-0' : 'pb-3') %}
 
 {# Lateral padding for content area #}
 {% if hasLatPad %}
@@ -103,7 +106,7 @@
 {# Image NEVER has its own radius — it follows the section edges.
    In exterior mode the section's overflow-hidden + blockRadius handle rounding. #}
 <section
-    class="block iw-block-text-images iw-block-text-images--fullwidth iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ isBottom ? 'bottom' : 'top' }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--fullwidth iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ isBottom ? 'bottom' : 'top' }} iw-split-gap flex flex-col {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >

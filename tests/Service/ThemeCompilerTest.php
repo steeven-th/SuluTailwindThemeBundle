@@ -277,6 +277,33 @@ final class ThemeCompilerTest extends TestCase
         self::assertStringContainsString('--font-size-h1: 4em;', $css);
     }
 
+    #[Test]
+    public function itEmitsTheSiteWideBlockGapToken(): void
+    {
+        $css = $this->compileCss(['defaults' => ['blockGap' => '2.5rem']]);
+
+        self::assertStringContainsString('--iw-blocks-gap: 2.5rem;', $css);
+    }
+
+    #[Test]
+    public function itFallsBackToTheDefaultBlockGapWhenUnset(): void
+    {
+        $css = $this->compileCss([]);
+
+        self::assertStringContainsString('--iw-blocks-gap: 1.5rem;', $css);
+        self::assertStringContainsString('--iw-blocks-title-gap: 1.5rem;', $css);
+        self::assertStringContainsString('--iw-blocks-image-gap: 1.5rem;', $css);
+        self::assertStringContainsString('--iw-blocks-component-gap: 1.5rem;', $css);
+    }
+
+    #[Test]
+    public function itEmitsTheSiteWideComponentGapToken(): void
+    {
+        $css = $this->compileCss(['defaults' => ['componentGap' => '2rem']]);
+
+        self::assertStringContainsString('--iw-blocks-component-gap: 2rem;', $css);
+    }
+
     /**
      * Dropdown entries in the language switcher carry both
      * .iw-menu__text--level-2 and .iw-menu__lang-item. Both are single-class

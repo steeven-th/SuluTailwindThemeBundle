@@ -24,7 +24,7 @@ use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
  * for the Theme configuration management.
  *
  * Provides a full CRUD interface with separate form tabs for:
- * details, colors, typography, buttons, borders, variants, and menu.
+ * details, colors, typography, buttons, defaults, variants, and menu.
  */
 class ThemeAdmin extends Admin
 {
@@ -228,7 +228,7 @@ class ThemeAdmin extends Admin
      * Configures the Sulu admin views for theme configuration management.
      *
      * Creates a list view, add form (with details tab only), and edit form
-     * (with details, colors, typography, buttons, borders, variants, and menu tabs).
+     * (with details, colors, typography, buttons, defaults, variants, and menu tabs).
      *
      * @param ViewCollection $viewCollection The view collection to configure
      */
@@ -329,12 +329,12 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: borders tab ─────────────────────────────
+            // ── Edit form: defaults tab (borders + site-wide block defaults) ──
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.borders', '/borders')
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/defaults')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_borders')
-                    ->setTabTitle('iw_sulu_tailwind_theme.borders')
+                    ->setFormKey('iw_theme_config_defaults')
+                    ->setTabTitle('iw_sulu_tailwind_theme.defaults')
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW)
             );

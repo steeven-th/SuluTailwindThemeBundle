@@ -53,6 +53,10 @@ The info column renders one of three partials depending on the `widgetType` admi
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
+| `--iw-block-form-split-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the form zone and the widget zone in `--split`. Halved below the `md` breakpoint. Falls back to the site-wide block gap set in the admin (Defaults > Blocks). |
+
+In `--centered` and `--card` the space between the titles and the form follows the site-wide title gap (`--iw-blocks-title-gap`, see [`transverse.md#block-titles-gap`](../transverse.md#block-titles-gap)); neither style adds a margin of its own any more.
+
 | `--iw-block-form-info-bg` | `var(--iw-variant-block-bg, var(--color-primary))` | Background of the `--split` info panel. Cascades from the active variant when `showBackground` is on; falls back to `--color-primary`. |
 | `--iw-block-form-info-color` | `#fff` | Default text color inside the info panel. |
 | `--iw-block-form-info-title-color` | `var(--iw-block-form-info-color, #fff)` | Color for the info-panel title. |

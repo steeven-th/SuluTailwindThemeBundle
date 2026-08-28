@@ -46,11 +46,16 @@ Configure **primary**, **secondary**, and **accent** button styles. For each var
 
 ---
 
-## Borders tab
+## Defaults tab
 
-Set global border radius values: default, small, large, full, and image radius.
+Site-wide defaults that are not tied to a single component. Two sections:
+**Border radii** (cards, images, paragraphs) and **Blocks**, which holds four
+spacings: between the two content zones of split blocks (text + images, form +
+widget, map + info, CTA + accessory), between a block's titles and its content,
+inside image grids (mosaic, gallery) and inside the other component grids
+(accordion, documents, linked pages, testimonials, key figures).
 
-![Borders configuration](images/screen/settings-theme-borders.png)
+![Defaults configuration](images/screen/settings-theme-defaults.png)
 
 ---
 

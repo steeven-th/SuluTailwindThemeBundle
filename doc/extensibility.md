@@ -42,7 +42,7 @@ also override an existing property by redeclaring its name.
 
 The theme forms are `iw_theme_config_details`, `iw_theme_config_colors`,
 `iw_theme_config_typography`, `iw_theme_config_buttons`,
-`iw_theme_config_borders`, `iw_theme_config_variants`, `iw_theme_config_menu`,
+`iw_theme_config_defaults`, `iw_theme_config_variants`, `iw_theme_config_menu`,
 `iw_theme_config_footer`, `iw_theme_config_components` and
 `iw_theme_config_articles`.
 
@@ -62,7 +62,7 @@ There is one namespace per storage column:
 | `footerConfig_custom_*` | `footerConfig.custom` | `iw_sulu_tailwind_theme_footer_config().custom` |
 
 Pick the one matching the form you extended: a field on the menu form belongs in
-`menuConfig_custom_*`. Everything else - colors, typography, buttons, borders,
+`menuConfig_custom_*`. Everything else - colors, typography, buttons, defaults,
 components, articles - lives in the tokens column, so use plain `custom_*`.
 
 These are JSON columns, so **no migration is ever needed**, whatever you add.

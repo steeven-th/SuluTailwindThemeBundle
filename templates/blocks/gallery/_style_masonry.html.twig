@@ -11,10 +11,15 @@
         {% set lateralMode = 'interior' %}
     {% endif %}
 
-    {# If paddingLateral is 0 or empty: seamless layout — no gap, no radius, no margin-bottom #}
+    {# Image spacing: an explicit choice from the admin (Content > Image
+       spacing) wins. Otherwise, paddingLateral at 0 or empty means a seamless
+       layout - no gap, no radius, no margin-bottom. #}
+    {% set explicitGap = galleryGap|default('') %}
     {% set pxVal = paddingLateral|default('') %}
-    {% set noGap = (pxVal is empty or pxVal == 'px-0') %}
-    {% if noGap %}
+    {% set noGap = explicitGap is empty and (pxVal is empty or pxVal == 'px-0') %}
+    {% if explicitGap is not empty %}
+        {% set gapClass = explicitGap %}
+    {% elseif noGap %}
         {% set imageRadiusVal = '' %}
         {% set gapClass = 'iw-block-gallery--gap-none' %}
     {% else %}

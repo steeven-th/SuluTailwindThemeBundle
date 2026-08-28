@@ -202,6 +202,53 @@ a:hover {
     margin-bottom: 0;
 }
 
+/* Titles group of a block - the space below it (before the block's own
+   content) follows the site-wide `--iw-blocks-title-gap` token, set in the
+   admin under Settings > Themes > Defaults > Blocks. It used to be carried by
+   the separator's bottom margin, so a variant that hides the separator lost
+   the spacing entirely. */
+.iw-block__titles {
+    margin-bottom: var(--iw-block-titles-gap, var(--iw-blocks-title-gap, 1.5rem));
+}
+
+/* A block that renders titles and nothing else must not trail empty space. */
+.iw-block__titles:last-child {
+    margin-bottom: 0;
+}
+
+/* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
+   masonry) stores one of these class names, and the class only feeds
+   `--iw-gap-choice`: the block's own rule keeps ownership of the `gap`
+   property and reads the choice first, then its per-block variable, then the
+   theme token. Tailwind's own `gap-*` utilities cannot serve here - this file
+   sits outside `@layer`, so its rules would win over them whatever the
+   specificity. */
+.iw-gap--0 { --iw-gap-choice: 0; }
+.iw-gap--2 { --iw-gap-choice: 0.5rem; }
+.iw-gap--4 { --iw-gap-choice: 1rem; }
+.iw-gap--5 { --iw-gap-choice: 1.25rem; }
+.iw-gap--6 { --iw-gap-choice: 1.5rem; }
+.iw-gap--8 { --iw-gap-choice: 2rem; }
+.iw-gap--10 { --iw-gap-choice: 2.5rem; }
+.iw-gap--12 { --iw-gap-choice: 3rem; }
+
+/* Split blocks - gap between the two content zones (text + images, form +
+   widget, map + info, CTA + accessory). The value comes from the site-wide
+   `--iw-blocks-gap` token, set in the admin under
+   Settings > Themes > Defaults > Blocks, and is halved below the `md`
+   breakpoint so a spacious desktop gap stays reasonable once the two zones
+   are stacked. Each block feeds `--iw-split-gap` from its own variable, so a
+   single block can be tuned without losing the site-wide harmonization. */
+.iw-split-gap {
+    gap: calc(var(--iw-split-gap, var(--iw-blocks-gap, 1.5rem)) * 0.5);
+}
+
+@media (min-width: 48rem) {
+    .iw-split-gap {
+        gap: var(--iw-split-gap, var(--iw-blocks-gap, 1.5rem));
+    }
+}
+
 /* ─── Horizontal Rule ───────────────────────────────────────────────────── */
 hr {
     height: 2px;
@@ -718,7 +765,7 @@ img.object-cover {
 .iw-block-accordion--cards {
     display: flex;
     flex-direction: column;
-    gap: var(--iw-block-accordion-cards-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-accordion-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 .iw-block-accordion--cards .iw-accordion__item {
@@ -830,7 +877,7 @@ img.object-cover {
 .iw-block-document--grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-document-grid-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-document-grid-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -965,7 +1012,7 @@ img.object-cover {
 .iw-block-linked-pages--cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-linked-pages-cards-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-linked-pages-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -1208,7 +1255,7 @@ img.object-cover {
 .iw-block-testimonial--cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-testimonial-cards-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-testimonial-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
@@ -1523,7 +1570,7 @@ img.object-cover {
 .iw-block-key-figures--grid-2x2 {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--iw-block-key-figures-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-key-figures-gap, var(--iw-blocks-component-gap, 1.5rem));
     max-width: var(--iw-block-key-figures-grid-2x2-max-width, 48rem);
     margin-inline: auto;
 }
@@ -2252,6 +2299,25 @@ img.object-cover {
     /* Hook only — no default styling. */
 }
 
+/* Text/images zones gap - side-by-side grid (classic left/right, mosaic,
+   sidebar, split-screen) and stacked layout (classic top/bottom, mosaic full
+   width, fullwidth image above or below its content). In --fullwidth the
+   section itself is the flex column, since the image is edge to edge and the
+   content carries the block padding. Follows the site-wide `--iw-blocks-gap`
+   token, see `.iw-split-gap`. */
+.iw-block-text-images__grid,
+.iw-block-text-images__stack,
+.iw-block-text-images--fullwidth {
+    --iw-split-gap: var(--iw-block-text-images-gap, var(--iw-blocks-gap, 1.5rem));
+}
+
+/* Spacing between the images inside the mosaic - a grid of images, so it
+   follows the site-wide image gap rather than the split-zones gap. The editor
+   can override it per block (Content > Image spacing). */
+.iw-block-text-images__mosaic-grid {
+    gap: var(--iw-gap-choice, var(--iw-block-text-images-mosaic-gap, var(--iw-blocks-image-gap, 1.5rem)));
+}
+
 /* --hero-banner / --overlay / --classic (background mode) all render a dark
    overlay above the background image. The overlay color is exposed as a
    custom property so a theme can change the opacity without rewriting the
@@ -2298,25 +2364,26 @@ img.object-cover {
     /* Hook only — no default styling. */
 }
 
-/* Card gap (L14): gallery grids/columns/slider follow the global
-   `--iw-cards-gap` token, overridable per gallery via the dedicated vars.
+/* Image gap: gallery grids/columns/slider follow the global
+   `--iw-blocks-image-gap` token (Defaults > Blocks), overridable per gallery
+   via the dedicated vars and per block by the editor's `iw-gap--*` choice.
    The seamless ("no gap") and interior-responsive states are explicit
    modifiers set by the templates. */
 .iw-block-gallery--grid {
-    gap: var(--iw-block-gallery-grid-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-gap-choice, var(--iw-block-gallery-grid-gap, var(--iw-blocks-image-gap, 1.5rem)));
 }
 
 .iw-block-gallery--masonry {
-    column-gap: var(--iw-block-gallery-masonry-gap, var(--iw-cards-gap, 1.5rem));
+    column-gap: var(--iw-gap-choice, var(--iw-block-gallery-masonry-gap, var(--iw-blocks-image-gap, 1.5rem)));
 }
 
 /* Masonry vertical rhythm (CSS columns ignore row-gap, so the items carry it). */
 .iw-block-gallery--masonry .iw-block-gallery__item {
-    margin-bottom: var(--iw-block-gallery-masonry-gap, var(--iw-cards-gap, 1.5rem));
+    margin-bottom: var(--iw-gap-choice, var(--iw-block-gallery-masonry-gap, var(--iw-blocks-image-gap, 1.5rem)));
 }
 
 .iw-block-gallery--slider .iw-block-gallery__track {
-    gap: var(--iw-block-gallery-slider-gap, var(--iw-cards-gap, 1.5rem));
+    gap: var(--iw-block-gallery-slider-gap, var(--iw-blocks-image-gap, 1.5rem));
 }
 
 /* Seamless layout — images edge-to-edge, no gap (explicit opt-in). */
@@ -2746,6 +2813,11 @@ section.block:has([data-slider-fullbleed-value]) {
    fill the player edge-to-edge instead of letterboxing — the default
    browser behaviour is `contain` which can leave black bars when the
    poster aspect differs from 16/9. */
+/* Content/accessory zones gap in --split, see `.iw-split-gap`. */
+.iw-block-cta--split {
+    --iw-split-gap: var(--iw-block-cta-split-gap, var(--iw-blocks-gap, 1.5rem));
+}
+
 .iw-block-cta--split .iw-block-cta__video {
     display: block;
     object-fit: cover;
@@ -2866,6 +2938,11 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-block-form {
     /* Hook only — no default styling. */
+}
+
+/* Form/widget zones gap in --split, see `.iw-split-gap`. */
+.iw-block-form--split {
+    --iw-split-gap: var(--iw-block-form-split-gap, var(--iw-blocks-gap, 1.5rem));
 }
 
 /* Post-submission confirmation, rendered in place of the form. Lives here
@@ -2994,6 +3071,20 @@ section.block:has([data-slider-fullbleed-value]) {
 
 .iw-block-location {
     /* Hook only — no default styling. */
+}
+
+/* Map/info zones gap, side by side in --map-with-info and stacked in
+   --fullwidth. Follows the site-wide `--iw-blocks-gap` token, see
+   `.iw-split-gap`. */
+.iw-block-location--map-with-info {
+    --iw-split-gap: var(--iw-block-location-map-with-info-gap, var(--iw-blocks-gap, 1.5rem));
+}
+
+.iw-block-location--fullwidth {
+    display: flex;
+    flex-direction: column;
+
+    --iw-split-gap: var(--iw-block-location-fullwidth-gap, var(--iw-blocks-gap, 1.5rem));
 }
 
 /* Address card shared by --fullwidth and --map-with-info. The default

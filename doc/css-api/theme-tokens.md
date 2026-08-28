@@ -258,7 +258,7 @@ Derived from the `body` assignment:
 
 ## Border variables
 
-Generated from **Settings > Themes > Borders** tab.
+Generated from the **Border radii** section of the **Settings > Themes > Defaults** tab.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
@@ -287,3 +287,24 @@ The compiler also emits theme-default utility classes (plus `sm:` variants) that
     border-radius: var(--border-imageRadius, var(--border-cardRadius));
 }
 ```
+
+---
+
+## Block default variables
+
+Generated from the **Blocks** section of the **Settings > Themes > Defaults** tab.
+These are the site-wide defaults shared by every block that are not tied to a
+single component (components have their own tab).
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `--iw-blocks-gap` | Gap between the two content zones of a split block (text + images, form + widget, map + info, CTA + accessory). Halved below the `md` breakpoint by the `.iw-split-gap` utility | `1.5rem` |
+| `--iw-blocks-title-gap` | Space between a block's titles group and its content, consumed by `.iw-block__titles` | `1.5rem` |
+| `--iw-blocks-image-gap` | Spacing inside an image grid (text + images mosaic, gallery grid / masonry / slider), overridable per block from the block's own Image spacing field | `1.5rem` |
+| `--iw-blocks-component-gap` | Spacing inside the component grids that are not article cards (accordion, documents, linked pages, testimonials, key figures) | `1.5rem` |
+
+See [`transverse.md#grid-spacing`](./transverse.md#grid-spacing),
+[`transverse.md#split-block-gap`](./transverse.md#split-block-gap) and
+[`transverse.md#block-titles-gap`](./transverse.md#block-titles-gap) for the
+per-block override variables. Article card grids keep their own token,
+`--iw-cards-gap`, set under Components > Cards.

@@ -69,6 +69,7 @@ Sizing, spacing, alignment, container behavior, prose-invert and the responsive 
 | `--iw-block-cta-banner-bg` | `var(--iw-variant-block-bg, var(--color-primary))` | Background color of the fullbleed banner. Cascades from the active variant when `showBackground` is on; falls back to `--color-primary`. |
 | `--iw-block-cta-overlay-color` | `rgb(0 0 0 / 0.5)` | Color of the dark overlay above the background image in `--banner`. |
 | `--iw-block-cta-background-position` | `center` | `object-position` of the background image in `--banner`. |
+| `--iw-block-cta-split-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the content zone and the accessory zone in `--split`. Halved below the `md` breakpoint. Falls back to the site-wide block gap set in the admin (Defaults > Blocks). |
 | `--iw-block-cta-actions-gap` | `1rem` | Gap between the primary and secondary buttons. |
 | `--iw-block-cta-actions-margin-top` | `1.5rem` | Vertical space between the text content and the buttons row. |
 | `--iw-block-cta-counter-gap` | `1.5rem` | Vertical gap between counters in `--counter` accessory. |

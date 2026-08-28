@@ -54,6 +54,13 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 
 ## CSS variables
 
+### Layout
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-block-location-map-with-info-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the map and the info column in `--map-with-info`. Halved below the `md` breakpoint. Falls back to the site-wide block gap set in the admin (Defaults > Blocks). |
+| `--iw-block-location-fullwidth-gap` | `var(--iw-blocks-gap, 1.5rem)` | Same gap between the map and the info block stacked below it in `--fullwidth`. |
+
 ### Address card (shared by `--fullwidth` and `--map-with-info`)
 
 | Variable | Default | Purpose |

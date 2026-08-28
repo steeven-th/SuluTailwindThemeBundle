@@ -19,7 +19,7 @@
     {% set widgetKind = widgetType|default('text') %}
     {% set isFormRight = formRight|default(false) %}
 
-    <div class="iw-block-form iw-block-form--split grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="iw-block-form iw-block-form--split iw-split-gap grid grid-cols-1 lg:grid-cols-2">
         {% if isFormRight %}
             {# Widget first (LEFT desktop / TOP mobile), form after #}
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">

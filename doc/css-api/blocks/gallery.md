@@ -65,13 +65,14 @@ Sizing, radius and aspect ratios are driven by Tailwind utility classes emitted 
 
 ## CSS variables
 
-The gap between images is exposed as dedicated variables, each falling back to the global `--iw-cards-gap` token (default `1.5rem`):
+The gap between images is exposed as dedicated variables, each falling back to the site-wide image gap token `--iw-blocks-image-gap` (Defaults > Blocks, default `1.5rem`). In `--grid` and `--masonry` the editor can also set it per block from **Content > Image spacing**, which takes precedence:
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-gallery-grid-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap in `--grid`. |
-| `--iw-block-gallery-masonry-gap` | `var(--iw-cards-gap, 1.5rem)` | Column gap + item vertical rhythm in `--masonry`. |
-| `--iw-block-gallery-slider-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between slides in the default `--slider` track. |
+| `--iw-gap-choice` | unset | Set by the `iw-gap--*` class the editor picks in **Content > Image spacing** (`--grid` and `--masonry`). Read before the per-block variable and the theme token; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
+| `--iw-block-gallery-grid-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap in `--grid`. |
+| `--iw-block-gallery-masonry-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Column gap + item vertical rhythm in `--masonry`. |
+| `--iw-block-gallery-slider-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap between slides in the default `--slider` track. |
 
 Navigation arrows and dot indicators are **only rendered when there is more than one image** in the block (single-image galleries get a clean static layout). The thumbnail strip in `--filmstrip` follows the same rule. Beyond the gap variables above, the Gallery block exposes very few custom properties of its own because layout / sizing are driven by Tailwind utilities composed in Twig. Theming is mostly done by:
 

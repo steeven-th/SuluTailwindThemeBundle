@@ -16,7 +16,7 @@
 
 <p align="center">
     A design-token-based theming system that compiles JSON configuration into CSS custom properties.<br>
-    Manage colors, typography, buttons, borders, block variants, and menu styles from the Sulu admin interface.
+    Manage colors, typography, buttons, site-wide defaults, block variants, and menu styles from the Sulu admin interface.
 </p>
 
 <p align="center">
@@ -38,7 +38,7 @@
 ## Features
 
 * **Design tokens**: Store all theme settings as structured JSON, compiled to CSS custom properties
-* **Admin interface**: Full CRUD with 7 tabs (details, colors, typography, buttons, borders, block variants, menu)
+* **Admin interface**: Full CRUD with 7 tabs (details, colors, typography, buttons, defaults, block variants, menu)
 * **Multi-webspace support**: Assign different themes to different webspaces (sites) in a multi-site Sulu installation
 * **Multiple themes**: Create and switch between 7 preset themes (corporate, creative, minimal, nature, halloween, christmas, megamenu)
 * **Named palette**: 10 base color roles + unlimited brand colors, each named by slug and expanded to OKLCH shades under a stable `--color-<role>` alias and a `--color-<slug>` alias
@@ -551,7 +551,7 @@ Navigate to **Settings > Themes** in the Sulu admin panel. From there you can:
 2. **Configure the palette**: Rename the 10 base color roles (primary, secondary, accent, background, black, white, neutral, error, warning, success) and add unlimited brand colors — each named by a unique slug and expanded to 11 OKLCH shades. Text/link/link-hover colors are set alongside.
 3. **Configure typography**: Select fonts for headings/body/accent via the Font Picker (Google Fonts autocomplete, system fonts, or free text)
 4. **Configure buttons**: Define unlimited button styles (named by slug) plus shared padding — colors, hover states, radius, border width/style, and five composable hover effects (shadow, transform, opacity, duration, easing). See [Button hover effects](doc/button-effects.md) for the full catalog.
-5. **Configure borders**: Set the three radius values (cards, images, paragraphs) — blocks follow them by default and can override each one individually
+5. **Configure defaults**: Set the three radius values (cards, images, paragraphs) - blocks follow them by default and can override each one individually - plus four site-wide block spacings: between the two content zones of split blocks, between a block's titles and its content, inside image grids (mosaic, gallery) and inside the other component grids (accordion, documents, linked pages, testimonials, key figures)
 6. **Configure block variants**: Define named color schemes (slug-based) for content blocks, each referencing a button style by slug
 7. **Configure menu**: Choose menu type, colors, animation, and display options
 

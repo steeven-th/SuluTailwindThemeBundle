@@ -123,6 +123,27 @@
                         </param>
                     </params>
                 </property>
+                <!-- Mosaic: spacing between the images of the mosaic grid.
+                     Empty follows the theme's card spacing; an explicit choice
+                     emits an `iw-gap` class feeding the gap variable. -->
+                <property name="mosaicGap" type="single_select"
+                          visibleCondition="__parent.style == 'mosaic'">
+                    <meta><title>iw_sulu_tailwind_theme.mosaic_gap</title></meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_gap_theme</title></meta></param>
+                            <param name="iw-gap--0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="iw-gap--2"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="iw-gap--4"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="iw-gap--5"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="iw-gap--6"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="iw-gap--8"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="iw-gap--10"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="iw-gap--12"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="showImagesName" type="checkbox"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
                     <meta><title>iw_sulu_tailwind_theme.show_images_name</title></meta>
