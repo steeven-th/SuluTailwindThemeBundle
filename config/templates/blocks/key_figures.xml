@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <!-- Global block type: Key figures -->
 <template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
@@ -14,6 +15,66 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
+                <!-- Titles and text, like every other block. The side-by-side
+                     style puts them beside the figures; the other styles stack
+                     them above. -->
+                <property name="title" type="iw_theme_title_editor">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title</title>
+                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="context" value="blocks"/>
+                    </params>
+                </property>
+                <property name="subTitle" type="iw_theme_title_editor">
+                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+                    <params>
+                        <param name="context" value="blocks"/>
+                    </params>
+                </property>
+                <property name="titleTag" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.title_level</title>
+                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="h2"/>
+                        <param name="values" type="collection">
+                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
+                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
+                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="titleAlignment" type="single_select">
+                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="text" type="text_editor">
+                    <meta><title>iw_sulu_tailwind_theme.text</title></meta>
+                </property>
+
+                <!-- Side-by-side style: which side the figures sit on. -->
+                <property name="contentRight" type="checkbox"
+                          visibleCondition="__parent.style == 'split'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.content_position_right</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
+
                 <block name="figures" default-type="figure" minOccurs="1">
                     <meta>
                         <title>iw_sulu_tailwind_theme.figures</title>
@@ -40,6 +101,9 @@
                         </type>
                     </types>
                 </block>
+                <!-- Call-to-action buttons, shared by every block that can carry actions. -->
+                <xi:include href="../fragments/cta-buttons.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
             </properties>
         </section>
 

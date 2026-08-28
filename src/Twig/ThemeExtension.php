@@ -713,8 +713,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      * Format the structured address of a Sulu location value as a multi-line string.
      *
      * Builds "number street\ncode town\ncountry" from the available fields,
-     * skipping empty parts. Used by the location block styles, the CTA
-     * location accessory and the form location widget (display + map popup).
+     * skipping empty parts. Used by the location block styles and the form
+     * location widget (display + map popup).
      *
      * @param array<string, mixed>|null $location The Sulu location value (lat, long, street, number, code, town, country)
      *

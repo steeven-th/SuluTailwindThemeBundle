@@ -63,7 +63,7 @@ Each content block has its own CSS API page. Override-friendly via `--iw-block-{
 | Article featured | hero / side_by_side / spotlight | [`css-api/blocks/article-featured.md`](./css-api/blocks/article-featured.md) |
 | News (article pages) | classic / magazine / minimal | [`css-api/blocks/news.md`](./css-api/blocks/news.md) |
 
-> Other blocks (`text_images`, `gallery`, `cta`, `location`, `form`) will be migrated in subsequent lots (L7+).
+> Other blocks (`text_images`, `gallery`, `location`, `form`) will be migrated in subsequent lots (L7+).
 
 ---
 

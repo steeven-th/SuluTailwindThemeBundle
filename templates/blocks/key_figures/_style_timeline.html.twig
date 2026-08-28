@@ -2,6 +2,20 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if text is defined and text is not empty %}
+        <div class="iw-block__text iw-block-key-figures__text prose max-w-none">
+            {{ text|raw }}
+        </div>
+    {% endif %}
+
     {% if figures is defined and figures is iterable %}
         <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--timeline">
             {# Vertical timeline line — left on mobile, centered on desktop #}

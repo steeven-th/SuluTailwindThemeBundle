@@ -72,6 +72,9 @@
                         <info_text>iw_sulu_tailwind_theme.code_snippet_info_open</info_text>
                     </meta>
                 </property>
+                <!-- Call-to-action buttons, shared by every block that can carry actions. -->
+                <xi:include href="../fragments/cta-buttons.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
             </properties>
         </section>
 

@@ -133,8 +133,9 @@ Resolution goes from most specific to least: **an explicit XML param**, then
 project can therefore turn the palette on everywhere and still force it off on
 one particular field.
 
-The setting is global per context, not per block. Wanting the palette on the CTA
-block but nowhere else means overriding that block's XML, not configuring it.
+The setting is global per context, not per block. Wanting the palette on the
+testimonial block but nowhere else means overriding that block's XML, not
+configuring it.
 
 ---
 

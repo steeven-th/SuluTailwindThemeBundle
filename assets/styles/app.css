@@ -216,6 +216,47 @@ a:hover {
     margin-bottom: 0;
 }
 
+/* Call-to-action buttons - the `ctaButtons` list any block can carry. The row
+   is laid out here rather than through Tailwind utilities in the partial,
+   because the alignment and the direction are admin settings: the templates
+   only emit the modifiers. Buttons themselves are painted by the theme's
+   `.iw-button--*` classes, which already own their padding and radius. */
+.iw-block__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--iw-block-actions-gap, 1rem);
+    margin-top: var(--iw-block-actions-margin-top, 1.5rem);
+}
+
+.iw-block__actions--row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.iw-block__actions--row.iw-block__actions--align-left { justify-content: flex-start; }
+.iw-block__actions--row.iw-block__actions--align-center { justify-content: center; }
+.iw-block__actions--row.iw-block__actions--align-right { justify-content: flex-end; }
+
+/* Stacked buttons keep their own width, so the horizontal placement is the
+   cross axis here. */
+.iw-block__actions--column {
+    flex-direction: column;
+}
+
+.iw-block__actions--column.iw-block__actions--align-left { align-items: flex-start; }
+.iw-block__actions--column.iw-block__actions--align-center { align-items: center; }
+.iw-block__actions--column.iw-block__actions--align-right { align-items: flex-end; }
+
+/* Inside a flex parent that already spaces its children, the row must not add
+   its own margin on top of that gap. */
+.iw-block__actions--flush {
+    margin-top: 0;
+}
+
+.iw-block__action {
+    text-align: center;
+}
+
 /* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
    masonry) stores one of these class names, and the class only feeds
    `--iw-gap-choice`: the block's own rule keeps ownership of the `gap`
@@ -1462,12 +1503,13 @@ img.object-cover {
 }
 
 /* ─── Block: key_figures ──────────────────────────────────────────────── */
-/* Five layout modifiers:
+/* Six layout modifiers:
    - --grid-2x2   : 2-column card grid (max-width centered)
    - --inline     : centered flex row with large counters
    - --progress   : list of horizontal progress bars
    - --timeline   : vertical timeline with dots + cards (alternating sides on desktop)
    - --with-icons : grid of figures with large icons (1..4 columns on desktop)
+   - --split      : text on one side, figures stacked on the other
 
    .iw-key-figure is the shared subcomponent for a single figure. Counter
    animation is driven by the `key-figures` Stimulus controller via
@@ -1478,6 +1520,39 @@ img.object-cover {
 
 .iw-block-key-figures {
     /* Hook only — modifiers below own the layout. */
+}
+
+/* --split: the text zone and the figures side by side from lg, stacked below.
+   The gap between the two zones is the site-wide block gap (.iw-split-gap on
+   the container); the figures keep the component gap between themselves. */
+.iw-block-key-figures--split {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+
+    --iw-split-gap: var(--iw-block-key-figures-split-gap, var(--iw-blocks-gap, 1.5rem));
+}
+
+@media (min-width: 1024px) {
+    .iw-block-key-figures--split {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Figures first in the DOM order stays a desktop-only inversion, so the
+       text keeps leading on mobile. */
+    .iw-block-key-figures__content--last {
+        order: 2;
+    }
+
+    .iw-block-key-figures__figures--first {
+        order: 1;
+    }
+}
+
+.iw-block-key-figures--split .iw-block-key-figures__figures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-block-key-figures-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 /* Shared counter color (used by every mode) */
@@ -2768,164 +2843,6 @@ section.block:has([data-slider-fullbleed-value]) {
 
 /* Block variant background and padding are handled
    via Tailwind classes (py-*, px-*) directly on the <section> in _block_wrapper.html.twig. */
-
-/* ─── Block: cta ───────────────────────────────────────────────────────── */
-/* Three layout modifiers: --centered (default), --banner (fullbleed hero
-   with optional background image + dark overlay), --split (image + content
-   side-by-side). All sizing, spacing, alignment, container behavior and
-   text inversion is driven by Tailwind utility classes emitted by the
-   Twig templates — the rules below expose customisation hooks via custom
-   properties. */
-
-.iw-block-cta {
-    /* Hook only — no default styling. */
-}
-
-/* --banner: fullbleed hero. The background color cascades from the active
-   variant's `--iw-variant-block-bg` (published by ThemeCompiler when the
-   block has `data-has-bg="true"`), with `--color-primary` as final fallback.
-   A background image (when set in the admin) sits on top of this color,
-   followed by a dark overlay that ensures legibility of the white text. */
-.iw-block-cta--banner {
-    background-color: var(--iw-block-cta-banner-bg, var(--iw-variant-block-bg, var(--color-primary)));
-}
-
-.iw-block-cta--banner .iw-block-cta__overlay {
-    background-color: var(--iw-block-cta-overlay-color, rgb(0 0 0 / 0.5));
-}
-
-/* Actions row (primary + optional secondary button). The Twig template
-   pre-sets `flex flex-wrap items-center gap-4 mt-6`; the gap is also
-   exposed as a custom property so it can be tweaked without rewriting
-   the template. */
-.iw-block-cta__actions {
-    gap: var(--iw-block-cta-actions-gap, 1rem);
-    margin-top: var(--iw-block-cta-actions-margin-top, 1.5rem);
-}
-
-/* --split accessory widgets — image, video, location, counter.
-   The wrapper `.iw-block-cta__accessory` is the stable hook; modifier
-   classes (`--image`, `--video`, `--location`, `--counter`) carry the
-   widget-specific layout. */
-
-/* Video iframe/video sit on aspect-ratio 16/9 set inline.
-   `object-fit: cover` makes the <video> poster (and the playing frames)
-   fill the player edge-to-edge instead of letterboxing — the default
-   browser behaviour is `contain` which can leave black bars when the
-   poster aspect differs from 16/9. */
-/* Content/accessory zones gap in --split, see `.iw-split-gap`. */
-.iw-block-cta--split {
-    --iw-split-gap: var(--iw-block-cta-split-gap, var(--iw-blocks-gap, 1.5rem));
-}
-
-.iw-block-cta--split .iw-block-cta__video {
-    display: block;
-    object-fit: cover;
-    background-color: var(--iw-block-cta-video-bg, #000);
-}
-
-/* Location accessory — map iframe + formatted address row below.
-   OpenStreetMap's embed doesn't expose a clickable marker tooltip, so the
-   address is rendered as text under the map for legibility. */
-.iw-block-cta__accessory--location {
-    display: flex;
-    flex-direction: column;
-    gap: var(--iw-block-cta-map-address-gap, 0.75rem);
-}
-
-.iw-block-cta__map-address {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--iw-block-cta-map-address-icon-gap, 0.5rem);
-    color: var(--iw-block-cta-map-address-color, var(--iw-variant-paragraph-color, inherit));
-}
-
-.iw-block-cta__map-address-icon {
-    flex: none;
-    width: var(--iw-block-cta-map-address-icon-size, 1.25rem);
-    height: var(--iw-block-cta-map-address-icon-size, 1.25rem);
-    margin-top: 0.125rem;
-    color: var(--iw-block-cta-map-address-icon-color, var(--iw-variant-link-color, var(--color-primary)));
-}
-
-.iw-block-cta__map-address-text {
-    margin: 0;
-    font-size: var(--iw-block-cta-map-address-size, 0.875rem);
-    line-height: 1.5;
-    opacity: var(--iw-block-cta-map-address-opacity, 0.85);
-}
-
-/* Counter accessory — 1 to 3 animated numbers + labels.
-   Three responsive layouts driven by flex-basis:
-   - Mobile (<480px): one per row
-   - Tablet (480–767px): two per row; a lonely 3rd counter wraps and is
-     centered horizontally by `justify-content: center` on the row below
-   - Desktop (≥768px): three per row when there are three; two centered
-     when there are two; one centered when there is one.
-   `justify-content: center` is what makes the lonely counter sit in the
-   middle of its wrap row at every breakpoint. */
-.iw-block-cta__accessory--counter {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--iw-block-cta-counter-gap, 1.5rem);
-    text-align: center;
-}
-
-.iw-block-cta__counter {
-    flex: 0 1 100%;
-}
-
-@media (min-width: 480px) {
-    .iw-block-cta__counter {
-        /* Two per row — gap is divided across both items so 2 × basis + gap = 100% */
-        flex-basis: calc(50% - (var(--iw-block-cta-counter-gap, 1.5rem) / 2));
-    }
-}
-
-@media (min-width: 768px) {
-    .iw-block-cta__counter {
-        /* Three per row — gap × 2 is divided across three items */
-        flex-basis: calc((100% - 2 * var(--iw-block-cta-counter-gap, 1.5rem)) / 3);
-    }
-}
-
-.iw-block-cta__counter-value {
-    display: inline-flex;
-    align-items: baseline;
-    gap: var(--iw-block-cta-counter-value-gap, 0.125rem);
-    justify-content: center;
-}
-
-.iw-block-cta__counter-number {
-    font-size: var(--iw-block-cta-counter-number-size, 3rem);
-    font-weight: var(--iw-block-cta-counter-number-weight, 700);
-    line-height: 1;
-    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
-}
-
-.iw-block-cta__counter-unit {
-    font-size: var(--iw-block-cta-counter-unit-size, 1.5rem);
-    font-weight: var(--iw-block-cta-counter-unit-weight, 600);
-    color: var(--iw-block-cta-counter-number-color, var(--iw-variant-link-color, var(--color-primary)));
-}
-
-.iw-block-cta__counter-label {
-    display: block;
-    margin-top: var(--iw-block-cta-counter-label-margin-top, 0.5rem);
-    font-size: var(--iw-block-cta-counter-label-size, 0.875rem);
-    color: var(--iw-block-cta-counter-label-color, var(--iw-variant-paragraph-color, inherit));
-    opacity: var(--iw-block-cta-counter-label-opacity, 0.75);
-}
-
-@media (min-width: 768px) {
-    .iw-block-cta__counter-number {
-        font-size: var(--iw-block-cta-counter-number-size-md, 3.75rem);
-    }
-    .iw-block-cta__counter-unit {
-        font-size: var(--iw-block-cta-counter-unit-size-md, 1.875rem);
-    }
-}
 
 /* ─── Block: form ──────────────────────────────────────────────────────── */
 /* Wrapper-only API. The actual form fields (`iw-form__*`, `iw-combobox__*`) and

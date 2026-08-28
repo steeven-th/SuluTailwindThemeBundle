@@ -1,6 +1,10 @@
 {# Text + Images block — classic layout supporting left/right, top/bottom and background positions #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaInline = true %}
+{% set ctaBlockKey = _key|default(null) %}
+
 {% block block_content %}
     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
         title: title|default(''),
@@ -150,21 +154,33 @@
                 {# Image first, then text #}
                 {% if imgClasses|length > 0 %}
                     <div class="{{ imgClasses|join(' ') }}">
-                        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+                        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
+                            mediaType: mediaType|default('images'),
                             images: images|default([]),
                             imageFormat: format,
                             showName: showImagesName|default(false),
                             autoplay: true,
-                            aspectRatio: ratio
+                            aspectRatio: ratio,
+                            videoProvider: videoProvider|default('youtube'),
+                            youtubeId: youtubeId|default(''),
+                            vimeoId: vimeoId|default(''),
+                            videoFile: videoFile|default(null),
+                            videoPoster: videoPoster|default(null)
                         } only %}
                     </div>
                 {% else %}
-                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
+                        mediaType: mediaType|default('images'),
                         images: images|default([]),
                         imageFormat: format,
                         showName: showImagesName|default(false),
                         autoplay: true,
-                        aspectRatio: ratio
+                        aspectRatio: ratio,
+                        videoProvider: videoProvider|default('youtube'),
+                        youtubeId: youtubeId|default(''),
+                        vimeoId: vimeoId|default(''),
+                        videoFile: videoFile|default(null),
+                        videoPoster: videoPoster|default(null)
                     } only %}
                 {% endif %}
 
@@ -182,6 +198,17 @@
                         paragraphRadius: paragraphRadiusClass
                     } only %}
                 {% endif %}
+
+                {# Buttons follow the text, wherever the image sits. The stack is
+                   a flex column with its own gap, so the row stays flush. #}
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    buttons: ctaButtons|default([]),
+                    buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                    alignment: ctaAlignment|default('title'),
+                    direction: ctaDirection|default('row'),
+                    titleAlignment: titleAlignment|default('left'),
+                    flush: true
+                } only %}
             {% else %}
                 {# Text first, then image #}
                 {% if paraMargin %}
@@ -198,23 +225,46 @@
                     } only %}
                 {% endif %}
 
+                {# Buttons follow the text, wherever the image sits. The stack is
+                   a flex column with its own gap, so the row stays flush. #}
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    buttons: ctaButtons|default([]),
+                    buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                    alignment: ctaAlignment|default('title'),
+                    direction: ctaDirection|default('row'),
+                    titleAlignment: titleAlignment|default('left'),
+                    flush: true
+                } only %}
+
                 {% if imgClasses|length > 0 %}
                     <div class="{{ imgClasses|join(' ') }}">
-                        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+                        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
+                            mediaType: mediaType|default('images'),
                             images: images|default([]),
                             imageFormat: format,
                             showName: showImagesName|default(false),
                             autoplay: true,
-                            aspectRatio: ratio
+                            aspectRatio: ratio,
+                            videoProvider: videoProvider|default('youtube'),
+                            youtubeId: youtubeId|default(''),
+                            vimeoId: vimeoId|default(''),
+                            videoFile: videoFile|default(null),
+                            videoPoster: videoPoster|default(null)
                         } only %}
                     </div>
                 {% else %}
-                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
+                        mediaType: mediaType|default('images'),
                         images: images|default([]),
                         imageFormat: format,
                         showName: showImagesName|default(false),
                         autoplay: true,
-                        aspectRatio: ratio
+                        aspectRatio: ratio,
+                        videoProvider: videoProvider|default('youtube'),
+                        youtubeId: youtubeId|default(''),
+                        vimeoId: vimeoId|default(''),
+                        videoFile: videoFile|default(null),
+                        videoPoster: videoPoster|default(null)
                     } only %}
                 {% endif %}
             {% endif %}
@@ -244,16 +294,30 @@
                     text: text|default(''),
                     paragraphRadius: paragraphRadiusClass
                 } only %}
+
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    buttons: ctaButtons|default([]),
+                    buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                    alignment: ctaAlignment|default('title'),
+                    direction: ctaDirection|default('row'),
+                    titleAlignment: titleAlignment|default('left')
+                } only %}
             </div>
 
             {# Images column: always has radius (never edge-to-edge in grid) #}
             <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }} {{ imageRadiusClass }} overflow-hidden">
-                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
+                    mediaType: mediaType|default('images'),
                     images: images|default([]),
                     imageFormat: format,
                     showName: showImagesName|default(false),
                     autoplay: true,
-                    aspectRatio: ratio
+                    aspectRatio: ratio,
+                    videoProvider: videoProvider|default('youtube'),
+                    youtubeId: youtubeId|default(''),
+                    vimeoId: vimeoId|default(''),
+                    videoFile: videoFile|default(null),
+                    videoPoster: videoPoster|default(null)
                 } only %}
             </div>
         </div>

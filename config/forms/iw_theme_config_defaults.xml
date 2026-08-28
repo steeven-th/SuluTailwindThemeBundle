@@ -48,7 +48,7 @@
             </meta>
             <properties>
                 <!-- Gap between the two content zones of split blocks
-                     (text + images, form + widget, map + info, CTA + accessory).
+                     (text + images, form + widget, map + info, text + figures).
                      Halved below the md breakpoint, see app.css. -->
                 <property name="defaults_blockGap" type="single_select" colspan="4">
                     <meta>

@@ -1,0 +1,63 @@
+{# Key figures block - text on one side, figures on the other.
+
+   Replaces the CTA block's counter accessory, removed in 3.0.0: a text with
+   figures beside it is a layout of this block rather than a block of its own.
+   The buttons sit under the text, like in every other two-zone layout. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% set ctaInline = true %}
+{% set ctaBlockKey = _key|default(null) %}
+
+{% block block_content %}
+    {% set figuresRight = not (contentRight|default(false)) %}
+
+    <div class="iw-block-key-figures iw-block-key-figures--split iw-split-gap">
+        <div class="iw-block-key-figures__content{{ figuresRight ? '' : ' iw-block-key-figures__content--last' }}">
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+                title: title|default(''),
+                subTitle: subTitle|default(''),
+                titleAlignment: titleAlignment|default('left'),
+                titleTag: titleTag|default('h2'),
+                variant: variant|default(0)
+            } only %}
+
+            {% if text is defined and text is not empty %}
+                <div class="iw-block__text iw-block-key-figures__text prose max-w-none">
+                    {{ text|raw }}
+                </div>
+            {% endif %}
+
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                buttons: ctaButtons|default([]),
+                buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                alignment: ctaAlignment|default('title'),
+                direction: ctaDirection|default('row'),
+                titleAlignment: titleAlignment|default('left')
+            } only %}
+        </div>
+
+        {% if figures is defined and figures is iterable %}
+            <div data-controller="key-figures" class="iw-block-key-figures__figures{{ figuresRight ? '' : ' iw-block-key-figures__figures--first' }}">
+                {% for figure in figures %}
+                    <div class="iw-key-figure iw-key-figure--split">
+                        {% if figure.number is defined and figure.number is not empty %}
+                            <span
+                                data-key-figures-target="counter"
+                                data-key-figures-end-value="{{ figure.number }}"
+                                class="iw-key-figure__counter iw-key-figure__counter--xl"
+                            >
+                                0
+                            </span>
+                        {% endif %}
+                        {% if figure.title is defined and figure.title is not empty %}
+                            <span class="iw-key-figure__title iw-block__title">{{ figure.title }}</span>
+                        {% endif %}
+                        {% if figure.subTitle is defined and figure.subTitle is not empty %}
+                            <span class="iw-key-figure__subtitle iw-block__subtitle">{{ figure.subTitle }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,4 +1,7 @@
 {# Text + Images block — 50/50 split screen with full-height image slider #}
+
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaBlockKey = _key|default(null) %}
 {# Does NOT extend _block_wrapper because padding applies to content only,
    not the section, so the image always fills its half edge-to-edge. #}
 
@@ -181,6 +184,15 @@
                         {{ text|raw }}
                     </div>
                 {% endif %}
+
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                    buttons: ctaButtons|default([]),
+                    buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                    alignment: ctaAlignment|default('title'),
+                    direction: ctaDirection|default('row'),
+                    titleAlignment: titleAlignment|default('left')
+                } only %}
+
             </div>
         </div>
     </div>

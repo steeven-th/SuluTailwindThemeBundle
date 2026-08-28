@@ -1,63 +1,70 @@
-{# CTA buttons — renders primary and optional secondary action buttons.
+{# Call-to-action buttons - renders the `ctaButtons` list of any block that
+   includes the `cta-buttons.xml` fragment.
+
    Expected variables:
-     - primaryButtonLink: string (URL from Sulu link type)
-     - primaryButtonView: object (view data with target, title, rel, href, provider)
-     - primaryButtonStyle: string (button style key: primary, secondary, accent)
-     - secondaryButtonLink: string (URL from Sulu link type, optional)
-     - secondaryButtonView: object (view data with target, title, rel, href, provider, optional)
-     - secondaryButtonStyle: string (button style key: primary, secondary, accent)
-#}
-{# An unresolvable link - deleted or unpublished target - comes back as the raw
-   reference structure rather than a URL string, so both are narrowed up front. #}
-{% set primaryButtonLink = primaryButtonLink is defined and primaryButtonLink is not iterable ? primaryButtonLink : '' %}
-{% set secondaryButtonLink = secondaryButtonLink is defined and secondaryButtonLink is not iterable ? secondaryButtonLink : '' %}
+     - buttons: the block's `ctaButtons` list ({ link, style } each)
+     - buttonsView: the matching view data, for link targets and labels
+     - alignment: `ctaAlignment` (title | left | center | right)
+     - direction: `ctaDirection` (row | column)
+     - titleAlignment: the block's own title alignment, used when the
+       alignment follows the title (the default)
+     - flush: drop the top margin, for a flex parent whose gap already spaces
+       the buttons from the text above
 
-{% if primaryButtonLink is not empty %}
-    {% set primaryTarget = primaryButtonView.target|default('_self') %}
-    {% set primaryRel = primaryButtonView.rel|default('') %}
-    {% set primaryBtnClass = 'iw-button--' ~ (primaryButtonStyle|default('primary')) %}
+   A block that extends `_block_wrapper` gets this for free at the end of the
+   block; a two-zone layout sets `ctaInline` and includes this partial under
+   its text column instead. #}
+{% set ctaList = buttons is defined and buttons is iterable ? buttons : [] %}
 
-    {# Resolve primary button label: attribute title > page title > URL #}
-    {% if primaryButtonView.title|default('') is not empty %}
-        {% set primaryLabel = primaryButtonView.title %}
-    {% elseif primaryButtonView.provider|default('') == 'page' and primaryButtonView.href|default('') is not empty %}
-        {% set linkedPage = sulu_page_load(primaryButtonView.href, {'title': 'title'}) %}
-        {% set primaryLabel = linkedPage.title|default(primaryButtonLink) %}
-    {% else %}
-        {% set primaryLabel = primaryButtonLink %}
+{% if ctaList|length > 0 %}
+    {% set ctaView = buttonsView is defined and buttonsView is iterable ? buttonsView : [] %}
+    {% set ctaAlign = alignment|default('title') %}
+    {% if ctaAlign == 'title' %}
+        {% set ctaAlign = titleAlignment|default('left') %}
     {% endif %}
+    {% set ctaDir = direction|default('row') == 'column' ? 'column' : 'row' %}
 
-    <div class="iw-block-cta__actions flex flex-wrap items-center gap-4 mt-6">
-        <a href="{{ primaryButtonLink }}"
-           class="{{ primaryBtnClass }} iw-block-cta__action iw-block-cta__action--primary inline-block px-6 py-3 text-center no-underline"
-           {{ primaryTarget != '_self' ? 'target="' ~ primaryTarget ~ '"' : '' }}
-           {{ primaryRel is not empty ? 'rel="' ~ primaryRel ~ '"' : (primaryTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
-        >
-            {{ primaryLabel }}
-        </a>
+    {# Rendered only once the list holds at least one resolvable link, so a
+       button added and left blank in the admin leaves no stray gap. Filtered
+       rather than flagged inside a loop: a `set` there would not survive it. #}
+    {% set ctaResolvable = ctaList|filter(cta => cta.link is defined and cta.link is not iterable and cta.link is not empty) %}
 
-        {% if secondaryButtonLink is not empty %}
-            {% set secondaryTarget = secondaryButtonView.target|default('_self') %}
-            {% set secondaryRel = secondaryButtonView.rel|default('') %}
-            {% set secondaryBtnClass = 'iw-button--' ~ (secondaryButtonStyle|default('secondary')) %}
+    {% if ctaResolvable|length > 0 %}
+        <div class="iw-block__actions iw-block__actions--{{ ctaDir }} iw-block__actions--align-{{ ctaAlign }}{{ flush|default(false) ? ' iw-block__actions--flush' : '' }}">
+            {% for cta in ctaList %}
+                {# An unresolvable link - deleted or unpublished target - comes back
+                   as the raw reference structure rather than a URL string. #}
+                {% set ctaUrl = cta.link is defined and cta.link is not iterable ? cta.link : '' %}
 
-            {# Resolve secondary button label: attribute title > page title > URL #}
-            {% if secondaryButtonView.title|default('') is not empty %}
-                {% set secondaryLabel = secondaryButtonView.title %}
-            {% elseif secondaryButtonView.provider|default('') == 'page' and secondaryButtonView.href|default('') is not empty %}
-                {% set linkedPage = sulu_page_load(secondaryButtonView.href, {'title': 'title'}) %}
-                {% set secondaryLabel = linkedPage.title|default(secondaryButtonLink) %}
-            {% else %}
-                {% set secondaryLabel = secondaryButtonLink %}
-            {% endif %}
+                {% if ctaUrl is not empty %}
+                    {% set ctaLinkView = ctaView[loop.index0].link|default({}) %}
+                    {% set ctaTarget = ctaLinkView.target|default('_self') %}
+                    {% set ctaRel = ctaLinkView.rel|default('') %}
+                    {% set ctaLabel = ctaLinkView.title|default('') %}
 
-            <a href="{{ secondaryButtonLink }}"
-               class="{{ secondaryBtnClass }} iw-block-cta__action iw-block-cta__action--secondary inline-block px-6 py-3 text-center no-underline"
-               {{ secondaryTarget != '_self' ? 'target="' ~ secondaryTarget ~ '"' : '' }}
-               {{ secondaryRel is not empty ? 'rel="' ~ secondaryRel ~ '"' : (secondaryTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
-            >
-                {{ secondaryLabel }}
-            </a>
-        {% endif %}
-    </div>
+                    {# Label fallbacks: link attribute, then the linked page or
+                       media title, then the raw URL. #}
+                    {% if ctaLabel is empty and ctaLinkView.provider|default('') == 'page' and ctaLinkView.href|default('') is not empty %}
+                        {% set ctaLabel = sulu_page_load(ctaLinkView.href, {'title': 'title'}).title|default('') %}
+                    {% endif %}
+                    {% if ctaLabel is empty and ctaLinkView.provider|default('') == 'media' and ctaLinkView.href|default('') is not empty %}
+                        {# A media deleted from the library resolves to null. #}
+                        {% set ctaMedia = sulu_resolve_media(ctaLinkView.href, app.request.locale) %}
+                        {% set ctaLabel = ctaMedia is not null ? ctaMedia.title|default('') : '' %}
+                    {% endif %}
+                    {% if ctaLabel is empty %}
+                        {% set ctaLabel = ctaUrl %}
+                    {% endif %}
+
+                    <a href="{{ ctaUrl }}"
+                       class="iw-button--{{ cta.style|default('primary') }} iw-block__action"
+                       {{ ctaTarget != '_self' ? 'target="' ~ ctaTarget ~ '"' : '' }}
+                       {{ ctaRel is not empty ? 'rel="' ~ ctaRel ~ '"' : (ctaTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
+                    >
+                        {{ ctaLabel }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endif %}

@@ -1,4 +1,7 @@
 {# Text + Images block — image background with text overlay #}
+
+{# The buttons belong under the text, not under the whole block. #}
+{% set ctaBlockKey = _key|default(null) %}
 {# Custom section: image covers the full block, padding applies to content only. #}
 {# Does NOT extend _block_wrapper because padding must be on the content div, #}
 {# not the section, so the image always fills the entire block edge-to-edge. #}
@@ -107,7 +110,16 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}" style="margin-block: 0;">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}
+
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                        buttons: ctaButtons|default([]),
+                        buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
+                        alignment: ctaAlignment|default('title'),
+                        direction: ctaDirection|default('row'),
+                        titleAlignment: titleAlignment|default('left')
+                    } only %}
+" style="margin-block: 0;">
                             {{ text|raw }}
                         </div>
                     {% endif %}

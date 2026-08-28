@@ -56,7 +56,6 @@
                 <type ref="location"/>
                 <type ref="form"/>
                 <type ref="document"/>
-                <type ref="cta"/>
                 <type ref="testimonial"/>
                 <type ref="accordion"/>
                 <type ref="iframe"/>

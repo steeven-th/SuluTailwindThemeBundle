@@ -50,7 +50,6 @@ class BlockTemplateResolver
         'location' => 'map_with_info',
         'form' => 'centered',
         'document' => 'default',
-        'cta' => 'centered',
         'testimonial' => 'cards',
         'accordion' => 'list',
         'iframe' => 'default',

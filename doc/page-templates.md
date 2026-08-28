@@ -4,7 +4,9 @@ The bundle ships with a ready-to-use page template and a modular architecture fo
 
 ## Default page template
 
-The `iw_theme_default` template includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `cta`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The `iw_theme_default` template includes **16 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+
+Call-to-action buttons are not a block type: every block above except `form` and `separator` carries its own list of buttons, through the `cta-buttons.xml` fragment.
 
 To use it, select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -95,7 +97,6 @@ config/templates/
     ├── location.xml
     ├── form.xml
     ├── document.xml
-    ├── cta.xml
     ├── testimonial.xml
     ├── accordion.xml
     ├── iframe.xml
@@ -181,7 +182,6 @@ Since blocks are registered globally, creating a custom page template with a sub
 | `location` | Map with address | Content (title group + coordinates + address), Appearance, Settings |
 | `form` | Form integration | Content (title group + SuluFormBundle toggle + form ID or Twig template path), Appearance, Settings |
 | `document` | Document downloads | Content (title group + media), Appearance, Settings |
-| `cta` | Call to action | Content (title group + buttons + image), Appearance, Settings |
 | `testimonial` | Testimonials | Content (title group + testimonials block), Appearance, Settings |
 | `accordion` | Collapsible items / FAQ | Content (title group + items block), Appearance (+ item heading level, icon style and position), Settings (+ single-open, FAQ markup) |
 | `iframe` | External embed (widget, video, map) | Content (title group + URL + accessible description), Appearance (+ sizing), Settings (+ sandbox, permissions, consent) |
@@ -238,6 +238,7 @@ Instead of manually writing header properties and block lists, you can **include
 |----------|------|-------------|
 | Header | `fragments/header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
 | Page hero | `fragments/page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
+| CTA buttons | `fragments/cta-buttons.xml` | `ctaButtons` (repeatable block of link + style) + `ctaAlignment` + `ctaDirection`. Include it in a custom block's `content` section to give it action buttons; render them with `blocks/common/_cta_buttons.html.twig`. |
 | Blocks | `fragments/blocks.xml` | `<block>` container with all 14 `<type ref="..."/>` |
 | Title group | `fragments/components/title_group.xml` | `title` + `subTitle` + `titleAlignment` (single_select) |
 | Variant | `fragments/components/variant.xml` | `variant` (iw_theme_variant_picker) |

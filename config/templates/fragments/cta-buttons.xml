@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: call-to-action buttons.
+
+    Included by every block that can carry actions, so a CTA is something you
+    add to the content you already wrote rather than a block type of its own.
+    The list is a Sulu block, so an editor adds and removes buttons freely
+    instead of filling two fixed slots.
+
+    Include it at the end of a block's `content` section:
+
+        <xi:include href="../fragments/cta-buttons.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
+
+    and render it with `blocks/common/_cta_buttons.html.twig`. A block template
+    that extends `_block_wrapper` gets that rendering for free, at the end of
+    the block; one that wants the buttons somewhere else - under the text
+    column of a two-zone layout - sets `ctaInline` and includes the partial
+    itself.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <block name="ctaButtons" default-type="cta_button" minOccurs="0">
+        <meta>
+            <title>iw_sulu_tailwind_theme.cta_buttons</title>
+            <info_text>iw_sulu_tailwind_theme.cta_buttons_info</info_text>
+        </meta>
+        <types>
+            <type name="cta_button">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.cta_button</title>
+                </meta>
+                <properties>
+                    <!-- The label comes from the link attributes, falling back
+                         to the linked page or media title, then to the URL. -->
+                    <property name="link" type="link" colspan="12">
+                        <meta>
+                            <title>iw_sulu_tailwind_theme.cta_button_link</title>
+                            <info_text>iw_sulu_tailwind_theme.cta_button_link_info</info_text>
+                        </meta>
+                        <params>
+                            <param name="enable_attributes" value="true"/>
+                        </params>
+                    </property>
+                    <property name="style" type="iw_theme_button_style_picker" colspan="12">
+                        <meta>
+                            <title>iw_sulu_tailwind_theme.cta_button_style</title>
+                        </meta>
+                    </property>
+                </properties>
+            </type>
+        </types>
+    </block>
+
+    <!-- Follows the title alignment unless the editor says otherwise. -->
+    <property name="ctaAlignment" type="single_select" colspan="6">
+        <meta>
+            <title>iw_sulu_tailwind_theme.cta_alignment</title>
+        </meta>
+        <params>
+            <param name="default_value" value="title"/>
+            <param name="values" type="collection">
+                <param name="title"><meta><title>iw_sulu_tailwind_theme.cta_alignment_title</title></meta></param>
+                <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+            </param>
+        </params>
+    </property>
+
+    <property name="ctaDirection" type="single_select" colspan="6">
+        <meta>
+            <title>iw_sulu_tailwind_theme.cta_direction</title>
+        </meta>
+        <params>
+            <param name="default_value" value="row"/>
+            <param name="values" type="collection">
+                <param name="row"><meta><title>iw_sulu_tailwind_theme.cta_direction_row</title></meta></param>
+                <param name="column"><meta><title>iw_sulu_tailwind_theme.cta_direction_column</title></meta></param>
+            </param>
+        </params>
+    </property>
+</properties>

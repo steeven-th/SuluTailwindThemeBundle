@@ -689,459 +689,325 @@
     "blocks": [
      {
       "_id": "515ce454",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": null,
-       "displayOption": null
-      },
-      "style": "banner",
-      "title": "titre",
       "variant": 0,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
       "marginBottom": "mb-5",
       "paddingBottom": "pb-5",
       "lateralMargins": "none",
       "paddingLateral": "px-0",
       "showBackground": true,
-      "titleAlignment": "left",
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
+      "type": "text_images",
+      "style": "hero_banner",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "titleAlignment": "center",
+      "image": {
+       "id": null,
+       "displayOption": null
       },
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "paragraphImageRadius": "rounded-none",
-      "secondaryButtonStyle": "secondary"
+      "ctaButtons": [
+       {
+        "_id": "ctabtn600",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       },
+       {
+        "_id": "ctabtn601",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "style": "secondary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "title",
+      "ctaDirection": "row"
      },
      {
       "_id": "b34ee929",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "style": "centered",
-      "title": "titre",
       "variant": 1,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
       "marginBottom": "mb-5",
       "paddingBottom": "pb-5",
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
-      "titleAlignment": "left",
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "paragraphImageRadius": "rounded-none",
-      "secondaryButtonStyle": "secondary"
+      "type": "text",
+      "style": "one_column",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
+      "titleAlignment": "center",
+      "ctaButtons": [
+       {
+        "_id": "ctabtn800",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "center",
+      "ctaDirection": "row"
      },
      {
       "_id": "c1ef9569",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": "@media:1",
-       "displayOption": null
-      },
-      "style": "split",
-      "title": "titre",
       "variant": 2,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
-      "contentRight": false,
       "marginBottom": "mb-5",
-      "accessoryType": "video",
       "paddingBottom": "pb-5",
-      "accessoryImage": {
-       "id": "@media:2",
-       "displayOption": null
-      },
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
+      "type": "text_images",
+      "style": "classic",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
       "titleAlignment": "left",
-      "accessoryVimeoId": "428046504",
-      "accessoryCounters": [],
-      "accessoryLocation": {
-       "lat": 43.58039085560786,
-       "code": "65800",
-       "long": 0.7036588838268677,
-       "town": "Aureilhan",
-       "zoom": 3,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 novembre",
-       "country": "France"
-      },
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "accessoryYoutubeId": "MsErcdTL_iY",
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "accessoryVideoPoster": {
-       "id": "@media:3",
-       "displayOption": null
-      },
-      "paragraphImageRadius": "rounded-2xl",
-      "secondaryButtonStyle": "secondary",
-      "accessoryVideoProvider": "youtube"
+      "imagePosition": "right",
+      "ctaButtons": [
+       {
+        "_id": "ctabtn600",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       },
+       {
+        "_id": "ctabtn601",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "style": "secondary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "title",
+      "ctaDirection": "row"
      },
      {
       "_id": "a1c04b47",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": "@media:4",
-       "displayOption": null
-      },
-      "style": "split",
-      "title": "titre",
       "variant": 2,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
-      "contentRight": false,
       "marginBottom": "mb-5",
-      "accessoryType": "video",
       "paddingBottom": "pb-5",
-      "accessoryImage": {
-       "id": "@media:5",
-       "displayOption": null
-      },
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
+      "type": "text_images",
+      "style": "classic",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
       "titleAlignment": "left",
-      "accessoryVimeoId": "428046504",
-      "accessoryCounters": [],
-      "accessoryLocation": {
-       "lat": 43.58039085560786,
-       "code": "65800",
-       "long": 0.7036588838268677,
-       "town": "Aureilhan",
-       "zoom": 3,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 novembre",
-       "country": "France"
-      },
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "accessoryVideoFile": {
-       "id": "@media:6",
-       "displayOption": null
-      },
-      "accessoryYoutubeId": "MsErcdTL_iY",
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "accessoryVideoPoster": {
-       "id": "@media:7",
-       "displayOption": null
-      },
-      "paragraphImageRadius": "rounded-2xl",
-      "secondaryButtonStyle": "secondary",
-      "accessoryVideoProvider": "file"
+      "imagePosition": "left",
+      "mediaType": "video",
+      "videoProvider": "youtube",
+      "youtubeId": "dQw4w9WgXcQ",
+      "ctaButtons": [
+       {
+        "_id": "ctabtn800",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "title",
+      "ctaDirection": "row"
      },
      {
       "_id": "9ff7aa05",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": "@media:8",
-       "displayOption": null
-      },
-      "style": "split",
-      "title": "titre",
       "variant": 2,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
-      "contentRight": false,
       "marginBottom": "mb-5",
-      "accessoryType": "image",
       "paddingBottom": "pb-5",
-      "accessoryImage": {
-       "id": "@media:9",
-       "displayOption": null
-      },
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
+      "type": "location",
+      "style": "map_with_info",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
       "titleAlignment": "left",
-      "accessoryVimeoId": "428046504",
-      "accessoryCounters": [],
-      "accessoryLocation": {
-       "lat": 43.58039085560786,
-       "code": "65800",
-       "long": 0.7036588838268677,
-       "town": "Aureilhan",
-       "zoom": 3,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 novembre",
-       "country": "France"
-      },
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "accessoryYoutubeId": "MsErcdTL_iY",
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "accessoryVideoPoster": {
-       "id": "@media:10",
-       "displayOption": null
-      },
-      "paragraphImageRadius": "rounded-2xl",
-      "secondaryButtonStyle": "secondary",
-      "accessoryVideoProvider": "youtube"
+      "ctaButtons": [
+       {
+        "_id": "ctabtn800",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "title",
+      "ctaDirection": "row"
      },
      {
       "_id": "97b69cd1",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": "@media:11",
-       "displayOption": null
-      },
-      "style": "split",
-      "title": "titre",
       "variant": 2,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
-      "contentRight": false,
       "marginBottom": "mb-5",
-      "accessoryType": "location",
       "paddingBottom": "pb-5",
-      "accessoryImage": {
-       "id": "@media:12",
-       "displayOption": null
-      },
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
+      "type": "key_figures",
+      "style": "split",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
       "titleAlignment": "left",
-      "accessoryVimeoId": "428046504",
-      "accessoryCounters": [],
-      "accessoryLocation": {
-       "lat": 43.58039085560786,
-       "code": "65800",
-       "long": 0.7036588838268677,
-       "town": "Aureilhan",
-       "zoom": 3,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 novembre",
-       "country": "France"
-      },
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "accessoryYoutubeId": "MsErcdTL_iY",
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "accessoryVideoPoster": {
-       "id": "@media:1",
-       "displayOption": null
-      },
-      "paragraphImageRadius": "rounded-2xl",
-      "secondaryButtonStyle": "secondary",
-      "accessoryVideoProvider": "youtube"
+      "figures": [
+       {
+        "_id": "kfsplit1",
+        "number": "250",
+        "title": "Projets",
+        "subTitle": "livrés",
+        "type": "figure"
+       },
+       {
+        "_id": "kfsplit2",
+        "number": "18",
+        "title": "Pays",
+        "subTitle": "couverts",
+        "type": "figure"
+       },
+       {
+        "_id": "kfsplit3",
+        "number": "99",
+        "title": "Satisfaction",
+        "subTitle": "clients",
+        "type": "figure"
+       }
+      ],
+      "ctaButtons": [
+       {
+        "_id": "ctabtn800",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "style": "primary",
+        "type": "cta_button"
+       }
+      ],
+      "ctaAlignment": "title",
+      "ctaDirection": "row"
      },
      {
       "_id": "9c639465",
-      "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "type": "cta",
-      "image": {
-       "id": "@media:2",
-       "displayOption": null
-      },
-      "style": "split",
-      "title": "titre",
       "variant": 2,
-      "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "blockRadius": "rounded-none",
-      "contentRight": false,
       "marginBottom": "mb-5",
-      "accessoryType": "counter",
       "paddingBottom": "pb-5",
-      "accessoryImage": {
-       "id": "@media:3",
-       "displayOption": null
-      },
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
-      "titleAlignment": "left",
-      "accessoryVimeoId": "428046504",
-      "accessoryCounters": [
+      "type": "gallery",
+      "style": "grid",
+      "title": "titre",
+      "subTitle": "sous titre",
+      "titleAlignment": "center",
+      "ctaButtons": [
        {
-        "_id": "b7153026",
-        "type": "counter",
-        "unit": "%",
-        "count": "50",
-        "label": "sdfgdqfg"
+        "_id": "ctabtn600",
+        "link": {
+         "rel": null,
+         "href": "@page:text",
+         "query": null,
+         "title": null,
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "page"
+        },
+        "style": "primary",
+        "type": "cta_button"
        },
        {
-        "_id": "e4231ffc",
-        "type": "counter",
-        "unit": "%",
-        "count": "50",
-        "label": "sdfgdqfg"
-       },
-       {
-        "_id": "b8810a0f",
-        "type": "counter",
-        "unit": "%",
-        "count": "50",
-        "label": "sdfgdqfg"
+        "_id": "ctabtn601",
+        "link": {
+         "rel": null,
+         "href": "https://google.com",
+         "query": null,
+         "title": "Google",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "style": "secondary",
+        "type": "cta_button"
        }
       ],
-      "accessoryLocation": {
-       "lat": 43.58039085560786,
-       "code": "65800",
-       "long": 0.7036588838268677,
-       "town": "Aureilhan",
-       "zoom": 3,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 novembre",
-       "country": "France"
-      },
-      "primaryButtonLink": {
-       "rel": null,
-       "href": "@page:text",
-       "query": null,
-       "title": null,
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "page"
-      },
-      "accessoryYoutubeId": "MsErcdTL_iY",
-      "primaryButtonStyle": "primary",
-      "secondaryButtonLink": {
-       "rel": null,
-       "href": "https://google.com",
-       "query": null,
-       "title": "Google",
-       "anchor": null,
-       "locale": "en",
-       "target": "_self",
-       "provider": "external"
-      },
-      "accessoryVideoPoster": {
-       "id": "@media:4",
-       "displayOption": null
-      },
-      "paragraphImageRadius": "rounded-2xl",
-      "secondaryButtonStyle": "secondary",
-      "accessoryVideoProvider": "vimeo"
+      "ctaAlignment": "center",
+      "ctaDirection": "column"
      }
     ]
    }
