@@ -258,6 +258,12 @@ class ThemeFormMapper
         // → defaults_blockGap. Shares the Defaults tab with the border radii.
         $this->flattenDepth1($data, self::PREFIX_DEFAULTS, $tokens['defaults'] ?? []);
 
+        // The max width scope is a list, which flattenDepth1 skips by design.
+        // A theme that never opened the modal has no scope stored, and null is
+        // what tells the field to show the suggested selection.
+        $scope = $tokens['defaults']['blockMaxWidthScope'] ?? null;
+        $data[self::PREFIX_DEFAULTS . 'blockMaxWidthScope'] = \is_array($scope) ? array_values($scope) : null;
+
         // Buttons: repeatable block (tokens.buttons list → data.buttons) + flat
         // global padding (tokens.buttonsGlobal.paddingX → buttons_paddingX).
         $this->flattenButtons($data, $tokens['buttons'] ?? [], $tokens['buttonsGlobal'] ?? []);
@@ -541,6 +547,7 @@ class ThemeFormMapper
         }
         // Site-wide block defaults (Defaults tab), stored next to the borders.
         $tokens['defaults'] = $this->unflattenDepth1($data, self::PREFIX_DEFAULTS, $tokens['defaults'] ?? []);
+        $tokens['defaults']['blockMaxWidthScope'] = $this->sanitizeMaxWidthScope($data[self::PREFIX_DEFAULTS . 'blockMaxWidthScope'] ?? null);
         // Buttons: repeatable list of {slug, label, ...} + separate global padding.
         // Validate slug uniqueness at save (collision rejected, not deduplicated).
         $legacyGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
@@ -607,6 +614,35 @@ class ThemeFormMapper
         }
 
         return $existing;
+    }
+
+    /**
+     * Normalize the block max width scope coming back from the admin form.
+     *
+     * The value reaches us from the browser, and each entry ends up compared
+     * against a block type and style at render time, so anything that is not
+     * a plain `type` or `type:style` identifier is dropped. Null is kept as
+     * null: it means the scope was never set, which the renderer reads as the
+     * suggested selection rather than as an empty one.
+     *
+     * @param mixed $value The raw form value
+     *
+     * @return list<string>|null The cleaned entries, or null when unset
+     */
+    private function sanitizeMaxWidthScope(mixed $value): ?array
+    {
+        if (!\is_array($value)) {
+            return null;
+        }
+
+        $entries = [];
+        foreach ($value as $entry) {
+            if (\is_string($entry) && 1 === preg_match('/^[a-z][a-z0-9_]*(:[a-z][a-z0-9_]*)?$/', $entry)) {
+                $entries[] = $entry;
+            }
+        }
+
+        return array_values(array_unique($entries));
     }
 
     /**

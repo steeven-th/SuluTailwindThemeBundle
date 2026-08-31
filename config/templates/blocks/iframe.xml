@@ -263,6 +263,9 @@
                         </param>
                     </params>
                 </property>
+                <!-- Maximum width of the block content, shared by every block. -->
+                <xi:include href="../fragments/block-max-width.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
                     <params>

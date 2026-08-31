@@ -61,9 +61,11 @@
     {# Uniform dark overlay for text readability (content is always centered) #}
     <div class="iw-block-text-images__bg-overlay absolute inset-0 bg-black/60"></div>
 
-    {# Content — centered over the image, always interior container #}
+    {# Content — centered over the image, always interior container. The block
+       max width caps that container, the background image stays full-bleed. #}
+    {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
     <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
-        <div class="container mx-auto">
+        <div class="container mx-auto {{ maxWidthClass }}">
             <div class="iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white">
                 <div class="max-w-4xl mx-auto">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {

@@ -240,6 +240,107 @@ there the title and the text belong to the same zone.
 
 ---
 
+## Block maximum width
+
+A block spans the page container, which climbs to 96rem: a title and two lines
+of text end up stretched across the whole screen. The maximum width caps that,
+site-wide from **Settings > Themes > Defaults > Blocks > Maximum content
+width** (`defaults.blockMaxWidth`, compiled to `--iw-blocks-max-width`) and per
+block from its **Settings > Maximum content width** field (`maxWidth`). The
+block field wins, an empty value follows the theme, and `none` opts a single
+block out of a theme that constrains everything.
+
+The steps are named after Tailwind's container scale and point at its
+variables, so a project that redefines `--container-*` moves the block widths
+with it. The literal is only a fallback: Tailwind emits a `--container-*`
+variable solely for the sizes its own utilities use.
+
+| Level (admin) | Step | Width |
+|---|---|---|
+| No limit (default) | - | the page container |
+| Very narrow | `lg` | `var(--container-lg, 32rem)` - 512px |
+| Narrow | `xl` | `var(--container-xl, 36rem)` - 576px |
+| Reading | `2xl` | `var(--container-2xl, 42rem)` - 672px |
+| Medium | `3xl` | `var(--container-3xl, 48rem)` - 768px |
+| Wide | `4xl` | `var(--container-4xl, 56rem)` - 896px |
+| Very wide | `5xl` | `var(--container-5xl, 64rem)` - 1024px |
+| Maximum | `6xl` | `var(--container-6xl, 72rem)` - 1152px |
+
+```css
+.iw-block-maxw {
+    max-width: var(--iw-maxw-choice, var(--iw-blocks-max-width, none));
+    margin-inline: auto;
+}
+
+.iw-maxw--3xl { --iw-maxw-choice: var(--container-3xl, 48rem); }
+```
+
+**Which element is capped depends on the lateral margins**, because the block
+background has to stay coherent with its content:
+
+| Lateral margins | Background | Capped element |
+|---|---|---|
+| Exterior | limited to the container | the `<section>` itself: the background shrinks with the content, giving a centered card |
+| Interior | edge to edge | the inner `.container`: full-bleed background, narrow content |
+| None | edge to edge | an inner wrapper, added only when a width is set |
+
+A block following the theme carries `.iw-block-maxw` alone and reads
+`--iw-blocks-max-width` at render time, so changing the theme moves it without
+re-rendering the page. A block that overrides the theme also carries its
+`iw-maxw--*` class. Nothing is emitted when no constraint applies: these rules
+sit outside `@layer`, so a `max-width: none` would beat the `.container`
+utility and widen every block instead of leaving it alone.
+
+### Which blocks the theme width reaches
+
+Every block carries the field, but the theme default does not reach all of them
+by default. **Settings > Themes > Defaults > Blocks > Blocks the maximum width
+applies to** opens a modal listing the block types on the left and, on the
+right, the styles of the selected one with the same wireframes the editor sees
+when picking a style. Ticking works at both levels.
+
+The selection is stored as `defaults.blockMaxWidthScope`, a list mixing block
+types and `type:style` pairs:
+
+```json
+["text", "accordion", "gallery:grid", "location:map_with_info"]
+```
+
+A block whose styles are all ticked is stored as the bare type, so a style
+added to the bundle later stays covered. A theme that never opened the modal
+stores no scope at all, and both the admin and the renderer read that as
+`ThemeAdmin::MAX_WIDTH_SUGGESTED_SCOPE` - the text-driven blocks, without the
+grids, the carousels, the maps, or `text_images`, which pairs a text zone with
+an image zone where a site-wide cap shrinks the image along with the text.
+
+Three things follow from this:
+
+- **A per-block choice ignores the scope**, in both directions. The editor is
+  looking at that very block, so an explicit width applies even on an unticked
+  block, and `Aucune limite` opts a ticked one out.
+- **The style is resolved before matching**, through the same
+  `BlockTemplateResolver` the dispatcher uses. A block with no stored style
+  still renders one - a curated default, or the first on disk - and a scope
+  entry naming that style has to match it.
+- **Changing a block's style can change its width**, when the scope names
+  styles rather than whole blocks.
+
+A block rendered outside the dispatcher carries no type. It follows the theme
+width, which is the closest thing to the behavior before the scope existed, and
+a block type that ships no `maxWidth` field at all stays out entirely.
+
+**Override examples:**
+
+```css
+/* One block type only, without touching the theme */
+.my-page .iw-block-accordion.iw-block-maxw { --iw-maxw-choice: 40rem; }
+
+/* Site-wide default for a theme scope */
+.theme-editorial { --iw-blocks-max-width: var(--container-2xl, 42rem); }
+```
+
+---
+
 ## Block actions (CTA)
 
 Call-to-action buttons are not a block type: any block can carry a list of

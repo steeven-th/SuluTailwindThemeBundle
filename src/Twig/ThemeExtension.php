@@ -6,6 +6,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
 use ItechWorld\SuluTailwindThemeBundle\ItechWorldSuluTailwindThemeBundle;
+use ItechWorld\SuluTailwindThemeBundle\Admin\ThemeAdmin;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
@@ -97,6 +98,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_location_address', $this->getLocationAddress(...)),
             new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_title_markup', $this->getTitleMarkup(...), [
@@ -707,6 +709,91 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             'image' => (string) ($borders['imageRadius'] ?? $card),
             default => $card,
         };
+    }
+
+    /**
+     * Resolve the classes capping a block's width.
+     *
+     * A block spans the page container by default, which leaves a title and
+     * two lines of text stretched over the whole screen. The theme sets a
+     * site-wide maximum under Defaults > Blocks and a block overrides it from
+     * its own Settings section: an empty value follows the theme, "none" opts
+     * this block out of a theme that constrains everything.
+     *
+     * The theme value only reaches the blocks listed in its scope, picked in
+     * the admin from the Maximum width modal. An explicit per-block choice
+     * ignores the scope entirely, in both directions - it is the editor
+     * looking at that very block.
+     *
+     * The step class is only added for an override, so a block following the
+     * theme reads `--iw-blocks-max-width` at render time and moves with it.
+     * Nothing is returned when no constraint applies: `.iw-block-maxw` sits
+     * outside `@layer`, so an unconstrained `max-width: none` would beat the
+     * `.container` utility and widen the block instead of leaving it alone.
+     *
+     * @param string|null $blockValue The per-block container step, if any
+     * @param string|null $blockType  The block type, to match against the theme scope
+     * @param string|null $style      The block style, resolved before matching
+     *
+     * @return string The classes to apply, or an empty string when the block is unconstrained
+     */
+    public function getMaxWidthClass(?string $blockValue = null, ?string $blockType = null, ?string $style = null): string
+    {
+        $blockValue = (string) $blockValue;
+
+        if ('none' === $blockValue) {
+            return '';
+        }
+
+        if ('' !== $blockValue) {
+            return 'iw-block-maxw iw-maxw--' . $blockValue;
+        }
+
+        $defaults = $this->themeProvider->getTokens()['defaults'] ?? [];
+        $themeValue = (string) ($defaults['blockMaxWidth'] ?? 'none');
+
+        if ('' === $themeValue || 'none' === $themeValue) {
+            return '';
+        }
+
+        return $this->isInMaxWidthScope($defaults['blockMaxWidthScope'] ?? null, $blockType, $style)
+            ? 'iw-block-maxw'
+            : '';
+    }
+
+    /**
+     * Tell whether a block follows the theme-wide maximum width.
+     *
+     * The scope holds block types (`"text"`, the whole block whatever its
+     * style) and type:style pairs (`"gallery:grid"`). A theme saved before the
+     * scope existed, or one whose scope was never touched, falls back to the
+     * suggested selection rather than to everything: turning the width on then
+     * capping an image gallery is not what the editor asked for.
+     *
+     * @param mixed       $scope     The stored scope, a list of entries or null
+     * @param string|null $blockType The block type being rendered
+     * @param string|null $style     The stored style, resolved to the one that renders
+     */
+    private function isInMaxWidthScope(mixed $scope, ?string $blockType, ?string $style): bool
+    {
+        $blockType = trim((string) $blockType);
+
+        // A block rendered outside the dispatcher carries no type. Capping it
+        // is the closest thing to the pre-scope behavior, and a block that
+        // does not want it says so in its own field.
+        if ('' === $blockType) {
+            return true;
+        }
+
+        $entries = \is_array($scope) ? $scope : ThemeAdmin::MAX_WIDTH_SUGGESTED_SCOPE;
+
+        if (\in_array($blockType, $entries, true)) {
+            return true;
+        }
+
+        $resolvedStyle = $this->blockTemplateResolver->resolveStyle($blockType, $style);
+
+        return null !== $resolvedStyle && \in_array($blockType . ':' . $resolvedStyle, $entries, true);
     }
 
     /**

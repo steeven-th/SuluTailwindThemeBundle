@@ -74,6 +74,25 @@ class ThemeCompiler
         'rounded-full' => 'calc(infinity * 1px)',
     ];
 
+    /**
+     * Mapping from block max-width steps to the Tailwind container scale.
+     *
+     * The steps are named after Tailwind's own container sizes, so a project
+     * that redefines `--container-*` sees the block widths follow. The literal
+     * is only a fallback: Tailwind emits a `--container-*` variable solely for
+     * the sizes its utilities actually use, so the ones we never reference from
+     * a utility class are simply absent from the compiled stylesheet.
+     */
+    private const MAX_WIDTH_MAP = [
+        'lg' => 'var(--container-lg, 32rem)',
+        'xl' => 'var(--container-xl, 36rem)',
+        '2xl' => 'var(--container-2xl, 42rem)',
+        '3xl' => 'var(--container-3xl, 48rem)',
+        '4xl' => 'var(--container-4xl, 56rem)',
+        '5xl' => 'var(--container-5xl, 64rem)',
+        '6xl' => 'var(--container-6xl, 72rem)',
+    ];
+
     public function __construct(
         private readonly string $cssOutputDir,
         private readonly GoogleFontsResolver $googleFontsResolver,
@@ -1470,6 +1489,9 @@ class ThemeCompiler
      *   - --iw-blocks-component-gap: spacing inside the component grids that
      *     are not article cards (accordion, documents, linked pages,
      *     testimonials, key figures).
+     *   - --iw-blocks-max-width: maximum width of a block's content, so a
+     *     short paragraph does not stretch across the whole container.
+     *     `none` (the default) keeps the previous full-width behavior.
      *
      * @param array<string, mixed> $defaults Site-wide default token values
      *
@@ -1481,12 +1503,14 @@ class ThemeCompiler
         $titleGap = (string) ($defaults['titleGap'] ?? '1.5rem');
         $imageGap = (string) ($defaults['imageGap'] ?? '1.5rem');
         $componentGap = (string) ($defaults['componentGap'] ?? '1.5rem');
+        $maxWidth = self::MAX_WIDTH_MAP[(string) ($defaults['blockMaxWidth'] ?? 'none')] ?? 'none';
 
         $css = "  /* Block defaults (site-wide) */\n";
         $css .= "  --iw-blocks-gap: {$gap};\n";
         $css .= "  --iw-blocks-title-gap: {$titleGap};\n";
         $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
         $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
+        $css .= "  --iw-blocks-max-width: {$maxWidth};\n";
 
         return $css . "\n";
     }

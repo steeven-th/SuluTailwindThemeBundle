@@ -302,9 +302,16 @@ single component (components have their own tab).
 | `--iw-blocks-title-gap` | Space between a block's titles group and its content, consumed by `.iw-block__titles` | `1.5rem` |
 | `--iw-blocks-image-gap` | Spacing inside an image grid (text + images mosaic, gallery grid / masonry / slider), overridable per block from the block's own Image spacing field | `1.5rem` |
 | `--iw-blocks-component-gap` | Spacing inside the component grids that are not article cards (accordion, documents, linked pages, testimonials, key figures) | `1.5rem` |
+| `--iw-blocks-max-width` | Maximum width of a block's content, so a short paragraph does not stretch across the whole container. `none` leaves blocks as wide as the page container | `var(--container-3xl, 48rem)` |
+
+The blocks that token reaches are picked in the admin, next to the width
+itself. That scope is a token too, `defaults.blockMaxWidthScope`, but it is
+read when rendering rather than compiled to CSS - see
+[`transverse.md#which-blocks-the-theme-width-reaches`](./transverse.md#which-blocks-the-theme-width-reaches).
 
 See [`transverse.md#grid-spacing`](./transverse.md#grid-spacing),
-[`transverse.md#split-block-gap`](./transverse.md#split-block-gap) and
-[`transverse.md#block-titles-gap`](./transverse.md#block-titles-gap) for the
-per-block override variables. Article card grids keep their own token,
+[`transverse.md#split-block-gap`](./transverse.md#split-block-gap),
+[`transverse.md#block-titles-gap`](./transverse.md#block-titles-gap) and
+[`transverse.md#block-maximum-width`](./transverse.md#block-maximum-width) for
+the per-block override variables. Article card grids keep their own token,
 `--iw-cards-gap`, set under Components > Cards.

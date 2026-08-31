@@ -275,6 +275,7 @@ Use the block wrapper `embed` to benefit from all variant/margin/padding logic:
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
     paragraphRadius: block.paragraphRadius|default(''),
+    maxWidth: block.maxWidth|default(''),
 } %}
     {% block block_content %}
         <h2 class="text-3xl font-bold mb-4">{{ block.headline }}</h2>
@@ -293,6 +294,17 @@ The wrapper handles:
 - Block border radius (with responsive prefix `sm:rounded-*`)
 - Background attribute (`data-has-bg="true"`)
 - Paragraph image radius
+- Maximum content width, capping the `<section>` or the inner container depending
+  on the lateral margins - see [`css-api/transverse.md#block-maximum-width`](./css-api/transverse.md#block-maximum-width).
+  Omit the `maxWidth` key entirely for a block built from two zones, and it stays
+  out of the theme-wide cap too
+
+Add the field to your block with the shared fragment, in the `settings` section:
+
+```xml
+<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-max-width.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+```
 
 ### Step 3: Reference your block in a page template
 

@@ -304,6 +304,27 @@ final class ThemeCompilerTest extends TestCase
         self::assertStringContainsString('--iw-blocks-component-gap: 2rem;', $css);
     }
 
+    #[Test]
+    public function itEmitsTheSiteWideBlockMaxWidthToken(): void
+    {
+        $css = $this->compileCss(['defaults' => ['blockMaxWidth' => '3xl']]);
+
+        // The Tailwind container variable, so a project redefining its scale
+        // moves the block widths with it. The literal is the fallback.
+        self::assertStringContainsString('--iw-blocks-max-width: var(--container-3xl, 48rem);', $css);
+    }
+
+    /**
+     * An unset or unknown step leaves the blocks unconstrained, the way they
+     * rendered before the setting existed.
+     */
+    #[Test]
+    public function itLeavesBlocksUnconstrainedWithoutAMaxWidth(): void
+    {
+        self::assertStringContainsString('--iw-blocks-max-width: none;', $this->compileCss([]));
+        self::assertStringContainsString('--iw-blocks-max-width: none;', $this->compileCss(['defaults' => ['blockMaxWidth' => 'nonsense']]));
+    }
+
     /**
      * Dropdown entries in the language switcher carry both
      * .iw-menu__text--level-2 and .iw-menu__lang-item. Both are single-class

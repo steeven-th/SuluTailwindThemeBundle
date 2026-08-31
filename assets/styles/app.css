@@ -290,6 +290,39 @@ a:hover {
     }
 }
 
+/* Block maximum width. A block spans the page container, which climbs to
+   96rem, so a title and two lines of text end up stretched over the whole
+   screen. `.iw-block-maxw` caps that width and centers what it holds. The
+   value comes from the site-wide `--iw-blocks-max-width` token, set in the
+   admin under Settings > Themes > Defaults > Blocks, and a block overrides it
+   with one of the `iw-maxw--*` classes below.
+
+   `_block_wrapper` only emits the class when the resulting width is an actual
+   constraint, because these rules sit outside `@layer` and a `max-width: none`
+   would then beat the `.container` utility and widen every block instead.
+
+   Which element carries it depends on the lateral margins: on exterior margins
+   the background is already limited to the container, so the <section> itself
+   shrinks and the background follows the content. On interior or no margins
+   the background runs edge to edge and only the inner container is capped.
+
+   The steps are named after Tailwind's container scale and point at its
+   variables, so redefining `--container-*` in a project moves the block widths
+   with it. The literal after the comma is the fallback: Tailwind only emits
+   the `--container-*` variables its utilities actually use. */
+.iw-block-maxw {
+    max-width: var(--iw-maxw-choice, var(--iw-blocks-max-width, none));
+    margin-inline: auto;
+}
+
+.iw-maxw--lg { --iw-maxw-choice: var(--container-lg, 32rem); }
+.iw-maxw--xl { --iw-maxw-choice: var(--container-xl, 36rem); }
+.iw-maxw--2xl { --iw-maxw-choice: var(--container-2xl, 42rem); }
+.iw-maxw--3xl { --iw-maxw-choice: var(--container-3xl, 48rem); }
+.iw-maxw--4xl { --iw-maxw-choice: var(--container-4xl, 56rem); }
+.iw-maxw--5xl { --iw-maxw-choice: var(--container-5xl, 64rem); }
+.iw-maxw--6xl { --iw-maxw-choice: var(--container-6xl, 72rem); }
+
 /* ─── Horizontal Rule ───────────────────────────────────────────────────── */
 hr {
     height: 2px;

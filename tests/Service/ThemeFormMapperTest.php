@@ -181,6 +181,66 @@ class ThemeFormMapperTest extends TestCase
         $this->assertSame('3rem', $target->getTokens()['defaults']['blockGap']);
     }
 
+    /**
+     * The scope is a list, which the depth-1 flattening skips by design, so it
+     * travels through a dedicated path. A theme that never opened the modal
+     * stores no scope, and that null is meaningful: the renderer reads it as
+     * the suggested selection, not as an empty one.
+     */
+    public function testMaxWidthScopeSurvivesTheRoundTrip(): void
+    {
+        $theme = $this->buildTheme();
+        $data = $this->mapper->serializeTheme($theme);
+
+        $this->assertSame(['text', 'gallery:grid'], $data['defaults_blockMaxWidthScope']);
+
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertSame(['text', 'gallery:grid'], $target->getTokens()['defaults']['blockMaxWidthScope']);
+    }
+
+    public function testAnUntouchedScopeStaysNull(): void
+    {
+        $theme = $this->buildTheme();
+        $tokens = $theme->getTokens();
+        unset($tokens['defaults']['blockMaxWidthScope']);
+        $theme->setTokens($tokens);
+
+        $data = $this->mapper->serializeTheme($theme);
+        $this->assertNull($data['defaults_blockMaxWidthScope']);
+
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertNull($target->getTokens()['defaults']['blockMaxWidthScope']);
+    }
+
+    /**
+     * Scope entries reach the server from the browser and end up compared
+     * against a block type and style when rendering, so anything that is not a
+     * plain identifier is dropped rather than stored.
+     */
+    public function testMaxWidthScopeRejectsAnythingButIdentifiers(): void
+    {
+        $data = $this->mapper->serializeTheme($this->buildTheme());
+        $data['defaults_blockMaxWidthScope'] = [
+            'text',
+            'gallery:grid',
+            'text',                       // duplicate
+            '../../etc/passwd',
+            '<script>alert(1)</script>',
+            'Text',                       // wrong case
+            'text:one_column:extra',
+            42,
+        ];
+
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertSame(['text', 'gallery:grid'], $target->getTokens()['defaults']['blockMaxWidthScope']);
+    }
+
     private function buildTheme(): ThemeConfig
     {
         $theme = new ThemeConfig();
@@ -192,7 +252,7 @@ class ThemeFormMapperTest extends TestCase
                 ['role' => 'secondary', 'slug' => 'secondary', 'value' => '#22aa88'],
             ],
             'borders' => ['radius' => '0.5rem', 'cardRadius' => '1rem'],
-            'defaults' => ['blockGap' => '2rem', 'titleGap' => '1.5rem', 'imageGap' => '1rem', 'componentGap' => '2rem'],
+            'defaults' => ['blockGap' => '2rem', 'titleGap' => '1.5rem', 'imageGap' => '1rem', 'componentGap' => '2rem', 'blockMaxWidth' => '3xl', 'blockMaxWidthScope' => ['text', 'gallery:grid']],
             'buttons' => [
                 ['slug' => 'primary', 'label' => 'Primary', 'bg' => '#3366ff', 'text' => '#ffffff'],
             ],
