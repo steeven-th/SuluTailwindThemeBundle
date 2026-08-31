@@ -98,6 +98,9 @@
             <properties>
                 <xi:include href="../fragments/code-block-common.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <!-- Maximum width of the block content, shared by every block. -->
+                <xi:include href="../fragments/block-max-width.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
     </properties>

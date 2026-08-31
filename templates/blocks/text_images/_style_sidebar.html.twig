@@ -35,6 +35,14 @@
 {% endif %}
 
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
+
+{# Maximum width of the block, mirroring `_block_wrapper`: exterior margins cap
+   the background at the container, so the constraint goes on the <section> and
+   the background shrinks with the content. The other modes paint the
+   background edge to edge and only the inner container is capped. #}
+{% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
+{% set sectionMaxWidthClass = (lateralMode == 'exterior') ? maxWidthClass : '' %}
+{% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ ((lateralMode == 'exterior') ? '' : maxWidthClass) %}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: only in exterior mode. #}
@@ -58,12 +66,12 @@
 
 {# ── Section ──────────────────────────────────────────────────────────────── #}
 <section
-    class="block iw-block-text-images iw-block-text-images--sidebar iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }}"
+    class="block iw-block-text-images iw-block-text-images--sidebar iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }}"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    {% if lateralMode == 'interior' %}
-    <div class="container mx-auto">
+    {% if innerWrapperClass|trim %}
+    <div class="{{ innerWrapperClass|trim }}">
     {% endif %}
 
         {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
@@ -108,7 +116,7 @@
             </div>
         </div>
 
-    {% if lateralMode == 'interior' %}
+    {% if innerWrapperClass|trim %}
     </div>
     {% endif %}
 </section>

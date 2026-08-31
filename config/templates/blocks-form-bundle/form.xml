@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <!-- Global block type: Form (with SuluFormBundle integration) -->
 <template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
@@ -138,6 +139,9 @@
                         </param>
                     </params>
                 </property>
+                <!-- Maximum width of the block content, shared by every block. -->
+                <xi:include href="../fragments/block-max-width.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
                     <params>

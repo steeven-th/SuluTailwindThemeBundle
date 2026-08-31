@@ -87,6 +87,27 @@ class BlockTemplateResolver
      */
     public function resolve(string $blockType, ?string $style): ?string
     {
+        $resolved = $this->resolveStyle($blockType, $style);
+
+        return null !== $resolved ? $this->templateName(trim($blockType), $resolved) : null;
+    }
+
+    /**
+     * Resolve a block type and style to the style actually rendered.
+     *
+     * Settings keyed by style - the theme's block max width scope - must read
+     * the same value the dispatcher renders, not the raw stored one: a block
+     * with no style (imported, AI-generated or predating the field) still
+     * renders a style, and would otherwise match no scope entry at all.
+     *
+     * @param string      $blockType The block type identifier (e.g. "text_images")
+     * @param string|null $style     The selected style, if any (e.g. "overlay")
+     *
+     * @return string|null The style that renders, or null when the block type
+     *                     has no renderable style at all
+     */
+    public function resolveStyle(string $blockType, ?string $style): ?string
+    {
         $blockType = trim($blockType);
         if (!$this->isSafeIdentifier($blockType)) {
             return null;
@@ -97,23 +118,18 @@ class BlockTemplateResolver
         // 1. Explicit style chosen in the admin, when its template exists.
         $style = null !== $style ? trim($style) : '';
         if ($this->isSafeIdentifier($style) && $this->styleExists($typeDirectory, $style)) {
-            return $this->templateName($blockType, $style);
+            return $style;
         }
 
         // 2. Curated per-type default (good-looking baseline for known blocks).
         $default = self::DEFAULT_STYLES[$blockType] ?? null;
         if (null !== $default && $this->styleExists($typeDirectory, $default)) {
-            return $this->templateName($blockType, $default);
+            return $default;
         }
 
         // 3. Safety net: first style available on disk, so an unknown or newly
         //    added block still renders instead of crashing or vanishing.
-        $first = $this->firstAvailableStyle($typeDirectory);
-        if (null !== $first) {
-            return $this->templateName($blockType, $first);
-        }
-
-        return null;
+        return $this->firstAvailableStyle($typeDirectory);
     }
 
     /**

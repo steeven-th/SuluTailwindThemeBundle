@@ -207,6 +207,7 @@ The bundle provides `@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.h
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
     paragraphRadius: block.paragraphRadius|default(''),
+    maxWidth: block.maxWidth|default(''),
 } %}
     {% block block_content %}
         {# Your custom block content here #}

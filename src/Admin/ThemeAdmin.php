@@ -51,6 +51,33 @@ class ThemeAdmin extends Admin
     ];
 
     /**
+     * Blocks the theme-wide maximum width applies to out of the box.
+     *
+     * The selection an editor gets before touching the scope modal, and what
+     * the modal's "Suggested selection" button restores. Text-driven blocks
+     * are in, layouts whose whole point is to use the width are out: image
+     * galleries, article grids and carousels, maps, and `text_images`, which
+     * pairs a text zone with an image zone - capping the pair shrinks the
+     * image along with the text rather than giving a readable column.
+     *
+     * Entries are block types, or `type:style` pairs for a finer selection.
+     *
+     * @var list<string>
+     */
+    public const MAX_WIDTH_SUGGESTED_SCOPE = [
+        'text',
+        'accordion',
+        'testimonial',
+        'form',
+        'key_figures',
+        'document',
+        'linked_pages',
+        'code',
+        'iframe',
+        'separator',
+    ];
+
+    /**
      * Available layout styles per block type, matching actual Twig templates
      * in templates/blocks/{type}/_style_{key}.html.twig.
      *
@@ -448,6 +475,9 @@ class ThemeAdmin extends Admin
 
         return array_merge($themeData, [
             'blockStyles' => self::BLOCK_STYLE_OPTIONS,
+            // Suggested selection for the block max width scope modal, so the
+            // admin and the renderer agree on what "not configured" means.
+            'maxWidthSuggestedScope' => self::MAX_WIDTH_SUGGESTED_SCOPE,
             'articleStyles' => self::ARTICLE_STYLE_OPTIONS,
             'collapsibleSections' => self::COLLAPSIBLE_SECTIONS,
             'hasApiKey' => $this->googleFontsCatalog->hasApiKey(),

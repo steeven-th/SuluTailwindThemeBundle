@@ -16,6 +16,7 @@ import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker'
 import WeightPicker from './components/WeightPicker/WeightPicker';
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
 import TitleEditor from './components/TitleEditor/TitleEditor';
+import BlockScopeSelector from './components/BlockScopeSelector/BlockScopeSelector';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
 
@@ -35,6 +36,8 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         collapsibleSections.init(config.collapsibleSections || {});
         FontPicker.hasApiKey = config.hasApiKey || false;
         TitleEditor.contextDefaults = config.titleEditor || {};
+        BlockScopeSelector.blockStyles = config.blockStyles || {};
+        BlockScopeSelector.suggestedScope = config.maxWidthSuggestedScope || [];
     }
 
     if (initialized) {
@@ -55,4 +58,5 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_weight_picker', WeightPicker);
     fieldRegistry.add('iw_theme_article_style_picker', ArticleStylePicker);
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);
+    fieldRegistry.add('iw_theme_block_scope', BlockScopeSelector);
 });

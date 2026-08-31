@@ -21,6 +21,23 @@
     {% set lateralMode = 'interior' %}
 {% endif %}
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
+
+{# Maximum width of the block. Empty follows the theme, `none` opts this block
+   out of a theme that constrains everything, and the function returns nothing
+   when no constraint applies.
+   The block type and style go with it: the theme value only reaches the blocks
+   its scope names, picked in the admin. Both come from the dispatcher, which
+   includes this template with the whole block, and an undefined `maxWidth`
+   means the block does not offer the field at all.
+   Exterior margins already cap the background at the container, so the
+   constraint lands on the <section> and the background shrinks with the
+   content. The other modes paint the background edge to edge, so only the
+   inner container is capped and the background stays full-bleed. #}
+{% set maxWidthClass = maxWidth is defined
+    ? iw_sulu_tailwind_theme_max_width_class(maxWidth, type|default(''), style|default(''))
+    : '' %}
+{% set sectionMaxWidthClass = (lateralMode == 'exterior') ? maxWidthClass : '' %}
+{% set innerMaxWidthClass = (lateralMode == 'exterior') ? '' : maxWidthClass %}
 {% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
 {% set effectiveBlockRadius = iw_sulu_tailwind_theme_effective_radius('card', blockRadius|default('')) %}
 {% set hasBlockRadius = effectiveBlockRadius is not empty and effectiveBlockRadius != 'rounded-none' %}
@@ -59,25 +76,15 @@
 {% set ctaButtonsView = ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [] %}
 
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
+    class="block {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    {% if lateralMode == 'interior' %}
-        <div class="container mx-auto">
-            {{ block('block_content') }}
-
-            {% if not (ctaInline|default(false)) %}
-                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
-                    buttons: ctaButtons|default([]),
-                    buttonsView: ctaButtonsView,
-                    alignment: ctaAlignment|default('title'),
-                    direction: ctaDirection|default('row'),
-                    titleAlignment: titleAlignment|default('left')
-                } only %}
-            {% endif %}
-        </div>
-    {% else %}
+    {# One inner wrapper, opened only when it carries something: the interior
+       container, the max-width cap, or both. Exterior margins put both on the
+       <section> itself, so nothing is wrapped there. #}
+    {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass %}
+    {% if innerWrapperClass|trim %}<div class="{{ innerWrapperClass|trim }}">{% endif %}
         {{ block('block_content') }}
 
         {% if not (ctaInline|default(false)) %}
@@ -89,5 +96,5 @@
                 titleAlignment: titleAlignment|default('left')
             } only %}
         {% endif %}
-    {% endif %}
+    {% if innerWrapperClass|trim %}</div>{% endif %}
 </section>

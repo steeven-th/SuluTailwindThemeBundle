@@ -139,6 +139,44 @@
                         </param>
                     </params>
                 </property>
+
+                <!-- Maximum width of a block's content. Blocks are as wide as
+                     the container by default, which leaves a short paragraph
+                     stretched over the whole page. The steps follow Tailwind's
+                     container scale, and each block can override the value
+                     from its own Settings section. -->
+                <property name="defaults_blockMaxWidth" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_blockMaxWidth</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_blockMaxWidth_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="none"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.max_width_none</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.max_width_lg</title></meta></param>
+                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.max_width_xl</title></meta></param>
+                            <param name="2xl"><meta><title>iw_sulu_tailwind_theme.max_width_2xl</title></meta></param>
+                            <param name="3xl"><meta><title>iw_sulu_tailwind_theme.max_width_3xl</title></meta></param>
+                            <param name="4xl"><meta><title>iw_sulu_tailwind_theme.max_width_4xl</title></meta></param>
+                            <param name="5xl"><meta><title>iw_sulu_tailwind_theme.max_width_5xl</title></meta></param>
+                            <param name="6xl"><meta><title>iw_sulu_tailwind_theme.max_width_6xl</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Which blocks the maximum width applies to. The field is a
+                     button opening a modal, so 16 block types and their styles
+                     do not weigh on the settings page. Disabled rather than
+                     hidden without a width: the setting stays where the eye
+                     found it, and the row keeps its three columns. -->
+                <property name="defaults_blockMaxWidthScope" type="iw_theme_block_scope" colspan="4"
+                          disabledCondition="defaults_blockMaxWidth == 'none'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope_info</info_text>
+                    </meta>
+                </property>
             </properties>
         </section>
     </properties>

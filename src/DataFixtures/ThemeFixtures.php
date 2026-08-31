@@ -163,12 +163,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-lg',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '2rem',
                     'titleGap' => '1.5rem',
                     'imageGap' => '1rem',
                     'componentGap' => '1.5rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -392,12 +393,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-2xl',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '2.5rem',
                     'titleGap' => '2rem',
                     'imageGap' => '1.5rem',
                     'componentGap' => '2rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '2rem',
@@ -624,12 +626,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-none',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '3rem',
                     'titleGap' => '2.5rem',
                     'imageGap' => '2rem',
                     'componentGap' => '2rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1rem',
@@ -853,12 +856,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '2rem',
                     'titleGap' => '1.5rem',
                     'imageGap' => '1rem',
                     'componentGap' => '1.5rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -1082,12 +1086,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '1.5rem',
                     'titleGap' => '1.5rem',
                     'imageGap' => '1rem',
                     'componentGap' => '1.5rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -1314,12 +1319,13 @@ class ThemeFixtures
                     'radiusFull' => 'rounded-full',
                     'imageRadius' => 'rounded-xl',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '1.5rem',
                     'titleGap' => '1.5rem',
                     'imageGap' => '1rem',
                     'componentGap' => '1.5rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',
@@ -1647,12 +1653,13 @@ class ThemeFixtures
                     'radius' => 'rounded-lg',
                     'imageRadius' => 'rounded-lg',
                 ],
-                // Site-wide block defaults (gap between the two zones of split blocks)
+                // Site-wide block defaults (spacings and maximum content width)
                 'defaults' => [
                     'blockGap' => '2rem',
                     'titleGap' => '1.5rem',
                     'imageGap' => '1.5rem',
                     'componentGap' => '1.5rem',
+                    'blockMaxWidth' => 'none',
                 ],
                 'buttonsGlobal' => [
                     'paddingX' => '1.5rem',

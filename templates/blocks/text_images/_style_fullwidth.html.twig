@@ -21,6 +21,14 @@
 {% endif %}
 
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
+
+{# Maximum width of the block, mirroring `_block_wrapper`: exterior margins cap
+   the background at the container, so the constraint goes on the <section> and
+   the background shrinks with the content. The other modes paint the
+   background edge to edge and only the inner container is capped. #}
+{% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
+{% set sectionMaxWidthClass = (lateralMode == 'exterior') ? maxWidthClass : '' %}
+{% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ ((lateralMode == 'exterior') ? '' : maxWidthClass) %}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
 {# Block radius: only in exterior mode (interior = image fills full width, no radius).
@@ -109,7 +117,7 @@
 {# Image NEVER has its own radius — it follows the section edges.
    In exterior mode the section's overflow-hidden + blockRadius handle rounding. #}
 <section
-    class="block iw-block-text-images iw-block-text-images--fullwidth iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ isBottom ? 'bottom' : 'top' }} iw-split-gap flex flex-col {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
+    class="block iw-block-text-images iw-block-text-images--fullwidth iw-block-text-images--lateral-mode-{{ lateralMode }} iw-block-text-images--position-{{ isBottom ? 'bottom' : 'top' }} iw-split-gap flex flex-col {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
@@ -129,8 +137,8 @@
 
     {# Content: titles + paragraph with padding #}
     <div class="iw-block-text-images__content {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
-        {% if lateralMode == 'interior' %}
-        <div class="container mx-auto">
+        {% if innerWrapperClass|trim %}
+        <div class="{{ innerWrapperClass|trim }}">
         {% endif %}
 
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
@@ -164,7 +172,7 @@
                 titleAlignment: titleAlignment|default('left')
             } only %}
 
-        {% if lateralMode == 'interior' %}
+        {% if innerWrapperClass|trim %}
         </div>
         {% endif %}
     </div>
