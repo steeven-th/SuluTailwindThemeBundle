@@ -47,6 +47,13 @@
                         <param name="block_type" value="iframe"/>
                     </params>
                 </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
                 <property name="heightMode" type="single_select" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.embed_height_mode</title>
@@ -100,13 +107,6 @@
                         <param name="default_value" value="500"/>
                     </params>
                 </property>
-            </properties>
-        </section>
-
-        <!-- ── Settings ── -->
-        <section name="settings">
-            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
-            <properties>
                 <property name="sandboxMode" type="single_select">
                     <meta>
                         <title>iw_sulu_tailwind_theme.embed_sandbox</title>

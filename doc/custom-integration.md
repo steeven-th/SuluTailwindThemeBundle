@@ -225,7 +225,8 @@ Register a global block type in `config/templates/blocks/my_block.xml`:
             </properties>
         </section>
 
-        <!-- Appearance section: the same colour variant picker as every block -->
+        <!-- Appearance section: the colour variant and the layout style, and
+             nothing else. See "Where a field goes" below. -->
         <section name="appearance">
             <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
             <properties>
@@ -270,6 +271,38 @@ And pick a single property out of any fragment with an `@name` selector:
 
 The full list of fragments is in
 [page-templates.md](./page-templates.md#available-fragments).
+
+### Where a field goes
+
+Three sections, and one rule for the two that are not content:
+
+| Section | Holds |
+|---------|-------|
+| `content` | What the editor writes: text, media, links, repeatable items. |
+| `appearance` | The colour variant and the layout style. Nothing else. |
+| `settings` | Every other setting, including the ones that read as appearance. |
+
+The line looks arbitrary until you try to draw it anywhere else. Margins,
+radius, maximum width and background have always been in `settings`, and they
+are no less visual than a column split or an icon position. Keeping
+`appearance` to the two fields that define the block's identity is the only
+version of the rule that can be stated rather than argued, which is what makes
+it survive the next field somebody adds.
+
+A field that refines a style still belongs to `settings`, conditioned on that
+style:
+
+```xml
+<property name="mediaRatio" type="single_select" colspan="6"
+          visibleCondition="__parent.style == 'classic'">
+```
+
+That works across sections because a Sulu section is a visual grouping only:
+the data stays flat, so a condition in `settings` reads a style declared in
+`appearance`. Moving a property from one section to another is therefore safe
+for content that is already published.
+
+`BlockSectionsContractTest` enforces this on every block the bundle ships.
 
 ### Step 2: Create the Twig template
 

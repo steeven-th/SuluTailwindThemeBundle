@@ -64,6 +64,13 @@
                         <param name="block_type" value="accordion"/>
                     </params>
                 </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
                 <property name="itemTitleTag" type="single_select" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.accordion_item_title_level</title>
@@ -101,13 +108,6 @@
                         </param>
                     </params>
                 </property>
-            </properties>
-        </section>
-
-        <!-- ── Settings ── -->
-        <section name="settings">
-            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
-            <properties>
                 <property name="singleOpen" type="checkbox">
                     <meta>
                         <title>iw_sulu_tailwind_theme.accordion_single_open</title>

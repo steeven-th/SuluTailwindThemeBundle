@@ -228,6 +228,13 @@
                         <param name="block_type" value="text_images"/>
                     </params>
                 </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
                 <!--
                     How the two zones share the width. Not a shared fragment,
                     because the field only makes sense for the styles that have
@@ -256,13 +263,6 @@
                         </param>
                     </params>
                 </property>
-            </properties>
-        </section>
-
-        <!-- ── Settings ── -->
-        <section name="settings">
-            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
-            <properties>
                 <xi:include href="../fragments/block-margins.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <!-- Same field as `block-lateral-margins.xml`, kept inline for the
