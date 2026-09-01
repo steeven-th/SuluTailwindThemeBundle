@@ -17,6 +17,15 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_media</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- Classic: the media zone can hold a video rather than images.
                      Carried over from the CTA block's video accessory, removed
                      in 3.0.0. -->
@@ -113,28 +122,14 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
-                <property name="imagesHeading" type="heading">
+                <property name="layoutHeading" type="heading">
                     <params>
                         <param name="label">
-                            <meta><title>iw_sulu_tailwind_theme.settings_group_images</title></meta>
+                            <meta><title>iw_sulu_tailwind_theme.settings_group_layout</title></meta>
                         </param>
                     </params>
                 </property>
 
-                <property name="imageFilter" type="single_select" colspan="6"
-                          visibleCondition="__parent.style != 'overlay' AND __parent.style != 'mosaic' AND __parent.style != 'hero_banner' AND __parent.style != 'split_screen'">
-                    <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
-                    <params>
-                        <param name="default_value" value="original"/>
-                        <param name="values" type="collection">
-                            <param name="16_9"><meta><title>16:9</title></meta></param>
-                            <param name="4_3"><meta><title>4:3</title></meta></param>
-                            <param name="1_1"><meta><title>1:1</title></meta></param>
-                            <param name="3_4"><meta><title>3:4</title></meta></param>
-                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
-                        </param>
-                    </params>
-                </property>
                 <property name="imagePosition" type="single_select" colspan="6"
                           visibleCondition="__parent.style == 'classic'">
                     <meta><title>iw_sulu_tailwind_theme.image_position</title></meta>
@@ -162,6 +157,97 @@
                         <param name="values" type="collection">
                             <param name="top"><meta><title>iw_sulu_tailwind_theme.position_top</title></meta></param>
                             <param name="bottom"><meta><title>iw_sulu_tailwind_theme.position_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!-- Overlay / Sidebar: toggle content position left/right -->
+                <property name="contentRight" type="checkbox"
+                          visibleCondition="__parent.style == 'overlay' OR __parent.style == 'sidebar' OR __parent.style == 'split_screen'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.content_position_right</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
+                <!--
+                    How the two zones share the width. Not a shared fragment,
+                    because the field only makes sense for the styles that have
+                    two zones and a condition cannot ride on an xi:include. The
+                    same property lives in text_images, both form variants and
+                    location: change one, change them all. The steps themselves
+                    are guarded by `MediaRatioContractTest`.
+                -->
+                <property name="mediaRatio" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'split_screen' OR __parent.style == 'sidebar'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_media_ratio</title>
+                        <info_text>iw_sulu_tailwind_theme.block_media_ratio_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.media_ratio_style</title></meta></param>
+                            <param name="1-4"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_4</title></meta></param>
+                            <param name="1-3"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_3</title></meta></param>
+                            <param name="2-5"><meta><title>iw_sulu_tailwind_theme.media_ratio_2_5</title></meta></param>
+                            <param name="1-2"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_2</title></meta></param>
+                            <param name="3-5"><meta><title>iw_sulu_tailwind_theme.media_ratio_3_5</title></meta></param>
+                            <param name="2-3"><meta><title>iw_sulu_tailwind_theme.media_ratio_2_3</title></meta></param>
+                            <param name="3-4"><meta><title>iw_sulu_tailwind_theme.media_ratio_3_4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!--
+                    How the two zones line up vertically, once the taller one
+                    has set the height. Its own field rather than more entries
+                    in the media position: the two axes are independent, and
+                    folding them together would mean a select of every
+                    combination. Same duplication rule as the width split above.
+                -->
+                <property name="zonesAlign" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'split_screen' OR __parent.style == 'sidebar'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_zones_align</title>
+                        <info_text>iw_sulu_tailwind_theme.block_zones_align_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.zones_align_style</title></meta></param>
+                            <param name="start"><meta><title>iw_sulu_tailwind_theme.zones_align_start</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.zones_align_center</title></meta></param>
+                            <param name="end"><meta><title>iw_sulu_tailwind_theme.zones_align_end</title></meta></param>
+                            <param name="stretch"><meta><title>iw_sulu_tailwind_theme.zones_align_stretch</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!-- Fullwidth: toggle image position top/bottom -->
+                <property name="imageBottom" type="checkbox"
+                          visibleCondition="__parent.style == 'fullwidth'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.image_position_bottom</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
+                <!-- Fullwidth: toggle image padding (auto-on when radius is set) -->
+                <property name="imagePadding" type="checkbox"
+                          visibleCondition="__parent.style == 'fullwidth'">
+                    <meta>
+                        <info_text>iw_sulu_tailwind_theme.image_padding_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.image_padding</title>
+                            </meta>
                         </param>
                     </params>
                 </property>
@@ -200,6 +286,29 @@
                         </param>
                     </params>
                 </property>
+
+                <property name="imagesHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.settings_group_images</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="imageFilter" type="single_select" colspan="6"
+                          visibleCondition="__parent.style != 'overlay' AND __parent.style != 'mosaic' AND __parent.style != 'hero_banner' AND __parent.style != 'split_screen'">
+                    <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
+                    <params>
+                        <param name="default_value" value="original"/>
+                        <param name="values" type="collection">
+                            <param name="16_9"><meta><title>16:9</title></meta></param>
+                            <param name="4_3"><meta><title>4:3</title></meta></param>
+                            <param name="1_1"><meta><title>1:1</title></meta></param>
+                            <param name="3_4"><meta><title>3:4</title></meta></param>
+                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="showImagesName" type="checkbox"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
                     <meta>
@@ -207,99 +316,6 @@
                         <info_text>iw_sulu_tailwind_theme.show_images_name_info</info_text>
                     </meta>
                 </property>
-                <!-- Overlay / Sidebar: toggle content position left/right -->
-                <property name="contentRight" type="checkbox"
-                          visibleCondition="__parent.style == 'overlay' OR __parent.style == 'sidebar' OR __parent.style == 'split_screen'">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.content_position_right</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
-                <!-- Fullwidth: toggle image position top/bottom -->
-                <property name="imageBottom" type="checkbox"
-                          visibleCondition="__parent.style == 'fullwidth'">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.image_position_bottom</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
-                <!-- Fullwidth: toggle image padding (auto-on when radius is set) -->
-                <property name="imagePadding" type="checkbox"
-                          visibleCondition="__parent.style == 'fullwidth'">
-                    <meta>
-                        <info_text>iw_sulu_tailwind_theme.image_padding_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.image_padding</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
-                <!--
-                    How the two zones share the width. Not a shared fragment,
-                    because the field only makes sense for the styles that have
-                    two zones and a condition cannot ride on an xi:include. The
-                    same property lives in text_images, both form variants and
-                    location: change one, change them all. The steps themselves
-                    are guarded by `MediaRatioContractTest`.
-                -->
-                <property name="mediaRatio" type="single_select" colspan="6"
-                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'split_screen' OR __parent.style == 'sidebar'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.block_media_ratio</title>
-                        <info_text>iw_sulu_tailwind_theme.block_media_ratio_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value=""/>
-                        <param name="values" type="collection">
-                            <param name=""><meta><title>iw_sulu_tailwind_theme.media_ratio_style</title></meta></param>
-                            <param name="1-4"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_4</title></meta></param>
-                            <param name="1-3"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_3</title></meta></param>
-                            <param name="2-5"><meta><title>iw_sulu_tailwind_theme.media_ratio_2_5</title></meta></param>
-                            <param name="1-2"><meta><title>iw_sulu_tailwind_theme.media_ratio_1_2</title></meta></param>
-                            <param name="3-5"><meta><title>iw_sulu_tailwind_theme.media_ratio_3_5</title></meta></param>
-                            <param name="2-3"><meta><title>iw_sulu_tailwind_theme.media_ratio_2_3</title></meta></param>
-                            <param name="3-4"><meta><title>iw_sulu_tailwind_theme.media_ratio_3_4</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-
-                <!--
-                    How the two zones line up vertically, once the taller one
-                    has set the height. Its own field rather than more entries
-                    in the media position: the two axes are independent, and
-                    folding them together would mean a select of every
-                    combination. Same duplication rule as the width split above.
-                -->
-                <property name="zonesAlign" type="single_select" colspan="6"
-                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'split_screen' OR __parent.style == 'sidebar'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.block_zones_align</title>
-                        <info_text>iw_sulu_tailwind_theme.block_zones_align_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value=""/>
-                        <param name="values" type="collection">
-                            <param name=""><meta><title>iw_sulu_tailwind_theme.zones_align_style</title></meta></param>
-                            <param name="start"><meta><title>iw_sulu_tailwind_theme.zones_align_start</title></meta></param>
-                            <param name="center"><meta><title>iw_sulu_tailwind_theme.zones_align_center</title></meta></param>
-                            <param name="end"><meta><title>iw_sulu_tailwind_theme.zones_align_end</title></meta></param>
-                            <param name="stretch"><meta><title>iw_sulu_tailwind_theme.zones_align_stretch</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-
                 <!--
                     Caps the image inside its column, which the column share
                     alone cannot do: a quarter of a wide block is still 300px,
@@ -330,6 +346,9 @@
                         </param>
                     </params>
                 </property>
+
+
+
                 <!--
                     The heading `block-spacing.xml` carries, repeated here because
                     this block composes the group by hand. It names the group and,

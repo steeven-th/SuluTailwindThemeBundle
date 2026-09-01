@@ -17,6 +17,15 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_articles</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="articles" type="smart_content">
                     <meta>
                         <title>iw_sulu_tailwind_theme.block.article_list.source</title>
