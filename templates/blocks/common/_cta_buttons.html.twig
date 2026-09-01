@@ -56,10 +56,15 @@
                         {% set ctaLabel = ctaUrl %}
                     {% endif %}
 
+                    {# Attributes are written as markup, not built as strings inside
+                       `{{ }}`: autoescaping turns the quotes of a concatenated
+                       expression into `&quot;`, which yields `target=&quot;_blank&quot;`
+                       and a link that never opens in a new tab. A literal string
+                       escapes the same way the moment a variable joins it. #}
                     <a href="{{ ctaUrl }}"
                        class="iw-button--{{ cta.style|default('primary') }} iw-block__action"
-                       {{ ctaTarget != '_self' ? 'target="' ~ ctaTarget ~ '"' : '' }}
-                       {{ ctaRel is not empty ? 'rel="' ~ ctaRel ~ '"' : (ctaTarget == '_blank' ? 'rel="noopener noreferrer"' : '') }}
+                       {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
+                       {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                     >
                         {{ ctaLabel }}
                     </a>
