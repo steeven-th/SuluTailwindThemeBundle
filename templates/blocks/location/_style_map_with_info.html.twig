@@ -19,7 +19,8 @@
         {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
         {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '2-3') %}
-        <div class="iw-block-location iw-block-location--map-with-info iw-split-gap iw-split-cols iw-split-cols--from-lg iw-split-cols--reverse {{ splitClass }}">
+        {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'center') %}
+        <div class="iw-block-location iw-block-location--map-with-info iw-split-gap iw-split-cols iw-split-cols--from-lg iw-split-cols--reverse {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}">
             {# Map — 2 columns #}
             <div>
                 <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden h-full min-h-[300px]">

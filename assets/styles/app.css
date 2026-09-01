@@ -336,6 +336,18 @@ a:hover {
     }
 }
 
+/* How the two zones line up vertically. Their own question, not a variant of
+   the horizontal position: a media can sit on the left and still align to the
+   top. Folding the two into one field would have meant a select of every
+   combination, and no way to change one without restating the other.
+
+   The share above decides the columns, this decides what happens to the
+   shorter zone once the taller one has set the height. */
+.iw-split-cols--align-start { align-items: start; }
+.iw-split-cols--align-center { align-items: center; }
+.iw-split-cols--align-end { align-items: end; }
+.iw-split-cols--align-stretch { align-items: stretch; }
+
 .iw-split-cols--1-4 { --iw-split-content: 3fr; --iw-split-media: 1fr; }
 .iw-split-cols--1-3 { --iw-split-content: 2fr; --iw-split-media: 1fr; }
 .iw-split-cols--2-5 { --iw-split-content: 3fr; --iw-split-media: 2fr; }

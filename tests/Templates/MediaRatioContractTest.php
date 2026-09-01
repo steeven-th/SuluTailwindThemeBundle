@@ -80,6 +80,52 @@ final class MediaRatioContractTest extends TestCase
     }
 
     /**
+     * The alignment field travels with the ratio: same four templates, same
+     * condition, since both settings describe the same two-zone grid.
+     */
+    #[Test]
+    #[DataProvider('templatesWithTheField')]
+    public function everyCopyOffersTheSameAlignments(string $path): void
+    {
+        $values = self::selectValues(self::root() . '/' . $path, 'zonesAlign');
+
+        self::assertSame([''], \array_slice($values, 0, 1), 'The first entry must be the empty "follow the style" one.');
+        self::assertSame(ThemeExtension::ZONES_ALIGN_VALUES, \array_slice($values, 1));
+    }
+
+    /**
+     * Every alignment has a rule behind it.
+     */
+    #[Test]
+    public function everyAlignmentHasAClassInTheStylesheet(): void
+    {
+        $css = (string) file_get_contents(self::root() . '/assets/styles/app.css');
+
+        foreach (ThemeExtension::ZONES_ALIGN_VALUES as $value) {
+            self::assertStringContainsString(
+                '.iw-split-cols--align-' . $value . ' {',
+                $css,
+                \sprintf('The %s alignment has no class in app.css.', $value),
+            );
+        }
+    }
+
+    /**
+     * An empty alignment keeps the style's own, same contract as the ratio.
+     */
+    #[Test]
+    public function anEmptyAlignmentKeepsTheStyleOne(): void
+    {
+        $extension = (new \ReflectionClass(ThemeExtension::class))->newInstanceWithoutConstructor();
+
+        self::assertSame('iw-split-cols--align-center', $extension->getZonesAlignClass('', 'center'));
+        self::assertSame('iw-split-cols--align-stretch', $extension->getZonesAlignClass(null, 'stretch'));
+        self::assertSame('iw-split-cols--align-start', $extension->getZonesAlignClass('start', 'center'));
+        self::assertSame('iw-split-cols--align-center', $extension->getZonesAlignClass('bogus', 'center'));
+        self::assertSame('iw-split-cols--align-stretch', $extension->getZonesAlignClass('', 'nonsense'));
+    }
+
+    /**
      * Every step has a rule, so picking one actually moves the columns.
      */
     #[Test]

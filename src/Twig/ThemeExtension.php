@@ -58,6 +58,16 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public const MEDIA_RATIO_STEPS = ['1-4', '1-3', '2-5', '1-2', '3-5', '2-3', '3-4'];
 
     /**
+     * Vertical alignments offered by the two-zone blocks.
+     *
+     * Each one must have a matching `.iw-split-cols--align-*` rule in
+     * `app.css`, which is what `MediaRatioContractTest` guards.
+     *
+     * @var list<string>
+     */
+    public const ZONES_ALIGN_VALUES = ['start', 'center', 'end', 'stretch'];
+
+    /**
      * Sequence backing getUniqueId(), reset between requests by reset().
      */
     private int $uniqueIdCounter = 0;
@@ -122,6 +132,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_media_ratio_class', $this->getMediaRatioClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_zones_align_class', $this->getZonesAlignClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_title_markup', $this->getTitleMarkup(...), [
@@ -830,6 +841,29 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         }
 
         return 'iw-split-cols--' . $value;
+    }
+
+    /**
+     * Class lining up the two zones of a block vertically.
+     *
+     * Same contract as the width split: the editor's value wins, the style's
+     * own alignment takes over when it is empty, so adding the field moves
+     * nothing until somebody asks.
+     *
+     * @param string|null $value    one of `ZONES_ALIGN_VALUES`, from `zonesAlign`
+     * @param string      $fallback the calling style's own alignment
+     *
+     * @return string the modifier class for `.iw-split-cols`
+     */
+    public function getZonesAlignClass(?string $value = null, string $fallback = 'stretch'): string
+    {
+        $value = (string) $value;
+
+        if (!\in_array($value, self::ZONES_ALIGN_VALUES, true)) {
+            $value = \in_array($fallback, self::ZONES_ALIGN_VALUES, true) ? $fallback : 'stretch';
+        }
+
+        return 'iw-split-cols--align-' . $value;
     }
 
     /**

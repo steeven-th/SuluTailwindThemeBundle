@@ -288,7 +288,8 @@
         {% set imageMobileOrder = mobilePos == 'top' ? 'order-1' : 'order-2' %}
 
         {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
-        <div class="iw-block-text-images__grid iw-split-gap iw-split-cols {{ splitClass }}{{ position == 'left' ? ' iw-split-cols--reverse' : '' }} items-center">
+        {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'center') %}
+        <div class="iw-block-text-images__grid iw-split-gap iw-split-cols {{ splitClass }}{{ position == 'left' ? ' iw-split-cols--reverse' : '' }} {{ alignClass }}">
             {# Text column #}
             <div class="{{ textMobileOrder }} {{ position == 'left' ? 'md:order-2' : 'md:order-1' }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {

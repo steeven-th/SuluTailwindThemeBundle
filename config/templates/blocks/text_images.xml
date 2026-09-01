@@ -265,6 +265,31 @@
                 </property>
 
                 <!--
+                    How the two zones line up vertically, once the taller one
+                    has set the height. Its own field rather than more entries
+                    in the media position: the two axes are independent, and
+                    folding them together would mean a select of every
+                    combination. Same duplication rule as the width split above.
+                -->
+                <property name="zonesAlign" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'split_screen' OR __parent.style == 'sidebar'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_zones_align</title>
+                        <info_text>iw_sulu_tailwind_theme.block_zones_align_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.zones_align_style</title></meta></param>
+                            <param name="start"><meta><title>iw_sulu_tailwind_theme.zones_align_start</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.zones_align_center</title></meta></param>
+                            <param name="end"><meta><title>iw_sulu_tailwind_theme.zones_align_end</title></meta></param>
+                            <param name="stretch"><meta><title>iw_sulu_tailwind_theme.zones_align_stretch</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!--
                     Caps the image inside its column, which the column share
                     alone cannot do: a quarter of a wide block is still 300px,
                     far too much for a pictogram. Written out rather than

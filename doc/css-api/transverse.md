@@ -361,6 +361,22 @@ content taking the rest.
 .iw-split-cols--3-4 { --iw-split-content: 1fr; --iw-split-media: 3fr; }
 ```
 
+The vertical alignment is a separate axis, and a separate field. A media can
+sit on the left and still align to the top, so folding the two into one select
+would have meant listing every combination and losing the ability to change one
+without restating the other.
+
+```css
+.iw-split-cols--align-start { align-items: start; }
+.iw-split-cols--align-center { align-items: center; }
+.iw-split-cols--align-end { align-items: end; }
+.iw-split-cols--align-stretch { align-items: stretch; }
+```
+
+Its default per style is what the layout hard-coded before: `center` for
+`classic`, `split_screen` and `map_with_info`, `stretch` for `sidebar` and
+`form/split`.
+
 Two more modifiers carry the rest of the behaviour:
 
 | Class | Role |
@@ -370,13 +386,13 @@ Two more modifiers carry the rest of the behaviour:
 
 **Styles offering the setting, and the share they default to:**
 
-| Block | Style | Media zone | Splits at |
-|-------|-------|-----------|-----------|
-| `text_images` | `classic` | 1/2 | `md` |
-| `text_images` | `split_screen` | 1/2 | `lg` |
-| `text_images` | `sidebar` | 2/5 | `md` |
-| `form` | `split` | 1/2 | `lg` |
-| `location` | `map_with_info` | 2/3 | `lg` |
+| Block | Style | Media zone | Alignment | Splits at |
+|-------|-------|-----------|-----------|-----------|
+| `text_images` | `classic` | 1/2 | center | `md` |
+| `text_images` | `split_screen` | 1/2 | center | `lg` |
+| `text_images` | `sidebar` | 2/5 | stretch | `md` |
+| `form` | `split` | 1/2 | stretch | `lg` |
+| `location` | `map_with_info` | 2/3 | center | `lg` |
 
 An empty value keeps the style's own share, which is what let the setting be
 added to blocks that already ship without moving a single existing page. The
