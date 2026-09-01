@@ -197,6 +197,8 @@
     "iw_sulu_tailwind_theme.media_ratio_2_3": "Zwei Drittel (67 %)",
     "iw_sulu_tailwind_theme.media_ratio_3_4": "Drei Viertel (75 %)",
     "iw_sulu_tailwind_theme.image_max_width_full": "Volle Breite",
+    "iw_sulu_tailwind_theme.image_max_width_3xs": "Symbol (48 px)",
+    "iw_sulu_tailwind_theme.image_max_width_2xs": "Piktogramm (96 px)",
     "iw_sulu_tailwind_theme.image_max_width_xs": "Sehr klein (128 px)",
     "iw_sulu_tailwind_theme.image_max_width_sm": "Klein (192 px)",
     "iw_sulu_tailwind_theme.image_max_width_md": "Mittel (256 px)",

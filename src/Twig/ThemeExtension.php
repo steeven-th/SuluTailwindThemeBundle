@@ -44,7 +44,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @var list<string>
      */
-    public const IMAGE_MAX_WIDTH_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'];
+    public const IMAGE_MAX_WIDTH_STEPS = ['3xs', '2xs', 'xs', 'sm', 'md', 'lg', 'xl'];
 
     /**
      * Media share steps offered by `fragments/block-media-ratio.xml`.

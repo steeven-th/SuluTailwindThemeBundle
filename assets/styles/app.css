@@ -386,11 +386,27 @@ a:hover {
    container, and constraining the container keeps the radius and the ratio
    box in step with it. A project moves the whole scale by redefining these
    five variables once. */
+.iw-imgw--3xs { max-width: var(--iw-imgw-3xs, 3rem); }
+.iw-imgw--2xs { max-width: var(--iw-imgw-2xs, 6rem); }
 .iw-imgw--xs { max-width: var(--iw-imgw-xs, 8rem); }
 .iw-imgw--sm { max-width: var(--iw-imgw-sm, 12rem); }
 .iw-imgw--md { max-width: var(--iw-imgw-md, 16rem); }
 .iw-imgw--lg { max-width: var(--iw-imgw-lg, 24rem); }
 .iw-imgw--xl { max-width: var(--iw-imgw-xl, 32rem); }
+
+/* Centred in whatever holds it. A capped image is narrower than its column, and
+   left alone it would sit against the outer edge with the whole gap between it
+   and the text it illustrates. Splitting that gap reads the same whichever side
+   the media is on, which a "pull it towards the text" rule could not do. */
+.iw-imgw--3xs,
+.iw-imgw--2xs,
+.iw-imgw--xs,
+.iw-imgw--sm,
+.iw-imgw--md,
+.iw-imgw--lg,
+.iw-imgw--xl {
+    margin-inline: auto;
+}
 
 /* ─── Horizontal Rule ───────────────────────────────────────────────────── */
 hr {

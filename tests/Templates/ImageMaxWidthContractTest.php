@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
 use ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -19,18 +20,53 @@ use PHPUnit\Framework\TestCase;
 final class ImageMaxWidthContractTest extends TestCase
 {
     /**
-     * The steps the fragment offers, minus the empty "no constraint" entry.
+     * Every place the field is declared.
+     *
+     * The fragment covers blocks that offer it on every style. A block that
+     * only offers it on some styles writes the property out instead, because a
+     * `visibleCondition` cannot ride on an `xi:include`, and those copies are
+     * exactly what drifts.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function declarations(): array
+    {
+        return [
+            'fragment' => ['config/templates/fragments/block-image-max-width.xml'],
+            'text_images' => ['config/templates/blocks/text_images.xml'],
+        ];
+    }
+
+    /**
+     * Each declaration offers the steps the extension knows, in order.
      */
     #[Test]
-    public function theFragmentOffersTheStepsTheExtensionKnows(): void
+    #[DataProvider('declarations')]
+    public function everyDeclarationOffersTheStepsTheExtensionKnows(string $path): void
     {
-        $values = self::selectValues(
-            self::root() . '/config/templates/fragments/block-image-max-width.xml',
-            'imageMaxWidth',
-        );
+        $values = self::selectValues(self::root() . '/' . $path, 'imageMaxWidth');
 
         self::assertSame([''], \array_slice($values, 0, 1), 'The first entry must be the empty "full width" one.');
         self::assertSame(ThemeExtension::IMAGE_MAX_WIDTH_STEPS, \array_slice($values, 1));
+    }
+
+    /**
+     * A capped image is centred in what holds it.
+     *
+     * Without this it would sit against the outer edge with the whole gap
+     * between it and the text it illustrates, which is worse than not capping
+     * it at all.
+     */
+    #[Test]
+    public function aCappedImageIsCentred(): void
+    {
+        $css = (string) file_get_contents(self::root() . '/assets/styles/app.css');
+
+        self::assertMatchesRegularExpression(
+            '/\.iw-imgw--xl,?\s*\{\s*margin-inline: auto;/s',
+            $css,
+            'The capped steps must share a rule centring them in their column.',
+        );
     }
 
     /**

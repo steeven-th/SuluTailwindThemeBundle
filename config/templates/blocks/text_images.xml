@@ -263,6 +263,37 @@
                         </param>
                     </params>
                 </property>
+
+                <!--
+                    Caps the image inside its column, which the column share
+                    alone cannot do: a quarter of a wide block is still 300px,
+                    far too much for a pictogram. Written out rather than
+                    included from `fragments/block-image-max-width.xml` because
+                    it only applies where the image is a thumbnail in a column,
+                    and a condition cannot ride on an xi:include. split_screen
+                    is left out on purpose, its image being a full-height
+                    cover. Mirror any change made to the fragment.
+                -->
+                <property name="imageMaxWidth" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'classic' OR __parent.style == 'sidebar'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_image_max_width</title>
+                        <info_text>iw_sulu_tailwind_theme.block_image_max_width_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_full</title></meta></param>
+                            <param name="3xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_3xs</title></meta></param>
+                            <param name="2xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_2xs</title></meta></param>
+                            <param name="xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_xs</title></meta></param>
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.image_max_width_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.image_max_width_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.image_max_width_lg</title></meta></param>
+                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.image_max_width_xl</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <xi:include href="../fragments/block-margins.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <!-- Same field as `block-lateral-margins.xml`, kept inline for the

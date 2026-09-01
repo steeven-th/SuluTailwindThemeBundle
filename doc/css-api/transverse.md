@@ -420,12 +420,25 @@ image keeps the full width of whatever holds it, exactly like a block that does
 not offer the field.
 
 ```css
+.iw-imgw--3xs { max-width: var(--iw-imgw-3xs, 3rem); }   /* icon */
+.iw-imgw--2xs { max-width: var(--iw-imgw-2xs, 6rem); }   /* pictogram */
 .iw-imgw--xs { max-width: var(--iw-imgw-xs, 8rem); }
 .iw-imgw--sm { max-width: var(--iw-imgw-sm, 12rem); }
 .iw-imgw--md { max-width: var(--iw-imgw-md, 16rem); }
 .iw-imgw--lg { max-width: var(--iw-imgw-lg, 24rem); }
 .iw-imgw--xl { max-width: var(--iw-imgw-xl, 32rem); }
 ```
+
+Every capped step also carries `margin-inline: auto`. A capped image is
+narrower than its column, and left alone it sits against the outer edge with
+the whole gap between it and the text it illustrates, which is worse than not
+capping it. Splitting that gap reads the same whichever side the media is on.
+
+**It composes with the width split.** They answer different questions: the
+split decides how wide the column is, the cap decides how much of it the image
+fills. A pictogram beside a paragraph usually wants both, a quarter of the
+block and a 96px image inside it, because a quarter of a wide block is still
+300px.
 
 The class goes on the element wrapping the image, not on the `<img>`: the image
 partial sizes the picture to its container, so capping the container keeps the
@@ -441,8 +454,10 @@ radius and the ratio box in step with it.
 .iw-block-timeline .iw-imgw--md { max-width: 10rem; }
 ```
 
-Offered today by the timeline block. Adding it to another block is two lines:
-the `xi:include` in its `settings` section, and the class on the wrapper.
+Offered by the timeline block on every style, through the fragment, and by
+`text_images` on `classic` and `sidebar`, written out because it needs a
+condition. Adding it to a block that offers it everywhere is two lines: the
+`xi:include` in its `settings` section, and the class on the wrapper.
 
 ---
 
