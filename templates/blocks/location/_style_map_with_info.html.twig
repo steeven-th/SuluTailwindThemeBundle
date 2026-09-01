@@ -18,9 +18,10 @@
         {% set zoom = location.zoom|default(15) %}
         {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
-        <div class="iw-block-location iw-block-location--map-with-info iw-split-gap grid grid-cols-1 lg:grid-cols-3">
+        {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '2-3') %}
+        <div class="iw-block-location iw-block-location--map-with-info iw-split-gap iw-split-cols iw-split-cols--from-lg iw-split-cols--reverse {{ splitClass }}">
             {# Map — 2 columns #}
-            <div class="lg:col-span-2">
+            <div>
                 <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden h-full min-h-[300px]">
                     {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                         location: location,
@@ -32,7 +33,7 @@
             </div>
 
             {# Info sidebar — 1 column #}
-            <div class="iw-block-location__info lg:col-span-1 space-y-6">
+            <div class="iw-block-location__info space-y-6">
                 {% if formattedAddress is not empty %}
                     <div class="iw-block-location__address {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} p-5">
                         <span class="iw-block-location__address-label block font-semibold mb-2 flex items-center gap-2 text-[var(--iw-variant-title-color,inherit)]">

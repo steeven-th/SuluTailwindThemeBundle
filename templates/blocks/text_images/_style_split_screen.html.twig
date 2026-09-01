@@ -80,7 +80,8 @@
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    <div class="iw-block-text-images__grid iw-split-gap grid grid-cols-1 lg:grid-cols-2">
+    {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
+    <div class="iw-block-text-images__grid iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ not isRight ? ' iw-split-cols--reverse' : '' }}">
         {# Image side — full-height cover with slider support.
            Custom rendering (not _image_slider partial) because images must fill
            the full grid cell height with no aspect-ratio constraint. #}

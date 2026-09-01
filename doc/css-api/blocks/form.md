@@ -94,14 +94,25 @@ In `--centered` and `--card` the space between the titles and the form follows t
 
 ### Switch the split columns ratio (wider form, narrower info)
 
+This is now a setting: **Appearance > Width split**, on the `--split` style. It
+offers the widget zone a quarter, a third, two fifths, half, three fifths, two
+thirds or three quarters of the block.
+
+Only reach for CSS when you need a share the admin does not offer:
+
 ```css
 .iw-block-form--split {
-    grid-template-columns: 1fr;
-}
-
-@media (min-width: 1024px) {
-    .iw-block-form--split {
-        grid-template-columns: 1fr 2fr;
-    }
+    --iw-split-content: 2fr;
+    --iw-split-media: 1fr;
 }
 ```
+
+Overriding the two variables rather than `grid-template-columns` keeps the
+stacking below `lg` and the reverse modifier working. See
+[transverse.md](../transverse.md#split-blocks-sharing-the-width).
+
+## Width split
+
+The two zones of this block share their width through the shared
+`.iw-split-cols` system, and the layout style sets the default share. See
+[transverse.md](../transverse.md#split-blocks-sharing-the-width).

@@ -341,6 +341,71 @@ a block type that ships no `maxWidth` field at all stays out entirely.
 
 ---
 
+## Split blocks: sharing the width
+
+`.iw-split-gap` above spaces the two zones of a block, `.iw-split-cols` sizes
+them. Until 3.0 the share was a property of the layout style, hard-coded as
+Tailwind columns, so a picture beside a paragraph was locked at half the block
+whether it was a photograph or a 40px pictogram.
+
+The steps name the share taken by the **media** zone (image, map, panel), the
+content taking the rest.
+
+```css
+.iw-split-cols--1-4 { --iw-split-content: 3fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-3 { --iw-split-content: 2fr; --iw-split-media: 1fr; }
+.iw-split-cols--2-5 { --iw-split-content: 3fr; --iw-split-media: 2fr; }
+.iw-split-cols--1-2 { --iw-split-content: 1fr; --iw-split-media: 1fr; }
+.iw-split-cols--3-5 { --iw-split-content: 2fr; --iw-split-media: 3fr; }
+.iw-split-cols--2-3 { --iw-split-content: 1fr; --iw-split-media: 2fr; }
+.iw-split-cols--3-4 { --iw-split-content: 1fr; --iw-split-media: 3fr; }
+```
+
+Two more modifiers carry the rest of the behaviour:
+
+| Class | Role |
+|-------|------|
+| `.iw-split-cols--reverse` | Swaps the two columns. The zones keep their DOM order and the templates flip them visually with `order`, so without this the media would land in the column sized for the content whenever it sits on the left. |
+| `.iw-split-cols--from-lg` | Splits at `lg` instead of `md`. The styles never agreed on one breakpoint: a paragraph beside a picture splits early, a form or a map needs more room first. |
+
+**Styles offering the setting, and the share they default to:**
+
+| Block | Style | Media zone | Splits at |
+|-------|-------|-----------|-----------|
+| `text_images` | `classic` | 1/2 | `md` |
+| `text_images` | `split_screen` | 1/2 | `lg` |
+| `text_images` | `sidebar` | 2/5 | `md` |
+| `form` | `split` | 1/2 | `lg` |
+| `location` | `map_with_info` | 2/3 | `lg` |
+
+An empty value keeps the style's own share, which is what let the setting be
+added to blocks that already ship without moving a single existing page. The
+Twig side takes that default as its second argument:
+
+```twig
+{% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '2-5') %}
+<div class="iw-split-gap iw-split-cols {{ splitClass }}">
+```
+
+**Override examples:**
+
+```css
+/* A share the admin does not offer, for one block type */
+.iw-block-location .iw-split-cols { --iw-split-media: 4fr; --iw-split-content: 1fr; }
+
+/* Keep a block's zones side by side on small screens too */
+@media (max-width: 47.99rem) {
+    .my-page .iw-block-form--split { grid-template-columns: 1fr 1fr; }
+}
+```
+
+The field is written out in each block rather than pulled from a fragment: it
+only applies to the styles that have two zones, and a `visibleCondition`
+cannot ride on an `xi:include`. `MediaRatioContractTest` keeps the four copies
+in step.
+
+---
+
 ## Image maximum width
 
 A block-wide cap on the images a block renders, offered by the
