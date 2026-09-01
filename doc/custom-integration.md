@@ -311,6 +311,37 @@ for content that is already published.
 Order inside `settings`: the block's own settings first, then the shared group
 of spacing, radius and background.
 
+### Rows and headings
+
+Sulu lays fields out on a twelve column grid, filling rows as it goes, so two
+`colspan="6"` fields share a row. An odd number of them pushes every pair below
+out of step, and a margin selector full of boxes ends up beside a plain select.
+
+The count cannot be balanced by hand, because `visibleCondition` changes it at
+runtime: a block that pairs up under one style comes out shifted under another.
+What holds is a full-width field between groups, which closes the row whatever
+came before. Sulu's native `heading` field does that and names the group at the
+same time:
+
+```xml
+<property name="spacingHeading" type="heading">
+    <params>
+        <param name="label">
+            <meta><title>iw_sulu_tailwind_theme.settings_group_spacing</title></meta>
+        </param>
+    </params>
+</property>
+```
+
+`block-spacing.xml` and `block-radius.xml` open with theirs, so a block
+including them gets the reset for free. A block composing the group by hand has
+to repeat the heading, which is what `text_images` does.
+
+Two fields on the same row should also render at the same height. A select and
+a checkbox pair well, a select and a margin selector do not.
+`FormLayoutContractTest` walks the resolved templates and fails on any row
+mixing the two.
+
 `BlockSectionsContractTest` enforces all of this on every block the bundle
 ships, both what Appearance may hold and what Content may hold.
 

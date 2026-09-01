@@ -16,6 +16,22 @@
 -->
 <properties xmlns="http://schemas.sulu.io/template/template"
             xmlns:xi="http://www.w3.org/2001/XInclude">
+    <!--
+        A heading, and a deliberate one: it names the group, and it spans the
+        full width, which resets the two-column grid. Without that reset an odd
+        number of half-width fields above pushes every pair below out of step,
+        and a margin selector full of boxes ends up beside a plain select. The
+        count above cannot be fixed by hand either, since visibility conditions
+        change it at runtime.
+    -->
+    <property name="spacingHeading" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.settings_group_spacing</title></meta>
+            </param>
+        </params>
+    </property>
+
     <xi:include href="block-margins.xml"
                 xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
     <xi:include href="block-lateral-margins.xml"

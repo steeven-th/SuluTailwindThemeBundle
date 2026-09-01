@@ -286,6 +286,8 @@
     "iw_sulu_tailwind_theme.content": "Content",
     "iw_sulu_tailwind_theme.appearance": "Appearance",
     "iw_sulu_tailwind_theme.settings": "Settings",
+    "iw_sulu_tailwind_theme.settings_group_spacing": "Spacing",
+    "iw_sulu_tailwind_theme.settings_group_radius": "Corner radius",
 
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Exterior",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Interior",

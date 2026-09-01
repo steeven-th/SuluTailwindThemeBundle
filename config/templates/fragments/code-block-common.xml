@@ -114,7 +114,7 @@
         </meta>
     </property>
 
-    <property name="consentText" type="text_area" colspan="6"
+    <property name="consentText" type="text_area"
               visibleCondition="__parent.consentMode != 'none'">
         <meta>
             <title>iw_sulu_tailwind_theme.consent_text</title>

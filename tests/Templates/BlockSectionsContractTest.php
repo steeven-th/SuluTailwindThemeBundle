@@ -133,6 +133,25 @@ final class BlockSectionsContractTest extends TestCase
     ];
 
     /**
+     * Options that qualify one authored field, and stay next to it.
+     *
+     * The test is what an editor does, not what the field looks like: a
+     * heading level and its alignment are chosen while writing the title, the
+     * button alignment while adding the buttons. A margin or an image position
+     * is adjusted afterwards, on the block as a whole, and belongs to Settings.
+     *
+     * @var list<string>
+     */
+    private const FIELD_OPTIONS = ['titleTag', 'titleAlignment', 'ctaAlignment', 'ctaDirection'];
+
+    /**
+     * Layout helpers, which hold no value at all.
+     *
+     * @var list<string>
+     */
+    private const LAYOUT_TYPES = ['heading'];
+
+    /**
      * Content holds what the editor writes, plus the switches that decide
      * which of those fields appear. A position, an alignment, a gap or a
      * display toggle is a setting, wherever it feels natural to put it.
@@ -141,19 +160,33 @@ final class BlockSectionsContractTest extends TestCase
     #[DataProvider('blockTemplates')]
     public function contentHoldsOnlyAuthoredFieldsAndSwitches(string $path): void
     {
-        $source = (string) file_get_contents($path);
+        // Resolved, so the fields a fragment brings are seen too: reading the
+        // raw file would miss the heading group and the button options.
+        $document = new \DOMDocument();
+        self::assertTrue($document->load($path));
+        self::assertNotFalse($document->xinclude());
 
-        if (1 !== preg_match('/<section name="content">(.*?)\n        <\/section>/s', $source, $matches)) {
+        $xpath = new \DOMXPath($document);
+        $xpath->registerNamespace('sulu', 'http://schemas.sulu.io/template/template');
+
+        $fields = $xpath->query('//sulu:section[@name="content"]/sulu:properties/sulu:property');
+        self::assertNotFalse($fields);
+
+        if (0 === $fields->count()) {
             self::markTestSkipped(basename($path) . ' has no content section.');
         }
 
-        // Fields inside a repeatable block are outside the section system.
-        $section = preg_replace('/<block name="\w+".*?<\/block>/s', '', $matches[1]) ?? '';
-
         $misplaced = [];
-        preg_match_all('/<property name="(\w+)" type="([\w_]+)"/', $section, $properties, PREG_SET_ORDER);
-        foreach ($properties as [, $name, $type]) {
-            if (\in_array($type, self::CONTENT_TYPES, true) || \in_array($name, self::SWITCHES, true)) {
+        foreach ($fields as $field) {
+            \assert($field instanceof \DOMElement);
+            $name = $field->getAttribute('name');
+            $type = $field->getAttribute('type');
+
+            if (\in_array($type, self::CONTENT_TYPES, true)
+                || \in_array($type, self::LAYOUT_TYPES, true)
+                || \in_array($name, self::SWITCHES, true)
+                || \in_array($name, self::FIELD_OPTIONS, true)
+            ) {
                 continue;
             }
             $misplaced[] = $name;
@@ -163,7 +196,7 @@ final class BlockSectionsContractTest extends TestCase
             [],
             $misplaced,
             \sprintf(
-                '%s keeps settings in Content: %s. Move them to Settings, or add them to SWITCHES if they decide which content fields appear.',
+                '%s keeps settings in Content: %s. Move them to Settings, or list them as a SWITCH if they decide which content fields appear, or as a FIELD_OPTION if they qualify one authored field.',
                 basename($path),
                 implode(', ', $misplaced),
             ),

@@ -278,6 +278,8 @@
     "iw_sulu_tailwind_theme.content": "Inhalt",
     "iw_sulu_tailwind_theme.appearance": "Darstellung",
     "iw_sulu_tailwind_theme.settings": "Einstellungen",
+    "iw_sulu_tailwind_theme.settings_group_spacing": "Abstände",
+    "iw_sulu_tailwind_theme.settings_group_radius": "Eckenradius",
 
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Außen",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Innen",
