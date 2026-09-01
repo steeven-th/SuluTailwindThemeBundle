@@ -18,7 +18,11 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 | `.iw-block-timeline--alternate` | Centred line, cards alternating left and right from `md`. Falls back to `--left` below. |
 | `.iw-block-timeline--left` | Line on the left, every card on its right. The base layout, and the fallback of the other three on small screens. |
 | `.iw-block-timeline--right` | Mirror of `--left`. |
-| `.iw-block-timeline--horizontal` | Steps side by side along a horizontal track from `md`, scrolling sideways on overflow. Falls back to `--left` below. |
+| `.iw-block-timeline--horizontal` | Steps side by side along a horizontal track from `md`. A real scroll container driven by the shared `slider` controller, with the native scrollbar hidden and arrows instead. Falls back to `--left` below `md`. |
+| `.iw-block-timeline--per-2` / `--per-3` / `--per-4` | How many steps share the width, from `lg`. Between `md` and `lg` the count drops to two whatever was picked. Horizontal only. |
+| `.iw-block-timeline--button-primary` / `--secondary` / `--accent` | Arrow accent, mirroring the variant's own button style. Horizontal only. |
+| `.iw-block-timeline__nav` | The arrow row. Hidden unless the layout is horizontal. |
+| `.iw-block-timeline__nav-button` / `__nav-icon` | Previous and next arrows. |
 | `.iw-block-timeline__line` | The line itself. Inset by half a marker at both ends so it stops at the first and last markers. Hidden in `--horizontal`, which draws segments between markers instead. |
 | `.iw-block-timeline__intro` | Optional rich text between the titles and the steps. |
 
@@ -50,9 +54,21 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 |----------|---------|
 | `--iw-timeline-line-color` | `var(--iw-variant-hr-color, var(--color-primary))` |
 | `--iw-timeline-line-width` | `2px` |
-| `--iw-timeline-gap` | `2rem` — vertical space between steps |
+| `--iw-timeline-gap` | `2rem` — space between steps, vertical and horizontal alike |
 | `--iw-timeline-marker-gap` | `1.5rem` — space between the marker and its card |
-| `--iw-timeline-step-width` | `18rem` — width of a step in `--horizontal` |
+| `--iw-timeline-per-view` | `3` — steps sharing the width in `--horizontal`, set by the `--per-*` modifier |
+
+### Arrows (horizontal only)
+
+| Variable | Default |
+|----------|---------|
+| `--iw-timeline-nav-accent` | the variant's button colour, set by the `--button-*` modifier |
+| `--iw-timeline-nav-size` | `2.5rem` |
+| `--iw-timeline-nav-icon-size` | `1.25rem` |
+| `--iw-timeline-nav-gap` | `0.5rem` |
+| `--iw-timeline-nav-margin-bottom` | `1rem` |
+| `--iw-timeline-nav-bg` / `--iw-timeline-nav-bg-hover` | the accent at 15% / 30% |
+| `--iw-timeline-nav-color` | the accent |
 
 ### Marker
 
@@ -123,3 +139,7 @@ The line is positioned from `--iw-timeline-marker-size`, so both stay aligned on
 **SVG pictograms.** The shared image partial deliberately emits no `avif` or `webp` `<source>` for a vector. Sulu exposes those thumbnail keys for an SVG like it does for anything else, but requesting one asks the image converter to rasterize a vector and it answers `500`. Nothing is lost: a vector is already smaller than any raster of it.
 
 **Marker content.** Which of the icon, the number or the date the marker holds is decided once for the whole block, in the admin. A pictogram set on a step is never lost: it moves into the card when the marker holds something else.
+
+**The horizontal track scrolls on its own.** The arrows call the shared `slider` controller, but the track is a plain scroll container with `scroll-snap`, so a trackpad, a touch swipe and the keyboard work with or without JavaScript. Hiding the scrollbar is therefore a visual choice, not a way of taking control away.
+
+**How many steps in view.** Four columns of rich text end up narrow and metres tall, so the count is the editor's to match to the content. It applies from `lg` only, drops to two between `md` and `lg`, and means nothing below, where the layout is vertical.

@@ -175,6 +175,28 @@
                         <param name="block_type" value="timeline"/>
                     </params>
                 </property>
+
+                <!--
+                    Horizontal only: how many steps share the width. Four steps
+                    of rich text turn into four narrow columns metres tall, so
+                    the count is the editor's to match to the content rather
+                    than a fixed width the layout imposes.
+                -->
+                <property name="stepsPerView" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'horizontal'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.timeline_steps_per_view</title>
+                        <info_text>iw_sulu_tailwind_theme.timeline_steps_per_view_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="3"/>
+                        <param name="values" type="collection">
+                            <param name="2"><meta><title>iw_sulu_tailwind_theme.timeline_steps_per_view_2</title></meta></param>
+                            <param name="3"><meta><title>iw_sulu_tailwind_theme.timeline_steps_per_view_3</title></meta></param>
+                            <param name="4"><meta><title>iw_sulu_tailwind_theme.timeline_steps_per_view_4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
             </properties>
         </section>
 

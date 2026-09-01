@@ -2115,25 +2115,96 @@ img.object-cover {
 }
 
 /* ── Layout: --horizontal ──
-   Steps read as stages side by side. The shared line is dropped for segments
-   drawn between markers, because the track scrolls and an absolutely
-   positioned line would stay behind. */
+   Steps read as stages side by side, in a real scroll container driven by the
+   shared `slider` controller. The native scrollbar is hidden and replaced by
+   arrows, but the track stays scrollable on its own: a trackpad, a swipe and
+   the keyboard keep working with the JavaScript disabled.
+
+   How many steps share the width is the editor's choice, because four columns
+   of rich text end up narrow and metres tall. Below `lg` the count drops to
+   two whatever was picked, and below `md` the layout falls back to the
+   vertical one inherited above. */
+.iw-block-timeline--per-2 { --iw-timeline-per-view: 2; }
+.iw-block-timeline--per-3 { --iw-timeline-per-view: 3; }
+.iw-block-timeline--per-4 { --iw-timeline-per-view: 4; }
+
+/* Arrow accent, from the variant's own button style, so the arrows match the
+   call-to-action buttons under them. */
+.iw-block-timeline--button-primary {
+    --iw-timeline-nav-accent: var(--btn-primary-bg, var(--color-primary));
+}
+
+.iw-block-timeline--button-secondary {
+    --iw-timeline-nav-accent: var(--btn-secondary-bg, var(--color-secondary));
+}
+
+.iw-block-timeline--button-accent {
+    --iw-timeline-nav-accent: var(--btn-accent-bg, var(--color-accent));
+}
+
+/* Hidden until the layout is actually horizontal: the other three scroll with
+   the page and have nothing to page through. */
+.iw-block-timeline__nav {
+    display: none;
+}
+
+.iw-block-timeline__nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--iw-timeline-nav-size, 2.5rem);
+    height: var(--iw-timeline-nav-size, 2.5rem);
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    background-color: var(--iw-timeline-nav-bg, color-mix(in srgb, var(--iw-timeline-nav-accent, var(--btn-primary-bg, var(--color-primary))) 15%, transparent));
+    color: var(--iw-timeline-nav-color, var(--iw-timeline-nav-accent, var(--btn-primary-bg, var(--color-primary))));
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.iw-block-timeline__nav-button:hover {
+    background-color: var(--iw-timeline-nav-bg-hover, color-mix(in srgb, var(--iw-timeline-nav-accent, var(--btn-primary-bg, var(--color-primary))) 30%, transparent));
+}
+
+.iw-block-timeline__nav-icon {
+    width: var(--iw-timeline-nav-icon-size, 1.25rem);
+    height: var(--iw-timeline-nav-icon-size, 1.25rem);
+}
+
 @media (min-width: 768px) {
     .iw-block-timeline--horizontal .iw-block-timeline__line {
         display: none;
     }
 
+    .iw-block-timeline--horizontal .iw-block-timeline__nav {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--iw-timeline-nav-gap, 0.5rem);
+        margin-bottom: var(--iw-timeline-nav-margin-bottom, 1rem);
+    }
+
     .iw-block-timeline--horizontal .iw-timeline {
         flex-direction: row;
         overflow-x: auto;
-        padding-bottom: 0.5rem;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
     }
 
+    /* Each step takes an equal share of the width, gaps deducted, so the count
+       is what the editor picked rather than a consequence of the viewport. */
     .iw-block-timeline--horizontal .iw-timeline-step {
-        flex: 0 0 var(--iw-timeline-step-width, 18rem);
+        flex: 0 0 calc(
+            (100% - (var(--iw-timeline-per-view, 3) - 1) * var(--iw-timeline-gap, 2rem))
+            / var(--iw-timeline-per-view, 3)
+        );
         flex-direction: column;
         align-items: stretch;
         gap: 0;
+        scroll-snap-align: start;
+    }
+
+    .iw-block-timeline--horizontal .iw-timeline-step__card {
+        flex: 1 1 auto;
     }
 
     /* The segment reaching the next marker. Drawn from the marker row so it
@@ -2148,7 +2219,7 @@ img.object-cover {
         position: absolute;
         top: calc(var(--iw-timeline-marker-size, 3rem) / 2);
         left: calc(var(--iw-timeline-marker-size, 3rem) / 2);
-        right: 0;
+        right: calc(var(--iw-timeline-gap, 2rem) * -1);
         height: var(--iw-timeline-line-width, 2px);
         transform: translateY(calc(var(--iw-timeline-line-width, 2px) / -2));
         background-color: var(--iw-timeline-line-color, var(--iw-variant-hr-color, var(--color-primary)));
@@ -2156,6 +2227,14 @@ img.object-cover {
 
     .iw-block-timeline--horizontal .iw-timeline-step:last-child::before {
         display: none;
+    }
+}
+
+/* Two at a time between md and lg: three columns of text are already tight on
+   a tablet. Placed after the choice above so it wins on equal specificity. */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .iw-block-timeline--horizontal {
+        --iw-timeline-per-view: 2;
     }
 }
 

@@ -27,6 +27,8 @@
     {% include '@ItechWorldSuluTailwindTheme/blocks/timeline/_steps.html.twig' with {
         layout: 'right',
         steps: steps|default([]),
+        stepsPerView: stepsPerView|default('3'),
+        variant: variant|default(null),
         stepsView: stepsView,
         dotContent: dotContent|default('icon'),
         dateMode: dateMode|default('text'),
