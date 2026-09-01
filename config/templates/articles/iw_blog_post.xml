@@ -22,18 +22,8 @@
 
     <properties>
         <!-- Header -->
-        <property name="title" type="text_line" mandatory="true">
-            <meta><title>iw_sulu_tailwind_theme.title</title></meta>
-            <params>
-                <param name="headline" value="true"/>
-            </params>
-            <tag name="sulu.rlp.part"/>
-        </property>
-
-        <property name="url" type="page_tree_route">
-            <meta><title>iw_sulu_tailwind_theme.url</title></meta>
-            <tag name="sulu.rlp"/>
-        </property>
+        <xi:include href="../fragments/article-header.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
         <!-- Hero section -->
         <section name="hero">
@@ -65,28 +55,8 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.article.section_content</title></meta>
             <properties>
-                <block name="blocks" default-type="text" minOccurs="0">
-                    <meta><title>iw_sulu_tailwind_theme.content_blocks</title></meta>
-                    <types>
-                        <type ref="text"/>
-                        <type ref="text_images"/>
-                        <type ref="gallery"/>
-                        <type ref="key_figures"/>
-                        <type ref="linked_pages"/>
-                        <type ref="location"/>
-                        <type ref="form"/>
-                        <type ref="document"/>
-                        <type ref="testimonial"/>
-                        <type ref="accordion"/>
-                        <type ref="iframe"/>
-                        <type ref="code"/>
-                        <type ref="separator"/>
-                        <type ref="article_carousel"/>
-                        <type ref="article_featured"/>
-                        <type ref="article_list"/>
-
-                    </types>
-                </block>
+                <xi:include href="../fragments/page-blocks.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
             </properties>
         </section>
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: corner radius of the text surface inside a block.
+
+    The third radius context, for the panel a paragraph sits on when the
+    layout gives text its own background, as in the split styles.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="paragraphRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.paragraph_radius</title></meta>
+        <params>
+            <param name="theme_key" value="paragraphRadius"/>
+        </params>
+    </property>
+</properties>

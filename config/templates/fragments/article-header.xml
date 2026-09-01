@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: title and URL of an article.
+
+    Same title as a page, but the route is a `page_tree_route`: an article
+    lives under a page of the site tree, and its URL is built from the parent
+    page the editor picks. It is not mandatory, so an article can be drafted
+    before its place in the tree is decided.
+
+    Include it first in an article template's properties:
+
+        <xi:include href="../fragments/article-header.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="page-title.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <property name="url" type="page_tree_route">
+        <meta><title>iw_sulu_tailwind_theme.url</title></meta>
+        <tag name="sulu.rlp"/>
+    </property>
+</properties>

@@ -22,18 +22,8 @@
     </meta>
 
     <properties>
-        <property name="title" type="text_line" mandatory="true">
-            <meta><title>iw_sulu_tailwind_theme.title</title></meta>
-            <params>
-                <param name="headline" value="true"/>
-            </params>
-            <tag name="sulu.rlp.part"/>
-        </property>
-
-        <property name="url" type="route" mandatory="true">
-            <meta><title>iw_sulu_tailwind_theme.url</title></meta>
-            <tag name="sulu.rlp"/>
-        </property>
+        <xi:include href="../fragments/page-header.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
         <!-- Hero section: same banner as a regular page, so a listing does not
              look like a different site. Its appearance comes from the site-wide

@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: corner radius of the images a block renders.
+
+    Images get their own context because a rounded card with square pictures
+    inside is a deliberate look, and the theme default for images is usually
+    tighter than the card one.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="imageRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.image_radius</title></meta>
+        <params>
+            <param name="theme_key" value="imageRadius"/>
+        </params>
+    </property>
+</properties>

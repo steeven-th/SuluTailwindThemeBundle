@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: colour variant of a block.
+
+    The variant names a role in the theme palette rather than a colour, so the
+    same block follows whichever palette the site is running. It shares its row
+    with the layout style picker, which stays in each block because it is
+    filtered by block type.
+
+    It opens the `appearance` section:
+
+        <xi:include href="../fragments/block-variant.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="variant" type="iw_theme_variant_picker" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
+    </property>
+</properties>

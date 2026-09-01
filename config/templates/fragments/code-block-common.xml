@@ -11,7 +11,8 @@
     Everything except that checkbox lives here, so the two variants cannot
     drift apart.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template">
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
     <property name="heightMode" type="single_select" colspan="6">
         <meta>
             <title>iw_sulu_tailwind_theme.embed_height_mode</title>
@@ -121,72 +122,15 @@
         </meta>
     </property>
 
-    <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
-        <params>
-            <param name="default_value" value="mt-5"/>
-        </params>
-    </property>
+    <xi:include href="block-spacing.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-    <property name="marginBottom" type="iw_theme_margin_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.margin_bottom</title></meta>
-        <params>
-            <param name="default_value" value="mb-5"/>
-        </params>
-    </property>
+    <xi:include href="block-radius.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-    <property name="lateralMargins" type="single_select">
-        <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
-        <params>
-            <param name="default_value" value="exterior"/>
-            <param name="values" type="collection">
-                <param name="exterior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_exterior</title></meta></param>
-                <param name="interior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_interior</title></meta></param>
-                <param name="none"><meta><title>iw_sulu_tailwind_theme.lateral_margins_none</title></meta></param>
-            </param>
-        </params>
-    </property>
+    <xi:include href="block-card-radius.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-    <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
-        <params>
-            <param name="default_value" value="pt-5"/>
-        </params>
-    </property>
-
-    <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.padding_bottom</title></meta>
-        <params>
-            <param name="default_value" value="pb-5"/>
-        </params>
-    </property>
-
-    <property name="paddingLateral" type="iw_theme_margin_selector">
-        <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
-        <params>
-            <param name="prefix" value="px"/>
-            <param name="default_value" value="px-5"/>
-        </params>
-    </property>
-
-    <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
-        <params>
-            <param name="theme_key" value="cardRadius"/>
-        </params>
-    </property>
-
-    <property name="cardRadius" type="iw_theme_radius_selector" colspan="6">
-        <meta><title>iw_sulu_tailwind_theme.card_radius</title></meta>
-        <params>
-            <param name="theme_key" value="cardRadius"/>
-        </params>
-    </property>
-
-    <property name="showBackground" type="checkbox">
-        <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
-        <params>
-            <param name="default_value" value="true"/>
-        </params>
-    </property>
+    <xi:include href="block-background.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 </properties>

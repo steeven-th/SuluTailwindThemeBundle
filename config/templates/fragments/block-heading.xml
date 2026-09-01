@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: the heading group opening almost every block.
+
+    Title, subtitle, heading level and alignment always travel together, so a
+    block only has to declare what makes it different. The title fields use
+    `iw_theme_title_editor`, which lets an editor mark words with [[brackets]]
+    to have them picked up by the theme accent colour.
+
+    Include it first in a block's `content` section:
+
+        <xi:include href="../fragments/block-heading.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    Blocks whose titles must stay plain text use `block-heading-plain.xml`
+    instead, then pull the level and alignment from their own fragments.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <property name="title" type="iw_theme_title_editor">
+        <meta>
+            <title>iw_sulu_tailwind_theme.title</title>
+            <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+        </meta>
+        <params>
+            <param name="context" value="blocks"/>
+        </params>
+    </property>
+    <property name="subTitle" type="iw_theme_title_editor">
+        <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+        <params>
+            <param name="context" value="blocks"/>
+        </params>
+    </property>
+    <xi:include href="block-title-tag.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <xi:include href="block-title-alignment.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+</properties>

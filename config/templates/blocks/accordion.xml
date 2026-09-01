@@ -15,46 +15,8 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
-                <property name="title" type="iw_theme_title_editor">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.title</title>
-                        <info_text>iw_sulu_tailwind_theme.title_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="context" value="blocks"/>
-                    </params>
-                </property>
-                <property name="subTitle" type="iw_theme_title_editor">
-                    <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
-                    <params>
-                        <param name="context" value="blocks"/>
-                    </params>
-                </property>
-                <property name="titleTag" type="single_select">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.title_level</title>
-                        <info_text>iw_sulu_tailwind_theme.title_level_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="h2"/>
-                        <param name="values" type="collection">
-                            <param name="h2"><meta><title>iw_sulu_tailwind_theme.title_level_h2</title></meta></param>
-                            <param name="h3"><meta><title>iw_sulu_tailwind_theme.title_level_h3</title></meta></param>
-                            <param name="h4"><meta><title>iw_sulu_tailwind_theme.title_level_h4</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="titleAlignment" type="single_select">
-                    <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
-                    <params>
-                        <param name="default_value" value="left"/>
-                        <param name="values" type="collection">
-                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
-                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
-                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
-                        </param>
-                    </params>
-                </property>
+                <xi:include href="../fragments/block-heading.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <block name="items" default-type="item" minOccurs="1">
                     <meta>
                         <title>iw_sulu_tailwind_theme.accordion_items</title>
@@ -94,9 +56,8 @@
         <section name="appearance">
             <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
             <properties>
-                <property name="variant" type="iw_theme_variant_picker" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
-                </property>
+                <xi:include href="../fragments/block-variant.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <property name="style" type="iw_theme_style_picker" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
                     <params>
@@ -165,69 +126,14 @@
                         <param name="default_value" value="false"/>
                     </params>
                 </property>
-                <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
-                    <params>
-                        <param name="default_value" value="mt-5"/>
-                    </params>
-                </property>
-                <property name="marginBottom" type="iw_theme_margin_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.margin_bottom</title></meta>
-                    <params>
-                        <param name="default_value" value="mb-5"/>
-                    </params>
-                </property>
-                <property name="lateralMargins" type="single_select">
-                    <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
-                    <params>
-                        <param name="default_value" value="exterior"/>
-                        <param name="values" type="collection">
-                            <param name="exterior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_exterior</title></meta></param>
-                            <param name="interior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_interior</title></meta></param>
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.lateral_margins_none</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <!-- Maximum width of the block content, shared by every block. -->
-                <xi:include href="../fragments/block-max-width.xml"
+                <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <property name="paddingTop" type="iw_theme_margin_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.padding_top</title></meta>
-                    <params>
-                        <param name="default_value" value="pt-5"/>
-                    </params>
-                </property>
-                <property name="paddingBottom" type="iw_theme_margin_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.padding_bottom</title></meta>
-                    <params>
-                        <param name="default_value" value="pb-5"/>
-                    </params>
-                </property>
-                <property name="paddingLateral" type="iw_theme_margin_selector">
-                    <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
-                    <params>
-                        <param name="prefix" value="px"/>
-                        <param name="default_value" value="px-5"/>
-                    </params>
-                </property>
-                <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
-                    <params>
-                        <param name="theme_key" value="cardRadius"/>
-                    </params>
-                </property>
-                <property name="cardRadius" type="iw_theme_radius_selector" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.card_radius</title></meta>
-                    <params>
-                        <param name="theme_key" value="cardRadius"/>
-                    </params>
-                </property>
-                <property name="showBackground" type="checkbox">
-                    <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
-                    <params>
-                        <param name="default_value" value="true"/>
-                    </params>
-                </property>
+                <xi:include href="../fragments/block-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <xi:include href="../fragments/block-card-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <xi:include href="../fragments/block-background.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
     </properties>

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: vertical margins of a block.
+
+    Margins push the neighbouring blocks away, outside the block background.
+    They are Tailwind steps (mt-5, mb-0) rather than raw values, so the spacing
+    stays on the theme scale and collapses the same way everywhere.
+
+    Bundled in `block-spacing.xml`. Include it on its own only when a block
+    needs to interleave something between the margins and the paddings.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="marginTop" type="iw_theme_margin_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.margin_top</title></meta>
+        <params>
+            <param name="default_value" value="mt-5"/>
+        </params>
+    </property>
+    <property name="marginBottom" type="iw_theme_margin_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.margin_bottom</title></meta>
+        <params>
+            <param name="default_value" value="mb-5"/>
+        </params>
+    </property>
+</properties>
