@@ -2128,6 +2128,34 @@ img.object-cover {
 .iw-block-timeline--per-3 { --iw-timeline-per-view: 3; }
 .iw-block-timeline--per-4 { --iw-timeline-per-view: 4; }
 
+/* The editor's count is a ceiling, not an absolute. What fits depends on the
+   width of the block, which a media query cannot see: a block capped at 768px
+   inside a 1600px screen still has 768px to share. Hence a container query,
+   asking the block itself rather than the viewport.
+
+   The thresholds keep every step at roughly 16rem of readable width, gaps
+   included: 2 x 16 + 2 = 34rem, 3 x 16 + 4 = 52rem, 4 x 16 + 6 = 70rem. They
+   are literals because a container query cannot read a custom property. */
+.iw-block-timeline--horizontal {
+    container-type: inline-size;
+}
+
+.iw-block-timeline--horizontal .iw-timeline {
+    --iw-timeline-per-fit: 1;
+}
+
+@container (min-width: 34rem) {
+    .iw-block-timeline--horizontal .iw-timeline { --iw-timeline-per-fit: 2; }
+}
+
+@container (min-width: 52rem) {
+    .iw-block-timeline--horizontal .iw-timeline { --iw-timeline-per-fit: 3; }
+}
+
+@container (min-width: 70rem) {
+    .iw-block-timeline--horizontal .iw-timeline { --iw-timeline-per-fit: 4; }
+}
+
 /* Arrow accent, from the variant's own button style, so the arrows match the
    call-to-action buttons under them. */
 .iw-block-timeline--button-primary {
@@ -2193,9 +2221,10 @@ img.object-cover {
     /* Each step takes an equal share of the width, gaps deducted, so the count
        is what the editor picked rather than a consequence of the viewport. */
     .iw-block-timeline--horizontal .iw-timeline-step {
+        --iw-timeline-per: min(var(--iw-timeline-per-view, 3), var(--iw-timeline-per-fit, 1));
         flex: 0 0 calc(
-            (100% - (var(--iw-timeline-per-view, 3) - 1) * var(--iw-timeline-gap, 2rem))
-            / var(--iw-timeline-per-view, 3)
+            (100% - (var(--iw-timeline-per) - 1) * var(--iw-timeline-gap, 2rem))
+            / var(--iw-timeline-per)
         );
         flex-direction: column;
         align-items: stretch;
@@ -2230,13 +2259,6 @@ img.object-cover {
     }
 }
 
-/* Two at a time between md and lg: three columns of text are already tight on
-   a tablet. Placed after the choice above so it wins on equal specificity. */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .iw-block-timeline--horizontal {
-        --iw-timeline-per-view: 2;
-    }
-}
 
 /* ─── Block: article_list ─────────────────────────────────────────────── */
 /* Three layout modifiers wrapping .iw-article-card (from L4):

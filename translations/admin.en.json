@@ -590,7 +590,7 @@
     "iw_sulu_tailwind_theme.timeline_steps": "Steps",
     "iw_sulu_tailwind_theme.timeline_step": "Step",
     "iw_sulu_tailwind_theme.timeline_steps_per_view": "Steps in view",
-    "iw_sulu_tailwind_theme.timeline_steps_per_view_info": "How many steps show at once on a large screen. Fewer steps means more width for each. Two at most on a tablet.",
+    "iw_sulu_tailwind_theme.timeline_steps_per_view_info": "The most steps shown at once. The block shows fewer when there is not enough width, so the cards stay readable.",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_2": "2 steps",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_3": "3 steps",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_4": "4 steps",

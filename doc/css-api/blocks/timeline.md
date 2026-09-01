@@ -19,7 +19,7 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 | `.iw-block-timeline--left` | Line on the left, every card on its right. The base layout, and the fallback of the other three on small screens. |
 | `.iw-block-timeline--right` | Mirror of `--left`. |
 | `.iw-block-timeline--horizontal` | Steps side by side along a horizontal track from `md`. A real scroll container driven by the shared `slider` controller, with the native scrollbar hidden and arrows instead. Falls back to `--left` below `md`. |
-| `.iw-block-timeline--per-2` / `--per-3` / `--per-4` | How many steps share the width, from `lg`. Between `md` and `lg` the count drops to two whatever was picked. Horizontal only. |
+| `.iw-block-timeline--per-2` / `--per-3` / `--per-4` | The most steps that share the width. A container query lowers it when the block is too narrow, so the effective count is the smaller of the two. Horizontal only. |
 | `.iw-block-timeline--button-primary` / `--secondary` / `--accent` | Arrow accent, mirroring the variant's own button style. Horizontal only. |
 | `.iw-block-timeline__nav` | The arrow row. Hidden unless the layout is horizontal. |
 | `.iw-block-timeline__nav-button` / `__nav-icon` | Previous and next arrows. |
@@ -56,7 +56,9 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 | `--iw-timeline-line-width` | `2px` |
 | `--iw-timeline-gap` | `2rem` — space between steps, vertical and horizontal alike |
 | `--iw-timeline-marker-gap` | `1.5rem` — space between the marker and its card |
-| `--iw-timeline-per-view` | `3` — steps sharing the width in `--horizontal`, set by the `--per-*` modifier |
+| `--iw-timeline-per-view` | `3` — the editor's ceiling, set by the `--per-*` modifier |
+| `--iw-timeline-per-fit` | what the block's own width allows, from a container query: 1, then 2 at `34rem`, 3 at `52rem`, 4 at `70rem` |
+| `--iw-timeline-per` | the smaller of the two, which is what the step width is computed from |
 
 ### Arrows (horizontal only)
 
@@ -142,4 +144,6 @@ The line is positioned from `--iw-timeline-marker-size`, so both stay aligned on
 
 **The horizontal track scrolls on its own.** The arrows call the shared `slider` controller, but the track is a plain scroll container with `scroll-snap`, so a trackpad, a touch swipe and the keyboard work with or without JavaScript. Hiding the scrollbar is therefore a visual choice, not a way of taking control away.
 
-**How many steps in view.** Four columns of rich text end up narrow and metres tall, so the count is the editor's to match to the content. It applies from `lg` only, drops to two between `md` and `lg`, and means nothing below, where the layout is vertical.
+**How many steps in view.** Four columns of rich text end up narrow and metres tall, so the count is the editor's to match to the content. It is a ceiling rather than an absolute: a **container query** on the block lowers it when there is not enough width, keeping every step around `16rem` of readable width.
+
+The query asks the block, not the viewport, which is the whole point. A block capped at 768px inside a 1600px screen still has 768px to share, and a media query would happily fit four columns into it. The thresholds are literals (`34rem`, `52rem`, `70rem`) because a container query cannot read a custom property, and they are derived from that `16rem` step plus the gaps.

@@ -582,7 +582,7 @@
     "iw_sulu_tailwind_theme.timeline_steps": "Schritte",
     "iw_sulu_tailwind_theme.timeline_step": "Schritt",
     "iw_sulu_tailwind_theme.timeline_steps_per_view": "Sichtbare Schritte",
-    "iw_sulu_tailwind_theme.timeline_steps_per_view_info": "Wie viele Schritte auf einem großen Bildschirm gleichzeitig zu sehen sind. Weniger Schritte bedeutet mehr Breite für jeden. Auf dem Tablet höchstens zwei.",
+    "iw_sulu_tailwind_theme.timeline_steps_per_view_info": "Wie viele Schritte höchstens gleichzeitig zu sehen sind. Bei zu geringer Breite zeigt der Block weniger, damit die Karten lesbar bleiben.",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_2": "2 Schritte",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_3": "3 Schritte",
     "iw_sulu_tailwind_theme.timeline_steps_per_view_4": "4 Schritte",
