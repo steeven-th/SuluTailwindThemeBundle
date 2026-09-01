@@ -57,6 +57,11 @@ final class BlockMaxWidthContractTest extends TestCase
     /**
      * Every block type offers the field, through the shared fragment: a block
      * left out would be the one an editor cannot narrow.
+     *
+     * The check runs on the resolved template rather than on its text: the
+     * field reaches most blocks through `block-spacing.xml`, which includes
+     * `block-max-width.xml` itself, so the fragment a block spells out is not
+     * what tells whether the editor gets the field.
      */
     #[Test]
     #[DataProvider('blockTemplateFiles')]
@@ -64,10 +69,10 @@ final class BlockMaxWidthContractTest extends TestCase
     {
         self::assertFileExists($path);
 
-        self::assertStringContainsString(
-            'fragments/block-max-width.xml',
-            (string) file_get_contents($path),
-            \sprintf('%s must include the block max width fragment in its settings section.', basename($path)),
+        self::assertContains(
+            'maxWidth',
+            self::resolvedPropertyNames($path),
+            \sprintf('%s must offer the block max width field in its settings section.', basename($path)),
         );
     }
 
@@ -274,6 +279,36 @@ final class BlockMaxWidthContractTest extends TestCase
             $component,
             'Array.from() is what accepts both a plain array and a MobX 4 observable one.',
         );
+    }
+
+    /**
+     * Names of every property a template ends up offering, fragments included.
+     *
+     * Templates are assembled with `xi:include`, and a fragment can include
+     * another one, so reading a file as text only sees the fragments it names
+     * directly. Resolving the includes first is what tests the fields an
+     * editor actually gets, whichever fragment they arrive through.
+     *
+     * @return list<string>
+     */
+    private static function resolvedPropertyNames(string $path): array
+    {
+        $document = new \DOMDocument();
+        self::assertTrue($document->load($path));
+        self::assertNotFalse($document->xinclude(), \sprintf('%s has an include that cannot be resolved.', basename($path)));
+
+        $xpath = new \DOMXPath($document);
+        $xpath->registerNamespace('sulu', 'http://schemas.sulu.io/template/template');
+
+        $nodes = $xpath->query('//sulu:property/@name');
+        self::assertNotFalse($nodes);
+
+        $names = [];
+        foreach ($nodes as $node) {
+            $names[] = (string) $node->nodeValue;
+        }
+
+        return $names;
     }
 
     /**
