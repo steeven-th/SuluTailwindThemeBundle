@@ -16,6 +16,18 @@ import {translate} from 'sulu-admin-bundle/utils';
  * within the same block container.
  */
 
+/**
+ * Upper bound on the children a section may have and still be collapsible.
+ *
+ * A sanity check against matching some large container that happens to hold
+ * the same label, not a real limit on how many fields a block can offer. It
+ * used to be 20, which the settings section of `iframe` and `code` reached
+ * exactly, so the next field added anywhere would have silently dropped their
+ * collapse. Sized well above the largest section the bundle ships, and
+ * `CollapsibleSectionsContractTest` fails if one ever gets close.
+ */
+const MAX_SECTION_CHILDREN = 60;
+
 const CHEVRON_SVG = '<svg class="iw-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const STYLES = `
@@ -364,7 +376,7 @@ function scanForSections(root: HTMLElement): void {
             if (
                 headerContainer === sectionEl.firstElementChild
                 && sectionEl.children.length >= 2
-                && sectionEl.children.length <= 20
+                && sectionEl.children.length <= MAX_SECTION_CHILDREN
             ) {
                 // Only match actual Sulu form sections (CSS module class "grid-section--xxx").
                 // This prevents matching navigation items, sidebar menus, or other UI elements
