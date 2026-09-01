@@ -54,9 +54,18 @@
        cannot encode AVIF. WebP is safe on any modern GD/Imagick and stays on.
        `is defined` (not |default) so an explicit `false` is honoured. #}
     {% set avifEnabled = iw_sulu_tailwind_theme.imageAvif is defined ? iw_sulu_tailwind_theme.imageAvif : true %}
+
+    {# A vector gets no raster sibling. Sulu exposes the `.avif`/`.webp` keys for
+       an SVG like it does for anything else, but requesting one asks the image
+       converter to rasterize a vector and it answers with a 500, so the <source>
+       would break the image instead of optimising it. The format URL itself is
+       fine: it serves the original SVG untouched. Nothing to convert anyway, a
+       vector is already smaller than any raster of it. #}
+    {% set isVector = 'image/svg+xml' == media.mimeType|default('') %}
+
     {% set baseUrl = media.thumbnails[format]|default(media.url) %}
-    {% set avifUrl = avifEnabled ? media.thumbnails[format ~ '.avif']|default(null) : null %}
-    {% set webpUrl = media.thumbnails[format ~ '.webp']|default(null) %}
+    {% set avifUrl = (avifEnabled and not isVector) ? media.thumbnails[format ~ '.avif']|default(null) : null %}
+    {% set webpUrl = isVector ? null : media.thumbnails[format ~ '.webp']|default(null) %}
 
     {% if raw|default(false) %}
         {# Component-owned image: the <picture> is transparent (display:contents)

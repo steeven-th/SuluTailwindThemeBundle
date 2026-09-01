@@ -1,0 +1,120 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   One timeline step: its marker on the line, then its card.
+
+   Shared by the four layouts, which only differ by where the CSS puts the
+   marker and the card. Everything an editor can decide is resolved here, so a
+   layout template never has to know about dates, states or marker content.
+
+   Parameters:
+     - step           : the step data ({ date, dateAt, state, icon, title,
+                        subTitle, text, image, ctaButtons, ... })
+     - index          : 1-based position, shown when the marker holds a number
+     - dotContent     : icon | number | date | none — what the marker holds
+     - dateMode       : text | date — which of the two date fields is in use
+     - dateFormat     : year | month_year | full — only read in `date` mode
+     - cardRadius     : the block's card radius choice
+     - imageRadius    : the block's image radius choice
+     - imageMaxWidth  : the block's image width cap, applied to the wrapper
+     - ctaView        : view data for this step's buttons, for labels and targets
+     - titleAlignment : the block's title alignment, which the buttons follow
+   ───────────────────────────────────────────────────────────────────────── #}
+
+{% set state = step.state|default('done') %}
+{% set marker = dotContent|default('icon') %}
+
+{# The date is either free text or a real date rendered through a pattern. Only
+   the real date can carry a machine readable <time datetime>, which is the
+   reason the mode exists. #}
+{% set rawDate = (dateMode|default('text')) == 'date' ? step.dateAt|default(null) : step.date|default('') %}
+{% set dateLabel = '' %}
+{% if (dateMode|default('text')) == 'date' and rawDate %}
+    {% set datePattern = {'year': 'yyyy', 'month_year': 'LLLL yyyy', 'full': 'long'}[dateFormat|default('month_year')]|default('LLLL yyyy') %}
+    {% set dateLabel = iw_sulu_tailwind_theme_format_date(rawDate, datePattern) %}
+{% elseif (dateMode|default('text')) != 'date' %}
+    {% set dateLabel = rawDate %}
+{% endif %}
+
+{% set iconMedia = step.icon|default(null) %}
+{% set hasIcon = iconMedia is not empty %}
+
+<li class="iw-timeline-step iw-timeline-step--{{ state }}">
+    {# The marker sits on the line. Its content is a block-wide decision, so
+       every step reads the same way. #}
+    <div class="iw-timeline-step__marker" aria-hidden="true">
+        {% if marker == 'icon' and hasIcon %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                media: iconMedia,
+                format: 'iw_theme_icon',
+                alt: '',
+                classes: 'iw-timeline-step__marker-icon',
+                raw: true
+            } only %}
+        {% elseif marker == 'number' %}
+            <span class="iw-timeline-step__marker-number">{{ index }}</span>
+        {% elseif marker == 'date' and dateLabel is not empty %}
+            <span class="iw-timeline-step__marker-date">{{ dateLabel }}</span>
+        {% endif %}
+    </div>
+
+    <div class="iw-timeline-step__card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+        {# The state is a colour and a shape on the marker, so it says nothing to
+           a screen reader without this. #}
+        {% if state != 'done' %}
+            <span class="sr-only">{{ ('iw_sulu_tailwind_theme.timeline_state_' ~ state)|trans }}</span>
+        {% endif %}
+
+        {# Shown in the card whenever the marker holds something else, so a step
+           icon is never lost just because the marker was set to numbers. #}
+        {% if hasIcon and marker != 'icon' %}
+            <div class="iw-timeline-step__icon">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                    media: iconMedia,
+                    format: 'iw_theme_icon',
+                    alt: '',
+                    classes: 'iw-timeline-step__icon-img',
+                    raw: true
+                } only %}
+            </div>
+        {% endif %}
+
+        {% if dateLabel is not empty and marker != 'date' %}
+            {% if (dateMode|default('text')) == 'date' %}
+                <time class="iw-timeline-step__date" datetime="{{ rawDate|date('Y-m-d') }}">{{ dateLabel }}</time>
+            {% else %}
+                <span class="iw-timeline-step__date">{{ dateLabel }}</span>
+            {% endif %}
+        {% endif %}
+
+        {% if step.title|default('') is not empty %}
+            <h3 class="iw-timeline-step__title iw-block__title">{{ step.title }}</h3>
+        {% endif %}
+
+        {% if step.subTitle|default('') is not empty %}
+            <p class="iw-timeline-step__subtitle iw-block__subtitle">{{ step.subTitle }}</p>
+        {% endif %}
+
+        {% if step.image|default(null) is not empty %}
+            <div class="iw-timeline-step__image {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                    media: step.image,
+                    format: 'iw_theme_4_3',
+                    radiusClass: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
+                } only %}
+            </div>
+        {% endif %}
+
+        {% if step.text|default('') is not empty %}
+            <div class="iw-timeline-step__text prose max-w-none">
+                {{ step.text|raw }}
+            </div>
+        {% endif %}
+
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+            buttons: step.ctaButtons|default([]),
+            buttonsView: ctaView|default([]),
+            alignment: step.ctaAlignment|default('title'),
+            direction: step.ctaDirection|default('row'),
+            titleAlignment: titleAlignment|default('left')
+        } only %}
+    </div>
+</li>

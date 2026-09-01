@@ -240,6 +240,54 @@ const WIREFRAME_RENDERERS = {
         </svg>
     ),
 
+    // ── timeline styles ──────────────────────────────────────────
+    // Prefixed with the block type: `left`, `right` and `horizontal` are
+    // generic enough that another block will want them one day, and the
+    // unprefixed lookup would then hand it a timeline.
+    timeline_alternate: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <line x1="60" y1="16" x2="60" y2="64" stroke={accent} strokeWidth="2" />
+            <circle cx="60" cy="16" r="5" fill={accent} />
+            <circle cx="60" cy="40" r="5" fill={accent} />
+            <circle cx="60" cy="64" r="5" fill={accent} />
+            <rect x="6" y="8" width="44" height="16" rx="3" fill={fill} />
+            <rect x="70" y="32" width="44" height="16" rx="3" fill={fill} />
+            <rect x="6" y="56" width="44" height="16" rx="3" fill={fill} />
+        </svg>
+    ),
+    timeline_left: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <line x1="14" y1="16" x2="14" y2="64" stroke={accent} strokeWidth="2" />
+            <circle cx="14" cy="16" r="5" fill={accent} />
+            <circle cx="14" cy="40" r="5" fill={accent} />
+            <circle cx="14" cy="64" r="5" fill={accent} />
+            <rect x="26" y="8" width="88" height="16" rx="3" fill={fill} />
+            <rect x="26" y="32" width="88" height="16" rx="3" fill={fill} />
+            <rect x="26" y="56" width="88" height="16" rx="3" fill={fill} />
+        </svg>
+    ),
+    timeline_right: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <line x1="106" y1="16" x2="106" y2="64" stroke={accent} strokeWidth="2" />
+            <circle cx="106" cy="16" r="5" fill={accent} />
+            <circle cx="106" cy="40" r="5" fill={accent} />
+            <circle cx="106" cy="64" r="5" fill={accent} />
+            <rect x="6" y="8" width="88" height="16" rx="3" fill={fill} />
+            <rect x="6" y="32" width="88" height="16" rx="3" fill={fill} />
+            <rect x="6" y="56" width="88" height="16" rx="3" fill={fill} />
+        </svg>
+    ),
+    timeline_horizontal: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <line x1="20" y1="16" x2="100" y2="16" stroke={accent} strokeWidth="2" />
+            <circle cx="20" cy="16" r="5" fill={accent} />
+            <circle cx="60" cy="16" r="5" fill={accent} />
+            <circle cx="100" cy="16" r="5" fill={accent} />
+            <rect x="8" y="28" width="24" height="44" rx="3" fill={fill} />
+            <rect x="48" y="28" width="24" height="44" rx="3" fill={fill} />
+            <rect x="88" y="28" width="24" height="44" rx="3" fill={fill} />
+        </svg>
+    ),
     // ── linked_pages styles ──────────────────────────────────────
     cards: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">

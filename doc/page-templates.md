@@ -4,7 +4,7 @@ The bundle ships with a ready-to-use page template and a modular architecture fo
 
 ## Default page template
 
-The `iw_theme_default` template includes **16 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
+The `iw_theme_default` template includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `timeline`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`.
 
 Call-to-action buttons are not a block type: every block above except `form` and `separator` carries its own list of buttons, through the `cta-buttons.xml` fragment.
 
@@ -197,7 +197,7 @@ Since blocks are registered globally, creating a custom page template with a sub
 
 > The 3 article blocks use `smart_content` with `provider: articles` to fetch articles. Articles ship with the Sulu 3 core (`Sulu\Article`), so there is nothing extra to install.
 
-> **Article templates offer the same 16 types.** `iw_news`, `iw_event` and `iw_blog_post` include the same `page-blocks.xml` fragment as the page template, so the list cannot drift and a block behaves the same wherever it is placed. Pages and article bodies share the block dispatcher (`components/_blocks.html.twig`), not just the block definitions.
+> **Article templates offer the same 17 types.** `iw_news`, `iw_event` and `iw_blog_post` include the same `page-blocks.xml` fragment as the page template, so the list cannot drift and a block behaves the same wherever it is placed. Pages and article bodies share the block dispatcher (`components/_blocks.html.twig`), not just the block definitions.
 
 Each block has 3 sections: **Content** (block-specific), **Appearance** (variant + style), and **Settings** (margins, paddings, radius, background).
 
@@ -249,7 +249,7 @@ the fields an editor already knows from the other blocks.
 | `page-header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
 | `article-header.xml` | Same title + `url` as `page_tree_route`, for content hanging under a page |
 | `page-title.xml` | The title alone, when you write your own route field |
-| `page-blocks.xml` | `<block>` container with all 16 `<type ref="..."/>`. Use the `sulu:block` xpointer |
+| `page-blocks.xml` | `<block>` container with all 17 `<type ref="..."/>`. Use the `sulu:block` xpointer |
 | `page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
 
 **Block level**
@@ -266,6 +266,7 @@ the fields an editor already knows from the other blocks.
 | `block-margins.xml` | The two vertical margins alone | settings |
 | `block-lateral-margins.xml` | `lateralMargins` alone | settings |
 | `block-max-width.xml` | `maxWidth` alone | settings |
+| `block-image-max-width.xml` | `imageMaxWidth`, a cap on the images the block renders | settings |
 | `block-paddings.xml` | The three paddings alone | settings |
 | `block-radius.xml` | `blockRadius`, the radius of the block surface | settings |
 | `block-card-radius.xml` | `cardRadius`, for blocks repeating a card | settings |

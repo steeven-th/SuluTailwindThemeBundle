@@ -46,6 +46,7 @@ class BlockTemplateResolver
         'text_images' => 'classic',
         'gallery' => 'grid',
         'key_figures' => 'inline',
+        'timeline' => 'alternate',
         'linked_pages' => 'cards',
         'location' => 'map_with_info',
         'form' => 'centered',

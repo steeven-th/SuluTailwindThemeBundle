@@ -66,5 +66,8 @@
     "iw_sulu_tailwind_theme.form_csrf_invalid": "Your session expired. Please send the message again.",
     "iw_sulu_tailwind_theme.form_technical_error": "Your message could not be sent for technical reasons. Please try again later.",
     "iw_sulu_tailwind_theme.form_honeypot_label": "Do not fill in this field",
-    "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile is enabled but no site key is configured: no widget is rendered, while the server-side check keeps running - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key."
+    "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile is enabled but no site key is configured: no widget is rendered, while the server-side check keeps running - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key.",
+    "iw_sulu_tailwind_theme.timeline_state_done": "Step completed",
+    "iw_sulu_tailwind_theme.timeline_state_current": "Step in progress",
+    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Upcoming step"
 }

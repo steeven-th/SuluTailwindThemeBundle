@@ -341,6 +341,46 @@ a block type that ships no `maxWidth` field at all stays out entirely.
 
 ---
 
+## Image maximum width
+
+A block-wide cap on the images a block renders, offered by the
+`config/templates/fragments/block-image-max-width.xml` fragment in a block's
+`settings` section. It answers a different question from the block width above:
+capping the block narrows its text along with its images, while this one leaves
+the text alone. A block can offer both.
+
+The field stores a step, and `iw_sulu_tailwind_theme_image_max_width_class()`
+turns it into a class. An unknown or empty value yields no class at all, so an
+image keeps the full width of whatever holds it, exactly like a block that does
+not offer the field.
+
+```css
+.iw-imgw--xs { max-width: var(--iw-imgw-xs, 8rem); }
+.iw-imgw--sm { max-width: var(--iw-imgw-sm, 12rem); }
+.iw-imgw--md { max-width: var(--iw-imgw-md, 16rem); }
+.iw-imgw--lg { max-width: var(--iw-imgw-lg, 24rem); }
+.iw-imgw--xl { max-width: var(--iw-imgw-xl, 32rem); }
+```
+
+The class goes on the element wrapping the image, not on the `<img>`: the image
+partial sizes the picture to its container, so capping the container keeps the
+radius and the ratio box in step with it.
+
+**Override examples:**
+
+```css
+/* Move the whole scale for a project */
+:root { --iw-imgw-md: 12rem; --iw-imgw-lg: 18rem; }
+
+/* One block type only */
+.iw-block-timeline .iw-imgw--md { max-width: 10rem; }
+```
+
+Offered today by the timeline block. Adding it to another block is two lines:
+the `xi:include` in its `settings` section, and the class on the wrapper.
+
+---
+
 ## Block actions (CTA)
 
 Call-to-action buttons are not a block type: any block can carry a list of

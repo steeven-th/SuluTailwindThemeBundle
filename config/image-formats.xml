@@ -40,6 +40,21 @@
     </format>
 
     <!-- Avatar (small square for profile pictures) -->
+    <!--
+        Small square icons: timeline markers, and any pictogram the theme sizes
+        itself. `inset`, not `outbound`: a pictogram usually carries its own
+        padding, and cropping to a square would eat it. The rendered size is
+        still fixed in CSS, because Sulu does not run SVG through the format
+        pipeline and an SVG icon comes back untouched.
+    -->
+    <format key="iw_theme_icon">
+        <meta>
+            <title lang="en">Theme Icon</title>
+            <title lang="fr">Thème Icône</title>
+        </meta>
+        <scale x="192" y="192" mode="inset"/>
+    </format>
+
     <format key="iw_theme_avatar">
         <meta>
             <title lang="en">Theme Avatar</title>

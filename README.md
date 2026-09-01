@@ -445,7 +445,7 @@ Three article templates will appear in the admin, each in its own tab:
 
 All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `article-hero`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
 
-The article body accepts the **same 16 block types as a page**, because both include the same `page-blocks.xml` fragment. The full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
+The article body accepts the **same 17 block types as a page**, because both include the same `page-blocks.xml` fragment. The full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
 
 Each article type comes with **multiple page styles** that can be selected via theme configuration:
 
@@ -569,7 +569,7 @@ The theme list in **Settings > Themes** shows a "Webspaces" column indicating wh
 
 ### Page templates
 
-The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **16 block types**: `text`, `text_images`, `gallery`, `key_figures`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`. Call-to-action buttons are not a block of their own: every block above except `form` and `separator` carries its own list of buttons.
+The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `timeline`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`. Call-to-action buttons are not a block of their own: every block above except `form` and `separator` carries its own list of buttons.
 
 To use it, simply select **"Page par défaut"** (or **"Default page"**) as the template when creating a page in the Sulu admin.
 
@@ -745,7 +745,7 @@ SuluTailwindThemeBundle/
 │   ├── lists/              # Sulu admin list XML
 │   ├── templates/
 │   │   ├── pages/          # Page template XML (uses <type ref="..."/>)
-│   │   ├── blocks/         # Global block type definitions (16 types)
+│   │   ├── blocks/         # Global block type definitions (17 types)
 │   │   ├── blocks-code/    # Code block, sandboxed variant (default)
 │   │   ├── blocks-code-open/ # Code block + unsandboxed opt-in variant
 │   │   └── fragments/      # Shared property fragments (reference)

@@ -37,6 +37,16 @@ use Twig\TwigFunction;
 class ThemeExtension extends AbstractExtension implements GlobalsInterface, ResetInterface
 {
     /**
+     * Image width steps offered by `fragments/block-image-max-width.xml`.
+     *
+     * Each one must have a matching `.iw-imgw--*` rule in `app.css`, which is
+     * what `ImageMaxWidthContractTest` guards.
+     *
+     * @var list<string>
+     */
+    public const IMAGE_MAX_WIDTH_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+    /**
      * Sequence backing getUniqueId(), reset between requests by reset().
      */
     private int $uniqueIdCounter = 0;
@@ -99,6 +109,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_title_markup', $this->getTitleMarkup(...), [
@@ -758,6 +769,30 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
 
         return $this->isInMaxWidthScope($defaults['blockMaxWidthScope'] ?? null, $blockType, $style)
             ? 'iw-block-maxw'
+            : '';
+    }
+
+    /**
+     * Class capping the width of the images a block renders.
+     *
+     * Unlike the block width, this one has no site-wide token behind it: an
+     * image cap is a per block decision, so an empty value means the images
+     * keep the full width of whatever holds them.
+     *
+     * The value is checked against the steps the fragment offers, so a stale
+     * or hand-edited value yields no class rather than a class that matches
+     * nothing in the stylesheet.
+     *
+     * @param string|null $value step key, from the `imageMaxWidth` property
+     *
+     * @return string the utility class, or an empty string for no constraint
+     */
+    public function getImageMaxWidthClass(?string $value = null): string
+    {
+        $value = (string) $value;
+
+        return \in_array($value, self::IMAGE_MAX_WIDTH_STEPS, true)
+            ? 'iw-imgw--' . $value
             : '';
     }
 

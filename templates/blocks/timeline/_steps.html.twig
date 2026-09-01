@@ -1,0 +1,95 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   The timeline itself: the line, and the ordered list of steps along it.
+
+   An <ol> rather than a stack of <div>: a timeline is ordered by definition,
+   and the list is what lets a screen reader announce how many steps there are
+   and which one is being read.
+
+   The four layouts all include this partial and differ only by `layout`, which
+   becomes a BEM modifier. The line, the alternating sides and the horizontal
+   track are CSS, so a project can restyle or add a layout without touching
+   the markup.
+
+   The horizontal layout adds arrows and hides the native scrollbar, through
+   the shared `slider` controller in its `scroll` mode - the same one the
+   article carousel and the galleries use. The track stays a real scroll
+   container, so a trackpad, a touch swipe and the keyboard all keep working
+   whether or not the JavaScript ever loads.
+
+   Parameters:
+     - layout       : alternate | left | right | horizontal
+     - steps        : the list of steps
+     - stepsPerView : 2 | 3 | 4, how many steps share the width in horizontal
+     - variant      : the block variant, which the arrows take their colour from
+     - plus every parameter `_item.html.twig` reads
+   ───────────────────────────────────────────────────────────────────────── #}
+
+{% set stepList = steps is defined and steps is iterable ? steps : [] %}
+
+{% if stepList|length > 0 %}
+    {% set isHorizontal = (layout|default('alternate')) == 'horizontal' %}
+    {% set perView = stepsPerView|default('3') in ['2', '3', '4'] ? stepsPerView|default('3') : '3' %}
+
+    {# The arrows follow the button style of the block variant, so they match
+       the call-to-action buttons sitting right under them. #}
+    {% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), iw_sulu_tailwind_theme.blockVariants|default([])) %}
+    {% set arrowStyle = variantConfig.buttonStyle|default('primary') %}
+
+    <div
+        class="iw-block-timeline iw-block-timeline--{{ layout|default('alternate') }}{% if isHorizontal %} iw-block-timeline--per-{{ perView }} iw-block-timeline--button-{{ arrowStyle }}{% endif %}"
+        {%- if isHorizontal %} data-controller="slider" data-slider-mode-value="scroll"{% endif %}
+    >
+        {% if isHorizontal %}
+            <div class="iw-block-timeline__nav">
+                <button
+                    type="button"
+                    data-action="slider#prev"
+                    class="iw-block-timeline__nav-button iw-block-timeline__nav-button--prev"
+                    aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_previous'|trans }}"
+                >
+                    <svg class="iw-block-timeline__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    data-action="slider#next"
+                    class="iw-block-timeline__nav-button iw-block-timeline__nav-button--next"
+                    aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_next'|trans }}"
+                >
+                    <svg class="iw-block-timeline__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        {% endif %}
+
+        {# Decorative: the line is drawn here rather than as a border on the list
+           so it can stop at the first and last markers instead of running past
+           them. The horizontal layout draws segments between markers instead,
+           because its track scrolls and an absolute line would stay behind. #}
+        <div class="iw-block-timeline__line" aria-hidden="true"></div>
+
+        <ol
+            class="iw-timeline{% if isHorizontal %} scrollbar-hide{% endif %}"
+            {%- if isHorizontal %} data-slider-target="track"{% endif %}
+        >
+            {% for step in stepList %}
+                {% if step.type|default('step') == 'step' %}
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/timeline/_item.html.twig' with {
+                        step: step,
+                        index: loop.index,
+                        dotContent: dotContent|default('icon'),
+                        dateMode: dateMode|default('text'),
+                        dateFormat: dateFormat|default('month_year'),
+                        cardRadius: cardRadius|default(''),
+                        imageRadius: imageRadius|default(''),
+                        imageMaxWidth: imageMaxWidth|default(''),
+                        ctaView: stepsView[loop.index0].ctaButtons|default([]),
+                        titleAlignment: titleAlignment|default('left')
+                    } only %}
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </div>
+{% endif %}

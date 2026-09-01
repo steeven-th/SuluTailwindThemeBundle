@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: maximum width of the images a block renders.
+
+    An image fills the width it is given, which is fine for a banner and much
+    too much for a pictogram or an illustration next to a paragraph. Capping
+    the block instead, through `block-max-width.xml`, narrows the text along
+    with the image, so the two settings answer different questions and a block
+    can offer both.
+
+    The value is a step rather than a length, so every block speaks the same
+    scale and a project can move the whole scale by redefining the `iw-imgw`
+    custom properties once. An empty value leaves the images at the full width
+    of whatever holds them, which is the behaviour of a block that does not
+    offer the field at all.
+
+    Include it in a block's `settings` section:
+
+        <xi:include href="../fragments/block-image-max-width.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    Render it with `iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth)`
+    on the element wrapping the image.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="imageMaxWidth" type="single_select" colspan="6">
+        <meta>
+            <title>iw_sulu_tailwind_theme.block_image_max_width</title>
+            <info_text>iw_sulu_tailwind_theme.block_image_max_width_info</info_text>
+        </meta>
+        <params>
+            <param name="default_value" value=""/>
+            <param name="values" type="collection">
+                <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_full</title></meta></param>
+                <param name="xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_xs</title></meta></param>
+                <param name="sm"><meta><title>iw_sulu_tailwind_theme.image_max_width_sm</title></meta></param>
+                <param name="md"><meta><title>iw_sulu_tailwind_theme.image_max_width_md</title></meta></param>
+                <param name="lg"><meta><title>iw_sulu_tailwind_theme.image_max_width_lg</title></meta></param>
+                <param name="xl"><meta><title>iw_sulu_tailwind_theme.image_max_width_xl</title></meta></param>
+            </param>
+        </params>
+    </property>
+</properties>
