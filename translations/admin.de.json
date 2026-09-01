@@ -280,6 +280,9 @@
     "iw_sulu_tailwind_theme.settings": "Einstellungen",
     "iw_sulu_tailwind_theme.settings_group_spacing": "Abstände",
     "iw_sulu_tailwind_theme.settings_group_radius": "Eckenradius",
+    "iw_sulu_tailwind_theme.settings_group_images": "Bilder",
+    "iw_sulu_tailwind_theme.content_group_titles": "Titel",
+    "iw_sulu_tailwind_theme.content_group_cta": "Handlungsaufruf",
 
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Außen",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Innen",
@@ -645,6 +648,8 @@
     "iw_sulu_tailwind_theme.gallery_gap": "Abstand zwischen den Bildern",
     "iw_sulu_tailwind_theme.image_gap_theme": "Standard (Theme)",
     "iw_sulu_tailwind_theme.show_images_name": "Bildnamen anzeigen",
+    "iw_sulu_tailwind_theme.show_images_name_info": "Der Medientitel dient als Bildunterschrift in der Lightbox, wenn das Bild per Klick geöffnet wird. Im Block selbst erscheint er nicht.",
+    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Der Medientitel dient als Bildunterschrift in der Lightbox, wenn das Bild per Klick geöffnet wird. Nur der Stil „Karussell“ zeigt ihn zusätzlich unter dem Bild im Block selbst.",
     "iw_sulu_tailwind_theme.content_position_right": "Inhalt rechts",
     "iw_sulu_tailwind_theme.image_position_bottom": "Bild unten",
 

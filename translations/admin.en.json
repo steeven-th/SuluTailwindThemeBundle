@@ -288,6 +288,9 @@
     "iw_sulu_tailwind_theme.settings": "Settings",
     "iw_sulu_tailwind_theme.settings_group_spacing": "Spacing",
     "iw_sulu_tailwind_theme.settings_group_radius": "Corner radius",
+    "iw_sulu_tailwind_theme.settings_group_images": "Images",
+    "iw_sulu_tailwind_theme.content_group_titles": "Titles",
+    "iw_sulu_tailwind_theme.content_group_cta": "Call to action",
 
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Exterior",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Interior",
@@ -653,6 +656,8 @@
     "iw_sulu_tailwind_theme.gallery_gap": "Image spacing",
     "iw_sulu_tailwind_theme.image_gap_theme": "Theme default",
     "iw_sulu_tailwind_theme.show_images_name": "Show image names",
+    "iw_sulu_tailwind_theme.show_images_name_info": "The media title is used as the caption in the lightbox, when the image is opened by clicking it. It does not show on the block itself.",
+    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "The media title is used as the caption in the lightbox, when the image is opened by clicking it. Only the \"Carousel\" style also shows it under the image, on the block itself.",
     "iw_sulu_tailwind_theme.content_position_right": "Content on the right",
     "iw_sulu_tailwind_theme.image_position_bottom": "Image at bottom",
 

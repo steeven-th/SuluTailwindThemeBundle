@@ -113,6 +113,14 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <property name="imagesHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.settings_group_images</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="imageFilter" type="single_select" colspan="6"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'mosaic' AND __parent.style != 'hero_banner' AND __parent.style != 'split_screen'">
                     <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
@@ -194,7 +202,10 @@
                 </property>
                 <property name="showImagesName" type="checkbox"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
-                    <meta><title>iw_sulu_tailwind_theme.show_images_name</title></meta>
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.show_images_name</title>
+                        <info_text>iw_sulu_tailwind_theme.show_images_name_info</info_text>
+                    </meta>
                 </property>
                 <!-- Overlay / Sidebar: toggle content position left/right -->
                 <property name="contentRight" type="checkbox"

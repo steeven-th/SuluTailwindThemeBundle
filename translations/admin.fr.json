@@ -288,6 +288,9 @@
     "iw_sulu_tailwind_theme.settings": "Réglages",
     "iw_sulu_tailwind_theme.settings_group_spacing": "Espacements",
     "iw_sulu_tailwind_theme.settings_group_radius": "Arrondis",
+    "iw_sulu_tailwind_theme.settings_group_images": "Images",
+    "iw_sulu_tailwind_theme.content_group_titles": "Titres",
+    "iw_sulu_tailwind_theme.content_group_cta": "Boutons d'action",
 
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Extérieur",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Intérieur",
@@ -653,6 +656,8 @@
     "iw_sulu_tailwind_theme.gallery_gap": "Espacement entre les images",
     "iw_sulu_tailwind_theme.image_gap_theme": "Défaut (thème)",
     "iw_sulu_tailwind_theme.show_images_name": "Afficher le nom des images",
+    "iw_sulu_tailwind_theme.show_images_name_info": "Le nom du média sert de légende dans la visionneuse, à l'ouverture de l'image au clic. Il ne s'affiche pas sur le bloc lui-même.",
+    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Le nom du média sert de légende dans la visionneuse, à l'ouverture de l'image au clic. Seul le style « Carrousel » l'affiche aussi sous l'image, directement dans le bloc.",
     "iw_sulu_tailwind_theme.content_position_right": "Contenu à droite",
     "iw_sulu_tailwind_theme.image_position_bottom": "Image en bas",
 

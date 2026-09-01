@@ -17,6 +17,19 @@
 -->
 <properties xmlns="http://schemas.sulu.io/template/template"
             xmlns:xi="http://www.w3.org/2001/XInclude">
+    <!--
+        Names the title group and, spanning the full width, closes the row
+        before whatever the block puts after it. See `block-spacing.xml`
+        for why that reset matters.
+    -->
+    <property name="titlesHeading" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.content_group_titles</title></meta>
+            </param>
+        </params>
+    </property>
+
     <property name="title" type="iw_theme_title_editor">
         <meta>
             <title>iw_sulu_tailwind_theme.title</title>
