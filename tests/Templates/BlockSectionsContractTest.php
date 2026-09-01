@@ -106,6 +106,70 @@ final class BlockSectionsContractTest extends TestCase
         );
     }
 
+    /**
+     * Field types that store what an editor writes.
+     *
+     * @var list<string>
+     */
+    private const CONTENT_TYPES = [
+        'text_line', 'text_area', 'text_editor', 'iw_theme_title_editor', 'single_media_selection',
+        'media_selection', 'link', 'route', 'page_tree_route', 'smart_content', 'location', 'date',
+        'datetime', 'single_icon_selection', 'color', 'number', 'url', 'email', 'phone',
+        'single_form_selection',
+    ];
+
+    /**
+     * Fields that decide which content fields appear.
+     *
+     * They are not authored values, but they belong next to the fields they
+     * drive: moving `mediaType` away from the video fields it reveals would
+     * make those fields appear out of nowhere. Every other non-content field
+     * belongs to Settings.
+     *
+     * @var list<string>
+     */
+    private const SWITCHES = [
+        'mediaType', 'widgetType', 'videoProvider', 'dateMode', 'useSuluFormBundle', 'singleImage',
+    ];
+
+    /**
+     * Content holds what the editor writes, plus the switches that decide
+     * which of those fields appear. A position, an alignment, a gap or a
+     * display toggle is a setting, wherever it feels natural to put it.
+     */
+    #[Test]
+    #[DataProvider('blockTemplates')]
+    public function contentHoldsOnlyAuthoredFieldsAndSwitches(string $path): void
+    {
+        $source = (string) file_get_contents($path);
+
+        if (1 !== preg_match('/<section name="content">(.*?)\n        <\/section>/s', $source, $matches)) {
+            self::markTestSkipped(basename($path) . ' has no content section.');
+        }
+
+        // Fields inside a repeatable block are outside the section system.
+        $section = preg_replace('/<block name="\w+".*?<\/block>/s', '', $matches[1]) ?? '';
+
+        $misplaced = [];
+        preg_match_all('/<property name="(\w+)" type="([\w_]+)"/', $section, $properties, PREG_SET_ORDER);
+        foreach ($properties as [, $name, $type]) {
+            if (\in_array($type, self::CONTENT_TYPES, true) || \in_array($name, self::SWITCHES, true)) {
+                continue;
+            }
+            $misplaced[] = $name;
+        }
+
+        self::assertSame(
+            [],
+            $misplaced,
+            \sprintf(
+                '%s keeps settings in Content: %s. Move them to Settings, or add them to SWITCHES if they decide which content fields appear.',
+                basename($path),
+                implode(', ', $misplaced),
+            ),
+        );
+    }
+
     private static function root(): string
     {
         return \dirname(__DIR__, 2);

@@ -26,18 +26,6 @@
                     </meta>
                 </property>
 
-                <!-- Split-only: position of the form column vs the widget column -->
-                <property name="formRight" type="checkbox"
-                          visibleCondition="__parent.style == 'split'">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.form_position_right</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
 
                 <!-- Split-only: choose which widget sits next to the form -->
                 <property name="widgetType" type="single_select"
@@ -86,6 +74,18 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <!-- Split-only: position of the form column vs the widget column -->
+                <property name="formRight" type="checkbox"
+                          visibleCondition="__parent.style == 'split'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.form_position_right</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
                 <!--
                     How the two zones share the width. Not a shared fragment,
                     because the field only makes sense for the styles that have

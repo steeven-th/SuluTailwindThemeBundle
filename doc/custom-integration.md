@@ -278,9 +278,15 @@ Three sections, and one rule for the two that are not content:
 
 | Section | Holds |
 |---------|-------|
-| `content` | What the editor writes: text, media, links, repeatable items. |
+| `content` | What the editor writes, plus the **switches** that decide which of those fields appear. |
 | `appearance` | The colour variant and the layout style. Nothing else. |
 | `settings` | Every other setting, including the ones that read as appearance. |
+
+A switch is not an authored value, but it belongs next to the fields it drives:
+`mediaType` reveals the image fields or the video ones, `widgetType` decides
+which widget the second zone shows. Move one to Settings and the fields it
+reveals appear out of nowhere. Everything else that is not authored, a
+position, an alignment, a gap, a display toggle, is a setting.
 
 The line looks arbitrary until you try to draw it anywhere else. Margins,
 radius, maximum width and background have always been in `settings`, and they
@@ -302,7 +308,11 @@ the data stays flat, so a condition in `settings` reads a style declared in
 `appearance`. Moving a property from one section to another is therefore safe
 for content that is already published.
 
-`BlockSectionsContractTest` enforces this on every block the bundle ships.
+Order inside `settings`: the block's own settings first, then the shared group
+of spacing, radius and background.
+
+`BlockSectionsContractTest` enforces all of this on every block the bundle
+ships, both what Appearance may hold and what Content may hold.
 
 ### Step 2: Create the Twig template
 
