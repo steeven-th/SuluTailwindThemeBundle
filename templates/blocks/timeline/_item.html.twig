@@ -14,6 +14,7 @@
      - dateFormat     : year | month_year | full — only read in `date` mode
      - cardRadius     : the block's card radius choice
      - imageRadius    : the block's image radius choice
+     - imageMaxWidth  : the block's image width cap, applied to the wrapper
      - ctaView        : view data for this step's buttons, for labels and targets
      - titleAlignment : the block's title alignment, which the buttons follow
    ───────────────────────────────────────────────────────────────────────── #}
@@ -93,7 +94,7 @@
         {% endif %}
 
         {% if step.image|default(null) is not empty %}
-            <div class="iw-timeline-step__image">
+            <div class="iw-timeline-step__image {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                     media: step.image,
                     format: 'iw_theme_4_3',

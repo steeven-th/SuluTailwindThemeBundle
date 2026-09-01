@@ -323,6 +323,21 @@ a:hover {
 .iw-maxw--5xl { --iw-maxw-choice: var(--container-5xl, 64rem); }
 .iw-maxw--6xl { --iw-maxw-choice: var(--container-6xl, 72rem); }
 
+/* Image maximum width. An image fills whatever holds it, which is right for a
+   banner and far too much for a pictogram or an illustration beside a
+   paragraph. Capping the block instead narrows the text with it, so this is a
+   separate setting rather than a variant of the one above.
+
+   The wrapper is capped, not the <img>: the partial sizes the image to its
+   container, and constraining the container keeps the radius and the ratio
+   box in step with it. A project moves the whole scale by redefining these
+   five variables once. */
+.iw-imgw--xs { max-width: var(--iw-imgw-xs, 8rem); }
+.iw-imgw--sm { max-width: var(--iw-imgw-sm, 12rem); }
+.iw-imgw--md { max-width: var(--iw-imgw-md, 16rem); }
+.iw-imgw--lg { max-width: var(--iw-imgw-lg, 24rem); }
+.iw-imgw--xl { max-width: var(--iw-imgw-xl, 32rem); }
+
 /* ─── Horizontal Rule ───────────────────────────────────────────────────── */
 hr {
     height: 2px;

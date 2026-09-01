@@ -37,7 +37,7 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 | `.iw-timeline-step__icon` / `__icon-img` | Pictogram shown in the card, when the marker is set to hold something else. |
 | `.iw-timeline-step__date` | The date in the card. A `<time datetime>` in real date mode, a `<span>` in free text mode. |
 | `.iw-timeline-step__title` / `__subtitle` | Step heading, alongside the shared `.iw-block__title` / `.iw-block__subtitle`. |
-| `.iw-timeline-step__image` | Wrapper of the step image. Carries the image radius. |
+| `.iw-timeline-step__image` | Wrapper of the step image. Carries the image radius, and the `iw-imgw--*` cap when the block sets one. See [image maximum width](../transverse.md#image-maximum-width). |
 | `.iw-timeline-step__text` | Rich text, alongside `prose`. |
 
 ---
@@ -118,6 +118,8 @@ The line is positioned from `--iw-timeline-marker-size`, so both stay aligned on
 
 ## Notes
 
-**Pictogram size.** It is capped in CSS, not by the image format. Sulu does not run SVG through its thumbnail pipeline, so an SVG pictogram arrives at its natural size and the `iw_theme_icon` format never applies to it. The format exists for raster pictograms, where it avoids shipping a full size image for a 24 pixel marker.
+**Pictogram size.** It is capped in CSS, not by the image format, because a vector pictogram comes back at whatever size it declares. Sulu does expose the `iw_theme_icon` URL for an SVG, and that URL serves the original file untouched, so the format is only doing real work for raster pictograms, where it avoids shipping a full size image for a 24 pixel marker.
+
+**SVG pictograms.** The shared image partial deliberately emits no `avif` or `webp` `<source>` for a vector. Sulu exposes those thumbnail keys for an SVG like it does for anything else, but requesting one asks the image converter to rasterize a vector and it answers `500`. Nothing is lost: a vector is already smaller than any raster of it.
 
 **Marker content.** Which of the icon, the number or the date the marker holds is decided once for the whole block, in the admin. A pictogram set on a step is never lost: it moves into the card when the marker holds something else.

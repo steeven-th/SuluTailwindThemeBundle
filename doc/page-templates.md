@@ -266,6 +266,7 @@ the fields an editor already knows from the other blocks.
 | `block-margins.xml` | The two vertical margins alone | settings |
 | `block-lateral-margins.xml` | `lateralMargins` alone | settings |
 | `block-max-width.xml` | `maxWidth` alone | settings |
+| `block-image-max-width.xml` | `imageMaxWidth`, a cap on the images the block renders | settings |
 | `block-paddings.xml` | The three paddings alone | settings |
 | `block-radius.xml` | `blockRadius`, the radius of the block surface | settings |
 | `block-card-radius.xml` | `cardRadius`, for blocks repeating a card | settings |
