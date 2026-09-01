@@ -348,6 +348,14 @@ a:hover {
 .iw-split-cols--align-end { align-items: end; }
 .iw-split-cols--align-stretch { align-items: stretch; }
 
+/* A column that measures the media instead of a share of the block. Meant for
+   a capped image: the cap decides the width, this stops the column from
+   leaving a gap around it, and there is no ratio left to guess. Bounded at
+   40% so an uncapped image cannot take over the row. */
+.iw-split-cols--auto { --iw-split-media: min(max-content, 40%); }
+
+.iw-split-cols--1-8 { --iw-split-content: 7fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-6 { --iw-split-content: 5fr; --iw-split-media: 1fr; }
 .iw-split-cols--1-4 { --iw-split-content: 3fr; --iw-split-media: 1fr; }
 .iw-split-cols--1-3 { --iw-split-content: 2fr; --iw-split-media: 1fr; }
 .iw-split-cols--2-5 { --iw-split-content: 3fr; --iw-split-media: 2fr; }

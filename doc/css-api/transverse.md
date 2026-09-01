@@ -352,6 +352,9 @@ The steps name the share taken by the **media** zone (image, map, panel), the
 content taking the rest.
 
 ```css
+.iw-split-cols--auto { --iw-split-media: min(max-content, 40%); }
+.iw-split-cols--1-8 { --iw-split-content: 7fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-6 { --iw-split-content: 5fr; --iw-split-media: 1fr; }
 .iw-split-cols--1-4 { --iw-split-content: 3fr; --iw-split-media: 1fr; }
 .iw-split-cols--1-3 { --iw-split-content: 2fr; --iw-split-media: 1fr; }
 .iw-split-cols--2-5 { --iw-split-content: 3fr; --iw-split-media: 2fr; }
@@ -455,6 +458,11 @@ split decides how wide the column is, the cap decides how much of it the image
 fills. A pictogram beside a paragraph usually wants both, a quarter of the
 block and a 96px image inside it, because a quarter of a wide block is still
 300px.
+
+For that case the `auto` split is the shorter route: it sizes the column to the
+media rather than to a share of the block, so a capped pictogram leaves no gap
+around itself and there is no ratio to work out per block width. It is bounded
+at 40%, so an uncapped image cannot take the row over.
 
 The class goes on the element wrapping the image, not on the `<img>`: the image
 partial sizes the picture to its container, so capping the container keeps the

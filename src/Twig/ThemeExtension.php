@@ -55,7 +55,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @var list<string>
      */
-    public const MEDIA_RATIO_STEPS = ['1-4', '1-3', '2-5', '1-2', '3-5', '2-3', '3-4'];
+    public const MEDIA_RATIO_STEPS = ['auto', '1-8', '1-6', '1-4', '1-3', '2-5', '1-2', '3-5', '2-3', '3-4'];
 
     /**
      * Vertical alignments offered by the two-zone blocks.
