@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: how a block sits inside the page container.
+
+    Three answers, and they decide where the background stops:
+      - exterior: the block stays inside the container, background included
+      - interior: the background runs edge to edge, the content stays centred
+      - none:     both go full width, for maps, carousels and hero banners
+
+    It shares a row with the maximum width field, which is the other half of
+    the same decision, hence the matching colspan.
+
+    Bundled in `block-spacing.xml`. Include it on its own when a block hides
+    the field for some layouts, the way `text_images` does for its hero banner:
+
+        <xi:include href="../fragments/block-lateral-margins.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="lateralMargins" type="single_select" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.lateral_margins</title></meta>
+        <params>
+            <param name="default_value" value="exterior"/>
+            <param name="values" type="collection">
+                <param name="exterior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_exterior</title></meta></param>
+                <param name="interior"><meta><title>iw_sulu_tailwind_theme.lateral_margins_interior</title></meta></param>
+                <param name="none"><meta><title>iw_sulu_tailwind_theme.lateral_margins_none</title></meta></param>
+            </param>
+        </params>
+    </property>
+</properties>

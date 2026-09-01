@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: the whole spacing group of a block, in its canonical order.
+
+    Margins, then how the block sits in the container, then its maximum width,
+    then the inner paddings. Every block opens its `settings` section with it,
+    which is what keeps the settings tab recognisable from one block to the
+    next and makes a change to the group land everywhere at once.
+
+        <xi:include href="../fragments/block-spacing.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    A block that has to alter one field composes the group from the four
+    fragments below instead of including this one, and writes only the field
+    it changes. See `text_images` for a worked example.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="block-margins.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <xi:include href="block-lateral-margins.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <xi:include href="block-max-width.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <xi:include href="block-paddings.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+</properties>

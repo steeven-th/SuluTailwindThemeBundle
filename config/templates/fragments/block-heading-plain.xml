@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: title and subtitle as plain text lines.
+
+    Same fields as `block-heading.xml`, without the rich title editor. Used by
+    blocks whose heading is echoed somewhere the accent markup cannot follow,
+    such as the code block caption and the form block heading.
+
+    The level and the alignment are not bundled here because these blocks do
+    not all expose both. Add what applies:
+
+        <xi:include href="../fragments/block-heading-plain.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+        <xi:include href="../fragments/block-title-tag.xml" .../>
+        <xi:include href="../fragments/block-title-alignment.xml" .../>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="title" type="text_line">
+        <meta>
+            <title>iw_sulu_tailwind_theme.title</title>
+            <info_text>iw_sulu_tailwind_theme.title_info</info_text>
+        </meta>
+    </property>
+    <property name="subTitle" type="text_line">
+        <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+    </property>
+</properties>

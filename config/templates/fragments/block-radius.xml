@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: corner radius of the block itself.
+
+    It rounds the block background, so it only shows once the block has one.
+    An empty value follows the theme, which is why the selector is given the
+    `cardRadius` theme key: a block that carries a background reads as a
+    surface, and surfaces share the card radius by default.
+
+    Include it in the `settings` section, right after the spacing group:
+
+        <xi:include href="../fragments/block-radius.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
+        <params>
+            <param name="theme_key" value="cardRadius"/>
+        </params>
+    </property>
+</properties>

@@ -443,9 +443,9 @@ Three article templates will appear in the admin, each in its own tab:
 | **Event** (`iw_event`) | events | Events with start/end dates, location (physical or online), organizer |
 | **Blog Post** (`iw_blog_post`) | publications | Blog/journal articles with excerpt and reading time |
 
-All templates use shared [XML fragments](config/templates/fragments/) (`article-hero`, `article-authors`, `article-dates`, etc.) that you can also include in your own custom article templates via `xi:include`.
+All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `article-hero`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
 
-The article body accepts the **same 17 block types as a page** — the full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
+The article body accepts the **same 16 block types as a page**, because both include the same `page-blocks.xml` fragment. The full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
 
 Each article type comes with **multiple page styles** that can be selected via theme configuration:
 
@@ -745,7 +745,7 @@ SuluTailwindThemeBundle/
 │   ├── lists/              # Sulu admin list XML
 │   ├── templates/
 │   │   ├── pages/          # Page template XML (uses <type ref="..."/>)
-│   │   ├── blocks/         # Global block type definitions (15 types)
+│   │   ├── blocks/         # Global block type definitions (16 types)
 │   │   ├── blocks-code/    # Code block, sandboxed variant (default)
 │   │   ├── blocks-code-open/ # Code block + unsandboxed opt-in variant
 │   │   └── fragments/      # Shared property fragments (reference)

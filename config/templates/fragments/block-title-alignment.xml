@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: horizontal alignment of a block heading.
+
+    Applies to the title and the subtitle as a pair, never to the body text,
+    which follows its own editor formatting.
+
+    Bundled in `block-heading.xml`. Include it on its own for blocks that write
+    their own title fields, such as the code and form blocks:
+
+        <xi:include href="../fragments/block-title-alignment.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="titleAlignment" type="single_select">
+        <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
+        <params>
+            <param name="default_value" value="left"/>
+            <param name="values" type="collection">
+                <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+            </param>
+        </params>
+    </property>
+</properties>

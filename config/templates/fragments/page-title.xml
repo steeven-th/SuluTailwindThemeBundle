@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: the title every page and article opens with.
+
+    It carries the `sulu.rlp.part` tag, which is what feeds the URL generator,
+    and the `headline` param, which is what puts the field in the form header
+    rather than in the body. Both are easy to forget when writing a template
+    from scratch, which is the reason this one-property fragment exists.
+
+    Bundled in `page-header.xml` and `article-header.xml`.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="title" type="text_line" mandatory="true">
+        <meta><title>iw_sulu_tailwind_theme.title</title></meta>
+        <params>
+            <param name="headline" value="true"/>
+        </params>
+        <tag name="sulu.rlp.part"/>
+    </property>
+</properties>

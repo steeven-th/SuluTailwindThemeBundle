@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: title and URL of a page.
+
+    The `route` type is what makes a page addressable on its own, as opposed
+    to an article, which hangs under a page and uses `page_tree_route`. See
+    `article-header.xml` for that variant.
+
+    Include it first in a page template's properties:
+
+        <xi:include href="../fragments/page-header.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="page-title.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    <property name="url" type="route" mandatory="true">
+        <meta><title>iw_sulu_tailwind_theme.url</title></meta>
+        <tag name="sulu.rlp"/>
+    </property>
+</properties>

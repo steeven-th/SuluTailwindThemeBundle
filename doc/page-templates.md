@@ -81,13 +81,17 @@ The template system is built on a **modular architecture** that separates concer
 config/templates/
 ├── pages/
 │   └── iw_theme_default.xml              ← Page template (~50 lines, uses <type ref="..."/>)
-├── fragments/                       ← Shared property fragments (reference/documentation)
-│   ├── header.xml                   ← title + url properties
-│   ├── blocks.xml                   ← Block container with all type references
-│   └── components/
-│       ├── title_group.xml          ← title + subtitle + alignment (used by 16/17 blocks)
-│       ├── variant.xml              ← Color variant picker (used by 17/17 blocks)
-│       └── settings.xml             ← All settings properties (single source of truth)
+├── fragments/                       ← Shared property fragments, included via xi:include
+│   ├── page-header.xml              ← title + url (route), for pages
+│   ├── article-header.xml           ← title + url (page_tree_route), for articles
+│   ├── page-blocks.xml              ← Block container with every block type
+│   ├── page-hero.xml                ← Banner image + overriding H1
+│   ├── block-heading.xml            ← title + subTitle + level + alignment
+│   ├── block-spacing.xml            ← margins + lateral margins + max width + paddings
+│   ├── block-radius.xml             ← Block corner radius (card, image, paragraph variants)
+│   ├── block-variant.xml            ← Colour variant picker
+│   ├── block-background.xml         ← Background toggle
+│   └── cta-buttons.xml              ← Repeatable action buttons
 └── blocks/                          ← Global block types (registered via Sulu DI)
     ├── text.xml
     ├── text_images.xml
@@ -193,7 +197,7 @@ Since blocks are registered globally, creating a custom page template with a sub
 
 > The 3 article blocks use `smart_content` with `provider: articles` to fetch articles. Articles ship with the Sulu 3 core (`Sulu\Article`), so there is nothing extra to install.
 
-> **Article templates offer the same 17 types.** `iw_news`, `iw_event` and `iw_blog_post` declare the identical list, so a block behaves the same wherever it is placed — pages and article bodies share the block dispatcher (`components/_blocks.html.twig`), not just the block definitions.
+> **Article templates offer the same 16 types.** `iw_news`, `iw_event` and `iw_blog_post` include the same `page-blocks.xml` fragment as the page template, so the list cannot drift and a block behaves the same wherever it is placed. Pages and article bodies share the block dispatcher (`components/_blocks.html.twig`), not just the block definitions.
 
 Each block has 3 sections: **Content** (block-specific), **Appearance** (variant + style), and **Settings** (margins, paddings, radius, background).
 
@@ -222,11 +226,11 @@ Instead of manually writing header properties and block lists, you can **include
 
     <properties>
         <!-- Include header properties (title + url) from the bundle -->
-        <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/header.xml"
+        <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/page-header.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
         <!-- Include the full blocks container (all types) -->
-        <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/blocks.xml"
+        <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/page-blocks.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
     </properties>
 </template>
@@ -234,24 +238,66 @@ Instead of manually writing header properties and block lists, you can **include
 
 ### Available fragments
 
-| Fragment | Path | Description |
-|----------|------|-------------|
-| Header | `fragments/header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
-| Page hero | `fragments/page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
-| CTA buttons | `fragments/cta-buttons.xml` | `ctaButtons` (repeatable block of link + style) + `ctaAlignment` + `ctaDirection`. Include it in a custom block's `content` section to give it action buttons; render them with `blocks/common/_cta_buttons.html.twig`. |
-| Blocks | `fragments/blocks.xml` | `<block>` container with all 14 `<type ref="..."/>` |
-| Title group | `fragments/components/title_group.xml` | `title` + `subTitle` + `titleAlignment` (single_select) |
-| Variant | `fragments/components/variant.xml` | `variant` (iw_theme_variant_picker) |
-| Settings | `fragments/components/settings.xml` | All 9 settings properties (margins, paddings, radius, background) |
+Every fragment is a `<properties>` document holding one or more properties, and
+the bundle's own templates are built from them. Including one gives you exactly
+the fields an editor already knows from the other blocks.
+
+**Page and article level**
+
+| Fragment | Properties |
+|----------|------------|
+| `page-header.xml` | `title` (text_line, mandatory, rlp.part) + `url` (route, mandatory, rlp) |
+| `article-header.xml` | Same title + `url` as `page_tree_route`, for content hanging under a page |
+| `page-title.xml` | The title alone, when you write your own route field |
+| `page-blocks.xml` | `<block>` container with all 16 `<type ref="..."/>`. Use the `sulu:block` xpointer |
+| `page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
+
+**Block level**
+
+| Fragment | Properties | Section |
+|----------|------------|---------|
+| `block-heading.xml` | `title` + `subTitle` (iw_theme_title_editor) + `titleTag` + `titleAlignment` | content |
+| `block-heading-plain.xml` | Same two fields as plain `text_line`, without the accent markup | content |
+| `block-title-tag.xml` | `titleTag` alone (h2 / h3 / h4) | content |
+| `block-title-alignment.xml` | `titleAlignment` alone | content |
+| `cta-buttons.xml` | `ctaButtons` (repeatable block of link + style) + `ctaAlignment` + `ctaDirection`. Render them with `blocks/common/_cta_buttons.html.twig` | content |
+| `block-variant.xml` | `variant` (iw_theme_variant_picker) | appearance |
+| `block-spacing.xml` | `marginTop` + `marginBottom` + `lateralMargins` + `maxWidth` + `paddingTop` + `paddingBottom` + `paddingLateral` | settings |
+| `block-margins.xml` | The two vertical margins alone | settings |
+| `block-lateral-margins.xml` | `lateralMargins` alone | settings |
+| `block-max-width.xml` | `maxWidth` alone | settings |
+| `block-paddings.xml` | The three paddings alone | settings |
+| `block-radius.xml` | `blockRadius`, the radius of the block surface | settings |
+| `block-card-radius.xml` | `cardRadius`, for blocks repeating a card | settings |
+| `block-image-radius.xml` | `imageRadius`, for blocks rendering images | settings |
+| `block-paragraph-radius.xml` | `paragraphRadius`, for a text panel | settings |
+| `block-background.xml` | `showBackground` | settings |
 
 > **Note:** The `href` path is relative to your template file location. Adjust `../../../vendor/` according to where your template sits relative to the project root. Typically, for templates in `config/templates/pages/`, the path is `../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/...`.
 
-You can also **include individual settings properties** using XPointer with a `@name` selector:
+### Composite and granular fragments
+
+`block-spacing.xml` is itself built from `block-margins`, `block-lateral-margins`,
+`block-max-width` and `block-paddings`, and `block-heading.xml` from
+`block-title-tag` and `block-title-alignment`. Include the composite for the
+usual case, one include and the canonical field order:
 
 ```xml
-<!-- Include only marginTop from settings.xml -->
-<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/components/settings.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property[@name='marginTop'])"/>
+<xi:include href=".../fragments/block-spacing.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+```
+
+Include the granular ones when a block has to change a single field. The
+`text_images` block does exactly that: it hides the lateral margins on its hero
+banner layout, so it lists `block-margins`, its own conditional `lateralMargins`,
+`block-max-width` and `block-paddings` instead of the composite.
+
+You can also pick a single property out of any fragment with an XPointer
+`@name` selector:
+
+```xml
+<xi:include href=".../fragments/block-paddings.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property[@name='paddingTop'])"/>
 ```
 
 ## Excluding the bundle's page template

@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: whether the block paints its colour variant as a background.
+
+    Off, the variant only tints the text and the accents, which is how a block
+    blends into the page. On, the variant fills the block surface, and the
+    radius and lateral margins start to matter.
+
+    It closes the `settings` section, after the radius fields:
+
+        <xi:include href="../fragments/block-background.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="showBackground" type="checkbox">
+        <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
+        <params>
+            <param name="default_value" value="true"/>
+        </params>
+    </property>
+</properties>
