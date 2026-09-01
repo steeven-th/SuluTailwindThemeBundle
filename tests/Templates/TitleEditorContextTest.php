@@ -89,23 +89,62 @@ final class TitleEditorContextTest extends TestCase
         }
     }
 
+    /**
+     * Counted on the shipped templates once their fragments are resolved, not
+     * on the files as text: a heading declared once in `block-heading.xml`
+     * reaches 13 blocks, and what matters is how many fields an editor meets,
+     * not how many times the bundle spells them out.
+     */
     #[Test]
     public function theShippedTemplatesCoverBothContexts(): void
     {
         $found = [];
 
-        foreach (self::templateProvider() as [$path]) {
-            $contents = (string) file_get_contents($path);
-            preg_match_all('/<param name="context" value="([a-z]+)"\/>/', $contents, $matches);
-            foreach ($matches[1] as $context) {
-                $found[$context] = ($found[$context] ?? 0) + 1;
+        foreach (self::shippedTemplates() as $path) {
+            $document = new \DOMDocument();
+            self::assertTrue($document->load($path));
+            self::assertNotFalse($document->xinclude());
+
+            $xpath = new \DOMXPath($document);
+            $xpath->registerNamespace('sulu', 'http://schemas.sulu.io/template/template');
+
+            $contexts = $xpath->query(
+                '//sulu:property[@type="iw_theme_title_editor"]/sulu:params/sulu:param[@name="context"]/@value',
+            );
+            self::assertNotFalse($contexts);
+
+            foreach ($contexts as $context) {
+                $value = (string) $context->nodeValue;
+                $found[$value] = ($found[$value] ?? 0) + 1;
             }
         }
 
         ksort($found);
 
-        // 26 block headings (13 blocks x title + subTitle), 2 page hero fields
-        // and 1 article subtitle.
-        self::assertSame(['blocks' => 26, 'pages' => 3], $found);
+        // 26 block headings (13 blocks x title + subTitle), then the hero
+        // fields as an editor meets them: 2 in each of the two page templates,
+        // 1 in each of the three article templates.
+        self::assertSame(['blocks' => 26, 'pages' => 7], $found);
+    }
+
+    /**
+     * The templates Sulu loads, as opposed to the fragments they are built
+     * from: counting a fragment on its own would count its fields once, and
+     * counting it again through every template that includes it.
+     *
+     * @return list<string>
+     */
+    private static function shippedTemplates(): array
+    {
+        $paths = [];
+        foreach (['blocks', 'blocks-code', 'blocks-code-open', 'blocks-form', 'blocks-form-bundle', 'pages', 'articles'] as $directory) {
+            foreach (glob(self::templatesDir() . '/' . $directory . '/*.xml') ?: [] as $path) {
+                $paths[] = $path;
+            }
+        }
+
+        self::assertNotEmpty($paths);
+
+        return $paths;
     }
 }
