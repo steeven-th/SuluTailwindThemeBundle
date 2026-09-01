@@ -66,5 +66,8 @@
     "iw_sulu_tailwind_theme.form_csrf_invalid": "Ihre Sitzung ist abgelaufen. Bitte senden Sie die Nachricht erneut.",
     "iw_sulu_tailwind_theme.form_technical_error": "Ihre Nachricht konnte aus technischen Gründen nicht gesendet werden. Bitte versuchen Sie es später erneut.",
     "iw_sulu_tailwind_theme.form_honeypot_label": "Dieses Feld nicht ausfüllen",
-    "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile ist aktiviert, aber es ist kein Site-Key konfiguriert: Es wird kein Widget gerendert, während die serverseitige Prüfung weiterläuft - jede Übermittlung wird abgelehnt. Prüfen Sie die Umgebungsvariable hinter itech_world_sulu_tailwind_theme.turnstile.site_key."
+    "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile ist aktiviert, aber es ist kein Site-Key konfiguriert: Es wird kein Widget gerendert, während die serverseitige Prüfung weiterläuft - jede Übermittlung wird abgelehnt. Prüfen Sie die Umgebungsvariable hinter itech_world_sulu_tailwind_theme.turnstile.site_key.",
+    "iw_sulu_tailwind_theme.timeline_state_done": "Schritt abgeschlossen",
+    "iw_sulu_tailwind_theme.timeline_state_current": "Schritt laufend",
+    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Geplanter Schritt"
 }

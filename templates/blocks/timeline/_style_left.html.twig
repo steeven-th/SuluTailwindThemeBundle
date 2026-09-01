@@ -1,0 +1,38 @@
+{# Timeline block - line on the left, every card on its right.
+
+   The layout to pick when the steps carry long text or images, which the
+   alternating one has to squeeze into half the width. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if text is defined and text is not empty %}
+        <div class="iw-block__text iw-block-timeline__intro prose max-w-none">
+            {{ text|raw }}
+        </div>
+    {% endif %}
+
+    {#- The view data carries the link targets and labels of the per step
+        buttons. `_key` is this block's index in the page, which is how the
+        dispatcher lets a block reach its own view branch. -#}
+    {% set stepsView = _key|default(null) is not null ? view.blocks[_key].steps|default([]) : [] %}
+
+    {% include '@ItechWorldSuluTailwindTheme/blocks/timeline/_steps.html.twig' with {
+        layout: 'left',
+        steps: steps|default([]),
+        stepsView: stepsView,
+        dotContent: dotContent|default('icon'),
+        dateMode: dateMode|default('text'),
+        dateFormat: dateFormat|default('month_year'),
+        cardRadius: cardRadius|default(''),
+        imageRadius: imageRadius|default(''),
+        titleAlignment: titleAlignment|default('left')
+    } only %}
+{% endblock %}

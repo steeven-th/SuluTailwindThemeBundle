@@ -70,6 +70,7 @@ class ThemeAdmin extends Admin
         'testimonial',
         'form',
         'key_figures',
+        'timeline',
         'document',
         'linked_pages',
         'code',
@@ -105,6 +106,12 @@ class ThemeAdmin extends Admin
             ['key' => 'carousel', 'label' => 'iw_sulu_tailwind_theme.style.carousel'],
             ['key' => 'wide_carousel', 'label' => 'iw_sulu_tailwind_theme.style.wide_carousel'],
             ['key' => 'filmstrip', 'label' => 'iw_sulu_tailwind_theme.style.filmstrip'],
+        ],
+        'timeline' => [
+            ['key' => 'alternate', 'label' => 'iw_sulu_tailwind_theme.style.alternate'],
+            ['key' => 'left', 'label' => 'iw_sulu_tailwind_theme.style.timeline_left'],
+            ['key' => 'right', 'label' => 'iw_sulu_tailwind_theme.style.timeline_right'],
+            ['key' => 'horizontal', 'label' => 'iw_sulu_tailwind_theme.style.horizontal'],
         ],
         'key_figures' => [
             ['key' => 'inline', 'label' => 'iw_sulu_tailwind_theme.style.inline'],

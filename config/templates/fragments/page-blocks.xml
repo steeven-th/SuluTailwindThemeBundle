@@ -25,6 +25,7 @@
             <type ref="text_images"/>
             <type ref="gallery"/>
             <type ref="key_figures"/>
+            <type ref="timeline"/>
             <type ref="linked_pages"/>
             <type ref="location"/>
             <type ref="form"/>

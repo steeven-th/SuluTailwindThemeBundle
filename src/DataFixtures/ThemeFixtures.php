@@ -1557,6 +1557,15 @@ class ThemeFixtures
                     ['key' => 'grid_2x2', 'label' => 'Grille 2x2', 'twig' => '_style_grid_2x2.html.twig'],
                 ],
             ],
+            'timeline' => [
+                'enabled' => true,
+                'styles' => [
+                    ['key' => 'alternate', 'label' => 'Alternee', 'twig' => '_style_alternate.html.twig', 'default' => true],
+                    ['key' => 'left', 'label' => 'Ligne a gauche', 'twig' => '_style_left.html.twig'],
+                    ['key' => 'right', 'label' => 'Ligne a droite', 'twig' => '_style_right.html.twig'],
+                    ['key' => 'horizontal', 'label' => 'Horizontale', 'twig' => '_style_horizontal.html.twig'],
+                ],
+            ],
             'linked_pages' => [
                 'enabled' => true,
                 'styles' => [
