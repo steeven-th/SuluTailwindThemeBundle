@@ -225,21 +225,25 @@ Register a global block type in `config/templates/blocks/my_block.xml`:
             </properties>
         </section>
 
-        <!-- Appearance section: variant + style pickers from the bundle -->
+        <!-- Appearance section: the same colour variant picker as every block -->
         <section name="appearance">
             <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
             <properties>
-                <property name="variant" type="iw_theme_variant_picker" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
-                </property>
+                <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-variant.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
 
-        <!-- Settings section: include all settings from the bundle -->
+        <!-- Settings section: spacing group, radius and background, in the order
+             the bundle's own blocks use, so the tab reads the same everywhere -->
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
-                <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/components/settings.xml"
+                <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-spacing.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-background.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
@@ -247,15 +251,25 @@ Register a global block type in `config/templates/blocks/my_block.xml`:
 </template>
 ```
 
-You can also include just specific settings properties using `@name` selectors:
+`block-spacing.xml` bundles the margins, the lateral margins, the maximum width
+and the paddings. Include the granular fragments instead when your block only
+needs part of the group, or has to alter one field:
 
 ```xml
-<!-- Only margin top and bottom -->
-<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/components/settings.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property[@name='marginTop'])"/>
-<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/components/settings.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property[@name='marginBottom'])"/>
+<!-- Only the vertical margins -->
+<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-margins.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 ```
+
+And pick a single property out of any fragment with an `@name` selector:
+
+```xml
+<xi:include href="../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/block-paddings.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property[@name='paddingTop'])"/>
+```
+
+The full list of fragments is in
+[page-templates.md](./page-templates.md#available-fragments).
 
 ### Step 2: Create the Twig template
 
@@ -316,6 +330,10 @@ Add the field to your block with the shared fragment, in the `settings` section:
     </types>
 </block>
 ```
+
+Writing your own container is the way to mix your block with the bundle's: the
+`page-blocks.xml` fragment ships a fixed list, so a template that needs an extra
+type declares the container itself and references the types it wants by name.
 
 ### Minimal integration (without the wrapper)
 
