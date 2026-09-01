@@ -55,6 +55,7 @@ Each content block has its own CSS API page. Override-friendly via `--iw-block-{
 | Code / Widget | default / fullwidth | [`css-api/blocks/code.md`](./css-api/blocks/code.md) |
 | Separator | line / divider / spacer | [`css-api/blocks/separator.md`](./css-api/blocks/separator.md) |
 | Key figures | grid_2x2 / inline / progress / timeline / with_icons | [`css-api/blocks/key-figures.md`](./css-api/blocks/key-figures.md) |
+| Timeline | alternate / left / right / horizontal | [`css-api/blocks/timeline.md`](./css-api/blocks/timeline.md) |
 | Testimonial | cards / minimal / slider | [`css-api/blocks/testimonial.md`](./css-api/blocks/testimonial.md) |
 | Linked pages | cards / carousel / list / minimal | [`css-api/blocks/linked-pages.md`](./css-api/blocks/linked-pages.md) |
 | Document | default / grid | [`css-api/blocks/document.md`](./css-api/blocks/document.md) |
