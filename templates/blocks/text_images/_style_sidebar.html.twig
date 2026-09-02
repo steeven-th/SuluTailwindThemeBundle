@@ -128,7 +128,7 @@
 
             {# Sidebar images — 2/5 = 40%.
                Grid cell stretches to full row height; sticky child stays visible while text scrolls. #}
-            <div class="iw-block-text-images__image-column{{ isRight ? ' md:order-1' : ' md:order-2' }} {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}">
+            <div class="iw-block-text-images__image-column{{ isRight ? ' md:order-1' : ' md:order-2' }} {{ widgetKind == 'image' ? iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) : '' }}">
                 <div class="iw-block-text-images__image-wrap {{ imageRadiusClass }} overflow-hidden" style="position: sticky; top: 6rem;">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                         widget: widget|default([]),
