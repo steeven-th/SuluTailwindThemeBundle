@@ -16,7 +16,14 @@
    nothing at all rather than an empty box.
    ───────────────────────────────────────────────────────────────────────── #}
 
-{% set item = widget is defined and widget is iterable ? (widget|first) : null %}
+{# A `maxOccurs="1"` block is stored as a one-item list but reaches the template
+   as the item itself, so `|first` would return the value of its first key. Both
+   shapes are accepted: the presence of `type` tells them apart, and a list still
+   works should Sulu ever hand one over. #}
+{% set item = null %}
+{% if widget is defined and widget is iterable %}
+    {% set item = widget.type is defined ? widget : (widget|first) %}
+{% endif %}
 
 {% if item %}
     {% set kind = item.type|default('image') %}

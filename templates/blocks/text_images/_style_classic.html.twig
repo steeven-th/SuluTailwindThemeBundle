@@ -8,7 +8,10 @@
    also show a video, a map or a text panel branches on `widgetKind` where it
    renders the zone. The others ignore the other types, which the field's info
    text warns about. #}
-{% set widgetItem = widget is defined and widget is iterable ? (widget|first) : null %}
+{% set widgetItem = null %}
+{% if widget is defined and widget is iterable %}
+    {% set widgetItem = widget.type is defined ? widget : (widget|first) %}
+{% endif %}
 {% set widgetKind = widgetItem ? widgetItem.type|default('image') : 'image' %}
 {% set rawWidgetImages = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
 {# `media_selection` is stored as `{ids: [...]}` and resolved to a plain list at
