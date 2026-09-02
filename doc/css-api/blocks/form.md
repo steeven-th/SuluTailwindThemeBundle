@@ -4,7 +4,7 @@ Wrapper block that renders a contact / signup form. The `useSuluFormBundle` admi
 
 - `--centered`: single column constrained to `max-w-2xl`, centered horizontally.
 - `--card`: single column constrained to `max-w-xl` with a white surface, shadow and large internal padding.
-- `--split`: two columns on `lg+`. One column hosts the form, the other is an "info" panel with the primary color background that hosts a **configurable widget** (rich text, image, or location map — picked via the `widgetType` admin field). The `formRight` toggle controls the column order: off by default → form on the left, widget on the right; on → form on the right, widget on the left.
+- `--split`: two columns on `lg+`. One column hosts the form, the other is an "info" panel with the primary color background that hosts a **configurable widget** (images, a video, a map or a rich text panel). The widget is a Sulu block type the editor picks, shared with `text_images`, see [transverse.md](../transverse.md) and [custom-integration.md](../../custom-integration.md#the-widget-zone). The `formRight` toggle controls the column order: off by default → form on the left, widget on the right; on → form on the right, widget on the left.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 >
@@ -28,18 +28,18 @@ Wrapper block that renders a contact / signup form. The `useSuluFormBundle` admi
 | Class | Role |
 |-------|------|
 | `.iw-block-form__content` | Wrapper around the included `_form_content.html.twig` partial. Always present, but the surrounding layout differs per modifier. |
-| `.iw-block-form__info` | `--split` only — info panel rendered on the left column on `lg+` (stacks above the form on mobile). Carries `bg-[var(--color-primary)] text-white` by default but the background is overridable via custom property (see below). Hosts the widget partial selected by `widgetType`. |
+| `.iw-block-form__info` | `--split` only — info panel rendered on the left column on `lg+` (stacks above the form on mobile). Carries `bg-[var(--color-primary)] text-white` by default but the background is overridable via custom property (see below). Hosts the shared widget partial, whichever kind the editor picked. |
 
 ### `--split` widget elements
 
-The info column renders one of three partials depending on the `widgetType` admin field:
+The info column renders the shared widget partial, which carries its own
+classes (`.iw-widget`, `.iw-widget--image` and so on). The block only styles the
+panel around it:
 
 | Class | Role |
 |-------|------|
 | `.iw-block-form__widget` | Stable hook on the widget wrapper. Always present in `--split`. |
-| `.iw-block-form__widget--text` | Modifier when `widgetType=text`. Wraps a `prose max-w-none` rich-text block fed by the `widgetText` text_editor field. |
-| `.iw-block-form__widget--image` | Modifier when `widgetType=image`. Wraps an `<img>` (`object-fit: cover`, height fills the info column). |
-| `.iw-block-form__widget--location` | Modifier when `widgetType=location`. Wraps the Leaflet map + the formatted address row. |
+| `.iw-widget--text` / `--image` / `--video` / `--location` | Set by the shared widget partial according to the kind. |
 | `.iw-block-form__image` | The `<img>` inside `--image`. |
 | `.iw-block-form__map-wrap` | Wrapper around the Leaflet map (carries the `imageRadius` class + `overflow-hidden`; theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-form__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
