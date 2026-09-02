@@ -1,6 +1,22 @@
 {# Text + Images block — 50/50 split screen with full-height image slider #}
 
 {# The buttons belong under the text, not under the whole block. #}
+{# ── Widget zone ──
+   The media zone is one `widget` block, typed by the editor. Mapping it back
+   to `images` and `image` keeps every rendering below untouched: what used to
+   be two fields is now one, and only the reading changes. A style that can
+   also show a video, a map or a text panel branches on `widgetKind` where it
+   renders the zone. The others ignore the other types, which the field's info
+   text warns about. #}
+{% set widgetItem = widget is defined and widget is iterable ? (widget|first) : null %}
+{% set widgetKind = widgetItem ? widgetItem.type|default('image') : 'image' %}
+{% set images = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
+{# `media_selection` yields raw ids, `single_media_selection` yielded an object.
+   The layouts painting a background were written against the latter, so the
+   first id is wrapped to keep `image.id` working. #}
+{% set firstImageId = images|first|default(null) %}
+{% set image = firstImageId ? {'id': firstImageId} : null %}
+{% set showImagesName = widgetItem ? widgetItem.showImagesName|default(false) : false %}
 {% set ctaBlockKey = _key|default(null) %}
 {# Does NOT extend _block_wrapper because padding applies to content only,
    not the section, so the image always fills its half edge-to-edge. #}
@@ -94,7 +110,18 @@
                 data-slider-interval-value="5000"
             {% endif %}
         >
-            {% if resolvedImages|length == 1 %}
+            {# The cover rendering below only makes sense for an image: it stretches
+           the media to the full height of the zone. The other widget kinds keep
+           their natural rendering, which is what the shared partial gives. #}
+        {% if widgetKind != 'image' %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+                widget: widget|default([]),
+                imageFormat: format|default('iw_theme_16_9'),
+                aspectRatio: '16/9',
+                imageRadius: imageRadiusClass|default(''),
+                blockPrefix: 'iw-block-text-images'
+            } only %}
+        {% elseif resolvedImages|length == 1 %}
                 {% set media = resolvedImages[0] %}
                 <a
                     href="{{ media.url }}"

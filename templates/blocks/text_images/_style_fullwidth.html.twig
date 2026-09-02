@@ -1,6 +1,22 @@
 {# Text + Images block — full-width image with text content #}
 
 {# The buttons belong under the text, not under the whole block. #}
+{# ── Widget zone ──
+   The media zone is one `widget` block, typed by the editor. Mapping it back
+   to `images` and `image` keeps every rendering below untouched: what used to
+   be two fields is now one, and only the reading changes. A style that can
+   also show a video, a map or a text panel branches on `widgetKind` where it
+   renders the zone. The others ignore the other types, which the field's info
+   text warns about. #}
+{% set widgetItem = widget is defined and widget is iterable ? (widget|first) : null %}
+{% set widgetKind = widgetItem ? widgetItem.type|default('image') : 'image' %}
+{% set images = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
+{# `media_selection` yields raw ids, `single_media_selection` yielded an object.
+   The layouts painting a background were written against the latter, so the
+   first id is wrapped to keep `image.id` working. #}
+{% set firstImageId = images|first|default(null) %}
+{% set image = firstImageId ? {'id': firstImageId} : null %}
+{% set showImagesName = widgetItem ? widgetItem.showImagesName|default(false) : false %}
 {% set ctaBlockKey = _key|default(null) %}
 {# Custom section: image always edge-to-edge, padding applies to content only. #}
 {# Does NOT extend _block_wrapper because padding must not affect the image, #}
@@ -125,12 +141,12 @@
         {# Image first — edge-to-edge by default, framed with margin + radius
            when a real image radius is in effect. #}
         {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
-        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
-            images: images|default([]),
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+            widget: widget|default([]),
             imageFormat: format,
-            showName: showImagesName|default(false),
-            autoplay: true,
-            aspectRatio: ratio
+            aspectRatio: ratio,
+            imageRadius: imageRadiusClass|default(''),
+            blockPrefix: 'iw-block-text-images'
         } only %}
         {% if imageWrapClass %}</div>{% endif %}
     {% endif %}
@@ -181,12 +197,12 @@
         {# Image last — edge-to-edge by default, framed with margin + radius
            when a real image radius is in effect. #}
         {% if imageWrapClass %}<div class="iw-block-text-images__image-wrap {{ imageWrapClass }}">{% endif %}
-        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
-            images: images|default([]),
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+            widget: widget|default([]),
             imageFormat: format,
-            showName: showImagesName|default(false),
-            autoplay: true,
-            aspectRatio: ratio
+            aspectRatio: ratio,
+            imageRadius: imageRadiusClass|default(''),
+            blockPrefix: 'iw-block-text-images'
         } only %}
         {% if imageWrapClass %}</div>{% endif %}
     {% endif %}
