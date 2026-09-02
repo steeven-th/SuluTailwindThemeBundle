@@ -59,7 +59,8 @@
                     three this block used to offer: a video beside a form is as
                     reasonable as a picture, and it costs an include.
                 -->
-                <block name="widget" default-type="text" minOccurs="1" maxOccurs="1">
+                <block name="widget" default-type="text" minOccurs="1" maxOccurs="1"
+                       visibleCondition="__parent.style == 'split'">
                     <meta><title>iw_sulu_tailwind_theme.widget</title></meta>
                     <types>
                         <xi:include href="../fragments/widgets/text.xml"
