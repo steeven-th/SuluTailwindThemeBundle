@@ -130,3 +130,9 @@ The map's height is fixed via Tailwind utility classes (`h-[400px] md:h-[500px]`
     background-color: rgba(31, 41, 55, 0.85);
 }
 ```
+
+## Width split
+
+The two zones of this block share their width through the shared
+`.iw-split-cols` system, and the layout style sets the default share. See
+[transverse.md](../transverse.md#split-blocks-sharing-the-width).

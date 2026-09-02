@@ -32,6 +32,8 @@
             <param name="default_value" value=""/>
             <param name="values" type="collection">
                 <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_full</title></meta></param>
+                <param name="3xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_3xs</title></meta></param>
+                <param name="2xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_2xs</title></meta></param>
                 <param name="xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_xs</title></meta></param>
                 <param name="sm"><meta><title>iw_sulu_tailwind_theme.image_max_width_sm</title></meta></param>
                 <param name="md"><meta><title>iw_sulu_tailwind_theme.image_max_width_md</title></meta></param>

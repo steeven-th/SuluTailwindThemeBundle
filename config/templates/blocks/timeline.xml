@@ -17,30 +17,19 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_steps</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="text" type="text_editor">
                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>
                 </property>
 
-                <!--
-                    Settings that apply to the whole timeline come before the steps:
-                    they decide how every step is read, so an editor sets them once
-                    and then fills the steps without going back up.
-                -->
-                <property name="dotContent" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.timeline_dot_content</title>
-                        <info_text>iw_sulu_tailwind_theme.timeline_dot_content_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="icon"/>
-                        <param name="values" type="collection">
-                            <param name="icon"><meta><title>iw_sulu_tailwind_theme.timeline_dot_icon</title></meta></param>
-                            <param name="number"><meta><title>iw_sulu_tailwind_theme.timeline_dot_number</title></meta></param>
-                            <param name="date"><meta><title>iw_sulu_tailwind_theme.timeline_dot_date</title></meta></param>
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.timeline_dot_none</title></meta></param>
-                        </param>
-                    </params>
-                </property>
 
                 <!--
                     Free text accepts "Summer 2020" or "Since 2024", a real date
@@ -64,25 +53,6 @@
                     </params>
                 </property>
 
-                <!--
-                    A date picker stores a full day, so without this a timeline
-                    meant to read "2019" would show "1 January 2019".
-                -->
-                <property name="dateFormat" type="single_select" colspan="6"
-                          visibleCondition="__parent.dateMode == 'date'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.timeline_date_format</title>
-                        <info_text>iw_sulu_tailwind_theme.timeline_date_format_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="month_year"/>
-                        <param name="values" type="collection">
-                            <param name="year"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_year</title></meta></param>
-                            <param name="month_year"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_month_year</title></meta></param>
-                            <param name="full"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_full</title></meta></param>
-                        </param>
-                    </params>
-                </property>
 
                 <block name="steps" default-type="step" minOccurs="1">
                     <meta>
@@ -175,7 +145,52 @@
                         <param name="block_type" value="timeline"/>
                     </params>
                 </property>
+            </properties>
+        </section>
 
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
+                <!--
+                    Settings that apply to the whole timeline come before the steps:
+                    they decide how every step is read, so an editor sets them once
+                    and then fills the steps without going back up.
+                -->
+                <property name="dotContent" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.timeline_dot_content</title>
+                        <info_text>iw_sulu_tailwind_theme.timeline_dot_content_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="icon"/>
+                        <param name="values" type="collection">
+                            <param name="icon"><meta><title>iw_sulu_tailwind_theme.timeline_dot_icon</title></meta></param>
+                            <param name="number"><meta><title>iw_sulu_tailwind_theme.timeline_dot_number</title></meta></param>
+                            <param name="date"><meta><title>iw_sulu_tailwind_theme.timeline_dot_date</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.timeline_dot_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!--
+                    A date picker stores a full day, so without this a timeline
+                    meant to read "2019" would show "1 January 2019".
+                -->
+                <property name="dateFormat" type="single_select" colspan="6"
+                          visibleCondition="__parent.dateMode == 'date'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.timeline_date_format</title>
+                        <info_text>iw_sulu_tailwind_theme.timeline_date_format_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="month_year"/>
+                        <param name="values" type="collection">
+                            <param name="year"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_year</title></meta></param>
+                            <param name="month_year"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_month_year</title></meta></param>
+                            <param name="full"><meta><title>iw_sulu_tailwind_theme.timeline_date_format_full</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <!--
                     Horizontal only: how many steps share the width. Four steps
                     of rich text turn into four narrow columns metres tall, so
@@ -197,13 +212,8 @@
                         </param>
                     </params>
                 </property>
-            </properties>
-        </section>
-
-        <!-- ── Settings ── -->
-        <section name="settings">
-            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
-            <properties>
+                <xi:include href="../fragments/block-image-max-width.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"
@@ -211,8 +221,6 @@
                 <xi:include href="../fragments/block-card-radius.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-image-radius.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <xi:include href="../fragments/block-image-max-width.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-background.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>

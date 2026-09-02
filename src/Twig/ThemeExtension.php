@@ -44,7 +44,28 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @var list<string>
      */
-    public const IMAGE_MAX_WIDTH_STEPS = ['xs', 'sm', 'md', 'lg', 'xl'];
+    public const IMAGE_MAX_WIDTH_STEPS = ['3xs', '2xs', 'xs', 'sm', 'md', 'lg', 'xl'];
+
+    /**
+     * Media share steps offered by `fragments/block-media-ratio.xml`.
+     *
+     * Named after the share the media zone takes. Each one must have a
+     * matching `.iw-split-cols--*` rule in `app.css`, which is what
+     * `MediaRatioContractTest` guards.
+     *
+     * @var list<string>
+     */
+    public const MEDIA_RATIO_STEPS = ['auto', '1-8', '1-6', '1-4', '1-3', '2-5', '1-2', '3-5', '2-3', '3-4'];
+
+    /**
+     * Vertical alignments offered by the two-zone blocks.
+     *
+     * Each one must have a matching `.iw-split-cols--align-*` rule in
+     * `app.css`, which is what `MediaRatioContractTest` guards.
+     *
+     * @var list<string>
+     */
+    public const ZONES_ALIGN_VALUES = ['start', 'center', 'end', 'stretch'];
 
     /**
      * Sequence backing getUniqueId(), reset between requests by reset().
@@ -110,6 +131,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_media_ratio_class', $this->getMediaRatioClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_zones_align_class', $this->getZonesAlignClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
             new TwigFunction('iw_sulu_tailwind_theme_title_markup', $this->getTitleMarkup(...), [
@@ -794,6 +817,53 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         return \in_array($value, self::IMAGE_MAX_WIDTH_STEPS, true)
             ? 'iw-imgw--' . $value
             : '';
+    }
+
+    /**
+     * Class sharing the width of a two-zone block between its two zones.
+     *
+     * The editor's value wins, and the style's own share takes over when it is
+     * empty or unknown. That fallback is the whole point: the setting is added
+     * to blocks that already ship, and an empty value has to leave them
+     * looking exactly as they did.
+     *
+     * @param string|null $value    step key, from the `mediaRatio` property
+     * @param string      $fallback the calling style's own share, e.g. '1-2'
+     *
+     * @return string the modifier class for `.iw-split-cols`
+     */
+    public function getMediaRatioClass(?string $value = null, string $fallback = '1-2'): string
+    {
+        $value = (string) $value;
+
+        if (!\in_array($value, self::MEDIA_RATIO_STEPS, true)) {
+            $value = \in_array($fallback, self::MEDIA_RATIO_STEPS, true) ? $fallback : '1-2';
+        }
+
+        return 'iw-split-cols--' . $value;
+    }
+
+    /**
+     * Class lining up the two zones of a block vertically.
+     *
+     * Same contract as the width split: the editor's value wins, the style's
+     * own alignment takes over when it is empty, so adding the field moves
+     * nothing until somebody asks.
+     *
+     * @param string|null $value    one of `ZONES_ALIGN_VALUES`, from `zonesAlign`
+     * @param string      $fallback the calling style's own alignment
+     *
+     * @return string the modifier class for `.iw-split-cols`
+     */
+    public function getZonesAlignClass(?string $value = null, string $fallback = 'stretch'): string
+    {
+        $value = (string) $value;
+
+        if (!\in_array($value, self::ZONES_ALIGN_VALUES, true)) {
+            $value = \in_array($fallback, self::ZONES_ALIGN_VALUES, true) ? $fallback : 'stretch';
+        }
+
+        return 'iw-split-cols--align-' . $value;
     }
 
     /**

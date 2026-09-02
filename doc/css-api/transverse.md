@@ -341,6 +341,90 @@ a block type that ships no `maxWidth` field at all stays out entirely.
 
 ---
 
+## Split blocks: sharing the width
+
+`.iw-split-gap` above spaces the two zones of a block, `.iw-split-cols` sizes
+them. Until 3.0 the share was a property of the layout style, hard-coded as
+Tailwind columns, so a picture beside a paragraph was locked at half the block
+whether it was a photograph or a 40px pictogram.
+
+The steps name the share taken by the **media** zone (image, map, panel), the
+content taking the rest.
+
+```css
+.iw-split-cols--auto { --iw-split-media: min(max-content, 40%); }
+.iw-split-cols--1-8 { --iw-split-content: 7fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-6 { --iw-split-content: 5fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-4 { --iw-split-content: 3fr; --iw-split-media: 1fr; }
+.iw-split-cols--1-3 { --iw-split-content: 2fr; --iw-split-media: 1fr; }
+.iw-split-cols--2-5 { --iw-split-content: 3fr; --iw-split-media: 2fr; }
+.iw-split-cols--1-2 { --iw-split-content: 1fr; --iw-split-media: 1fr; }
+.iw-split-cols--3-5 { --iw-split-content: 2fr; --iw-split-media: 3fr; }
+.iw-split-cols--2-3 { --iw-split-content: 1fr; --iw-split-media: 2fr; }
+.iw-split-cols--3-4 { --iw-split-content: 1fr; --iw-split-media: 3fr; }
+```
+
+The vertical alignment is a separate axis, and a separate field. A media can
+sit on the left and still align to the top, so folding the two into one select
+would have meant listing every combination and losing the ability to change one
+without restating the other.
+
+```css
+.iw-split-cols--align-start { align-items: start; }
+.iw-split-cols--align-center { align-items: center; }
+.iw-split-cols--align-end { align-items: end; }
+.iw-split-cols--align-stretch { align-items: stretch; }
+```
+
+Its default per style is what the layout hard-coded before: `center` for
+`classic`, `split_screen` and `map_with_info`, `stretch` for `sidebar` and
+`form/split`.
+
+Two more modifiers carry the rest of the behaviour:
+
+| Class | Role |
+|-------|------|
+| `.iw-split-cols--reverse` | Swaps the two columns. The zones keep their DOM order and the templates flip them visually with `order`, so without this the media would land in the column sized for the content whenever it sits on the left. |
+| `.iw-split-cols--from-lg` | Splits at `lg` instead of `md`. The styles never agreed on one breakpoint: a paragraph beside a picture splits early, a form or a map needs more room first. |
+
+**Styles offering the setting, and the share they default to:**
+
+| Block | Style | Media zone | Alignment | Splits at |
+|-------|-------|-----------|-----------|-----------|
+| `text_images` | `classic` | 1/2 | center | `md` |
+| `text_images` | `split_screen` | 1/2 | center | `lg` |
+| `text_images` | `sidebar` | 2/5 | stretch | `md` |
+| `form` | `split` | 1/2 | stretch | `lg` |
+| `location` | `map_with_info` | 2/3 | center | `lg` |
+
+An empty value keeps the style's own share, which is what let the setting be
+added to blocks that already ship without moving a single existing page. The
+Twig side takes that default as its second argument:
+
+```twig
+{% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '2-5') %}
+<div class="iw-split-gap iw-split-cols {{ splitClass }}">
+```
+
+**Override examples:**
+
+```css
+/* A share the admin does not offer, for one block type */
+.iw-block-location .iw-split-cols { --iw-split-media: 4fr; --iw-split-content: 1fr; }
+
+/* Keep a block's zones side by side on small screens too */
+@media (max-width: 47.99rem) {
+    .my-page .iw-block-form--split { grid-template-columns: 1fr 1fr; }
+}
+```
+
+The field is written out in each block rather than pulled from a fragment: it
+only applies to the styles that have two zones, and a `visibleCondition`
+cannot ride on an `xi:include`. `MediaRatioContractTest` keeps the four copies
+in step.
+
+---
+
 ## Image maximum width
 
 A block-wide cap on the images a block renders, offered by the
@@ -355,12 +439,30 @@ image keeps the full width of whatever holds it, exactly like a block that does
 not offer the field.
 
 ```css
+.iw-imgw--3xs { max-width: var(--iw-imgw-3xs, 3rem); }   /* icon */
+.iw-imgw--2xs { max-width: var(--iw-imgw-2xs, 6rem); }   /* pictogram */
 .iw-imgw--xs { max-width: var(--iw-imgw-xs, 8rem); }
 .iw-imgw--sm { max-width: var(--iw-imgw-sm, 12rem); }
 .iw-imgw--md { max-width: var(--iw-imgw-md, 16rem); }
 .iw-imgw--lg { max-width: var(--iw-imgw-lg, 24rem); }
 .iw-imgw--xl { max-width: var(--iw-imgw-xl, 32rem); }
 ```
+
+Every capped step also carries `margin-inline: auto`. A capped image is
+narrower than its column, and left alone it sits against the outer edge with
+the whole gap between it and the text it illustrates, which is worse than not
+capping it. Splitting that gap reads the same whichever side the media is on.
+
+**It composes with the width split.** They answer different questions: the
+split decides how wide the column is, the cap decides how much of it the image
+fills. A pictogram beside a paragraph usually wants both, a quarter of the
+block and a 96px image inside it, because a quarter of a wide block is still
+300px.
+
+For that case the `auto` split is the shorter route: it sizes the column to the
+media rather than to a share of the block, so a capped pictogram leaves no gap
+around itself and there is no ratio to work out per block width. It is bounded
+at 40%, so an uncapped image cannot take the row over.
 
 The class goes on the element wrapping the image, not on the `<img>`: the image
 partial sizes the picture to its container, so capping the container keeps the
@@ -376,8 +478,10 @@ radius and the ratio box in step with it.
 .iw-block-timeline .iw-imgw--md { max-width: 10rem; }
 ```
 
-Offered today by the timeline block. Adding it to another block is two lines:
-the `xi:include` in its `settings` section, and the class on the wrapper.
+Offered by the timeline block on every style, through the fragment, and by
+`text_images` on `classic` and `sidebar`, written out because it needs a
+condition. Adding it to a block that offers it everywhere is two lines: the
+`xi:include` in its `settings` section, and the class on the wrapper.
 
 ---
 

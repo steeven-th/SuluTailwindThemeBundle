@@ -15,6 +15,39 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.content</title></meta>
             <properties>
+                <property name="text" type="text_line"
+                          visibleCondition="__parent.style == 'divider'">
+                    <meta><title>iw_sulu_tailwind_theme.center_text</title></meta>
+                </property>
+                <property name="icon" type="single_media_selection"
+                          visibleCondition="__parent.style == 'divider'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.center_icon</title>
+                        <info_text>iw_sulu_tailwind_theme.center_icon_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Appearance ── -->
+        <section name="appearance">
+            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
+            <properties>
+                <xi:include href="../fragments/block-variant.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <property name="style" type="iw_theme_style_picker" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
+                    <params>
+                        <param name="block_type" value="separator"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
                 <property name="height" type="single_select"
                           visibleCondition="__parent.style == 'spacer'">
                     <meta><title>iw_sulu_tailwind_theme.height</title></meta>
@@ -53,17 +86,6 @@
                         </param>
                     </params>
                 </property>
-                <property name="text" type="text_line"
-                          visibleCondition="__parent.style == 'divider'">
-                    <meta><title>iw_sulu_tailwind_theme.center_text</title></meta>
-                </property>
-                <property name="icon" type="single_media_selection"
-                          visibleCondition="__parent.style == 'divider'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.center_icon</title>
-                        <info_text>iw_sulu_tailwind_theme.center_icon_info</info_text>
-                    </meta>
-                </property>
                 <property name="iconSize" type="single_select"
                           visibleCondition="__parent.style == 'divider'">
                     <meta><title>iw_sulu_tailwind_theme.icon_size</title></meta>
@@ -77,6 +99,14 @@
                         </param>
                     </params>
                 </property>
+                <xi:include href="../fragments/block-spacing.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <!--
+                    A toggler rather than the shared `block-background` fragment,
+                    kept for the separator alone: the block is a rule or a gap, so
+                    the background is a yes/no the editor flips often. Placed last
+                    all the same, where every other block has it.
+                -->
                 <property name="showBackground" type="checkbox">
                     <params>
                         <param name="type" value="toggler"/>
@@ -88,30 +118,6 @@
                         </param>
                     </params>
                 </property>
-            </properties>
-        </section>
-
-        <!-- ── Appearance ── -->
-        <section name="appearance">
-            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
-            <properties>
-                <xi:include href="../fragments/block-variant.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <property name="style" type="iw_theme_style_picker" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
-                    <params>
-                        <param name="block_type" value="separator"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
-        <!-- ── Settings ── -->
-        <section name="settings">
-            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
-            <properties>
-                <xi:include href="../fragments/block-spacing.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
     </properties>

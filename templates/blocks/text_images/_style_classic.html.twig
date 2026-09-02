@@ -287,7 +287,9 @@
         {% set textMobileOrder = mobilePos == 'top' ? 'order-2' : 'order-1' %}
         {% set imageMobileOrder = mobilePos == 'top' ? 'order-1' : 'order-2' %}
 
-        <div class="iw-block-text-images__grid iw-split-gap grid grid-cols-1 md:grid-cols-2 items-center">
+        {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
+        {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'center') %}
+        <div class="iw-block-text-images__grid iw-split-gap iw-split-cols {{ splitClass }}{{ position == 'left' ? ' iw-split-cols--reverse' : '' }} {{ alignClass }}">
             {# Text column #}
             <div class="{{ textMobileOrder }} {{ position == 'left' ? 'md:order-2' : 'md:order-1' }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_paragraph.html.twig' with {
@@ -305,7 +307,7 @@
             </div>
 
             {# Images column: always has radius (never edge-to-edge in grid) #}
-            <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }} {{ imageRadiusClass }} overflow-hidden">
+            <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }} {{ imageRadiusClass }} {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_media.html.twig' with {
                     mediaType: mediaType|default('images'),
                     images: images|default([]),

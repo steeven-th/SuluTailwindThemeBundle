@@ -17,6 +17,15 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_testimonials</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <block name="testimonials" default-type="testimonial" minOccurs="1">
                     <meta>
                         <title>iw_sulu_tailwind_theme.testimonials</title>

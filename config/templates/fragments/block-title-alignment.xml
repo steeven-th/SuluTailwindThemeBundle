@@ -12,7 +12,7 @@
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="titleAlignment" type="single_select">
+    <property name="titleAlignment" type="single_select" colspan="6">
         <meta><title>iw_sulu_tailwind_theme.title_alignment</title></meta>
         <params>
             <param name="default_value" value="left"/>

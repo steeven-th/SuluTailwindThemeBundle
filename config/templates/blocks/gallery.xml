@@ -17,67 +17,21 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <property name="images" type="media_selection">
-                    <meta><title>iw_sulu_tailwind_theme.images</title></meta>
-                </property>
-                <property name="imageFilter" type="single_select">
-                    <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
+
+                <property name="contentHeading" type="heading">
                     <params>
-                        <param name="default_value" value="original"/>
-                        <param name="values" type="collection">
-                            <param name="16_9"><meta><title>16:9</title></meta></param>
-                            <param name="4_3"><meta><title>4:3</title></meta></param>
-                            <param name="1_1"><meta><title>1:1</title></meta></param>
-                            <param name="3_4"><meta><title>3:4</title></meta></param>
-                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_images</title></meta>
                         </param>
                     </params>
+                </property>
+
+                <property name="images" type="media_selection">
+                    <meta><title>iw_sulu_tailwind_theme.images</title></meta>
                 </property>
                 <property name="singleImage" type="checkbox"
                           visibleCondition="__parent.style == 'slider'">
                     <meta><title>iw_sulu_tailwind_theme.single_image_display</title></meta>
-                </property>
-                <property name="enableParallax" type="checkbox"
-                          visibleCondition="__parent.style == 'wide_carousel'">
-                    <meta><title>iw_sulu_tailwind_theme.enable_parallax</title></meta>
-                </property>
-                <property name="parallaxIntensity" type="single_select"
-                          visibleCondition="__parent.style == 'wide_carousel' AND __parent.enableParallax == true">
-                    <meta><title>iw_sulu_tailwind_theme.parallax_intensity</title></meta>
-                    <params>
-                        <param name="default_value" value="medium"/>
-                        <param name="values" type="collection">
-                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_subtle</title></meta></param>
-                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_medium</title></meta></param>
-                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_strong</title></meta></param>
-                            <param name="extreme"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_extreme</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <!-- Grid / masonry: spacing between the images. Empty follows
-                     the theme's card spacing; an explicit choice emits an
-                     `iw-gap` class feeding the gap variable and overrides
-                     the seamless layout deduced from the lateral padding. -->
-                <property name="galleryGap" type="single_select"
-                          visibleCondition="__parent.style == 'grid' OR __parent.style == 'masonry'">
-                    <meta><title>iw_sulu_tailwind_theme.gallery_gap</title></meta>
-                    <params>
-                        <param name="default_value" value=""/>
-                        <param name="values" type="collection">
-                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_gap_theme</title></meta></param>
-                            <param name="iw-gap--0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
-                            <param name="iw-gap--2"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
-                            <param name="iw-gap--4"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
-                            <param name="iw-gap--5"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
-                            <param name="iw-gap--6"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
-                            <param name="iw-gap--8"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
-                            <param name="iw-gap--10"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
-                            <param name="iw-gap--12"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="showImagesName" type="checkbox">
-                    <meta><title>iw_sulu_tailwind_theme.show_images_name</title></meta>
                 </property>
                 <!-- Call-to-action buttons, shared by every block that can carry actions. -->
                 <xi:include href="../fragments/cta-buttons.xml"
@@ -104,6 +58,72 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <property name="imagesHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.settings_group_images</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="imageFilter" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
+                    <params>
+                        <param name="default_value" value="original"/>
+                        <param name="values" type="collection">
+                            <param name="16_9"><meta><title>16:9</title></meta></param>
+                            <param name="4_3"><meta><title>4:3</title></meta></param>
+                            <param name="1_1"><meta><title>1:1</title></meta></param>
+                            <param name="3_4"><meta><title>3:4</title></meta></param>
+                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <!-- Grid / masonry: spacing between the images. Empty follows
+                     the theme's card spacing; an explicit choice emits an
+                     `iw-gap` class feeding the gap variable and overrides
+                     the seamless layout deduced from the lateral padding. -->
+                <property name="galleryGap" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'grid' OR __parent.style == 'masonry'">
+                    <meta><title>iw_sulu_tailwind_theme.gallery_gap</title></meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_gap_theme</title></meta></param>
+                            <param name="iw-gap--0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="iw-gap--2"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="iw-gap--4"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="iw-gap--5"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="iw-gap--6"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="iw-gap--8"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="iw-gap--10"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="iw-gap--12"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="enableParallax" type="checkbox"
+                          visibleCondition="__parent.style == 'wide_carousel'">
+                    <meta><title>iw_sulu_tailwind_theme.enable_parallax</title></meta>
+                </property>
+                <property name="parallaxIntensity" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'wide_carousel' AND __parent.enableParallax == true">
+                    <meta><title>iw_sulu_tailwind_theme.parallax_intensity</title></meta>
+                    <params>
+                        <param name="default_value" value="medium"/>
+                        <param name="values" type="collection">
+                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_subtle</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_strong</title></meta></param>
+                            <param name="extreme"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_extreme</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="showImagesName" type="checkbox">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.show_images_name</title>
+                        <info_text>iw_sulu_tailwind_theme.show_images_name_gallery_info</info_text>
+                    </meta>
+                </property>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"

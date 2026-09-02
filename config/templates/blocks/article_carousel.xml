@@ -17,6 +17,15 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_articles</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="articles" type="smart_content">
                     <meta>
                         <title>iw_sulu_tailwind_theme.block.article_carousel.source</title>
@@ -36,9 +45,6 @@
                             <param name="excerptCategories" value="excerpt.categories"/>
                         </param>
                     </params>
-                </property>
-                <property name="autoplay" type="checkbox" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.block.article_carousel.autoplay</title></meta>
                 </property>
                 <property name="interval" type="number" colspan="6"
                           visibleCondition="__parent.autoplay == true">
@@ -77,6 +83,9 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <property name="autoplay" type="checkbox" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.block.article_carousel.autoplay</title></meta>
+                </property>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"

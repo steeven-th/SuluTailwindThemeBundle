@@ -82,17 +82,22 @@ Other layout/spacing/typography choices are driven by Tailwind utilities compose
 
 ### Make the `--split-screen` image take 60% on desktop
 
+This is now a setting: **Appearance > Width split**, offered on `classic`,
+`split_screen` and `sidebar`. Sixty percent is the "three fifths" step, so no
+CSS is needed.
+
+Only reach for CSS when you need a share the admin does not offer:
+
 ```css
 .iw-block-text-images--split-screen .iw-block-text-images__grid {
-    grid-template-columns: 1fr;
-}
-
-@media (min-width: 1024px) {
-    .iw-block-text-images--split-screen .iw-block-text-images__grid {
-        grid-template-columns: 3fr 2fr;
-    }
+    --iw-split-content: 2fr;
+    --iw-split-media: 3fr;
 }
 ```
+
+Overriding the two variables rather than `grid-template-columns` keeps the
+stacking below the breakpoint and the reverse modifier working. See
+[transverse.md](../transverse.md#split-blocks-sharing-the-width).
 
 ### Re-theme the hero typography (`--hero-banner` only)
 
@@ -119,3 +124,9 @@ The directional gradient is built inline in Twig via `linear-gradient({{ gradien
 ```
 
 (The `!important` is needed because the gradient is set inline by Twig.)
+
+## Width split
+
+The two zones of this block share their width through the shared
+`.iw-split-cols` system, and the layout style sets the default share. See
+[transverse.md](../transverse.md#split-blocks-sharing-the-width).

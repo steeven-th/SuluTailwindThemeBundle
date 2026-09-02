@@ -13,6 +13,22 @@
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
+    <!--
+        A heading, and a deliberate one: it names the group, and it spans the
+        full width, which resets the two-column grid. Without that reset an odd
+        number of half-width fields above pushes every pair below out of step,
+        and a margin selector full of boxes ends up beside a plain select. The
+        count above cannot be fixed by hand either, since visibility conditions
+        change it at runtime.
+    -->
+    <property name="radiusHeading" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.settings_group_radius</title></meta>
+            </param>
+        </params>
+    </property>
+
     <property name="blockRadius" type="iw_theme_radius_selector" colspan="6">
         <meta><title>iw_sulu_tailwind_theme.block_radius</title></meta>
         <params>

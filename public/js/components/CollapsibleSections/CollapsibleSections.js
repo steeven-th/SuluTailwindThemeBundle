@@ -16,9 +16,58 @@ import {translate} from 'sulu-admin-bundle/utils';
  * within the same block container.
  */
 
+/**
+ * Upper bound on the children a section may have and still be collapsible.
+ *
+ * A sanity check against matching some large container that happens to hold
+ * the same label, not a real limit on how many fields a block can offer. It
+ * used to be 20, which the settings section of `iframe` and `code` reached
+ * exactly, so the next field added anywhere would have silently dropped their
+ * collapse. Sized well above the largest section the bundle ships, and
+ * `CollapsibleSectionsContractTest` fails if one ever gets close.
+ */
+const MAX_SECTION_CHILDREN = 60;
+
 const CHEVRON_SVG = '<svg class="iw-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const STYLES = `
+/* Rows of fields, instead of floats that snag.
+
+   Sulu lays a form out with \`float: left\` on each field (Grid/item.scss), so a
+   field taller than its neighbour keeps the next one from rising past it: the
+   row below starts under the tallest field so far and leaves a visible hole.
+   Adding an info text to one field of a pair is enough to trigger it, which is
+   how it showed up here. Reported upstream as sulu/sulu#7652, open since
+   November 2024.
+
+   Flex wrap lays the same widths out in real rows, and \`align-items:
+   flex-start\` keeps each field at its natural height. The widths come from
+   \`width: calc(n * 100% / 12)\` on the items, which flex honours as readily as
+   floats did, so nothing else moves.
+
+   Both containers need it. Sulu nests \`grid--\` > \`grid-section--\` > \`item--\`,
+   all floating (Grid/section.scss and Grid/item.scss), and the fields sit in
+   the section, not in the grid. Flexing only the grid lines the sections up
+   and leaves the fields inside them floating, which looks like nothing changed.
+
+   Scoped to block forms: \`section[role="switch"]\` is what Sulu renders a block
+   as, so the rest of the admin keeps the layout it has always had. The class
+   names are CSS modules, hashed as \`[local]--[contenthash]\`, hence the prefix
+   matching. Note that \`grid-section--\` does not contain the substring
+   \`grid--\`, so it needs its own selector. */
+section[role="switch"] [class*="grid--"],
+section[role="switch"] [class*="grid-section--"] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+section[role="switch"] [class*="grid--"] > [class*="section--"],
+section[role="switch"] [class*="grid--"] > [class*="item--"],
+section[role="switch"] [class*="grid-section--"] > [class*="item--"] {
+    float: none;
+}
+
 /* Reset Sulu's negative margin on all collapsible sections
    to prevent overlap between stacked sections.
    Sulu uses margin-bottom: -30px on grid-section for float layout. */
@@ -364,7 +413,7 @@ function scanForSections(root: HTMLElement): void {
             if (
                 headerContainer === sectionEl.firstElementChild
                 && sectionEl.children.length >= 2
-                && sectionEl.children.length <= 20
+                && sectionEl.children.length <= MAX_SECTION_CHILDREN
             ) {
                 // Only match actual Sulu form sections (CSS module class "grid-section--xxx").
                 // This prevents matching navigation items, sidebar menus, or other UI elements

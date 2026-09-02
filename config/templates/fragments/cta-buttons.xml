@@ -19,6 +19,14 @@
     itself.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="ctaHeading" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.content_group_cta</title></meta>
+            </param>
+        </params>
+    </property>
+
     <block name="ctaButtons" default-type="cta_button" minOccurs="0">
         <meta>
             <title>iw_sulu_tailwind_theme.cta_buttons</title>

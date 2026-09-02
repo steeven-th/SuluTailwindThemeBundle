@@ -17,22 +17,19 @@
             <properties>
                 <xi:include href="../fragments/block-heading.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_figures</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="text" type="text_editor">
                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>
                 </property>
 
-                <!-- Side-by-side style: which side the figures sit on. -->
-                <property name="contentRight" type="checkbox"
-                          visibleCondition="__parent.style == 'split'">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.content_position_right</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
 
                 <block name="figures" default-type="figure" minOccurs="1">
                     <meta>
@@ -85,6 +82,18 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <!-- Side-by-side style: which side the figures sit on. -->
+                <property name="contentRight" type="checkbox"
+                          visibleCondition="__parent.style == 'split'">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="label">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.content_position_right</title>
+                            </meta>
+                        </param>
+                    </params>
+                </property>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"

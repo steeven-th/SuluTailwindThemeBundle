@@ -30,6 +30,15 @@
             <properties>
                 <xi:include href="../fragments/block-heading-plain.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_code</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <xi:include href="../fragments/block-title-tag.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-title-alignment.xml"

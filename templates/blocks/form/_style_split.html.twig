@@ -19,7 +19,9 @@
     {% set widgetKind = widgetType|default('text') %}
     {% set isFormRight = formRight|default(false) %}
 
-    <div class="iw-block-form iw-block-form--split iw-split-gap grid grid-cols-1 lg:grid-cols-2">
+    {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
+    {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'stretch') %}
+    <div class="iw-block-form iw-block-form--split iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ isFormRight ? ' iw-split-cols--reverse' : '' }}">
         {% if isFormRight %}
             {# Widget first (LEFT desktop / TOP mobile), form after #}
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
