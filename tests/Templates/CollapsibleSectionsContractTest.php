@@ -56,6 +56,36 @@ final class CollapsibleSectionsContractTest extends TestCase
     }
 
     /**
+     * The float workaround stays in the injected stylesheet.
+     *
+     * Sulu floats form fields, so a field taller than its neighbour holds the
+     * next row back and leaves a hole. The component injects a flex layout to
+     * fix it, scoped to block forms. Dropping it brings the holes back with
+     * nothing failing anywhere, and adding an info text is enough to see them.
+     */
+    #[Test]
+    public function theFloatWorkaroundIsInjected(): void
+    {
+        $source = (string) file_get_contents(
+            self::root() . '/public/js/components/CollapsibleSections/CollapsibleSections.js',
+        );
+
+        foreach ([
+            'section[role="switch"] [class*="grid--"]',
+            'section[role="switch"] [class*="grid-section--"]',
+            'flex-wrap: wrap;',
+            'align-items: flex-start;',
+            'float: none;',
+        ] as $needed) {
+            self::assertStringContainsString(
+                $needed,
+                $source,
+                'The block form layout falls back to Sulu floats, which leave holes between rows.',
+            );
+        }
+    }
+
+    /**
      * The bound the JavaScript enforces, read from the component itself.
      */
     private static function maxSectionChildren(): int
