@@ -19,6 +19,8 @@
             <title>iw_sulu_tailwind_theme.widget_video</title>
         </meta>
         <properties>
+            <!-- The provider on its own row: the field that follows is an id or a
+                 media picker, both of which want the full width. -->
             <property name="provider" type="single_select" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.video_provider</title>
@@ -32,14 +34,14 @@
                     </param>
                 </params>
             </property>
-            <property name="youtubeId" type="text_line" colspan="6"
+            <property name="youtubeId" type="text_line"
                       visibleCondition="__parent.provider == 'youtube'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.video_youtube_id</title>
                     <info_text>iw_sulu_tailwind_theme.video_youtube_id_info</info_text>
                 </meta>
             </property>
-            <property name="vimeoId" type="text_line" colspan="6"
+            <property name="vimeoId" type="text_line"
                       visibleCondition="__parent.provider == 'vimeo'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.video_vimeo_id</title>

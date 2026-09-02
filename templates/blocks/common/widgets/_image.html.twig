@@ -1,7 +1,16 @@
 {# Widget: images. One turns into a single frame, several into a slider, which
-   is what `_image_slider` already does for every block that shows images. #}
+   is what `_image_slider` already does for every block that shows images.
+
+   `media_selection` is stored as `{ids: [...]}` and resolved to a plain list at
+   render time, but not in every context, so the field is normalised here rather
+   than in each caller. Handing the raw shape to the slider makes it resolve the
+   list itself as if it were one id, which fails in the database layer with an
+   error naming neither the template nor the field. #}
+{% set imageList = images|default([]) %}
+{% set imageList = imageList.ids|default(imageList) %}
+
 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
-    images: images|default([]),
+    images: imageList,
     imageFormat: imageFormat|default('iw_theme_16_9'),
     showName: showName|default(false),
     autoplay: true,

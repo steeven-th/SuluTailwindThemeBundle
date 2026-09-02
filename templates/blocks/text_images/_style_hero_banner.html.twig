@@ -10,7 +10,11 @@
    text warns about. #}
 {% set widgetItem = widget is defined and widget is iterable ? (widget|first) : null %}
 {% set widgetKind = widgetItem ? widgetItem.type|default('image') : 'image' %}
-{% set images = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
+{% set rawWidgetImages = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
+{# `media_selection` is stored as `{ids: [...]}` and resolved to a plain list at
+   render time, but not in every context: the same guard is used for the excerpt
+   images elsewhere in the bundle. #}
+{% set images = rawWidgetImages.ids|default(rawWidgetImages) %}
 {# `media_selection` yields raw ids, `single_media_selection` yielded an object.
    The layouts painting a background were written against the latter, so the
    first id is wrapped to keep `image.id` working. #}
