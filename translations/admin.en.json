@@ -1098,7 +1098,6 @@
     "iw_sulu_tailwind_theme.style.article_listing_grid": "Grid",
     "iw_sulu_tailwind_theme.style.article_listing_list": "List",
     "iw_sulu_tailwind_theme.style.article_listing_cards": "Cards",
-    "iw_sulu_tailwind_theme.widget_type": "Widget type",
     "iw_sulu_tailwind_theme.widget_text": "Text",
     "iw_sulu_tailwind_theme.widget": "Media zone content",
     "iw_sulu_tailwind_theme.widget_info": "What the zone beside the text shows. The Overlay, Hero banner and Mosaic styles only show images: the other types have no effect there.",

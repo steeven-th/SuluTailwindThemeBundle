@@ -1189,7 +1189,6 @@
     "iw_sulu_tailwind_theme.style.article_listing_grid": "Grille",
     "iw_sulu_tailwind_theme.style.article_listing_list": "Liste",
     "iw_sulu_tailwind_theme.style.article_listing_cards": "Cartes",
-    "iw_sulu_tailwind_theme.widget_type": "Type de widget",
     "iw_sulu_tailwind_theme.widget_text": "Texte",
     "iw_sulu_tailwind_theme.widget": "Contenu de la zone média",
     "iw_sulu_tailwind_theme.widget_info": "Ce que la zone à côté du texte affiche. Les styles Superposition, Bannière héro et Mosaïque n'affichent que des images : sur ceux-là, les autres types restent sans effet.",

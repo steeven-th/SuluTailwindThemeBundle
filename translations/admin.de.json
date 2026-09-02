@@ -1083,7 +1083,6 @@
     "iw_sulu_tailwind_theme.style.article_listing_grid": "Raster",
     "iw_sulu_tailwind_theme.style.article_listing_list": "Liste",
     "iw_sulu_tailwind_theme.style.article_listing_cards": "Karten",
-    "iw_sulu_tailwind_theme.widget_type": "Widget-Typ",
     "iw_sulu_tailwind_theme.widget_text": "Text",
     "iw_sulu_tailwind_theme.widget": "Inhalt des Medienbereichs",
     "iw_sulu_tailwind_theme.widget_info": "Was der Bereich neben dem Text zeigt. Die Stile Überlagerung, Hero-Banner und Mosaik zeigen nur Bilder, andere Typen bleiben dort ohne Wirkung.",
