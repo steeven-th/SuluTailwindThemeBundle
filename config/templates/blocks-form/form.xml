@@ -36,31 +36,28 @@
                 </property>
 
 
-                <!-- Split-only: choose which widget sits next to the form -->
-                <property name="widgetType" type="single_select"
-                          visibleCondition="__parent.style == 'split'">
-                    <meta><title>iw_sulu_tailwind_theme.widget_type</title></meta>
-                    <params>
-                        <param name="default_value" value="text"/>
-                        <param name="values" type="collection">
-                            <param name="text"><meta><title>iw_sulu_tailwind_theme.widget_text</title></meta></param>
-                            <param name="image"><meta><title>iw_sulu_tailwind_theme.widget_image</title></meta></param>
-                            <param name="location"><meta><title>iw_sulu_tailwind_theme.widget_location</title></meta></param>
-                        </param>
-                    </params>
-                </property>
-                <property name="widgetText" type="text_editor"
-                          visibleCondition="__parent.style == 'split' AND __parent.widgetType == 'text'">
-                    <meta><title>iw_sulu_tailwind_theme.widget_text</title></meta>
-                </property>
-                <property name="widgetImage" type="single_media_selection"
-                          visibleCondition="__parent.style == 'split' AND __parent.widgetType == 'image'">
-                    <meta><title>iw_sulu_tailwind_theme.widget_image</title></meta>
-                </property>
-                <property name="widgetLocation" type="location"
-                          visibleCondition="__parent.style == 'split' AND __parent.widgetType == 'location'">
-                    <meta><title>iw_sulu_tailwind_theme.widget_location</title></meta>
-                </property>
+                <!--
+                    The widget zone, now the shared block type. It replaces a
+                    select plus one conditioned field per kind, which is the
+                    same shape text_images had. Four kinds here rather than the
+                    three this block used to offer: a video beside a form is as
+                    reasonable as a picture, and it costs an include.
+                -->
+                <block name="widget" default-type="text" minOccurs="1" maxOccurs="1"
+                       visibleCondition="__parent.style == 'split'">
+                    <meta><title>iw_sulu_tailwind_theme.widget</title></meta>
+                    <types>
+                        <xi:include href="../fragments/widgets/text.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/image.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/video.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/location.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                    </types>
+                </block>
+
             </properties>
         </section>
 

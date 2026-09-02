@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!--
+    Widget: a rich text panel.
+
+    A second text beside the first one, which is what a form block uses to put
+    a phone number or opening hours next to its fields. It carries the theme
+    variant, so it reads as a panel rather than as more body copy.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="text">
+        <meta>
+            <title>iw_sulu_tailwind_theme.widget_text</title>
+        </meta>
+        <properties>
+            <property name="text" type="text_editor">
+                <meta><title>iw_sulu_tailwind_theme.text</title></meta>
+            </property>
+        </properties>
+    </type>
+</types>

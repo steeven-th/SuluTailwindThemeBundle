@@ -1,6 +1,29 @@
 {# Text + Images block — sticky sidebar with image, scrollable text area #}
 
 {# The buttons belong under the text, not under the whole block. #}
+{# ── Widget zone ──
+   The media zone is one `widget` block, typed by the editor. Mapping it back
+   to `images` and `image` keeps every rendering below untouched: what used to
+   be two fields is now one, and only the reading changes. A style that can
+   also show a video, a map or a text panel branches on `widgetKind` where it
+   renders the zone. The others ignore the other types, which the field's info
+   text warns about. #}
+{% set widgetItem = null %}
+{% if widget is defined and widget is iterable %}
+    {% set widgetItem = widget.type is defined ? widget : (widget|first) %}
+{% endif %}
+{% set widgetKind = widgetItem ? widgetItem.type|default('image') : 'image' %}
+{% set rawWidgetImages = widgetKind == 'image' and widgetItem ? widgetItem.images|default([]) : [] %}
+{# `media_selection` is stored as `{ids: [...]}` and resolved to a plain list at
+   render time, but not in every context: the same guard is used for the excerpt
+   images elsewhere in the bundle. #}
+{% set images = rawWidgetImages.ids|default(rawWidgetImages) %}
+{# `media_selection` yields raw ids, `single_media_selection` yielded an object.
+   The layouts painting a background were written against the latter, so the
+   first id is wrapped to keep `image.id` working. #}
+{% set firstImageId = images|first|default(null) %}
+{% set image = firstImageId ? {'id': firstImageId} : null %}
+{% set showImagesName = widgetItem ? widgetItem.showImagesName|default(false) : false %}
 {% set ctaBlockKey = _key|default(null) %}
 {# Does NOT extend _block_wrapper so we can enforce minimum padding defaults
    (padding always present even when explicitly set to 0). #}
@@ -105,14 +128,14 @@
 
             {# Sidebar images — 2/5 = 40%.
                Grid cell stretches to full row height; sticky child stays visible while text scrolls. #}
-            <div class="iw-block-text-images__image-column{{ isRight ? ' md:order-1' : ' md:order-2' }} {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}">
+            <div class="iw-block-text-images__image-column{{ isRight ? ' md:order-1' : ' md:order-2' }} {{ widgetKind == 'image' ? iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) : '' }}">
                 <div class="iw-block-text-images__image-wrap {{ imageRadiusClass }} overflow-hidden" style="position: sticky; top: 6rem;">
-                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
-                        images: images|default([]),
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+                        widget: widget|default([]),
                         imageFormat: format,
-                        showName: showImagesName|default(false),
-                        autoplay: true,
-                        aspectRatio: ratio
+                        aspectRatio: ratio,
+                        imageRadius: imageRadiusClass|default(''),
+                        blockPrefix: 'iw-block-text-images'
                     } only %}
                 </div>
             </div>

@@ -311,6 +311,52 @@ for content that is already published.
 Order inside `settings`: the block's own settings first, then the shared group
 of spacing, radius and background.
 
+### The widget zone
+
+A block pairing content with a second zone lets the editor choose what that zone
+holds: images, a video, a map or a text panel. The zone is a Sulu **block type**,
+not a select with conditions:
+
+```xml
+<block name="widget" default-type="image" minOccurs="1" maxOccurs="1">
+    <meta><title>iw_sulu_tailwind_theme.widget</title></meta>
+    <types>
+        <xi:include href="../fragments/widgets/image.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+        <xi:include href="../fragments/widgets/video.xml" ... />
+    </types>
+</block>
+```
+
+Render it with `blocks/common/_widget.html.twig`, which dispatches on the kind.
+
+**Why a block type.** The fields of a widget only concern that widget. Written
+with `visibleCondition`, each one repeats the whole chain: `style == 'classic'
+AND mediaType == 'video' AND videoProvider == 'youtube'` was a real condition
+here, three levels deep for one field. A block type carries the choice itself,
+and the conditions left are between siblings.
+
+**Each block composes its own catalogue.** Offering a kind costs an include, so
+a block offers what makes sense for it and nothing else.
+
+**Two shapes at render time.** A `maxOccurs="1"` block is stored as a one-item
+list but reaches the template as the item itself, so `widget|first` returns the
+value of its first key. The dispatcher accepts both, told apart by the presence
+of `type`. This is invisible until the page renders: the block compiles and the
+data stores correctly either way.
+
+**Empty is not falsy.** Sulu stores an untouched media picker as `{id: null}`, a
+media list as `{ids: [...]}`, and an untouched location with null coordinates.
+`x.id is defined` answers true for a picker nobody filled. Test the value.
+
+**Which blocks have it.** `text_images` and `form`. `location` deliberately does
+not: it is the map block, its zone never varies, and a type selector with a
+single entry would be noise in the form. A block joins them when its zone can
+hold more than one thing.
+
+`WidgetContractTest` keeps the three moving parts in step: the type fragment,
+the dispatcher branch and the partial.
+
 ### Rows and headings
 
 Sulu lays fields out on a twelve column grid, filling rows as it goes, so two

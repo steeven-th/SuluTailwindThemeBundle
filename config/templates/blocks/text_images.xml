@@ -23,76 +23,45 @@
                         <param name="label">
                             <meta><title>iw_sulu_tailwind_theme.content_group_media</title></meta>
                         </param>
-                    </params>
-                </property>
-
-                <!-- Classic: the media zone can hold a video rather than images.
-                     Carried over from the CTA block's video accessory, removed
-                     in 3.0.0. -->
-                <property name="mediaType" type="single_select"
-                          visibleCondition="__parent.style == 'classic'">
-                    <meta><title>iw_sulu_tailwind_theme.media_type</title></meta>
-                    <params>
-                        <param name="default_value" value="images"/>
-                        <param name="values" type="collection">
-                            <param name="images"><meta><title>iw_sulu_tailwind_theme.media_type_images</title></meta></param>
-                            <param name="video"><meta><title>iw_sulu_tailwind_theme.media_type_video</title></meta></param>
+                        <param name="description">
+                            <meta><title>iw_sulu_tailwind_theme.widget_info</title></meta>
                         </param>
                     </params>
                 </property>
 
-                <property name="videoProvider" type="single_select"
-                          visibleCondition="__parent.style == 'classic' AND __parent.mediaType == 'video'">
-                    <meta><title>iw_sulu_tailwind_theme.video_provider</title></meta>
-                    <params>
-                        <param name="default_value" value="youtube"/>
-                        <param name="values" type="collection">
-                            <param name="youtube"><meta><title>YouTube</title></meta></param>
-                            <param name="vimeo"><meta><title>Vimeo</title></meta></param>
-                            <param name="file"><meta><title>iw_sulu_tailwind_theme.video_provider_file</title></meta></param>
-                        </param>
-                    </params>
-                </property>
+                <!--
+                    The second zone, whatever the editor decides to put in it.
+                    A Sulu block type rather than a media type plus conditions:
+                    the fields of a video only concern a video, and expressing
+                    that with visibleCondition took a three-level chain per
+                    field. See `fragments/widgets/README.md`.
 
-                <property name="youtubeId" type="text_line"
-                          visibleCondition="__parent.style == 'classic' AND __parent.mediaType == 'video' AND __parent.videoProvider == 'youtube'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.youtube_id</title>
-                        <info_text>iw_sulu_tailwind_theme.youtube_id_info</info_text>
-                    </meta>
-                </property>
+                    Every style reads this one field, so switching style never
+                    empties the zone. Each style then takes what it can show:
+                    the list for the mosaic grid, the first image for the
+                    layouts that paint it as a background. Those cannot render
+                    a map or a video, which the field's own info text says.
+                -->
+                <block name="widget" default-type="image" minOccurs="1" maxOccurs="1">
+                    <meta><title>iw_sulu_tailwind_theme.widget</title></meta>
+                    <types>
+                        <xi:include href="../fragments/widgets/image.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/video.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/location.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/text.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                    </types>
+                </block>
 
-                <property name="vimeoId" type="text_line"
-                          visibleCondition="__parent.style == 'classic' AND __parent.mediaType == 'video' AND __parent.videoProvider == 'vimeo'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.vimeo_id</title>
-                        <info_text>iw_sulu_tailwind_theme.vimeo_id_info</info_text>
-                    </meta>
-                </property>
 
-                <property name="videoFile" type="single_media_selection"
-                          visibleCondition="__parent.style == 'classic' AND __parent.mediaType == 'video' AND __parent.videoProvider == 'file'">
-                    <meta><title>iw_sulu_tailwind_theme.video_file</title></meta>
-                </property>
 
-                <property name="videoPoster" type="single_media_selection"
-                          visibleCondition="__parent.style == 'classic' AND __parent.mediaType == 'video' AND __parent.videoProvider == 'file'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.video_poster</title>
-                        <info_text>iw_sulu_tailwind_theme.video_poster_info</info_text>
-                    </meta>
-                </property>
 
-                <!-- Multiple images: hidden for overlay and hero_banner (use single image) -->
-                <property name="images" type="media_selection"
-                          visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
-                    <meta><title>iw_sulu_tailwind_theme.images</title></meta>
-                </property>
-                <!-- Single image: only for overlay and hero_banner layouts -->
-                <property name="image" type="single_media_selection"
-                          visibleCondition="__parent.style == 'overlay' OR __parent.style == 'hero_banner'">
-                    <meta><title>iw_sulu_tailwind_theme.image</title></meta>
-                </property>
+
+
+
 
                 <property name="text" type="text_editor">
                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>

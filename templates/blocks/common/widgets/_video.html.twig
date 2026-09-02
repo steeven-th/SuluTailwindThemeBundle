@@ -1,0 +1,94 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   Widget: a video, embedded from YouTube or Vimeo, or hosted on the site.
+
+   Moved here from `_media.html.twig`, which paired it with the image case
+   behind a `mediaType` switch. The widget block type carries that choice now,
+   so each renderer only has to know its own kind.
+
+   Parameters:
+     - provider    : youtube | vimeo | file
+     - youtubeId / vimeoId : the id for the matching provider
+     - videoFile   : Sulu media object, when the video is hosted here
+     - videoPoster : Sulu media object. The `poster` of a hosted video, and
+                     the facade of an embedded one: with it, the frame only
+                     loads once the visitor clicks.
+     - videoRadius : optional radius class on the frame
+   ───────────────────────────────────────────────────────────────────────── #}
+
+{% set kind = provider|default('youtube') %}
+{# An empty media picker is stored as `{id: null}`, not as nothing: testing
+   `videoPoster.id is defined` answers true for a picker nobody filled, and the
+   facade below would then wait for a click on an image that does not exist,
+   showing an empty box. The value is what matters, not the key. #}
+{% set hasPoster = videoPoster.id|default(null) is not null %}
+
+{# A poster on an embedded video is not decoration: it lets the frame stay
+   unloaded until a visitor asks for it, so nothing reaches YouTube or Vimeo
+   before the click. `_embed_frame` already does exactly that for the iframe
+   block, placeholder image included, so the widget hands the work over rather
+   than growing its own. Without a poster the frame loads as before. #}
+{% set embedSrc = '' %}
+{% if kind == 'youtube' and youtubeId|default('') is not empty %}
+    {% set embedSrc = 'https://www.youtube.com/embed/' ~ youtubeId %}
+{% elseif kind == 'vimeo' and vimeoId|default('') is not empty %}
+    {% set embedSrc = 'https://player.vimeo.com/video/' ~ vimeoId %}
+{% endif %}
+
+{% if embedSrc is not empty and hasPoster %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_embed_frame.html.twig' with {
+        src: embedSrc,
+        frameTitle: 'iw_sulu_tailwind_theme.media_video'|trans,
+        heightMode: 'ratio',
+        ratio: '16-9',
+        sandboxMode: 'standard',
+        lazyLoad: true,
+        allowFullscreen: true,
+        allowMedia: true,
+        consentMode: 'placeholder',
+        consentService: kind,
+        consentImage: videoPoster,
+        frameClass: videoRadius|default('')
+    } only %}
+{% else %}
+<div class="iw-widget__video-wrap{% if videoRadius|default('') %} {{ videoRadius }} overflow-hidden{% endif %}">
+    {% if kind == 'youtube' and youtubeId|default('') is not empty %}
+        <iframe
+            src="https://www.youtube.com/embed/{{ youtubeId }}"
+            class="iw-widget__video w-full border-0 iw-ratio--16-9"
+            loading="lazy"
+            title="{{ 'iw_sulu_tailwind_theme.media_video'|trans }}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+        ></iframe>
+    {% elseif kind == 'vimeo' and vimeoId|default('') is not empty %}
+        <iframe
+            src="https://player.vimeo.com/video/{{ vimeoId }}"
+            class="iw-widget__video w-full border-0 iw-ratio--16-9"
+            loading="lazy"
+            title="{{ 'iw_sulu_tailwind_theme.media_video'|trans }}"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowfullscreen
+        ></iframe>
+    {% elseif kind == 'file' and videoFile.id|default(null) is not null %}
+        {% set resolvedVideo = sulu_resolve_media(videoFile.id, app.request.locale) %}
+        {% set posterUrl = '' %}
+        {% if hasPoster %}
+            {% set resolvedPoster = sulu_resolve_media(videoPoster.id, app.request.locale) %}
+            {# A deleted poster costs the still frame, not the video. #}
+            {% if resolvedPoster is not null %}
+                {% set posterUrl = resolvedPoster.thumbnails['iw_theme_16_9']|default(resolvedPoster.url) %}
+            {% endif %}
+        {% endif %}
+        {# A deleted video file leaves nothing to play: render no player at all. #}
+        {% if resolvedVideo is not null %}
+            <video
+                src="{{ resolvedVideo.url }}"
+                class="iw-widget__video w-full iw-ratio--16-9"
+                controls
+                preload="metadata"
+                {% if posterUrl %}poster="{{ posterUrl }}"{% endif %}
+            ></video>
+        {% endif %}
+    {% endif %}
+</div>
+{% endif %}

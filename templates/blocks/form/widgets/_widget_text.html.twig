@@ -1,9 +1,0 @@
-{# Form widget — rich-text content rendered in the info column of `--split`.
-   Expected variables:
-     - text: HTML string from the `widgetText` text_editor field
-#}
-{% if text is defined and text is not empty %}
-    <div class="iw-block-form__widget iw-block-form__widget--text prose max-w-none">
-        {{ text|raw }}
-    </div>
-{% endif %}
