@@ -16,7 +16,11 @@
    ───────────────────────────────────────────────────────────────────────── #}
 
 {% set kind = provider|default('youtube') %}
-{% set hasPoster = videoPoster is defined and videoPoster is not empty and videoPoster.id is defined %}
+{# An empty media picker is stored as `{id: null}`, not as nothing: testing
+   `videoPoster.id is defined` answers true for a picker nobody filled, and the
+   facade below would then wait for a click on an image that does not exist,
+   showing an empty box. The value is what matters, not the key. #}
+{% set hasPoster = videoPoster.id|default(null) is not null %}
 
 {# A poster on an embedded video is not decoration: it lets the frame stay
    unloaded until a visitor asks for it, so nothing reaches YouTube or Vimeo
@@ -65,10 +69,10 @@
             allow="autoplay; fullscreen; picture-in-picture"
             allowfullscreen
         ></iframe>
-    {% elseif kind == 'file' and videoFile is defined and videoFile is not empty and videoFile.id is defined %}
+    {% elseif kind == 'file' and videoFile.id|default(null) is not null %}
         {% set resolvedVideo = sulu_resolve_media(videoFile.id, app.request.locale) %}
         {% set posterUrl = '' %}
-        {% if videoPoster is defined and videoPoster is not empty and videoPoster.id is defined %}
+        {% if hasPoster %}
             {% set resolvedPoster = sulu_resolve_media(videoPoster.id, app.request.locale) %}
             {# A deleted poster costs the still frame, not the video. #}
             {% if resolvedPoster is not null %}

@@ -1,7 +1,10 @@
 {# Widget: an interactive map, through the same partial the location block uses
    so a map reads the same wherever it is placed. The address below it comes
    from the structured fields of the Sulu location, when they are filled in. #}
-{% if location is defined and location is not empty and location.lat is defined and location.long is defined %}
+{# Same trap as an empty media picker: an untouched location field is stored
+   with its keys and null values, so `is defined` answers true for a map nobody
+   placed. The coordinates are what decide. #}
+{% if location.lat|default(null) is not null and location.long|default(null) is not null %}
     {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
 
     <div class="iw-widget__map-wrap{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
