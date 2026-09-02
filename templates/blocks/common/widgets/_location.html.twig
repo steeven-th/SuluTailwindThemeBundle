@@ -1,0 +1,19 @@
+{# Widget: an interactive map, through the same partial the location block uses
+   so a map reads the same wherever it is placed. The address below it comes
+   from the structured fields of the Sulu location, when they are filled in. #}
+{% if location is defined and location is not empty and location.lat is defined and location.long is defined %}
+    {% set formattedAddress = iw_sulu_tailwind_theme_location_address(location) %}
+
+    <div class="iw-widget__map-wrap{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
+        {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
+            location: location,
+            title: 'iw_sulu_tailwind_theme.widget_location'|trans,
+            address: formattedAddress,
+            mapClass: 'iw-widget__map w-full aspect-[4/3]'
+        } only %}
+    </div>
+
+    {% if formattedAddress is not empty %}
+        <p class="iw-widget__address">{{ formattedAddress }}</p>
+    {% endif %}
+{% endif %}

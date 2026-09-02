@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<!--
+    Widget: an embedded or self-hosted video.
+
+    The provider decides which field follows, so that condition stays inside the
+    type: one level, on a sibling, rather than the three-level chain it took
+    when the whole thing hung off a select in the block.
+
+    The preview image is offered whatever the provider, and does more than
+    decorate. On a hosted file it is the `poster` of the player. On YouTube or
+    Vimeo it turns the embed into a facade: the image shows, and the iframe is
+    only requested once a visitor clicks it. Nothing reaches the platform until
+    then, no request, no cookie, no IP, which is the same reason the iframe
+    block offers a consent placeholder.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="video">
+        <meta>
+            <title>iw_sulu_tailwind_theme.widget_video</title>
+        </meta>
+        <properties>
+            <property name="provider" type="single_select" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_provider</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="youtube"/>
+                    <param name="values" type="collection">
+                        <param name="youtube"><meta><title>iw_sulu_tailwind_theme.video_provider_youtube</title></meta></param>
+                        <param name="vimeo"><meta><title>iw_sulu_tailwind_theme.video_provider_vimeo</title></meta></param>
+                        <param name="file"><meta><title>iw_sulu_tailwind_theme.video_provider_file</title></meta></param>
+                    </param>
+                </params>
+            </property>
+            <property name="youtubeId" type="text_line" colspan="6"
+                      visibleCondition="__parent.provider == 'youtube'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_youtube_id</title>
+                    <info_text>iw_sulu_tailwind_theme.video_youtube_id_info</info_text>
+                </meta>
+            </property>
+            <property name="vimeoId" type="text_line" colspan="6"
+                      visibleCondition="__parent.provider == 'vimeo'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_vimeo_id</title>
+                    <info_text>iw_sulu_tailwind_theme.video_vimeo_id_info</info_text>
+                </meta>
+            </property>
+            <property name="videoFile" type="single_media_selection"
+                      visibleCondition="__parent.provider == 'file'">
+                <meta><title>iw_sulu_tailwind_theme.video_file</title></meta>
+                <params>
+                    <param name="types" value="video"/>
+                </params>
+            </property>
+            <property name="videoPoster" type="single_media_selection">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_poster</title>
+                    <info_text>iw_sulu_tailwind_theme.video_poster_info</info_text>
+                </meta>
+                <params>
+                    <param name="types" value="image"/>
+                </params>
+            </property>
+        </properties>
+    </type>
+</types>

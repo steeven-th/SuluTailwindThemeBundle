@@ -1,0 +1,6 @@
+{# Widget: a rich text panel beside the block's own text. #}
+{% if text is defined and text is not empty %}
+    <div class="iw-widget__text prose max-w-none">
+        {{ text|raw }}
+    </div>
+{% endif %}

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!--
+    Widget: an interactive map centred on an address.
+
+    Rendered through `components/_location_map.html.twig`, the same partial the
+    location block uses, so a map looks the same wherever it is placed.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="location">
+        <meta>
+            <title>iw_sulu_tailwind_theme.widget_location</title>
+        </meta>
+        <properties>
+            <property name="location" type="location">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.location</title>
+                    <info_text>iw_sulu_tailwind_theme.widget_location_info</info_text>
+                </meta>
+            </property>
+        </properties>
+    </type>
+</types>

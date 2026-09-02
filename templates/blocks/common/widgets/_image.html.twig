@@ -1,0 +1,10 @@
+{# Widget: images. One turns into a single frame, several into a slider, which
+   is what `_image_slider` already does for every block that shows images. #}
+{% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+    images: images|default([]),
+    imageFormat: imageFormat|default('iw_theme_16_9'),
+    showName: showName|default(false),
+    autoplay: true,
+    aspectRatio: aspectRatio|default('16/9'),
+    imageRadius: imageRadius|default('')
+} only %}

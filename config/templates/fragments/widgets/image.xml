@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!--
+    Widget: one or several images.
+
+    Images only. A video from the library belongs to the video widget, which
+    shows one player rather than a carousel: sliding through videos pits the
+    slider's autoplay against the player, and nobody watches the second one.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="image">
+        <meta>
+            <title>iw_sulu_tailwind_theme.widget_image</title>
+        </meta>
+        <properties>
+            <property name="images" type="media_selection">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.images</title>
+                    <info_text>iw_sulu_tailwind_theme.widget_images_info</info_text>
+                </meta>
+                <params>
+                    <param name="types" value="image"/>
+                </params>
+            </property>
+            <property name="showImagesName" type="checkbox">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.show_images_name</title>
+                    <info_text>iw_sulu_tailwind_theme.show_images_name_info</info_text>
+                </meta>
+            </property>
+        </properties>
+    </type>
+</types>
