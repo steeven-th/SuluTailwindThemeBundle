@@ -79,23 +79,6 @@
                         </param>
                     </params>
                 </property>
-                <property name="enableParallax" type="checkbox"
-                          visibleCondition="__parent.style == 'wide_carousel'">
-                    <meta><title>iw_sulu_tailwind_theme.enable_parallax</title></meta>
-                </property>
-                <property name="parallaxIntensity" type="single_select" colspan="6"
-                          visibleCondition="__parent.style == 'wide_carousel' AND __parent.enableParallax == true">
-                    <meta><title>iw_sulu_tailwind_theme.parallax_intensity</title></meta>
-                    <params>
-                        <param name="default_value" value="medium"/>
-                        <param name="values" type="collection">
-                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_subtle</title></meta></param>
-                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_medium</title></meta></param>
-                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_strong</title></meta></param>
-                            <param name="extreme"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_extreme</title></meta></param>
-                        </param>
-                    </params>
-                </property>
                 <!-- Grid / masonry: spacing between the images. Empty follows
                      the theme's card spacing; an explicit choice emits an
                      `iw-gap` class feeding the gap variable and overrides
@@ -115,6 +98,23 @@
                             <param name="iw-gap--8"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
                             <param name="iw-gap--10"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
                             <param name="iw-gap--12"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+                <property name="enableParallax" type="checkbox"
+                          visibleCondition="__parent.style == 'wide_carousel'">
+                    <meta><title>iw_sulu_tailwind_theme.enable_parallax</title></meta>
+                </property>
+                <property name="parallaxIntensity" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'wide_carousel' AND __parent.enableParallax == true">
+                    <meta><title>iw_sulu_tailwind_theme.parallax_intensity</title></meta>
+                    <params>
+                        <param name="default_value" value="medium"/>
+                        <param name="values" type="collection">
+                            <param name="subtle"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_subtle</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_strong</title></meta></param>
+                            <param name="extreme"><meta><title>iw_sulu_tailwind_theme.parallax_intensity_extreme</title></meta></param>
                         </param>
                     </params>
                 </property>

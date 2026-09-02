@@ -315,13 +315,6 @@
                         </param>
                     </params>
                 </property>
-                <property name="showImagesName" type="checkbox"
-                          visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.show_images_name</title>
-                        <info_text>iw_sulu_tailwind_theme.show_images_name_info</info_text>
-                    </meta>
-                </property>
                 <!--
                     Caps the image inside its column, which the column share
                     alone cannot do: a quarter of a wide block is still 300px,
@@ -351,6 +344,13 @@
                             <param name="xl"><meta><title>iw_sulu_tailwind_theme.image_max_width_xl</title></meta></param>
                         </param>
                     </params>
+                </property>
+                <property name="showImagesName" type="checkbox"
+                          visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.show_images_name</title>
+                        <info_text>iw_sulu_tailwind_theme.show_images_name_info</info_text>
+                    </meta>
                 </property>
 
 

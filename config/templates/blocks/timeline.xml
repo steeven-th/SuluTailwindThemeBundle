@@ -212,9 +212,9 @@
                         </param>
                     </params>
                 </property>
-                <xi:include href="../fragments/block-spacing.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-image-max-width.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>

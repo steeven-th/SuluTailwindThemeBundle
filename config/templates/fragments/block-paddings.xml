@@ -6,6 +6,10 @@
     coloured block its breathing room. The lateral one carries the `px` prefix
     because the selector defaults to the vertical scale.
 
+    All three are half width. The lateral one ends up alone on its row, which
+    is fine: the heading opening the next group closes the row anyway, so it
+    cannot be paired with a field of another height.
+
     Bundled in `block-spacing.xml`.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
@@ -21,7 +25,7 @@
             <param name="default_value" value="pb-5"/>
         </params>
     </property>
-    <property name="paddingLateral" type="iw_theme_margin_selector">
+    <property name="paddingLateral" type="iw_theme_margin_selector" colspan="6">
         <meta><title>iw_sulu_tailwind_theme.padding_lateral</title></meta>
         <params>
             <param name="prefix" value="px"/>
