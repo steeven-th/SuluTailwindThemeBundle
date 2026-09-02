@@ -1196,7 +1196,13 @@
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
       "titleAlignment": "left",
-      "paragraphImageRadius": "rounded-none"
+      "paragraphImageRadius": "rounded-none",
+      "widget": [
+       {
+        "_id": "formwidget001",
+        "type": "text"
+       }
+      ]
      },
      {
       "_id": "dc63245d",
@@ -1207,8 +1213,6 @@
       "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "widgetType": "text",
       "blockRadius": "rounded-none",
       "marginBottom": "mb-5",
       "twigTemplate": "forms/contact.html.twig",
@@ -1216,7 +1220,14 @@
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
       "titleAlignment": "left",
-      "paragraphImageRadius": "rounded-none"
+      "paragraphImageRadius": "rounded-none",
+      "widget": [
+       {
+        "_id": "formwidget002",
+        "type": "text",
+        "text": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>"
+       }
+      ]
      },
      {
       "_id": "1eef6f86",
@@ -1227,20 +1238,25 @@
       "subTitle": "sous titre",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "widgetType": "image",
       "blockRadius": "rounded-none",
-      "widgetImage": {
-       "id": "@media:11",
-       "displayOption": null
-      },
       "marginBottom": "mb-5",
       "twigTemplate": "forms/contact.html.twig",
       "paddingBottom": "pb-5",
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
       "titleAlignment": "left",
-      "paragraphImageRadius": "rounded-none"
+      "paragraphImageRadius": "rounded-none",
+      "widget": [
+       {
+        "_id": "formwidget003",
+        "type": "image",
+        "images": {
+         "ids": [
+          "@media:11"
+         ]
+        }
+       }
+      ]
      },
      {
       "_id": "1ad2c1cb",
@@ -1252,31 +1268,31 @@
       "formRight": true,
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
-      "widgetText": "<p><strong>Lorem Ipsum</strong> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library, took a 1914 Cicero translation and scrambled it to make dummy text for Letraset's Body Type sheets. It has survived not only many decades, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised thanks to these sheets and more recently with desktop publishing software including versions of Lorem Ipsum.</p>",
-      "widgetType": "location",
       "blockRadius": "rounded-none",
-      "widgetImage": {
-       "id": "@media:12",
-       "displayOption": null
-      },
       "marginBottom": "mb-5",
       "twigTemplate": "forms/contact.html.twig",
       "paddingBottom": "pb-5",
       "lateralMargins": "exterior",
       "paddingLateral": "px-5",
       "titleAlignment": "left",
-      "widgetLocation": {
-       "lat": 43.20817874674293,
-       "code": "65800",
-       "long": 0.05627260664330615,
-       "town": "Aureilhan",
-       "zoom": 10,
-       "title": "Otidea",
-       "number": "11",
-       "street": "rue du 11 Novembre",
-       "country": "France"
-      },
-      "paragraphImageRadius": "rounded-2xl"
+      "paragraphImageRadius": "rounded-2xl",
+      "widget": [
+       {
+        "_id": "formwidget004",
+        "type": "location",
+        "location": {
+         "lat": 43.20817874674293,
+         "code": "65800",
+         "long": 0.05627260664330615,
+         "town": "Aureilhan",
+         "zoom": 10,
+         "title": "Otidea",
+         "number": "11",
+         "street": "rue du 11 Novembre",
+         "country": "France"
+        }
+       }
+      ]
      },
      {
       "_id": "96619cb8",
@@ -1295,7 +1311,13 @@
       "paddingLateral": "px-5",
       "showBackground": true,
       "titleAlignment": "left",
-      "paragraphImageRadius": "rounded-none"
+      "paragraphImageRadius": "rounded-none",
+      "widget": [
+       {
+        "_id": "formwidget005",
+        "type": "text"
+       }
+      ]
      }
     ]
    }

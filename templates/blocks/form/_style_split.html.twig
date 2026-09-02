@@ -1,7 +1,7 @@
 {# Form block — info widget + form side by side.
-   The info column renders one of 3 widgets based on the `widgetType` admin
-   field: rich text, image, or location map. The `formRight` toggle controls
-   the column order:
+   The info column renders whichever widget the editor picked, through the
+   shared partial: rich text, images, a video or a map. The `formRight` toggle
+   controls the column order:
      - formRight = false (default): form LEFT (desktop) / form TOP (mobile)
      - formRight = true:            form RIGHT (desktop) / form BOTTOM (mobile)
    HTML order drives mobile order; CSS grid keeps the columns aligned on lg+. #}
@@ -16,7 +16,7 @@
         variant: variant|default(0)
     } only %}
 
-    {% set widgetKind = widgetType|default('text') %}
+
     {% set isFormRight = formRight|default(false) %}
 
     {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
@@ -25,11 +25,12 @@
         {% if isFormRight %}
             {# Widget first (LEFT desktop / TOP mobile), form after #}
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
-                {% include '@ItechWorldSuluTailwindTheme/blocks/form/widgets/_widget_' ~ widgetKind ~ '.html.twig' with {
-                    text: widgetText|default(''),
-                    image: widgetImage|default(null),
-                    location: widgetLocation|default(null),
-                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+                    widget: widget|default([]),
+                    imageFormat: 'iw_theme_4_3',
+                    aspectRatio: '4/3',
+                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
+                    blockPrefix: 'iw-block-form'
                 } only %}
             </div>
 
@@ -53,11 +54,12 @@
             </div>
 
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
-                {% include '@ItechWorldSuluTailwindTheme/blocks/form/widgets/_widget_' ~ widgetKind ~ '.html.twig' with {
-                    text: widgetText|default(''),
-                    image: widgetImage|default(null),
-                    location: widgetLocation|default(null),
-                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+                    widget: widget|default([]),
+                    imageFormat: 'iw_theme_4_3',
+                    aspectRatio: '4/3',
+                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
+                    blockPrefix: 'iw-block-form'
                 } only %}
             </div>
         {% endif %}
