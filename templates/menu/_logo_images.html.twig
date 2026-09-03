@@ -28,14 +28,19 @@
 {# Resolve the four medias. A media deleted from the library resolves to null:
    skip that variant rather than rendering a broken image.
 
-   Each variant also tracks whether the URL we ended up with is a raw vector
-   file. Sulu does not rasterize SVG uploads, so an SVG logo has no thumbnail
-   and is served as-is; if that file declares only a viewBox (no width/height
-   attributes) it has no intrinsic size, and `width: auto` next to a bare
-   `max-height` resolves to zero inside the flex bar — the logo vanishes. The
-   `--vector` modifier gives those an explicit height. The check is deliberately
-   "no thumbnail AND svg" rather than just "svg": should a raster thumbnail ever
-   exist for an SVG source, we are serving the raster and must not force it. #}
+   Each variant also tracks whether it ends up serving a vector file. Sulu does
+   not rasterize an SVG: the format URL exists and serves the original
+   untouched. If that file declares only a viewBox, with no width or height, it
+   has no intrinsic size, and `width: auto` next to a bare `max-height` resolves
+   to zero inside the flex bar, so the logo vanishes. The `--vector` modifier
+   gives those an explicit height.
+
+   The check is the mime type alone. It used to also require the thumbnail to be
+   missing, on the theory that a raster thumbnail would mean we are serving the
+   raster. Sulu exposes a thumbnail URL for an SVG like it does for anything
+   else, so that condition was never true and the modifier never applied: an SVG
+   logo without intrinsic dimensions disappeared, which is the case the code was
+   written to prevent. #}
 {% set logoDesktopUrl = null %}
 {% set logoMobileUrl = null %}
 {% set logoDesktopTransparentUrl = null %}
@@ -50,7 +55,7 @@
     {% if media is not null %}
         {% set thumbnail = media.thumbnails['iw_theme_logo_desktop']|default(null) %}
         {% set logoDesktopUrl = thumbnail|default(media.url)|default(null) %}
-        {% set logoDesktopVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
+        {% set logoDesktopVector = 'image/svg+xml' == media.mimeType|default('') %}
     {% endif %}
 {% endif %}
 
@@ -59,7 +64,7 @@
     {% if media is not null %}
         {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
         {% set logoMobileUrl = thumbnail|default(media.url)|default(null) %}
-        {% set logoMobileVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
+        {% set logoMobileVector = 'image/svg+xml' == media.mimeType|default('') %}
     {% endif %}
 {% endif %}
 
@@ -70,7 +75,7 @@
         {% if media is not null %}
             {% set thumbnail = media.thumbnails['iw_theme_logo_desktop']|default(null) %}
             {% set logoDesktopTransparentUrl = thumbnail|default(media.url)|default(null) %}
-            {% set logoDesktopTransparentVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
+            {% set logoDesktopTransparentVector = 'image/svg+xml' == media.mimeType|default('') %}
         {% endif %}
     {% endif %}
     {% if showMobile and config.logoTransparentMobile.id|default(null) is not null %}
@@ -78,7 +83,7 @@
         {% if media is not null %}
             {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
             {% set logoMobileTransparentUrl = thumbnail|default(media.url)|default(null) %}
-            {% set logoMobileTransparentVector = thumbnail is null and 'image/svg+xml' == media.mimeType|default('') %}
+            {% set logoMobileTransparentVector = 'image/svg+xml' == media.mimeType|default('') %}
         {% endif %}
     {% endif %}
 {% endif %}
