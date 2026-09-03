@@ -2906,6 +2906,11 @@ class ThemeCompiler
             // blocks, same contract as `--iw-variant-paragraph-bg`. The accent
             // surface has no rule of its own here on purpose: it belongs to
             // whatever puts an element forward, not to every block.
+            //
+            // There is deliberately no card surface either. A card is an
+            // enclosed unit, so it takes the paragraph surface, and a card put
+            // forward takes this one. Adding one would mean adding a
+            // highlighted-card surface beside it, to say what these two say.
             'contentBg' => '--iw-variant-content-bg',
             'contentBorder' => '--iw-variant-content-border',
             'blockBorder' => '--iw-variant-block-border',

@@ -212,9 +212,11 @@ transparent on a variant that sets no paragraph background. `SurfaceUsageContrac
 checks both, and refuses a rule that paints `.iw-block__content` with the
 paragraph background.
 
-**Known limit.** Cards and rich text areas share the paragraph background, so a
-theme cannot tint its cards without tinting the text panels of every block. A
-card surface of its own would fix it, at the cost of one more setting.
+**A card is a paragraph, and a highlighted card is an accent.** Cards share the
+paragraph background with rich text areas, deliberately: they are both enclosed
+units, and giving cards a surface of their own would mean giving highlighted
+cards one too, which is what the accent surface already is. Four surfaces cover
+it, six would say the same thing twice.
 
 ## Paragraph background (`.iw-block__text`)
 
