@@ -3,12 +3,12 @@ import React, {Fragment} from 'react';
 import {observer} from 'mobx-react';
 import {ChromePicker} from 'react-color';
 import {translate} from 'sulu-admin-bundle/utils';
-import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
+import loadFormPalette from '../../utils/formPalette';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -144,33 +144,13 @@ export default class ColorTokenEditor extends React.Component {
      * palette (saved state) when not in a theme form.
      */
     _loadPaletteFromForm() {
-        const {formInspector} = this.props;
-        if (!formInspector || !this.showPalette) return;
+        if (!this.showPalette) return;
 
-        // The PaletteEditor holds the base colors as a list [{role, slug, value}].
-        // getValueByPath may return a MobX observable array (fails Array.isArray).
-        const raw = formInspector.getValueByPath('/palette');
-        if (!raw || !raw.length) return;
-        const colors = Array.from(raw);
-
-        const params = new URLSearchParams();
-        colors.forEach((color) => {
-            const key = color && (color.role || color.slug);
-            const value = color && color.value;
-            if (key && typeof value === 'string' && value) {
-                params.set(key, value);
+        loadFormPalette(this.props.formInspector).then((palette) => {
+            if (palette) {
+                this.setState({localPalette: palette});
             }
         });
-
-        if (params.toString() === '') return;
-
-        Requester.get('/admin/api/iw-theme-palette?' + params.toString())
-            .then((palette) => {
-                this.setState({localPalette: palette});
-            })
-            .catch(() => {
-                // Fallback to store palette on error
-            });
     }
 
     componentDidUpdate(prevProps) {

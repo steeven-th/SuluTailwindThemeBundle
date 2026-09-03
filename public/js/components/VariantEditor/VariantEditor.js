@@ -3,6 +3,9 @@ import React from 'react';
 import {observer} from 'mobx-react';
 import {translate} from 'sulu-admin-bundle/utils';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
+import themeConfigStore from '../../stores/themeConfigStore';
+import {resolveRef} from '../../utils/colorRefResolver';
+import loadFormPalette from '../../utils/formPalette';
 import {ZONES, WIDTHS, FIELDS, fieldOf} from './zones';
 
 const STYLE_ID = 'iw-variant-editor-styles';
@@ -140,14 +143,42 @@ function toColors(value) {
  */
 @observer
 export default class VariantEditor extends React.Component {
-    state = {selected: 'title'};
+    state = {selected: 'title', palette: null};
 
     componentDidMount() {
         ensureVariantEditorStyles();
+
+        // Colors edited in the palette tab of the same form are not saved yet,
+        // so the store would show the previous ones and the preview would
+        // disagree with what the page renders.
+        loadFormPalette(this.props.formInspector).then((palette) => {
+            if (palette) {
+                this.setState({palette});
+            }
+        });
     }
 
     get colors() {
         return toColors(this.props.value);
+    }
+
+    /**
+     * A stored color as CSS can use it.
+     *
+     * A color picked from the palette is stored as a reference, not a hex, so
+     * feeding it to CSS straight sets the property to something invalid. The
+     * declaration is then dropped at computed-value time and the element falls
+     * back to transparent, which reads as "my color did nothing".
+     *
+     * The compiler resolves the same way server-side, so the preview and the
+     * page agree.
+     */
+    resolved(value) {
+        if (typeof value !== 'string' || '' === value) {
+            return value;
+        }
+
+        return resolveRef(value, this.state.palette || themeConfigStore.palette);
     }
 
     /** Custom properties that paint the preview. */
@@ -160,7 +191,24 @@ export default class VariantEditor extends React.Component {
             if (held === undefined) {
                 return;
             }
-            style['--ve-' + key] = 'width' === kind ? held + 'px' : held;
+
+            if ('width' === kind) {
+                style['--ve-' + key] = held + 'px';
+
+                return;
+            }
+
+            const value = this.resolved(held);
+
+            // An unresolved reference is not a color. Setting the property to
+            // one anyway makes the whole declaration invalid, and the element
+            // falls back to transparent, which looks like the color did
+            // nothing. Leaving the property unset keeps the readable default.
+            if ('string' === typeof value && 0 === value.indexOf('ref:')) {
+                return;
+            }
+
+            style['--ve-' + key] = value;
         });
 
         return style;
@@ -213,7 +261,7 @@ export default class VariantEditor extends React.Component {
 
     renderPreview() {
         return (
-            <div className="iw-ve__preview">
+            <div>
                 {this.renderRegion('blockBg', 'iw-ve__block', (
                     <div>
                         {this.renderRegion('contentBg', 'iw-ve__content', (
@@ -298,7 +346,7 @@ export default class VariantEditor extends React.Component {
                             {'color' === field.kind && (
                                 <span
                                     className="iw-ve__swatch"
-                                    style={{background: colors[field.key] || 'transparent'}}
+                                    style={{background: this.resolved(colors[field.key]) || 'transparent'}}
                                 />
                             )}
                             {translate(field.label)}
@@ -347,6 +395,7 @@ export default class VariantEditor extends React.Component {
                     : (
                         <ColorTokenEditor
                             disabled={this.props.disabled}
+                            formInspector={this.props.formInspector}
                             onChange={(next) => this.commit(field.key, next)}
                             schemaOptions={{show_palette: {value: true}}}
                             value={value || ''}
