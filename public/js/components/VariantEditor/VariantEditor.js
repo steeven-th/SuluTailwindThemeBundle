@@ -95,7 +95,22 @@ function ensureVariantEditorStyles() {
         // clickable regions
         '.iw-ve [data-ve-field] { cursor: pointer; outline-offset: -1px; border-radius: 2px; }',
         '.iw-ve [data-ve-field]:hover { outline: 1px dashed #6b7280; }',
-        '.iw-ve [data-ve-field][data-ve-selected="true"] { outline: 2px solid #2563eb; }',
+
+        // The outline sits exactly where the border being edited is drawn, so
+        // a solid one hides the colour you are choosing. Fading it in and out
+        // shows what is underneath without having to select something else,
+        // and the movement makes the selected part easy to find again.
+        '@keyframes iw-ve-pulse {',
+        '  0%, 100% { outline-color: rgba(37, 99, 235, .95); }',
+        '  50% { outline-color: rgba(37, 99, 235, .12); }',
+        '}',
+        '.iw-ve [data-ve-field][data-ve-selected="true"] {',
+        '  outline: 2px solid rgba(37, 99, 235, .95);',
+        '  animation: iw-ve-pulse 1.9s ease-in-out infinite;',
+        '}',
+        '@media (prefers-reduced-motion: reduce) {',
+        '  .iw-ve [data-ve-field][data-ve-selected="true"] { animation: none; }',
+        '}',
 
         // the editor panel, directly under the preview
         '.iw-ve__hint { font-size: 12px; color: #6b7280; margin: 0 0 10px; }',
