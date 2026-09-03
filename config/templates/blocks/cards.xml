@@ -64,15 +64,24 @@
                                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>
                                 </property>
 
-                                <property name="link" type="link" colspan="6">
-                                    <meta><title>iw_sulu_tailwind_theme.cards_link</title></meta>
-                                </property>
-
-                                <property name="linkLabel" type="text_line" colspan="6">
+                                <!-- `enable_attributes` gives the link its own title,
+                                     target and rel, so a separate label field would
+                                     ask twice for the same thing. Empty, the title of
+                                     the linked page or media is used. -->
+                                <property name="link" type="link">
                                     <meta>
-                                        <title>iw_sulu_tailwind_theme.cards_link_label</title>
-                                        <info_text>iw_sulu_tailwind_theme.cards_link_label_info</info_text>
+                                        <title>iw_sulu_tailwind_theme.cards_link</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_link_info</info_text>
                                     </meta>
+                                    <params>
+                                        <param name="enable_anchor" value="true"/>
+                                        <param name="enable_attributes" value="true"/>
+                                        <param name="types" type="collection">
+                                            <param name="page"/>
+                                            <param name="external"/>
+                                            <param name="media"/>
+                                        </param>
+                                    </params>
                                 </property>
 
                                 <!-- Puts one card forward using the accent surface of
@@ -117,8 +126,16 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <!-- A heading takes its text from the `label` param, not from
+                     `meta`, which is what the shared fragments do. Through meta
+                     it renders as an ordinary property title: not bold, and
+                     followed by the empty space where its field would go. -->
                 <property name="cardsHeading" type="heading">
-                    <meta><title>iw_sulu_tailwind_theme.cards_group</title></meta>
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.cards_group</title></meta>
+                        </param>
+                    </params>
                 </property>
 
                 <!-- Equal columns, then the uneven pairs. An uneven split is a
@@ -225,6 +242,23 @@
                     </meta>
                     <params>
                         <param name="type" value="toggler"/>
+                    </params>
+                </property>
+
+                <!-- Decided for the grid rather than per card: a row where one
+                     card ends in a button and the next in a link reads as a
+                     mistake. The button takes the style the variant points at. -->
+                <property name="linkDisplay" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_link_display</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_link_display_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="link"/>
+                        <param name="values" type="collection">
+                            <param name="link"><meta><title>iw_sulu_tailwind_theme.cards_link_as_link</title></meta></param>
+                            <param name="button"><meta><title>iw_sulu_tailwind_theme.cards_link_as_button</title></meta></param>
+                        </param>
                     </params>
                 </property>
 

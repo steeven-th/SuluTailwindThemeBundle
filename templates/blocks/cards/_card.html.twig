@@ -21,6 +21,8 @@
      - index         : 0-based position, shown when `numbered` is on
      - iconPosition  : inline | above
      - shadow        : bool, lifts the card off the page
+     - linkDisplay   : link | button, how the action is drawn
+     - buttonStyle   : slug of the button style the variant points at
      - numbered      : bool, shows the position of the card
      - imageMaxWidth : cap on the image width, from the block settings
      - cardRadius    : radius class for the card
@@ -32,7 +34,6 @@
 {% set image = card.image|default(null) %}
 {% set title = card.title|default('') %}
 {% set text = card.text|default('') %}
-{% set linkLabel = card.linkLabel|default('') %}
 {% set highlighted = card.highlighted|default(false) %}
 
 {# A media picker that was opened and left empty stores `{id: null}`, which is
@@ -47,7 +48,22 @@
 {% set linkView = cardView.link|default({}) %}
 {% set linkTarget = linkView.target|default('_self') %}
 {% set linkRel = linkView.rel|default('') %}
-{% if linkLabel is empty %}{% set linkLabel = linkView.title|default('') %}{% endif %}
+
+{# The label is the title carried by the link itself. Left empty, the title of
+   the linked page or media stands in, so a link never renders unlabelled. #}
+{% set linkLabel = linkView.title|default('') %}
+{% if linkLabel is empty and linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
+    {% set linkLabel = sulu_page_load(linkView.href, {'title': 'title'}).title|default('') %}
+{% endif %}
+{% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
+    {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
+    {% set linkLabel = linkedMedia.title|default('') %}
+{% endif %}
+
+{# Last resort, the URL itself. An external link with no title would otherwise
+   leave the action with nothing to show, and it would vanish silently: the
+   editor sets a link and sees none. #}
+{% if linkLabel is empty %}{% set linkLabel = href %}{% endif %}
 
 {% set wholeCardIsLink = clickable|default(false) and href is not empty %}
 
@@ -61,11 +77,13 @@
 >
     {% if style == 'image_top' and hasImage %}
         <div class="iw-card__banner">
+            {#- No image radius here: the banner is flush against the body, so
+                rounding its bottom corners would cut a notch out of the card.
+                Its top corners follow the card, which clips them. -#}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                 media: image,
                 format: 'iw_theme_16_9',
-                ratio: '16-9',
-                radiusClass: imageRadius|default('')
+                ratio: '16-9'
             } only %}
         </div>
     {% endif %}
@@ -115,13 +133,24 @@
 
         {# The link is a real link unless the whole card already is one, in
            which case a nested <a> would be invalid markup. #}
+        {#- A button is a link that looks like one, so it takes the button
+            style of the variant. When the whole card is already the link, the
+            action becomes a span: an anchor inside an anchor is invalid, and
+            the styling is what carries the affordance anyway. -#}
         {% if href is not empty and linkLabel is not empty %}
+            {% set actionClass = linkDisplay|default('link') == 'button'
+                ? 'iw-card__action iw-button--' ~ (buttonStyle|default('primary'))
+                : 'iw-card__link' %}
+
             {% if wholeCardIsLink %}
-                <span class="iw-card__link">{{ linkLabel }}</span>
+                <span class="{{ actionClass }}">{{ linkLabel }}</span>
             {% else %}
-                <a class="iw-card__link" href="{{ href }}"
+                {# Attributes are written as markup rather than built as strings:
+                   autoescaping turns the quotes of a concatenated expression into
+                   entities, and the attribute stops working. #}
+                <a class="{{ actionClass }}" href="{{ href }}"
                    {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
-                   {% if linkRel is not empty %}rel="{{ linkRel }}"{% endif %}
+                   {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                 >{{ linkLabel }}</a>
             {% endif %}
         {% endif %}
