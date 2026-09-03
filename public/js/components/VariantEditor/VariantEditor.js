@@ -101,7 +101,9 @@ function ensureVariantEditorStyles() {
         '.iw-ve__hint { font-size: 12px; color: #6b7280; margin: 0 0 10px; }',
         '.iw-ve__editor { border: 1px solid #d1d5db; border-radius: 4px; padding: 12px 14px; background: #fff; }',
         '.iw-ve__editor-title { font-size: 13px; font-weight: 600; margin: 0 0 10px; color: #111827; }',
-        '.iw-ve__settings { display: flex; flex-wrap: wrap; gap: 14px; }',
+        // flex-start, or a short field stretches to the height of the tallest
+        // one on its row and the panel looks like a broken table
+        '.iw-ve__settings { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }',
         '.iw-ve__setting { flex: 0 1 210px; min-width: 180px; }',
         '.iw-ve__setting-label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }',
         '.iw-ve__widths { display: flex; gap: 6px; }',

@@ -89,9 +89,15 @@ const WIDTHS = [1, 2, 3];
  * and its width in another, so picking a colour appeared to do nothing until
  * you found the width somewhere else.
  *
- * Within a group the order is always the same: background, then border, then
- * text. Reading two groups in different orders makes them feel like different
- * things, and the eye stops finding a setting where it found it last time.
+ * Within a group the order is always the same: background, border, text, and
+ * the border width last. Reading two groups in different orders makes them
+ * feel like different things, and the eye stops finding a setting where it
+ * found it last time.
+ *
+ * The width trails the group despite belonging with its border colour, because
+ * it is the one control that is taller than the rest: a row of buttons, and a
+ * line of explanation when it has no colour yet. Anywhere but last it pushes
+ * whatever follows onto a ragged new row.
  *
  * Every setting lives in exactly one group, including the ones with no resting
  * state of their own - a link hover sits with the link, a focus border with the
@@ -110,7 +116,7 @@ const PREVIEW_GROUPS = [
     {id: 'subtitle', label: 'iw_sulu_tailwind_theme.variant_subtitle_color',
         fields: ['subtitle']},
     {id: 'paragraph', label: 'iw_sulu_tailwind_theme.variant_surface_paragraph',
-        fields: ['paragraphBg', 'paragraphBorder', 'paragraphBorderWidth', 'paragraph']},
+        fields: ['paragraphBg', 'paragraphBorder', 'paragraph', 'paragraphBorderWidth']},
     {id: 'link', label: 'iw_sulu_tailwind_theme.variant_link_color',
         fields: ['link', 'linkHover']},
     {id: 'list', label: 'iw_sulu_tailwind_theme.variant_list_color',
@@ -118,7 +124,7 @@ const PREVIEW_GROUPS = [
     {id: 'hr', label: 'iw_sulu_tailwind_theme.variant_hr_color',
         fields: ['hr']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
-        fields: ['accentBg', 'accentBorder', 'accentBorderWidth', 'accentText']},
+        fields: ['accentBg', 'accentBorder', 'accentText', 'accentBorderWidth']},
     {id: 'form', label: 'iw_sulu_tailwind_theme.variant_zone_form',
         fields: ['formBg', 'formBorder', 'formBorderFocus', 'formBorderError',
             'formText', 'formPlaceholder', 'formLabel']},
