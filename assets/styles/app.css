@@ -5780,8 +5780,22 @@ aside .iw-toc {
    and the number all turned into link colour the moment the card became
    clickable. Three classes and a type beat the variant rule, which is two
    classes and a type, so no !important is needed. */
-.iw-block-cards .iw-block-cards__grid a.iw-card {
+.iw-block-cards .iw-block-cards__grid a.iw-card,
+.iw-block-cards .iw-block-cards__grid a.iw-card:hover,
+.iw-block-cards .iw-block-cards__grid a.iw-card:focus,
+.iw-block-cards .iw-block-cards__grid a.iw-card:visited {
     color: inherit;
+}
+
+/* The action is the only part that reads as a link, so it keeps the link
+   colours - including on hover of the card, since the card is the anchor and
+   the action inside it is only a span. */
+.iw-block-cards a.iw-card .iw-card__link {
+    color: var(--iw-variant-link-color, inherit);
+}
+
+.iw-block-cards a.iw-card:hover .iw-card__link {
+    color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
 }
 
 a.iw-card {
