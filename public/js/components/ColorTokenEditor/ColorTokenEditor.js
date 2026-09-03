@@ -4,6 +4,7 @@ import {observer} from 'mobx-react';
 import {ChromePicker} from 'react-color';
 import {translate} from 'sulu-admin-bundle/utils';
 import themeConfigStore from '../../stores/themeConfigStore';
+import Icon from 'sulu-admin-bundle/components/Icon';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
@@ -49,17 +50,31 @@ function ensurePickerStyles() {
             overflow: hidden;
             border: 1px solid #c0c0c0;
         }
-        /* Sulu hands the clear icon the same style object as the colour swatch,
-           so it inherits the chosen colour and a white or pale one makes the
-           cross invisible. It is a glyph, not a swatch: no border, and a fixed
-           grey of its own. The attribute match is on the CSS module class,
-           whose suffix is a content hash. */
-        [class*="appendContainer"] .iw-color-picker-icon {
-            color: #7c7c7c !important;
+        /* The clear control is a trash button beside the field, the way Sulu
+           removes a selected item, rather than Input's own clear slot. That
+           slot draws a cross, and hands it the same style object as the colour
+           swatch, so it took the chosen colour and a white one made it
+           invisible. */
+        .iw-color-picker-field {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .iw-color-picker-field > *:first-child {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .iw-color-picker-clear {
+            flex: 0 0 auto;
             border: 0;
-            max-height: none;
-            max-width: none;
-            overflow: visible;
+            background: none;
+            padding: 4px;
+            cursor: pointer;
+            color: #7c7c7c;
+            line-height: 1;
+        }
+        .iw-color-picker-clear:hover {
+            color: #d02525;
         }
         .iw-palette-tabs {
             display: flex;
@@ -551,23 +566,36 @@ export default class ColorTokenEditor extends React.Component {
             && themeConfigStore.palette
             && Object.keys(themeConfigStore.palette).length > 0;
 
+        const showClear = !disabled && false !== clearable && !!internalValue;
+
         return (
             <Fragment>
-                <Input
-                    disabled={!!disabled}
-                    icon="su-square"
-                    iconClassName="iw-color-picker-icon"
-                    iconStyle={iconStyle}
-                    id={dataPath}
-                    inputContainerRef={this.setAnchorRef}
-                    onBlur={this.handleBlur}
-                    onChange={this.handleInputChange}
-                    onClearClick={!disabled && false !== clearable ? this.handleClearClick : undefined}
-                    onIconClick={!disabled ? this.handleIconClick : undefined}
-                    placeholder="#000000"
-                    valid={!error}
-                    value={internalValue}
-                />
+                <div className="iw-color-picker-field">
+                    <Input
+                        disabled={!!disabled}
+                        icon="su-square"
+                        iconClassName="iw-color-picker-icon"
+                        iconStyle={iconStyle}
+                        id={dataPath}
+                        inputContainerRef={this.setAnchorRef}
+                        onBlur={this.handleBlur}
+                        onChange={this.handleInputChange}
+                        onIconClick={!disabled ? this.handleIconClick : undefined}
+                        placeholder="#000000"
+                        valid={!error}
+                        value={internalValue}
+                    />
+                    {showClear &&
+                        <button
+                            className="iw-color-picker-clear"
+                            onClick={this.handleClearClick}
+                            title={translate('sulu_admin.delete')}
+                            type="button"
+                        >
+                            <Icon name="su-trash-alt" />
+                        </button>
+                    }
+                </div>
                 <Popover
                     anchorElement={this.anchorRef}
                     horizontalOffset={35}
