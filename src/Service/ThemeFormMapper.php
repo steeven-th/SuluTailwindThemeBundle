@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
@@ -507,7 +508,14 @@ class ThemeFormMapper
         // Normalize so every variant carries a stable, unique slug (derived from
         // the label for legacy variants) before the admin edits it.
         foreach (VariantResolver::normalizeVariants($variants) as $props) {
-            $result[] = array_merge(['type' => 'variant'], $props);
+            // The colors travel as ONE value, which is what lets a single field
+            // type paint a preview and edit them on it: a Sulu field type gets
+            // one value and cannot write into sibling properties. The stored
+            // shape is untouched, `unflattenBlockVariants()` spreads them back.
+            [$flat, $grouped] = VariantZones::split($props);
+            $flat[VariantZones::GROUPED_KEY] = $grouped;
+
+            $result[] = array_merge(['type' => 'variant'], $flat);
         }
 
         return $result;
@@ -887,6 +895,24 @@ class ThemeFormMapper
             $props = $blockItem;
             // Remove Sulu block metadata
             unset($props['type']);
+
+            // Spread the grouped colors back to the flat keys the entity, the
+            // compiler and the resolver have always used. Nothing downstream
+            // knows about the grouping, and no stored theme needs migrating.
+            //
+            // Unknown keys inside the group are dropped rather than stored: the
+            // value comes from the browser, and letting it write arbitrary keys
+            // into the variant would be a way to smuggle anything into the
+            // token JSON.
+            $grouped = $props[VariantZones::GROUPED_KEY] ?? null;
+            unset($props[VariantZones::GROUPED_KEY]);
+            if (\is_array($grouped)) {
+                foreach (VariantZones::keys() as $key) {
+                    if (\array_key_exists($key, $grouped)) {
+                        $props[$key] = $grouped[$key];
+                    }
+                }
+            }
             // Derive a slug from the label only when empty (defensive; the form
             // makes it mandatory). Do NOT deduplicate here: a slug collision must
             // be REJECTED at save by the SlugValidator, not silently renamed

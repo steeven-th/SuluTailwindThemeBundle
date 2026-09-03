@@ -119,6 +119,25 @@ See [`buttons.md`](./buttons.md) for the full button API and hover effects.
 
 ---
 
+## Editing a variant
+
+The colors of a variant are edited as **one field**, `iw_theme_variant_editor`,
+which paints a mock block with them and recolors the element you click.
+
+They used to be some thirty sibling color pickers. That is unreadable, and it
+showed nothing of the result: you picked a hex and found out on the page.
+
+Not every color has a visible counterpart in a mock - a link hover has no
+resting state - so the editor also lists every field beside the preview,
+grouped by zone. Nothing becomes unreachable by being left out of the mock.
+
+**The stored shape is unchanged.** `ThemeFormMapper` folds the colors on the way
+to the form and spreads them back on the way to the entity, so the compiler and
+`VariantResolver` read the flat keys they always read, and no theme needs
+migrating. `src/Color/VariantZones.php` is the source of truth for which colors
+exist and how they are grouped, mirrored in `zones.js` for the browser with a
+parity test guarding the two.
+
 ## Surfaces
 
 A variant used to describe colors in isolation. That left no way to put an

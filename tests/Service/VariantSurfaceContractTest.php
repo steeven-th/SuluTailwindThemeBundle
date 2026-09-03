@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
@@ -73,27 +74,28 @@ final class VariantSurfaceContractTest extends TestCase
     }
 
     /**
-     * Every token of every surface has a field in the variant form.
+     * Every token of every surface is declared in a zone.
      *
-     * Without the field the color can never be set, so the surface is dead
-     * weight the compiler carries.
+     * The variant form holds one field for all the colors, so a token reaches
+     * the admin only by being listed in `VariantZones`. One that is not is
+     * dead weight the compiler carries: it can never be set.
      */
     #[Test]
     #[DataProvider('surfaces')]
-    public function everySurfaceTokenHasAFormField(string $surface): void
+    public function everySurfaceTokenIsEditable(string $surface): void
     {
-        $form = (string) file_get_contents(self::root() . '/config/forms/iw_theme_config_variants.xml');
         $spec = self::SURFACES[$surface];
+        $known = VariantZones::keys();
 
         foreach ([$spec['bg'], $spec['text'], $spec['border'], $spec['width']] as $token) {
             if (null === $token) {
                 continue;
             }
 
-            self::assertStringContainsString(
-                \sprintf('<property name="%s"', $token),
-                $form,
-                \sprintf('The %s surface declares %s, which the variant form never offers.', $surface, $token),
+            self::assertContains(
+                $token,
+                $known,
+                \sprintf('The %s surface declares %s, which no zone offers, so it can never be set.', $surface, $token),
             );
         }
     }

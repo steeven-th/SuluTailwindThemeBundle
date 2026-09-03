@@ -17,6 +17,7 @@ import WeightPicker from './components/WeightPicker/WeightPicker';
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
 import TitleEditor from './components/TitleEditor/TitleEditor';
 import BlockScopeSelector from './components/BlockScopeSelector/BlockScopeSelector';
+import VariantEditor from './components/VariantEditor/VariantEditor';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
 
@@ -59,4 +60,5 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_article_style_picker', ArticleStylePicker);
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);
     fieldRegistry.add('iw_theme_block_scope', BlockScopeSelector);
+    fieldRegistry.add('iw_theme_variant_editor', VariantEditor);
 });

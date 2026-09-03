@@ -585,6 +585,21 @@ confirms the one that was posted, and the visitor lands on the confirmation.
 and therefore keeps the old silent behaviour. Add the branch — see
 [Form block](form-block.md#after-a-successful-submission).
 
+## Variant colors are edited in one field (changed)
+
+The variant form no longer lists a color picker per color. All of them are
+edited through `iw_theme_variant_editor`, which paints a mock block and
+recolors the element you click, with every field also listed by zone beside it
+for the ones a mock cannot show.
+
+**No data migration.** The stored shape is untouched: the mapper folds the
+colors for the form and spreads them back for the entity. Every existing theme
+opens and saves unchanged, which was verified by round-tripping the eight test
+themes and diffing the stored tokens.
+
+This only matters if you override the variant form XML: the sibling color
+properties are gone, replaced by a single `colors` property.
+
 ## Variant surfaces (new)
 
 A block variant now describes **surfaces** on top of its individual colors. A
