@@ -49,6 +49,18 @@ function ensurePickerStyles() {
             overflow: hidden;
             border: 1px solid #c0c0c0;
         }
+        /* Sulu hands the clear icon the same style object as the colour swatch,
+           so it inherits the chosen colour and a white or pale one makes the
+           cross invisible. It is a glyph, not a swatch: no border, and a fixed
+           grey of its own. The attribute match is on the CSS module class,
+           whose suffix is a content hash. */
+        [class*="appendContainer"] .iw-color-picker-icon {
+            color: #7c7c7c !important;
+            border: 0;
+            max-height: none;
+            max-width: none;
+            overflow: visible;
+        }
         .iw-palette-tabs {
             display: flex;
             border-bottom: 1px solid #e0e0e0;
@@ -107,6 +119,7 @@ function ensurePickerStyles() {
  * @param {Function} props.onChange - Callback when color changes
  * @param {boolean} props.disabled - Whether the field is disabled
  * @param {Object} props.schemaOptions - Schema params from XML config
+ * @param {boolean} props.clearable - Set false to hide the clear button (default: shown)
  */
 @observer
 export default class ColorTokenEditor extends React.Component {
@@ -207,6 +220,27 @@ export default class ColorTokenEditor extends React.Component {
     /**
      * Validate and commit value on blur.
      */
+    /**
+     * Clear the color, the way every other Sulu input clears.
+     *
+     * Offered unless `clearable` is false. Empty is meaningful in most places
+     * the picker is used - the token is unset and the cascade falls back - but
+     * not everywhere: a base palette role with no color compiles to a grey
+     * palette, silently, so the palette editor opts out.
+     *
+     * An empty color is meaningful here: it means the token is unset and the
+     * cascade falls back, so there has to be a way back to it once a color has
+     * been picked. Retyping over the field was the only one.
+     */
+    handleClearClick = () => {
+        this.setState({internalValue: ''});
+        this.props.onChange(undefined);
+
+        if (this.props.onFinish) {
+            this.props.onFinish();
+        }
+    };
+
     handleBlur = () => {
         const {internalValue} = this.state;
 
@@ -497,7 +531,7 @@ export default class ColorTokenEditor extends React.Component {
     }
 
     render() {
-        const {disabled, error, dataPath} = this.props;
+        const {disabled, error, dataPath, clearable} = this.props;
         const {popoverOpen, internalValue, activeTab} = this.state;
 
         const isTransparent = internalValue === 'transparent';
@@ -528,6 +562,7 @@ export default class ColorTokenEditor extends React.Component {
                     inputContainerRef={this.setAnchorRef}
                     onBlur={this.handleBlur}
                     onChange={this.handleInputChange}
+                    onClearClick={!disabled && false !== clearable ? this.handleClearClick : undefined}
                     onIconClick={!disabled ? this.handleIconClick : undefined}
                     placeholder="#000000"
                     valid={!error}

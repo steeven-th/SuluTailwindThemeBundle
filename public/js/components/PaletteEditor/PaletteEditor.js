@@ -255,6 +255,10 @@ export default class PaletteEditor extends React.Component {
                 <div className="iw-palette-editor__controls">
                     <div className="iw-palette-editor__color">
                         <ColorTokenEditor
+                            // A role with no colour compiles to a grey palette
+                            // rather than failing, so there is no way back from
+                            // clearing one by accident.
+                            clearable={false}
                             dataPath={(dataPath || 'palette') + '-' + index}
                             disabled={disabled}
                             onChange={(value) => this.handleValueChange(index, value)}
