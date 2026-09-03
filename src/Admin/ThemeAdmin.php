@@ -71,6 +71,7 @@ class ThemeAdmin extends Admin
         'form',
         'key_figures',
         'timeline',
+        'cards',
         'document',
         'linked_pages',
         'code',
@@ -106,6 +107,14 @@ class ThemeAdmin extends Admin
             ['key' => 'carousel', 'label' => 'iw_sulu_tailwind_theme.style.carousel'],
             ['key' => 'wide_carousel', 'label' => 'iw_sulu_tailwind_theme.style.wide_carousel'],
             ['key' => 'filmstrip', 'label' => 'iw_sulu_tailwind_theme.style.filmstrip'],
+        ],
+        'cards' => [
+            ['key' => 'bordered', 'label' => 'iw_sulu_tailwind_theme.style.cards_bordered'],
+            ['key' => 'elevated', 'label' => 'iw_sulu_tailwind_theme.style.cards_elevated'],
+            ['key' => 'minimal', 'label' => 'iw_sulu_tailwind_theme.style.cards_minimal'],
+            ['key' => 'icon_top', 'label' => 'iw_sulu_tailwind_theme.style.cards_icon_top'],
+            ['key' => 'image_top', 'label' => 'iw_sulu_tailwind_theme.style.cards_image_top'],
+            ['key' => 'numbered', 'label' => 'iw_sulu_tailwind_theme.style.cards_numbered'],
         ],
         'timeline' => [
             ['key' => 'alternate', 'label' => 'iw_sulu_tailwind_theme.style.alternate'],

@@ -5487,3 +5487,207 @@ aside .iw-toc {
     padding: 1rem;
     text-decoration: underline;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Block: cards
+   A grid of free-form cards. The six styles share the same markup and differ
+   only here, so a project can restyle one, or add a style of its own, without
+   touching Twig.
+
+   A card is an enclosed unit, so it takes the PARAGRAPH surface of the
+   variant. A highlighted card takes the ACCENT surface, which carries the
+   colour of the text on it, so it stays legible whatever the accent is.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.iw-block-cards {
+    /* Hook only - the grid and the styles below own the layout. */
+}
+
+.iw-block-cards__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--iw-block-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
+}
+
+@media (min-width: 640px) {
+    .iw-block-cards__grid--cols-2,
+    .iw-block-cards__grid--cols-3,
+    .iw-block-cards__grid--cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-block-cards__grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .iw-block-cards__grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .iw-block-cards__grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+.iw-block-cards__grid--align-center {
+    text-align: center;
+}
+
+/* The card ─────────────────────────────────────────────────────────────── */
+
+.iw-card {
+    display: flex;
+    flex-direction: column;
+    /* Equal height by default: a row of cards with ragged bottoms reads as a
+       mistake, and nothing here depends on the content being the same length. */
+    height: 100%;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+}
+
+.iw-card__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: var(--iw-card-padding, 1.25rem);
+}
+
+.iw-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.iw-card__head--stacked {
+    flex-direction: column;
+    align-items: inherit;
+    gap: 0.4rem;
+}
+
+.iw-block-cards__grid--align-center .iw-card__head {
+    justify-content: center;
+}
+
+.iw-card__icon {
+    flex: 0 0 auto;
+    display: block;
+    width: var(--iw-card-icon-size, 1.6rem);
+}
+
+.iw-card__head--stacked .iw-card__icon {
+    width: var(--iw-card-icon-size-stacked, 3rem);
+}
+
+.iw-card__title {
+    margin: 0;
+    font-size: var(--iw-card-title-size, 1.0625rem);
+    font-weight: 600;
+    color: var(--iw-variant-title-color, inherit);
+}
+
+.iw-card__text {
+    flex: 1 1 auto;
+    font-size: var(--iw-card-text-size, 0.9375rem);
+    line-height: 1.6;
+}
+
+.iw-card__image {
+    /* Sits inside the body for every style but image_top. */
+    margin-block: 0.25rem;
+}
+
+.iw-card__banner img {
+    width: 100%;
+}
+
+.iw-card__link {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--iw-variant-link-color, inherit);
+}
+
+.iw-card__link:hover {
+    color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
+}
+
+.iw-card__number {
+    font-size: var(--iw-card-number-size, 1.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--iw-variant-highlight, var(--color-accent));
+}
+
+/* Styles ───────────────────────────────────────────────────────────────── */
+
+/* The three-level cascade every enclosed unit uses: a hook for this block, the
+   variant surface, then the computed neutral. See doc/css-api/block-variants.md */
+.iw-card--bordered {
+    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+    border: var(--iw-variant-paragraph-border-width, 1px) solid
+        var(--iw-card-border, var(--iw-variant-paragraph-border, var(--iw-variant-hr-color, currentColor)));
+}
+
+.iw-card--elevated {
+    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    box-shadow: var(--iw-card-shadow, 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 16px -6px rgb(0 0 0 / 0.12));
+}
+
+.iw-card--elevated:hover {
+    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px rgb(0 0 0 / 0.12), 0 12px 24px -8px rgb(0 0 0 / 0.18));
+}
+
+/* Minimal has no frame at all, so its body loses the padding that framed it. */
+.iw-card--minimal .iw-card__body {
+    padding: 0;
+}
+
+.iw-card--icon-top,
+.iw-card--image-top,
+.iw-card--numbered {
+    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+}
+
+.iw-card--icon-top {
+    text-align: center;
+}
+
+.iw-card--icon-top .iw-card__head {
+    align-items: center;
+}
+
+/* Highlighted ──────────────────────────────────────────────────────────── */
+
+/* The accent surface owns its text colour, which is the whole point: a plain
+   accent background could not promise the text on it stays readable. The
+   title, link and number follow it too, or they would keep the colours meant
+   for the normal card background. */
+.iw-card--highlighted {
+    background-color: var(--iw-variant-accent-bg, var(--color-accent));
+    border-color: var(--iw-variant-accent-border, transparent);
+    border-width: var(--iw-variant-accent-border-width, 1px);
+    color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
+}
+
+.iw-card--highlighted .iw-card__title,
+.iw-card--highlighted .iw-card__link,
+.iw-card--highlighted .iw-card__number {
+    color: inherit;
+}
+
+/* A card that is entirely a link ───────────────────────────────────────── */
+
+a.iw-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+a.iw-card:hover {
+    transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    a.iw-card {
+        transition: none;
+    }
+
+    a.iw-card:hover {
+        transform: none;
+    }
+}

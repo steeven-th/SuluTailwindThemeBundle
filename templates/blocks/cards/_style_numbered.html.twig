@@ -1,0 +1,40 @@
+{# Cards block - Each card is numbered by its position, for steps and rankings.
+   The number is decorative markup, so it never reaches a screen reader
+   twice. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% set cardRadiusClass = iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) %}
+    {% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
+    {% set imageMaxWidthClass = iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) %}
+
+    {#- The view carries the resolved link targets, keyed by this block's index
+        in the page. -#}
+    {% set blockKey = _key|default(null) %}
+    {% set itemsView = blockKey is not null ? view.blocks[blockKey].items|default([]) : [] %}
+
+    <div class="iw-block-cards iw-block-cards--numbered">
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+            title: title|default(''),
+            subTitle: subTitle|default(''),
+            titleAlignment: titleAlignment|default('left'),
+            titleTag: titleTag|default('h2'),
+            variant: variant|default(0),
+            separatorMode: separatorMode|default(''),
+            variantConfig: variantConfig|default({})
+        } only %}
+
+        {% include '@ItechWorldSuluTailwindTheme/blocks/cards/_grid.html.twig' with {
+            items: items|default([]),
+            itemsView: itemsView,
+            style: 'numbered',
+            columns: columns|default('3'),
+            align: contentAlignment|default('left'),
+            iconPosition: iconPosition|default('inline'),
+            imageMaxWidth: imageMaxWidthClass,
+            cardRadius: cardRadiusClass,
+            imageRadius: imageRadiusClass,
+            clickable: clickableCard|default(false)
+        } only %}
+    </div>
+{% endblock %}

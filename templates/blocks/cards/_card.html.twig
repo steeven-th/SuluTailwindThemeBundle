@@ -1,0 +1,121 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   One card.
+
+   The six styles share this markup and differ by CSS alone, so a project can
+   restyle one or add a style of its own without touching Twig.
+
+   A highlighted card carries `--highlighted` and takes the ACCENT surface of
+   the variant. That surface owns the colour of the text on it, so the card
+   stays legible whatever the accent is - which a plain background could not
+   promise.
+
+   Parameters:
+     - card          : the item {icon, image, title, text, link, linkLabel, highlighted}
+     - cardView      : the matching view data, for link target and rel
+     - style         : bordered | elevated | minimal | icon_top | image_top | numbered
+     - index         : 0-based position, shown by the `numbered` style
+     - iconPosition  : inline | above
+     - imageMaxWidth : cap on the image width, from the block settings
+     - cardRadius    : radius class for the card
+     - imageRadius   : radius class for the image
+     - clickable     : bool, whole card becomes the link target
+   ───────────────────────────────────────────────────────────────────────── #}
+
+{% set icon = card.icon|default(null) %}
+{% set image = card.image|default(null) %}
+{% set title = card.title|default('') %}
+{% set text = card.text|default('') %}
+{% set linkLabel = card.linkLabel|default('') %}
+{% set highlighted = card.highlighted|default(false) %}
+
+{# A media picker that was opened and left empty stores `{id: null}`, which is
+   truthy in Twig. Only the id says whether anything was chosen. #}
+{% set hasIcon = icon.id|default(null) is not null %}
+{% set hasImage = image.id|default(null) is not null %}
+
+{# A resolvable link arrives as the URL string. One whose target was deleted
+   or unpublished comes back as the raw reference structure instead, which is
+   iterable - that is how the other blocks tell the two apart. #}
+{% set href = card.link is defined and card.link is not iterable ? card.link : '' %}
+{% set linkView = cardView.link|default({}) %}
+{% set linkTarget = linkView.target|default('_self') %}
+{% set linkRel = linkView.rel|default('') %}
+{% if linkLabel is empty %}{% set linkLabel = linkView.title|default('') %}{% endif %}
+
+{% set wholeCardIsLink = clickable|default(false) and href is not empty %}
+
+<{{ wholeCardIsLink ? 'a' : 'div' }}
+    class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ highlighted ? ' iw-card--highlighted' : '' }} {{ cardRadius|default('') }}"
+    {% if wholeCardIsLink %}
+        href="{{ href }}"
+        {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+        {% if linkRel is not empty %}rel="{{ linkRel }}"{% endif %}
+    {% endif %}
+>
+    {% if style == 'image_top' and hasImage %}
+        <div class="iw-card__banner">
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                media: image,
+                format: 'iw_theme_16_9',
+                ratio: '16-9',
+                radiusClass: imageRadius|default('')
+            } only %}
+        </div>
+    {% endif %}
+
+    <div class="iw-card__body">
+        {% if style == 'numbered' %}
+            {#- Padded by hand: `format_number` needs the Intl extension of Twig,
+                which the bundle does not require. -#}
+            {% set position = index|default(0) + 1 %}
+            <span class="iw-card__number" aria-hidden="true">{{ position < 10 ? '0' ~ position : position }}</span>
+        {% endif %}
+
+        {# The icon leads the title on one line, or sits above it. `icon_top`
+           and `image_top` own their layout and ignore the setting. #}
+        {% set iconAbove = style == 'icon_top' or iconPosition|default('inline') == 'above' %}
+
+        <div class="iw-card__head{{ iconAbove ? ' iw-card__head--stacked' : '' }}">
+            {% if hasIcon %}
+                <span class="iw-card__icon">
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                        media: icon,
+                        format: 'iw_theme_1_1',
+                        alt: ''
+                    } only %}
+                </span>
+            {% endif %}
+
+            {% if title is not empty %}
+                <h3 class="iw-card__title">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</h3>
+            {% endif %}
+        </div>
+
+        {% if style != 'image_top' and hasImage %}
+            <div class="iw-card__image {{ imageMaxWidth|default('') }}">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                    media: image,
+                    format: 'iw_theme_16_9',
+                    radiusClass: imageRadius|default('')
+                } only %}
+            </div>
+        {% endif %}
+
+        {% if text is not empty %}
+            <div class="iw-card__text prose">{{ text|raw }}</div>
+        {% endif %}
+
+        {# The link is a real link unless the whole card already is one, in
+           which case a nested <a> would be invalid markup. #}
+        {% if href is not empty and linkLabel is not empty %}
+            {% if wholeCardIsLink %}
+                <span class="iw-card__link">{{ linkLabel }}</span>
+            {% else %}
+                <a class="iw-card__link" href="{{ href }}"
+                   {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
+                   {% if linkRel is not empty %}rel="{{ linkRel }}"{% endif %}
+                >{{ linkLabel }}</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</{{ wholeCardIsLink ? 'a' : 'div' }}>
