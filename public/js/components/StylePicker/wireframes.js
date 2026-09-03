@@ -378,6 +378,26 @@ const WIREFRAME_RENDERERS = {
     ),
 
     // ── form styles ──────────────────────────────────────────────
+    // Prefixed: `centered` and `card` are generic enough that another block
+    // will want them, and the unprefixed lookup would then hand it a form.
+    form_centered: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="35" y="8" width="50" height="6" rx="2" fill={accent} />
+            <rect x="20" y="22" width="80" height="9" rx="3" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="20" y="36" width="80" height="9" rx="3" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="20" y="50" width="80" height="9" rx="3" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="45" y="65" width="30" height="9" rx="3" fill={accent} />
+        </svg>
+    ),
+    form_card: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="10" y="6" width="100" height="68" rx="5" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="35" y="14" width="50" height="5" rx="2" fill={accent} />
+            <rect x="24" y="26" width="72" height="8" rx="3" fill={fill} opacity="0.4" />
+            <rect x="24" y="39" width="72" height="8" rx="3" fill={fill} opacity="0.4" />
+            <rect x="45" y="56" width="30" height="9" rx="3" fill={accent} />
+        </svg>
+    ),
     split: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
             <rect x="5" y="5" width="52" height="70" rx="3" fill={accent} opacity="0.15" />
@@ -392,6 +412,75 @@ const WIREFRAME_RENDERERS = {
 
     // ── form styles (card) ──────────────────────────────────────
     // Note: 'centered' and 'split' wireframes are shared with text/form blocks above
+
+    // ── accordion styles ─────────────────────────────────────────
+    accordion_bordered: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="10" width="104" height="60" rx="4" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="16" y="18" width="60" height="5" rx="2" fill={accent} />
+            <path d="M96 19l4 4 4-4" stroke={fill} strokeWidth="2" fill="none" strokeLinecap="round" />
+            <line x1="8" y1="32" x2="112" y2="32" stroke={fill} strokeWidth="2" />
+            <rect x="16" y="40" width="52" height="5" rx="2" fill={accent} />
+            <path d="M96 41l4 4 4-4" stroke={fill} strokeWidth="2" fill="none" strokeLinecap="round" />
+            <line x1="8" y1="54" x2="112" y2="54" stroke={fill} strokeWidth="2" />
+            <rect x="16" y="60" width="56" height="5" rx="2" fill={accent} />
+            <path d="M96 61l4 4 4-4" stroke={fill} strokeWidth="2" fill="none" strokeLinecap="round" />
+        </svg>
+    ),
+
+    // ── iframe and code styles ───────────────────────────────────
+    // `default` is taken by the document block, so both are prefixed.
+    iframe_default: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="10" width="104" height="60" rx="4" fill="none" stroke={fill} strokeWidth="2" />
+            <rect x="8" y="10" width="104" height="12" rx="4" fill={fill} opacity="0.4" />
+            <circle cx="16" cy="16" r="2" fill={fill} />
+            <circle cx="24" cy="16" r="2" fill={fill} />
+            <rect x="40" y="14" width="50" height="4" rx="2" fill={fill} />
+            <rect x="46" y="36" width="28" height="20" rx="3" fill={accent} opacity="0.5" />
+        </svg>
+    ),
+    code_default: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="10" width="104" height="60" rx="4" fill={fill} opacity="0.5" />
+            <rect x="16" y="20" width="34" height="4" rx="2" fill={accent} />
+            <rect x="24" y="30" width="52" height="4" rx="2" fill={accent} opacity="0.6" />
+            <rect x="24" y="40" width="44" height="4" rx="2" fill={accent} opacity="0.6" />
+            <rect x="32" y="50" width="38" height="4" rx="2" fill={accent} opacity="0.4" />
+            <rect x="16" y="60" width="26" height="4" rx="2" fill={accent} />
+        </svg>
+    ),
+
+    // ── article_featured styles ──────────────────────────────────
+    // All three prefixed: `hero` and `side_by_side` already mean something
+    // else elsewhere in the bundle.
+    article_featured_hero: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="8" width="104" height="34" rx="3" fill={fill} />
+            <rect x="16" y="30" width="50" height="5" rx="2" fill={accent} />
+            <rect x="8" y="48" width="50" height="24" rx="3" fill={fill} opacity="0.6" />
+            <rect x="62" y="48" width="50" height="24" rx="3" fill={fill} opacity="0.6" />
+        </svg>
+    ),
+    article_featured_side_by_side: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="10" width="50" height="40" rx="3" fill={fill} />
+            <rect x="8" y="56" width="38" height="5" rx="2" fill={accent} />
+            <rect x="8" y="65" width="30" height="4" rx="2" fill={fill} opacity="0.6" />
+            <rect x="62" y="10" width="50" height="40" rx="3" fill={fill} />
+            <rect x="62" y="56" width="38" height="5" rx="2" fill={accent} />
+            <rect x="62" y="65" width="30" height="4" rx="2" fill={fill} opacity="0.6" />
+        </svg>
+    ),
+    article_featured_spotlight: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            <rect x="8" y="10" width="62" height="60" rx="3" fill={fill} />
+            <rect x="16" y="56" width="42" height="5" rx="2" fill={accent} />
+            <rect x="76" y="10" width="36" height="16" rx="3" fill={fill} opacity="0.6" />
+            <rect x="76" y="32" width="36" height="16" rx="3" fill={fill} opacity="0.6" />
+            <rect x="76" y="54" width="36" height="16" rx="3" fill={fill} opacity="0.6" />
+        </svg>
+    ),
 
     // ── document styles ──────────────────────────────────────────
     document_default: (fill, accent) => (
