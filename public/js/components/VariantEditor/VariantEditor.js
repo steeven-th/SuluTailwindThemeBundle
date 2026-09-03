@@ -61,10 +61,12 @@ function ensureVariantEditorStyles() {
         '  font-size: 13px; line-height: 1.6; padding: 10px; border-radius: 3px; margin: 0 0 10px;',
         '}',
         '.iw-ve__link { color: var(--ve-link, #2563eb); text-decoration: underline; }',
-        '.iw-ve__list { color: var(--ve-paragraph, #374151); font-size: 13px; margin: 0 0 10px; }',
+        '.iw-ve__text-line { margin: 0; }',
+        '.iw-ve__list { color: var(--ve-paragraph, #374151); font-size: 13px; margin: 6px 0 0; }',
         '.iw-ve__list-items { margin: 0; padding-left: 18px; }',
         '.iw-ve__list li::marker { color: var(--ve-list, #d97706); }',
-        '.iw-ve__hr { border: 0; border-top: 2px solid var(--ve-hr, #e5e7eb); margin: 10px 0; }',
+        '.iw-ve__hr-wrap { margin: 8px 0 0; }',
+        '.iw-ve__hr { border: 0; border-top: 2px solid var(--ve-hr, #e5e7eb); margin: 0; }',
         '.iw-ve__accent {',
         '  background: var(--ve-accentBg, #f3f4f6);',
         '  border: var(--ve-accentBorderWidth, 0px) solid var(--ve-accentBorder, transparent);',
@@ -374,19 +376,26 @@ export default class VariantEditor extends React.Component {
                         ))}
                         {this.renderRegion('subtitle', 'iw-ve__subtitle',
                             translate('iw_sulu_tailwind_theme.variant_preview_subtitle'))}
+                        {/* The list and the separator come from the rich text
+                            like the paragraph does, so they sit inside its
+                            background rather than beside it. Outside, the
+                            paragraph background looked like it stopped at the
+                            first line of prose. */}
                         {this.renderRegion('paragraph', 'iw-ve__text', (
-                            <span>
-                                {translate('iw_sulu_tailwind_theme.variant_preview_paragraph')}{' '}
-                                {this.renderInline('link', 'iw-ve__link',
-                                    'iw_sulu_tailwind_theme.variant_preview_link')}
-                            </span>
+                            <div>
+                                <p className="iw-ve__text-line">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_paragraph')}{' '}
+                                    {this.renderInline('link', 'iw-ve__link',
+                                        'iw_sulu_tailwind_theme.variant_preview_link')}
+                                </p>
+                                {this.renderRegion('list', 'iw-ve__list', (
+                                    <ul className="iw-ve__list-items">
+                                        <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
+                                    </ul>
+                                ))}
+                                {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
+                            </div>
                         ))}
-                        {this.renderRegion('list', 'iw-ve__list', (
-                            <ul className="iw-ve__list-items">
-                                <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
-                            </ul>
-                        ))}
-                        {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
                         {this.renderRegion('accent', 'iw-ve__accent',
                             translate('iw_sulu_tailwind_theme.variant_preview_accent'))}
                         {this.renderButton()}
