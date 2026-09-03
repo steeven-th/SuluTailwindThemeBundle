@@ -588,7 +588,7 @@
     "iw_sulu_tailwind_theme.show_background": "Couleur de fond",
 
     "iw_sulu_tailwind_theme.block.text": "Texte",
-    "iw_sulu_tailwind_theme.block.text_images": "Texte et images",
+    "iw_sulu_tailwind_theme.block.text_images": "Texte et médias",
     "iw_sulu_tailwind_theme.block.gallery": "Galerie",
     "iw_sulu_tailwind_theme.block.key_figures": "Chiffres clés",
     "iw_sulu_tailwind_theme.block.timeline": "Timeline",
@@ -1212,7 +1212,7 @@
     "iw_sulu_tailwind_theme.image_padding": "Marge autour du média",
     "iw_sulu_tailwind_theme.image_padding_info": "La marge est appliquée automatiquement quand un radius d'image est configuré (pour que les coins arrondis soient visibles).",
     "iw_sulu_tailwind_theme.mobile_image_position": "Position du média sur mobile",
-    "iw_sulu_tailwind_theme.mobile_image_position_info": "Sur grand écran, la position est définie par les réglages 'Position de l'image' / 'Contenu à droite'.",
+    "iw_sulu_tailwind_theme.mobile_image_position_info": "Sur grand écran, la position est définie par les réglages « Position du média » et « Contenu à droite ».",
     "iw_sulu_tailwind_theme.components_section_maps": "Cartes (Leaflet)",
     "iw_sulu_tailwind_theme.components_section_maps_info": "Cartes interactives utilisées par le bloc Localisation et le widget Localisation des formulaires. L'attribution du fournisseur de tuiles est toujours affichée (obligation OpenStreetMap/Carto). Laissez les couleurs vides pour hériter automatiquement du thème.",
     "iw_sulu_tailwind_theme.components_maps_tile_provider": "Style de carte (tuiles)",

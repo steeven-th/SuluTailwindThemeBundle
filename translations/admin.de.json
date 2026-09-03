@@ -580,7 +580,7 @@
     "iw_sulu_tailwind_theme.show_background": "Hintergrundfarbe",
 
     "iw_sulu_tailwind_theme.block.text": "Text",
-    "iw_sulu_tailwind_theme.block.text_images": "Text und Bilder",
+    "iw_sulu_tailwind_theme.block.text_images": "Text und Medien",
     "iw_sulu_tailwind_theme.block.gallery": "Galerie",
     "iw_sulu_tailwind_theme.block.key_figures": "Kennzahlen",
     "iw_sulu_tailwind_theme.block.timeline": "Zeitleiste",
@@ -1106,7 +1106,7 @@
     "iw_sulu_tailwind_theme.image_padding": "Abstand um das Medium",
     "iw_sulu_tailwind_theme.image_padding_info": "Der Abstand wird automatisch angewendet, wenn ein Bildradius konfiguriert ist (damit die abgerundeten Ecken sichtbar bleiben).",
     "iw_sulu_tailwind_theme.mobile_image_position": "Medienposition auf Mobilgeräten",
-    "iw_sulu_tailwind_theme.mobile_image_position_info": "Auf größeren Bildschirmen wird die Position durch die Einstellungen „Bildposition“ / „Inhalt rechts“ gesteuert.",
+    "iw_sulu_tailwind_theme.mobile_image_position_info": "Auf größeren Bildschirmen wird die Position durch die Einstellungen „Medienposition“ / „Inhalt rechts“ gesteuert.",
     "iw_sulu_tailwind_theme.components_section_maps": "Karten (Leaflet)",
     "iw_sulu_tailwind_theme.components_section_maps_info": "Interaktive Karten für den Standort-Block und das Formular-Standort-Widget. Die Attribution des Kartenanbieters wird immer angezeigt (OpenStreetMap/Carto-Vorgabe). Farben leer lassen, um sie vom Theme zu erben.",
     "iw_sulu_tailwind_theme.components_maps_tile_provider": "Kartenstil (Tiles)",
