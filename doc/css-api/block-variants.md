@@ -45,7 +45,6 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
 | `--iw-variant-content-bg` | `contentBg` | Background behind the whole content, title included (`.iw-block__content`) |
-| `--iw-variant-content-text` | `contentText` | Base text color on the content surface |
 | `--iw-variant-content-border` | `contentBorder` | Border color of the content surface |
 | `--iw-variant-content-border-width` | `contentBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
@@ -163,7 +162,7 @@ construction rather than by manual tuning.
 | Surface | Painted on | Notes |
 |---|---|---|
 | Block | `.iw-variant--{slug}` | Background hangs off `[data-has-bg]`, the border does not: an outlined block with no fill is a normal thing to want |
-| Content | `.iw-block__content` | Everything the block holds, title included. Only visible where the block has padding |
+| Content | `.iw-block__content` | Everything the block holds, title included. Only visible where the block has padding. Carries no text color: the title, subtitle and paragraph colors already cover its text, and are more specific |
 | Paragraph | `.iw-block__text` | The rich-text area. See the section below |
 | Accent | *(no rule of its own)* | Published for whatever puts an element forward, such as a highlighted card. Deliberately not applied to every block |
 

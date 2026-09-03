@@ -11,6 +11,16 @@ import {WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './z
 const STYLE_ID = 'iw-variant-editor-styles';
 
 /**
+ * Which part of the preview is selected, per field instance.
+ *
+ * Sulu remounts the field when its value changes, so a selection held in
+ * component state is lost the moment you pick a colour: the outline vanished
+ * and you had to click another element to get it back. Keyed by the field's
+ * own data path, so two variants in the same form keep their own selection.
+ */
+const selectionByPath = {};
+
+/**
  * Inject the editor stylesheet once.
  *
  * The preview is painted from custom properties set on its root element, so
@@ -67,11 +77,16 @@ function ensureVariantEditorStyles() {
         '  font-size: 13px; font-weight: 600; cursor: default;',
         '}',
         '.iw-ve__form {',
+        '  display: flex; align-items: center; justify-content: space-between; gap: 8px;',
         '  background: var(--ve-formBg, #ffffff);',
         '  border: 1px solid var(--ve-formBorder, #d1d5db);',
-        '  color: var(--ve-formText, #111827);',
-        '  padding: 8px 10px; border-radius: 3px; font-size: 13px;',
+        '  padding: 8px 10px; border-radius: 3px; font-size: 13px; margin-bottom: 6px;',
         '}',
+        '.iw-ve__form:last-child { margin-bottom: 0; }',
+        '.iw-ve__form--focus { border-color: var(--ve-formBorderFocus, #2563eb); }',
+        '.iw-ve__form--error { border-color: var(--ve-formBorderError, #dc2626); }',
+        '.iw-ve__form-value { color: var(--ve-formText, #111827); }',
+        '.iw-ve__form-state { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; opacity: .55; }',
         '.iw-ve__form-label { color: var(--ve-formLabel, #374151); font-size: 12px; display: block; margin-bottom: 4px; }',
         '.iw-ve__form-placeholder { color: var(--ve-formPlaceholder, #9ca3af); }',
 
@@ -143,7 +158,7 @@ function toColors(value) {
  */
 @observer
 export default class VariantEditor extends React.Component {
-    state = {selected: 'block', palette: null};
+    state = {selected: selectionByPath[this.props.dataPath] || 'block', palette: null};
 
     componentDidMount() {
         ensureVariantEditorStyles();
@@ -294,6 +309,7 @@ export default class VariantEditor extends React.Component {
     }
 
     handleSelect = (group) => {
+        selectionByPath[this.props.dataPath] = group;
         this.setState({selected: group});
     };
 
@@ -380,8 +396,29 @@ export default class VariantEditor extends React.Component {
                                     {translate('iw_sulu_tailwind_theme.variant_preview_form_label')}
                                 </label>
                                 <div className="iw-ve__form">
+                                    <span className="iw-ve__form-value">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_value')}
+                                    </span>
+                                </div>
+                                <div className="iw-ve__form">
                                     <span className="iw-ve__form-placeholder">
                                         {translate('iw_sulu_tailwind_theme.variant_preview_form_placeholder')}
+                                    </span>
+                                </div>
+                                <div className="iw-ve__form iw-ve__form--focus">
+                                    <span className="iw-ve__form-value">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_value')}
+                                    </span>
+                                    <span className="iw-ve__form-state">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_focus')}
+                                    </span>
+                                </div>
+                                <div className="iw-ve__form iw-ve__form--error">
+                                    <span className="iw-ve__form-value">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_value')}
+                                    </span>
+                                    <span className="iw-ve__form-state">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_error')}
                                     </span>
                                 </div>
                             </div>

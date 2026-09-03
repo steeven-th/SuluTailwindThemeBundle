@@ -39,7 +39,6 @@ const ZONES = [
         label: 'iw_sulu_tailwind_theme.variant_surface_content',
         fields: [
             {key: 'contentBg', label: 'iw_sulu_tailwind_theme.variant_content_bg', kind: 'color'},
-            {key: 'contentText', label: 'iw_sulu_tailwind_theme.variant_content_text', kind: 'color'},
             {key: 'contentBorder', label: 'iw_sulu_tailwind_theme.variant_content_border', kind: 'color'},
             {key: 'contentBorderWidth', label: 'iw_sulu_tailwind_theme.variant_content_border_width', kind: 'width'},
         ],
@@ -90,6 +89,10 @@ const WIDTHS = [1, 2, 3];
  * and its width in another, so picking a colour appeared to do nothing until
  * you found the width somewhere else.
  *
+ * Within a group the order is always the same: background, then border, then
+ * text. Reading two groups in different orders makes them feel like different
+ * things, and the eye stops finding a setting where it found it last time.
+ *
  * Every setting lives in exactly one group, including the ones with no resting
  * state of their own - a link hover sits with the link, a focus border with the
  * field. That is what lets the editor drop the long list beside the preview:
@@ -99,7 +102,7 @@ const PREVIEW_GROUPS = [
     {id: 'block', label: 'iw_sulu_tailwind_theme.variant_zone_block',
         fields: ['blockBg', 'blockBorder', 'blockBorderWidth']},
     {id: 'content', label: 'iw_sulu_tailwind_theme.variant_surface_content',
-        fields: ['contentBg', 'contentText', 'contentBorder', 'contentBorderWidth']},
+        fields: ['contentBg', 'contentBorder', 'contentBorderWidth']},
     {id: 'title', label: 'iw_sulu_tailwind_theme.variant_title_color',
         fields: ['title']},
     {id: 'highlight', label: 'iw_sulu_tailwind_theme.variant_highlight_color',
@@ -107,7 +110,7 @@ const PREVIEW_GROUPS = [
     {id: 'subtitle', label: 'iw_sulu_tailwind_theme.variant_subtitle_color',
         fields: ['subtitle']},
     {id: 'paragraph', label: 'iw_sulu_tailwind_theme.variant_surface_paragraph',
-        fields: ['paragraph', 'paragraphBg', 'paragraphBorder', 'paragraphBorderWidth']},
+        fields: ['paragraphBg', 'paragraphBorder', 'paragraphBorderWidth', 'paragraph']},
     {id: 'link', label: 'iw_sulu_tailwind_theme.variant_link_color',
         fields: ['link', 'linkHover']},
     {id: 'list', label: 'iw_sulu_tailwind_theme.variant_list_color',
@@ -115,10 +118,10 @@ const PREVIEW_GROUPS = [
     {id: 'hr', label: 'iw_sulu_tailwind_theme.variant_hr_color',
         fields: ['hr']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
-        fields: ['accentBg', 'accentText', 'accentBorder', 'accentBorderWidth']},
+        fields: ['accentBg', 'accentBorder', 'accentBorderWidth', 'accentText']},
     {id: 'form', label: 'iw_sulu_tailwind_theme.variant_zone_form',
-        fields: ['formBg', 'formText', 'formLabel', 'formPlaceholder',
-            'formBorder', 'formBorderFocus', 'formBorderError']},
+        fields: ['formBg', 'formBorder', 'formBorderFocus', 'formBorderError',
+            'formText', 'formPlaceholder', 'formLabel']},
 ];
 
 /** The group a setting belongs to. */

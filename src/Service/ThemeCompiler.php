@@ -2907,7 +2907,6 @@ class ThemeCompiler
             // surface has no rule of its own here on purpose: it belongs to
             // whatever puts an element forward, not to every block.
             'contentBg' => '--iw-variant-content-bg',
-            'contentText' => '--iw-variant-content-text',
             'contentBorder' => '--iw-variant-content-border',
             'blockBorder' => '--iw-variant-block-border',
             'paragraphBorder' => '--iw-variant-paragraph-border',
@@ -3002,23 +3001,21 @@ class ThemeCompiler
             // Content surface: the background behind the whole content, title
             // included, which is what `.iw-block__content` wraps. It only shows
             // where the block has padding, exactly as specified.
+            //
+            // It carries no text color of its own, unlike the accent surface.
+            // The content holds everything, so the title, subtitle, paragraph
+            // and list colors of the variant already cover its text, and they
+            // are more specific: a color here would have painted almost
+            // nothing while looking like it should paint everything.
             $contentBg = trim($this->resolveColorValue((string) ($props['contentBg'] ?? '')));
             $contentBorder = trim($this->resolveColorValue((string) ($props['contentBorder'] ?? '')));
-            $contentText = trim($this->resolveColorValue((string) ($props['contentText'] ?? '')));
-            if ('' !== $contentBg || '' !== $contentBorder || '' !== $contentText) {
+            if ('' !== $contentBg || '' !== $contentBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__content {\n";
                 if ('' !== $contentBg) {
                     $css .= "  background-color: {$contentBg};\n";
                 }
                 if ('' !== $contentBorder) {
                     $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
-                }
-                // Base text color only. Headings and paragraphs keep their own
-                // variant colors when set, since those rules are more specific.
-                // This catches what has none, and gives an editor something to
-                // turn when a dark content background swallows the text.
-                if ('' !== $contentText) {
-                    $css .= "  color: {$contentText};\n";
                 }
                 $css .= "}\n";
             }

@@ -609,8 +609,10 @@ what makes an element put forward legible without hand-tuning every color.
 Four surfaces: block, content, paragraph and accent. The block and paragraph
 backgrounds already existed and simply joined theirs. New in this release:
 
-- a **content** background, its text color and its border, painted on
-  `.iw-block__content`, which covers everything the block holds, title included
+- a **content** background and border, painted on `.iw-block__content`, which
+  covers everything the block holds, title included. It has no text color of
+  its own: the title, subtitle and paragraph colors of the variant already
+  cover its text and are more specific
 - an **accent** surface, published for whatever puts an element forward and
   applied by no block on its own
 - a **border** on every surface, with a width of 1px, 2px or 3px

@@ -43,8 +43,12 @@ final class VariantSurfaceContractTest extends TestCase
             'border' => 'blockBorder', 'width' => 'blockBorderWidth',
             'property' => '--iw-variant-block-border',
         ],
+        // No text color: the content holds everything, so the title, subtitle
+        // and paragraph colors of the variant already cover its text and are
+        // more specific. One here painted almost nothing while looking like it
+        // covered the lot.
         'content' => [
-            'bg' => 'contentBg', 'text' => 'contentText',
+            'bg' => 'contentBg', 'text' => null,
             'border' => 'contentBorder', 'width' => 'contentBorderWidth',
             'property' => '--iw-variant-content-bg',
         ],

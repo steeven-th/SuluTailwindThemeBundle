@@ -79,7 +79,6 @@ final class VariantZones
             'label' => 'iw_sulu_tailwind_theme.variant_surface_content',
             'fields' => [
                 ['contentBg', 'iw_sulu_tailwind_theme.variant_content_bg', 'color'],
-                ['contentText', 'iw_sulu_tailwind_theme.variant_content_text', 'color'],
                 ['contentBorder', 'iw_sulu_tailwind_theme.variant_content_border', 'color'],
                 ['contentBorderWidth', 'iw_sulu_tailwind_theme.variant_content_border_width', 'width'],
             ],
