@@ -132,7 +132,7 @@
                         </param>
                     </params>
                 </property>
-                <!-- Overlay / Sidebar: toggle content position left/right -->
+                <!-- Overlay / Sidebar / Split screen: toggle content position left/right -->
                 <property name="contentRight" type="checkbox"
                           visibleCondition="__parent.style == 'overlay' OR __parent.style == 'sidebar' OR __parent.style == 'split_screen'">
                     <params>

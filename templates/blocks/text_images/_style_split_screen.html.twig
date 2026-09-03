@@ -58,7 +58,10 @@
 {% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
 {% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
 
-{# Content position: contentRight = true → text right, image left (default: text left, image right) #}
+{# `contentRight` puts the content on the right, as the field says and as the
+   sidebar style has always done. This one had the ternaries the other way
+   round, so ticking the box moved the content to the left. Fixed rather than
+   relabelled: two styles cannot read the same field in opposite directions. #}
 {% set isRight = contentRight|default(false) %}
 
 {# Mobile image position: drives the DOM stacking order on `<lg` so the
@@ -105,11 +108,11 @@
 >
     {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
     {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'center') %}
-    <div class="iw-block-text-images__grid iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ not isRight ? ' iw-split-cols--reverse' : '' }}">
+    <div class="iw-block-text-images__grid iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ isRight ? ' iw-split-cols--reverse' : '' }}">
         {# Image side — full-height cover with slider support.
            Custom rendering (not _image_slider partial) because images must fill
            the full grid cell height with no aspect-ratio constraint. #}
-        <div class="iw-block-text-images__image-side {{ imageMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} relative min-h-[300px] lg:min-h-[400px]"
+        <div class="iw-block-text-images__image-side {{ imageMobileOrder }} {{ isRight ? 'lg:order-1' : 'lg:order-2' }} relative min-h-[300px] lg:min-h-[400px]"
             {% if resolvedImages|length > 1 %}
                 data-controller="slider"
                 data-slider-mode-value="carousel"
@@ -209,7 +212,7 @@
            the column is then centered inside its half rather than pushed
            against the image, `.iw-block-maxw` owning both margins. #}
         {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
-        <div class="iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-1' : 'lg:order-2' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+        <div class="iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
             <div class="w-full max-w-2xl{{ isRight ? ' ml-auto' : '' }} {{ maxWidthClass }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                     title: title|default(''),
