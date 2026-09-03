@@ -442,6 +442,17 @@ img {
     height: auto;
 }
 
+/* An image inside a <picture> that carries its own radius must not add the
+   theme one on top. `_image.html.twig` clips the picture with overflow, so the
+   frame already rounds the image - but a clip cannot UN-round anything, so an
+   image rounded more than its frame keeps its own corners and the chosen
+   radius appears to do nothing. That is what made every value below the theme
+   default look identical to it. */
+picture[class*="rounded-"] > img,
+picture[class*="iw-radius--"] > img {
+    border-radius: 0;
+}
+
 /* Override for cover images (used as backgrounds in overlay blocks, sliders, etc.) */
 img.object-cover {
     max-width: none;
@@ -5763,6 +5774,15 @@ aside .iw-toc {
 }
 
 /* A card that is entirely a link ───────────────────────────────────────── */
+
+/* A card that is a link is still a card: the variant colours every <a> with
+   the link colour, and everything inside inherits it, so the title, the text
+   and the number all turned into link colour the moment the card became
+   clickable. Three classes and a type beat the variant rule, which is two
+   classes and a type, so no !important is needed. */
+.iw-block-cards .iw-block-cards__grid a.iw-card {
+    color: inherit;
+}
 
 a.iw-card {
     transition: transform .15s ease, box-shadow .15s ease;
