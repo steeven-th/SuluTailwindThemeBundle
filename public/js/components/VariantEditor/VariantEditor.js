@@ -65,7 +65,7 @@ function ensureVariantEditorStyles() {
         '.iw-ve__list { color: var(--ve-paragraph, #374151); font-size: 13px; margin: 6px 0 0; }',
         '.iw-ve__list-items { margin: 0; padding-left: 18px; }',
         '.iw-ve__list li::marker { color: var(--ve-list, #d97706); }',
-        '.iw-ve__hr-wrap { margin: 8px 0 0; }',
+        '.iw-ve__hr-wrap { margin: 0 0 10px; }',
         '.iw-ve__hr { border: 0; border-top: 2px solid var(--ve-hr, #e5e7eb); margin: 0; }',
         '.iw-ve__accent {',
         '  background: var(--ve-accentBg, #f3f4f6);',
@@ -376,11 +376,14 @@ export default class VariantEditor extends React.Component {
                         ))}
                         {this.renderRegion('subtitle', 'iw-ve__subtitle',
                             translate('iw_sulu_tailwind_theme.variant_preview_subtitle'))}
-                        {/* The list and the separator come from the rich text
-                            like the paragraph does, so they sit inside its
-                            background rather than beside it. Outside, the
-                            paragraph background looked like it stopped at the
-                            first line of prose. */}
+                        {/* The separator is emitted by _titles, right under the
+                            title and subtitle, so it sits on the content
+                            background and not in the paragraph. */}
+                        {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
+                        {/* The list is rich text like the prose, so it belongs
+                            inside the paragraph background. Drawn beside it,
+                            that background looked like it stopped at the first
+                            line and the list looked like content. */}
                         {this.renderRegion('paragraph', 'iw-ve__text', (
                             <div>
                                 <p className="iw-ve__text-line">
@@ -393,7 +396,6 @@ export default class VariantEditor extends React.Component {
                                         <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
                                     </ul>
                                 ))}
-                                {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
                             </div>
                         ))}
                         {this.renderRegion('accent', 'iw-ve__accent',
