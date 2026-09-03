@@ -111,7 +111,7 @@
 
         <div class="iw-block-text-images__grid iw-split-gap {{ isSideBySide ? 'grid grid-cols-1 lg:grid-cols-3' : 'flex flex-col' }}">
             {# Text area — full width when stacked, 1 column when side-by-side #}
-            <div class="iw-block-text-images__content {{ isSideBySide ? 'lg:col-span-1' : '' }} {{ imageFirst ? 'order-2' : 'order-1' }} {{ isSideBySide ? (imageFirst ? 'lg:order-2' : 'lg:order-1') : '' }}">
+            <div class="iw-block__content iw-block-text-images__content {{ isSideBySide ? 'lg:col-span-1' : '' }} {{ imageFirst ? 'order-2' : 'order-1' }} {{ isSideBySide ? (imageFirst ? 'lg:order-2' : 'lg:order-1') : '' }}">
                 {% if text is defined and text is not empty %}
                     <div class="iw-block__text iw-block-text-images__text prose max-w-none {{ paragraphRadiusClass }}" style="margin-block: 0;">
                         {{ text|raw }}

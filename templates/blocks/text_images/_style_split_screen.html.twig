@@ -212,7 +212,7 @@
            the column is then centered inside its half rather than pushed
            against the image, `.iw-block-maxw` owning both margins. #}
         {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
-        <div class="iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+        <div class="iw-block__content iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
             <div class="w-full max-w-2xl{{ isRight ? ' ml-auto' : '' }} {{ maxWidthClass }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                     title: title|default(''),
