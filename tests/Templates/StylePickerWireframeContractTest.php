@@ -22,24 +22,16 @@ use PHPUnit\Framework\TestCase;
 final class StylePickerWireframeContractTest extends TestCase
 {
     /**
-     * Styles that ship without a wireframe today.
+     * Styles that ship without a wireframe.
      *
-     * Pre-existing debt, listed rather than hidden: the editor sees the neutral
-     * placeholder for these. The point of the list is that it can only shrink,
-     * because a style added from now on fails the test until it has a preview.
+     * Empty, and meant to stay that way. It held eight entries when this test
+     * was written, all of them predating it, and the editor saw the neutral
+     * placeholder for each. They have their previews now, so a style shipping
+     * without one fails the test outright.
      *
      * @var list<string>
      */
-    private const KNOWN_MISSING = [
-        'form:centered',
-        'form:card',
-        'accordion:bordered',
-        'iframe:default',
-        'code:default',
-        'article_featured:hero',
-        'article_featured:side_by_side',
-        'article_featured:spotlight',
-    ];
+    private const KNOWN_MISSING = [];
 
     /**
      * Every declared style has a preview, or is a known gap.

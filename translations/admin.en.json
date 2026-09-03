@@ -588,7 +588,7 @@
     "iw_sulu_tailwind_theme.show_background": "Background color",
 
     "iw_sulu_tailwind_theme.block.text": "Text",
-    "iw_sulu_tailwind_theme.block.text_images": "Text and images",
+    "iw_sulu_tailwind_theme.block.text_images": "Text and media",
     "iw_sulu_tailwind_theme.block.gallery": "Gallery",
     "iw_sulu_tailwind_theme.block.key_figures": "Key figures",
     "iw_sulu_tailwind_theme.block.timeline": "Timeline",
@@ -1121,7 +1121,7 @@
     "iw_sulu_tailwind_theme.image_padding": "Margin around the media",
     "iw_sulu_tailwind_theme.image_padding_info": "The margin is applied automatically when an image radius is configured (so the rounded corners stay visible).",
     "iw_sulu_tailwind_theme.mobile_image_position": "Media position on mobile",
-    "iw_sulu_tailwind_theme.mobile_image_position_info": "On larger screens the position is controlled by the 'Image position' / 'Content on the right' settings.",
+    "iw_sulu_tailwind_theme.mobile_image_position_info": "On larger screens the position is controlled by the « Media position » and « Content on the right » settings.",
     "iw_sulu_tailwind_theme.components_section_maps": "Maps (Leaflet)",
     "iw_sulu_tailwind_theme.components_section_maps_info": "Interactive maps used by the Location block and the form location widget. The tile provider attribution is always displayed (OpenStreetMap/Carto requirement). Leave colors empty to inherit them from the theme.",
     "iw_sulu_tailwind_theme.components_maps_tile_provider": "Map style (tiles)",
