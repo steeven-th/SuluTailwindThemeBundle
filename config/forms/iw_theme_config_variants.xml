@@ -121,6 +121,162 @@
                             </params>
                         </property>
 
+                        <property name="surfacesHeading" type="heading">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_surfaces</title>
+                            </meta>
+                        </property>
+
+                        <property name="blockBorder" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_block_border</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="blockBorderWidth" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_block_border_width</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value=""/>
+                                <param name="values" type="collection">
+                                    <param name=""><meta><title>iw_sulu_tailwind_theme.variant_border_none</title></meta></param>
+                                    <param name="1"><meta><title>1px</title></meta></param>
+                                    <param name="2"><meta><title>2px</title></meta></param>
+                                    <param name="3"><meta><title>3px</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+
+                        <property name="contentSurfaceHeading" type="heading">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_surface_content</title>
+                            </meta>
+                        </property>
+
+                        <property name="contentBg" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_content_bg</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="contentText" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_content_text</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="contentBorder" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_content_border</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="contentBorderWidth" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_content_border_width</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value=""/>
+                                <param name="values" type="collection">
+                                    <param name=""><meta><title>iw_sulu_tailwind_theme.variant_border_none</title></meta></param>
+                                    <param name="1"><meta><title>1px</title></meta></param>
+                                    <param name="2"><meta><title>2px</title></meta></param>
+                                    <param name="3"><meta><title>3px</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+
+                        <property name="paragraphSurfaceHeading" type="heading">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_surface_paragraph</title>
+                            </meta>
+                        </property>
+
+                        <property name="paragraphBorder" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_paragraph_border</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="paragraphBorderWidth" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_paragraph_border_width</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value=""/>
+                                <param name="values" type="collection">
+                                    <param name=""><meta><title>iw_sulu_tailwind_theme.variant_border_none</title></meta></param>
+                                    <param name="1"><meta><title>1px</title></meta></param>
+                                    <param name="2"><meta><title>2px</title></meta></param>
+                                    <param name="3"><meta><title>3px</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+
+                        <property name="accentSurfaceHeading" type="heading">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_surface_accent</title>
+                            </meta>
+                        </property>
+
+                        <property name="accentBg" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_accent_bg</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="accentText" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_accent_text</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="accentBorder" type="iw_theme_color_token_editor" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_accent_border</title>
+                            </meta>
+                            <params>
+                                <param name="show_palette" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="accentBorderWidth" type="single_select" colspan="4">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.variant_accent_border_width</title>
+                            </meta>
+                            <params>
+                                <param name="default_value" value=""/>
+                                <param name="values" type="collection">
+                                    <param name=""><meta><title>iw_sulu_tailwind_theme.variant_border_none</title></meta></param>
+                                    <param name="1"><meta><title>1px</title></meta></param>
+                                    <param name="2"><meta><title>2px</title></meta></param>
+                                    <param name="3"><meta><title>3px</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+
                         <property name="buttonStyle" type="iw_theme_button_style_picker">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.variant_button_style</title>

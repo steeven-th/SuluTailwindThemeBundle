@@ -585,6 +585,39 @@ confirms the one that was posted, and the visitor lands on the confirmation.
 and therefore keeps the old silent behaviour. Add the branch — see
 [Form block](form-block.md#after-a-successful-submission).
 
+## Variant surfaces (new)
+
+A block variant now describes **surfaces** on top of its individual colors. A
+surface is a background, the color of the text on it, and its border, which is
+what makes an element put forward legible without hand-tuning every color.
+
+Four surfaces: block, content, paragraph and accent. The block and paragraph
+backgrounds already existed and simply joined theirs. New in this release:
+
+- a **content** background, its text color and its border, painted on
+  `.iw-block__content`, which covers everything the block holds, title included
+- an **accent** surface, published for whatever puts an element forward and
+  applied by no block on its own
+- a **border** on every surface, with a width of 1px, 2px or 3px
+
+**Nothing changes for an existing theme.** Every new field starts empty, and an
+empty value emits no declaration at all, so a variant that sets none of them
+renders exactly as before. There is no data migration.
+
+One structural change is worth knowing about if you override templates:
+`_block_wrapper.html.twig` now **always** opens its inner container, named
+`iw-block__content`. It used to appear only when it carried the interior
+container or the max-width cap. Selectors written against the old markup that
+assumed the block content was a direct child of the `<section>` need updating,
+though nothing in the bundle did so.
+
+`--iw-variant-highlight` is unchanged and keeps its role: a highlighted word on
+a normal background. It is not a surface, and using it as a background is what
+these surfaces exist to replace.
+
+See [`css-api/block-variants.md`](./css-api/block-variants.md) for the full list
+of custom properties.
+
 ## Multi-line titles with highlighted words (new)
 
 Titles can now span several lines and put a few words forward in another color.

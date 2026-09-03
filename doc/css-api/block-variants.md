@@ -42,6 +42,18 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
+| `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
+| `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
+| `--iw-variant-content-bg` | `contentBg` | Background behind the whole content, title included (`.iw-block__content`) |
+| `--iw-variant-content-text` | `contentText` | Base text color on the content surface |
+| `--iw-variant-content-border` | `contentBorder` | Border color of the content surface |
+| `--iw-variant-content-border-width` | `contentBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
+| `--iw-variant-paragraph-border-width` | `paragraphBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-accent-bg` | `accentBg` | Background of an element put forward |
+| `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
+| `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
+| `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 
 Additionally:
 
@@ -106,6 +118,40 @@ Use `.iw-button--variant` inside a block to automatically match the variant's bu
 See [`buttons.md`](./buttons.md) for the full button API and hover effects.
 
 ---
+
+## Surfaces
+
+A variant used to describe colors in isolation. That left no way to put an
+element forward: `--iw-variant-highlight` is a **text** color, so using it as a
+background guarantees nothing about the text sitting on top of it, and a word
+highlighted inside such an element would be accent on accent.
+
+A surface bundles the three things that have to agree - a background, the color
+of the text on it, and its border - so a highlighted element is legible by
+construction rather than by manual tuning.
+
+| Surface | Painted on | Notes |
+|---|---|---|
+| Block | `.iw-variant--{slug}` | Background hangs off `[data-has-bg]`, the border does not: an outlined block with no fill is a normal thing to want |
+| Content | `.iw-block__content` | Everything the block holds, title included. Only visible where the block has padding |
+| Paragraph | `.iw-block__text` | The rich-text area. See the section below |
+| Accent | *(no rule of its own)* | Published for whatever puts an element forward, such as a highlighted card. Deliberately not applied to every block |
+
+Every value is optional, and an empty one emits nothing at all - not an empty
+declaration, which would make `var(--iw-variant-x, fallback)` unreachable and
+break the three-level cascades the blocks rely on. A variant that sets none of
+them renders exactly as before.
+
+`--iw-variant-highlight` is unchanged and keeps its own role: a highlighted word
+on a normal background.
+
+### The content container
+
+`.iw-block__content` wraps the content of every block. Most styles inherit it
+from `_block_wrapper`, which always opens it - it used to appear only when it
+carried the container or the max-width cap, and a target that comes and goes
+cannot be styled. Six `text_images` styles build their own `<section>` and carry
+the class themselves. A contract test refuses a style that has neither.
 
 ## Paragraph background (`.iw-block__text`)
 

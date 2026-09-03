@@ -61,6 +61,15 @@ class ThemeCompiler
     /**
      * Mapping from Tailwind rounded-* class suffixes to CSS border-radius values.
      */
+    /**
+     * Thickest border a variant surface can draw, in pixels.
+     *
+     * The admin offers 1, 2 and 3. The bound is repeated here because the
+     * compiler must not trust stored data: a theme edited before the field
+     * existed, or by hand, would otherwise emit any width it likes.
+     */
+    public const MAX_BORDER_WIDTH = 3;
+
     private const RADIUS_MAP = [
         'rounded-none' => '0',
         'rounded-xs' => '0.125rem',
@@ -2885,6 +2894,35 @@ class ThemeCompiler
             'list' => '--iw-variant-list-color',
             'hr' => '--iw-variant-hr-color',
             'paragraphBg' => '--iw-variant-paragraph-bg',
+
+            // Surfaces. A variant used to describe colors in isolation, which
+            // left no way to put an element forward: a highlight color is a
+            // TEXT color, so using it as a background guarantees nothing about
+            // the text sitting on top. A surface bundles the three things that
+            // have to agree - a background, the color of the text on it, and
+            // its border - so a highlighted card is legible by construction.
+            //
+            // These are published as custom properties and consumed by the
+            // blocks, same contract as `--iw-variant-paragraph-bg`. The accent
+            // surface has no rule of its own here on purpose: it belongs to
+            // whatever puts an element forward, not to every block.
+            'contentBg' => '--iw-variant-content-bg',
+            'contentText' => '--iw-variant-content-text',
+            'contentBorder' => '--iw-variant-content-border',
+            'blockBorder' => '--iw-variant-block-border',
+            'paragraphBorder' => '--iw-variant-paragraph-border',
+            'accentBg' => '--iw-variant-accent-bg',
+            'accentText' => '--iw-variant-accent-text',
+            'accentBorder' => '--iw-variant-accent-border',
+        ];
+
+        // Border widths travel with the border colors but are not colors, so
+        // they skip `resolveColorValue()` and are emitted separately.
+        $widthMap = [
+            'blockBorderWidth' => '--iw-variant-block-border-width',
+            'contentBorderWidth' => '--iw-variant-content-border-width',
+            'paragraphBorderWidth' => '--iw-variant-paragraph-border-width',
+            'accentBorderWidth' => '--iw-variant-accent-border-width',
         ];
 
         // Variants are keyed by a stable slug (not the positional index).
@@ -2905,7 +2943,23 @@ class ThemeCompiler
                 if (!isset($props[$tokenKey])) {
                     continue;
                 }
-                $css .= "  {$cssProperty}: {$this->resolveColorValue((string) $props[$tokenKey])};\n";
+                // An empty value would emit `--iw-variant-x: ;`, which drops the
+                // whole declaration and, worse, makes the fallback in
+                // `var(--iw-variant-x, …)` unreachable: the property IS set, to
+                // nothing. Leaving it out keeps the fallback working.
+                $resolved = trim($this->resolveColorValue((string) $props[$tokenKey]));
+                if ('' === $resolved) {
+                    continue;
+                }
+                $css .= "  {$cssProperty}: {$resolved};\n";
+            }
+
+            foreach ($widthMap as $tokenKey => $cssProperty) {
+                $width = (int) ($props[$tokenKey] ?? 0);
+                if ($width < 1 || $width > self::MAX_BORDER_WIDTH) {
+                    continue;
+                }
+                $css .= "  {$cssProperty}: {$width}px;\n";
             }
 
             // Apply title color as default text color for the block
@@ -2932,6 +2986,40 @@ class ThemeCompiler
                 $css .= ".iw-variant--{$index}[data-has-bg=\"true\"] {\n";
                 $css .= "  background-color: {$resolvedBlockBg};\n";
                 $css .= "  --iw-variant-block-bg: {$resolvedBlockBg};\n";
+                $css .= "}\n";
+            }
+
+            // Block surface border. Unlike the background it does NOT hang off
+            // `[data-has-bg]`: an outlined block with no fill is a common ask,
+            // and tying the two would make it unreachable.
+            $blockBorder = trim($this->resolveColorValue((string) ($props['blockBorder'] ?? '')));
+            if ('' !== $blockBorder) {
+                $css .= ".iw-variant--{$index} {\n";
+                $css .= "  border: var(--iw-variant-block-border-width, 1px) solid {$blockBorder};\n";
+                $css .= "}\n";
+            }
+
+            // Content surface: the background behind the whole content, title
+            // included, which is what `.iw-block__content` wraps. It only shows
+            // where the block has padding, exactly as specified.
+            $contentBg = trim($this->resolveColorValue((string) ($props['contentBg'] ?? '')));
+            $contentBorder = trim($this->resolveColorValue((string) ($props['contentBorder'] ?? '')));
+            $contentText = trim($this->resolveColorValue((string) ($props['contentText'] ?? '')));
+            if ('' !== $contentBg || '' !== $contentBorder || '' !== $contentText) {
+                $css .= ".iw-variant--{$index} .iw-block__content {\n";
+                if ('' !== $contentBg) {
+                    $css .= "  background-color: {$contentBg};\n";
+                }
+                if ('' !== $contentBorder) {
+                    $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
+                }
+                // Base text color only. Headings and paragraphs keep their own
+                // variant colors when set, since those rules are more specific.
+                // This catches what has none, and gives an editor something to
+                // turn when a dark content background swallows the text.
+                if ('' !== $contentText) {
+                    $css .= "  color: {$contentText};\n";
+                }
                 $css .= "}\n";
             }
 
@@ -3077,10 +3165,20 @@ class ThemeCompiler
             // template (mx-4) when the block has no lateral padding — adding it here
             // would stack with the block's own paddingLateral.
             // No visible paragraphBg → no background, no padding, no margin.
+            // A border belongs to the same surface as the background, and needs
+            // the same padding: drawn on its own, it would sit against the text.
+            // So either one opens the rule, and the padding comes with both.
             $pgBg = $this->resolveColorValue(trim($props['paragraphBg'] ?? ''));
-            if ($pgBg !== '' && strtolower($pgBg) !== 'transparent') {
+            $pgBorder = trim($this->resolveColorValue((string) ($props['paragraphBorder'] ?? '')));
+            $hasPgBg = $pgBg !== '' && strtolower($pgBg) !== 'transparent';
+            if ($hasPgBg || '' !== $pgBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__text {\n";
-                $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
+                if ($hasPgBg) {
+                    $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
+                }
+                if ('' !== $pgBorder) {
+                    $css .= "  border: var(--iw-variant-paragraph-border-width, 1px) solid {$pgBorder};\n";
+                }
                 $css .= "  padding: 1rem 1.5rem;\n";
                 $css .= "  margin-block: 1rem;\n";
                 $css .= "  overflow: hidden;\n";
