@@ -109,7 +109,7 @@
         {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'stretch') %}
         <div class="iw-block-text-images__grid iw-split-gap iw-split-cols {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ isRight ? ' iw-split-cols--reverse' : '' }}">
             {# Main text area — 3/5 = 60% #}
-            <div class="iw-block-text-images__content{{ isRight ? ' md:order-2' : ' md:order-1' }}">
+            <div class="iw-block__content iw-block-text-images__content{{ isRight ? ' md:order-2' : ' md:order-1' }}">
                 {% if text is defined and text is not empty %}
                     <div class="iw-block__text iw-block-text-images__text prose max-w-none {{ paragraphRadiusClass }}" style="margin-block: 0;">
                         {{ text|raw }}

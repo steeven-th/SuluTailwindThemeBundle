@@ -1,0 +1,186 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
+
+use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Guards the JavaScript copy of the variant zones against the PHP one.
+ *
+ * The editor needs the zone list in the browser, and the mapper needs it on
+ * the server. An endpoint for a list that never changes at runtime would be
+ * ceremony, so the list is duplicated and the drift is caught here instead.
+ *
+ * Drift is silent and one-sided: a color added to the PHP list is stored and
+ * spread correctly, but the editor never shows it, so it can never be set. The
+ * reverse is worse - the editor offers a color the mapper drops at save.
+ */
+final class VariantZonesParityTest extends TestCase
+{
+    /**
+     * Both copies declare the same fields, in the same order, in the same zones.
+     */
+    #[Test]
+    public function bothCopiesDeclareTheSameZones(): void
+    {
+        $php = [];
+        foreach (VariantZones::zones() as $id => $zone) {
+            foreach ($zone['fields'] as [$key, $label, $kind]) {
+                $php[] = \sprintf('%s/%s/%s/%s', $id, $key, $label, $kind);
+            }
+        }
+
+        self::assertSame(
+            $php,
+            self::javascriptZones(),
+            "The JavaScript zones no longer match VariantZones.php.\n"
+            . 'Update public/js/components/VariantEditor/zones.js to match, field for field.',
+        );
+    }
+
+    /**
+     * The widths offered match too, or the editor writes one the compiler drops.
+     */
+    #[Test]
+    public function bothCopiesOfferTheSameWidths(): void
+    {
+        $source = self::javascriptSource();
+
+        self::assertSame(
+            1,
+            preg_match('/const WIDTHS = \[([^\]]*)\]/', $source, $matches),
+            'zones.js must declare WIDTHS.',
+        );
+
+        $javascript = array_map(
+            static fn (string $value): int => (int) trim($value),
+            explode(',', trim($matches[1])),
+        );
+
+        self::assertSame(VariantZones::WIDTHS, $javascript);
+    }
+
+    /**
+     * The widths the editor offers are the ones the compiler accepts.
+     *
+     * The compiler clamps to its own bound, so a wider one is silently
+     * dropped: the editor would show a setting that does nothing.
+     */
+    #[Test]
+    public function theOfferedWidthsAreWithinWhatTheCompilerAccepts(): void
+    {
+        foreach (VariantZones::WIDTHS as $width) {
+            self::assertGreaterThanOrEqual(1, $width);
+            self::assertLessThanOrEqual(
+                \ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler::MAX_BORDER_WIDTH,
+                $width,
+                'A width is offered that the compiler refuses to emit.',
+            );
+        }
+    }
+
+    /**
+     * Every setting belongs to exactly one clickable part of the preview.
+     *
+     * The editor dropped the list of every field beside the preview: reaching a
+     * setting now means clicking the element that owns it. A setting in no
+     * group is therefore unreachable, and one in two groups is edited from two
+     * places, which is how a value ends up depending on which one you used last.
+     */
+    #[Test]
+    public function everySettingBelongsToExactlyOnePreviewGroup(): void
+    {
+        $source = self::javascriptSource();
+
+        $start = strpos($source, 'const PREVIEW_GROUPS');
+        self::assertNotFalse($start, 'zones.js must declare PREVIEW_GROUPS.');
+        $end = strpos($source, 'function groupOf', $start);
+        self::assertNotFalse($end);
+        // Only the field lists: a group id can also be a setting name ("title"
+        // is both), so matching every quoted token would count those twice and
+        // report a duplicate that is not one.
+        preg_match_all(
+            '/fields: \[(.*?)\]/s',
+            substr($source, $start, $end - $start),
+            $lists,
+            \PREG_SET_ORDER,
+        );
+        self::assertNotEmpty($lists, 'No field list could be read from PREVIEW_GROUPS.');
+
+        $grouped = [];
+        foreach ($lists as $list) {
+            preg_match_all("/'(\\w+)'/", $list[1], $names);
+            foreach ($names[1] as $name) {
+                $grouped[] = $name;
+            }
+        }
+
+        $known = VariantZones::keys();
+        self::assertSame(
+            [],
+            array_values(array_diff($grouped, $known)),
+            'A group lists a setting that does not exist.',
+        );
+
+        self::assertSame(
+            [],
+            array_values(array_diff($known, $grouped)),
+            'These settings belong to no group, so the editor offers no way to reach them.',
+        );
+
+        $duplicates = array_values(array_diff_assoc($grouped, array_unique($grouped)));
+        self::assertSame(
+            [],
+            $duplicates,
+            'These settings are in more than one group: ' . implode(', ', $duplicates),
+        );
+    }
+
+    /**
+     * The zones of the JavaScript copy, flattened the same way as the PHP one.
+     *
+     * @return list<string>
+     */
+    private static function javascriptZones(): array
+    {
+        $source = self::javascriptSource();
+
+        // Each zone opens with its id, then lists its fields until the next one.
+        preg_match_all(
+            "/id: '(\w+)',\s*\n\s*label: '([\w.]+)',\s*\n\s*fields: \[(.*?)\n\s*\],/s",
+            $source,
+            $zones,
+            \PREG_SET_ORDER,
+        );
+
+        self::assertNotEmpty($zones, 'No zone could be read from zones.js.');
+
+        $flat = [];
+        foreach ($zones as $zone) {
+            preg_match_all(
+                "/\{key: '(\w+)', label: '([\w.]+)', kind: '(\w+)'\}/",
+                $zone[3],
+                $fields,
+                \PREG_SET_ORDER,
+            );
+
+            foreach ($fields as $field) {
+                $flat[] = \sprintf('%s/%s/%s/%s', $zone[1], $field[1], $field[2], $field[3]);
+            }
+        }
+
+        return $flat;
+    }
+
+    private static function javascriptSource(): string
+    {
+        $path = \dirname(__DIR__, 2) . '/public/js/components/VariantEditor/zones.js';
+        self::assertFileExists($path);
+
+        return (string) file_get_contents($path);
+    }
+}

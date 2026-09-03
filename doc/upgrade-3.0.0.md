@@ -585,6 +585,62 @@ confirms the one that was posted, and the visitor lands on the confirmation.
 and therefore keeps the old silent behaviour. Add the branch — see
 [Form block](form-block.md#after-a-successful-submission).
 
+## Variant colors are edited in one field (changed)
+
+The variant form no longer lists a color picker per color. All of them are
+edited through `iw_theme_variant_editor`, which paints a mock block and
+recolors the element you click. Clicking a part opens the settings that part
+owns, all together: a border color with its width, a link with its hover, the
+seven form colors. Settings with no resting state of their own sit with the
+element they belong to, so clicking is enough to reach all of them.
+
+**No data migration.** The stored shape is untouched: the mapper folds the
+colors for the form and spreads them back for the entity. Every existing theme
+opens and saves unchanged, which was verified by round-tripping the eight test
+themes and diffing the stored tokens.
+
+This only matters if you override the variant form XML: the sibling color
+properties are gone, replaced by a single `colors` property.
+
+Color pickers also gained a clear button, so a color can be unset once picked
+rather than only overwritten. It is hidden in the palette editor, where a base
+role with no color would compile to a grey palette.
+
+## Variant surfaces (new)
+
+A block variant now describes **surfaces** on top of its individual colors. A
+surface is a background, the color of the text on it, and its border, which is
+what makes an element put forward legible without hand-tuning every color.
+
+Four surfaces: block, content, paragraph and accent. The block and paragraph
+backgrounds already existed and simply joined theirs. New in this release:
+
+- a **content** background and border, painted on `.iw-block__content`, which
+  covers everything the block holds, title included. It has no text color of
+  its own: the title, subtitle and paragraph colors of the variant already
+  cover its text and are more specific
+- an **accent** surface, published for whatever puts an element forward and
+  applied by no block on its own
+- a **border** on every surface, with a width of 1px, 2px or 3px
+
+**Nothing changes for an existing theme.** Every new field starts empty, and an
+empty value emits no declaration at all, so a variant that sets none of them
+renders exactly as before. There is no data migration.
+
+One structural change is worth knowing about if you override templates:
+`_block_wrapper.html.twig` now **always** opens its inner container, named
+`iw-block__content`. It used to appear only when it carried the interior
+container or the max-width cap. Selectors written against the old markup that
+assumed the block content was a direct child of the `<section>` need updating,
+though nothing in the bundle did so.
+
+`--iw-variant-highlight` is unchanged and keeps its role: a highlighted word on
+a normal background. It is not a surface, and using it as a background is what
+these surfaces exist to replace.
+
+See [`css-api/block-variants.md`](./css-api/block-variants.md) for the full list
+of custom properties.
+
 ## Multi-line titles with highlighted words (new)
 
 Titles can now span several lines and put a few words forward in another color.

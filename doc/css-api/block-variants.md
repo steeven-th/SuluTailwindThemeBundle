@@ -42,6 +42,17 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
+| `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
+| `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
+| `--iw-variant-content-bg` | `contentBg` | Background behind the whole content, title included (`.iw-block__content`) |
+| `--iw-variant-content-border` | `contentBorder` | Border color of the content surface |
+| `--iw-variant-content-border-width` | `contentBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
+| `--iw-variant-paragraph-border-width` | `paragraphBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-accent-bg` | `accentBg` | Background of an element put forward |
+| `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
+| `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
+| `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 
 Additionally:
 
@@ -106,6 +117,106 @@ Use `.iw-button--variant` inside a block to automatically match the variant's bu
 See [`buttons.md`](./buttons.md) for the full button API and hover effects.
 
 ---
+
+## Editing a variant
+
+The colors of a variant are edited as **one field**, `iw_theme_variant_editor`,
+which paints a mock block with them and recolors the element you click.
+
+They used to be some thirty sibling color pickers. That is unreadable, and it
+showed nothing of the result: you picked a hex and found out on the page.
+
+Clicking a part of the mock opens the settings **that part owns**, all of them
+together: a border colour and its width, a link and its hover, the seven form
+colors. Grouping them by data zone instead put a border colour in one place and
+its width in another, so picking a colour appeared to do nothing.
+
+That grouping is also what lets the editor drop the long list of fields it used
+to show beside the preview. Every setting belongs to exactly one part, the ones
+with no resting state included, so clicking the thing you want to change is
+enough to reach all 29. A contract test fails when a setting belongs to none,
+or to two.
+
+The mock also draws the button of the variant, read from the button style it
+points at. That one is shown, not edited: its colors belong to the button
+style, which has its own field.
+
+**The stored shape is unchanged.** `ThemeFormMapper` folds the colors on the way
+to the form and spreads them back on the way to the entity, so the compiler and
+`VariantResolver` read the flat keys they always read, and no theme needs
+migrating. `src/Color/VariantZones.php` is the source of truth for which colors
+exist and how they are grouped, mirrored in `zones.js` for the browser with a
+parity test guarding the two.
+
+## Surfaces
+
+A variant used to describe colors in isolation. That left no way to put an
+element forward: `--iw-variant-highlight` is a **text** color, so using it as a
+background guarantees nothing about the text sitting on top of it, and a word
+highlighted inside such an element would be accent on accent.
+
+A surface bundles the three things that have to agree - a background, the color
+of the text on it, and its border - so a highlighted element is legible by
+construction rather than by manual tuning.
+
+| Surface | Painted on | Notes |
+|---|---|---|
+| Block | `.iw-variant--{slug}` | Background hangs off `[data-has-bg]`, the border does not: an outlined block with no fill is a normal thing to want |
+| Content | `.iw-block__content` | Everything the block holds, title included. Only visible where the block has padding. Carries no text color: the title, subtitle and paragraph colors already cover its text, and are more specific |
+| Paragraph | `.iw-block__text` | The rich-text area. See the section below |
+| Accent | *(no rule of its own)* | Published for whatever puts an element forward, such as a highlighted card. Deliberately not applied to every block |
+
+Every value is optional, and an empty one emits nothing at all - not an empty
+declaration, which would make `var(--iw-variant-x, fallback)` unreachable and
+break the three-level cascades the blocks rely on. A variant that sets none of
+them renders exactly as before.
+
+`--iw-variant-highlight` is unchanged and keeps its own role: a highlighted word
+on a normal background.
+
+### The content container
+
+`.iw-block__content` wraps the content of every block. Most styles inherit it
+from `_block_wrapper`, which always opens it - it used to appear only when it
+carried the container or the max-width cap, and a target that comes and goes
+cannot be styled. Six `text_images` styles build their own `<section>` and carry
+the class themselves. A contract test refuses a style that has neither.
+
+## Which surface paints what
+
+Three of the four surfaces can be reached by a block, and they are easy to
+confuse because any of them makes a panel look better. The rule:
+
+| You want to paint | Surface | Painted on |
+|---|---|---|
+| The whole section | Block | `.iw-variant--{slug}` |
+| Everything the block holds, title included | Content | `.iw-block__content` |
+| One enclosed unit: a rich text area, a card, an inset | Paragraph | that unit |
+
+Before the content surface existed, the paragraph background was the only one
+available, so everything that needed a panel used it. That is why cards reach
+for it across the bundle - timeline steps, document cards, linked pages,
+article items, the consent banner, the location inset. They are enclosed units,
+so it stays the right one.
+
+A component painting an enclosed unit uses the full three-level cascade:
+
+```css
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+```
+
+The first level is what a theme overrides for that component alone, the second
+is the variant, the third is the computed neutral. Dropping the first makes the
+component impossible to style on its own; dropping the third leaves it
+transparent on a variant that sets no paragraph background. `SurfaceUsageContractTest`
+checks both, and refuses a rule that paints `.iw-block__content` with the
+paragraph background.
+
+**A card is a paragraph, and a highlighted card is an accent.** Cards share the
+paragraph background with rich text areas, deliberately: they are both enclosed
+units, and giving cards a surface of their own would mean giving highlighted
+cards one too, which is what the accent surface already is. Four surfaces cover
+it, six would say the same thing twice.
 
 ## Paragraph background (`.iw-block__text`)
 

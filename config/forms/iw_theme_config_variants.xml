@@ -30,164 +30,17 @@
                             </meta>
                         </property>
 
-                        <property name="title" type="iw_theme_color_token_editor" colspan="4">
+                        <property name="colors" type="iw_theme_variant_editor">
                             <meta>
-                                <title>iw_sulu_tailwind_theme.variant_title_color</title>
+                                <title>iw_sulu_tailwind_theme.variant_colors</title>
+                                <info_text>iw_sulu_tailwind_theme.variant_colors_info</info_text>
                             </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="subtitle" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_subtitle_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="highlight" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_highlight_color</title>
-                                <info_text>iw_sulu_tailwind_theme.variant_highlight_color_info</info_text>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="paragraph" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_paragraph_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="link" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_link_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="linkHover" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_link_hover_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="list" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_list_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="hr" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_hr_color</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="paragraphBg" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_paragraphBg</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="blockBg" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_blockBg</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
                         </property>
 
                         <property name="buttonStyle" type="iw_theme_button_style_picker">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.variant_button_style</title>
                             </meta>
-                        </property>
-
-                        <property name="formBg" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_bg</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formText" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_text</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formLabel" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_label</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formPlaceholder" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_placeholder</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formBorder" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_border</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formBorderFocus" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_border_focus</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
-                        </property>
-
-                        <property name="formBorderError" type="iw_theme_color_token_editor" colspan="4">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.variant_form_border_error</title>
-                            </meta>
-                            <params>
-                                <param name="show_palette" value="true"/>
-                            </params>
                         </property>
 
                         <property name="separatorMode" type="single_select" colspan="4">

@@ -80,11 +80,17 @@
     {{ bgAttr|raw }}
     data-controller="lightbox"
 >
-    {# One inner wrapper, opened only when it carries something: the interior
-       container, the max-width cap, or both. Exterior margins put both on the
-       <section> itself, so nothing is wrapped there. #}
+    {# One inner wrapper around the whole content, title included. It used to
+       open only when it carried something - the interior container, the
+       max-width cap, or both - but the content surface of a variant needs
+       somewhere to paint, and a target that comes and goes cannot be styled.
+       So it is always open, and `iw-block__content` names it.
+
+       Adding a level was checked rather than assumed: nothing selects a direct
+       child of `.block` or `.iw-variant--*`, and `.block` is Tailwind's
+       `display: block`, so the extra element does not disturb the flow. #}
     {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass %}
-    {% if innerWrapperClass|trim %}<div class="{{ innerWrapperClass|trim }}">{% endif %}
+    <div class="{{ ('iw-block__content ' ~ innerWrapperClass)|trim }}">
         {{ block('block_content') }}
 
         {% if not (ctaInline|default(false)) %}
@@ -96,5 +102,5 @@
                 titleAlignment: titleAlignment|default('left')
             } only %}
         {% endif %}
-    {% if innerWrapperClass|trim %}</div>{% endif %}
+    </div>
 </section>

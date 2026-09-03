@@ -3,12 +3,12 @@ import React, {Fragment} from 'react';
 import {observer} from 'mobx-react';
 import {ChromePicker} from 'react-color';
 import {translate} from 'sulu-admin-bundle/utils';
-import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
+import loadFormPalette from '../../utils/formPalette';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -48,6 +48,28 @@ function ensurePickerStyles() {
             max-width: 1em;
             overflow: hidden;
             border: 1px solid #c0c0c0;
+        }
+        /* Sulu's clear slot draws su-times. This is a delete, not a dismiss, so
+           it shows the same trash glyph the admin uses everywhere else for
+           that. Swapping the character is enough: the button keeps Sulu's
+           position, spacing and colour, and the input keeps the margin that
+           comes with having a clear icon.
+           The codepoints are the ones sulu-icon.css maps: e901 su-times,
+           e943 su-trash-alt. */
+        [class*="append-container"] .su-times:before,
+        [class*="appendContainer"] .su-times:before {
+            content: "\\e943";
+        }
+        /* The colour swatch shares its style object with the clear icon, so a
+           pale colour would make the glyph disappear. It is a glyph, not a
+           swatch. */
+        [class*="append-container"] .iw-color-picker-icon,
+        [class*="appendContainer"] .iw-color-picker-icon {
+            color: inherit !important;
+            border: 0;
+            max-height: none;
+            max-width: none;
+            overflow: visible;
         }
         .iw-palette-tabs {
             display: flex;
@@ -107,6 +129,7 @@ function ensurePickerStyles() {
  * @param {Function} props.onChange - Callback when color changes
  * @param {boolean} props.disabled - Whether the field is disabled
  * @param {Object} props.schemaOptions - Schema params from XML config
+ * @param {boolean} props.clearable - Set false to hide the clear button (default: shown)
  */
 @observer
 export default class ColorTokenEditor extends React.Component {
@@ -144,33 +167,13 @@ export default class ColorTokenEditor extends React.Component {
      * palette (saved state) when not in a theme form.
      */
     _loadPaletteFromForm() {
-        const {formInspector} = this.props;
-        if (!formInspector || !this.showPalette) return;
+        if (!this.showPalette) return;
 
-        // The PaletteEditor holds the base colors as a list [{role, slug, value}].
-        // getValueByPath may return a MobX observable array (fails Array.isArray).
-        const raw = formInspector.getValueByPath('/palette');
-        if (!raw || !raw.length) return;
-        const colors = Array.from(raw);
-
-        const params = new URLSearchParams();
-        colors.forEach((color) => {
-            const key = color && (color.role || color.slug);
-            const value = color && color.value;
-            if (key && typeof value === 'string' && value) {
-                params.set(key, value);
+        loadFormPalette(this.props.formInspector).then((palette) => {
+            if (palette) {
+                this.setState({localPalette: palette});
             }
         });
-
-        if (params.toString() === '') return;
-
-        Requester.get('/admin/api/iw-theme-palette?' + params.toString())
-            .then((palette) => {
-                this.setState({localPalette: palette});
-            })
-            .catch(() => {
-                // Fallback to store palette on error
-            });
     }
 
     componentDidUpdate(prevProps) {
@@ -227,6 +230,27 @@ export default class ColorTokenEditor extends React.Component {
     /**
      * Validate and commit value on blur.
      */
+    /**
+     * Clear the color, the way every other Sulu input clears.
+     *
+     * Offered unless `clearable` is false. Empty is meaningful in most places
+     * the picker is used - the token is unset and the cascade falls back - but
+     * not everywhere: a base palette role with no color compiles to a grey
+     * palette, silently, so the palette editor opts out.
+     *
+     * An empty color is meaningful here: it means the token is unset and the
+     * cascade falls back, so there has to be a way back to it once a color has
+     * been picked. Retyping over the field was the only one.
+     */
+    handleClearClick = () => {
+        this.setState({internalValue: ''});
+        this.props.onChange(undefined);
+
+        if (this.props.onFinish) {
+            this.props.onFinish();
+        }
+    };
+
     handleBlur = () => {
         const {internalValue} = this.state;
 
@@ -517,7 +541,7 @@ export default class ColorTokenEditor extends React.Component {
     }
 
     render() {
-        const {disabled, error, dataPath} = this.props;
+        const {disabled, error, dataPath, clearable} = this.props;
         const {popoverOpen, internalValue, activeTab} = this.state;
 
         const isTransparent = internalValue === 'transparent';
@@ -537,6 +561,8 @@ export default class ColorTokenEditor extends React.Component {
             && themeConfigStore.palette
             && Object.keys(themeConfigStore.palette).length > 0;
 
+        const showClear = !disabled && false !== clearable && !!internalValue;
+
         return (
             <Fragment>
                 <Input
@@ -548,6 +574,7 @@ export default class ColorTokenEditor extends React.Component {
                     inputContainerRef={this.setAnchorRef}
                     onBlur={this.handleBlur}
                     onChange={this.handleInputChange}
+                    onClearClick={showClear ? this.handleClearClick : undefined}
                     onIconClick={!disabled ? this.handleIconClick : undefined}
                     placeholder="#000000"
                     valid={!error}
