@@ -255,57 +255,19 @@ const WIREFRAME_RENDERERS = {
             <rect x="6" y="56" width="44" height="16" rx="3" fill={fill} />
         </svg>
     ),
-    // Cards block. Three cards on a row, differing by what frames them, so the
-    // previews differ the same way rather than by their contents.
-    cards_bordered: (fill, accent) => (
+    // Cards block. Three LAYOUTS, so the previews differ by where things sit,
+    // not by what frames them: the frame comes from the variant, and shadow
+    // and numbering are settings that work on all three.
+    cards_stacked: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
             {[6, 43, 80].map((x) => (
                 <g key={x}>
-                    <rect x={x} y="18" width="34" height="44" rx="3" fill="none" stroke={accent} strokeWidth="1.5" />
+                    <rect x={x} y="18" width="34" height="44" rx="3" fill="none" stroke={fill} strokeWidth="1" />
                     <circle cx={x + 8} cy="28" r="3" fill={accent} />
                     <rect x={x + 14} y="25" width="14" height="5" rx="1.5" fill={accent} />
-                    <rect x={x + 6} y="37" width="22" height="3" rx="1.5" fill={fill} />
-                    <rect x={x + 6} y="44" width="18" height="3" rx="1.5" fill={fill} />
-                </g>
-            ))}
-        </svg>
-    ),
-    cards_elevated: (fill, accent) => (
-        <svg viewBox="0 0 120 80" width="120" height="80">
-            {[6, 43, 80].map((x) => (
-                <g key={x}>
-                    <rect x={x + 2} y="21" width="34" height="44" rx="3" fill={accent} opacity="0.18" />
-                    <rect x={x} y="18" width="34" height="44" rx="3" fill="#ffffff" stroke={fill} strokeWidth="0.5" />
-                    <circle cx={x + 8} cy="28" r="3" fill={accent} />
-                    <rect x={x + 14} y="25" width="14" height="5" rx="1.5" fill={accent} />
-                    <rect x={x + 6} y="37" width="22" height="3" rx="1.5" fill={fill} />
-                    <rect x={x + 6} y="44" width="18" height="3" rx="1.5" fill={fill} />
-                </g>
-            ))}
-        </svg>
-    ),
-    cards_minimal: (fill, accent) => (
-        <svg viewBox="0 0 120 80" width="120" height="80">
-            {[6, 43, 80].map((x) => (
-                <g key={x}>
-                    <circle cx={x + 4} cy="26" r="3" fill={accent} />
-                    <rect x={x + 10} y="23" width="16" height="5" rx="1.5" fill={accent} />
-                    <rect x={x} y="36" width="28" height="3" rx="1.5" fill={fill} />
-                    <rect x={x} y="43" width="24" height="3" rx="1.5" fill={fill} />
-                    <rect x={x} y="50" width="20" height="3" rx="1.5" fill={fill} />
-                </g>
-            ))}
-        </svg>
-    ),
-    cards_icon_top: (fill, accent) => (
-        <svg viewBox="0 0 120 80" width="120" height="80">
-            {[6, 43, 80].map((x) => (
-                <g key={x}>
-                    <rect x={x} y="16" width="34" height="48" rx="3" fill="none" stroke={fill} strokeWidth="1" />
-                    <circle cx={x + 17} cy="28" r="6" fill={accent} />
-                    <rect x={x + 7} y="40" width="20" height="4" rx="2" fill={accent} />
-                    <rect x={x + 5} y="49" width="24" height="3" rx="1.5" fill={fill} />
-                    <rect x={x + 8} y="56" width="18" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 6} y="38" width="22" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 6} y="45" width="18" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 6} y="52" width="20" height="3" rx="1.5" fill={fill} />
                 </g>
             ))}
         </svg>
@@ -323,23 +285,14 @@ const WIREFRAME_RENDERERS = {
             ))}
         </svg>
     ),
-    cards_numbered: (fill, accent) => (
+    cards_horizontal: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
-            {[6, 43, 80].map((x, i) => (
-                <g key={x}>
-                    <rect x={x} y="18" width="34" height="44" rx="3" fill="none" stroke={fill} strokeWidth="1" />
-                    <text
-                        fill={accent}
-                        fontFamily="sans-serif"
-                        fontSize="13"
-                        fontWeight="700"
-                        x={x + 5}
-                        y="34"
-                    >
-                        {'0' + (i + 1)}
-                    </text>
-                    <rect x={x + 5} y="41" width="22" height="4" rx="2" fill={accent} />
-                    <rect x={x + 5} y="50" width="24" height="3" rx="1.5" fill={fill} />
+            {[10, 34, 58].map((y) => (
+                <g key={y}>
+                    <rect x="8" y={y} width="104" height="20" rx="3" fill="none" stroke={fill} strokeWidth="1" />
+                    <circle cx="20" cy={y + 10} r="5" fill={accent} />
+                    <rect x="31" y={y + 5} width="30" height="4" rx="2" fill={accent} />
+                    <rect x="31" y={y + 12} width="66" height="3" rx="1.5" fill={fill} />
                 </g>
             ))}
         </svg>

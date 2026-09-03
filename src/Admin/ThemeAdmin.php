@@ -108,13 +108,16 @@ class ThemeAdmin extends Admin
             ['key' => 'wide_carousel', 'label' => 'iw_sulu_tailwind_theme.style.wide_carousel'],
             ['key' => 'filmstrip', 'label' => 'iw_sulu_tailwind_theme.style.filmstrip'],
         ],
+        // A style is a LAYOUT. What a card is framed with comes from the
+        // variant, and what it shows on top of its content is a setting, so
+        // neither is a style: "bordered" and "minimal" were the paragraph
+        // surface with and without a border, "icon_top" was the icon position
+        // setting, and "elevated" and "numbered" are now toggles that work on
+        // all three layouts instead of being one each.
         'cards' => [
-            ['key' => 'bordered', 'label' => 'iw_sulu_tailwind_theme.style.cards_bordered'],
-            ['key' => 'elevated', 'label' => 'iw_sulu_tailwind_theme.style.cards_elevated'],
-            ['key' => 'minimal', 'label' => 'iw_sulu_tailwind_theme.style.cards_minimal'],
-            ['key' => 'icon_top', 'label' => 'iw_sulu_tailwind_theme.style.cards_icon_top'],
+            ['key' => 'stacked', 'label' => 'iw_sulu_tailwind_theme.style.cards_stacked'],
             ['key' => 'image_top', 'label' => 'iw_sulu_tailwind_theme.style.cards_image_top'],
-            ['key' => 'numbered', 'label' => 'iw_sulu_tailwind_theme.style.cards_numbered'],
+            ['key' => 'horizontal', 'label' => 'iw_sulu_tailwind_theme.style.cards_horizontal'],
         ],
         'timeline' => [
             ['key' => 'alternate', 'label' => 'iw_sulu_tailwind_theme.style.alternate'],

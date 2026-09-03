@@ -5490,38 +5490,68 @@ aside .iw-toc {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Block: cards
-   A grid of free-form cards. The six styles share the same markup and differ
-   only here, so a project can restyle one, or add a style of its own, without
-   touching Twig.
+   A grid of free-form cards, in three LAYOUTS.
 
-   A card is an enclosed unit, so it takes the PARAGRAPH surface of the
-   variant. A highlighted card takes the ACCENT surface, which carries the
-   colour of the text on it, so it stays legible whatever the accent is.
+   What frames a card is not a layout: a card is an enclosed unit, so its
+   background and border come from the PARAGRAPH surface of the variant, like
+   every other card in the bundle. A highlighted card takes the ACCENT surface,
+   which carries the colour of the text on it, so it stays legible whatever the
+   accent is.
+
+   Shadow and numbering are options rather than layouts, so a numbered card can
+   have a shadow and a banner image can have a number.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .iw-block-cards {
-    /* Hook only - the grid and the styles below own the layout. */
+    /* Hook only - the grid and the layouts below own the placement. */
 }
 
 .iw-block-cards__grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--iw-block-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
+    /* Only bites once a row is narrower than the block, which the width cap
+       below is what causes. */
+    justify-content: start;
 }
+
+/* Equal columns ────────────────────────────────────────────────────────── */
 
 @media (min-width: 640px) {
     .iw-block-cards__grid--cols-2,
     .iw-block-cards__grid--cols-3,
     .iw-block-cards__grid--cols-4 {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, var(--iw-card-track, 1fr)));
     }
 }
 
 @media (min-width: 1024px) {
-    .iw-block-cards__grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .iw-block-cards__grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .iw-block-cards__grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .iw-block-cards__grid--cols-2 { grid-template-columns: repeat(2, minmax(0, var(--iw-card-track, 1fr))); }
+    .iw-block-cards__grid--cols-3 { grid-template-columns: repeat(3, minmax(0, var(--iw-card-track, 1fr))); }
+    .iw-block-cards__grid--cols-4 { grid-template-columns: repeat(4, minmax(0, var(--iw-card-track, 1fr))); }
 }
+
+/* Uneven pairs ─────────────────────────────────────────────────────────── */
+
+/* Two tracks in a repeating pattern, so a fifth card starts the pattern again
+   rather than the split applying to the first row alone. */
+@media (min-width: 768px) {
+    .iw-block-cards__grid--cols-1-2 { grid-template-columns: repeat(auto-fit, minmax(0, 1fr) minmax(0, 2fr)); }
+    .iw-block-cards__grid--cols-2-1 { grid-template-columns: repeat(auto-fit, minmax(0, 2fr) minmax(0, 1fr)); }
+    .iw-block-cards__grid--cols-1-3 { grid-template-columns: repeat(auto-fit, minmax(0, 1fr) minmax(0, 3fr)); }
+    .iw-block-cards__grid--cols-3-1 { grid-template-columns: repeat(auto-fit, minmax(0, 3fr) minmax(0, 1fr)); }
+}
+
+/* How wide a card may be ───────────────────────────────────────────────── */
+
+/* `fill` leaves the track at 1fr, so the cards share the width as they always
+   did. The others cap it, which is what leaves room for the row to be placed. */
+.iw-block-cards__grid--width-compact { --iw-card-track: 14rem; }
+.iw-block-cards__grid--width-medium { --iw-card-track: 18rem; }
+.iw-block-cards__grid--width-large { --iw-card-track: 24rem; }
+
+.iw-block-cards__grid--place-center { justify-content: center; }
+.iw-block-cards__grid--place-right { justify-content: end; }
 
 .iw-block-cards__grid--align-center {
     text-align: center;
@@ -5538,6 +5568,16 @@ aside .iw-toc {
     overflow: hidden;
     color: inherit;
     text-decoration: none;
+    /* The frame comes from the variant. A variant that sets neither background
+       nor border leaves the cards bare, held together by the grid alone. */
+    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+}
+
+/* The border only draws when the variant gives it a colour, so a bare variant
+   does not get a hairline nobody asked for. */
+.iw-card {
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-card-border, var(--iw-variant-paragraph-border, transparent));
 }
 
 .iw-card__body {
@@ -5588,7 +5628,6 @@ aside .iw-toc {
 }
 
 .iw-card__image {
-    /* Sits inside the body for every style but image_top. */
     margin-block: 0.25rem;
 }
 
@@ -5615,42 +5654,49 @@ aside .iw-toc {
     color: var(--iw-variant-highlight, var(--color-accent));
 }
 
-/* Styles ───────────────────────────────────────────────────────────────── */
+/* Layouts ──────────────────────────────────────────────────────────────── */
 
-/* The three-level cascade every enclosed unit uses: a hook for this block, the
-   variant surface, then the computed neutral. See doc/css-api/block-variants.md */
-.iw-card--bordered {
-    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
-    border: var(--iw-variant-paragraph-border-width, 1px) solid
-        var(--iw-card-border, var(--iw-variant-paragraph-border, var(--iw-variant-hr-color, currentColor)));
+/* `stacked` and `image-top` need no rule of their own: the card is a column,
+   and the banner is placed by the markup. Only the horizontal one turns. */
+.iw-card--horizontal .iw-card__body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        'visual head'
+        'visual text'
+        'visual link';
+    align-items: start;
+    column-gap: 1rem;
 }
 
-.iw-card--elevated {
-    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+.iw-card--horizontal .iw-card__head {
+    grid-area: head;
+}
+
+.iw-card--horizontal .iw-card__image {
+    grid-area: visual;
+    align-self: center;
+    width: var(--iw-card-horizontal-visual, 6rem);
+    margin-block: 0;
+}
+
+.iw-card--horizontal .iw-card__text {
+    grid-area: text;
+}
+
+.iw-card--horizontal .iw-card__link {
+    grid-area: link;
+    margin-top: 0.35rem;
+}
+
+/* Options ──────────────────────────────────────────────────────────────── */
+
+.iw-card--shadow {
     box-shadow: var(--iw-card-shadow, 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 16px -6px rgb(0 0 0 / 0.12));
 }
 
-.iw-card--elevated:hover {
+.iw-card--shadow:hover {
     box-shadow: var(--iw-card-shadow-hover, 0 2px 6px rgb(0 0 0 / 0.12), 0 12px 24px -8px rgb(0 0 0 / 0.18));
-}
-
-/* Minimal has no frame at all, so its body loses the padding that framed it. */
-.iw-card--minimal .iw-card__body {
-    padding: 0;
-}
-
-.iw-card--icon-top,
-.iw-card--image-top,
-.iw-card--numbered {
-    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-}
-
-.iw-card--icon-top {
-    text-align: center;
-}
-
-.iw-card--icon-top .iw-card__head {
-    align-items: center;
 }
 
 /* Highlighted ──────────────────────────────────────────────────────────── */

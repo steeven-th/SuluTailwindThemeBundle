@@ -1,5 +1,6 @@
-{# Cards block - A full-width image banner, then the text. The card image moves to
-   the top of the card rather than sitting inside the body. #}
+{# Cards block - a full-width image banner, then the content.
+   The card image moves to the top of the card rather than sitting inside
+   the body, which is a change of structure and so a layout of its own. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -29,7 +30,11 @@
             style: 'image_top',
             columns: columns|default('3'),
             align: contentAlignment|default('left'),
+            width: cardWidth|default('fill'),
+            gridAlign: cardsAlignment|default('left'),
             iconPosition: iconPosition|default('inline'),
+            shadow: cardShadow|default(false),
+            numbered: cardNumbers|default(false),
             imageMaxWidth: imageMaxWidthClass,
             cardRadius: cardRadiusClass,
             imageRadius: imageRadiusClass,

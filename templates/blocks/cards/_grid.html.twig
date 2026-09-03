@@ -1,5 +1,5 @@
 {# ─────────────────────────────────────────────────────────────────────────
-   The grid of cards, shared by the six styles.
+   The grid of cards, shared by the three layouts.
 
    The column count is a BEM modifier rather than Tailwind classes, so the
    breakpoints live in app.css and a project can change where the grid folds
@@ -9,10 +9,13 @@
      - items     : the list of cards
      - itemsView : the matching view data, carrying resolved link targets
      - columns : 2 | 3 | 4
-     - align   : left | center
+     - align     : left | center - the text inside each card
+     - width     : fill | compact | medium | large - how wide a card may be
+     - gridAlign : left | center | right - where a row sits once it no
+                   longer fills the block
    ───────────────────────────────────────────────────────────────────────── #}
 
-<div class="iw-block-cards__grid iw-block-cards__grid--cols-{{ columns|default('3') }} iw-block-cards__grid--align-{{ align|default('left') }}">
+<div class="iw-block-cards__grid iw-block-cards__grid--cols-{{ columns|default('3') }} iw-block-cards__grid--width-{{ width|default('fill') }} iw-block-cards__grid--place-{{ gridAlign|default('left') }} iw-block-cards__grid--align-{{ align|default('left') }}">
     {% for card in items|default([]) %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/cards/_card.html.twig' with {
             card: card,
@@ -20,6 +23,8 @@
             style: style,
             index: loop.index0,
             iconPosition: iconPosition|default('inline'),
+            shadow: shadow|default(false),
+            numbered: numbered|default(false),
             imageMaxWidth: imageMaxWidth|default(''),
             cardRadius: cardRadius|default(''),
             imageRadius: imageRadius|default(''),

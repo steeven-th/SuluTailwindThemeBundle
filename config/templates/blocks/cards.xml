@@ -121,6 +121,9 @@
                     <meta><title>iw_sulu_tailwind_theme.cards_group</title></meta>
                 </property>
 
+                <!-- Equal columns, then the uneven pairs. An uneven split is a
+                     repeating pattern, so five cards on "1 / 2" alternate narrow
+                     and wide rather than only affecting the first row. -->
                 <property name="columns" type="single_select" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.cards_columns</title>
@@ -129,9 +132,50 @@
                     <params>
                         <param name="default_value" value="3"/>
                         <param name="values" type="collection">
-                            <param name="2"><meta><title>2</title></meta></param>
-                            <param name="3"><meta><title>3</title></meta></param>
-                            <param name="4"><meta><title>4</title></meta></param>
+                            <param name="2"><meta><title>iw_sulu_tailwind_theme.cards_columns_2</title></meta></param>
+                            <param name="3"><meta><title>iw_sulu_tailwind_theme.cards_columns_3</title></meta></param>
+                            <param name="4"><meta><title>iw_sulu_tailwind_theme.cards_columns_4</title></meta></param>
+                            <param name="1-2"><meta><title>iw_sulu_tailwind_theme.cards_columns_1_2</title></meta></param>
+                            <param name="2-1"><meta><title>iw_sulu_tailwind_theme.cards_columns_2_1</title></meta></param>
+                            <param name="1-3"><meta><title>iw_sulu_tailwind_theme.cards_columns_1_3</title></meta></param>
+                            <param name="3-1"><meta><title>iw_sulu_tailwind_theme.cards_columns_3_1</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Columns say how many share a row, this says how wide each one
+                     is allowed to be. Left to "fill" they share the width as
+                     before. Capped, the row is narrower than the block, which is
+                     what `cardsAlignment` then places. -->
+                <property name="cardWidth" type="single_select" colspan="6"
+                          visibleCondition="__parent.columns == '2' OR __parent.columns == '3' OR __parent.columns == '4'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_width</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_width_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="fill"/>
+                        <param name="values" type="collection">
+                            <param name="fill"><meta><title>iw_sulu_tailwind_theme.cards_width_fill</title></meta></param>
+                            <param name="compact"><meta><title>iw_sulu_tailwind_theme.cards_width_compact</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.cards_width_medium</title></meta></param>
+                            <param name="large"><meta><title>iw_sulu_tailwind_theme.cards_width_large</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Only meaningful once the cards no longer fill the row. -->
+                <property name="cardsAlignment" type="single_select" colspan="6"
+                          visibleCondition="__parent.cardWidth != 'fill'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_grid_alignment</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
                         </param>
                     </params>
                 </property>
@@ -147,10 +191,10 @@
                     </params>
                 </property>
 
-                <!-- Only the styles that place the icon beside the title can move
-                     it: icon_top and image_top own their layout. -->
+                <!-- The horizontal layout puts the visual beside the text, so it
+                     owns that placement and the setting would do nothing. -->
                 <property name="iconPosition" type="single_select" colspan="6"
-                          visibleCondition="__parent.style == 'bordered' OR __parent.style == 'elevated' OR __parent.style == 'minimal' OR __parent.style == 'numbered'">
+                          visibleCondition="__parent.style != 'horizontal'">
                     <meta><title>iw_sulu_tailwind_theme.cards_icon_position</title></meta>
                     <params>
                         <param name="default_value" value="inline"/>
@@ -158,6 +202,29 @@
                             <param name="inline"><meta><title>iw_sulu_tailwind_theme.cards_icon_inline</title></meta></param>
                             <param name="above"><meta><title>iw_sulu_tailwind_theme.cards_icon_above</title></meta></param>
                         </param>
+                    </params>
+                </property>
+
+                <!-- Both were styles of their own, which meant a numbered card
+                     could not have a shadow, nor a banner image a number. As
+                     options they combine with every layout. -->
+                <property name="cardShadow" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_shadow</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_shadow_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                    </params>
+                </property>
+
+                <property name="cardNumbers" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_numbers</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_numbers_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
                     </params>
                 </property>
 
