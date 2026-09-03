@@ -84,6 +84,63 @@ final class VariantZonesParityTest extends TestCase
     }
 
     /**
+     * Every setting belongs to exactly one clickable part of the preview.
+     *
+     * The editor dropped the list of every field beside the preview: reaching a
+     * setting now means clicking the element that owns it. A setting in no
+     * group is therefore unreachable, and one in two groups is edited from two
+     * places, which is how a value ends up depending on which one you used last.
+     */
+    #[Test]
+    public function everySettingBelongsToExactlyOnePreviewGroup(): void
+    {
+        $source = self::javascriptSource();
+
+        $start = strpos($source, 'const PREVIEW_GROUPS');
+        self::assertNotFalse($start, 'zones.js must declare PREVIEW_GROUPS.');
+        $end = strpos($source, 'function groupOf', $start);
+        self::assertNotFalse($end);
+        // Only the field lists: a group id can also be a setting name ("title"
+        // is both), so matching every quoted token would count those twice and
+        // report a duplicate that is not one.
+        preg_match_all(
+            '/fields: \[(.*?)\]/s',
+            substr($source, $start, $end - $start),
+            $lists,
+            \PREG_SET_ORDER,
+        );
+        self::assertNotEmpty($lists, 'No field list could be read from PREVIEW_GROUPS.');
+
+        $grouped = [];
+        foreach ($lists as $list) {
+            preg_match_all("/'(\\w+)'/", $list[1], $names);
+            foreach ($names[1] as $name) {
+                $grouped[] = $name;
+            }
+        }
+
+        $known = VariantZones::keys();
+        self::assertSame(
+            [],
+            array_values(array_diff($grouped, $known)),
+            'A group lists a setting that does not exist.',
+        );
+
+        self::assertSame(
+            [],
+            array_values(array_diff($known, $grouped)),
+            'These settings belong to no group, so the editor offers no way to reach them.',
+        );
+
+        $duplicates = array_values(array_diff_assoc($grouped, array_unique($grouped)));
+        self::assertSame(
+            [],
+            $duplicates,
+            'These settings are in more than one group: ' . implode(', ', $duplicates),
+        );
+    }
+
+    /**
      * The zones of the JavaScript copy, flattened the same way as the PHP one.
      *
      * @return list<string>

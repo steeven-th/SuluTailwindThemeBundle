@@ -81,6 +81,63 @@ const ZONES = [
 /** Widths a border can take, in pixels. Mirrors VariantZones::WIDTHS. */
 const WIDTHS = [1, 2, 3];
 
+/**
+ * The clickable parts of the preview, and the settings each one owns.
+ *
+ * ZONES above describes the DATA, and is mirrored in PHP. This describes the
+ * PREVIEW, and belongs to the browser alone. They are deliberately different
+ * shapes: grouping the editor by data zone put a border colour in one place
+ * and its width in another, so picking a colour appeared to do nothing until
+ * you found the width somewhere else.
+ *
+ * Every setting lives in exactly one group, including the ones with no resting
+ * state of their own - a link hover sits with the link, a focus border with the
+ * field. That is what lets the editor drop the long list beside the preview:
+ * clicking the thing you want to change is enough to reach all of them.
+ */
+const PREVIEW_GROUPS = [
+    {id: 'block', label: 'iw_sulu_tailwind_theme.variant_zone_block',
+        fields: ['blockBg', 'blockBorder', 'blockBorderWidth']},
+    {id: 'content', label: 'iw_sulu_tailwind_theme.variant_surface_content',
+        fields: ['contentBg', 'contentText', 'contentBorder', 'contentBorderWidth']},
+    {id: 'title', label: 'iw_sulu_tailwind_theme.variant_title_color',
+        fields: ['title']},
+    {id: 'highlight', label: 'iw_sulu_tailwind_theme.variant_highlight_color',
+        fields: ['highlight']},
+    {id: 'subtitle', label: 'iw_sulu_tailwind_theme.variant_subtitle_color',
+        fields: ['subtitle']},
+    {id: 'paragraph', label: 'iw_sulu_tailwind_theme.variant_surface_paragraph',
+        fields: ['paragraph', 'paragraphBg', 'paragraphBorder', 'paragraphBorderWidth']},
+    {id: 'link', label: 'iw_sulu_tailwind_theme.variant_link_color',
+        fields: ['link', 'linkHover']},
+    {id: 'list', label: 'iw_sulu_tailwind_theme.variant_list_color',
+        fields: ['list']},
+    {id: 'hr', label: 'iw_sulu_tailwind_theme.variant_hr_color',
+        fields: ['hr']},
+    {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
+        fields: ['accentBg', 'accentText', 'accentBorder', 'accentBorderWidth']},
+    {id: 'form', label: 'iw_sulu_tailwind_theme.variant_zone_form',
+        fields: ['formBg', 'formText', 'formLabel', 'formPlaceholder',
+            'formBorder', 'formBorderFocus', 'formBorderError']},
+];
+
+/** The group a setting belongs to. */
+function groupOf(key) {
+    return PREVIEW_GROUPS.find((group) => group.fields.indexOf(key) !== -1) || null;
+}
+
+/**
+ * The border width that goes with a border colour, if any.
+ *
+ * Setting a colour with no width draws nothing, which reads as the colour
+ * having no effect. The editor uses this to default the width instead.
+ */
+function widthKeyFor(key) {
+    const candidate = key + 'Width';
+
+    return FIELDS.some((field) => field.key === candidate) ? candidate : null;
+}
+
 /** Every field, flattened, in zone order. */
 const FIELDS = ZONES.reduce((all, zone) => all.concat(zone.fields), []);
 
@@ -89,4 +146,4 @@ function fieldOf(key) {
     return FIELDS.find((field) => field.key === key) || null;
 }
 
-export {ZONES, WIDTHS, FIELDS, fieldOf};
+export {ZONES, WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};

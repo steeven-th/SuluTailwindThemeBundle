@@ -127,9 +127,20 @@ which paints a mock block with them and recolors the element you click.
 They used to be some thirty sibling color pickers. That is unreadable, and it
 showed nothing of the result: you picked a hex and found out on the page.
 
-Not every color has a visible counterpart in a mock - a link hover has no
-resting state - so the editor also lists every field beside the preview,
-grouped by zone. Nothing becomes unreachable by being left out of the mock.
+Clicking a part of the mock opens the settings **that part owns**, all of them
+together: a border colour and its width, a link and its hover, the seven form
+colors. Grouping them by data zone instead put a border colour in one place and
+its width in another, so picking a colour appeared to do nothing.
+
+That grouping is also what lets the editor drop the long list of fields it used
+to show beside the preview. Every setting belongs to exactly one part, the ones
+with no resting state included, so clicking the thing you want to change is
+enough to reach all 29. A contract test fails when a setting belongs to none,
+or to two.
+
+The mock also draws the button of the variant, read from the button style it
+points at. That one is shown, not edited: its colors belong to the button
+style, which has its own field.
 
 **The stored shape is unchanged.** `ThemeFormMapper` folds the colors on the way
 to the form and spreads them back on the way to the entity, so the compiler and

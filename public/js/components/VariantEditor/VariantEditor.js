@@ -4,9 +4,9 @@ import {observer} from 'mobx-react';
 import {translate} from 'sulu-admin-bundle/utils';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
 import themeConfigStore from '../../stores/themeConfigStore';
-import {resolveRef} from '../../utils/colorRefResolver';
+import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
 import loadFormPalette from '../../utils/formPalette';
-import {ZONES, WIDTHS, FIELDS, fieldOf} from './zones';
+import {WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
 
 const STYLE_ID = 'iw-variant-editor-styles';
 
@@ -26,9 +26,8 @@ function ensureVariantEditorStyles() {
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-        '.iw-ve { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }',
-        '.iw-ve__preview { flex: 1 1 420px; min-width: 320px; }',
-        '.iw-ve__side { flex: 0 1 300px; min-width: 260px; }',
+        '.iw-ve { max-width: 760px; }',
+        '.iw-ve__preview { margin-bottom: 12px; }',
 
         // the mock block, painted from the variant
         '.iw-ve__block {',
@@ -52,7 +51,8 @@ function ensureVariantEditorStyles() {
         '  font-size: 13px; line-height: 1.6; padding: 10px; border-radius: 3px; margin: 0 0 10px;',
         '}',
         '.iw-ve__link { color: var(--ve-link, #2563eb); text-decoration: underline; }',
-        '.iw-ve__list { color: var(--ve-paragraph, #374151); font-size: 13px; margin: 0 0 10px; padding-left: 18px; }',
+        '.iw-ve__list { color: var(--ve-paragraph, #374151); font-size: 13px; margin: 0 0 10px; }',
+        '.iw-ve__list-items { margin: 0; padding-left: 18px; }',
         '.iw-ve__list li::marker { color: var(--ve-list, #d97706); }',
         '.iw-ve__hr { border: 0; border-top: 2px solid var(--ve-hr, #e5e7eb); margin: 10px 0; }',
         '.iw-ve__accent {',
@@ -60,6 +60,11 @@ function ensureVariantEditorStyles() {
         '  border: var(--ve-accentBorderWidth, 0px) solid var(--ve-accentBorder, transparent);',
         '  color: var(--ve-accentText, #111827);',
         '  padding: 10px 12px; border-radius: 3px; font-size: 13px; margin: 0 0 10px;',
+        '}',
+        '.iw-ve__button-wrap { margin: 0 0 10px; }',
+        '.iw-ve__button {',
+        '  display: inline-block; padding: 7px 15px; border-radius: 3px;',
+        '  font-size: 13px; font-weight: 600; cursor: default;',
         '}',
         '.iw-ve__form {',
         '  background: var(--ve-formBg, #ffffff);',
@@ -71,30 +76,25 @@ function ensureVariantEditorStyles() {
         '.iw-ve__form-placeholder { color: var(--ve-formPlaceholder, #9ca3af); }',
 
         // clickable regions
-        '.iw-ve [data-ve-field] { cursor: pointer; outline-offset: 2px; }',
+        '.iw-ve [data-ve-field] { cursor: pointer; outline-offset: -1px; border-radius: 2px; }',
         '.iw-ve [data-ve-field]:hover { outline: 1px dashed #6b7280; }',
         '.iw-ve [data-ve-field][data-ve-selected="true"] { outline: 2px solid #2563eb; }',
 
-        // the side panel
+        // the editor panel, directly under the preview
         '.iw-ve__hint { font-size: 12px; color: #6b7280; margin: 0 0 10px; }',
-        '.iw-ve__zone { margin-bottom: 12px; }',
-        '.iw-ve__zone-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin: 0 0 6px; }',
-        '.iw-ve__chips { display: flex; flex-wrap: wrap; gap: 4px; }',
-        '.iw-ve__chip {',
-        '  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;',
-        '  border: 1px solid #d1d5db; background: #fff; border-radius: 3px;',
-        '  padding: 3px 7px; font-size: 12px; color: #374151;',
-        '}',
-        '.iw-ve__chip[data-ve-selected="true"] { border-color: #2563eb; color: #1d4ed8; }',
-        '.iw-ve__swatch { width: 11px; height: 11px; border-radius: 2px; border: 1px solid rgba(0,0,0,.2); }',
-        '.iw-ve__editor { border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; }',
-        '.iw-ve__editor-title { font-size: 13px; font-weight: 600; margin: 0 0 8px; }',
+        '.iw-ve__editor { border: 1px solid #d1d5db; border-radius: 4px; padding: 12px 14px; background: #fff; }',
+        '.iw-ve__editor-title { font-size: 13px; font-weight: 600; margin: 0 0 10px; color: #111827; }',
+        '.iw-ve__settings { display: flex; flex-wrap: wrap; gap: 14px; }',
+        '.iw-ve__setting { flex: 0 1 210px; min-width: 180px; }',
+        '.iw-ve__setting-label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }',
         '.iw-ve__widths { display: flex; gap: 6px; }',
         '.iw-ve__width {',
         '  cursor: pointer; border: 1px solid #d1d5db; background: #fff;',
-        '  border-radius: 3px; padding: 4px 10px; font-size: 12px;',
+        '  border-radius: 3px; padding: 5px 11px; font-size: 12px;',
         '}',
         '.iw-ve__width[data-ve-selected="true"] { border-color: #2563eb; color: #1d4ed8; }',
+        '.iw-ve__width:disabled { opacity: .45; cursor: default; }',
+        '.iw-ve__note { font-size: 11px; color: #6b7280; margin: 6px 0 0; }',
     ].join('\n');
 
     document.head.appendChild(style);
@@ -143,7 +143,7 @@ function toColors(value) {
  */
 @observer
 export default class VariantEditor extends React.Component {
-    state = {selected: 'title', palette: null};
+    state = {selected: 'block', palette: null};
 
     componentDidMount() {
         ensureVariantEditorStyles();
@@ -181,6 +181,57 @@ export default class VariantEditor extends React.Component {
         return resolveRef(value, this.state.palette || themeConfigStore.palette);
     }
 
+    /**
+     * The button style this variant points at, if any.
+     *
+     * It is a sibling property, not part of the colors, so it is read from the
+     * form by deriving its path from this field's own. The preview shows the
+     * result rather than letting it be edited here: the picker for it sits a
+     * few fields below, and two places to change one value is how a setting
+     * ends up depending on which one you used last.
+     */
+    get buttonStyle() {
+        const {formInspector, dataPath} = this.props;
+        if (!formInspector || !dataPath) {
+            return null;
+        }
+
+        return formInspector.getValueByPath(dataPath.replace(/\/colors$/, '/buttonStyle')) || null;
+    }
+
+    /**
+     * The button to draw, resolved against the buttons of the theme form.
+     *
+     * Falls back to the first one defined, so the preview still shows what a
+     * button looks like on this variant before a style has been picked.
+     */
+    get button() {
+        const {formInspector} = this.props;
+        let buttons = [];
+
+        if (formInspector) {
+            const raw = formInspector.getValueByPath('/buttons');
+            if (raw && raw.length) {
+                buttons = Array.from(raw).map((button) => ({...button}));
+            }
+        }
+
+        if (!buttons.length) {
+            buttons = Array.from(themeConfigStore.buttons || []);
+        }
+
+        if (!buttons.length) {
+            return null;
+        }
+
+        const slug = this.buttonStyle;
+        const found = slug ? buttons.find((button) => button.slug === slug) : null;
+        const button = found || buttons[0];
+        const palette = this.state.palette || themeConfigStore.palette;
+
+        return palette ? resolveAllRefs(button, palette) : button;
+    }
+
     /** Custom properties that paint the preview. */
     get previewStyle() {
         const colors = this.colors;
@@ -214,13 +265,26 @@ export default class VariantEditor extends React.Component {
         return style;
     }
 
+    /**
+     * Write one setting, and give a border colour a width to draw with.
+     *
+     * A colour with no width draws nothing, so picking one looked like it had
+     * no effect: the setting that made it visible was a separate field. The
+     * width stays editable, this only decides what it starts at.
+     */
     commit(key, value) {
         const colors = {...this.colors};
+        const empty = '' === value || null === value || undefined === value;
 
-        if (value === '' || value === null || value === undefined) {
+        if (empty) {
             delete colors[key];
         } else {
             colors[key] = value;
+        }
+
+        const widthKey = widthKeyFor(key);
+        if (widthKey && !empty && !colors[widthKey]) {
+            colors[widthKey] = '1';
         }
 
         this.props.onChange(colors);
@@ -229,178 +293,215 @@ export default class VariantEditor extends React.Component {
         }
     }
 
-    handleSelect = (key) => {
-        this.setState({selected: key});
+    handleSelect = (group) => {
+        this.setState({selected: group});
     };
 
-    renderRegion(key, className, children, extraProps = {}) {
-        const selected = this.state.selected === key;
-
+    /**
+     * A clickable part of the preview.
+     *
+     * The click stops here so the innermost element wins: the paragraph is
+     * inside the content, which is inside the block, and clicking the text
+     * should not select the whole block.
+     */
+    renderRegion(group, className, children) {
         return (
             <div
                 className={className}
-                data-ve-field={key}
-                data-ve-selected={selected ? 'true' : 'false'}
+                data-ve-field={group}
+                data-ve-selected={this.state.selected === group ? 'true' : 'false'}
                 onClick={(event) => {
                     event.stopPropagation();
-                    this.handleSelect(key);
+                    this.handleSelect(group);
+                }}
+                onKeyPress={(event) => {
+                    if ('Enter' === event.key || ' ' === event.key) {
+                        this.handleSelect(group);
+                    }
                 }}
                 role="button"
                 tabIndex={0}
-                onKeyPress={(event) => {
-                    if ('Enter' === event.key || ' ' === event.key) {
-                        this.handleSelect(key);
-                    }
-                }}
-                {...extraProps}
             >
                 {children}
             </div>
         );
     }
 
-    renderPreview() {
+    /** An inline part, for words inside a sentence. */
+    renderInline(group, className, label) {
         return (
+            <span
+                className={className}
+                data-ve-field={group}
+                data-ve-selected={this.state.selected === group ? 'true' : 'false'}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    this.handleSelect(group);
+                }}
+            >
+                {translate(label)}
+            </span>
+        );
+    }
+
+    renderPreview() {
+        return this.renderRegion('block', 'iw-ve__block', (
             <div>
-                {this.renderRegion('blockBg', 'iw-ve__block', (
+                {this.renderRegion('content', 'iw-ve__content', (
                     <div>
-                        {this.renderRegion('contentBg', 'iw-ve__content', (
+                        {this.renderRegion('title', 'iw-ve__title', (
+                            <span>
+                                {translate('iw_sulu_tailwind_theme.variant_preview_title')}{' '}
+                                {this.renderInline('highlight', 'iw-ve__highlight',
+                                    'iw_sulu_tailwind_theme.variant_preview_highlight')}
+                            </span>
+                        ))}
+                        {this.renderRegion('subtitle', 'iw-ve__subtitle',
+                            translate('iw_sulu_tailwind_theme.variant_preview_subtitle'))}
+                        {this.renderRegion('paragraph', 'iw-ve__text', (
+                            <span>
+                                {translate('iw_sulu_tailwind_theme.variant_preview_paragraph')}{' '}
+                                {this.renderInline('link', 'iw-ve__link',
+                                    'iw_sulu_tailwind_theme.variant_preview_link')}
+                            </span>
+                        ))}
+                        {this.renderRegion('list', 'iw-ve__list', (
+                            <ul className="iw-ve__list-items">
+                                <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
+                            </ul>
+                        ))}
+                        {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
+                        {this.renderRegion('accent', 'iw-ve__accent',
+                            translate('iw_sulu_tailwind_theme.variant_preview_accent'))}
+                        {this.renderButton()}
+                        {this.renderRegion('form', 'iw-ve__form-wrap', (
                             <div>
-                                {this.renderRegion('title', 'iw-ve__title', (
-                                    <span>
-                                        {translate('iw_sulu_tailwind_theme.variant_preview_title')}{' '}
-                                        <span
-                                            className="iw-ve__highlight"
-                                            data-ve-field="highlight"
-                                            data-ve-selected={'highlight' === this.state.selected ? 'true' : 'false'}
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                this.handleSelect('highlight');
-                                            }}
-                                        >
-                                            {translate('iw_sulu_tailwind_theme.variant_preview_highlight')}
-                                        </span>
+                                <label className="iw-ve__form-label">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_form_label')}
+                                </label>
+                                <div className="iw-ve__form">
+                                    <span className="iw-ve__form-placeholder">
+                                        {translate('iw_sulu_tailwind_theme.variant_preview_form_placeholder')}
                                     </span>
-                                ))}
-                                {this.renderRegion('subtitle', 'iw-ve__subtitle',
-                                    translate('iw_sulu_tailwind_theme.variant_preview_subtitle'))}
-                                {this.renderRegion('paragraphBg', 'iw-ve__text', (
-                                    <span>
-                                        {translate('iw_sulu_tailwind_theme.variant_preview_paragraph')}{' '}
-                                        <span
-                                            className="iw-ve__link"
-                                            data-ve-field="link"
-                                            data-ve-selected={'link' === this.state.selected ? 'true' : 'false'}
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                this.handleSelect('link');
-                                            }}
-                                        >
-                                            {translate('iw_sulu_tailwind_theme.variant_preview_link')}
-                                        </span>
-                                    </span>
-                                ))}
-                                {this.renderRegion('list', 'iw-ve__list', (
-                                    <ul style={{margin: 0, paddingLeft: 18}}>
-                                        <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
-                                    </ul>
-                                ), {})}
-                                {this.renderRegion('hr', 'iw-ve__hr-wrap', <hr className="iw-ve__hr" />)}
-                                {this.renderRegion('accentBg', 'iw-ve__accent',
-                                    translate('iw_sulu_tailwind_theme.variant_preview_accent'))}
-                                {this.renderRegion('formBg', 'iw-ve__form-wrap', (
-                                    <div>
-                                        <label className="iw-ve__form-label">
-                                            {translate('iw_sulu_tailwind_theme.variant_preview_form_label')}
-                                        </label>
-                                        <div className="iw-ve__form">
-                                            <span className="iw-ve__form-placeholder">
-                                                {translate('iw_sulu_tailwind_theme.variant_preview_form_placeholder')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
+                                </div>
                             </div>
                         ))}
                     </div>
                 ))}
             </div>
-        );
-    }
-
-    renderChips() {
-        const colors = this.colors;
-
-        return ZONES.map((zone) => (
-            <div className="iw-ve__zone" key={zone.id}>
-                <p className="iw-ve__zone-title">{translate(zone.label)}</p>
-                <div className="iw-ve__chips">
-                    {zone.fields.map((field) => (
-                        <button
-                            className="iw-ve__chip"
-                            data-ve-selected={this.state.selected === field.key ? 'true' : 'false'}
-                            key={field.key}
-                            onClick={() => this.handleSelect(field.key)}
-                            type="button"
-                        >
-                            {'color' === field.kind && (
-                                <span
-                                    className="iw-ve__swatch"
-                                    style={{background: this.resolved(colors[field.key]) || 'transparent'}}
-                                />
-                            )}
-                            {translate(field.label)}
-                        </button>
-                    ))}
-                </div>
-            </div>
         ));
     }
 
-    renderEditor() {
-        const field = fieldOf(this.state.selected);
+    /**
+     * The button of this variant, drawn but not editable.
+     *
+     * Its colors belong to the button style, which is its own field, so this
+     * is here to judge the whole rather than to change it.
+     */
+    renderButton() {
+        const button = this.button;
+        if (!button) {
+            return null;
+        }
+
+        const style = {
+            background: button.bg || 'transparent',
+            color: button.text || 'inherit',
+        };
+
+        if (button.border) {
+            style.border = (button.borderWidth || 1) + 'px solid ' + button.border;
+        }
+
+        return (
+            <div className="iw-ve__button-wrap">
+                <span className="iw-ve__button" style={style}>
+                    {button.label || translate('iw_sulu_tailwind_theme.variant_preview_button')}
+                </span>
+            </div>
+        );
+    }
+
+    /** One setting: a colour picker, or the widths of a border. */
+    renderSetting(key) {
+        const field = fieldOf(key);
         if (!field) {
             return null;
         }
 
-        const value = this.colors[field.key];
+        const value = this.colors[key];
+
+        if ('width' === field.kind) {
+            // The width means nothing until the border has a colour, and saying
+            // so beats offering buttons that quietly do nothing.
+            const colorKey = key.replace(/Width$/, '');
+            const hasColor = !!this.colors[colorKey];
+
+            return (
+                <div className="iw-ve__setting" key={key}>
+                    <span className="iw-ve__setting-label">{translate(field.label)}</span>
+                    <div className="iw-ve__widths">
+                        <button
+                            className="iw-ve__width"
+                            data-ve-selected={!value ? 'true' : 'false'}
+                            disabled={!hasColor}
+                            onClick={() => this.commit(key, '')}
+                            type="button"
+                        >
+                            {translate('iw_sulu_tailwind_theme.variant_border_none')}
+                        </button>
+                        {WIDTHS.map((width) => (
+                            <button
+                                className="iw-ve__width"
+                                data-ve-selected={String(width) === String(value) ? 'true' : 'false'}
+                                disabled={!hasColor}
+                                key={width}
+                                onClick={() => this.commit(key, String(width))}
+                                type="button"
+                            >
+                                {width}px
+                            </button>
+                        ))}
+                    </div>
+                    {!hasColor && (
+                        <p className="iw-ve__note">
+                            {translate('iw_sulu_tailwind_theme.variant_border_needs_color')}
+                        </p>
+                    )}
+                </div>
+            );
+        }
+
+        return (
+            <div className="iw-ve__setting" key={key}>
+                <span className="iw-ve__setting-label">{translate(field.label)}</span>
+                <ColorTokenEditor
+                    disabled={this.props.disabled}
+                    formInspector={this.props.formInspector}
+                    onChange={(next) => this.commit(key, next)}
+                    schemaOptions={{show_palette: {value: true}}}
+                    value={value || ''}
+                />
+            </div>
+        );
+    }
+
+    /**
+     * The settings of the selected part, all of them, side by side.
+     *
+     * A border colour and its width belong together: apart, picking a colour
+     * appeared to do nothing until you found the width elsewhere in a list.
+     */
+    renderEditor() {
+        const group = PREVIEW_GROUPS.find((candidate) => candidate.id === this.state.selected)
+            || PREVIEW_GROUPS[0];
 
         return (
             <div className="iw-ve__editor">
-                <p className="iw-ve__editor-title">{translate(field.label)}</p>
-                {'width' === field.kind
-                    ? (
-                        <div className="iw-ve__widths">
-                            <button
-                                className="iw-ve__width"
-                                data-ve-selected={!value ? 'true' : 'false'}
-                                onClick={() => this.commit(field.key, '')}
-                                type="button"
-                            >
-                                {translate('iw_sulu_tailwind_theme.variant_border_none')}
-                            </button>
-                            {WIDTHS.map((width) => (
-                                <button
-                                    className="iw-ve__width"
-                                    data-ve-selected={String(width) === String(value) ? 'true' : 'false'}
-                                    key={width}
-                                    onClick={() => this.commit(field.key, String(width))}
-                                    type="button"
-                                >
-                                    {width}px
-                                </button>
-                            ))}
-                        </div>
-                    )
-                    : (
-                        <ColorTokenEditor
-                            disabled={this.props.disabled}
-                            formInspector={this.props.formInspector}
-                            onChange={(next) => this.commit(field.key, next)}
-                            schemaOptions={{show_palette: {value: true}}}
-                            value={value || ''}
-                        />
-                    )}
+                <p className="iw-ve__editor-title">{translate(group.label)}</p>
+                <div className="iw-ve__settings">
+                    {group.fields.map((key) => this.renderSetting(key))}
+                </div>
             </div>
         );
     }
@@ -411,11 +512,8 @@ export default class VariantEditor extends React.Component {
                 <div className="iw-ve__preview" style={this.previewStyle}>
                     {this.renderPreview()}
                 </div>
-                <div className="iw-ve__side">
-                    <p className="iw-ve__hint">{translate('iw_sulu_tailwind_theme.variant_editor_hint')}</p>
-                    {this.renderEditor()}
-                    <div style={{marginTop: 12}}>{this.renderChips()}</div>
-                </div>
+                <p className="iw-ve__hint">{translate('iw_sulu_tailwind_theme.variant_editor_hint')}</p>
+                {this.renderEditor()}
             </div>
         );
     }
