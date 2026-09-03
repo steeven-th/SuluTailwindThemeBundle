@@ -182,6 +182,40 @@ carried the container or the max-width cap, and a target that comes and goes
 cannot be styled. Six `text_images` styles build their own `<section>` and carry
 the class themselves. A contract test refuses a style that has neither.
 
+## Which surface paints what
+
+Three of the four surfaces can be reached by a block, and they are easy to
+confuse because any of them makes a panel look better. The rule:
+
+| You want to paint | Surface | Painted on |
+|---|---|---|
+| The whole section | Block | `.iw-variant--{slug}` |
+| Everything the block holds, title included | Content | `.iw-block__content` |
+| One enclosed unit: a rich text area, a card, an inset | Paragraph | that unit |
+
+Before the content surface existed, the paragraph background was the only one
+available, so everything that needed a panel used it. That is why cards reach
+for it across the bundle - timeline steps, document cards, linked pages,
+article items, the consent banner, the location inset. They are enclosed units,
+so it stays the right one.
+
+A component painting an enclosed unit uses the full three-level cascade:
+
+```css
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+```
+
+The first level is what a theme overrides for that component alone, the second
+is the variant, the third is the computed neutral. Dropping the first makes the
+component impossible to style on its own; dropping the third leaves it
+transparent on a variant that sets no paragraph background. `SurfaceUsageContractTest`
+checks both, and refuses a rule that paints `.iw-block__content` with the
+paragraph background.
+
+**Known limit.** Cards and rich text areas share the paragraph background, so a
+theme cannot tint its cards without tinting the text panels of every block. A
+card surface of its own would fix it, at the cost of one more setting.
+
 ## Paragraph background (`.iw-block__text`)
 
 When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`), the `.iw-block__text` element inside that variant gets:
