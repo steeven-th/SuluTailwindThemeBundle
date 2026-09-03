@@ -589,8 +589,10 @@ and therefore keeps the old silent behaviour. Add the branch — see
 
 The variant form no longer lists a color picker per color. All of them are
 edited through `iw_theme_variant_editor`, which paints a mock block and
-recolors the element you click, with every field also listed by zone beside it
-for the ones a mock cannot show.
+recolors the element you click. Clicking a part opens the settings that part
+owns, all together: a border color with its width, a link with its hover, the
+seven form colors. Settings with no resting state of their own sit with the
+element they belong to, so clicking is enough to reach all of them.
 
 **No data migration.** The stored shape is untouched: the mapper folds the
 colors for the form and spreads them back for the entity. Every existing theme
@@ -599,6 +601,10 @@ themes and diffing the stored tokens.
 
 This only matters if you override the variant form XML: the sibling color
 properties are gone, replaced by a single `colors` property.
+
+Color pickers also gained a clear button, so a color can be unset once picked
+rather than only overwritten. It is hidden in the palette editor, where a base
+role with no color would compile to a grey palette.
 
 ## Variant surfaces (new)
 
