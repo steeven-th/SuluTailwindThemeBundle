@@ -5780,10 +5780,34 @@ aside .iw-toc {
    and the number all turned into link colour the moment the card became
    clickable. Three classes and a type beat the variant rule, which is two
    classes and a type, so no !important is needed. */
-.iw-block-cards .iw-block-cards__grid a.iw-card,
-.iw-block-cards .iw-block-cards__grid a.iw-card:hover,
-.iw-block-cards .iw-block-cards__grid a.iw-card:focus,
-.iw-block-cards .iw-block-cards__grid a.iw-card:visited {
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted),
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):hover,
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):focus,
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):visited {
+    color: inherit;
+}
+
+/* A highlighted card holds the text colour of the accent surface, in every
+   state, for the same reason: it is the colour that surface guarantees to be
+   readable on its background. Excluded from the rule above and given its own,
+   or that rule - three classes to its one - would strip it back to inherit and
+   the card would lose the very thing the accent surface exists to provide. */
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:hover,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:focus,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:visited {
+    color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
+}
+
+/* Inside a highlighted card the action follows the card, not the link colour,
+   which is rarely readable on an accent background - a dark blue link on an
+   orange card, in the theme this was tested against.
+   The grid class is in the selector to outweigh the generic action rule above:
+   without it the two are equally specific, and the later one simply won. */
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted .iw-card__link,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:hover .iw-card__link,
+.iw-block-cards .iw-block-cards__grid .iw-card--highlighted .iw-card__link,
+.iw-block-cards .iw-block-cards__grid .iw-card--highlighted .iw-card__action {
     color: inherit;
 }
 
