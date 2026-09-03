@@ -29,10 +29,9 @@
                     </params>
                 </property>
 
+                <!-- No title of its own: the heading right above already says
+                     "Cards", and Sulu would print it twice. -->
                 <block name="items" default-type="card" minOccurs="1">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.cards_items</title>
-                    </meta>
                     <types>
                         <type name="card">
                             <meta>

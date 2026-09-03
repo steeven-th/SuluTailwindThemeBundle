@@ -627,7 +627,6 @@
     "iw_sulu_tailwind_theme.block.text": "Texte",
     "iw_sulu_tailwind_theme.block.text_images": "Texte et médias",
     "iw_sulu_tailwind_theme.block.cards": "Cartes",
-    "iw_sulu_tailwind_theme.cards_items": "Cartes",
     "iw_sulu_tailwind_theme.cards_item": "Carte",
     "iw_sulu_tailwind_theme.cards_icon": "Picto",
     "iw_sulu_tailwind_theme.cards_icon_info": "Petit visuel affiché avec le titre. Un SVG reste net à toutes les tailles.",

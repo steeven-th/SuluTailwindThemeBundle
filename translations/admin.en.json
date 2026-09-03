@@ -627,7 +627,6 @@
     "iw_sulu_tailwind_theme.block.text": "Text",
     "iw_sulu_tailwind_theme.block.text_images": "Text and media",
     "iw_sulu_tailwind_theme.block.cards": "Cards",
-    "iw_sulu_tailwind_theme.cards_items": "Cards",
     "iw_sulu_tailwind_theme.cards_item": "Card",
     "iw_sulu_tailwind_theme.cards_icon": "Icon",
     "iw_sulu_tailwind_theme.cards_icon_info": "Small visual shown with the title. An SVG stays sharp at any size.",
