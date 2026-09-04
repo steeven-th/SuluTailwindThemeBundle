@@ -162,6 +162,16 @@
     "iw_sulu_tailwind_theme.borders_imageRadius": "Rayon des images",
     "iw_sulu_tailwind_theme.borders_paragraphRadius": "Rayon des paragraphes",
 
+    "iw_sulu_tailwind_theme.defaults_section_block_padding": "Espacement intérieur des blocs par défaut",
+    "iw_sulu_tailwind_theme.defaults_section_block_padding_info": "Espacement qu'un bloc prend quand aucun n'a été choisi sur le bloc lui-même. Un bloc qui a son propre réglage le garde, y compris un espacement nul.",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingTop": "Espacement intérieur haut",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingTop_info": "Espace entre le haut du bloc et son contenu.",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingBottom": "Espacement intérieur bas",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info": "Espace entre le bas du bloc et son contenu.",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Espacement intérieur latéral",
+    "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Espace entre les bords gauche et droit du bloc et son contenu.",
+    "iw_sulu_tailwind_theme.margin_theme_default": "Selon le thème",
+
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Espacement intérieur des surfaces",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Espace entre une surface et ce qui est posé dessus. Ne s'applique qu'aux surfaces qui ont un fond ou une bordure, un bloc sans fond de contenu garde donc sa mise en page.",
     "iw_sulu_tailwind_theme.defaults_contentPaddingX": "Contenu - espacement horizontal",

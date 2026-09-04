@@ -261,6 +261,50 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_padding_class(context, blockValue)`
+
+Resolves the padding class a block puts on one of its edges: the block value
+when set, otherwise the `iw-padding--*` utility the theme stylesheet defines.
+Leaving the value in the theme is what lets a change of theme move every block
+that never chose a padding, with no content to migrate.
+
+Empty and zero are different answers. `pt-0` is a block refusing any padding
+and it keeps winning over a theme that has one.
+
+```twig
+{% set ptClass = iw_sulu_tailwind_theme_padding_class('top', paddingTop|default('')) %}
+```
+
+**Parameters:**
+- `context` (`string`) — The edge: `top`, `bottom` or `lateral`
+- `blockValue` (`string|null`) — The per-block Tailwind class, if any
+
+**Returns:** `string` — The class to render, e.g. `pt-8` or `iw-padding--top`.
+
+---
+
+### `iw_sulu_tailwind_theme_effective_padding(context, blockValue)`
+
+Resolves the **effective** padding class, theme default included. The class
+rendered by the function above may be a utility only the stylesheet can
+resolve, so anything that has to reason about the padding needs this instead.
+The block wrapper does: it drops the radius of a block whose edges reach the
+viewport, and decides that from the lateral padding. Reading the raw value
+there treats "follow the theme" as "no padding".
+
+```twig
+{% set effLatPad = iw_sulu_tailwind_theme_effective_padding('lateral', paddingLateral|default('')) %}
+{% set hasLatPad = effLatPad is not empty and effLatPad != 'px-0' %}
+```
+
+**Parameters:**
+- `context` (`string`) — The edge: `top`, `bottom` or `lateral`
+- `blockValue` (`string|null`) — The per-block Tailwind class, if any
+
+**Returns:** `string` — The effective Tailwind class, e.g. `px-5`.
+
+---
+
 ### `iw_sulu_tailwind_theme_color_scheme(variant, hasBackground)`
 
 Tells whether a block variant renders on a **light** or a **dark** surface. Meant

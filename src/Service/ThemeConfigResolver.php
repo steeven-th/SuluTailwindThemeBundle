@@ -127,6 +127,9 @@ class ThemeConfigResolver
             'palette' => $palette,
             'colors' => $colors,
             'borders' => $borders,
+            // Block defaults, so a selector left on "follow the theme" can name
+            // the value it will take rather than just say it follows something.
+            'defaults' => $tokens['defaults'] ?? [],
         ];
     }
 

@@ -130,11 +130,12 @@ final class SurfacePaddingTest extends TestCase
     #[Test]
     public function theChosenValuesReachTheStylesheet(): void
     {
+        // Stored as spacing steps, like every other spacing field in the admin.
         $css = $this->compileCss(['defaults' => [
-            'contentPaddingX' => '2.5rem',
-            'contentPaddingY' => '0.5rem',
-            'paragraphPaddingX' => '3rem',
-            'paragraphPaddingY' => '0',
+            'contentPaddingX' => 'px-10',
+            'contentPaddingY' => 'py-2',
+            'paragraphPaddingX' => 'px-12',
+            'paragraphPaddingY' => 'py-0',
         ]]);
 
         foreach ([
