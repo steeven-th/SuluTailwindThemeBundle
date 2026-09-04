@@ -69,7 +69,7 @@
             <properties>
                 <xi:include href="../fragments/block-variant.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <property name="style" type="iw_theme_style_picker" colspan="6">
+                <property name="style" type="iw_theme_style_picker" colspan="12">
                     <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
                     <params>
                         <param name="block_type" value="key_figures"/>

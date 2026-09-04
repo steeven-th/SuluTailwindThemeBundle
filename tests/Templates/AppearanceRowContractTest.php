@@ -8,27 +8,26 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Guards that the two appearance pickers keep sharing a row.
+ * Guards that both appearance pickers keep a full row each.
  *
- * The color variant comes from a shared fragment, which sets its width; the
- * layout style stays in each block, because it is filtered by block type, and
- * so carries its width twenty times over. Nothing ties the two, and a missing
- * `colspan` is not an error: Sulu just gives the property the full width.
+ * They draw grids of thumbnails, and a grid needs width: on half a row the
+ * options list one per line on a narrow settings panel, which is the layout a
+ * picker exists to avoid. So neither shares its row.
  *
- * The block then reads as if only the styles were wide. What actually happens
- * is worse than cosmetic: the variant keeps half the panel, its thumbnails no
- * longer fit two per row, and it drops to a single column while the styles
- * beside it still show two - on the same cards, at the same size.
- *
- * That is what `cards` shipped with.
+ * Nothing enforces that on its own. The variant width comes from a shared
+ * fragment, the style width is repeated in each of the twenty blocks, and a
+ * missing `colspan` is not an error - Sulu reads it as full width, which is
+ * how `cards` ended up with a wide style picker beside a half-width variant
+ * one, the variant listing its thumbnails one per line while the styles
+ * beside it showed two.
  */
 final class AppearanceRowContractTest extends TestCase
 {
     /**
-     * Wherever both pickers appear, they are the same width.
+     * Every thumbnail picker in a block takes a full row.
      */
     #[Test]
-    public function theVariantAndStylePickersShareOneRow(): void
+    public function bothAppearancePickersTakeAFullRow(): void
     {
         $checked = 0;
 
@@ -49,19 +48,21 @@ final class AppearanceRowContractTest extends TestCase
 
             ++$checked;
 
-            self::assertSame(
-                $variant->getAttribute('colspan'),
-                $style->getAttribute('colspan'),
-                \sprintf(
-                    'In %s the style picker is %s wide and the variant picker %s. They share the '
-                    . 'appearance row, so a wider one takes the whole width and leaves the variant '
-                    . 'too narrow to fit two thumbnails per row. Note that an omitted colspan is '
-                    . 'full width, not the fragment default.',
-                    basename($path),
-                    self::describe($style->getAttribute('colspan')),
-                    self::describe($variant->getAttribute('colspan')),
-                ),
-            );
+            foreach (['variant' => $variant, 'style' => $style] as $name => $picker) {
+                self::assertSame(
+                    '12',
+                    $picker->getAttribute('colspan'),
+                    \sprintf(
+                        'In %s the %s picker is %s. A thumbnail grid on half a row lists its '
+                        . 'options one per line on a narrow panel, so both pickers state colspan '
+                        . '12. Note that an omitted colspan is already full width, but say it, '
+                        . 'or the next reader cannot tell it from an oversight.',
+                        basename($path),
+                        $name,
+                        self::describe($picker->getAttribute('colspan')),
+                    ),
+                );
+            }
         }
 
         self::assertGreaterThan(10, $checked, 'The blocks pairing both pickers were not found.');

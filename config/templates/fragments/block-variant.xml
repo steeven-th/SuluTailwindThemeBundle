@@ -3,9 +3,12 @@
     Fragment: colour variant of a block.
 
     The variant names a role in the theme palette rather than a colour, so the
-    same block follows whichever palette the site is running. It shares its row
-    with the layout style picker, which stays in each block because it is
-    filtered by block type.
+    same block follows whichever palette the site is running.
+
+    It takes a full row, as does the layout style picker below it, which stays
+    in each block because it is filtered by block type. Both draw a grid of
+    thumbnails, and half a row is too narrow to fit two of them side by side on
+    a narrow settings panel - the pickers then list their options one per line.
 
     It opens the `appearance` section:
 
@@ -13,7 +16,7 @@
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="variant" type="iw_theme_variant_picker" colspan="6">
+    <property name="variant" type="iw_theme_variant_picker" colspan="12">
         <meta><title>iw_sulu_tailwind_theme.color_variant</title></meta>
     </property>
 </properties>
