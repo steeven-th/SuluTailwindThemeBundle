@@ -200,7 +200,7 @@
     "iw_sulu_tailwind_theme.media_ratio_3_5": "Three fifths (60%)",
     "iw_sulu_tailwind_theme.media_ratio_2_3": "Two thirds (67%)",
     "iw_sulu_tailwind_theme.media_ratio_3_4": "Three quarters (75%)",
-    "iw_sulu_tailwind_theme.block_zones_align": "Vertical alignment",
+    "iw_sulu_tailwind_theme.block_zones_align": "Vertical alignment of the zones",
     "iw_sulu_tailwind_theme.block_zones_align_info": "How the two zones line up when they are not the same height. \"Follow the style\" keeps the original behaviour. No effect on mobile, where the zones stack.",
     "iw_sulu_tailwind_theme.zones_align_style": "Follow the style",
     "iw_sulu_tailwind_theme.zones_align_start": "Top",

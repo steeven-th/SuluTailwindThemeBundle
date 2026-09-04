@@ -200,7 +200,7 @@
     "iw_sulu_tailwind_theme.media_ratio_3_5": "Trois cinquièmes (60 %)",
     "iw_sulu_tailwind_theme.media_ratio_2_3": "Deux tiers (67 %)",
     "iw_sulu_tailwind_theme.media_ratio_3_4": "Trois quarts (75 %)",
-    "iw_sulu_tailwind_theme.block_zones_align": "Alignement vertical",
+    "iw_sulu_tailwind_theme.block_zones_align": "Alignement vertical des zones",
     "iw_sulu_tailwind_theme.block_zones_align_info": "Alignement des deux zones l'une par rapport à l'autre quand elles n'ont pas la même hauteur. « Selon le style » garde le comportement d'origine. Sans effet sur mobile, où les zones se superposent.",
     "iw_sulu_tailwind_theme.zones_align_style": "Selon le style",
     "iw_sulu_tailwind_theme.zones_align_start": "En haut",

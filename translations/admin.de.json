@@ -200,7 +200,7 @@
     "iw_sulu_tailwind_theme.media_ratio_3_5": "Drei Fünftel (60 %)",
     "iw_sulu_tailwind_theme.media_ratio_2_3": "Zwei Drittel (67 %)",
     "iw_sulu_tailwind_theme.media_ratio_3_4": "Drei Viertel (75 %)",
-    "iw_sulu_tailwind_theme.block_zones_align": "Vertikale Ausrichtung",
+    "iw_sulu_tailwind_theme.block_zones_align": "Vertikale Ausrichtung der Bereiche",
     "iw_sulu_tailwind_theme.block_zones_align_info": "Wie die beiden Bereiche zueinander stehen, wenn sie unterschiedlich hoch sind. „Dem Stil folgen“ behält das ursprüngliche Verhalten bei. Ohne Wirkung auf dem Handy, wo die Bereiche untereinander stehen.",
     "iw_sulu_tailwind_theme.zones_align_style": "Dem Stil folgen",
     "iw_sulu_tailwind_theme.zones_align_start": "Oben",
