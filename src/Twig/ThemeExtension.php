@@ -129,6 +129,8 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_location_address', $this->getLocationAddress(...)),
             new TwigFunction('iw_sulu_tailwind_theme_radius_class', $this->getRadiusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_effective_radius', $this->getEffectiveRadius(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_padding_class', $this->getPaddingClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_effective_padding', $this->getEffectivePadding(...)),
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_media_ratio_class', $this->getMediaRatioClass(...)),
@@ -730,6 +732,61 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @return string The effective Tailwind class, or an empty string when none
      */
+    /**
+     * The padding class a block puts on itself for one of its edges.
+     *
+     * Mirrors getRadiusClass: an empty block value means "follow the theme",
+     * and the theme default travels as a utility class the stylesheet defines
+     * rather than as a value, so a change of theme moves every block that never
+     * chose a padding of its own without touching any content.
+     *
+     * Empty and zero are NOT the same thing here. `pt-0` is a block saying it
+     * wants no padding, and it must keep winning over a theme that has one.
+     *
+     * @param string      $context    top, bottom or lateral
+     * @param string|null $blockValue The padding stored on the block, if any
+     *
+     * @return string The class to render
+     */
+    public function getPaddingClass(string $context, ?string $blockValue = null): string
+    {
+        if (null !== $blockValue && '' !== $blockValue) {
+            return $blockValue;
+        }
+
+        return 'iw-padding--' . $context;
+    }
+
+    /**
+     * The padding a block ends up with, as a Tailwind class name.
+     *
+     * The class the template renders may be a utility that only the stylesheet
+     * can resolve, so anything that has to REASON about the padding needs this
+     * instead. The block wrapper does: it drops the radius of a block whose
+     * edges reach the viewport, and it decides that by looking at the lateral
+     * padding. Reading the raw value there would treat "follow the theme" as
+     * "no padding" and strip the corners of every block that never set one.
+     *
+     * @param string      $context    top, bottom or lateral
+     * @param string|null $blockValue The padding stored on the block, if any
+     *
+     * @return string The effective Tailwind class, e.g. "pt-5"
+     */
+    public function getEffectivePadding(string $context, ?string $blockValue = null): string
+    {
+        if (null !== $blockValue && '' !== $blockValue) {
+            return $blockValue;
+        }
+
+        $defaults = $this->themeProvider->getTokens()['defaults'] ?? [];
+
+        return match ($context) {
+            'top' => (string) ($defaults['blockPaddingTop'] ?? 'pt-5'),
+            'bottom' => (string) ($defaults['blockPaddingBottom'] ?? 'pb-5'),
+            default => (string) ($defaults['blockPaddingLateral'] ?? 'px-5'),
+        };
+    }
+
     public function getEffectiveRadius(string $context, ?string $blockValue = null): string
     {
         if (null !== $blockValue && '' !== $blockValue) {

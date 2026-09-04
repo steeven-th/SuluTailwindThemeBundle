@@ -1,5 +1,8 @@
 // @flow
 import React from 'react';
+import {observer} from 'mobx-react';
+import {translate} from 'sulu-admin-bundle/utils';
+import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 
 /**
@@ -10,6 +13,15 @@ import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
  * Tailwind number alone means nothing without that conversion in mind.
  */
 const MARGIN_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 32];
+
+/**
+ * The key of the "follow the theme" button, which is not a spacing value.
+ *
+ * It stores an empty value, and empty is NOT zero: zero is a block refusing
+ * any padding, empty is a block deferring to the theme. Collapsing the two
+ * would make the theme default impossible to come back to once left.
+ */
+const THEME_DEFAULT_KEY = 'theme';
 
 /**
  * MarginSelector field component for the Sulu admin.
@@ -23,13 +35,57 @@ const MARGIN_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 32];
  * @param {Function} props.onChange - Callback when a value is selected
  * @param {Object} props.schemaOptions - Options from the form schema
  */
+@observer
 export default class MarginSelector extends React.Component {
+    /**
+     * The theme defaults key this field follows when left empty, if any.
+     *
+     * Set through `theme_key` in the block template. Without it the field is an
+     * ordinary spacing picker, which is what the theme's own defaults form
+     * needs: the value it edits IS the theme default, so it cannot follow it.
+     *
+     * @returns {string|null} "top", "bottom", "lateral", or null
+     */
+    themeKey() {
+        const {schemaOptions} = this.props;
+        const key = schemaOptions && schemaOptions.theme_key && schemaOptions.theme_key.value;
+
+        return key ? String(key) : null;
+    }
+
+    /**
+     * The spacing step the theme carries for this edge, for display.
+     *
+     * @returns {number|null} The Tailwind step, or null when unreadable
+     */
+    themeStep() {
+        const key = this.themeKey();
+        if (!key) {
+            return null;
+        }
+
+        const stored = themeConfigStore.defaults[{
+            top: 'blockPaddingTop',
+            bottom: 'blockPaddingBottom',
+            lateral: 'blockPaddingLateral',
+        }[key]];
+
+        return this.parseCurrentValue(stored);
+    }
+
     /**
      * Apply default value from schemaOptions when field is empty on mount.
      * Uses setTimeout to ensure the Sulu form is fully initialized before
      * calling onChange, which avoids race conditions with form state setup.
      */
     componentDidMount() {
+        // A field that follows the theme must be ALLOWED to stay empty, so no
+        // default is forced onto it: writing one in would silently opt every
+        // new block out of the theme default it is meant to take.
+        if (this.themeKey()) {
+            return;
+        }
+
         const {value, onChange, schemaOptions} = this.props;
         if ((value === null || value === undefined || value === '') && onChange) {
             const defaultValue = schemaOptions
@@ -107,10 +163,35 @@ export default class MarginSelector extends React.Component {
 
     render() {
         const {value} = this.props;
+        const isEmpty = value === null || value === undefined || value === '';
         const currentValue = this.parseCurrentValue(value);
         const prefix = this.resolvePrefix();
+        const themeKey = this.themeKey();
+        const themeStep = this.themeStep();
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
+
+        // Selected on an empty value, never on a step: a block sitting on the
+        // theme default holds nothing of its own, which is the whole point.
+        const followsTheme = Boolean(themeKey) && isEmpty;
+
+        const buttonBase = (selected) => ({
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '38px',
+            border: selected ? `2px solid ${primary}` : '1px solid #d0d0d0',
+            borderRadius: '4px',
+            backgroundColor: selected ? tint : '#fff',
+            color: selected ? primary : '#333',
+            fontSize: '12px',
+            fontWeight: selected ? 'bold' : 'normal',
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            outline: 'none',
+            padding: 0,
+        });
 
         const containerStyle = {
             display: 'flex',
@@ -121,27 +202,29 @@ export default class MarginSelector extends React.Component {
 
         return (
             <div style={containerStyle}>
-                {MARGIN_VALUES.map((marginValue) => {
-                    const isSelected = currentValue === marginValue;
+                {themeKey && (
+                    <button
+                        key={THEME_DEFAULT_KEY}
+                        type="button"
+                        style={{...buttonBase(followsTheme), width: '78px'}}
+                        onClick={() => this.props.onChange && this.props.onChange('')}
+                        title={translate('iw_sulu_tailwind_theme.margin_theme_default')}
+                    >
+                        <span style={{fontSize: '10px', lineHeight: 1.1}}>
+                            {translate('iw_sulu_tailwind_theme.margin_theme_default')}
+                        </span>
+                        {null !== themeStep && (
+                            <span style={{fontSize: '9px', opacity: 0.65, lineHeight: 1}}>
+                                {themeStep} · {themeStep * 4}px
+                            </span>
+                        )}
+                    </button>
+                )}
 
-                    const buttonStyle = {
-                        display: 'inline-flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '40px',
-                        height: '38px',
-                        border: isSelected ? `2px solid ${primary}` : '1px solid #d0d0d0',
-                        borderRadius: '4px',
-                        backgroundColor: isSelected ? tint : '#fff',
-                        color: isSelected ? primary : '#333',
-                        fontSize: '12px',
-                        fontWeight: isSelected ? 'bold' : 'normal',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                        outline: 'none',
-                        padding: 0,
-                    };
+                {MARGIN_VALUES.map((marginValue) => {
+                    const isSelected = !followsTheme && currentValue === marginValue;
+
+                    const buttonStyle = {...buttonBase(isSelected), width: '40px'};
 
                     return (
                         <button

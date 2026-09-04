@@ -5,7 +5,8 @@ import {Requester} from 'sulu-admin-bundle/services';
 /**
  * Shared MobX observable store for theme config data.
  *
- * Holds the current webspace's variants, buttons, palette, and borders data.
+ * Holds the current webspace's variants, buttons, palette, borders and block
+ * defaults.
  * Components decorated with @observer that read from this store
  * will automatically re-render when the data changes (e.g. on webspace switch).
  */
@@ -17,6 +18,8 @@ class ThemeConfigStore {
     /** Ordered palette colors: [{role, slug, value, labelKey}] */
     @observable colors: Array<Object> = [];
     @observable borders: Object = {};
+    /** Site-wide block defaults, so a field can name the value it follows. */
+    @observable defaults: Object = {};
 
     /** Track the currently loaded webspace to avoid redundant fetches */
     _currentWebspace: ?string = null;
@@ -30,6 +33,7 @@ class ThemeConfigStore {
         this.palette = data.palette || {};
         this.colors = data.colors || [];
         this.borders = data.borders || {};
+        this.defaults = data.defaults || {};
     }
 
     /**

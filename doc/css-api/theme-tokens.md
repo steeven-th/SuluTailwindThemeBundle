@@ -303,6 +303,40 @@ single component (components have their own tab).
 | `--iw-blocks-image-gap` | Spacing inside an image grid (text + images mosaic, gallery grid / masonry / slider), overridable per block from the block's own Image spacing field | `1.5rem` |
 | `--iw-blocks-component-gap` | Spacing inside the component grids that are not article cards (accordion, documents, linked pages, testimonials, key figures) | `1.5rem` |
 | `--iw-blocks-max-width` | Maximum width of a block's content, so a short paragraph does not stretch across the whole container. `none` leaves blocks as wide as the page container | `var(--container-3xl, 48rem)` |
+| `--iw-surface-content-padding-x` / `-y` | Space between the content surface and what sits on it, horizontally and vertically. Applied only where the variant paints that surface, so a block with no content background or border keeps its layout | `1.5rem` |
+| `--iw-surface-paragraph-padding-x` / `-y` | Same, for the paragraph surface. The defaults are the values the compiler used to write in, so an upgrade moves nothing | `1.5rem` / `1rem` |
+
+A block that never chose a padding of its own renders `iw-padding--top`,
+`--bottom` or `--lateral` instead of a Tailwind class, and the value comes from
+the **Default block padding** section. Changing the theme then moves every such
+block at once, with no content to migrate.
+
+Empty and zero are different answers there. Empty means "follow the theme",
+`pt-0` means the block refuses any padding and keeps refusing it whatever the
+theme carries. Anything that has to reason about the padding rather than render
+it must read the resolved value through
+`iw_sulu_tailwind_theme_effective_padding()`: the block wrapper does, since it
+drops the radius of a block whose edges reach the viewport and decides that
+from the lateral padding. Reading the raw value there would treat "follow the
+theme" as "no padding" and strip the corners of every block that never chose
+one.
+
+Every spacing in this tab is stored as a Tailwind step (`px-6`, `gap-6`), which
+is what the spacing picker produces, and the compiler turns into a length. A
+value already written as a length passes through untouched, so a theme saved
+before the picker replaced the dropdowns keeps working.
+
+The two surface paddings come from the **Surface padding** section of the same
+tab. They are emitted as tokens but consumed inside the variant rules that
+already check whether the surface paints anything: a padding applied to every
+`.iw-block__content` would shift the layout of every block on every existing
+site, most of which paint no content surface at all.
+
+The content surface takes its corner from the **paragraph radius**, resolved by
+the block wrapper. There is no separate field: the two are the same corner to
+an editor, one nested in the other, and sharing the resolution is what drops
+the corner where a block runs to the edge of the viewport, where rounding
+means nothing.
 
 The blocks that token reaches are picked in the admin, next to the width
 itself. That scope is a token too, `defaults.blockMaxWidthScope`, but it is

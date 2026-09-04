@@ -4,14 +4,22 @@
 {% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
-{% set ptClass = paddingTop|default('pt-3') %}
-{% set pbClass = paddingBottom|default('pb-3') %}
+{#- An empty padding means "follow the theme", which travels as a utility class
+    the stylesheet resolves, so a change of theme moves every block that never
+    chose one. A block that DID choose keeps its own, `pt-0` included: empty and
+    zero are different answers. -#}
+{% set ptClass = iw_sulu_tailwind_theme_padding_class('top', paddingTop|default('')) %}
+{% set pbClass = iw_sulu_tailwind_theme_padding_class('bottom', paddingBottom|default('')) %}
 {% if paddingLateral is defined and paddingLateral %}
     {% set plClass = paddingLateral|replace({'px-': 'pl-'}) %}
     {% set prClass = paddingLateral|replace({'px-': 'pr-'}) %}
-{% else %}
+{% elseif paddingLeft is defined and paddingLeft or paddingRight is defined and paddingRight %}
     {% set plClass = paddingLeft|default('pl-3') %}
     {% set prClass = paddingRight|default('pr-3') %}
+{% else %}
+    {#- One class covers both sides, unlike the per-side legacy fields. -#}
+    {% set plClass = iw_sulu_tailwind_theme_padding_class('lateral', '') %}
+    {% set prClass = '' %}
 {% endif %}
 {% set lateralMode = lateralMargins|default('interior') %}
 {# Backward compat: old checkbox true/false → map to exterior/none #}
@@ -47,14 +55,19 @@
    would wrongly treat `false` as empty and reapply the default. #}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
 
-{# Detect effective block padding per axis (same logic as text_images) #}
-{% set hasTopPad = paddingTop is defined and paddingTop is not empty and paddingTop != 'pt-0' %}
-{% set hasBotPad = paddingBottom is defined and paddingBottom is not empty and paddingBottom != 'pb-0' %}
+{#- Effective padding per axis, theme defaults resolved. Reading the raw value
+    here would read "follow the theme" as "no padding" and strip the corners of
+    every block that never chose one - the radius below hangs off this. -#}
+{% set effTopPad = iw_sulu_tailwind_theme_effective_padding('top', paddingTop|default('')) %}
+{% set effBotPad = iw_sulu_tailwind_theme_effective_padding('bottom', paddingBottom|default('')) %}
+{% set hasTopPad = effTopPad is not empty and effTopPad != 'pt-0' %}
+{% set hasBotPad = effBotPad is not empty and effBotPad != 'pb-0' %}
 {% set hasLatPad = false %}
-{% if paddingLateral is defined and paddingLateral is not empty and paddingLateral != 'px-0' %}
-    {% set hasLatPad = true %}
-{% elseif (paddingLeft is defined and paddingLeft is not empty and paddingLeft != 'pl-0') or (paddingRight is defined and paddingRight is not empty and paddingRight != 'pr-0') %}
-    {% set hasLatPad = true %}
+{% if paddingLeft is defined and paddingLeft or paddingRight is defined and paddingRight %}
+    {% set hasLatPad = (paddingLeft|default('') not in ['', 'pl-0']) or (paddingRight|default('') not in ['', 'pr-0']) %}
+{% else %}
+    {% set effLatPad = iw_sulu_tailwind_theme_effective_padding('lateral', paddingLateral|default('')) %}
+    {% set hasLatPad = effLatPad is not empty and effLatPad != 'px-0' %}
 {% endif %}
 
 {# Compute conditional paragraph radius: only when lateral space exists (edges don't touch viewport).
@@ -89,7 +102,12 @@
        Adding a level was checked rather than assumed: nothing selects a direct
        child of `.block` or `.iw-variant--*`, and `.block` is Tailwind's
        `display: block`, so the extra element does not disturb the flow. #}
-    {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass %}
+    {#- The content surface takes the paragraph radius: the two are the same
+        corner to an editor, one nested in the other, and the theme already has
+        a field for it. Same condition as the paragraph - a radius against the
+        edge of the viewport rounds nothing. Harmless without a surface, where
+        there is no background for the corner to cut. -#}
+    {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass ~ ' ' ~ resolvedParagraphRadius %}
     <div class="{{ ('iw-block__content ' ~ innerWrapperClass)|trim }}">
         {{ block('block_content') }}
 

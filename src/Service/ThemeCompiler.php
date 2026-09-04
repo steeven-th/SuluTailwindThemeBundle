@@ -295,6 +295,10 @@ class ThemeCompiler
         // radius override fall back to these)
         $css .= $this->generateRadiusUtilityClasses();
 
+        // Same idea for the block paddings: a block that never chose one
+        // renders the utility instead of a Tailwind class.
+        $css .= $this->generatePaddingUtilityClasses($tokens['defaults'] ?? []);
+
         // Article card classes (base + BEM modifiers for hover effects)
         $css .= $this->generateArticleCardClasses();
 
@@ -1508,11 +1512,22 @@ class ThemeCompiler
      */
     private function generateBlockDefaultVariables(array $defaults): string
     {
-        $gap = (string) ($defaults['blockGap'] ?? '1.5rem');
-        $titleGap = (string) ($defaults['titleGap'] ?? '1.5rem');
-        $imageGap = (string) ($defaults['imageGap'] ?? '1.5rem');
-        $componentGap = (string) ($defaults['componentGap'] ?? '1.5rem');
+        // Stored as spacing steps since the gaps moved to the spacing picker.
+        // A theme saved before that still holds a length, which spacingToLength
+        // passes through untouched.
+        $gap = self::spacingToLength((string) ($defaults['blockGap'] ?? 'gap-6'));
+        $titleGap = self::spacingToLength((string) ($defaults['titleGap'] ?? 'gap-6'));
+        $imageGap = self::spacingToLength((string) ($defaults['imageGap'] ?? 'gap-6'));
+        $componentGap = self::spacingToLength((string) ($defaults['componentGap'] ?? 'gap-6'));
         $maxWidth = self::MAX_WIDTH_MAP[(string) ($defaults['blockMaxWidth'] ?? 'none')] ?? 'none';
+
+        // Space between a surface and what sits on it. The paragraph defaults
+        // are what this compiler used to write in by hand, so a theme that
+        // never opens the new fields renders exactly as before.
+        $contentPadX = self::spacingToLength((string) ($defaults['contentPaddingX'] ?? 'px-6'));
+        $contentPadY = self::spacingToLength((string) ($defaults['contentPaddingY'] ?? 'py-6'));
+        $paragraphPadX = self::spacingToLength((string) ($defaults['paragraphPaddingX'] ?? 'px-6'));
+        $paragraphPadY = self::spacingToLength((string) ($defaults['paragraphPaddingY'] ?? 'py-4'));
 
         $css = "  /* Block defaults (site-wide) */\n";
         $css .= "  --iw-blocks-gap: {$gap};\n";
@@ -1520,6 +1535,10 @@ class ThemeCompiler
         $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
         $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
         $css .= "  --iw-blocks-max-width: {$maxWidth};\n";
+        $css .= "  --iw-surface-content-padding-x: {$contentPadX};\n";
+        $css .= "  --iw-surface-content-padding-y: {$contentPadY};\n";
+        $css .= "  --iw-surface-paragraph-padding-x: {$paragraphPadX};\n";
+        $css .= "  --iw-surface-paragraph-padding-y: {$paragraphPadY};\n";
 
         return $css . "\n";
     }
@@ -1533,6 +1552,66 @@ class ThemeCompiler
      *
      * @return string CSS class declarations
      */
+    /**
+     * Generate the theme-default padding utility classes.
+     *
+     * The counterpart of the radius utilities: a block that never chose a
+     * padding renders `iw-padding--top` instead of a Tailwind class, and the
+     * value comes from the theme. Changing the theme then moves every such
+     * block at once, with no content to migrate.
+     *
+     * Tailwind spacing is a quarter of a rem per step, which is what turns the
+     * stored class back into a length.
+     *
+     * @param array<string, mixed> $defaults Site-wide default token values
+     *
+     * @return string CSS class declarations
+     */
+    private function generatePaddingUtilityClasses(array $defaults): string
+    {
+        $edges = [
+            'top' => ['padding-top', (string) ($defaults['blockPaddingTop'] ?? 'pt-5')],
+            'bottom' => ['padding-bottom', (string) ($defaults['blockPaddingBottom'] ?? 'pb-5')],
+            'lateral' => ['padding-inline', (string) ($defaults['blockPaddingLateral'] ?? 'px-5')],
+        ];
+
+        $css = "/* Theme-default padding utilities */\n";
+        foreach ($edges as $name => [$property, $stored]) {
+            $css .= ".iw-padding--{$name} { {$property}: " . self::spacingToLength($stored) . "; }\n";
+        }
+
+        return $css . "\n";
+    }
+
+    /**
+     * Turn a stored Tailwind spacing class into a CSS length.
+     *
+     * `pt-5` is five quarters of a rem. A class with no numeric tail, or one
+     * this method cannot read, falls back to the shipped default rather than to
+     * zero: a padding that silently collapses is worse than one that is merely
+     * not the one asked for.
+     *
+     * @param string $stored A Tailwind spacing class, e.g. "pt-5"
+     *
+     * @return string The CSS length, e.g. "1.25rem"
+     */
+    private static function spacingToLength(string $stored): string
+    {
+        // Already a length: a value typed by hand, or one stored before the
+        // spacing picker replaced the dropdown here.
+        if (1 === preg_match('/^-?[\d.]+(rem|px|em|%)$/', $stored)) {
+            return $stored;
+        }
+
+        if (1 !== preg_match('/-(\d+)$/', $stored, $matches)) {
+            return '1.25rem';
+        }
+
+        $steps = (int) $matches[1];
+
+        return 0 === $steps ? '0' : rtrim(rtrim(number_format($steps * 0.25, 2, '.', ''), '0'), '.') . 'rem';
+    }
+
     private function generateRadiusUtilityClasses(): string
     {
         $variants = [
@@ -3022,6 +3101,10 @@ class ThemeCompiler
                 if ('' !== $contentBorder) {
                     $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
                 }
+                // Inside this rule, so it only applies where the surface paints
+                // something. Unconditional, it would move every block of every
+                // existing site, including those with no content surface at all.
+                $css .= "  padding: var(--iw-surface-content-padding-y, 1.5rem) var(--iw-surface-content-padding-x, 1.5rem);\n";
                 $css .= "}\n";
             }
 
@@ -3181,7 +3264,7 @@ class ThemeCompiler
                 if ('' !== $pgBorder) {
                     $css .= "  border: var(--iw-variant-paragraph-border-width, 1px) solid {$pgBorder};\n";
                 }
-                $css .= "  padding: 1rem 1.5rem;\n";
+                $css .= "  padding: var(--iw-surface-paragraph-padding-y, 1rem) var(--iw-surface-paragraph-padding-x, 1.5rem);\n";
                 $css .= "  margin-block: 1rem;\n";
                 $css .= "  overflow: hidden;\n";
                 $css .= "}\n";
