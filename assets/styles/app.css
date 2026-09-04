@@ -4123,6 +4123,60 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-page-hero-subtitle-below-color, var(--color-secondary-600));
     text-shadow: none;
 }
+/* Side by side: the image sits in the flow beside the text rather than behind
+   it, so the banner drops the ratio, the height cap and the clipping the other
+   modes need. The content sets the height. */
+.iw-page-hero--side-by-side {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding-block: var(--iw-page-hero-side-padding-block, 2.5rem);
+}
+
+.iw-page-hero--side-by-side .iw-page-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--iw-page-hero-side-gap, 2rem);
+    align-items: center;
+}
+
+/* Stacked below the breakpoint: a portrait screen has no room for two columns,
+   and the image ends up too small to read. */
+@media (min-width: 1024px) {
+    .iw-page-hero--side-by-side .iw-page-hero__inner {
+        grid-template-columns: 1fr var(--iw-page-hero-visual-width, 38%);
+    }
+}
+
+/* The image leads on a narrow screen, matching the other modes where it comes
+   first, and follows the text once there are two columns. */
+.iw-page-hero--side-by-side .iw-page-hero__visual {
+    order: -1;
+}
+
+@media (min-width: 1024px) {
+    .iw-page-hero--side-by-side .iw-page-hero__visual {
+        order: 0;
+    }
+}
+
+.iw-page-hero--side-by-side .iw-page-hero__visual img {
+    width: 100%;
+}
+
+/* Text colors, not the light ones the overlay needs: there is no image behind
+   the text here. */
+.iw-page-hero__title--side {
+    color: var(--iw-page-hero-title-below-color, inherit);
+    text-shadow: none;
+}
+
+.iw-page-hero__subtitle--side {
+    color: var(--iw-page-hero-subtitle-below-color, var(--color-secondary-600));
+    text-shadow: none;
+}
+
 /* Below the image: the breadcrumb sits above the text → bottom margin, and
    uses the theme text colors instead of the light overlay ones. */
 .iw-page-hero__breadcrumb--below {

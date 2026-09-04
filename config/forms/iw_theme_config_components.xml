@@ -537,7 +537,8 @@
                 <info_text>iw_sulu_tailwind_theme.components_section_page_hero_info</info_text>
             </meta>
             <properties>
-                <property name="pageHero_height" type="single_select" colspan="6">
+                <property name="pageHero_height" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay != 'side_by_side'">
                     <meta><title>iw_sulu_tailwind_theme.page.hero_height</title></meta>
                     <params>
                         <param name="default_value" value="md"/>
@@ -550,7 +551,8 @@
                     </params>
                 </property>
 
-                <property name="pageHero_parallax" type="checkbox" colspan="6">
+                <property name="pageHero_parallax" type="checkbox" colspan="6"
+                          visibleCondition="pageHero_titleDisplay != 'side_by_side'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.page.hero_parallax</title>
                         <info_text>iw_sulu_tailwind_theme.page.hero_parallax_info</info_text>
@@ -571,6 +573,7 @@
                         <param name="values" type="collection">
                             <param name="overlay"><meta><title>iw_sulu_tailwind_theme.page.hero_display_overlay</title></meta></param>
                             <param name="below"><meta><title>iw_sulu_tailwind_theme.page.hero_display_below</title></meta></param>
+                            <param name="side_by_side"><meta><title>iw_sulu_tailwind_theme.page.hero_display_side_by_side</title></meta></param>
                             <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_display_hidden</title></meta></param>
                         </param>
                     </params>

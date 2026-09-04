@@ -562,6 +562,7 @@
     "iw_sulu_tailwind_theme.page.hero_title_display_info": "Position du titre par rapport à l'image du bandeau.",
     "iw_sulu_tailwind_theme.page.hero_display_overlay": "Sur l'image",
     "iw_sulu_tailwind_theme.page.hero_display_below": "Sous l'image",
+    "iw_sulu_tailwind_theme.page.hero_display_side_by_side": "À côté de l’image",
     "iw_sulu_tailwind_theme.page.hero_display_hidden": "Masqué (image seule)",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb": "Fil d'ariane",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb_info": "Position du fil d'ariane. « Avec le titre » suit l'alignement du titre.",

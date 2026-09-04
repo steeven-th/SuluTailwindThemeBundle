@@ -57,7 +57,7 @@
 {# Whitelist every option so unexpected values fall back to a sane default. #}
 {% set heroTitle = title|default('') %}
 {% set heroSubtitle = subtitle|default('') %}
-{% set display = display|default('overlay') in ['overlay', 'below', 'hidden'] ? display : 'overlay' %}
+{% set display = display|default('overlay') in ['overlay', 'below', 'side_by_side', 'hidden'] ? display : 'overlay' %}
 {% set alignX = alignX|default('left') in ['left', 'center', 'right'] ? alignX : 'left' %}
 {% set alignY = alignY|default('bottom') in ['top', 'middle', 'bottom'] ? alignY : 'bottom' %}
 {% set shade = shade|default('medium') in ['none', 'light', 'medium', 'strong'] ? shade : 'medium' %}
@@ -65,9 +65,9 @@
 {% set parallax = hasImage and parallax|default(false) %}
 {% set showBreadcrumb = breadcrumb|default(false) %}
 
-{# "below" needs an image to sit under; without one the header goes back into
-   the banner itself. #}
-{% set display = (not hasImage and display == 'below') ? 'overlay' : display %}
+{# "below" needs an image to sit under, and "side_by_side" one to sit beside;
+   without one the header goes back into the banner itself. #}
+{% set display = (not hasImage and display in ['below', 'side_by_side']) ? 'overlay' : display %}
 
 {% set hasHeader = heroTitle is not empty or heroSubtitle is not empty or showBreadcrumb %}
 
@@ -79,7 +79,44 @@
     <h1 class="iw-visually-hidden">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
 {% endif %}
 
-{% if renderBanner %}
+{% if display == 'side_by_side' %}
+    {#- Text on one side, image on the other. Unlike the other modes the image
+        is part of the flow rather than a background, so it takes the theme
+        image radius and the banner has no height, no veil and no parallax:
+        the content sets the height. -#}
+    <section class="iw-page-hero iw-page-hero--side-by-side">
+        <div class="iw-page-hero__inner container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="iw-page-hero__text iw-page-hero--x-{{ alignX }}">
+                {% if showBreadcrumb %}
+                    <div class="iw-page-hero__breadcrumb iw-page-hero__breadcrumb--below">
+                        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                            context: 'page',
+                            pageUuid: breadcrumbPageUuid|default(null),
+                            currentTitle: breadcrumbCurrentTitle|default(''),
+                            align: alignX,
+                        } only %}
+                    </div>
+                {% endif %}
+                {% if heroTitle is not empty %}
+                    <h1 class="iw-page-hero__title iw-page-hero__title--side">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
+                {% endif %}
+                {% if heroSubtitle is not empty %}
+                    <p class="iw-page-hero__subtitle iw-page-hero__subtitle--side">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
+                {% endif %}
+            </div>
+
+            <div class="iw-page-hero__visual">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+                    media: media,
+                    format: 'iw_theme_hero',
+                    alt: media.title|default(''),
+                    loading: 'eager',
+                    radiusClass: iw_sulu_tailwind_theme_radius_class('image', '')
+                } only %}
+            </div>
+        </div>
+    </section>
+{% elseif renderBanner %}
     {% set imgClasses = 'iw-page-hero__image' ~ (parallax ? ' iw-page-hero__image--parallax' : '') %}
 
     <section class="iw-page-hero iw-page-hero--h-{{ height }}{{ hasImage ? '' : ' iw-page-hero--no-image' }}{{ parallax ? ' iw-page-hero--parallax' : '' }}"
