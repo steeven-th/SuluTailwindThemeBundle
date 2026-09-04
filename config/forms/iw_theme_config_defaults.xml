@@ -52,7 +52,7 @@
                 <info_text>iw_sulu_tailwind_theme.defaults_section_block_padding_info</info_text>
             </meta>
             <properties>
-                <property name="defaults_blockPaddingTop" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_blockPaddingTop" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_blockPaddingTop</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingTop_info</info_text>
@@ -63,7 +63,7 @@
                     </params>
                 </property>
 
-                <property name="defaults_blockPaddingBottom" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_blockPaddingBottom" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_blockPaddingBottom</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info</info_text>
@@ -74,7 +74,7 @@
                     </params>
                 </property>
 
-                <property name="defaults_blockPaddingLateral" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_blockPaddingLateral" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_blockPaddingLateral</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info</info_text>
@@ -97,7 +97,7 @@
                 <info_text>iw_sulu_tailwind_theme.defaults_section_surface_padding_info</info_text>
             </meta>
             <properties>
-                <property name="defaults_contentPaddingX" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_contentPaddingX" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_contentPaddingX</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingX_info</info_text>
@@ -108,7 +108,7 @@
                     </params>
                 </property>
 
-                <property name="defaults_contentPaddingY" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_contentPaddingY" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_contentPaddingY</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingY_info</info_text>
@@ -119,7 +119,7 @@
                     </params>
                 </property>
 
-                <property name="defaults_paragraphPaddingX" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_paragraphPaddingX" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingX</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info</info_text>
@@ -130,7 +130,7 @@
                     </params>
                 </property>
 
-                <property name="defaults_paragraphPaddingY" type="iw_theme_margin_selector" colspan="6">
+                <property name="defaults_paragraphPaddingY" type="iw_theme_margin_selector" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingY</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info</info_text>
