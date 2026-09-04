@@ -36,6 +36,8 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 | Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |
 | Horizontal align without an image | `pageHero_alignXNoImage` | empty (default, follows `pageHero_alignX`) · `left` · `center` · `right` — on `side_by_side` only, where a page with no image shows its text across the full width instead of a column |
 | Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
+| Vertical align with an image | `pageHero_alignYWithImage` | `top` · `middle` (default) · `bottom` — where the text sits facing the image, on `side_by_side` only |
+| Vertical align without an image | `pageHero_alignYNoImage` | `top` · `middle` · `bottom` (default) — the banner takes the height above, on `side_by_side` only |
 | Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
 | Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `bottom_bar` · `hidden` |
 | Image format | `pageHero_imageFormat` | `original` (default) · `16_9` · `4_3` · `1_1` · `3_4` — the crop, on `side_by_side` only |

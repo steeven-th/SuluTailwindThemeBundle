@@ -179,6 +179,7 @@ class ThemeFormMapper
         'pageHero_height', 'pageHero_parallax', 'pageHero_titleDisplay',
         'pageHero_alignX', 'pageHero_alignY', 'pageHero_shade', 'pageHero_breadcrumb',
         'pageHero_breadcrumbPosition', 'pageHero_imageFormat', 'pageHero_alignXNoImage',
+        'pageHero_alignYWithImage', 'pageHero_alignYNoImage',
     ];
 
     /**

@@ -639,7 +639,7 @@
                     </params>
                 </property>
 
-                <property name="pageHero_alignX" type="single_select" colspan="4">
+                <property name="pageHero_alignX" type="single_select" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.page.hero_align_x</title></meta>
                     <params>
                         <param name="default_value" value="left"/>
@@ -656,7 +656,7 @@
                      instead of sitting in a column. That is a different layout,
                      so it gets its own alignment. Empty follows the one above,
                      which is what every theme did before this existed. -->
-                <property name="pageHero_alignXNoImage" type="single_select" colspan="4"
+                <property name="pageHero_alignXNoImage" type="single_select" colspan="6"
                           visibleCondition="pageHero_titleDisplay == 'side_by_side'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.page.hero_align_x_no_image</title>
@@ -673,7 +673,7 @@
                     </params>
                 </property>
 
-                <property name="pageHero_alignY" type="single_select" colspan="4"
+                <property name="pageHero_alignY" type="single_select" colspan="6"
                           visibleCondition="pageHero_titleDisplay == 'overlay'">
                     <meta><title>iw_sulu_tailwind_theme.page.hero_align_y</title></meta>
                     <params>
@@ -686,7 +686,46 @@
                     </params>
                 </property>
 
-                <property name="pageHero_shade" type="single_select" colspan="4"
+                <!-- The vertical position on the side-by-side banner, which the
+                     overlay field above does not cover: there the text is
+                     placed in the banner height, here in the row facing the
+                     image. Both cases are named outright rather than one
+                     following the other, the overlay field being hidden on this
+                     mode. The defaults are what the CSS did before they
+                     existed. -->
+                <property name="pageHero_alignYWithImage" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_align_y_with_image</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_align_y_with_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="middle"/>
+                        <param name="values" type="collection">
+                            <param name="top"><meta><title>iw_sulu_tailwind_theme.page.hero_align_top</title></meta></param>
+                            <param name="middle"><meta><title>iw_sulu_tailwind_theme.page.hero_align_middle</title></meta></param>
+                            <param name="bottom"><meta><title>iw_sulu_tailwind_theme.page.hero_align_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_alignYNoImage" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_align_y_no_image</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_align_y_no_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="bottom"/>
+                        <param name="values" type="collection">
+                            <param name="top"><meta><title>iw_sulu_tailwind_theme.page.hero_align_top</title></meta></param>
+                            <param name="middle"><meta><title>iw_sulu_tailwind_theme.page.hero_align_middle</title></meta></param>
+                            <param name="bottom"><meta><title>iw_sulu_tailwind_theme.page.hero_align_bottom</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pageHero_shade" type="single_select" colspan="6"
                           visibleCondition="pageHero_titleDisplay == 'overlay'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.page.hero_shade</title>

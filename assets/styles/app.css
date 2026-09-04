@@ -4147,6 +4147,13 @@ section.block:has([data-slider-fullbleed-value]) {
     align-items: center;
 }
 
+/* Vertical position of the text facing the image. A grid row, not the banner
+   height the --y- classes fill, hence its own set: centred is what this mode
+   did before the setting existed. */
+.iw-page-hero--side-by-side .iw-page-hero__inner.iw-page-hero--yside-top { align-items: start; }
+.iw-page-hero--side-by-side .iw-page-hero__inner.iw-page-hero--yside-middle { align-items: center; }
+.iw-page-hero--side-by-side .iw-page-hero__inner.iw-page-hero--yside-bottom { align-items: end; }
+
 /* Stacked below the breakpoint: a portrait screen has no room for two columns,
    and the image ends up too small to read. */
 @media (min-width: 1024px) {

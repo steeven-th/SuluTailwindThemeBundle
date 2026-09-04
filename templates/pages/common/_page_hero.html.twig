@@ -22,6 +22,11 @@
     - alignXNoImage: '' | 'left' | 'center' | 'right' - overrides alignX on the
              side_by_side mode when the page has no image, where the text spans
              the full width instead of a column. Empty follows alignX.
+    - alignYWithImage: 'top' | 'middle' | 'bottom' - vertical position of the
+             text in the row facing the image, side_by_side only
+    - alignYNoImage: 'top' | 'middle' | 'bottom' - vertical position on the
+             side_by_side mode when the page has no image and the banner falls
+             back to the overlay one, side_by_side only
     - alignY: 'top' | 'middle' | 'bottom' — vertical position (overlay only)
     - shade: 'none' | 'light' | 'medium' | 'strong' — readability veil. Ignored
              without an image: there is nothing to veil.
@@ -41,7 +46,8 @@
     - .iw-page-hero__image (the rendered <img>)
     - .iw-page-hero__overlay (+ .iw-page-hero--y-{top|middle|bottom} + .iw-page-hero--shade-{…})
     - .iw-page-hero__caption (the "below" wrapper)
-    - .iw-page-hero__inner (+ .iw-page-hero--x-{left|center|right})
+    - .iw-page-hero__inner (+ .iw-page-hero--x-{left|center|right}
+      + .iw-page-hero--yside-{top|middle|bottom} on side_by_side)
     - .iw-page-hero__breadcrumb / __title / __subtitle
     Overridable via --iw-page-hero-* (see app.css).
 #}
@@ -77,9 +83,20 @@
     different layouts, so side_by_side carries its own alignment for the second.
     Read before the mode falls back below, so it is the mode the editor picked
     that decides. Empty keeps alignX, which is what themes did before. -#}
-{% if display == 'side_by_side' and not hasImage and alignXNoImage|default('') in ['left', 'center', 'right'] %}
-    {% set alignX = alignXNoImage %}
+{% if display == 'side_by_side' and not hasImage %}
+    {% if alignXNoImage|default('') in ['left', 'center', 'right'] %}
+        {% set alignX = alignXNoImage %}
+    {% endif %}
+    {#- The vertical one is named outright rather than following the field
+        above, which this mode does not show. -#}
+    {% if alignYNoImage|default('') in ['top', 'middle', 'bottom'] %}
+        {% set alignY = alignYNoImage %}
+    {% endif %}
 {% endif %}
+
+{#- Facing the image the text sits in a grid row, not in a banner height, so it
+    is aligned with its own class rather than the --y- one. -#}
+{% set alignYSide = alignYWithImage|default('middle') in ['top', 'middle', 'bottom'] ? alignYWithImage : 'middle' %}
 
 {#- Built once and printed where the setting asks. `--above` names what the
     class does - the breadcrumb sits above the titles, so it needs a bottom
@@ -117,7 +134,7 @@
         image radius and the banner has no height, no veil and no parallax:
         the content sets the height. -#}
     <section class="iw-page-hero iw-page-hero--side-by-side">
-        <div class="iw-page-hero__inner container mx-auto px-4">
+        <div class="iw-page-hero__inner iw-page-hero--yside-{{ alignYSide }} container mx-auto px-4">
             <div class="iw-page-hero__text iw-page-hero--x-{{ alignX }}">
                 {% if breadcrumbPosition == 'above' %}{{ breadcrumbHtml }}{% endif %}
                 {% if heroTitle is not empty %}
