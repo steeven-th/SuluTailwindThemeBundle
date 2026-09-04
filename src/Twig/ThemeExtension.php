@@ -15,6 +15,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
@@ -143,6 +144,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_title_text', $this->getTitleText(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
@@ -491,6 +493,27 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @return array<string, mixed> The matched variant config, or [] if none
      */
+    /**
+     * Resolve a stored button style to a slug the theme actually defines.
+     *
+     * For the places that put the style INTO a class name of their own, like
+     * the carousel and timeline arrow modifiers: an empty value there would
+     * render `--button-` and match nothing. Those need a real slug, not the
+     * `iw-button--variant` alias a plain button falls back to.
+     *
+     * Never returns a hard-coded name. A theme names its own buttons, so
+     * writing "primary" in a template matches the themes that happen to use
+     * that name and silently unstyles every other one.
+     *
+     * @param string|null $stored The style stored on the block or the variant
+     *
+     * @return string A slug the theme defines, or empty when it defines none
+     */
+    public function getButtonSlug(?string $stored = null): string
+    {
+        return ButtonResolver::resolveSlug($stored, $this->themeProvider->getTokens()['buttons'] ?? []);
+    }
+
     public function getVariantConfig(mixed $variant, array $variants): array
     {
         return VariantResolver::resolveConfig($variant, $variants);

@@ -23,7 +23,7 @@
        color as the buttons configured for this variant. #}
     {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
     {% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), allVariants) %}
-    {% set carouselButtonStyle = variantConfig.buttonStyle|default('primary') %}
+    {% set carouselButtonStyle = iw_sulu_tailwind_theme_button_slug(variantConfig.buttonStyle|default('')) %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         {% set displayedArticles = articleItems %}

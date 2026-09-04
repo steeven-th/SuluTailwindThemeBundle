@@ -54,6 +54,27 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 
+### Reaching the accent surface
+
+The other three surfaces are reached by consuming their custom properties. The
+accent one is reached by carrying a class, **`iw-surface--accent`**, because
+the text on it has to outrank the variant's own text rules rather than inherit
+past them:
+
+```twig
+<div class="iw-card iw-card--highlighted iw-surface--accent">
+```
+
+The compiler then emits, per variant, the text colour for that class and
+everything inside it - paragraphs, list items, definition lists, captions and
+links in every state - at a specificity that beats the variant rules. Without
+it the element keeps the paragraph colour, which was chosen against a
+completely different background and has no reason to be readable on the accent
+one. That is the point of the surface owning a text colour at all.
+
+Buttons are excluded: a call to action on an accent card keeps the colours of
+its button style.
+
 Additionally:
 
 - `color` is set to the `title` value (default text color for the block). Any text

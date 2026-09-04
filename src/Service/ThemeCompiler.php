@@ -1553,6 +1553,73 @@ class ThemeCompiler
      * @return string CSS class declarations
      */
     /**
+     * Emit the rules of one button under the given selector.
+     *
+     * The selector is a parameter because the same button is emitted twice:
+     * once under its own slug, and once as `.iw-button--variant` for the first
+     * button of the theme. The variant name stays the slug either way, since it
+     * keys the @keyframes emitted earlier.
+     *
+     * @param string               $selector The CSS selector to emit under
+     * @param string               $variant  The button slug, keying its keyframes
+     * @param array<string, mixed> $props    The button definition
+     * @param string               $paddingX Global horizontal padding fallback
+     * @param string               $paddingY Global vertical padding fallback
+     *
+     * @return string The CSS rules
+     */
+    private function generateOneButtonClass(
+        string $selector,
+        string $variant,
+        array $props,
+        string $paddingX,
+        string $paddingY,
+    ): string {
+        $borderWidth = isset($props['borderWidth']) ? (string) $props['borderWidth'] : '1px';
+        $borderStyle = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
+
+        $duration = ButtonEffectCatalog::resolveDuration((string) ($props['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
+        $easing = ButtonEffectCatalog::resolveEasing((string) ($props['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
+        $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
+        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
+
+        $css = "{$selector} {\n";
+        if (isset($props['bg'])) {
+            $css .= "  background-color: {$this->resolveColorValue((string) $props['bg'])};\n";
+        }
+        if (isset($props['text'])) {
+            $css .= "  color: {$this->resolveColorValue((string) $props['text'])};\n";
+        }
+        if (isset($props['radius'])) {
+            $css .= "  border-radius: {$this->resolveRadius((string) $props['radius'])};\n";
+        }
+        if (isset($props['border']) && 'none' !== $props['border']) {
+            $css .= "  border: {$borderWidth} {$borderStyle} {$this->resolveColorValue((string) $props['border'])};\n";
+        } else {
+            $css .= "  border: none;\n";
+        }
+        $css .= "  padding: var(--iw-button-padding-y, {$paddingY}) var(--iw-button-padding-x, {$paddingX});\n";
+        $css .= "  cursor: pointer;\n";
+        $css .= "  display: inline-block;\n";
+        $css .= "  text-decoration: none;\n";
+        if ($hasBgEffect && 'pulse-bg' !== $bgEffectKey) {
+            // Required for the ::before overlay (slide / gradient) to be
+            // confined to the button and stack below the text.
+            $css .= "  position: relative;\n";
+            $css .= "  overflow: hidden;\n";
+            $css .= "  isolation: isolate;\n";
+        }
+        $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
+        $css .= "}\n";
+
+        // Overlay pseudo-element for slide-* / gradient-shift effects
+        $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
+
+        // Hover state
+        return $css . $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
+    }
+
+    /**
      * Generate the theme-default padding utility classes.
      *
      * The counterpart of the radius utilities: a block that never chose a
@@ -2305,54 +2372,38 @@ class ThemeCompiler
         $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
         $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
 
+        $first = null;
         foreach ($buttons as $props) {
             if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
-            $variant = $props['slug'];
 
-            $borderWidth = isset($props['borderWidth']) ? (string) $props['borderWidth'] : '1px';
-            $borderStyle = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
+            $first ??= $props;
+            $css .= $this->generateOneButtonClass(
+                ".iw-button--{$props['slug']}",
+                (string) $props['slug'],
+                $props,
+                $paddingX,
+                $paddingY,
+            );
+        }
 
-            $duration = ButtonEffectCatalog::resolveDuration((string) ($props['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
-            $easing = ButtonEffectCatalog::resolveEasing((string) ($props['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
-            $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
-            $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
-
-            $css .= ".iw-button--{$variant} {\n";
-            if (isset($props['bg'])) {
-                $css .= "  background-color: {$this->resolveColorValue((string) $props['bg'])};\n";
-            }
-            if (isset($props['text'])) {
-                $css .= "  color: {$this->resolveColorValue((string) $props['text'])};\n";
-            }
-            if (isset($props['radius'])) {
-                $css .= "  border-radius: {$this->resolveRadius((string) $props['radius'])};\n";
-            }
-            if (isset($props['border']) && 'none' !== $props['border']) {
-                $css .= "  border: {$borderWidth} {$borderStyle} {$this->resolveColorValue((string) $props['border'])};\n";
-            } else {
-                $css .= "  border: none;\n";
-            }
-            $css .= "  padding: var(--iw-button-padding-y, {$paddingY}) var(--iw-button-padding-x, {$paddingX});\n";
-            $css .= "  cursor: pointer;\n";
-            $css .= "  display: inline-block;\n";
-            $css .= "  text-decoration: none;\n";
-            if ($hasBgEffect && 'pulse-bg' !== $bgEffectKey) {
-                // Required for the ::before overlay (slide / gradient) to be
-                // confined to the button and stack below the text.
-                $css .= "  position: relative;\n";
-                $css .= "  overflow: hidden;\n";
-                $css .= "  isolation: isolate;\n";
-            }
-            $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
-            $css .= "}\n";
-
-            // Overlay pseudo-element for slide-* / gradient-shift effects
-            $css .= $this->generateButtonBgEffectBefore(".iw-button--{$variant}", $variant, $bgEffectKey, $duration, $easing);
-
-            // Hover state
-            $css .= $this->generateButtonHoverRules(".iw-button--{$variant}", $variant, $props, $bgEffectKey);
+        // A button with no style of its own renders `iw-button--variant`, which
+        // the variant rules paint. Outside a variant - a block that has none, a
+        // menu, a component - nothing would paint it, so it falls back here to
+        // the theme's first button. One class against the two of the variant
+        // rule, so the variant still wins wherever there is one.
+        //
+        // The alias is not a slug: every theme names its own buttons, and a
+        // hard-coded "primary" is exactly the bug this replaces.
+        if (null !== $first) {
+            $css .= $this->generateOneButtonClass(
+                '.iw-button--variant',
+                (string) $first['slug'],
+                $first,
+                $paddingX,
+                $paddingY,
+            );
         }
 
         return $css;
@@ -3133,6 +3184,38 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} dd,\n";
             $css .= ".iw-variant--{$index} figcaption {\n";
             $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
+            $css .= "}\n";
+
+            // Text sitting ON the accent surface takes the colour that surface
+            // guarantees readable on itself, which is the whole reason the
+            // surface owns a text colour at all. The rule above is one class
+            // and a type, so plain inheritance loses to it: a highlighted card
+            // kept the paragraph colour, chosen against a different background,
+            // and only its title followed the accent.
+            //
+            // Hung off the surface class rather than off `.iw-card--highlighted`
+            // so anything that paints the accent surface later - a badge, a
+            // callout - is covered without a rule of its own.
+            $css .= ".iw-variant--{$index} .iw-surface--accent,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent p,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent li,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent dt,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent dd,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent figcaption {\n";
+            $css .= "  color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));\n";
+            $css .= "}\n";
+
+            // Links too, and in every state. The variant's own link rule carries
+            // a :not() that counts towards specificity, so it beats a plain
+            // two-class rule: without this one, a link on the accent surface
+            // keeps the link colour picked against the normal background, which
+            // is the colour least likely to be readable there. Buttons stay
+            // excluded - a button on the surface keeps being a button.
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]),\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):hover,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):focus,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):visited {\n";
+            $css .= "  color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));\n";
             $css .= "}\n";
 
             $css .= ".iw-variant--{$index} a:not([class*=\"iw-button--\"]) {\n";

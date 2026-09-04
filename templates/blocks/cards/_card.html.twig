@@ -61,7 +61,7 @@
 {% set hasButtons = cardButtons is iterable and cardButtons|length > 0 %}
 
 <{{ wholeCardIsLink ? 'a' : 'div' }}
-    class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted' : '' }} {{ cardRadius|default('') }}"
+    class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted iw-surface--accent' : '' }} {{ cardRadius|default('') }}"
     {% if wholeCardIsLink %}
         href="{{ cardLink }}"
     {% endif %}
@@ -141,7 +141,7 @@
 
             {% if cardLinkLabel is not empty %}
                 <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
-                    <span class="iw-button--{{ card.linkStyle|default('primary') }} iw-block__action">{{ cardLinkLabel }}</span>
+                    <span class="{{ card.linkStyle|default('') ? 'iw-button--' ~ card.linkStyle : 'iw-button--variant' }} iw-block__action">{{ cardLinkLabel }}</span>
                 </span>
             {% endif %}
         {%- elseif hasButtons -%}

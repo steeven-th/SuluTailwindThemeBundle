@@ -22,9 +22,50 @@ use PHPUnit\Framework\TestCase;
  * timeline cards, the document cards and the consent banner all reach for it.
  * They are enclosed units, so it remains the right one, but the reason has to
  * be written down or the next panel will pick whichever is handy.
+ *
+ * A fourth surface, accent, is reached through a class rather than through a
+ * cascade of custom properties, because the text on it has to outrank the
+ * variant's own text rules. That makes it a two-part contract: the element
+ * carries `iw-surface--accent`, and the stylesheet paints that class. Either
+ * half can go missing with nothing failing - the card still renders, its text
+ * simply keeps a colour picked against another background.
  */
 final class SurfaceUsageContractTest extends TestCase
 {
+    /**
+     * Whatever paints the accent surface says so with the shared class.
+     *
+     * Hanging the rules off `.iw-card--highlighted` would have worked for the
+     * cards block and for nothing else. The class is what lets a badge or a
+     * callout added later take the surface without a rule of its own, so
+     * anything painting the accent background has to carry it.
+     */
+    #[Test]
+    public function theAccentSurfaceIsReachedThroughItsClass(): void
+    {
+        $card = (string) file_get_contents(
+            \dirname(__DIR__, 2) . '/templates/blocks/cards/_card.html.twig',
+        );
+
+        self::assertMatchesRegularExpression(
+            '/iw-card--highlighted iw-surface--accent/',
+            $card,
+            'A highlighted card must carry iw-surface--accent beside its own modifier, or the '
+            . 'text rules of the accent surface never reach it and it keeps the paragraph '
+            . 'colour, chosen against a different background.',
+        );
+
+        $compiler = (string) file_get_contents(
+            \dirname(__DIR__, 2) . '/src/Service/ThemeCompiler.php',
+        );
+
+        self::assertStringContainsString(
+            '.iw-surface--accent',
+            $compiler,
+            'The stylesheet must paint the class the templates carry.',
+        );
+    }
+
     /**
      * Nothing paints the content container with the paragraph background.
      *

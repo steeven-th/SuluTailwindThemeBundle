@@ -261,6 +261,32 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_button_slug(stored)`
+
+Resolves a stored button style to a slug the theme actually defines, falling
+back to its first button. For the places that put the style INTO a class name
+of their own - the carousel and timeline arrow modifiers - where an empty value
+would render `--button-` and match nothing.
+
+A plain button does not need this: it renders `iw-button--variant` when it has
+no style of its own, and the stylesheet paints that alias from the variant, or
+from the theme's first button outside any variant.
+
+Never write a slug into a template. Every theme names its own buttons, so a
+hard-coded `primary` matches the themes that happen to use that name and leaves
+the button unstyled everywhere else.
+
+```twig
+{% set arrowStyle = iw_sulu_tailwind_theme_button_slug(variantConfig.buttonStyle|default('')) %}
+```
+
+**Parameters:**
+- `stored` (`string|null`) — The style stored on the block or the variant
+
+**Returns:** `string` — A slug the theme defines, or an empty string when it defines no button.
+
+---
+
 ### `iw_sulu_tailwind_theme_padding_class(context, blockValue)`
 
 Resolves the padding class a block puts on one of its edges: the block value

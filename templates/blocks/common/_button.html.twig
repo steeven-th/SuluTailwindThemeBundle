@@ -1,6 +1,6 @@
 {# Button component — primary or secondary style #}
 {# Expected variables: url, label, buttonStyle (primary/secondary), target (optional) #}
-{% set btnClass = 'iw-button--' ~ (buttonStyle|default('primary')) %}
+{% set btnClass = buttonStyle|default('') ? 'iw-button--' ~ buttonStyle : 'iw-button--variant' %}
 {% set targetAttr = (target|default('_self') == '_blank') ? 'target="_blank" rel="noopener noreferrer"' : '' %}
 
 {% if url is defined and url is not empty %}
