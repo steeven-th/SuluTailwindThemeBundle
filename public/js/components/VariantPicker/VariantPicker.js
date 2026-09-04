@@ -291,7 +291,10 @@ export default class VariantPicker extends React.Component {
         return (
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                // Same track as the style pickers, which sit in the same panel:
+                // at 150px the variants dropped to one column while the styles
+                // beside them still fitted two.
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 gap: '12px',
                 padding: '8px',
             }}>
