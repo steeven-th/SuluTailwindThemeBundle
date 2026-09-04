@@ -3182,7 +3182,11 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} li,\n";
             $css .= ".iw-variant--{$index} dt,\n";
             $css .= ".iw-variant--{$index} dd,\n";
-            $css .= ".iw-variant--{$index} figcaption {\n";
+            $css .= ".iw-variant--{$index} figcaption,\n";
+            // A table caption is running text like any other, and it was the
+            // one element of a table nothing coloured: it fell through to the
+            // block colour, which is the TITLE colour.
+            $css .= ".iw-variant--{$index} caption {\n";
             $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
@@ -3201,7 +3205,14 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} .iw-surface--accent li,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent dt,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent dd,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent figcaption {\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent figcaption,\n";
+            // Table cells too. A header normally takes the title colour and a
+            // cell the paragraph one, but on the accent surface both become the
+            // colour that surface guarantees readable on itself - the same
+            // reason the card title follows it rather than keeping its own.
+            $css .= ".iw-variant--{$index} .iw-surface--accent caption,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent th,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent td {\n";
             $css .= "  color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));\n";
             $css .= "}\n";
 

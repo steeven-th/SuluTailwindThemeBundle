@@ -35,7 +35,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-title-color` | `title` | Color for `h1`–`h6` |
 | `--iw-variant-subtitle-color` | `subtitle` | Color for `.iw-block__subtitle` / blockquote text |
 | `--iw-variant-highlight` | `highlight` | Color for words highlighted inside a title or subtitle (`.iw-highlight`). Falls back to `--color-accent` when the variant leaves it empty |
-| `--iw-variant-paragraph-color` | `paragraph` | Color for every text-bearing element of the content: `<p>`, list items, definition lists, captions, table cells |
+| `--iw-variant-paragraph-color` | `paragraph` | Color for every text-bearing element of the content: `<p>`, list items, definition lists, figure and table captions, table cells |
 | `--iw-variant-link-color` | `link` | Color for links (excluding `.iw-button--*`) |
 | `--iw-variant-link-hover` | `linkHover` | Link hover color |
 | `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
@@ -53,6 +53,22 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
+
+### Tables
+
+A table from the rich-text editor is coloured by the variant like any other
+content, and the split is the one an editor would expect: the cells take the
+paragraph colour, the header row takes the **title** colour over
+`--iw-variant-subtle-bg`, and the caption takes the paragraph colour. Cell
+borders use the separator colour, `--iw-variant-hr-color`, since a table with
+no rules is unreadable rather than merely unstyled - that is the one border in
+the bundle that does not default to none.
+
+One known limit: `--iw-variant-subtle-bg` is computed from the block
+background, not from the surface the table happens to sit on. A table inside a
+dark paragraph surface on a light block therefore gets a light header tint. It
+stays legible, the tint being a translucent black or white, but the contrast is
+weaker than it would be if the surface were taken into account.
 
 ### Cards
 
