@@ -3186,6 +3186,38 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
+            // Text sitting ON the accent surface takes the colour that surface
+            // guarantees readable on itself, which is the whole reason the
+            // surface owns a text colour at all. The rule above is one class
+            // and a type, so plain inheritance loses to it: a highlighted card
+            // kept the paragraph colour, chosen against a different background,
+            // and only its title followed the accent.
+            //
+            // Hung off the surface class rather than off `.iw-card--highlighted`
+            // so anything that paints the accent surface later - a badge, a
+            // callout - is covered without a rule of its own.
+            $css .= ".iw-variant--{$index} .iw-surface--accent,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent p,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent li,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent dt,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent dd,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent figcaption {\n";
+            $css .= "  color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));\n";
+            $css .= "}\n";
+
+            // Links too, and in every state. The variant's own link rule carries
+            // a :not() that counts towards specificity, so it beats a plain
+            // two-class rule: without this one, a link on the accent surface
+            // keeps the link colour picked against the normal background, which
+            // is the colour least likely to be readable there. Buttons stay
+            // excluded - a button on the surface keeps being a button.
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]),\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):hover,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):focus,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent a:not([class*=\"iw-button--\"]):visited {\n";
+            $css .= "  color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));\n";
+            $css .= "}\n";
+
             $css .= ".iw-variant--{$index} a:not([class*=\"iw-button--\"]) {\n";
             $css .= "  color: var(--iw-variant-link-color, inherit);\n";
             $css .= "}\n";
