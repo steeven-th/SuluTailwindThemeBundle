@@ -1026,6 +1026,284 @@
    }
   },
   {
+   "title": "Cards",
+   "locale": "en",
+   "data": {
+    "url": "/test-blocks/cards",
+    "title": "Cards",
+    "blocks": [
+     {
+      "variant": 0,
+      "marginTop": "mt-5",
+      "marginBottom": "mb-5",
+      "paddingTop": "pt-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "blockRadius": "rounded-none",
+      "lateralMargins": "interior",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "titleTag": "h2",
+      "_id": "cards0001",
+      "type": "cards",
+      "style": "stacked",
+      "columns": "3",
+      "title": "Systematic [[check-ups]]",
+      "subTitle": "Planned from hiring onwards",
+      "cardShadow": false,
+      "cardNumbers": false,
+      "clickableCard": false,
+      "contentAlignment": "left",
+      "iconPosition": "inline",
+      "items": [
+       {
+        "_id": "card001",
+        "type": "card",
+        "title": "Information and prevention visit",
+        "text": "<p>Checking that the role carries no risk for the employee's health.</p>",
+        "icon": {
+         "id": "@media:4",
+         "displayOption": null
+        }
+       },
+       {
+        "_id": "card002",
+        "type": "card",
+        "title": "Medical examination on hiring",
+        "text": "<p>Confirming fitness for the role before any exposure.</p>",
+        "icon": {
+         "id": "@media:5",
+         "displayOption": null
+        },
+        "highlighted": true
+       },
+       {
+        "_id": "card003",
+        "type": "card",
+        "title": "Periodic visit",
+        "text": "<p>Reviewing health against the risks of the role.</p>",
+        "icon": {
+         "id": "@media:6",
+         "displayOption": null
+        }
+       }
+      ]
+     },
+     {
+      "variant": 0,
+      "marginTop": "mt-5",
+      "marginBottom": "mb-5",
+      "paddingTop": "pt-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "blockRadius": "rounded-none",
+      "lateralMargins": "interior",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "titleTag": "h2",
+      "_id": "cards0002",
+      "type": "cards",
+      "style": "image_top",
+      "columns": "2",
+      "title": "Image on top",
+      "subTitle": "Shadow on, two buttons per card",
+      "cardShadow": true,
+      "cardNumbers": false,
+      "clickableCard": false,
+      "contentAlignment": "left",
+      "iconPosition": "inline",
+      "ctaAlignment": "left",
+      "ctaDirection": "row",
+      "items": [
+       {
+        "_id": "card004",
+        "type": "card",
+        "title": "A card with a banner",
+        "text": "<p>The image spans the card, square at the bottom.</p>",
+        "image": {
+         "id": "@media:7",
+         "displayOption": null
+        },
+        "ctaButtons": [
+         {
+          "_id": "cardbtn040",
+          "link": {
+           "rel": null,
+           "href": "https://sulu.io/docs",
+           "query": null,
+           "title": "Articles",
+           "anchor": null,
+           "locale": "en",
+           "target": "_self",
+           "provider": "external"
+          },
+          "style": "primary",
+          "type": "cta_button"
+         },
+         {
+          "_id": "cardbtn041",
+          "link": {
+           "rel": null,
+           "href": "https://sulu.io",
+           "query": null,
+           "title": "Sulu",
+           "anchor": null,
+           "locale": "en",
+           "target": "_self",
+           "provider": "external"
+          },
+          "style": "secondary",
+          "type": "cta_button"
+         }
+        ]
+       },
+       {
+        "_id": "card005",
+        "type": "card",
+        "title": "Another one",
+        "text": "<p>Both buttons keep their own style.</p>",
+        "image": {
+         "id": "@media:8",
+         "displayOption": null
+        },
+        "ctaButtons": [
+         {
+          "_id": "cardbtn050",
+          "link": {
+           "rel": null,
+           "href": "https://symfony.com",
+           "query": null,
+           "title": "Symfony",
+           "anchor": null,
+           "locale": "en",
+           "target": "_self",
+           "provider": "external"
+          },
+          "style": "accent",
+          "type": "cta_button"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "variant": 0,
+      "marginTop": "mt-5",
+      "marginBottom": "mb-5",
+      "paddingTop": "pt-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "blockRadius": "rounded-none",
+      "lateralMargins": "interior",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "titleTag": "h2",
+      "_id": "cards0003",
+      "type": "cards",
+      "style": "horizontal",
+      "columns": "2",
+      "title": "Horizontal and numbered",
+      "subTitle": "Each card is a link as a whole",
+      "cardShadow": false,
+      "cardNumbers": true,
+      "clickableCard": true,
+      "contentAlignment": "left",
+      "iconPosition": "inline",
+      "items": [
+       {
+        "_id": "card006",
+        "type": "card",
+        "title": "First step",
+        "text": "<p>The visual sits beside the text.</p>",
+        "icon": {
+         "id": "@media:9",
+         "displayOption": null
+        },
+        "link": {
+         "rel": null,
+         "href": "https://sulu.io/docs",
+         "query": null,
+         "title": "Articles",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "linkStyle": "primary"
+       },
+       {
+        "_id": "card007",
+        "type": "card",
+        "title": "Second step",
+        "text": "<p>The whole card leads to the page.</p>",
+        "icon": {
+         "id": "@media:10",
+         "displayOption": null
+        },
+        "link": {
+         "rel": null,
+         "href": "https://sulu.io",
+         "query": null,
+         "title": "Learn more",
+         "anchor": null,
+         "locale": "en",
+         "target": "_self",
+         "provider": "external"
+        },
+        "linkStyle": "secondary"
+       }
+      ]
+     },
+     {
+      "variant": 0,
+      "marginTop": "mt-5",
+      "marginBottom": "mb-5",
+      "paddingTop": "pt-5",
+      "paddingBottom": "pb-5",
+      "paddingLateral": "px-5",
+      "blockRadius": "rounded-none",
+      "lateralMargins": "interior",
+      "showBackground": true,
+      "titleAlignment": "left",
+      "titleTag": "h2",
+      "_id": "cards0004",
+      "type": "cards",
+      "style": "stacked",
+      "columns": "1-2",
+      "title": "Uneven split",
+      "subTitle": "One third, two thirds",
+      "cardShadow": false,
+      "cardNumbers": false,
+      "clickableCard": false,
+      "contentAlignment": "left",
+      "iconPosition": "above",
+      "items": [
+       {
+        "_id": "card008",
+        "type": "card",
+        "title": "Narrow",
+        "text": "<p>One third of the row.</p>",
+        "icon": {
+         "id": "@media:11",
+         "displayOption": null
+        }
+       },
+       {
+        "_id": "card009",
+        "type": "card",
+        "title": "Wide",
+        "text": "<p>Two thirds of the row, with the pictogram above the title.</p>",
+        "icon": {
+         "id": "@media:12",
+         "displayOption": null
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
    "title": "Code - Widget",
    "locale": "en",
    "data": {
