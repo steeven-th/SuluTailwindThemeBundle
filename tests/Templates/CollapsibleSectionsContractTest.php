@@ -70,6 +70,12 @@ final class CollapsibleSectionsContractTest extends TestCase
             self::root() . '/public/js/components/CollapsibleSections/CollapsibleSections.js',
         );
 
+        // Both rule groups matter and both name the same selectors, so a
+        // presence check passes while one of the two is gone. Each selector is
+        // required to appear in the flex rule AND in the float reset.
+        $flex = self::ruleBody($source, 'align-items: flex-start;');
+        $float = self::ruleBody($source, 'float: none;');
+
         foreach ([
             'section[role="switch"] [class*="grid--"]',
             'section[role="switch"] [class*="grid-section--"]',
@@ -78,18 +84,45 @@ final class CollapsibleSectionsContractTest extends TestCase
             // the fix hangs off that attribute.
             '[data-iw-theme-form] [class*="grid--"]',
             '[data-iw-theme-form] [class*="grid-section--"]',
-            "data-iw-theme-form', ''",
-            'hashchange',
-            'flex-wrap: wrap;',
-            'align-items: flex-start;',
-            'float: none;',
-        ] as $needed) {
+        ] as $selector) {
+            self::assertStringContainsString(
+                $selector,
+                $flex,
+                \sprintf('%s is missing from the flex rule, so its fields fall back to Sulu floats.', $selector),
+            );
+            self::assertStringContainsString(
+                $selector,
+                $float,
+                \sprintf('%s is missing from the float reset, so its fields keep floating.', $selector),
+            );
+        }
+
+        foreach (["data-iw-theme-form', ''", 'hashchange'] as $needed) {
             self::assertStringContainsString(
                 $needed,
                 $source,
-                'The block form layout falls back to Sulu floats, which leave holes between rows.',
+                'The theme forms must be flagged from the route, and re-flagged when it changes.',
             );
         }
+    }
+
+    /**
+     * The selectors of the rule holding a given declaration.
+     *
+     * Everything between the previous closing brace and the opening one, which
+     * is the comma-separated selector list of that rule.
+     */
+    private static function ruleBody(string $source, string $declaration): string
+    {
+        $at = strpos($source, $declaration);
+        self::assertNotFalse($at, \sprintf('No rule declares %s.', $declaration));
+
+        $open = strrpos(substr($source, 0, $at), '{');
+        self::assertNotFalse($open);
+
+        $previous = strrpos(substr($source, 0, $open), '}');
+
+        return substr($source, false === $previous ? 0 : $previous, $open - (false === $previous ? 0 : $previous));
     }
 
     /**
