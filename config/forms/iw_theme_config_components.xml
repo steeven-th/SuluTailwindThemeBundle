@@ -537,7 +537,8 @@
                 <info_text>iw_sulu_tailwind_theme.components_section_page_hero_info</info_text>
             </meta>
             <properties>
-                <property name="pageHero_height" type="single_select" colspan="6">
+                <property name="pageHero_height" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay != 'side_by_side'">
                     <meta><title>iw_sulu_tailwind_theme.page.hero_height</title></meta>
                     <params>
                         <param name="default_value" value="md"/>
@@ -550,7 +551,8 @@
                     </params>
                 </property>
 
-                <property name="pageHero_parallax" type="checkbox" colspan="6">
+                <property name="pageHero_parallax" type="checkbox" colspan="6"
+                          visibleCondition="pageHero_titleDisplay != 'side_by_side'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.page.hero_parallax</title>
                         <info_text>iw_sulu_tailwind_theme.page.hero_parallax_info</info_text>
@@ -571,6 +573,7 @@
                         <param name="values" type="collection">
                             <param name="overlay"><meta><title>iw_sulu_tailwind_theme.page.hero_display_overlay</title></meta></param>
                             <param name="below"><meta><title>iw_sulu_tailwind_theme.page.hero_display_below</title></meta></param>
+                            <param name="side_by_side"><meta><title>iw_sulu_tailwind_theme.page.hero_display_side_by_side</title></meta></param>
                             <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_display_hidden</title></meta></param>
                         </param>
                     </params>
@@ -586,7 +589,46 @@
                         <param name="values" type="collection">
                             <param name="with_title"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_with_title</title></meta></param>
                             <param name="top_bar"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_top_bar</title></meta></param>
+                            <param name="bottom_bar"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_bottom_bar</title></meta></param>
                             <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_hidden</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Only the side-by-side banner crops its image: the other modes
+                     fill the banner edge to edge, where a ratio is set by the
+                     height instead. -->
+                <property name="pageHero_imageFormat" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_image_format</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_image_format_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="original"/>
+                        <param name="values" type="collection">
+                            <param name="16_9"><meta><title>16:9</title></meta></param>
+                            <param name="4_3"><meta><title>4:3</title></meta></param>
+                            <param name="1_1"><meta><title>1:1</title></meta></param>
+                            <param name="3_4"><meta><title>3:4</title></meta></param>
+                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Only meaningful when the breadcrumb sits with the titles.
+                     The bars have a place of their own. -->
+                <property name="pageHero_breadcrumbPosition" type="single_select" colspan="6"
+                          visibleCondition="pageHero_breadcrumb == 'with_title'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_breadcrumb_position</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_breadcrumb_position_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="above"/>
+                        <param name="values" type="collection">
+                            <param name="above"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_above</title></meta></param>
+                            <param name="below"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_below</title></meta></param>
                         </param>
                     </params>
                 </property>

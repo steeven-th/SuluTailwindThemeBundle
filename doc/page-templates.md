@@ -30,13 +30,15 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 
 | Setting | Key | Values (default) |
 |---------|-----|------------------|
-| Height | `pageHero_height` | `sm` · `md` (default) · `lg` · `full` (full viewport) |
-| Parallax | `pageHero_parallax` | off (default) / on — vertical scroll via the `hero-parallax` controller, respects `prefers-reduced-motion` |
-| Title display | `pageHero_titleDisplay` | `overlay` (default) · `below` · `hidden` |
+| Height | `pageHero_height` | `sm` · `md` (default) · `lg` · `full` (full viewport) — hidden on `side_by_side`, where the content sets the height |
+| Parallax | `pageHero_parallax` | off (default) / on — vertical scroll via the `hero-parallax` controller, respects `prefers-reduced-motion`. Hidden on `side_by_side`, where the image is not a background |
+| Title display | `pageHero_titleDisplay` | `overlay` (default) · `below` · `side_by_side` · `hidden` |
 | Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |
 | Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
 | Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
-| Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `hidden` |
+| Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `bottom_bar` · `hidden` |
+| Image format | `pageHero_imageFormat` | `original` (default) · `16_9` · `4_3` · `1_1` · `3_4` — the crop, on `side_by_side` only |
+| Breadcrumb position | `pageHero_breadcrumbPosition` | `above` (default) · `below` — where it sits relative to the titles, on `with_title` only |
 
 Rendering rules (see `templates/pages/default.html.twig`):
 
@@ -46,6 +48,9 @@ The banner image is a **property** of the hero, not a condition for it: the comp
 - **`heroImage` empty** → the same banner renders without an image, on a transparent background (`.iw-page-hero--no-image`), with the theme text colors instead of the light-on-photo ones. Height, alignment and title placement are unchanged. Set `--iw-page-hero-bg` for a flat color.
 - **`pageHero_titleDisplay: hidden`** → the H1 is still emitted, visually hidden (`.iw-visually-hidden`). Without an image, no empty banner is rendered — only the hidden heading.
 - **`pageHero_titleDisplay: below`** without an image → falls back to `overlay`: there is no image for the header to sit under.
+- **`pageHero_titleDisplay: side_by_side`** → the title and subtitle sit on one side, the image on the other, both in the flow. The image takes the theme image radius, and the banner has no ratio, no height cap and no veil: the content sets the height. Below `lg` the two stack, image first. Without an image it falls back to `overlay`, for the same reason as `below`.
+- **`pageHero_imageFormat`** applies to `side_by_side` alone: it is the only mode whose image is a normal element with a shape of its own. The others fill the banner edge to edge, where the ratio comes from `pageHero_height`. `original` sets no crop and keeps the natural proportions.
+- **`pageHero_breadcrumbPosition`** applies to all three visible display modes. Each used to place the breadcrumb its own way - below the titles on `overlay`, above them on `below` - which the setting replaces.
 - **`pageHero_shade` and `pageHero_parallax`** are ignored without an image — there is nothing to veil, and nothing to scroll.
 
 A `heroImage` pointing at a deleted media resolves to nothing and falls back to the image-less banner, rather than dropping the header (and the H1) entirely.
@@ -61,6 +66,9 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero` + `.iw-page-hero--h-{sm\|md\|lg\|full}` | Banner wrapper / height (`--iw-page-hero-ratio`, `--iw-page-hero-max-height`) |
 | `.iw-page-hero--no-image` | Image-less banner: transparent background (`--iw-page-hero-bg`), theme text colors (`--iw-page-hero-title-no-image-color`, `--iw-page-hero-subtitle-no-image-color`), no text shadow |
 | `.iw-page-hero--parallax` / `.iw-page-hero__image--parallax` | Parallax modifier / taller image |
+| `.iw-page-hero--side-by-side` | Text one side, image the other. Drops the ratio, the height cap and the clipping the other modes need (`--iw-page-hero-side-padding-block`, `--iw-page-hero-side-gap`, `--iw-page-hero-visual-width`) |
+| `.iw-page-hero__text` / `.iw-page-hero__visual` | The two columns of that mode. Below `lg` they stack, the visual first |
+| `.iw-page-hero__title--side` / `.iw-page-hero__subtitle--side` | Their text colors: the theme ones, not the light-on-photo ones, since nothing sits behind the text |
 | `.iw-page-hero__image` | The rendered `<img>` (object-cover, no radius — banner is edge-to-edge) |
 | `.iw-page-hero__overlay` + `.iw-page-hero--y-{top\|middle\|bottom}` | Overlay layer / vertical position (`--iw-page-hero-overlay-padding-block`) |
 | `.iw-page-hero--shade-{none\|light\|medium\|strong}` | Readability veil (`--iw-page-hero-shade`, `--iw-page-hero-shade-opacity`) |
@@ -68,7 +76,8 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero__inner` / `.iw-page-hero__caption` | Overlay content wrapper / below-image wrapper |
 | `.iw-page-hero__title` (+ `--below`) | The H1 (`--iw-page-hero-title-*`) |
 | `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
-| `.iw-page-hero__breadcrumb` (+ `--below`) | Breadcrumb trail (`--iw-page-hero-breadcrumb-*`) |
+| `.iw-page-hero__breadcrumb` (+ `--above`) | Breadcrumb trail. The modifier moves its margin to the other side, for a breadcrumb sitting above the titles |
+| `.iw-page-hero:not(.iw-page-hero--no-image) .iw-page-hero__overlay .iw-page-hero__breadcrumb` | The one case with light colors and a shadow (`--iw-page-hero-breadcrumb-*`): sitting over the image. Everywhere else the breadcrumb keeps the colors set in **Components → Breadcrumb** |
 | `.iw-visually-hidden` | Utility: keeps the H1 in the accessibility tree when the title display is `hidden` |
 
 > The parallax option requires the `hero_parallax` Stimulus controller to be registered in your `controllers.json` (see the installation section of the README).
