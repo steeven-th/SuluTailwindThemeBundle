@@ -55,8 +55,13 @@ final class CardLinkContractTest extends TestCase
     {
         $source = self::card();
 
+        // The class is built by an expression now, since an unstyled action
+        // falls back to the variant alias, so the button hook is matched
+        // through the block class beside it rather than literally. The closing
+        // quote matters: without it this also matches the `iw-block__actions`
+        // wrapper a line above, and the check passes on an anchor.
         self::assertMatchesRegularExpression(
-            '/if wholeCardIsLink[\s\S]{0,1500}<span class="iw-button--/',
+            '/if wholeCardIsLink[\s\S]{0,1500}<span class="[^"]*iw-block__action"/',
             $source,
             'A clickable card must draw its action as a span, not an anchor.',
         );

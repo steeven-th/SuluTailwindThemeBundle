@@ -21,7 +21,7 @@
     {% set menuItems = megaSnippet is not null and megaSnippet.content is defined ? megaSnippet.content.menu_items|default([]) : [] %}
     {% set ctaTitle = megaSnippet is not null and megaSnippet.content is defined ? megaSnippet.content.cta_title|default(null) : null %}
     {% set ctaLink = megaSnippet is not null and megaSnippet.content is defined ? megaSnippet.content.cta_link|default(null) : null %}
-    {% set ctaStyle = megaSnippet is not null and megaSnippet.content is defined ? megaSnippet.content.cta_style|default('primary') : 'primary' %}
+    {% set ctaStyle = megaSnippet is not null and megaSnippet.content is defined ? megaSnippet.content.cta_style|default('') : '' %}
 {% else %}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(3), {title: 'title', url: 'url'}) %}
 {% endif %}
@@ -144,7 +144,7 @@
                 {% if megaSource == 'snippet' and ctaTitle and ctaLink %}
                     <a
                         href="{{ sulu_content_path(ctaLink.url|default('#')) }}"
-                        class="hidden md:inline-block iw-button--{{ ctaStyle }} px-5 py-2 text-sm font-medium no-underline"
+                        class="hidden md:inline-block {{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} px-5 py-2 text-sm font-medium no-underline"
                     >
                         {{ ctaTitle }}
                     </a>
@@ -246,7 +246,7 @@
                                     {% set featImgPos = column.image_position|default('left') %}
                                     {% set featRatioClasses = {'1-1': 'aspect-square', '9-16': 'aspect-[9/16]', '16-9': 'aspect-video'} %}
                                     {% set featRatioClass = featRatioClasses[column.image_ratio|default('auto')]|default('') %}
-                                    {% set featBtnStyle = column.cta_style|default('primary') %}
+                                    {% set featBtnStyle = column.cta_style|default('') %}
                                     <div class="iw-mega-menu__featured {{ featLayout == 'horizontal' ? 'iw-mega-menu__featured--horizontal' : '' }} {{ featLayout == 'horizontal' and featImgPos == 'right' ? 'iw-mega-menu__featured--img-right' : '' }}">
                                         {% if column.image is defined and column.image.id|default(null) is not null %}
                                             {% set featMedia = sulu_resolve_media(column.image.id, app.request.locale) %}
@@ -268,7 +268,7 @@
                                             {% endif %}
                                             {% if column.cta_title|default(null) and column.cta_link|default(null) %}
                                                 <a href="{{ sulu_content_path(column.cta_link.url|default('#')) }}"
-                                                   class="iw-button--{{ featBtnStyle }} text-xs">
+                                                   class="{{ featBtnStyle ? 'iw-button--' ~ featBtnStyle : 'iw-button--variant' }} text-xs">
                                                     {{ column.cta_title }}
                                                 </a>
                                             {% endif %}
@@ -397,7 +397,7 @@
                     <div class="pt-4 pb-2">
                         <a
                             href="{{ sulu_content_path(ctaLink.url|default('#')) }}"
-                            class="iw-button--{{ ctaStyle }} block text-center px-5 py-3 text-base font-medium no-underline"
+                            class="{{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} block text-center px-5 py-3 text-base font-medium no-underline"
                         >
                             {{ ctaTitle }}
                         </a>

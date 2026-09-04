@@ -156,7 +156,7 @@
                 </p>
                 {# Reuses the theme's button style so the placeholder matches
                    every other button on the site, variant included. #}
-                <button type="button" class="iw-embed__consent-button iw-button--{{ consentButtonStyle|default('primary') }}" data-action="consent#accept">
+                <button type="button" class="iw-embed__consent-button {{ consentButtonStyle|default('') ? 'iw-button--' ~ consentButtonStyle : 'iw-button--variant' }}" data-action="consent#accept">
                     {{ (consentMode == 'delegated'
                         ? 'iw_sulu_tailwind_theme.consent_open_preferences'
                         : 'iw_sulu_tailwind_theme.consent_load')|trans }}

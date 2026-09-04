@@ -62,7 +62,7 @@
                        and a link that never opens in a new tab. A literal string
                        escapes the same way the moment a variable joins it. #}
                     <a href="{{ ctaUrl }}"
-                       class="iw-button--{{ cta.style|default('primary') }} iw-block__action"
+                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action"
                        {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
                        {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                     >

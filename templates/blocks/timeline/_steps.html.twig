@@ -33,7 +33,7 @@
     {# The arrows follow the button style of the block variant, so they match
        the call-to-action buttons sitting right under them. #}
     {% set variantConfig = iw_sulu_tailwind_theme_variant_config(variant|default(null), iw_sulu_tailwind_theme.blockVariants|default([])) %}
-    {% set arrowStyle = variantConfig.buttonStyle|default('primary') %}
+    {% set arrowStyle = iw_sulu_tailwind_theme_button_slug(variantConfig.buttonStyle|default('')) %}
 
     <div
         class="iw-block-timeline iw-block-timeline--{{ layout|default('alternate') }}{% if isHorizontal %} iw-block-timeline--per-{{ perView }} iw-block-timeline--button-{{ arrowStyle }}{% endif %}"
