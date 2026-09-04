@@ -48,9 +48,20 @@
         height: iw_sulu_tailwind_theme.pageHero_height|default('md'),
         parallax: heroParallax,
         breadcrumb: (effectiveBreadcrumb == 'with_title') and pageBreadcrumbsOn,
+        breadcrumbPosition: iw_sulu_tailwind_theme.pageHero_breadcrumbPosition|default('above'),
         breadcrumbPageUuid: resource.uuid|default(null),
         breadcrumbCurrentTitle: content.title|default(''),
     } only %}
+
+    {# A bar under the banner, the mirror of the one above it. #}
+    {% if effectiveBreadcrumb == 'bottom_bar' and pageBreadcrumbsOn %}
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'page',
+                pageUuid: resource.uuid|default(null),
+            } only %}
+        </div>
+    {% endif %}
 
     {% include '@ItechWorldSuluTailwindTheme/components/_blocks.html.twig' with {
         blocks: content.blocks|default([]),

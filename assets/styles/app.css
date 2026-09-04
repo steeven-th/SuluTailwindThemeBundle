@@ -4177,9 +4177,15 @@ section.block:has([data-slider-fullbleed-value]) {
     text-shadow: none;
 }
 
-/* Below the image: the breadcrumb sits above the text → bottom margin, and
-   uses the theme text colors instead of the light overlay ones. */
-.iw-page-hero__breadcrumb--below {
+/* The breadcrumb above the titles: bottom margin instead of the top one the
+   base rule gives it. Named after what it does, not after the mode that used
+   to be the only one doing it - the position is a setting now, so all three
+   modes can place it either way.
+
+   It also drops the light overlay colours: sitting above the titles it is
+   outside the shaded area in every mode but overlay, where the shade covers
+   the whole column anyway. */
+.iw-page-hero__breadcrumb--above {
     margin-top: 0;
     margin-bottom: var(--iw-page-hero-breadcrumb-gap, 0.75rem);
     text-shadow: none;

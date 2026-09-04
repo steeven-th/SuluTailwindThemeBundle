@@ -26,6 +26,8 @@
     - parallax: bool — vertical parallax scroll on the image (image only)
     - breadcrumb: bool — render the breadcrumb next to the title (already gated
                   by the admin breadcrumbs setting by the caller)
+    - breadcrumbPosition: above | below — where the breadcrumb sits relative to
+                  the titles, when it sits with them
     - breadcrumbPageUuid / breadcrumbCurrentTitle: breadcrumb context
 
     Public CSS API:
@@ -64,6 +66,23 @@
 {% set height = height|default('md') in ['sm', 'md', 'lg', 'full'] ? height : 'md' %}
 {% set parallax = hasImage and parallax|default(false) %}
 {% set showBreadcrumb = breadcrumb|default(false) %}
+{% set breadcrumbPosition = breadcrumbPosition|default('above') == 'below' ? 'below' : 'above' %}
+
+{#- Built once and printed where the setting asks. `--above` names what the
+    class does - the breadcrumb sits above the titles, so it needs a bottom
+    margin - rather than the mode that happened to use it. -#}
+{% set breadcrumbHtml %}
+    {% if showBreadcrumb %}
+        <div class="iw-page-hero__breadcrumb{{ breadcrumbPosition == 'above' ? ' iw-page-hero__breadcrumb--above' : '' }}">
+            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+                context: 'page',
+                pageUuid: breadcrumbPageUuid|default(null),
+                currentTitle: breadcrumbCurrentTitle|default(''),
+                align: alignX,
+            } only %}
+        </div>
+    {% endif %}
+{% endset %}
 
 {# "below" needs an image to sit under, and "side_by_side" one to sit beside;
    without one the header goes back into the banner itself. #}
@@ -87,22 +106,14 @@
     <section class="iw-page-hero iw-page-hero--side-by-side">
         <div class="iw-page-hero__inner container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="iw-page-hero__text iw-page-hero--x-{{ alignX }}">
-                {% if showBreadcrumb %}
-                    <div class="iw-page-hero__breadcrumb iw-page-hero__breadcrumb--below">
-                        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-                            context: 'page',
-                            pageUuid: breadcrumbPageUuid|default(null),
-                            currentTitle: breadcrumbCurrentTitle|default(''),
-                            align: alignX,
-                        } only %}
-                    </div>
-                {% endif %}
+                {% if breadcrumbPosition == 'above' %}{{ breadcrumbHtml }}{% endif %}
                 {% if heroTitle is not empty %}
                     <h1 class="iw-page-hero__title iw-page-hero__title--side">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
                 {% endif %}
                 {% if heroSubtitle is not empty %}
                     <p class="iw-page-hero__subtitle iw-page-hero__subtitle--side">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
                 {% endif %}
+                {% if breadcrumbPosition == 'below' %}{{ breadcrumbHtml }}{% endif %}
             </div>
 
             <div class="iw-page-hero__visual">
@@ -143,23 +154,14 @@
             {# The veil only makes sense over an image. #}
             <div class="iw-page-hero__overlay iw-page-hero--y-{{ alignY }}{{ hasImage ? ' iw-page-hero--shade-' ~ shade : '' }}">
                 <div class="iw-page-hero__inner iw-page-hero--x-{{ alignX }} container mx-auto px-4 sm:px-6 lg:px-8">
+                    {% if breadcrumbPosition == 'above' %}{{ breadcrumbHtml }}{% endif %}
                     {% if heroTitle is not empty %}
                         <h1 class="iw-page-hero__title">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
                     {% endif %}
                     {% if heroSubtitle is not empty %}
                         <p class="iw-page-hero__subtitle">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
                     {% endif %}
-                    {# Overlay: breadcrumb sits below the text, aligned with it. #}
-                    {% if showBreadcrumb %}
-                        <div class="iw-page-hero__breadcrumb">
-                            {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-                                context: 'page',
-                                pageUuid: breadcrumbPageUuid|default(null),
-                                currentTitle: breadcrumbCurrentTitle|default(''),
-                                align: alignX,
-                            } only %}
-                        </div>
-                    {% endif %}
+                    {% if breadcrumbPosition == 'below' %}{{ breadcrumbHtml }}{% endif %}
                 </div>
             </div>
         {% endif %}
@@ -167,23 +169,14 @@
 
     {% if display == 'below' and hasHeader %}
         <div class="iw-page-hero__caption iw-page-hero--x-{{ alignX }} container mx-auto px-4 sm:px-6 lg:px-8">
-            {# Below the image: breadcrumb sits above the text, aligned with it. #}
-            {% if showBreadcrumb %}
-                <div class="iw-page-hero__breadcrumb iw-page-hero__breadcrumb--below">
-                    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
-                        context: 'page',
-                        pageUuid: breadcrumbPageUuid|default(null),
-                        currentTitle: breadcrumbCurrentTitle|default(''),
-                        align: alignX,
-                    } only %}
-                </div>
-            {% endif %}
+            {% if breadcrumbPosition == 'above' %}{{ breadcrumbHtml }}{% endif %}
             {% if heroTitle is not empty %}
                 <h1 class="iw-page-hero__title iw-page-hero__title--below">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
             {% endif %}
             {% if heroSubtitle is not empty %}
                 <p class="iw-page-hero__subtitle iw-page-hero__subtitle--below">{{ iw_sulu_tailwind_theme_title_markup(heroSubtitle) }}</p>
             {% endif %}
+            {% if breadcrumbPosition == 'below' %}{{ breadcrumbHtml }}{% endif %}
         </div>
     {% endif %}
 {% endif %}

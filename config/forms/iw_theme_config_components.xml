@@ -589,7 +589,25 @@
                         <param name="values" type="collection">
                             <param name="with_title"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_with_title</title></meta></param>
                             <param name="top_bar"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_top_bar</title></meta></param>
+                            <param name="bottom_bar"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_bottom_bar</title></meta></param>
                             <param name="hidden"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_hidden</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Only meaningful when the breadcrumb sits with the titles.
+                     The bars have a place of their own. -->
+                <property name="pageHero_breadcrumbPosition" type="single_select" colspan="6"
+                          visibleCondition="pageHero_breadcrumb == 'with_title'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_breadcrumb_position</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_breadcrumb_position_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="above"/>
+                        <param name="values" type="collection">
+                            <param name="above"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_above</title></meta></param>
+                            <param name="below"><meta><title>iw_sulu_tailwind_theme.page.hero_breadcrumb_below</title></meta></param>
                         </param>
                     </params>
                 </property>

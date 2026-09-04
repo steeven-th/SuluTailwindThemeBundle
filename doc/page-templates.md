@@ -36,7 +36,8 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 | Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |
 | Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
 | Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
-| Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `hidden` |
+| Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `bottom_bar` · `hidden` |
+| Breadcrumb position | `pageHero_breadcrumbPosition` | `above` (default) · `below` — where it sits relative to the titles, on `with_title` only |
 
 Rendering rules (see `templates/pages/default.html.twig`):
 
@@ -47,6 +48,7 @@ The banner image is a **property** of the hero, not a condition for it: the comp
 - **`pageHero_titleDisplay: hidden`** → the H1 is still emitted, visually hidden (`.iw-visually-hidden`). Without an image, no empty banner is rendered — only the hidden heading.
 - **`pageHero_titleDisplay: below`** without an image → falls back to `overlay`: there is no image for the header to sit under.
 - **`pageHero_titleDisplay: side_by_side`** → the title and subtitle sit on one side, the image on the other, both in the flow. The image takes the theme image radius, and the banner has no ratio, no height cap and no veil: the content sets the height. Below `lg` the two stack, image first. Without an image it falls back to `overlay`, for the same reason as `below`.
+- **`pageHero_breadcrumbPosition`** applies to all three visible display modes. Each used to place the breadcrumb its own way - below the titles on `overlay`, above them on `below` - which the setting replaces.
 - **`pageHero_shade` and `pageHero_parallax`** are ignored without an image — there is nothing to veil, and nothing to scroll.
 
 A `heroImage` pointing at a deleted media resolves to nothing and falls back to the image-less banner, rather than dropping the header (and the H1) entirely.
