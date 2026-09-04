@@ -155,7 +155,7 @@
         "_id": "ff9e6fff",
         "link": {
          "rel": null,
-         "href": "@page:Text - Images",
+         "href": "@page:Text - Media",
          "query": null,
          "title": null,
          "anchor": null,
@@ -3321,10 +3321,10 @@
    }
   },
   {
-   "title": "Text - Images",
+   "title": "Text - Media",
    "locale": "en",
    "data": {
-    "title": "Text - Images",
+    "title": "Text - Media",
     "blocks": [
      {
       "_id": "ce3ba390",

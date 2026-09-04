@@ -60,7 +60,7 @@ class DemoContentCommand extends Command
      *
      * @var list<string>
      */
-    private const MINIMAL_PAGES = ['Text - Images', 'Gallery', 'Call to action', 'Accordion'];
+    private const MINIMAL_PAGES = ['Text - Media', 'Gallery', 'Call to action', 'Accordion'];
 
     public function __construct(
         MessageBusInterface $messageBus,

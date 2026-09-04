@@ -60,7 +60,7 @@ type underneath it:
 ├── separator
 ├── testimonial
 ├── text
-└── Text - Images
+└── Text - Media
 ```
 
 Pages hang under the index rather than at the site root, and everything is
@@ -83,7 +83,7 @@ placeholder images.
 | `name` (argument) | `Test Blocks` | Name of the index page |
 | `--webspace`, `-w` | first configured | Target webspace |
 | `--locale`, `-l` | webspace default | Locale to create the pages in |
-| `--minimal` | off | Only `Text - Images`, `Gallery`, `Call to action` and `Accordion` |
+| `--minimal` | off | Only `Text - Media`, `Gallery`, `Call to action` and `Accordion` |
 
 Use `--minimal` to get the idea without clicking through seventeen pages.
 
