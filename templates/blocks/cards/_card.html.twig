@@ -15,14 +15,16 @@
    promise.
 
    Parameters:
-     - card          : the item {icon, image, title, text, link, linkLabel, highlighted}
-     - cardView      : the matching view data, for link target and rel
+     - card          : the item {icon, image, title, text, ctaButtons, highlighted}
+     - cardView      : the matching view data, carrying resolved links
      - style         : stacked | image_top | horizontal
      - index         : 0-based position, shown when `numbered` is on
      - iconPosition  : inline | above
      - shadow        : bool, lifts the card off the page
-     - linkDisplay   : link | button, how the action is drawn
-     - buttonStyle   : slug of the button style the variant points at
+     - ctaAlignment  : how the buttons of every card line up
+     - ctaDirection  : row | column
+     - align         : the text alignment of the grid, used when the buttons
+                       follow the title
      - numbered      : bool, shows the position of the card
      - imageMaxWidth : cap on the image width, from the block settings
      - cardRadius    : radius class for the card
@@ -41,38 +43,37 @@
 {% set hasIcon = icon.id|default(null) is not null %}
 {% set hasImage = image.id|default(null) is not null %}
 
-{# A resolvable link arrives as the URL string. One whose target was deleted
-   or unpublished comes back as the raw reference structure instead, which is
-   iterable - that is how the other blocks tell the two apart. #}
-{% set href = card.link is defined and card.link is not iterable ? card.link : '' %}
-{% set linkView = cardView.link|default({}) %}
-{% set linkTarget = linkView.target|default('_self') %}
-{% set linkRel = linkView.rel|default('') %}
+{#- The card carries the shared CTA block, so it can hold several buttons with
+    their own styles.
 
-{# The label is the title carried by the link itself. Left empty, the title of
-   the linked page or media stands in, so a link never renders unlabelled. #}
-{% set linkLabel = linkView.title|default('') %}
-{% if linkLabel is empty and linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
-    {% set linkLabel = sulu_page_load(linkView.href, {'title': 'title'}).title|default('') %}
-{% endif %}
-{% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
-    {% set linkedMedia = sulu_resolve_media(linkView.href, app.request.locale) %}
-    {% set linkLabel = linkedMedia.title|default('') %}
-{% endif %}
+    Making the whole card clickable uses the link of the card, a field the admin
+    reveals when that setting is on. Left empty it falls back to the single
+    button, so turning the setting on works without retyping a destination that
+    is already there.
 
-{# Last resort, the URL itself. An external link with no title would otherwise
-   leave the action with nothing to show, and it would vanish silently: the
-   editor sets a link and sees none. #}
-{% if linkLabel is empty %}{% set linkLabel = href %}{% endif %}
+    A card holding TWO buttons is never itself a link, whatever the setting
+    says: an anchor cannot contain anchors, and turning both buttons into spans
+    would drop a destination the editor entered. The buttons win, being the more
+    precise target. -#}
+{% set cardButtons = card.ctaButtons|default([]) %}
+{% set cardButtonsView = cardView.ctaButtons|default([]) %}
+{% set hasButtons = cardButtons is iterable and cardButtons|length > 0 %}
 
-{% set wholeCardIsLink = clickable|default(false) and href is not empty %}
+{% set ownLink = card.link is defined and card.link is not iterable ? card.link : '' %}
+{% set onlyButton = hasButtons and cardButtons|length == 1 ? cardButtons|first : null %}
+{% set onlyButtonLink = onlyButton and onlyButton.link is defined and onlyButton.link is not iterable
+    ? onlyButton.link : '' %}
+{% set cardLink = ownLink is not empty ? ownLink : onlyButtonLink %}
+
+{# Two or more buttons keep the card a plain container, or its anchor would
+   wrap theirs. #}
+{% set manyButtons = hasButtons and cardButtons|length > 1 %}
+{% set wholeCardIsLink = clickable|default(false) and cardLink is not empty and not manyButtons %}
 
 <{{ wholeCardIsLink ? 'a' : 'div' }}
     class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted' : '' }} {{ cardRadius|default('') }}"
     {% if wholeCardIsLink %}
-        href="{{ href }}"
-        {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
-        {% if linkRel is not empty %}rel="{{ linkRel }}"{% endif %}
+        href="{{ cardLink }}"
     {% endif %}
 >
     {% if style == 'image_top' and hasImage %}
@@ -131,28 +132,25 @@
             <div class="iw-card__text prose">{{ text|raw }}</div>
         {% endif %}
 
-        {# The link is a real link unless the whole card already is one, in
-           which case a nested <a> would be invalid markup. #}
-        {#- A button is a link that looks like one, so it takes the button
-            style of the variant. When the whole card is already the link, the
-            action becomes a span: an anchor inside an anchor is invalid, and
-            the styling is what carries the affordance anyway. -#}
-        {% if href is not empty and linkLabel is not empty %}
-            {% set actionClass = linkDisplay|default('link') == 'button'
-                ? 'iw-card__action iw-button--' ~ (buttonStyle|default('primary'))
-                : 'iw-card__link' %}
-
-            {% if wholeCardIsLink %}
-                <span class="{{ actionClass }}">{{ linkLabel }}</span>
-            {% else %}
-                {# Attributes are written as markup rather than built as strings:
-                   autoescaping turns the quotes of a concatenated expression into
-                   entities, and the attribute stops working. #}
-                <a class="{{ actionClass }}" href="{{ href }}"
-                   {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
-                   {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
-                >{{ linkLabel }}</a>
-            {% endif %}
-        {% endif %}
+        {#- A card standing in for its single button renders that button as a
+            styled span: an anchor inside an anchor is invalid, and the card
+            already leads there. Only ever one button here: two make the card
+            a plain container, so the branch below renders them for real. -#}
+        {%- if hasButtons and wholeCardIsLink -%}
+            <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
+                <span class="iw-button--{{ onlyButton.style|default('primary') }} iw-block__action">
+                    {{ cardButtonsView[0].link.title|default('') ?: cardLink }}
+                </span>
+            </span>
+        {%- elseif hasButtons -%}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
+                buttons: cardButtons,
+                buttonsView: cardButtonsView,
+                alignment: ctaAlignment|default('title'),
+                direction: ctaDirection|default('row'),
+                titleAlignment: align|default('left'),
+                flush: true
+            } only %}
+        {%- endif -%}
     </div>
 </{{ wholeCardIsLink ? 'a' : 'div' }}>

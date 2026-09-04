@@ -74,11 +74,12 @@
                                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>
                                 </property>
 
-                                <!-- `enable_attributes` gives the link its own title,
-                                     target and rel, so a separate label field would
-                                     ask twice for the same thing. Empty, the title of
-                                     the linked page or media is used. -->
-                                <property name="link" type="link">
+                                <!-- The destination of the card as a whole, shown only
+                                     when the block makes its cards clickable. Two
+                                     levels of `__parent`: the card is inside the
+                                     repeatable block, the setting is beside it. -->
+                                <property name="link" type="link"
+                                          visibleCondition="__parent.__parent.clickableCard">
                                     <meta>
                                         <title>iw_sulu_tailwind_theme.cards_link</title>
                                         <info_text>iw_sulu_tailwind_theme.cards_link_info</info_text>
@@ -93,6 +94,15 @@
                                         </param>
                                     </params>
                                 </property>
+
+                                <!-- The shared CTA block, so a card can carry several
+                                     buttons with their own styles rather than one link.
+                                     Only the repeatable block is taken: its alignment
+                                     and direction stay block-level settings, since a
+                                     grid where each card aligns its buttons
+                                     differently reads as a mistake. -->
+                                <xi:include href="../fragments/cta-buttons.xml"
+                                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
 
                                 <!-- Puts one card forward using the accent surface of
                                      the variant, which carries its own text colour, so
@@ -111,8 +121,6 @@
                     </types>
                 </block>
 
-                <xi:include href="../fragments/cta-buttons.xml"
-                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
 
@@ -255,22 +263,6 @@
                     </params>
                 </property>
 
-                <!-- Decided for the grid rather than per card: a row where one
-                     card ends in a button and the next in a link reads as a
-                     mistake. The button takes the style the variant points at. -->
-                <property name="linkDisplay" type="single_select" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.cards_link_display</title>
-                        <info_text>iw_sulu_tailwind_theme.cards_link_display_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="link"/>
-                        <param name="values" type="collection">
-                            <param name="link"><meta><title>iw_sulu_tailwind_theme.cards_link_as_link</title></meta></param>
-                            <param name="button"><meta><title>iw_sulu_tailwind_theme.cards_link_as_button</title></meta></param>
-                        </param>
-                    </params>
-                </property>
 
                 <property name="clickableCard" type="checkbox" colspan="6">
                     <meta>
