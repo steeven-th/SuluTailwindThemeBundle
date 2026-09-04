@@ -442,6 +442,17 @@ img {
     height: auto;
 }
 
+/* An image inside a <picture> that carries its own radius must not add the
+   theme one on top. `_image.html.twig` clips the picture with overflow, so the
+   frame already rounds the image - but a clip cannot UN-round anything, so an
+   image rounded more than its frame keeps its own corners and the chosen
+   radius appears to do nothing. That is what made every value below the theme
+   default look identical to it. */
+picture[class*="rounded-"] > img,
+picture[class*="iw-radius--"] > img {
+    border-radius: 0;
+}
+
 /* Override for cover images (used as backgrounds in overlay blocks, sliders, etc.) */
 img.object-cover {
     max-width: none;
@@ -5486,4 +5497,345 @@ aside .iw-toc {
     display: inline-block;
     padding: 1rem;
     text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Block: cards
+   A grid of free-form cards, in three LAYOUTS.
+
+   What frames a card is not a layout: a card is an enclosed unit, so its
+   background and border come from the PARAGRAPH surface of the variant, like
+   every other card in the bundle. A highlighted card takes the ACCENT surface,
+   which carries the colour of the text on it, so it stays legible whatever the
+   accent is.
+
+   Shadow and numbering are options rather than layouts, so a numbered card can
+   have a shadow and a banner image can have a number.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.iw-block-cards {
+    /* Hook only - the grid and the layouts below own the placement. */
+}
+
+.iw-block-cards__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--iw-block-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
+    /* Only bites once a row is narrower than the block, which the width cap
+       below is what causes. */
+    justify-content: start;
+}
+
+/* Equal columns ────────────────────────────────────────────────────────── */
+
+@media (min-width: 640px) {
+    .iw-block-cards__grid--cols-2,
+    .iw-block-cards__grid--cols-3,
+    .iw-block-cards__grid--cols-4 {
+        grid-template-columns: repeat(2, minmax(0, var(--iw-card-track, 1fr)));
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-block-cards__grid--cols-2 { grid-template-columns: repeat(2, minmax(0, var(--iw-card-track, 1fr))); }
+    .iw-block-cards__grid--cols-3 { grid-template-columns: repeat(3, minmax(0, var(--iw-card-track, 1fr))); }
+    .iw-block-cards__grid--cols-4 { grid-template-columns: repeat(4, minmax(0, var(--iw-card-track, 1fr))); }
+}
+
+/* Uneven pairs ─────────────────────────────────────────────────────────── */
+
+/* Exactly two tracks, declared once. `repeat(auto-fit, ...)` around a two-track
+   pattern was wrong: auto-fit keeps repeating for as long as there is room, so
+   three cards came out as three columns at 25/50/25 instead of two columns with
+   the third card wrapping. Two tracks named plainly give the split asked for,
+   and any card beyond the second flows onto a new row with the same widths. */
+@media (min-width: 768px) {
+    .iw-block-cards__grid--cols-1-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+    .iw-block-cards__grid--cols-2-1 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+    .iw-block-cards__grid--cols-1-3 { grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); }
+    .iw-block-cards__grid--cols-3-1 { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+}
+
+/* The horizontal layout overrides the column count ─────────────────────── */
+
+/* A horizontal card is wide by nature: its visual sits beside its text, so
+   three of them on a row leaves each one too narrow for the arrangement to
+   read. It stacks one per row, and pairs up only once there is real width.
+   Declared after the column rules so it wins whatever count was picked, and
+   `!important` is not needed: the two-class selector is more specific. */
+.iw-block-cards--horizontal .iw-block-cards__grid {
+    grid-template-columns: minmax(0, var(--iw-card-track, 1fr));
+}
+
+@media (min-width: 1024px) {
+    .iw-block-cards--horizontal .iw-block-cards__grid--cols-2,
+    .iw-block-cards--horizontal .iw-block-cards__grid--cols-3,
+    .iw-block-cards--horizontal .iw-block-cards__grid--cols-4 {
+        grid-template-columns: repeat(2, minmax(0, var(--iw-card-track, 1fr)));
+    }
+}
+
+/* How wide a card may be ───────────────────────────────────────────────── */
+
+/* `fill` leaves the track at 1fr, so the cards share the width as they always
+   did. The others cap it, which is what leaves room for the row to be placed. */
+.iw-block-cards__grid--width-compact { --iw-card-track: 14rem; }
+.iw-block-cards__grid--width-medium { --iw-card-track: 18rem; }
+.iw-block-cards__grid--width-large { --iw-card-track: 24rem; }
+
+.iw-block-cards__grid--place-center { justify-content: center; }
+.iw-block-cards__grid--place-right { justify-content: end; }
+
+.iw-block-cards__grid--align-center {
+    text-align: center;
+}
+
+/* The card ─────────────────────────────────────────────────────────────── */
+
+.iw-card {
+    display: flex;
+    flex-direction: column;
+    /* Equal height by default: a row of cards with ragged bottoms reads as a
+       mistake, and nothing here depends on the content being the same length. */
+    height: 100%;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    /* The frame comes from the variant. A variant that sets neither background
+       nor border leaves the cards bare, held together by the grid alone. */
+    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+}
+
+/* The border only draws when the variant gives it a colour, so a bare variant
+   does not get a hairline nobody asked for. */
+.iw-card {
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-card-border, var(--iw-variant-paragraph-border, transparent));
+}
+
+.iw-card__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: var(--iw-card-padding, 1.25rem);
+}
+
+.iw-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.iw-card__head--stacked {
+    flex-direction: column;
+    align-items: inherit;
+    gap: 0.4rem;
+}
+
+.iw-block-cards__grid--align-center .iw-card__head {
+    justify-content: center;
+}
+
+.iw-card__icon {
+    flex: 0 0 auto;
+    display: block;
+    width: var(--iw-card-icon-size, 1.6rem);
+}
+
+.iw-card__head--stacked .iw-card__icon {
+    width: var(--iw-card-icon-size-stacked, 3rem);
+}
+
+.iw-card__title {
+    margin: 0;
+    font-size: var(--iw-card-title-size, 1.0625rem);
+    font-weight: 600;
+    color: var(--iw-variant-title-color, inherit);
+}
+
+.iw-card__text {
+    flex: 1 1 auto;
+    font-size: var(--iw-card-text-size, 0.9375rem);
+    line-height: 1.6;
+}
+
+.iw-card__image {
+    margin-block: 0.25rem;
+}
+
+.iw-card__banner {
+    /* Flush against the body: the card clips the top corners through its own
+       radius and overflow, and the bottom ones must stay square or the banner
+       cuts a notch out of the card. */
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.iw-card__banner img,
+.iw-card__banner picture {
+    width: 100%;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+}
+
+/* An action drawn as a button keeps the button styling and the spacing the
+   plain link had, so a grid mixing the two does not shift. */
+.iw-card__action {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.iw-block-cards__grid--align-center .iw-card__action {
+    align-self: center;
+}
+
+.iw-card__link {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--iw-variant-link-color, inherit);
+}
+
+.iw-card__link:hover {
+    color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
+}
+
+.iw-card__number {
+    font-size: var(--iw-card-number-size, 1.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--iw-variant-highlight, var(--color-accent));
+}
+
+/* Layouts ──────────────────────────────────────────────────────────────── */
+
+/* `stacked` and `image-top` need no rule of their own: the card is a column,
+   and the banner is placed by the markup. Only the horizontal one turns. */
+.iw-card--horizontal .iw-card__body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        'visual head'
+        'visual text'
+        'visual link';
+    align-items: start;
+    column-gap: 1rem;
+}
+
+.iw-card--horizontal .iw-card__head {
+    grid-area: head;
+}
+
+.iw-card--horizontal .iw-card__image {
+    grid-area: visual;
+    align-self: center;
+    width: var(--iw-card-horizontal-visual, 6rem);
+    margin-block: 0;
+}
+
+.iw-card--horizontal .iw-card__text {
+    grid-area: text;
+}
+
+.iw-card--horizontal .iw-card__link {
+    grid-area: link;
+    margin-top: 0.35rem;
+}
+
+/* Options ──────────────────────────────────────────────────────────────── */
+
+.iw-card--shadow {
+    box-shadow: var(--iw-card-shadow, 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 16px -6px rgb(0 0 0 / 0.12));
+}
+
+.iw-card--shadow:hover {
+    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px rgb(0 0 0 / 0.12), 0 12px 24px -8px rgb(0 0 0 / 0.18));
+}
+
+/* Highlighted ──────────────────────────────────────────────────────────── */
+
+/* The accent surface owns its text colour, which is the whole point: a plain
+   accent background could not promise the text on it stays readable. The
+   title, link and number follow it too, or they would keep the colours meant
+   for the normal card background. */
+.iw-card--highlighted {
+    background-color: var(--iw-variant-accent-bg, var(--color-accent));
+    border-color: var(--iw-variant-accent-border, transparent);
+    border-width: var(--iw-variant-accent-border-width, 1px);
+    color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
+}
+
+.iw-card--highlighted .iw-card__title,
+.iw-card--highlighted .iw-card__link,
+.iw-card--highlighted .iw-card__number {
+    color: inherit;
+}
+
+/* A card that is entirely a link ───────────────────────────────────────── */
+
+/* A card that is a link is still a card: the variant colours every <a> with
+   the link colour, and everything inside inherits it, so the title, the text
+   and the number all turned into link colour the moment the card became
+   clickable. Three classes and a type beat the variant rule, which is two
+   classes and a type, so no !important is needed. */
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted),
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):hover,
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):focus,
+.iw-block-cards .iw-block-cards__grid a.iw-card:not(.iw-card--highlighted):visited {
+    color: inherit;
+}
+
+/* A highlighted card holds the text colour of the accent surface, in every
+   state, for the same reason: it is the colour that surface guarantees to be
+   readable on its background. Excluded from the rule above and given its own,
+   or that rule - three classes to its one - would strip it back to inherit and
+   the card would lose the very thing the accent surface exists to provide. */
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:hover,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:focus,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:visited {
+    color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
+}
+
+/* Inside a highlighted card the action follows the card, not the link colour,
+   which is rarely readable on an accent background - a dark blue link on an
+   orange card, in the theme this was tested against.
+   The grid class is in the selector to outweigh the generic action rule above:
+   without it the two are equally specific, and the later one simply won. */
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted .iw-card__link,
+.iw-block-cards .iw-block-cards__grid a.iw-card--highlighted:hover .iw-card__link,
+.iw-block-cards .iw-block-cards__grid .iw-card--highlighted .iw-card__link,
+.iw-block-cards .iw-block-cards__grid .iw-card--highlighted .iw-card__action {
+    color: inherit;
+}
+
+/* The action is the only part that reads as a link, so it keeps the link
+   colours - including on hover of the card, since the card is the anchor and
+   the action inside it is only a span. */
+.iw-block-cards a.iw-card .iw-card__link {
+    color: var(--iw-variant-link-color, inherit);
+}
+
+.iw-block-cards a.iw-card:hover .iw-card__link {
+    color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
+}
+
+a.iw-card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+a.iw-card:hover {
+    transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    a.iw-card {
+        transition: none;
+    }
+
+    a.iw-card:hover {
+        transform: none;
+    }
 }

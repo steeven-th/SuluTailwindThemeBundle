@@ -1,0 +1,46 @@
+{# Cards block - a full-width image banner, then the content.
+   The card image moves to the top of the card rather than sitting inside
+   the body, which is a change of structure and so a layout of its own. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% set cardRadiusClass = iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) %}
+    {% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
+    {% set imageMaxWidthClass = iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) %}
+
+    {#- The view carries the resolved link targets, keyed by this block's index
+        in the page. -#}
+    {% set blockKey = _key|default(null) %}
+    {% set itemsView = blockKey is not null ? view.blocks[blockKey].items|default([]) : [] %}
+
+    <div class="iw-block-cards iw-block-cards--image-top">
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+            title: title|default(''),
+            subTitle: subTitle|default(''),
+            titleAlignment: titleAlignment|default('left'),
+            titleTag: titleTag|default('h2'),
+            variant: variant|default(0),
+            separatorMode: separatorMode|default(''),
+            variantConfig: variantConfig|default({})
+        } only %}
+
+        {% include '@ItechWorldSuluTailwindTheme/blocks/cards/_grid.html.twig' with {
+            items: items|default([]),
+            itemsView: itemsView,
+            style: 'image_top',
+            columns: columns|default('3'),
+            align: contentAlignment|default('left'),
+            width: cardWidth|default('fill'),
+            gridAlign: cardsAlignment|default('left'),
+            iconPosition: iconPosition|default('inline'),
+            shadow: cardShadow|default(false),
+            numbered: cardNumbers|default(false),
+            ctaAlignment: ctaAlignment|default('title'),
+            ctaDirection: ctaDirection|default('row'),
+            imageMaxWidth: imageMaxWidthClass,
+            cardRadius: cardRadiusClass,
+            imageRadius: imageRadiusClass,
+            clickable: clickableCard|default(false)
+        } only %}
+    </div>
+{% endblock %}

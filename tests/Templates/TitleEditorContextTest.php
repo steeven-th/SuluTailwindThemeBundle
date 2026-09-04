@@ -124,7 +124,7 @@ final class TitleEditorContextTest extends TestCase
         // 28 block headings (14 blocks x title + subTitle), then the hero
         // fields as an editor meets them: 2 in each of the two page templates,
         // 1 in each of the three article templates.
-        self::assertSame(['blocks' => 28, 'pages' => 7], $found);
+        self::assertSame(['blocks' => 31, 'pages' => 7], $found);
     }
 
     /**

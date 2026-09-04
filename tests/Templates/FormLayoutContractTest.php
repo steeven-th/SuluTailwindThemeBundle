@@ -146,6 +146,46 @@ final class FormLayoutContractTest extends TestCase
         }
     }
 
+    /**
+     * A block that includes the titles fragment opens a group of its own after it.
+     *
+     * `block-heading.xml` opens a "Titles" group, and a Sulu group runs until
+     * the next heading closes it. A block that adds fields after the include
+     * without a heading of its own leaves them looking like part of the titles,
+     * which is how the cards block first shipped its list of cards.
+     */
+    #[Test]
+    #[DataProvider('blockTemplates')]
+    public function aBlockThatIncludesTheTitlesOpensItsOwnGroup(string $path): void
+    {
+        $source = (string) file_get_contents($path);
+
+        if (1 !== preg_match('/<section name="content">(.*?)<\/section>/s', $source, $matches)) {
+            self::markTestSkipped(basename($path) . ' has no content section.');
+        }
+
+        $content = $matches[1];
+        if (!str_contains($content, 'block-heading.xml')) {
+            self::markTestSkipped(basename($path) . ' does not include the titles fragment.');
+        }
+
+        [, $afterInclude] = explode('block-heading.xml', $content, 2);
+
+        // Nothing follows the titles: no group to close.
+        if (1 !== preg_match('/<(?:property|block) name="/', $afterInclude)) {
+            self::markTestSkipped(basename($path) . ' adds nothing after the titles.');
+        }
+
+        self::assertStringContainsString(
+            'type="heading"',
+            $afterInclude,
+            \sprintf(
+                '%s adds fields after the titles fragment without opening a group, so they read as part of the titles.',
+                basename($path),
+            ),
+        );
+    }
+
     private static function height(string $type): string
     {
         return \in_array($type, self::TALL, true) ? 'tall' : 'short';

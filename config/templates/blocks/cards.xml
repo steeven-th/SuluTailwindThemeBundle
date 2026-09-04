@@ -1,0 +1,357 @@
+<?xml version="1.0" ?>
+<!-- Global block type: Cards -->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>cards</key>
+    <meta>
+        <title>iw_sulu_tailwind_theme.block.cards</title>
+    </meta>
+
+    <properties>
+        <!-- ── Content ── -->
+        <section name="content">
+            <meta><title>iw_sulu_tailwind_theme.content</title></meta>
+            <properties>
+                <xi:include href="../fragments/block-heading.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <!-- `block-heading.xml` opens a "Titles" group, and a group stays
+                     open until the next heading closes it. Without this one the
+                     cards read as part of the titles. -->
+                <property name="contentHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.content_group_cards</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- No title of its own: the heading right above already says
+                     "Cards", and Sulu would print it twice. -->
+                <block name="items" default-type="card" minOccurs="1">
+                    <types>
+                        <type name="card">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.cards_item</title>
+                            </meta>
+                            <properties>
+                                <!-- The icon is a media rather than a picker from a
+                                     set: the bundle ships no icon library, and the
+                                     timeline established this. An SVG scales. -->
+                                <property name="icon" type="single_media_selection" colspan="6">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_icon</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_icon_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="types" value="image"/>
+                                    </params>
+                                </property>
+
+                                <property name="image" type="single_media_selection" colspan="6">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_image</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_image_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="types" value="image"/>
+                                    </params>
+                                </property>
+
+                                <property name="title" type="iw_theme_title_editor">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.title</title>
+                                    </meta>
+                                    <params>
+                                        <param name="context" value="blocks"/>
+                                    </params>
+                                </property>
+
+                                <property name="text" type="text_editor">
+                                    <meta><title>iw_sulu_tailwind_theme.text</title></meta>
+                                </property>
+
+                                <!-- The destination of the card as a whole, shown only
+                                     when the block makes its cards clickable. Two
+                                     levels of `__parent`: the card is inside the
+                                     repeatable block, the setting is beside it. -->
+                                <property name="link" type="link"
+                                          visibleCondition="__parent.__parent.clickableCard">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_link</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_link_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="enable_anchor" value="true"/>
+                                        <param name="enable_attributes" value="true"/>
+                                        <param name="types" type="collection">
+                                            <param name="page"/>
+                                            <param name="external"/>
+                                            <param name="media"/>
+                                        </param>
+                                    </params>
+                                </property>
+
+                                <property name="linkStyle" type="iw_theme_button_style_picker"
+                                          visibleCondition="__parent.__parent.clickableCard">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_link_style</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_link_style_info</info_text>
+                                    </meta>
+                                </property>
+
+                                <!-- The shared CTA buttons, offered only when the card
+                                     is NOT clickable: either the card leads somewhere
+                                     as a whole, or it holds buttons that lead to
+                                     several places, never both.
+
+                                     Copied from `cta-buttons.xml` rather than included,
+                                     because a `visibleCondition` cannot ride on an
+                                     `xi:include`. `CardLinkContractTest` compares the
+                                     two so the copy cannot drift. -->
+                                <block name="ctaButtons" default-type="cta_button" minOccurs="0"
+                                       visibleCondition="__parent.__parent.clickableCard != true">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cta_buttons</title>
+                                        <info_text>iw_sulu_tailwind_theme.cta_buttons_info</info_text>
+                                    </meta>
+                                    <types>
+                                        <type name="cta_button">
+                                            <meta>
+                                                <title>iw_sulu_tailwind_theme.cta_button</title>
+                                            </meta>
+                                            <properties>
+                                                <property name="link" type="link" colspan="12">
+                                                    <meta>
+                                                        <title>iw_sulu_tailwind_theme.cta_button_link</title>
+                                                        <info_text>iw_sulu_tailwind_theme.cta_button_link_info</info_text>
+                                                    </meta>
+                                                    <params>
+                                                        <param name="enable_attributes" value="true"/>
+                                                    </params>
+                                                </property>
+                                                <property name="style" type="iw_theme_button_style_picker" colspan="12">
+                                                    <meta>
+                                                        <title>iw_sulu_tailwind_theme.cta_button_style</title>
+                                                    </meta>
+                                                </property>
+                                            </properties>
+                                        </type>
+                                    </types>
+                                </block>
+
+                                <!-- Puts one card forward using the accent surface of
+                                     the variant, which carries its own text colour, so
+                                     the card stays legible whatever the accent is. -->
+                                <property name="highlighted" type="checkbox">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_highlighted</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_highlighted_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="type" value="toggler"/>
+                                    </params>
+                                </property>
+                            </properties>
+                        </type>
+                    </types>
+                </block>
+
+            </properties>
+        </section>
+
+        <!-- ── Appearance ── -->
+        <section name="appearance">
+            <meta><title>iw_sulu_tailwind_theme.appearance</title></meta>
+            <properties>
+                <xi:include href="../fragments/block-variant.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <property name="style" type="iw_theme_style_picker">
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
+                    <params>
+                        <param name="block_type" value="cards"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- ── Settings ── -->
+        <section name="settings">
+            <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
+            <properties>
+                <!-- A heading takes its text from the `label` param, not from
+                     `meta`, which is what the shared fragments do. Through meta
+                     it renders as an ordinary property title: not bold, and
+                     followed by the empty space where its field would go. -->
+                <property name="cardsHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.cards_group</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Equal columns, then the uneven pairs. An uneven split is a
+                     repeating pattern, so five cards on "1 / 2" alternate narrow
+                     and wide rather than only affecting the first row. -->
+                <property name="columns" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_columns</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_columns_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="3"/>
+                        <param name="values" type="collection">
+                            <param name="2"><meta><title>iw_sulu_tailwind_theme.cards_columns_2</title></meta></param>
+                            <param name="3"><meta><title>iw_sulu_tailwind_theme.cards_columns_3</title></meta></param>
+                            <param name="4"><meta><title>iw_sulu_tailwind_theme.cards_columns_4</title></meta></param>
+                            <param name="1-2"><meta><title>iw_sulu_tailwind_theme.cards_columns_1_2</title></meta></param>
+                            <param name="2-1"><meta><title>iw_sulu_tailwind_theme.cards_columns_2_1</title></meta></param>
+                            <param name="1-3"><meta><title>iw_sulu_tailwind_theme.cards_columns_1_3</title></meta></param>
+                            <param name="3-1"><meta><title>iw_sulu_tailwind_theme.cards_columns_3_1</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Columns say how many share a row, this says how wide each one
+                     is allowed to be. Left to "fill" they share the width as
+                     before. Capped, the row is narrower than the block, which is
+                     what `cardsAlignment` then places. -->
+                <property name="cardWidth" type="single_select" colspan="6"
+                          visibleCondition="__parent.columns == '2' OR __parent.columns == '3' OR __parent.columns == '4'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_width</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_width_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="fill"/>
+                        <param name="values" type="collection">
+                            <param name="fill"><meta><title>iw_sulu_tailwind_theme.cards_width_fill</title></meta></param>
+                            <param name="compact"><meta><title>iw_sulu_tailwind_theme.cards_width_compact</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.cards_width_medium</title></meta></param>
+                            <param name="large"><meta><title>iw_sulu_tailwind_theme.cards_width_large</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Only meaningful once the cards no longer fill the row. -->
+                <property name="cardsAlignment" type="single_select" colspan="6"
+                          visibleCondition="__parent.cardWidth != 'fill'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_grid_alignment</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="contentAlignment" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.cards_alignment</title></meta>
+                    <params>
+                        <param name="default_value" value="left"/>
+                        <param name="values" type="collection">
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- The horizontal layout puts the visual beside the text, so it
+                     owns that placement and the setting would do nothing. -->
+                <property name="iconPosition" type="single_select" colspan="6"
+                          visibleCondition="__parent.style != 'horizontal'">
+                    <meta><title>iw_sulu_tailwind_theme.cards_icon_position</title></meta>
+                    <params>
+                        <param name="default_value" value="inline"/>
+                        <param name="values" type="collection">
+                            <param name="inline"><meta><title>iw_sulu_tailwind_theme.cards_icon_inline</title></meta></param>
+                            <param name="above"><meta><title>iw_sulu_tailwind_theme.cards_icon_above</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Both were styles of their own, which meant a numbered card
+                     could not have a shadow, nor a banner image a number. As
+                     options they combine with every layout. -->
+                <property name="cardShadow" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_shadow</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_shadow_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                    </params>
+                </property>
+
+                <property name="cardNumbers" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_numbers</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_numbers_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                    </params>
+                </property>
+
+
+                <property name="clickableCard" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_clickable</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_clickable_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                    </params>
+                </property>
+
+                <!-- The banner layout stretches its image across the card, so a
+                     width cap has nothing to act on. Written out rather than
+                     included: a `visibleCondition` cannot ride on an xi:include. -->
+                <property name="imageMaxWidth" type="single_select" colspan="6"
+                          visibleCondition="__parent.style != 'image_top'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_image_max_width</title>
+                        <info_text>iw_sulu_tailwind_theme.block_image_max_width_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_full</title></meta></param>
+                            <param name="3xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_3xs</title></meta></param>
+                            <param name="2xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_2xs</title></meta></param>
+                            <param name="xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_xs</title></meta></param>
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.image_max_width_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.image_max_width_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.image_max_width_lg</title></meta></param>
+                            <param name="xl"><meta><title>iw_sulu_tailwind_theme.image_max_width_xl</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <xi:include href="../fragments/block-spacing.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <xi:include href="../fragments/block-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <xi:include href="../fragments/block-card-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <xi:include href="../fragments/block-image-radius.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+                <xi:include href="../fragments/block-background.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+            </properties>
+        </section>
+    </properties>
+</template>

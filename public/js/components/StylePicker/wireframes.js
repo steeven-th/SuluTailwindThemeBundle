@@ -255,6 +255,48 @@ const WIREFRAME_RENDERERS = {
             <rect x="6" y="56" width="44" height="16" rx="3" fill={fill} />
         </svg>
     ),
+    // Cards block. Three LAYOUTS, so the previews differ by where things sit,
+    // not by what frames them: the frame comes from the variant, and shadow
+    // and numbering are settings that work on all three.
+    cards_stacked: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            {[6, 43, 80].map((x) => (
+                <g key={x}>
+                    <rect x={x} y="18" width="34" height="44" rx="3" fill="none" stroke={fill} strokeWidth="1" />
+                    <circle cx={x + 8} cy="28" r="3" fill={accent} />
+                    <rect x={x + 14} y="25" width="14" height="5" rx="1.5" fill={accent} />
+                    <rect x={x + 6} y="38" width="22" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 6} y="45" width="18" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 6} y="52" width="20" height="3" rx="1.5" fill={fill} />
+                </g>
+            ))}
+        </svg>
+    ),
+    cards_image_top: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            {[6, 43, 80].map((x) => (
+                <g key={x}>
+                    <rect x={x} y="16" width="34" height="48" rx="3" fill="none" stroke={fill} strokeWidth="1" />
+                    <path d={'M' + x + ' 19a3 3 0 0 1 3-3h28a3 3 0 0 1 3 3v15H' + x + 'z'} fill={accent} opacity="0.55" />
+                    <rect x={x + 5} y="40" width="20" height="4" rx="2" fill={accent} />
+                    <rect x={x + 5} y="49" width="24" height="3" rx="1.5" fill={fill} />
+                    <rect x={x + 5} y="56" width="17" height="3" rx="1.5" fill={fill} />
+                </g>
+            ))}
+        </svg>
+    ),
+    cards_horizontal: (fill, accent) => (
+        <svg viewBox="0 0 120 80" width="120" height="80">
+            {[10, 34, 58].map((y) => (
+                <g key={y}>
+                    <rect x="8" y={y} width="104" height="20" rx="3" fill="none" stroke={fill} strokeWidth="1" />
+                    <circle cx="20" cy={y + 10} r="5" fill={accent} />
+                    <rect x="31" y={y + 5} width="30" height="4" rx="2" fill={accent} />
+                    <rect x="31" y={y + 12} width="66" height="3" rx="1.5" fill={fill} />
+                </g>
+            ))}
+        </svg>
+    ),
     timeline_left: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
             <line x1="14" y1="16" x2="14" y2="64" stroke={accent} strokeWidth="2" />
