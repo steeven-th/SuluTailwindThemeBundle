@@ -74,7 +74,8 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero__inner` / `.iw-page-hero__caption` | Overlay content wrapper / below-image wrapper |
 | `.iw-page-hero__title` (+ `--below`) | The H1 (`--iw-page-hero-title-*`) |
 | `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
-| `.iw-page-hero__breadcrumb` (+ `--below`) | Breadcrumb trail (`--iw-page-hero-breadcrumb-*`) |
+| `.iw-page-hero__breadcrumb` (+ `--above`) | Breadcrumb trail. The modifier moves its margin to the other side, for a breadcrumb sitting above the titles |
+| `.iw-page-hero:not(.iw-page-hero--no-image) .iw-page-hero__overlay .iw-page-hero__breadcrumb` | The one case with light colors and a shadow (`--iw-page-hero-breadcrumb-*`): sitting over the image. Everywhere else the breadcrumb keeps the colors set in **Components → Breadcrumb** |
 | `.iw-visually-hidden` | Utility: keeps the H1 in the accessibility tree when the title display is `hidden` |
 
 > The parallax option requires the `hero_parallax` Stimulus controller to be registered in your `controllers.json` (see the installation section of the README).
