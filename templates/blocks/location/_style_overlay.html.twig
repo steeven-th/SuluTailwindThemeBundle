@@ -39,7 +39,7 @@
                     >
                         <span class="iw-block-location__card-header-content">
                             {% if title is defined and title is not empty %}
-                                <span class="text-base font-semibold text-black leading-tight">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</span>
+                                <span class="text-base font-semibold text-black leading-tight">{{ iw_sulu_tailwind_theme_title_markup(title) }}</span>
                             {% endif %}
                             {% if formattedAddress is not empty and (title is not defined or title is empty) %}
                                 <span class="text-sm text-black/75 leading-tight">{{ formattedAddress|split("\n")|first }}</span>

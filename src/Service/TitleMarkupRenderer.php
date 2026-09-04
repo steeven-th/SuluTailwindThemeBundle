@@ -38,16 +38,23 @@ final class TitleMarkupRenderer
     /**
      * Render a stored title to HTML.
      *
-     * @param string|null $text       The stored title, or null
-     * @param bool        $allowColor Whether explicit palette colors are honored.
-     *                                When false (a block title, whose accent color
-     *                                comes from its variant), a colored marker
-     *                                degrades to a plain highlight rather than
-     *                                being dropped.
+     * A marker with no colour becomes `.iw-highlight`, which follows the block
+     * variant, or the theme accent outside one. A marker naming a colour
+     * becomes `.iw-text--<colour>` and gets exactly that.
+     *
+     * The renderer used to take an `$allowColor` flag, false in every block
+     * template, which turned a coloured marker back into a plain highlight.
+     * That made `title_editor.blocks.color` a setting offering a button whose
+     * effect was then discarded: the editor wrote `[[primary:word]]`, saw the
+     * marker stored, and the page still showed the accent. Which buttons the
+     * admin offers is the config's business; what the page shows is what was
+     * written.
+     *
+     * @param string|null $text The stored title, or null
      *
      * @return string HTML, safe to print unescaped
      */
-    public function render(?string $text, bool $allowColor = true): string
+    public function render(?string $text): string
     {
         if (null === $text || '' === trim($text)) {
             return '';
@@ -57,9 +64,9 @@ final class TitleMarkupRenderer
 
         $html = (string) preg_replace_callback(
             self::MARKER_PATTERN,
-            static function (array $matches) use ($allowColor): string {
+            static function (array $matches): string {
                 $color = $matches[1] ?? '';
-                $class = ('' !== $color && $allowColor)
+                $class = '' !== $color
                     ? 'iw-text--' . $color
                     : 'iw-highlight';
 

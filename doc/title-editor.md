@@ -142,14 +142,23 @@ configuring it.
 ## Rendering it
 
 Two Twig functions, both documented in
-[`twig-reference.md`](./twig-reference.md#iw_sulu_tailwind_theme_title_markuptext-allowcolor):
+[`twig-reference.md`](./twig-reference.md):
+
+The rendering shows **what was written**: a marker naming a colour gets that
+colour, wherever the title sits. A marker with no colour follows the block
+variant, or the theme accent outside one.
+
+Which buttons an editor is offered is a separate decision, made in the config
+below. It used to be enforced twice: block templates also passed a flag telling
+the renderer to discard colours, so turning `blocks.color` on offered a button
+whose effect was then thrown away - the marker was stored, and the page still
+showed the accent.
 
 ```twig
 {# A page title #}
 <h1 class="iw-page-hero__title">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
 
-{# A block title: pass false so an explicit color degrades to the variant highlight #}
-<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</h2>
+<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title) }}</h2>
 
 {# Anywhere the title must be plain: <title>, meta, alt, aria-label #}
 <title>{{ iw_sulu_tailwind_theme_title_text(heroTitle) }}</title>

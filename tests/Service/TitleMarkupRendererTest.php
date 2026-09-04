@@ -96,15 +96,50 @@ final class TitleMarkupRendererTest extends TestCase
     }
 
     #[Test]
-    public function itDegradesAColoredMarkerToAHighlightWhenColorsAreNotAllowed(): void
+    public function itHonoursAColorWhereverTheTitleSits(): void
     {
-        // A block title takes its accent color from its variant. A colored
-        // marker (pasted from a page title, say) must still highlight the word
-        // rather than lose it.
+        // A block title used to discard the colour and fall back to its
+        // variant, which made `title_editor.blocks.color` offer a button whose
+        // effect was thrown away: the marker was stored, and the page still
+        // showed the accent. Which buttons the admin offers is a config
+        // decision; the page shows what was written.
+        self::assertSame(
+            'Notre <span class="iw-text--accent">expertise</span>.',
+            $this->renderer->render('Notre [[accent:expertise]].'),
+        );
+
+        // Without a colour the marker still follows the variant, or the theme
+        // accent outside one, which is what `.iw-highlight` resolves to.
         self::assertSame(
             'Notre <span class="iw-highlight">expertise</span>.',
-            $this->renderer->render('Notre [[accent:expertise]].', false),
+            $this->renderer->render('Notre [[expertise]].'),
         );
+    }
+
+    #[Test]
+    public function noTemplateAsksForTheColourToBeDiscarded(): void
+    {
+        // The flag is gone from the renderer. A template still passing a second
+        // argument would fail at render time, and only on the page carrying
+        // that title.
+        // Recursive: `templates/**/*.twig` only descends one level, and would
+        // miss most of the tree.
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(\dirname(__DIR__, 2) . '/templates'),
+        );
+
+        $offenders = [];
+        foreach ($files as $file) {
+            if (!$file instanceof \SplFileInfo || 'twig' !== $file->getExtension()) {
+                continue;
+            }
+
+            if (1 === preg_match('/title_markup\([^()]*,\s*(?:true|false)\s*\)/', (string) file_get_contents($file->getPathname()))) {
+                $offenders[] = $file->getBasename();
+            }
+        }
+
+        self::assertSame([], $offenders, 'These templates still pass the removed flag.');
     }
 
     #[Test]

@@ -351,7 +351,7 @@ heading typography is restored via CSS.
 
 ---
 
-### `iw_sulu_tailwind_theme_title_markup(text, allowColor)`
+### `iw_sulu_tailwind_theme_title_markup(text)`
 
 Renders a title stored by the `iw_theme_title_editor` field type. Titles are
 stored as **plain text** carrying a small, closed syntax:
@@ -375,18 +375,20 @@ migration. See [`css-api/transverse.md`](./css-api/transverse.md#text-color-util
 for the generated classes.
 
 ```twig
-{# A page title: the editor picks colors from the palette #}
+{# Anywhere a stored title is printed #}
 <h1 class="iw-page-hero__title">{{ iw_sulu_tailwind_theme_title_markup(heroTitle) }}</h1>
-
-{# A block title: the accent color comes from the variant, not from the editor #}
-<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title, false) }}</h2>
+<h2 class="iw-block__title">{{ iw_sulu_tailwind_theme_title_markup(title) }}</h2>
 ```
+
+A marker naming a colour gets that colour, wherever the title sits. One with no
+colour follows the block variant, or the theme accent outside one. Which buttons
+an editor is offered is decided by `title_editor` in the bundle config, not here.
+
+The function took a second argument until 3.0.0, false in every block template,
+which discarded an explicit colour. See [`upgrade-3.0.0.md`](./upgrade-3.0.0.md).
 
 **Parameters:**
 - `text` (`string|null`) - The stored title
-- `allowColor` (`bool`) - Whether `[[color:word]]` markers keep their explicit
-  color (default `true`). Pass `false` on a block title: a colored marker then
-  degrades to a plain highlight rather than being dropped.
 
 **Returns:** `string` - HTML, safe to print unescaped.
 

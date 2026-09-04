@@ -641,6 +641,27 @@ these surfaces exist to replace.
 See [`css-api/block-variants.md`](./css-api/block-variants.md) for the full list
 of custom properties.
 
+## Title colours are honoured in blocks too (fixed)
+
+`iw_sulu_tailwind_theme_title_markup()` no longer takes a second argument. It
+used to accept a flag, false in every block template, that turned a marker
+naming a colour back into a plain highlight.
+
+That made `title_editor.blocks.color` a setting with no effect: turning it on
+offered the palette button, the editor picked a colour, the marker was stored -
+and the page still rendered the theme accent.
+
+A marker now renders what it says, wherever the title sits. Only the config
+decides which buttons an editor is offered.
+
+**This changes existing pages** whose block titles already carry a coloured
+marker: they were rendering as the variant highlight and will now show the
+colour that was chosen. Nothing else moves.
+
+If you override a template that calls the function with two arguments, drop the
+second one - Twig fails on the extra argument, and only on the page carrying
+that title.
+
 ## Multi-line titles with highlighted words (new)
 
 Titles can now span several lines and put a few words forward in another color.

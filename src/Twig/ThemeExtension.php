@@ -636,9 +636,9 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @return string HTML
      */
-    public function getTitleMarkup(?string $text, bool $allowColor = true): string
+    public function getTitleMarkup(?string $text): string
     {
-        return $this->titleMarkupRenderer->render($text, $allowColor);
+        return $this->titleMarkupRenderer->render($text);
     }
 
     /**
