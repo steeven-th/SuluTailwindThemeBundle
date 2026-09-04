@@ -206,16 +206,20 @@ export default class MarginSelector extends React.Component {
                     <button
                         key={THEME_DEFAULT_KEY}
                         type="button"
-                        style={{...buttonBase(followsTheme), width: '78px'}}
+                        style={{...buttonBase(followsTheme), width: '40px'}}
                         onClick={() => this.props.onChange && this.props.onChange('')}
                         title={translate('iw_sulu_tailwind_theme.margin_theme_default')}
                     >
-                        <span style={{fontSize: '10px', lineHeight: 1.1}}>
+                        {/* Same two lines as a step button, so the grid stays
+                            regular: a word on top, the value it resolves to
+                            below. The Tailwind step is dropped - the reader is
+                            picking a spacing, not a scale position. */}
+                        <span style={{fontSize: '9px', lineHeight: 1.1}}>
                             {translate('iw_sulu_tailwind_theme.margin_theme_default')}
                         </span>
                         {null !== themeStep && (
                             <span style={{fontSize: '9px', opacity: 0.65, lineHeight: 1}}>
-                                {themeStep} · {themeStep * 4}px
+                                {themeStep * 4}px
                             </span>
                         )}
                     </button>

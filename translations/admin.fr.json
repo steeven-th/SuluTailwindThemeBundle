@@ -170,7 +170,7 @@
     "iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info": "Espace entre le bas du bloc et son contenu.",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Espacement intérieur latéral",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Espace entre les bords gauche et droit du bloc et son contenu.",
-    "iw_sulu_tailwind_theme.margin_theme_default": "Selon le thème",
+    "iw_sulu_tailwind_theme.margin_theme_default": "Défaut",
 
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Espacement intérieur des surfaces",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Espace entre une surface et ce qui est posé dessus. Ne s'applique qu'aux surfaces qui ont un fond ou une bordure, un bloc sans fond de contenu garde donc sa mise en page.",

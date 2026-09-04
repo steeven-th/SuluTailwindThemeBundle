@@ -170,7 +170,7 @@
     "iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info": "Abstand zwischen der Unterkante des Blocks und seinem Inhalt.",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Seitlicher Innenabstand",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Abstand zwischen dem linken und rechten Rand des Blocks und seinem Inhalt.",
-    "iw_sulu_tailwind_theme.margin_theme_default": "Dem Thema folgen",
+    "iw_sulu_tailwind_theme.margin_theme_default": "Standard",
 
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Innenabstand der Flächen",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Abstand zwischen einer Fläche und dem, was darauf liegt. Gilt nur für Flächen mit Hintergrund oder Rahmen, ein Block ohne Inhaltsfläche behält also sein Layout.",

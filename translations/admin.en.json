@@ -170,7 +170,7 @@
     "iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info": "Space between the bottom of the block and its content.",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Lateral padding",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Space between the left and right edges of the block and its content.",
-    "iw_sulu_tailwind_theme.margin_theme_default": "Follow the theme",
+    "iw_sulu_tailwind_theme.margin_theme_default": "Default",
 
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Surface padding",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Space between a surface and what sits on it. It only applies to surfaces that have a background or a border, so a block with no content surface keeps its layout.",
