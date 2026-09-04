@@ -629,10 +629,12 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      * is safe to print unescaped - which is why this function is declared
      * `is_safe: html` and templates never need `|raw`.
      *
-     * @param string|null $text       The stored title
-     * @param bool        $allowColor Whether `[[color:word]]` markers keep their
-     *                                explicit color. Pass false on a block title,
-     *                                whose accent color comes from its variant.
+     * A marker naming a color gets that color, wherever the title sits. One
+     * with no color follows the block variant, or the theme accent outside
+     * one. Which buttons an editor is offered is decided by `title_editor` in
+     * the bundle config, not here.
+     *
+     * @param string|null $text The stored title
      *
      * @return string HTML
      */
