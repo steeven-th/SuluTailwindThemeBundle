@@ -63,6 +63,21 @@ const ZONES = [
         ],
     },
     {
+        id: 'table',
+        label: 'iw_sulu_tailwind_theme.variant_zone_table',
+        fields: [
+            {key: 'tableHeadBg', label: 'iw_sulu_tailwind_theme.variant_table_head_bg', kind: 'color'},
+            {key: 'tableHeadText', label: 'iw_sulu_tailwind_theme.variant_table_head_text', kind: 'color'},
+            {key: 'tableCellBg', label: 'iw_sulu_tailwind_theme.variant_table_cell_bg', kind: 'color'},
+            {key: 'tableCellText', label: 'iw_sulu_tailwind_theme.variant_table_cell_text', kind: 'color'},
+            {key: 'tableStripeBg', label: 'iw_sulu_tailwind_theme.variant_table_stripe_bg', kind: 'color'},
+            {key: 'tableHoverBg', label: 'iw_sulu_tailwind_theme.variant_table_hover_bg', kind: 'color'},
+            {key: 'tableBorder', label: 'iw_sulu_tailwind_theme.variant_table_border', kind: 'color'},
+            {key: 'tableBorderWidth', label: 'iw_sulu_tailwind_theme.variant_table_border_width', kind: 'width'},
+            {key: 'tableBorderStyle', label: 'iw_sulu_tailwind_theme.variant_table_border_style', kind: 'lineStyle'},
+        ],
+    },
+    {
         id: 'form',
         label: 'iw_sulu_tailwind_theme.variant_zone_form',
         fields: [
@@ -79,6 +94,9 @@ const ZONES = [
 
 /** Widths a border can take, in pixels. Mirrors VariantZones::WIDTHS. */
 const WIDTHS = [1, 2, 3];
+
+/** Line styles a border can take. Mirrors VariantZones::LINE_STYLES. */
+const LINE_STYLES = ['solid', 'dashed', 'dotted'];
 
 /**
  * The clickable parts of the preview, and the settings each one owns.
@@ -125,6 +143,10 @@ const PREVIEW_GROUPS = [
         fields: ['hr']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
         fields: ['accentBg', 'accentBorder', 'accentText', 'accentBorderWidth']},
+    {id: 'table', label: 'iw_sulu_tailwind_theme.variant_zone_table',
+        fields: ['tableHeadBg', 'tableHeadText', 'tableCellBg', 'tableCellText',
+            'tableStripeBg', 'tableHoverBg', 'tableBorder', 'tableBorderStyle',
+            'tableBorderWidth']},
     {id: 'form', label: 'iw_sulu_tailwind_theme.variant_zone_form',
         fields: ['formBg', 'formBorder', 'formBorderFocus', 'formBorderError',
             'formText', 'formPlaceholder', 'formLabel']},
@@ -155,4 +177,4 @@ function fieldOf(key) {
     return FIELDS.find((field) => field.key === key) || null;
 }
 
-export {ZONES, WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
+export {ZONES, WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};

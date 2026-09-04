@@ -53,16 +53,44 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-table-head-bg` | `tableHeadBg` | Header row background. Empty keeps the computed tint |
+| `--iw-variant-table-head-text` | `tableHeadText` | Header row text. Empty keeps the title colour |
+| `--iw-variant-table-cell-bg` | `tableCellBg` | Cell background. Empty is transparent |
+| `--iw-variant-table-cell-text` | `tableCellText` | Cell text. Empty keeps the paragraph colour |
+| `--iw-variant-table-stripe-bg` | `tableStripeBg` | Every other body row. Empty means no striping |
+| `--iw-variant-table-hover-bg` | `tableHoverBg` | Hovered body row. Empty means no hover tint |
+| `--iw-variant-table-border` | `tableBorder` | Rule colour. Empty keeps the separator colour |
+| `--iw-variant-table-border-width` | `tableBorderWidth` | `0` to `3px`. Empty keeps the default `1px` |
+| `--iw-variant-table-border-style` | `tableBorderStyle` | `solid`, `dashed` or `dotted`. Empty is solid |
 
 ### Tables
 
-A table from the rich-text editor is coloured by the variant like any other
-content, and the split is the one an editor would expect: the cells take the
+A table from the rich-text editor has no block of its own, so the variant is
+the only place to configure it. Nine settings cover the header, the cells and
+the rules, and **every one of them is empty by default**: an editor only ever
+sees the ones they changed, and a table nobody touched renders exactly as it
+did before they existed.
+
+Left alone, the split is the one an editor would expect: the cells take the
 paragraph colour, the header row takes the **title** colour over
-`--iw-variant-subtle-bg`, and the caption takes the paragraph colour. Cell
-borders use the separator colour, `--iw-variant-hr-color`, since a table with
-no rules is unreadable rather than merely unstyled - that is the one border in
-the bundle that does not default to none.
+`--iw-variant-subtle-bg`, and the caption takes the paragraph colour.
+
+Two defaults are worth knowing about.
+
+The **header background is computed**, not fixed: a translucent black or white
+picked from the lightness of the block, so a header stays legible on a dark
+variant with nobody having chosen anything. Setting `tableHeadBg` replaces that
+computation, so leave it empty unless you mean to.
+
+The **rules are drawn without being asked for**, unlike every other border in
+the bundle: `1px solid` in the separator colour. A table without rules is
+unreadable, where a card without a border is merely plain. That is why zero is
+a value here and nowhere else - it is the only way to remove them - and why an
+empty width means the default rather than none.
+
+Striping and hover tint are off until a colour is given. Both are worth setting
+on any table people actually read across: without a repeating cue the eye jumps
+rows while scanning the far columns.
 
 One known limit: `--iw-variant-subtle-bg` is computed from the block
 background, not from the surface the table happens to sit on. A table inside a

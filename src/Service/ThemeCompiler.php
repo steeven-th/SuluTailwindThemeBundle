@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Event\ThemeCompileEvent;
@@ -3048,6 +3049,18 @@ class ThemeCompiler
             'accentBg' => '--iw-variant-accent-bg',
             'accentText' => '--iw-variant-accent-text',
             'accentBorder' => '--iw-variant-accent-border',
+            // Tables. Every one of these is empty by default and falls back, in
+            // the rules further down, to what the table used to take from
+            // elsewhere: the header from the title colour over the computed
+            // subtle background, the cells from the paragraph colour, the rules
+            // from the separator colour. Nothing moves until one is set.
+            'tableHeadBg' => '--iw-variant-table-head-bg',
+            'tableHeadText' => '--iw-variant-table-head-text',
+            'tableCellBg' => '--iw-variant-table-cell-bg',
+            'tableCellText' => '--iw-variant-table-cell-text',
+            'tableStripeBg' => '--iw-variant-table-stripe-bg',
+            'tableHoverBg' => '--iw-variant-table-hover-bg',
+            'tableBorder' => '--iw-variant-table-border',
         ];
 
         // Border widths travel with the border colors but are not colors, so
@@ -3057,6 +3070,7 @@ class ThemeCompiler
             'contentBorderWidth' => '--iw-variant-content-border-width',
             'paragraphBorderWidth' => '--iw-variant-paragraph-border-width',
             'accentBorderWidth' => '--iw-variant-accent-border-width',
+            'tableBorderWidth' => '--iw-variant-table-border-width',
         ];
 
         // Variants are keyed by a stable slug (not the positional index).
@@ -3089,11 +3103,31 @@ class ThemeCompiler
             }
 
             foreach ($widthMap as $tokenKey => $cssProperty) {
-                $width = (int) ($props[$tokenKey] ?? 0);
-                if ($width < 1 || $width > self::MAX_BORDER_WIDTH) {
+                $stored = (string) ($props[$tokenKey] ?? '');
+                if ('' === $stored) {
+                    continue;
+                }
+
+                $width = (int) $stored;
+                // Zero is meaningful for table rules alone. Everywhere else the
+                // border is off until asked for, so its absence already says
+                // zero and emitting one would only be a longer way to say
+                // nothing. Table rules are drawn by default, so removing them
+                // takes an explicit zero.
+                $floor = 'tableBorderWidth' === $tokenKey ? 0 : 1;
+                if ($width < $floor || $width > self::MAX_BORDER_WIDTH) {
                     continue;
                 }
                 $css .= "  {$cssProperty}: {$width}px;\n";
+            }
+
+            // The line style is neither a colour nor a length, so it goes
+            // through neither map. Whitelisted rather than passed through: this
+            // value lands inside a `border` shorthand, where an unexpected
+            // string would take the whole declaration down with it.
+            $lineStyle = (string) ($props['tableBorderStyle'] ?? '');
+            if (\in_array($lineStyle, VariantZones::LINE_STYLES, true)) {
+                $css .= "  --iw-variant-table-border-style: {$lineStyle};\n";
             }
 
             // Apply title color as default text color for the block
@@ -3259,20 +3293,53 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} table {\n";
             $css .= "  width: 100%;\n";
             $css .= "  border-collapse: collapse;\n";
-            $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
+            $css .= "  color: var(--iw-variant-table-cell-text, var(--iw-variant-paragraph-color, inherit));\n";
             $css .= "}\n";
 
+            // The rules are the one border in the bundle that is there by
+            // default: a table without them is unreadable, where a card without
+            // one is merely plain. So the width falls back to 1px rather than to
+            // zero, and the colour to the separator - which is what a table took
+            // before any of this was settable.
             $css .= ".iw-variant--{$index} table th,\n";
             $css .= ".iw-variant--{$index} table td {\n";
             $css .= "  padding: 0.75rem 1rem;\n";
-            $css .= "  border: 1px solid var(--iw-variant-hr-color, #e5e7eb);\n";
+            $css .= "  border: var(--iw-variant-table-border-width, 1px)\n";
+            $css .= "    var(--iw-variant-table-border-style, solid)\n";
+            $css .= "    var(--iw-variant-table-border, var(--iw-variant-hr-color, #e5e7eb));\n";
             $css .= "  text-align: left;\n";
             $css .= "}\n";
 
+            // Cell background: transparent unless asked, so a table stays on
+            // whatever surface it sits on.
+            $css .= ".iw-variant--{$index} table td {\n";
+            $css .= "  background-color: var(--iw-variant-table-cell-bg, transparent);\n";
+            $css .= "}\n";
+
+            // Zebra striping, off unless a colour is given. `tbody` keeps the
+            // header out of the count, and `:nth-child(even)` tints the second
+            // row first, which is what reads as an alternation rather than as a
+            // first row that looks selected.
+            $css .= ".iw-variant--{$index} table tbody tr:nth-child(even) td {\n";
+            $css .= "  background-color: var(--iw-variant-table-stripe-bg, var(--iw-variant-table-cell-bg, transparent));\n";
+            $css .= "}\n";
+
+            // Row hover, likewise off unless asked. It wins over the stripe so
+            // the pointer stays followable across both kinds of row.
+            $css .= ".iw-variant--{$index} table tbody tr:hover td,\n";
+            $css .= ".iw-variant--{$index} table tbody tr:nth-child(even):hover td {\n";
+            $css .= "  background-color: var(--iw-variant-table-hover-bg, var(--iw-variant-table-stripe-bg, var(--iw-variant-table-cell-bg, transparent)));\n";
+            $css .= "}\n";
+
+            // The header keeps the title colour over the computed subtle
+            // background when nothing is set. That computation is worth keeping
+            // as the default: it picks a translucent black or white from the
+            // lightness of the block, so a header stays legible with nobody
+            // having chosen anything.
             $css .= ".iw-variant--{$index} table th {\n";
             $css .= "  font-weight: 600;\n";
-            $css .= "  color: var(--iw-variant-title-color, inherit);\n";
-            $css .= "  background-color: var(--iw-variant-subtle-bg);\n";
+            $css .= "  color: var(--iw-variant-table-head-text, var(--iw-variant-title-color, inherit));\n";
+            $css .= "  background-color: var(--iw-variant-table-head-bg, var(--iw-variant-subtle-bg));\n";
             $css .= "}\n";
 
             // Inline code (<code> not inside <pre>)
