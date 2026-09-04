@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Guards which theme the admin color pickers paint.
+ * Guards which theme the admin fields read.
  *
  * `themeConfigStore` holds the theme the webspace runs. A theme form edits some
  * other theme, whose colors are only in the form until it is saved. Reaching
@@ -24,8 +24,13 @@ use PHPUnit\Framework\TestCase;
  * for the second the form palette took to load.
  *
  * The rule now lives in one place, `paletteFor`, and this test keeps it there.
+ *
+ * The lists a field offers have the same problem and their own fix: read the
+ * form first, fall back to the store only outside one. The variant picker never
+ * did, so the footer tab of a non-active theme listed the active theme's
+ * variants and let one be picked from that list.
  */
-final class PaletteSourceContractTest extends TestCase
+final class ThemeSourceContractTest extends TestCase
 {
     /**
      * The one module allowed to name the store palette: it decides the source.
@@ -134,6 +139,79 @@ final class PaletteSourceContractTest extends TestCase
                 \sprintf('%s must tell an omitted prop from a null one.', $prop),
             );
         }
+    }
+
+    /**
+     * Fields living in the theme form and the list each one must read from it.
+     *
+     * A field used only on a page (a block picker) is not here: there the store
+     * IS the theme being edited. These four sit in the theme form, where it is
+     * some other theme.
+     *
+     * @return array<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function themeFormLists(): array
+    {
+        return [
+            'variant picker' => [
+                'public/js/components/VariantPicker/VariantPicker.js',
+                '/blockVariants',
+                'themeConfigStore.variants',
+            ],
+            'button style picker' => [
+                'public/js/components/ButtonStylePicker/ButtonStylePicker.js',
+                '/buttons',
+                'themeConfigStore.buttons',
+            ],
+            'variant editor' => [
+                'public/js/components/VariantEditor/VariantEditor.js',
+                '/buttons',
+                'themeConfigStore.buttons',
+            ],
+        ];
+    }
+
+    /**
+     * Each list is read from the form first, the store only as a fallback.
+     */
+    #[Test]
+    #[DataProvider('themeFormLists')]
+    public function everyThemeListIsReadFromTheFormFirst(
+        string $component,
+        string $path,
+        string $storeProperty,
+    ): void {
+        $source = self::read($component);
+
+        $fromForm = strpos($source, "getValueByPath('" . $path . "')");
+        self::assertNotFalse(
+            $fromForm,
+            \sprintf(
+                '%s must read %s from the form. It sits in the theme form, where the store holds '
+                . 'the active webspace theme instead of the one being edited.',
+                $component,
+                $path,
+            ),
+        );
+
+        self::assertSame(
+            1,
+            substr_count($source, $storeProperty),
+            \sprintf(
+                '%s must name %s exactly once, as the fallback outside a theme form.',
+                $component,
+                $storeProperty,
+            ),
+        );
+
+        self::assertGreaterThan(
+            $fromForm,
+            strpos($source, $storeProperty),
+            \sprintf(
+                'The %s fallback must come after the form is read, not instead of it.',
+                $storeProperty,
+            ),
+        );
     }
 
     private static function read(string $relative): string

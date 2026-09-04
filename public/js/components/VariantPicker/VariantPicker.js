@@ -2,6 +2,8 @@
 import React from 'react';
 import {observer} from 'mobx-react';
 import themeConfigStore from '../../stores/themeConfigStore';
+import loadFormPalette from '../../utils/formPalette';
+import {resolveAllRefs} from '../../utils/colorRefResolver';
 import {getSuluPrimaryColor, getSuluPrimaryAlpha} from '../../utils/suluColors';
 
 /**
@@ -44,8 +46,11 @@ function selectedVariantSlug(value, variants) {
  * colored bars representing different text elements (title, subtitle, paragraph,
  * link, hr) over the block background color. Clicking a wireframe selects the variant.
  *
- * Reads variant data from the shared themeConfigStore (MobX observable),
- * which is updated dynamically when the user switches webspace.
+ * Inside a theme form the variants come from the form, not from the store: the
+ * store holds the theme the webspace runs, so editing any other theme listed
+ * the wrong variants - and the footer tab picks one from that list. Everywhere
+ * else (a block on a page) the store is the right source and is read as before,
+ * updated dynamically when the user switches webspace.
  *
  * @param {Object} props - Component props from Sulu form field
  * @param {*} props.value - Currently selected variant key
@@ -65,12 +70,23 @@ export default class VariantPicker extends React.Component {
      * Apply default value (first variant) when field is empty on mount.
      * Also triggers webspace-aware theme config loading.
      */
+    state = {palette: null};
+
     componentDidMount() {
         this._syncWebspaceTheme();
 
+        // Colors edited in the palette tab of the same form are not saved yet,
+        // and the variants reference them, so the wireframes need the form
+        // palette rather than the saved one.
+        loadFormPalette(this.props.formInspector).then((palette) => {
+            if (palette) {
+                this.setState({palette});
+            }
+        });
+
         const {value, onChange} = this.props;
         if ((value === null || value === undefined || value === '') && onChange) {
-            const variants = themeConfigStore.variants;
+            const variants = this._getVariants();
             if (variants.length > 0) {
                 const firstSlug = variants[0].slug;
                 setTimeout(() => onChange(firstSlug), 0);
@@ -92,6 +108,37 @@ export default class VariantPicker extends React.Component {
         if (match) {
             themeConfigStore.ensureWebspace(match[1]);
         }
+    }
+
+    /**
+     * The variants to show: the edited theme's, or the active one's.
+     *
+     * The form holds the colors grouped under a single property, which is what
+     * lets the variant editor own them, and holds them as written - a palette
+     * reference stays a reference. The wireframe reads flat, resolved colors,
+     * the way ThemeConfigResolver ships them to the store, so both are undone
+     * here. Until the palette loads a reference stays unresolved and paints the
+     * default grey, rather than a color taken from another theme.
+     *
+     * @returns {Array<Object>} The variants, flat and resolved
+     */
+    _getVariants() {
+        const {formInspector} = this.props;
+
+        if (formInspector) {
+            // getValueByPath may return a MobX observable array (fails Array.isArray).
+            const raw = formInspector.getValueByPath('/blockVariants');
+            if (raw && raw.length) {
+                return Array.from(raw).map((variant) => {
+                    const flat = {...variant, ...(variant.colors || {})};
+                    delete flat.colors;
+
+                    return this.state.palette ? resolveAllRefs(flat, this.state.palette) : flat;
+                });
+            }
+        }
+
+        return Array.from(themeConfigStore.variants || []);
     }
 
     /**
@@ -230,7 +277,7 @@ export default class VariantPicker extends React.Component {
 
     render() {
         const {value} = this.props;
-        const variants = themeConfigStore.variants;
+        const variants = this._getVariants();
         const selectedSlug = selectedVariantSlug(value, variants);
 
         if (variants.length === 0) {
