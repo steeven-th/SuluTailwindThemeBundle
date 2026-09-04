@@ -147,7 +147,11 @@ function ensureVariantEditorStyles() {
         '.iw-ve__settings { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }',
         '.iw-ve__setting { flex: 0 1 210px; min-width: 180px; }',
         '.iw-ve__setting-label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }',
-        '.iw-ve__widths { display: flex; gap: 6px; }',
+        '.iw-ve__widths { display: flex; flex-wrap: wrap; gap: 6px; }',
+        // A row of five buttons does not fit the width a colour picker needs,
+        // and overflowed into the setting beside it. Half a row each, so the
+        // two of them wrap onto a line of their own.
+        '.iw-ve__setting--wide { flex: 1 1 calc(50% - 7px); min-width: 260px; }',
         '.iw-ve__width {',
         '  cursor: pointer; border: 1px solid #d1d5db; background: #fff;',
         '  border-radius: 3px; padding: 5px 11px; font-size: 12px;',
@@ -470,8 +474,14 @@ export default class VariantEditor extends React.Component {
                                     </tr>
                                     <tr className="iw-ve__table-row--hover">
                                         <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
-                                        <td className="iw-ve__table-state">
-                                            {translate('iw_sulu_tailwind_theme.variant_preview_table_hover')}
+                                        <td>
+                                            {/* The label is dimmed, not the cell: opacity on a
+                                                <td> makes its BACKGROUND translucent too, so the
+                                                hover colour showed through darker on one cell
+                                                than on the other. */}
+                                            <span className="iw-ve__table-state">
+                                                {translate('iw_sulu_tailwind_theme.variant_preview_table_hover')}
+                                            </span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -558,7 +568,7 @@ export default class VariantEditor extends React.Component {
 
         if ('lineStyle' === field.kind) {
             return (
-                <div className="iw-ve__setting" key={key}>
+                <div className="iw-ve__setting iw-ve__setting--wide" key={key}>
                     <span className="iw-ve__setting-label">{translate(field.label)}</span>
                     <div className="iw-ve__widths">
                         {['', ...LINE_STYLES].map((style) => (
@@ -600,7 +610,7 @@ export default class VariantEditor extends React.Component {
                 : 'iw_sulu_tailwind_theme.variant_border_none';
 
             return (
-                <div className="iw-ve__setting" key={key}>
+                <div className={'iw-ve__setting' + (drawnByDefault ? ' iw-ve__setting--wide' : '')} key={key}>
                     <span className="iw-ve__setting-label">{translate(field.label)}</span>
                     <div className="iw-ve__widths">
                         <button
