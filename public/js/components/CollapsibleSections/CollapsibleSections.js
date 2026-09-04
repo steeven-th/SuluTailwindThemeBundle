@@ -54,9 +54,16 @@ const STYLES = `
    as, so the rest of the admin keeps the layout it has always had. The class
    names are CSS modules, hashed as \`[local]--[contenthash]\`, hence the prefix
    matching. Note that \`grid-section--\` does not contain the substring
-   \`grid--\`, so it needs its own selector. */
+   \`grid--\`, so it needs its own selector.
+
+   The theme config forms hit the same bug and are covered too, through the
+   \`data-iw-theme-form\` attribute this component puts on the body while one is
+   open. They are ordinary Sulu form views, so nothing in the markup tells them
+   apart - the route does. */
 section[role="switch"] [class*="grid--"],
-section[role="switch"] [class*="grid-section--"] {
+section[role="switch"] [class*="grid-section--"],
+[data-iw-theme-form] [class*="grid--"],
+[data-iw-theme-form] [class*="grid-section--"] {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -64,7 +71,10 @@ section[role="switch"] [class*="grid-section--"] {
 
 section[role="switch"] [class*="grid--"] > [class*="section--"],
 section[role="switch"] [class*="grid--"] > [class*="item--"],
-section[role="switch"] [class*="grid-section--"] > [class*="item--"] {
+section[role="switch"] [class*="grid-section--"] > [class*="item--"],
+[data-iw-theme-form] [class*="grid--"] > [class*="section--"],
+[data-iw-theme-form] [class*="grid--"] > [class*="item--"],
+[data-iw-theme-form] [class*="grid-section--"] > [class*="item--"] {
     float: none;
 }
 
@@ -530,6 +540,32 @@ function startObserver(): void {
  * @param {Object} config - The collapsible sections config from ThemeAdmin::getConfig()
  *                          Maps section names to {translationKey, defaultOpen}
  */
+/**
+ * Route prefix of the theme config views, from ThemeAdmin::LIST_VIEW.
+ *
+ * Its form views hang off it: /themes/:id/details, /components, and so on.
+ */
+const THEME_FORM_ROUTE = '/themes/';
+
+/**
+ * Flag the body while a theme config form is open.
+ *
+ * Those forms are ordinary Sulu form views, so the markup gives no way to tell
+ * them from any other admin screen. The route does, and the layout fix above
+ * hangs off the resulting attribute rather than applying to the whole admin.
+ */
+function markThemeForm(): void {
+    const onThemeForm = window.location.hash.includes(THEME_FORM_ROUTE);
+
+    if (onThemeForm) {
+        document.body.setAttribute('data-iw-theme-form', '');
+
+        return;
+    }
+
+    document.body.removeAttribute('data-iw-theme-form');
+}
+
 function init(config: Object): void {
     if (!config || Object.keys(config).length === 0) {
         return;
@@ -544,6 +580,9 @@ function init(config: Object): void {
     if (!initialized) {
         injectStyles();
         startObserver();
+        markThemeForm();
+        // The admin is a single page app: the route changes without a reload.
+        window.addEventListener('hashchange', markThemeForm);
         initialized = true;
     }
 

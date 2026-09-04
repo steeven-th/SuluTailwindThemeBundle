@@ -73,6 +73,13 @@ final class CollapsibleSectionsContractTest extends TestCase
         foreach ([
             'section[role="switch"] [class*="grid--"]',
             'section[role="switch"] [class*="grid-section--"]',
+            // The theme config forms hit the same bug. They are ordinary Sulu
+            // form views, so the component flags the body from the route and
+            // the fix hangs off that attribute.
+            '[data-iw-theme-form] [class*="grid--"]',
+            '[data-iw-theme-form] [class*="grid-section--"]',
+            "data-iw-theme-form', ''",
+            'hashchange',
             'flex-wrap: wrap;',
             'align-items: flex-start;',
             'float: none;',
