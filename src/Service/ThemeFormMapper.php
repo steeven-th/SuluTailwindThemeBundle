@@ -178,7 +178,7 @@ class ThemeFormMapper
         // the page's Hero section; these drive how it is displayed everywhere.
         'pageHero_height', 'pageHero_parallax', 'pageHero_titleDisplay',
         'pageHero_alignX', 'pageHero_alignY', 'pageHero_shade', 'pageHero_breadcrumb',
-        'pageHero_breadcrumbPosition',
+        'pageHero_breadcrumbPosition', 'pageHero_imageFormat',
     ];
 
     /**

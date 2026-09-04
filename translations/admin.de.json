@@ -563,6 +563,8 @@
     "iw_sulu_tailwind_theme.page.hero_display_overlay": "Über dem Bild",
     "iw_sulu_tailwind_theme.page.hero_display_below": "Unter dem Bild",
     "iw_sulu_tailwind_theme.page.hero_display_side_by_side": "Neben dem Bild",
+    "iw_sulu_tailwind_theme.page.hero_image_format": "Bildformat",
+    "iw_sulu_tailwind_theme.page.hero_image_format_info": "Zuschnitt des Bannerbilds. „Original“ behält die eigenen Proportionen.",
     "iw_sulu_tailwind_theme.page.hero_display_hidden": "Ausgeblendet (nur Bild)",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb": "Brotkrümelnavigation",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb_info": "Position der Brotkrümelnavigation. „Mit dem Titel“ folgt der Titelausrichtung.",

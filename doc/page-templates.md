@@ -37,6 +37,7 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 | Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
 | Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
 | Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `bottom_bar` · `hidden` |
+| Image format | `pageHero_imageFormat` | `original` (default) · `16_9` · `4_3` · `1_1` · `3_4` — the crop, on `side_by_side` only |
 | Breadcrumb position | `pageHero_breadcrumbPosition` | `above` (default) · `below` — where it sits relative to the titles, on `with_title` only |
 
 Rendering rules (see `templates/pages/default.html.twig`):
@@ -48,6 +49,7 @@ The banner image is a **property** of the hero, not a condition for it: the comp
 - **`pageHero_titleDisplay: hidden`** → the H1 is still emitted, visually hidden (`.iw-visually-hidden`). Without an image, no empty banner is rendered — only the hidden heading.
 - **`pageHero_titleDisplay: below`** without an image → falls back to `overlay`: there is no image for the header to sit under.
 - **`pageHero_titleDisplay: side_by_side`** → the title and subtitle sit on one side, the image on the other, both in the flow. The image takes the theme image radius, and the banner has no ratio, no height cap and no veil: the content sets the height. Below `lg` the two stack, image first. Without an image it falls back to `overlay`, for the same reason as `below`.
+- **`pageHero_imageFormat`** applies to `side_by_side` alone: it is the only mode whose image is a normal element with a shape of its own. The others fill the banner edge to edge, where the ratio comes from `pageHero_height`. `original` sets no crop and keeps the natural proportions.
 - **`pageHero_breadcrumbPosition`** applies to all three visible display modes. Each used to place the breadcrumb its own way - below the titles on `overlay`, above them on `below` - which the setting replaces.
 - **`pageHero_shade` and `pageHero_parallax`** are ignored without an image — there is nothing to veil, and nothing to scroll.
 

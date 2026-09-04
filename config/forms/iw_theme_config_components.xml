@@ -595,6 +595,27 @@
                     </params>
                 </property>
 
+                <!-- Only the side-by-side banner crops its image: the other modes
+                     fill the banner edge to edge, where a ratio is set by the
+                     height instead. -->
+                <property name="pageHero_imageFormat" type="single_select" colspan="6"
+                          visibleCondition="pageHero_titleDisplay == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_image_format</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_image_format_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="original"/>
+                        <param name="values" type="collection">
+                            <param name="16_9"><meta><title>16:9</title></meta></param>
+                            <param name="4_3"><meta><title>4:3</title></meta></param>
+                            <param name="1_1"><meta><title>1:1</title></meta></param>
+                            <param name="3_4"><meta><title>3:4</title></meta></param>
+                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- Only meaningful when the breadcrumb sits with the titles.
                      The bars have a place of their own. -->
                 <property name="pageHero_breadcrumbPosition" type="single_select" colspan="6"

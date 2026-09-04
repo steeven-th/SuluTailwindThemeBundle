@@ -563,6 +563,8 @@
     "iw_sulu_tailwind_theme.page.hero_display_overlay": "Over the image",
     "iw_sulu_tailwind_theme.page.hero_display_below": "Below the image",
     "iw_sulu_tailwind_theme.page.hero_display_side_by_side": "Beside the image",
+    "iw_sulu_tailwind_theme.page.hero_image_format": "Image format",
+    "iw_sulu_tailwind_theme.page.hero_image_format_info": "How the banner image is cropped. « Original » keeps its own proportions.",
     "iw_sulu_tailwind_theme.page.hero_display_hidden": "Hidden (image only)",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb": "Breadcrumb",
     "iw_sulu_tailwind_theme.page.hero_breadcrumb_info": "Breadcrumb position. \"With the title\" follows the title alignment.",

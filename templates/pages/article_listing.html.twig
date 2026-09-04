@@ -59,6 +59,7 @@
         parallax: heroParallax,
         breadcrumb: (effectiveBreadcrumb == 'with_title') and listingBreadcrumbsOn,
         breadcrumbPosition: iw_sulu_tailwind_theme.pageHero_breadcrumbPosition|default('above'),
+        imageFormat: iw_sulu_tailwind_theme.pageHero_imageFormat|default('original'),
         breadcrumbPageUuid: resource.uuid|default(null),
         breadcrumbCurrentTitle: content.title|default(''),
     } only %}
