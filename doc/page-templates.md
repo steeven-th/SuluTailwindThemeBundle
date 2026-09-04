@@ -30,7 +30,7 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 
 | Setting | Key | Values (default) |
 |---------|-----|------------------|
-| Height | `pageHero_height` | `sm` · `md` (default) · `lg` · `full` (full viewport) — hidden on `side_by_side`, where the content sets the height |
+| Height | `pageHero_height` | `sm` · `md` (default) · `lg` · `full` (full viewport). On `side_by_side` the height follows the content, so this only reaches pages with no image, which fall back to the overlay banner |
 | Parallax | `pageHero_parallax` | off (default) / on — vertical scroll via the `hero-parallax` controller, respects `prefers-reduced-motion`. Hidden on `side_by_side`, where the image is not a background |
 | Title display | `pageHero_titleDisplay` | `overlay` (default) · `below` · `side_by_side` · `hidden` |
 | Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |

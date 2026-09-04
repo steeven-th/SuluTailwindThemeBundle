@@ -548,6 +548,7 @@
     "iw_sulu_tailwind_theme.page.hero_image": "Image du bandeau",
     "iw_sulu_tailwind_theme.page.hero_image_info": "Image affichée en pleine largeur en haut de la page. Le point de focus définit le recadrage.",
     "iw_sulu_tailwind_theme.page.hero_height": "Hauteur du bandeau",
+    "iw_sulu_tailwind_theme.page.hero_height_info": "Hauteur du bandeau. Dans le style « À côté de l'image », la hauteur suit le contenu : ce réglage ne vaut alors que pour les pages sans image, qui retombent sur le bandeau superposé.",
     "iw_sulu_tailwind_theme.page.hero_height_sm": "Petite",
     "iw_sulu_tailwind_theme.page.hero_height_md": "Moyenne",
     "iw_sulu_tailwind_theme.page.hero_height_lg": "Grande",

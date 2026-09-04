@@ -537,9 +537,15 @@
                 <info_text>iw_sulu_tailwind_theme.components_section_page_hero_info</info_text>
             </meta>
             <properties>
-                <property name="pageHero_height" type="single_select" colspan="6"
-                          visibleCondition="pageHero_titleDisplay != 'side_by_side'">
-                    <meta><title>iw_sulu_tailwind_theme.page.hero_height</title></meta>
+                <!-- Shown on every mode, side_by_side included: that one takes
+                     its height from the content, but a page with no image falls
+                     back to the overlay banner, which reads this. Hidden, the
+                     height of that fallback could not be set at all. -->
+                <property name="pageHero_height" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_height</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_height_info</info_text>
+                    </meta>
                     <params>
                         <param name="default_value" value="md"/>
                         <param name="values" type="collection">

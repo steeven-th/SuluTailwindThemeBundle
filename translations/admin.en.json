@@ -548,6 +548,7 @@
     "iw_sulu_tailwind_theme.page.hero_image": "Hero image",
     "iw_sulu_tailwind_theme.page.hero_image_info": "Full-width image displayed at the top of the page. The focus point drives the crop.",
     "iw_sulu_tailwind_theme.page.hero_height": "Hero height",
+    "iw_sulu_tailwind_theme.page.hero_height_info": "Height of the banner. In the « Beside the image » style the height follows the content, so this only applies to pages with no image, which fall back to the overlay banner.",
     "iw_sulu_tailwind_theme.page.hero_height_sm": "Small",
     "iw_sulu_tailwind_theme.page.hero_height_md": "Medium",
     "iw_sulu_tailwind_theme.page.hero_height_lg": "Large",

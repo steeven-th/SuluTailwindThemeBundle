@@ -548,6 +548,7 @@
     "iw_sulu_tailwind_theme.page.hero_image": "Bannerbild",
     "iw_sulu_tailwind_theme.page.hero_image_info": "Bild in voller Breite oben auf der Seite. Der Fokuspunkt bestimmt den Zuschnitt.",
     "iw_sulu_tailwind_theme.page.hero_height": "Bannerhöhe",
+    "iw_sulu_tailwind_theme.page.hero_height_info": "Höhe des Banners. Im Stil „Neben dem Bild“ richtet sich die Höhe nach dem Inhalt, diese Einstellung gilt dort nur für Seiten ohne Bild, die auf das überlagerte Banner zurückfallen.",
     "iw_sulu_tailwind_theme.page.hero_height_sm": "Klein",
     "iw_sulu_tailwind_theme.page.hero_height_md": "Mittel",
     "iw_sulu_tailwind_theme.page.hero_height_lg": "Groß",
