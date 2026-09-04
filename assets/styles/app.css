@@ -1088,7 +1088,8 @@ img.object-cover {
     align-items: center;
     gap: var(--iw-document-card-gap, 1rem);
     padding: var(--iw-document-card-padding, 1rem);
-    border: 1px solid var(--iw-document-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-document-card-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-document-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-document-card-color, var(--iw-variant-paragraph-color, inherit));
     text-decoration: none;
@@ -1222,7 +1223,8 @@ img.object-cover {
     display: block;
     height: 100%;
     padding: var(--iw-linked-page-card-padding, 1.5rem);
-    border: 1px solid var(--iw-linked-page-card-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-linked-page-card-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-linked-page-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
@@ -1975,7 +1977,8 @@ img.object-cover {
 .iw-block-key-figures--timeline .iw-key-figure__timeline-card {
     margin-left: 3rem;
     padding: var(--iw-key-figure-timeline-card-padding, 1.5rem);
-    border: 1px solid var(--iw-block-key-figures-timeline-card-border, var(--iw-block-key-figures-timeline-accent, var(--iw-variant-hr-color, var(--color-primary))));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-block-key-figures-timeline-card-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
 }
@@ -2132,7 +2135,8 @@ img.object-cover {
     flex: 1 1 auto;
     min-width: 0;
     padding: var(--iw-timeline-card-padding, 1.5rem);
-    border: var(--iw-timeline-card-border-width, 1px) solid var(--iw-timeline-card-border, var(--iw-variant-hr-color, var(--color-primary)));
+    border: var(--iw-timeline-card-border-width, var(--iw-variant-paragraph-border-width, 0)) solid
+        var(--iw-timeline-card-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
 }
@@ -2398,7 +2402,8 @@ img.object-cover {
     height: 100%;
     overflow: hidden;
     background-color: var(--iw-block-article-item-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    border: var(--iw-block-article-item-border, 1px solid var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    border: var(--iw-block-article-item-border, var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-variant-paragraph-border, transparent));
 }
 
 /* The L4 article-card applies `border-radius: var(--border-radius)` at its
@@ -2591,7 +2596,8 @@ img.object-cover {
 .iw-block-article-featured .iw-featured-article-card {
     display: block;
     background-color: var(--iw-featured-article-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    border: var(--iw-featured-article-card-border, 1px solid var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    border: var(--iw-featured-article-card-border, var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-variant-paragraph-border, transparent));
     box-shadow: var(--iw-featured-article-card-shadow, 0 1px 2px rgb(0 0 0 / 0.05));
     overflow: hidden;
     text-decoration: none;
@@ -3407,11 +3413,15 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-block-form-info-subtitle-color, var(--iw-block-form-info-color, rgb(255 255 255 / 0.8)));
 }
 
-/* --card surface (white background by default). The radius is inlined via the
-   Tailwind utility `rounded-[var(--border-radius,8px)]` so it follows the
-   theme tokens automatically. */
+/* --card surface. It is a card like the others, so it takes the paragraph
+   surface of the variant rather than a white of its own - a white card on a
+   dark variant was the most visible half of this inconsistency. The radius is
+   inlined via the Tailwind utility `rounded-[var(--border-radius,8px)]` so it
+   follows the theme tokens automatically. */
 .iw-block-form--card {
-    background-color: var(--iw-block-form-card-bg, #fff);
+    background-color: var(--iw-block-form-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-block-form-card-border, var(--iw-variant-paragraph-border, transparent));
 }
 
 /* --split widget (text / image / location). The widget partial fills the info
@@ -3497,7 +3507,8 @@ section.block:has([data-slider-fullbleed-value]) {
    token in the variant. Both are overridable via custom properties for
    downstream theming. */
 .iw-block-location__address {
-    border: 1px solid var(--iw-block-location-info-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-block-location-info-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-block-location-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
     color: var(--iw-block-location-info-color, var(--iw-variant-paragraph-color, inherit));
 }

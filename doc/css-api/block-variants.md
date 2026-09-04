@@ -54,6 +54,29 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 
+### Cards
+
+Every card in the bundle is an enclosed unit, so it takes the **paragraph
+surface**: the background from `--iw-variant-paragraph-bg`, the border colour
+from `--iw-variant-paragraph-border` and its width from
+`--iw-variant-paragraph-border-width`, which defaults to zero.
+
+That default is the point. A variant that asks for no border gets none, on
+every block. Eight blocks draw cards - cards, documents, linked pages, both
+timelines, article list, carousel and featured, plus the form in card style -
+and each used to carry its own rule. The older ones drew a hairline of their
+own in the separator colour, so an article carousel and a cards block on the
+same variant looked like two different designs.
+
+Each card keeps an override hook of its own as the first fallback
+(`--iw-document-card-border`, `--iw-block-article-item-bg`…), so a project can
+still single one out without touching the others.
+
+Two exceptions are deliberate and stay out: the event info card and the mobile
+location card are translucent over a photo or a map, where a solid light
+background is legibility rather than styling, and following a dark variant
+would make them unreadable.
+
 ### Reaching the accent surface
 
 The other three surfaces are reached by consuming their custom properties. The
