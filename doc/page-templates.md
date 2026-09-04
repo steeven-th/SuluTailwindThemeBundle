@@ -34,6 +34,7 @@ Configured once in the theme admin and applied to every page. Exposed to Twig as
 | Parallax | `pageHero_parallax` | off (default) / on — vertical scroll via the `hero-parallax` controller, respects `prefers-reduced-motion`. Hidden on `side_by_side`, where the image is not a background |
 | Title display | `pageHero_titleDisplay` | `overlay` (default) · `below` · `side_by_side` · `hidden` |
 | Horizontal align | `pageHero_alignX` | `left` (default) · `center` · `right` (overlay + below) |
+| Horizontal align without an image | `pageHero_alignXNoImage` | empty (default, follows `pageHero_alignX`) · `left` · `center` · `right` — on `side_by_side` only, where a page with no image shows its text across the full width instead of a column |
 | Vertical position | `pageHero_alignY` | `top` · `middle` · `bottom` (default) — overlay only |
 | Readability veil | `pageHero_shade` | `none` · `light` · `medium` (default) · `strong` — overlay only |
 | Breadcrumb | `pageHero_breadcrumb` | `with_title` (default) · `top_bar` · `bottom_bar` · `hidden` |

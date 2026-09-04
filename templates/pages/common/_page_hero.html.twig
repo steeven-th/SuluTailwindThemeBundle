@@ -18,7 +18,10 @@
                Without an image, 'below' behaves like 'overlay' — there is no
                image for the header to sit under — and 'hidden' renders no
                banner at all, only the hidden H1.
-    - alignX: 'left' | 'center' | 'right' — horizontal text alignment (both modes)
+    - alignX: 'left' | 'center' | 'right' - horizontal text alignment (both modes)
+    - alignXNoImage: '' | 'left' | 'center' | 'right' - overrides alignX on the
+             side_by_side mode when the page has no image, where the text spans
+             the full width instead of a column. Empty follows alignX.
     - alignY: 'top' | 'middle' | 'bottom' — vertical position (overlay only)
     - shade: 'none' | 'light' | 'medium' | 'strong' — readability veil. Ignored
              without an image: there is nothing to veil.
@@ -69,6 +72,14 @@
 {% set parallax = hasImage and parallax|default(false) %}
 {% set showBreadcrumb = breadcrumb|default(false) %}
 {% set breadcrumbPosition = breadcrumbPosition|default('above') == 'below' ? 'below' : 'above' %}
+
+{#- Text beside an image sits in a column, text without one spans the width:
+    different layouts, so side_by_side carries its own alignment for the second.
+    Read before the mode falls back below, so it is the mode the editor picked
+    that decides. Empty keeps alignX, which is what themes did before. -#}
+{% if display == 'side_by_side' and not hasImage and alignXNoImage|default('') in ['left', 'center', 'right'] %}
+    {% set alignX = alignXNoImage %}
+{% endif %}
 
 {#- Built once and printed where the setting asks. `--above` names what the
     class does - the breadcrumb sits above the titles, so it needs a bottom

@@ -651,6 +651,28 @@
                     </params>
                 </property>
 
+                <!-- The side-by-side banner falls back to the overlay one when a
+                     page has no image, and the text then spans the full width
+                     instead of sitting in a column. That is a different layout,
+                     so it gets its own alignment. Empty follows the one above,
+                     which is what every theme did before this existed. -->
+                <property name="pageHero_alignXNoImage" type="single_select" colspan="4"
+                          visibleCondition="pageHero_titleDisplay == 'side_by_side'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.page.hero_align_x_no_image</title>
+                        <info_text>iw_sulu_tailwind_theme.page.hero_align_x_no_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.page.hero_align_x_follow</title></meta></param>
+                            <param name="left"><meta><title>iw_sulu_tailwind_theme.align_left</title></meta></param>
+                            <param name="center"><meta><title>iw_sulu_tailwind_theme.align_center</title></meta></param>
+                            <param name="right"><meta><title>iw_sulu_tailwind_theme.align_right</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="pageHero_alignY" type="single_select" colspan="4"
                           visibleCondition="pageHero_titleDisplay == 'overlay'">
                     <meta><title>iw_sulu_tailwind_theme.page.hero_align_y</title></meta>
