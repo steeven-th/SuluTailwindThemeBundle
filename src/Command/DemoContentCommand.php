@@ -146,10 +146,18 @@ class DemoContentCommand extends Command
         ], $homepageUuid);
         $io->text(\sprintf('  %s (index)', $name));
 
-        // Children carry the actual blocks; the index links to them afterwards.
+        // Slugs differ from theme to theme, so the fixture names variants and
+        // button styles by position and they are resolved against whichever
+        // theme this webspace runs.
+        $themeSlugs = $this->themeSlugs($webspaceKey);
+
+        // Children carry the actual blocks, and some of them link to a sibling,
+        // so they are created first and linked in a second pass: a page cannot
+        // point at one the run has not created yet.
         $pageUuids = [];
+        $children = [];
         foreach ($pages['children'] as $page) {
-            $data = $this->resolveReferences($page['data'], $mediaIds, [], $locale);
+            $data = $this->resolveReferences($page['data'], $mediaIds, [], $locale, $themeSlugs);
             $data['title'] = $page['title'];
             $data['url'] = '/' . $this->slugify($name) . '/' . $this->slugify($page['title']);
 
@@ -163,15 +171,32 @@ class DemoContentCommand extends Command
             );
 
             $pageUuids[$page['title']] = $child->getUuid();
-            $this->publish($child->getUuid(), $locale);
+            $children[$page['title']] = $child->getUuid();
             $io->text(\sprintf('  %s', $page['title']));
+        }
+
+        // Second pass: now every sibling exists, the links between them
+        // resolve. Publishing happens here, or the published version would be
+        // the one whose links are still unresolved.
+        foreach ($pages['children'] as $page) {
+            $uuid = $children[$page['title']];
+
+            if (self::linksAPage($page['data'])) {
+                $data = $this->pruneUnresolvedLinks($page['data'], $pageUuids);
+                $data = $this->resolveReferences($data, $mediaIds, $pageUuids, $locale, $themeSlugs);
+                $data['title'] = $page['title'];
+                $data['url'] = '/' . $this->slugify($name) . '/' . $this->slugify($page['title']);
+                $this->modifyPage($uuid, $locale, $data);
+            }
+
+            $this->publish($uuid, $locale);
         }
 
         // The index links to the children, so it is filled once they exist.
         if (null !== $pages['index']) {
             // Prune before resolving, while the markers still name their target.
             $data = $this->pruneUnresolvedLinks($pages['index']['data'], $pageUuids);
-            $data = $this->resolveReferences($data, $mediaIds, $pageUuids, $locale);
+            $data = $this->resolveReferences($data, $mediaIds, $pageUuids, $locale, $themeSlugs);
             $data['title'] = $name;
             $data['url'] = '/' . $this->slugify($name);
             $this->modifyPage($index->getUuid(), $locale, $data);
@@ -427,18 +452,95 @@ class DemoContentCommand extends Command
     }
 
     /**
+     * The variant and button slugs of the theme this webspace runs, in order.
+     *
+     * Empty lists when the webspace has no theme, which leaves every positional
+     * marker resolving to an empty value: the blocks then take the theme
+     * defaults, which is right when there is no theme to name.
+     *
+     * @param string $webspaceKey The webspace being filled
+     *
+     * @return array{variant: list<string>, button: list<string>}
+     */
+    private function themeSlugs(string $webspaceKey): array
+    {
+        $tokens = $this->themeProvider->getThemeForWebspace($webspaceKey)?->getTokens() ?? [];
+
+        $slugsOf = static function (mixed $entries): array {
+            if (!\is_array($entries)) {
+                return [];
+            }
+
+            $slugs = [];
+            foreach ($entries as $entry) {
+                $slug = \is_array($entry) ? ($entry['slug'] ?? null) : null;
+                if (\is_string($slug) && '' !== $slug) {
+                    $slugs[] = $slug;
+                }
+            }
+
+            return $slugs;
+        };
+
+        return [
+            'variant' => $slugsOf($tokens['blockVariants'] ?? []),
+            'button' => $slugsOf($tokens['buttons'] ?? []),
+        ];
+    }
+
+    /**
+     * Whether these page data link to another demo page.
+     *
+     * Only such a page needs the second pass, so the others are not rewritten
+     * and republished for nothing.
+     *
+     * @param mixed $value Any node of the fixture data
+     */
+    private static function linksAPage(mixed $value): bool
+    {
+        if (\is_string($value)) {
+            return str_starts_with($value, '@page:');
+        }
+
+        if (!\is_array($value)) {
+            return false;
+        }
+
+        foreach ($value as $item) {
+            if (self::linksAPage($item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Replace the fixture's symbolic markers by the ids created in this run.
      *
      * `@media:<n>` points into the generated pool, `@page:<title>` into the
-     * children created just before.
+     * children created just before, and `@variant:<n>` / `@button:<n>` into the
+     * theme this webspace runs.
      *
-     * @param mixed                 $value
-     * @param array<int, int>       $mediaIds
-     * @param array<string, string> $pageUuids
-     * @param string                $locale    Overrides the locale frozen in the fixture
+     * The last two are positional because a slug is not portable: every theme
+     * names its own variants and buttons, so a fixture holding "clair-nature"
+     * or "accent" matches the one theme that happens to use those names and
+     * leaves every other site with an unselected picker. Positions fall back to
+     * the first entry, so a theme with fewer of them still gets a valid value.
+     *
+     * @param mixed                              $value
+     * @param array<int, int>                    $mediaIds
+     * @param array<string, string>              $pageUuids
+     * @param string                             $locale     Overrides the locale frozen in the fixture
+     * @param array{variant: list<string>, button: list<string>} $themeSlugs
      */
-    private function resolveReferences(mixed $value, array $mediaIds, array $pageUuids, string $locale): mixed
-    {
+    private function resolveReferences(
+        mixed $value,
+        array $mediaIds,
+        array $pageUuids,
+        string $locale,
+        array $themeSlugs = ['variant' => [], 'button' => []],
+    ): mixed {
         if (\is_string($value)) {
             if (str_starts_with($value, '@media:')) {
                 $index = (int) substr($value, 7);
@@ -448,6 +550,18 @@ class DemoContentCommand extends Command
 
             if (str_starts_with($value, '@page:')) {
                 return $pageUuids[substr($value, 6)] ?? null;
+            }
+
+            foreach (['variant', 'button'] as $kind) {
+                $marker = '@' . $kind . ':';
+                if (str_starts_with($value, $marker)) {
+                    $slugs = $themeSlugs[$kind];
+                    $index = (int) substr($value, \strlen($marker)) - 1;
+
+                    // Empty rather than a stale slug: the block then falls back
+                    // to the theme default instead of naming something absent.
+                    return $slugs[$index] ?? ($slugs[0] ?? '');
+                }
             }
 
             return $value;
@@ -461,7 +575,7 @@ class DemoContentCommand extends Command
             }
 
             foreach ($value as $key => $item) {
-                $value[$key] = $this->resolveReferences($item, $mediaIds, $pageUuids, $locale);
+                $value[$key] = $this->resolveReferences($item, $mediaIds, $pageUuids, $locale, $themeSlugs);
             }
         }
 

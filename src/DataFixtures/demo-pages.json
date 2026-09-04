@@ -290,7 +290,7 @@
       ],
       "style": "list",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "subTitle": "sous titre",
       "titleTag": "h2",
       "faqSchema": false,
@@ -716,7 +716,7 @@
          "target": "_self",
          "provider": "page"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        },
        {
@@ -731,7 +731,7 @@
          "target": "_self",
          "provider": "external"
         },
-        "style": "secondary",
+        "style": "@button:2",
         "type": "cta_button"
        }
       ],
@@ -740,6 +740,11 @@
       "widget": [
        {
         "_id": "widget001",
+        "images": {
+         "ids": [
+          "@media:3"
+         ]
+        },
         "type": "image"
        }
       ]
@@ -772,7 +777,7 @@
          "target": "_self",
          "provider": "page"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        }
       ],
@@ -808,7 +813,7 @@
          "target": "_self",
          "provider": "page"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        },
        {
@@ -823,7 +828,7 @@
          "target": "_self",
          "provider": "external"
         },
-        "style": "secondary",
+        "style": "@button:2",
         "type": "cta_button"
        }
       ],
@@ -865,7 +870,7 @@
          "target": "_self",
          "provider": "external"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        }
       ],
@@ -908,7 +913,7 @@
          "target": "_self",
          "provider": "external"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        }
       ],
@@ -966,7 +971,7 @@
          "target": "_self",
          "provider": "page"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        }
       ],
@@ -1000,7 +1005,7 @@
          "target": "_self",
          "provider": "page"
         },
-        "style": "primary",
+        "style": "@button:1",
         "type": "cta_button"
        },
        {
@@ -1015,7 +1020,7 @@
          "target": "_self",
          "provider": "external"
         },
-        "style": "secondary",
+        "style": "@button:2",
         "type": "cta_button"
        }
       ],
@@ -1137,7 +1142,7 @@
            "target": "_self",
            "provider": "external"
           },
-          "style": "primary",
+          "style": "@button:1",
           "type": "cta_button"
          },
          {
@@ -1152,7 +1157,7 @@
            "target": "_self",
            "provider": "external"
           },
-          "style": "secondary",
+          "style": "@button:2",
           "type": "cta_button"
          }
         ]
@@ -1179,7 +1184,7 @@
            "target": "_self",
            "provider": "external"
           },
-          "style": "accent",
+          "style": "@button:3",
           "type": "cta_button"
          }
         ]
@@ -1316,7 +1321,7 @@
       "ratio": "16-9",
       "style": "default",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "subTitle": "sous titre",
       "titleTag": "h2",
       "marginTop": "mt-5",
@@ -1343,7 +1348,7 @@
       "ratio": "16-9",
       "style": "default",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "subTitle": "sous titre",
       "titleTag": "h2",
       "marginTop": "mt-5",
@@ -1368,7 +1373,7 @@
       "type": "code",
       "style": "fullwidth",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "subTitle": "sous titre",
       "titleTag": "h2",
       "marginTop": "mt-5",
@@ -1903,7 +1908,7 @@
       "ratio": "16-9",
       "style": "default",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "lazyLoad": true,
       "subTitle": "sous titre",
       "titleTag": "h2",
@@ -1933,7 +1938,7 @@
       "ratio": "16-9",
       "style": "default",
       "title": "titre",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "lazyLoad": true,
       "subTitle": "sous titre",
       "titleTag": "h2",
@@ -3263,7 +3268,7 @@
       "_id": "c3a4c4ca",
       "type": "text",
       "style": "one_column",
-      "variant": "clair-nature",
+      "variant": "@variant:1",
       "titleTag": "h2",
       "marginTop": "mt-5",
       "paddingTop": "pt-5",
@@ -3391,6 +3396,11 @@
       "widget": [
        {
         "_id": "widget006",
+        "images": {
+         "ids": [
+          "@media:5"
+         ]
+        },
         "type": "image",
         "showImagesName": true
        }
@@ -3419,6 +3429,11 @@
       "widget": [
        {
         "_id": "widget007",
+        "images": {
+         "ids": [
+          "@media:7"
+         ]
+        },
         "type": "image",
         "showImagesName": true
        }
@@ -3616,6 +3631,11 @@
       "widget": [
        {
         "_id": "widget012",
+        "images": {
+         "ids": [
+          "@media:9"
+         ]
+        },
         "type": "image",
         "showImagesName": true
        }
