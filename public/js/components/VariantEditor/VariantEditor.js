@@ -5,7 +5,7 @@ import {translate} from 'sulu-admin-bundle/utils';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
-import loadFormPalette from '../../utils/formPalette';
+import loadFormPalette, {paletteFor} from '../../utils/formPalette';
 import {WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
 
 const STYLE_ID = 'iw-variant-editor-styles';
@@ -212,7 +212,7 @@ export default class VariantEditor extends React.Component {
             return value;
         }
 
-        return resolveRef(value, this.state.palette || themeConfigStore.palette);
+        return resolveRef(value, paletteFor(this.props.formInspector, this.state.palette));
     }
 
     /**
@@ -261,7 +261,7 @@ export default class VariantEditor extends React.Component {
         const slug = this.buttonStyle;
         const found = slug ? buttons.find((button) => button.slug === slug) : null;
         const button = found || buttons[0];
-        const palette = this.state.palette || themeConfigStore.palette;
+        const palette = paletteFor(this.props.formInspector, this.state.palette);
 
         return palette ? resolveAllRefs(button, palette) : button;
     }

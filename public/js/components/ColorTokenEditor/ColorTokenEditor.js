@@ -3,12 +3,11 @@ import React, {Fragment} from 'react';
 import {observer} from 'mobx-react';
 import {ChromePicker} from 'react-color';
 import {translate} from 'sulu-admin-bundle/utils';
-import themeConfigStore from '../../stores/themeConfigStore';
 import Input from 'sulu-admin-bundle/components/Input';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
-import loadFormPalette from '../../utils/formPalette';
+import loadFormPalette, {formPaletteColors, paletteFor} from '../../utils/formPalette';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -360,7 +359,7 @@ export default class ColorTokenEditor extends React.Component {
     handleCopy = () => {
         const {internalValue} = this.state;
         if (internalValue && navigator.clipboard) {
-            const palette = this.state.localPalette || themeConfigStore.palette;
+            const palette = paletteFor(this.props.formInspector, this.state.localPalette);
             const resolved = resolveRef(internalValue, palette);
             navigator.clipboard.writeText(resolved);
         }
@@ -405,9 +404,12 @@ export default class ColorTokenEditor extends React.Component {
     renderPaletteTab() {
         return (
             <PaletteGrid
+                // Undefined outside a theme form, where the store is the right
+                // source: null there would read as "still loading" and blank the grid.
+                colors={formPaletteColors(this.props.formInspector) || undefined}
                 isSelected={this.isSwatchSelected}
                 onSelect={this.handleSwatchClick}
-                palette={this.state.localPalette || themeConfigStore.palette}
+                palette={paletteFor(this.props.formInspector, this.state.localPalette)}
             />
         );
     }
@@ -545,7 +547,7 @@ export default class ColorTokenEditor extends React.Component {
         const {popoverOpen, internalValue, activeTab} = this.state;
 
         const isTransparent = internalValue === 'transparent';
-        const palette = this.state.localPalette || themeConfigStore.palette;
+        const palette = paletteFor(this.props.formInspector, this.state.localPalette);
         const resolvedValue = isRef(internalValue)
             ? resolveRef(internalValue, palette)
             : internalValue;
@@ -558,8 +560,8 @@ export default class ColorTokenEditor extends React.Component {
         };
 
         const hasPalette = this.showPalette
-            && themeConfigStore.palette
-            && Object.keys(themeConfigStore.palette).length > 0;
+            && palette
+            && Object.keys(palette).length > 0;
 
         const showClear = !disabled && false !== clearable && !!internalValue;
 

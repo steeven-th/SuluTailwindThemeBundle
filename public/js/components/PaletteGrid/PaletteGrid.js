@@ -113,9 +113,11 @@ function ensureGridStyles() {
 /**
  * The theme palette rendered as rows of swatches, one row per color.
  *
- * Colors come from the theme config store (all base roles plus the unlimited
+ * Colors come from the theme being painted (all base roles plus the unlimited
  * brand colors), never from a hard-coded list, so the grid follows whatever the
- * theme defines.
+ * theme defines. The list and the shades must come from the SAME theme: taking
+ * the rows from the store while the shades came from a form showed the active
+ * webspace theme's base colors next to another theme's ramps.
  *
  * The component deliberately says nothing about what a selection MEANS: it
  * reports the color key, the shade and the hex, and lets the caller decide what
@@ -123,7 +125,8 @@ function ensureGridStyles() {
  * and the title editor (which stores the bare name `accent-500`) share one UI.
  *
  * @param {Object} props
- * @param {Object} props.palette Palette data keyed by color name; defaults to the store
+ * @param {Object} props.palette Palette data keyed by color name; omit for the store, null while loading
+ * @param {Array<Object>} props.colors The colors to render, in order; omit for the store's
  * @param {Function} props.isSelected (colorKey, shade, hex) => boolean
  * @param {Function} props.onSelect (hex, colorKey, shade) => void; shade is null for the base color
  * @param {string} props.maxHeight CSS max-height of the scrolling area
@@ -141,11 +144,20 @@ class PaletteGrid extends React.Component<*> {
 
     render() {
         const {isSelected, maxHeight, onSelect} = this.props;
-        const palette = this.props.palette || themeConfigStore.palette;
+        // Undefined means "no opinion, use the store" - a caller that does not
+        // paint a specific theme. Null means "the theme I paint has not loaded
+        // yet", and must render nothing rather than the store, which holds the
+        // active webspace theme and would flash its colors.
+        const palette = undefined === this.props.palette ? themeConfigStore.palette : this.props.palette;
+        const colors = undefined === this.props.colors ? themeConfigStore.colors : this.props.colors;
+
+        if (!palette || !colors) {
+            return <div className="iw-palette-grid" style={{maxHeight}} />;
+        }
 
         return (
             <div className="iw-palette-grid" style={{maxHeight}}>
-                {themeConfigStore.colors.map((color) => {
+                {colors.map((color) => {
                     const key = colorRefKey(color);
                     const shades = palette[key];
                     if (!shades || 0 === Object.keys(shades).length) {
@@ -153,7 +165,10 @@ class PaletteGrid extends React.Component<*> {
                     }
 
                     const label = colorLabel(color);
-                    const baseHex = color.value;
+                    // The shades ship the configured color under "base", so it
+                    // comes from the same theme as the ramp beside it rather
+                    // than from whichever list built this row.
+                    const baseHex = shades.base || color.value;
 
                     return (
                         <div key={key} className="iw-palette-row">
