@@ -162,6 +162,17 @@
     "iw_sulu_tailwind_theme.borders_imageRadius": "Image radius",
     "iw_sulu_tailwind_theme.borders_paragraphRadius": "Paragraph radius",
 
+    "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Surface padding",
+    "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Space between a surface and what sits on it. It only applies to surfaces that have a background or a border, so a block with no content surface keeps its layout.",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingX": "Content - horizontal padding",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingX_info": "Space on the left and right, between the edge of the content surface and what it holds.",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingY": "Content - vertical padding",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingY_info": "Space at the top and bottom, between the edge of the content surface and what it holds.",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingX": "Paragraph - horizontal padding",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info": "Space on the left and right, between the edge of the paragraph surface and its text.",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraph - vertical padding",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Space at the top and bottom, between the edge of the paragraph surface and its text.",
+
     "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocks",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Gap between zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "Applies to blocks with two content zones (text + images, form + widget, map + info, text + key figures). The gap is halved on mobile.",

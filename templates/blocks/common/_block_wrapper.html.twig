@@ -89,7 +89,12 @@
        Adding a level was checked rather than assumed: nothing selects a direct
        child of `.block` or `.iw-variant--*`, and `.block` is Tailwind's
        `display: block`, so the extra element does not disturb the flow. #}
-    {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass %}
+    {#- The content surface takes the paragraph radius: the two are the same
+        corner to an editor, one nested in the other, and the theme already has
+        a field for it. Same condition as the paragraph - a radius against the
+        edge of the viewport rounds nothing. Harmless without a surface, where
+        there is no background for the corner to cut. -#}
+    {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass ~ ' ' ~ resolvedParagraphRadius %}
     <div class="{{ ('iw-block__content ' ~ innerWrapperClass)|trim }}">
         {{ block('block_content') }}
 

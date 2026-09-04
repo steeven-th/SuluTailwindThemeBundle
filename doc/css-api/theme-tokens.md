@@ -303,6 +303,20 @@ single component (components have their own tab).
 | `--iw-blocks-image-gap` | Spacing inside an image grid (text + images mosaic, gallery grid / masonry / slider), overridable per block from the block's own Image spacing field | `1.5rem` |
 | `--iw-blocks-component-gap` | Spacing inside the component grids that are not article cards (accordion, documents, linked pages, testimonials, key figures) | `1.5rem` |
 | `--iw-blocks-max-width` | Maximum width of a block's content, so a short paragraph does not stretch across the whole container. `none` leaves blocks as wide as the page container | `var(--container-3xl, 48rem)` |
+| `--iw-surface-content-padding-x` / `-y` | Space between the content surface and what sits on it, horizontally and vertically. Applied only where the variant paints that surface, so a block with no content background or border keeps its layout | `1.5rem` |
+| `--iw-surface-paragraph-padding-x` / `-y` | Same, for the paragraph surface. The defaults are the values the compiler used to write in, so an upgrade moves nothing | `1.5rem` / `1rem` |
+
+The two surface paddings come from the **Surface padding** section of the same
+tab. They are emitted as tokens but consumed inside the variant rules that
+already check whether the surface paints anything: a padding applied to every
+`.iw-block__content` would shift the layout of every block on every existing
+site, most of which paint no content surface at all.
+
+The content surface takes its corner from the **paragraph radius**, resolved by
+the block wrapper. There is no separate field: the two are the same corner to
+an editor, one nested in the other, and sharing the resolution is what drops
+the corner where a block runs to the edge of the viewport, where rounding
+means nothing.
 
 The blocks that token reaches are picked in the admin, next to the width
 itself. That scope is a token too, `defaults.blockMaxWidthScope`, but it is

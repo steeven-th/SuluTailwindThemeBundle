@@ -1514,12 +1514,24 @@ class ThemeCompiler
         $componentGap = (string) ($defaults['componentGap'] ?? '1.5rem');
         $maxWidth = self::MAX_WIDTH_MAP[(string) ($defaults['blockMaxWidth'] ?? 'none')] ?? 'none';
 
+        // Space between a surface and what sits on it. The paragraph defaults
+        // are what this compiler used to write in by hand, so a theme that
+        // never opens the new fields renders exactly as before.
+        $contentPadX = (string) ($defaults['contentPaddingX'] ?? '1.5rem');
+        $contentPadY = (string) ($defaults['contentPaddingY'] ?? '1.5rem');
+        $paragraphPadX = (string) ($defaults['paragraphPaddingX'] ?? '1.5rem');
+        $paragraphPadY = (string) ($defaults['paragraphPaddingY'] ?? '1rem');
+
         $css = "  /* Block defaults (site-wide) */\n";
         $css .= "  --iw-blocks-gap: {$gap};\n";
         $css .= "  --iw-blocks-title-gap: {$titleGap};\n";
         $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
         $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
         $css .= "  --iw-blocks-max-width: {$maxWidth};\n";
+        $css .= "  --iw-surface-content-padding-x: {$contentPadX};\n";
+        $css .= "  --iw-surface-content-padding-y: {$contentPadY};\n";
+        $css .= "  --iw-surface-paragraph-padding-x: {$paragraphPadX};\n";
+        $css .= "  --iw-surface-paragraph-padding-y: {$paragraphPadY};\n";
 
         return $css . "\n";
     }
@@ -3022,6 +3034,10 @@ class ThemeCompiler
                 if ('' !== $contentBorder) {
                     $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
                 }
+                // Inside this rule, so it only applies where the surface paints
+                // something. Unconditional, it would move every block of every
+                // existing site, including those with no content surface at all.
+                $css .= "  padding: var(--iw-surface-content-padding-y, 1.5rem) var(--iw-surface-content-padding-x, 1.5rem);\n";
                 $css .= "}\n";
             }
 
@@ -3181,7 +3197,7 @@ class ThemeCompiler
                 if ('' !== $pgBorder) {
                     $css .= "  border: var(--iw-variant-paragraph-border-width, 1px) solid {$pgBorder};\n";
                 }
-                $css .= "  padding: 1rem 1.5rem;\n";
+                $css .= "  padding: var(--iw-surface-paragraph-padding-y, 1rem) var(--iw-surface-paragraph-padding-x, 1.5rem);\n";
                 $css .= "  margin-block: 1rem;\n";
                 $css .= "  overflow: hidden;\n";
                 $css .= "}\n";

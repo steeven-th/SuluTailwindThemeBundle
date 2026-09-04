@@ -42,6 +42,98 @@
 
         <!-- Site-wide block defaults: settings shared by every block that are
              not tied to a single component (components have their own tab). -->
+        <!-- Space between a surface and what sits on it. Only surfaces that
+             paint something need it: the compiler emits these paddings inside
+             the rules already guarded by "has a background or a border", so a
+             block with neither keeps its current layout. -->
+        <section name="surfacePadding">
+            <meta>
+                <title>iw_sulu_tailwind_theme.defaults_section_surface_padding</title>
+                <info_text>iw_sulu_tailwind_theme.defaults_section_surface_padding_info</info_text>
+            </meta>
+            <properties>
+                <property name="defaults_contentPaddingX" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_contentPaddingX</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingX_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="defaults_contentPaddingY" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_contentPaddingY</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingY_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="defaults_paragraphPaddingX" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingX</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1.5rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="defaults_paragraphPaddingY" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingY</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="1rem"/>
+                        <param name="values" type="collection">
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_very_compact</title></meta></param>
+                            <param name="1rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact</title></meta></param>
+                            <param name="1.25rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_compact_plus</title></meta></param>
+                            <param name="1.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_normal</title></meta></param>
+                            <param name="2rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_spacious</title></meta></param>
+                            <param name="2.5rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_large</title></meta></param>
+                            <param name="3rem"><meta><title>iw_sulu_tailwind_theme.defaults_spacing_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
         <section name="blockDefaults">
             <meta>
                 <title>iw_sulu_tailwind_theme.defaults_section_blocks</title>

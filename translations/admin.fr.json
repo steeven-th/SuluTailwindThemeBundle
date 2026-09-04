@@ -162,6 +162,17 @@
     "iw_sulu_tailwind_theme.borders_imageRadius": "Rayon des images",
     "iw_sulu_tailwind_theme.borders_paragraphRadius": "Rayon des paragraphes",
 
+    "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Espacement intérieur des surfaces",
+    "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Espace entre une surface et ce qui est posé dessus. Ne s'applique qu'aux surfaces qui ont un fond ou une bordure, un bloc sans fond de contenu garde donc sa mise en page.",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingX": "Contenu - espacement horizontal",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingX_info": "Espace à gauche et à droite, entre le bord du fond de contenu et ce qu'il contient.",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingY": "Contenu - espacement vertical",
+    "iw_sulu_tailwind_theme.defaults_contentPaddingY_info": "Espace en haut et en bas, entre le bord du fond de contenu et ce qu'il contient.",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingX": "Paragraphe - espacement horizontal",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info": "Espace à gauche et à droite, entre le bord du fond de paragraphe et son texte.",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraphe - espacement vertical",
+    "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Espace en haut et en bas, entre le bord du fond de paragraphe et son texte.",
+
     "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocs",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Espacement entre les zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "S'applique aux blocs à deux zones de contenu (texte + images, formulaire + widget, carte + informations, texte + chiffres clés). L'espacement est réduit de moitié sur mobile.",
