@@ -28,47 +28,76 @@ final class CardLinkContractTest extends TestCase
     }
 
     /**
-     * A card holding more than one button is never itself a link.
+     * A clickable card carries no buttons at all.
      *
-     * With two destinations the card cannot stand in for them, and collapsing
-     * both buttons into spans would drop one the editor entered.
+     * The two are exclusive by construction: the admin reveals the card link
+     * when the setting is on and the buttons when it is off, and the template
+     * drops the buttons on a clickable card whatever is stored. Without that
+     * an old value left behind would put anchors inside the card anchor.
      */
     #[Test]
-    public function manyButtonsKeepTheCardAPlainContainer(): void
+    public function aClickableCardDropsItsButtons(): void
     {
         $source = self::card();
 
-        self::assertMatchesRegularExpression(
-            '/set manyButtons = hasButtons and cardButtons\|length > 1/',
-            $source,
-            'The card must know when it holds more than one button.',
-        );
-
         self::assertStringContainsString(
-            'and not manyButtons',
+            'set cardButtons = clickableCard ? [] : card.ctaButtons',
             $source,
-            'A card with several buttons must not become a link, or its anchor wraps theirs.',
+            'A clickable card must ignore stored buttons, or its anchor wraps theirs.',
         );
     }
 
     /**
-     * A card that IS a link renders its button as a span, not an anchor.
+     * The action of a clickable card is a span, styled as a button.
      */
     #[Test]
-    public function aLinkedCardRendersItsButtonAsASpan(): void
+    public function aLinkedCardRendersItsActionAsASpan(): void
     {
         $source = self::card();
 
         self::assertMatchesRegularExpression(
-            '/if hasButtons and wholeCardIsLink[\s\S]{0,400}<span class="iw-button--/',
+            '/if wholeCardIsLink[\s\S]{0,1500}<span class="iw-button--/',
             $source,
-            'A card standing in for its button must render that button as a span.',
+            'A clickable card must draw its action as a span, not an anchor.',
         );
 
         self::assertMatchesRegularExpression(
             '/elseif hasButtons[\s\S]{0,400}_cta_buttons\.html\.twig/',
             $source,
-            'A card that is not a link must render its buttons through the shared partial.',
+            'A card that is not clickable must render its buttons through the shared partial.',
+        );
+    }
+
+    /**
+     * The buttons offered on a card match the shared fragment, field for field.
+     *
+     * They are copied rather than included, because a `visibleCondition` cannot
+     * ride on an `xi:include` and the buttons have to disappear when the card
+     * becomes clickable. A copy drifts, so this compares the two.
+     */
+    #[Test]
+    public function theCopiedButtonsMatchTheSharedFragment(): void
+    {
+        $root = \dirname(__DIR__, 2);
+
+        $fields = static function (string $xml): array {
+            if (1 !== preg_match('/<block name="ctaButtons".*?<\/block>/s', $xml, $block)) {
+                return [];
+            }
+
+            preg_match_all('/<property name="(\w+)" type="([\w_]+)"/', $block[0], $found, \PREG_SET_ORDER);
+
+            return array_map(static fn (array $m): string => $m[1] . ':' . $m[2], $found);
+        };
+
+        $fragment = $fields((string) file_get_contents($root . '/config/templates/fragments/cta-buttons.xml'));
+        $copy = $fields((string) file_get_contents($root . '/config/templates/blocks/cards.xml'));
+
+        self::assertNotEmpty($fragment, 'The CTA fragment must declare its button fields.');
+        self::assertSame(
+            $fragment,
+            $copy,
+            'The buttons copied into the cards block no longer match cta-buttons.xml.',
         );
     }
 

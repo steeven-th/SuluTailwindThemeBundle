@@ -15,7 +15,8 @@
    promise.
 
    Parameters:
-     - card          : the item {icon, image, title, text, ctaButtons, highlighted}
+     - card          : the item {icon, image, title, text, link, linkStyle,
+                       ctaButtons, highlighted}
      - cardView      : the matching view data, carrying resolved links
      - style         : stacked | image_top | horizontal
      - index         : 0-based position, shown when `numbered` is on
@@ -43,32 +44,21 @@
 {% set hasIcon = icon.id|default(null) is not null %}
 {% set hasImage = image.id|default(null) is not null %}
 
-{#- The card carries the shared CTA block, so it can hold several buttons with
-    their own styles.
+{#- Either the card leads somewhere as a whole, or it holds buttons leading to
+    several places. Never both: an anchor cannot contain anchors, and the admin
+    shows one or the other depending on the clickable setting, so the two can
+    never be filled at once.
 
-    Making the whole card clickable uses the link of the card, a field the admin
-    reveals when that setting is on. Left empty it falls back to the single
-    button, so turning the setting on works without retyping a destination that
-    is already there.
+    A clickable card keeps its button styling through `linkStyle`, drawn as a
+    span since the card itself is already the anchor. -#}
+{% set clickableCard = clickable|default(false) %}
 
-    A card holding TWO buttons is never itself a link, whatever the setting
-    says: an anchor cannot contain anchors, and turning both buttons into spans
-    would drop a destination the editor entered. The buttons win, being the more
-    precise target. -#}
-{% set cardButtons = card.ctaButtons|default([]) %}
+{% set cardLink = card.link is defined and card.link is not iterable ? card.link : '' %}
+{% set wholeCardIsLink = clickableCard and cardLink is not empty %}
+
+{% set cardButtons = clickableCard ? [] : card.ctaButtons|default([]) %}
 {% set cardButtonsView = cardView.ctaButtons|default([]) %}
 {% set hasButtons = cardButtons is iterable and cardButtons|length > 0 %}
-
-{% set ownLink = card.link is defined and card.link is not iterable ? card.link : '' %}
-{% set onlyButton = hasButtons and cardButtons|length == 1 ? cardButtons|first : null %}
-{% set onlyButtonLink = onlyButton and onlyButton.link is defined and onlyButton.link is not iterable
-    ? onlyButton.link : '' %}
-{% set cardLink = ownLink is not empty ? ownLink : onlyButtonLink %}
-
-{# Two or more buttons keep the card a plain container, or its anchor would
-   wrap theirs. #}
-{% set manyButtons = hasButtons and cardButtons|length > 1 %}
-{% set wholeCardIsLink = clickable|default(false) and cardLink is not empty and not manyButtons %}
 
 <{{ wholeCardIsLink ? 'a' : 'div' }}
     class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted' : '' }} {{ cardRadius|default('') }}"
@@ -132,16 +122,28 @@
             <div class="iw-card__text prose">{{ text|raw }}</div>
         {% endif %}
 
-        {#- A card standing in for its single button renders that button as a
-            styled span: an anchor inside an anchor is invalid, and the card
-            already leads there. Only ever one button here: two make the card
-            a plain container, so the branch below renders them for real. -#}
-        {%- if hasButtons and wholeCardIsLink -%}
-            <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
-                <span class="iw-button--{{ onlyButton.style|default('primary') }} iw-block__action">
-                    {{ cardButtonsView[0].link.title|default('') ?: cardLink }}
+        {#- The card is the anchor, so its action is a span carrying the button
+            style. Without a label there is nothing to draw, which is the case
+            of a card made clickable with no link yet. -#}
+        {%- if wholeCardIsLink -%}
+            {#- Same label chain as the CTA partial: the title carried by the
+                link, then the title of what it points at. No URL fallback
+                here - a card is already clickable as a whole, so a button
+                labelled with a raw URL would be worse than none. -#}
+            {% set cardLinkView = cardView.link|default({}) %}
+            {% set cardLinkLabel = cardLinkView.title|default('') %}
+            {% if cardLinkLabel is empty and cardLinkView.provider|default('') == 'page' and cardLinkView.href|default('') is not empty %}
+                {% set cardLinkLabel = sulu_page_load(cardLinkView.href, {'title': 'title'}).title|default('') %}
+            {% endif %}
+            {% if cardLinkLabel is empty and cardLinkView.provider|default('') == 'media' and cardLinkView.href|default('') is not empty %}
+                {% set cardLinkLabel = sulu_resolve_media(cardLinkView.href, app.request.locale).title|default('') %}
+            {% endif %}
+
+            {% if cardLinkLabel is not empty %}
+                <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
+                    <span class="iw-button--{{ card.linkStyle|default('primary') }} iw-block__action">{{ cardLinkLabel }}</span>
                 </span>
-            </span>
+            {% endif %}
         {%- elseif hasButtons -%}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
                 buttons: cardButtons,

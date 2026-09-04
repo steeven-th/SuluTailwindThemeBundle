@@ -110,6 +110,69 @@ final class TranslationParityTest extends TestCase
     }
 
     /**
+     * Every key a template asks for exists.
+     *
+     * Parity guards the three files against each other, but not against the
+     * templates: a key mistyped in an XML file is in none of them, so parity
+     * stays green while the admin renders `iw_sulu_tailwind_theme.whatever` as
+     * a label. That is how two invented keys reached the cards block, copied
+     * out of a fragment whose real names differed.
+     *
+     * Only `<title>` and `<info_text>` are read, so a key named in a comment
+     * as a family - `pageHero_*` - is not mistaken for a missing one.
+     */
+    #[Test]
+    public function everyKeyAskedForByATemplateExists(): void
+    {
+        $known = self::entries('admin', self::REFERENCE);
+
+        $missing = [];
+        foreach (self::configFiles() as $path) {
+            $source = (string) file_get_contents($path);
+
+            preg_match_all(
+                '/<(?:title|info_text)>(' . preg_quote(self::PREFIX, '/') . '[\w.]+)<\/(?:title|info_text)>/',
+                $source,
+                $matches,
+            );
+
+            foreach (array_unique($matches[1]) as $key) {
+                if (!\array_key_exists($key, $known)) {
+                    $missing[] = \sprintf('%s (%s)', $key, basename($path));
+                }
+            }
+        }
+
+        self::assertSame(
+            [],
+            $missing,
+            "These keys are asked for but translated nowhere, so the admin shows the key itself:\n  "
+            . implode("\n  ", $missing),
+        );
+    }
+
+    /**
+     * Every XML the bundle ships under config.
+     *
+     * @return list<string>
+     */
+    private static function configFiles(): array
+    {
+        $files = [];
+        foreach (['templates/blocks', 'templates/blocks-code', 'templates/blocks-code-open',
+            'templates/blocks-form', 'templates/blocks-form-bundle', 'templates/fragments',
+            'templates/fragments/widgets', 'templates/pages', 'templates/articles', 'forms'] as $directory) {
+            foreach (glob(\dirname(__DIR__, 2) . '/config/' . $directory . '/*.xml') ?: [] as $path) {
+                $files[] = $path;
+            }
+        }
+
+        self::assertNotEmpty($files);
+
+        return $files;
+    }
+
+    /**
      * The bundle's own keys, in file order.
      *
      * @return list<string>

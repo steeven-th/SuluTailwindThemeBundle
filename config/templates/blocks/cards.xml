@@ -95,14 +95,53 @@
                                     </params>
                                 </property>
 
-                                <!-- The shared CTA block, so a card can carry several
-                                     buttons with their own styles rather than one link.
-                                     Only the repeatable block is taken: its alignment
-                                     and direction stay block-level settings, since a
-                                     grid where each card aligns its buttons
-                                     differently reads as a mistake. -->
-                                <xi:include href="../fragments/cta-buttons.xml"
-                                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
+                                <property name="linkStyle" type="iw_theme_button_style_picker"
+                                          visibleCondition="__parent.__parent.clickableCard">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cards_link_style</title>
+                                        <info_text>iw_sulu_tailwind_theme.cards_link_style_info</info_text>
+                                    </meta>
+                                </property>
+
+                                <!-- The shared CTA buttons, offered only when the card
+                                     is NOT clickable: either the card leads somewhere
+                                     as a whole, or it holds buttons that lead to
+                                     several places, never both.
+
+                                     Copied from `cta-buttons.xml` rather than included,
+                                     because a `visibleCondition` cannot ride on an
+                                     `xi:include`. `CardLinkContractTest` compares the
+                                     two so the copy cannot drift. -->
+                                <block name="ctaButtons" default-type="cta_button" minOccurs="0"
+                                       visibleCondition="__parent.__parent.clickableCard != true">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.cta_buttons</title>
+                                        <info_text>iw_sulu_tailwind_theme.cta_buttons_info</info_text>
+                                    </meta>
+                                    <types>
+                                        <type name="cta_button">
+                                            <meta>
+                                                <title>iw_sulu_tailwind_theme.cta_button</title>
+                                            </meta>
+                                            <properties>
+                                                <property name="link" type="link" colspan="12">
+                                                    <meta>
+                                                        <title>iw_sulu_tailwind_theme.cta_button_link</title>
+                                                        <info_text>iw_sulu_tailwind_theme.cta_button_link_info</info_text>
+                                                    </meta>
+                                                    <params>
+                                                        <param name="enable_attributes" value="true"/>
+                                                    </params>
+                                                </property>
+                                                <property name="style" type="iw_theme_button_style_picker" colspan="12">
+                                                    <meta>
+                                                        <title>iw_sulu_tailwind_theme.cta_button_style</title>
+                                                    </meta>
+                                                </property>
+                                            </properties>
+                                        </type>
+                                    </types>
+                                </block>
 
                                 <!-- Puts one card forward using the accent surface of
                                      the variant, which carries its own text colour, so
@@ -132,7 +171,7 @@
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
                 <property name="style" type="iw_theme_style_picker">
-                    <meta><title>iw_sulu_tailwind_theme.style</title></meta>
+                    <meta><title>iw_sulu_tailwind_theme.layout_style</title></meta>
                     <params>
                         <param name="block_type" value="cards"/>
                     </params>
@@ -286,7 +325,7 @@
                     <params>
                         <param name="default_value" value=""/>
                         <param name="values" type="collection">
-                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_none</title></meta></param>
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.image_max_width_full</title></meta></param>
                             <param name="3xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_3xs</title></meta></param>
                             <param name="2xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_2xs</title></meta></param>
                             <param name="xs"><meta><title>iw_sulu_tailwind_theme.image_max_width_xs</title></meta></param>
