@@ -4016,12 +4016,7 @@ section.block:has([data-slider-fullbleed-value]) {
     text-shadow: none;
 }
 
-.iw-page-hero--no-image .iw-page-hero__breadcrumb {
-    text-shadow: none;
-    --iw-breadcrumbs-color: initial;
-    --iw-breadcrumbs-current-color: initial;
-    --iw-breadcrumbs-link-hover: initial;
-}
+
 
 .iw-page-hero__image {
     width: 100%;
@@ -4100,15 +4095,26 @@ section.block:has([data-slider-fullbleed-value]) {
     text-shadow: var(--iw-page-hero-subtitle-shadow, 0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
-/* Overlay: the breadcrumb sits below the text → top margin. A light text
-   shadow keeps it legible over the image (matches the title/subtitle). */
+/* The breadcrumb below the titles: top margin. Colours are left alone, so the
+   component resolves the ones set in Components > Breadcrumb.
+
+   Light colours are for one case only - sitting over the image - and used to
+   be the default here, with the other cases each undoing them. A mode that
+   forgot to undo them, or a new one, got white on white. The rule below opts
+   into them instead. */
 .iw-page-hero__breadcrumb {
     margin-top: var(--iw-page-hero-breadcrumb-gap, 0.75rem);
+    --iw-breadcrumbs-margin-bottom: 0;
+}
+
+/* Over the image: light colours and a shadow, like the title and subtitle
+   beside it. Only the overlay puts the breadcrumb on the image, and only when
+   there is one. */
+.iw-page-hero:not(.iw-page-hero--no-image) .iw-page-hero__overlay .iw-page-hero__breadcrumb {
     text-shadow: var(--iw-page-hero-breadcrumb-shadow, 0 1px 2px rgba(0, 0, 0, 0.35));
     --iw-breadcrumbs-color: var(--iw-page-hero-breadcrumb-color, rgba(255, 255, 255, 0.85));
     --iw-breadcrumbs-current-color: var(--iw-page-hero-breadcrumb-current-color, #fff);
     --iw-breadcrumbs-link-hover: var(--iw-page-hero-breadcrumb-link-hover, #fff);
-    --iw-breadcrumbs-margin-bottom: 0;
 }
 
 /* Below: header in the normal flow under the image, with theme text colors. */
@@ -4185,13 +4191,11 @@ section.block:has([data-slider-fullbleed-value]) {
    It also drops the light overlay colours: sitting above the titles it is
    outside the shaded area in every mode but overlay, where the shade covers
    the whole column anyway. */
+/* Above the titles: the margin moves to the other side. Nothing else, since
+   the colours are no longer something to undo. */
 .iw-page-hero__breadcrumb--above {
     margin-top: 0;
     margin-bottom: var(--iw-page-hero-breadcrumb-gap, 0.75rem);
-    text-shadow: none;
-    --iw-breadcrumbs-color: initial;
-    --iw-breadcrumbs-current-color: initial;
-    --iw-breadcrumbs-link-hover: initial;
 }
 
 /* ─── Article meta ──────────────────────────────────────────────────────── */
