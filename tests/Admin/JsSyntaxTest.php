@@ -15,25 +15,30 @@ use PHPUnit\Framework\TestCase;
  * broken admin build in someone else's project, after a release. A stray
  * character in a comment is enough.
  *
- * The parser is not a dependency of this bundle - there is no build here to
- * hang one off. It is borrowed from wherever one happens to be installed,
- * which in practice is the Sulu application next door, the one that compiles
- * this admin in the first place. When there is none the test skips rather than
- * fails: a contributor without a JavaScript toolchain should not see a red
- * suite over a check they cannot run.
+ * The parser is installed into the bundle, not depended on through the admin
+ * package: that one declares peer dependencies on React and sulu-admin-bundle,
+ * which npm would try to resolve for a check that needs neither. A bare
+ * `npm install --no-save @babel/parser` at the root sidesteps all of it.
+ *
+ * With no parser installed the test skips rather than fails, so a contributor
+ * without a JavaScript toolchain does not face a red suite over a check they
+ * cannot run. CI installs it, which is where the guarantee actually matters.
  */
 final class JsSyntaxTest extends TestCase
 {
     /**
      * Where a @babel/parser may be found, nearest first.
      *
+     * Both inside the bundle. An earlier version also looked in a Sulu
+     * application beside it, which worked on the machine it was written on and
+     * nowhere else - a contributor has no reason to keep one there, and CI
+     * certainly does not.
+     *
      * @var list<string>
      */
     private const PARSER_PATHS = [
-        'public/js/node_modules/@babel/parser',
         'node_modules/@babel/parser',
-        '../sulu-base/node_modules/@babel/parser',
-        '../../sulu-base/node_modules/@babel/parser',
+        'public/js/node_modules/@babel/parser',
     ];
 
     #[Test]
@@ -42,8 +47,8 @@ final class JsSyntaxTest extends TestCase
         $parser = self::locateParser();
         if (null === $parser) {
             self::markTestSkipped(
-                'No @babel/parser found. This check borrows one from a Sulu application next to '
-                . 'the bundle, since there is no JavaScript build here to depend on.',
+                'No @babel/parser installed. Run `npm install --no-save @babel/parser` at the '
+                . 'root of the bundle to run this check locally. CI installs it.',
             );
         }
 

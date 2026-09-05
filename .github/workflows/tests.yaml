@@ -42,6 +42,20 @@ jobs:
         # test against what a consumer would actually resolve today.
         run: composer update --prefer-dist --no-interaction --no-progress
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install the JavaScript parser
+        # The admin components are compiled by the host application, never
+        # here, so nothing else would catch a syntax error in them before a
+        # release. JsSyntaxTest skips without this, which is fine locally and
+        # not fine on CI. Installed at the root rather than through
+        # public/js/package.json, whose peer dependencies npm would try to
+        # resolve for a check that needs neither React nor sulu-admin-bundle.
+        run: npm install --no-save --no-audit --no-fund @babel/parser
+
       - name: Report the resolved PHPUnit version
         run: vendor/bin/phpunit --version
 
