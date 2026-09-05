@@ -214,6 +214,13 @@ export default class ColorTokenEditor extends React.Component {
         if (this.props.onFinish) {
             this.props.onFinish();
         }
+
+        // A caller that opened this itself needs to know it is over. In a form
+        // the input stays and there is nothing to tell; mounted for one pick,
+        // the input is all that is left on screen once the popover goes.
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
     };
 
     /**

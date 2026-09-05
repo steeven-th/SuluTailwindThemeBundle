@@ -166,6 +166,7 @@ export default class TextColorPlugin extends Plugin {
             }
 
             button.set({isToggleable: true});
+            this.button = button;
 
             this.listenTo(button, 'execute', action(() => {
                 // Mounted on the first click rather than in init(): CKEditor
@@ -226,6 +227,7 @@ export default class TextColorPlugin extends Plugin {
                             <ColorTokenEditor
                                 autoOpen={true}
                                 onChange={this.handleChange}
+                                onClose={this.handleClose}
                                 onFinish={this.handleFinish}
                                 // The palette tab is opt-in, and it is the
                                 // whole point here: without it the editor
@@ -260,8 +262,20 @@ export default class TextColorPlugin extends Plugin {
 
     /**
      * The picker reports a colour as finished on every interaction, the way a
-     * Sulu form field does. Nothing to do with it here: the panel stays until
-     * the button is pressed again.
+     * Sulu form field does. Nothing to do with it here: only the popover
+     * closing means the pick is over.
      */
     handleFinish = () => {};
+
+    /**
+     * The popover closed, so the panel has nothing left to show.
+     *
+     * The picker is a form field: an input, and a popover above it. In a form
+     * the input is the field and stays. Mounted for one pick, it would sit
+     * under the toolbar with nothing to do until the button was pressed again.
+     */
+    handleClose = action(() => {
+        this.open = false;
+        this.button.isOn = false;
+    });
 }

@@ -188,7 +188,17 @@ final class CKEditorToolsContractTest extends TestCase
         self::assertStringContainsString(
             'this.open = !this.open;',
             $source,
-            'The button must toggle the panel, since it is the only thing that closes it.',
+            'The button must toggle the panel.',
+        );
+
+        // The picker is an input plus a popover. Left mounted after the
+        // popover closes, the input sits under the toolbar doing nothing until
+        // the button is pressed again.
+        self::assertStringContainsString(
+            'onClose={this.handleClose}',
+            $source,
+            'The panel must come down when the popover closes, or its input is stranded under '
+            . 'the toolbar.',
         );
     }
 
