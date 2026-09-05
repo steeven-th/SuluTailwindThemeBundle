@@ -166,6 +166,33 @@ final class CKEditorToolsContractTest extends TestCase
     }
 
     /**
+     * The colour panel closes on the button, and on nothing else.
+     *
+     * The picker calls `onFinish` on every colour it is handed - that is what
+     * a Sulu form field does, and it is how the form knows to validate. Wiring
+     * a close to that signal shut the panel the moment a slider moved, which
+     * made the custom colour tab unusable.
+     */
+    #[Test]
+    public function theColourPanelIsClosedByItsButtonAlone(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        self::assertMatchesRegularExpression(
+            '/handleFinish = \(\) => \{\}/',
+            $source,
+            'Closing on onFinish closes the panel on every interaction: picking a colour, '
+            . 'dragging a slider, typing a hex.',
+        );
+
+        self::assertStringContainsString(
+            'this.open = !this.open;',
+            $source,
+            'The button must toggle the panel, since it is the only thing that closes it.',
+        );
+    }
+
+    /**
      * The picker attaches to the rendered editor, not to the source element.
      *
      * CKEditor builds its interface after the plugins run, so `init()` is too

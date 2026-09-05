@@ -165,6 +165,8 @@ export default class TextColorPlugin extends Plugin {
                 button.bind('isEnabled').to(command, 'isEnabled');
             }
 
+            button.set({isToggleable: true});
+
             this.listenTo(button, 'execute', action(() => {
                 // Mounted on the first click rather than in init(): CKEditor
                 // builds its interface after the plugins run, so there is no
@@ -174,8 +176,18 @@ export default class TextColorPlugin extends Plugin {
                 // corner of the screen.
                 this.mountPicker();
 
-                this.value = this.currentValue();
-                this.open = true;
+                // A toggle, and it has to be: the picker reports every colour
+                // it is handed as finished, which is what a Sulu form field
+                // does, so closing on that signal closed the panel the moment
+                // a slider moved. The button is the only thing that closes it.
+                this.open = !this.open;
+                button.isOn = this.open;
+
+                if (this.open) {
+                    this.value = this.currentValue();
+                } else {
+                    this.editor.editing.view.focus();
+                }
             }));
 
             return button;
@@ -246,8 +258,10 @@ export default class TextColorPlugin extends Plugin {
         });
     });
 
-    handleFinish = action(() => {
-        this.open = false;
-        this.editor.editing.view.focus();
-    });
+    /**
+     * The picker reports a colour as finished on every interaction, the way a
+     * Sulu form field does. Nothing to do with it here: the panel stays until
+     * the button is pressed again.
+     */
+    handleFinish = () => {};
 }
