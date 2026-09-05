@@ -48,8 +48,8 @@ final class VariantZones
     /**
      * Ordered zones: zone id => [label key, ordered field list].
      *
-     * A field is `[storage key, label key, kind]`, where kind is `color` or
-     * `width`. The order is the order the editor lists them in.
+     * A field is `[storage key, label key, kind]`, where kind is `color`,
+     * `width` or `lineStyle`. The order is the order the editor lists them in.
      *
      * @var array<string, array{label: string, fields: list<array{0: string, 1: string, 2: string}>}>
      */
@@ -100,6 +100,20 @@ final class VariantZones
                 ['accentBorderWidth', 'iw_sulu_tailwind_theme.variant_accent_border_width', 'width'],
             ],
         ],
+        'table' => [
+            'label' => 'iw_sulu_tailwind_theme.variant_zone_table',
+            'fields' => [
+                ['tableHeadBg', 'iw_sulu_tailwind_theme.variant_table_head_bg', 'color'],
+                ['tableHeadText', 'iw_sulu_tailwind_theme.variant_table_head_text', 'color'],
+                ['tableCellBg', 'iw_sulu_tailwind_theme.variant_table_cell_bg', 'color'],
+                ['tableCellText', 'iw_sulu_tailwind_theme.variant_table_cell_text', 'color'],
+                ['tableStripeBg', 'iw_sulu_tailwind_theme.variant_table_stripe_bg', 'color'],
+                ['tableHoverBg', 'iw_sulu_tailwind_theme.variant_table_hover_bg', 'color'],
+                ['tableBorder', 'iw_sulu_tailwind_theme.variant_table_border', 'color'],
+                ['tableBorderWidth', 'iw_sulu_tailwind_theme.variant_table_border_width', 'width'],
+                ['tableBorderStyle', 'iw_sulu_tailwind_theme.variant_table_border_style', 'lineStyle'],
+            ],
+        ],
         'form' => [
             'label' => 'iw_sulu_tailwind_theme.variant_zone_form',
             'fields' => [
@@ -120,6 +134,18 @@ final class VariantZones
      * @var list<int>
      */
     public const WIDTHS = [1, 2, 3];
+
+    /**
+     * Line styles a border can take.
+     *
+     * The third kind of field, after colours and widths. Tables are the only
+     * place it appears: their rules are the one border in the bundle that is
+     * there by default, so it is the one an editor may want to soften rather
+     * than remove.
+     *
+     * @var list<string>
+     */
+    public const LINE_STYLES = ['solid', 'dashed', 'dotted'];
 
     /**
      * The zones, as the editor consumes them.
@@ -149,7 +175,7 @@ final class VariantZones
     }
 
     /**
-     * The kind of a grouped key, `color` or `width`.
+     * The kind of a grouped key: `color`, `width` or `lineStyle`.
      */
     public static function kindOf(string $key): ?string
     {

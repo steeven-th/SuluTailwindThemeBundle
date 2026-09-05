@@ -46,6 +46,9 @@ final class AccentSurfaceTextTest extends TestCase
             'definition term' => ['dt'],
             'definition body' => ['dd'],
             'caption' => ['figcaption'],
+            'table caption' => ['caption'],
+            'table header' => ['th'],
+            'table cell' => ['td'],
         ];
     }
 
@@ -58,7 +61,9 @@ final class AccentSurfaceTextTest extends TestCase
     {
         $css = $this->compileCss();
 
-        $variantRule = \sprintf('.iw-variant--accent-demo %s', $element);
+        $variantRule = \in_array($element, ['th', 'td'], true)
+            ? \sprintf('.iw-variant--accent-demo table %s', $element)
+            : \sprintf('.iw-variant--accent-demo %s', $element);
         $surfaceRule = \sprintf('.iw-variant--accent-demo .iw-surface--accent %s', $element);
 
         // No trailing comma asserted: the last selector of the list ends with
@@ -120,6 +125,52 @@ final class AccentSurfaceTextTest extends TestCase
             $css,
             'The surface rule must exclude buttons: a call to action on an accent card keeps '
             . 'the colours of its button style.',
+        );
+    }
+
+    /**
+     * Every element that can hold editor text is coloured by the variant.
+     *
+     * The block itself falls back to the TITLE colour, so an element left out
+     * of the variant rules does not lose its colour - it silently renders in
+     * the heading one, which is the failure that is hard to spot: white body
+     * text on a light background, in the worst case.
+     *
+     * List items were the first casualty, definition lists the second, and
+     * table captions the third: nothing coloured a `<caption>`, so a table
+     * legend came out in the heading colour.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function richTextElements(): array
+    {
+        return [
+            'paragraph' => ['p'],
+            'list item' => ['li'],
+            'definition term' => ['dt'],
+            'definition body' => ['dd'],
+            'figure caption' => ['figcaption'],
+            'table caption' => ['caption'],
+            'table cell' => ['td'],
+            'table header' => ['th'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('richTextElements')]
+    public function everyRichTextElementIsColouredByTheVariant(string $element): void
+    {
+        $css = $this->compileCss();
+
+        self::assertMatchesRegularExpression(
+            \sprintf('/\.iw-variant--accent-demo (?:table )?%s[,\s{]/', preg_quote($element, '/')),
+            $css,
+            \sprintf(
+                'Nothing colours <%s>, so it falls through to the block colour - which is the '
+                . 'heading colour, not the body one. The failure is silent: the text is '
+                . 'coloured, just with the wrong colour.',
+                $element,
+            ),
         );
     }
 

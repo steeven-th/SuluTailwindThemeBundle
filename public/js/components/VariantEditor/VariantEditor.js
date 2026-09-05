@@ -6,7 +6,7 @@ import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
-import {WIDTHS, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
 
 const STYLE_ID = 'iw-variant-editor-styles';
 
@@ -73,6 +73,32 @@ function ensureVariantEditorStyles() {
         '  color: var(--ve-accentText, #111827);',
         '  padding: 10px 12px; border-radius: 3px; font-size: 13px; margin: 0 0 10px;',
         '}',
+        '.iw-ve__table-wrap { margin: 0 0 10px; }',
+        '.iw-ve__table {',
+        '  width: 100%; border-collapse: collapse; font-size: 12px;',
+        '  color: var(--ve-tableCellText, var(--ve-paragraph, #374151));',
+        '}',
+        '.iw-ve__table th, .iw-ve__table td {',
+        '  border: var(--ve-tableBorderWidth, 1px) var(--ve-tableBorderStyle, solid)',
+        '    var(--ve-tableBorder, var(--ve-hr, #e5e7eb));',
+        '  padding: 5px 7px; text-align: left;',
+        '}',
+        '.iw-ve__table th {',
+        '  font-weight: 600;',
+        '  color: var(--ve-tableHeadText, var(--ve-title, #1a1a1a));',
+        '  background: var(--ve-tableHeadBg, rgba(0, 0, 0, .04));',
+        '}',
+        '.iw-ve__table td { background: var(--ve-tableCellBg, transparent); }',
+        '.iw-ve__table tbody tr:nth-child(even) td {',
+        '  background: var(--ve-tableStripeBg, var(--ve-tableCellBg, transparent));',
+        '}',
+        /* Drawn as a row rather than left to a real hover, the same way the
+           form shows its focus and error states: a setting nobody can see
+           without hovering is a setting nobody knows they have. */
+        '.iw-ve__table tbody tr.iw-ve__table-row--hover td {',
+        '  background: var(--ve-tableHoverBg, var(--ve-tableStripeBg, var(--ve-tableCellBg, transparent)));',
+        '}',
+        '.iw-ve__table-state { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; opacity: .55; }',
         '.iw-ve__button-wrap { margin: 0 0 10px; }',
         '.iw-ve__button {',
         '  display: inline-block; padding: 7px 15px; border-radius: 3px;',
@@ -121,7 +147,11 @@ function ensureVariantEditorStyles() {
         '.iw-ve__settings { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }',
         '.iw-ve__setting { flex: 0 1 210px; min-width: 180px; }',
         '.iw-ve__setting-label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 4px; }',
-        '.iw-ve__widths { display: flex; gap: 6px; }',
+        '.iw-ve__widths { display: flex; flex-wrap: wrap; gap: 6px; }',
+        // A row of five buttons does not fit the width a colour picker needs,
+        // and overflowed into the setting beside it. Half a row each, so the
+        // two of them wrap onto a line of their own.
+        '.iw-ve__setting--wide { flex: 1 1 calc(50% - 7px); min-width: 260px; }',
         '.iw-ve__width {',
         '  cursor: pointer; border: 1px solid #d1d5db; background: #fff;',
         '  border-radius: 3px; padding: 5px 11px; font-size: 12px;',
@@ -283,6 +313,14 @@ export default class VariantEditor extends React.Component {
                 return;
             }
 
+            // A line style is a keyword, so it goes in as it stands: neither a
+            // length to suffix nor a colour to resolve.
+            if ('lineStyle' === kind) {
+                style['--ve-' + key] = held;
+
+                return;
+            }
+
             const value = this.resolved(held);
 
             // An unresolved reference is not a color. Setting the property to
@@ -417,6 +455,38 @@ export default class VariantEditor extends React.Component {
                         ))}
                         {this.renderRegion('accent', 'iw-ve__accent',
                             translate('iw_sulu_tailwind_theme.variant_preview_accent'))}
+                        {this.renderRegion('table', 'iw-ve__table-wrap', (
+                            <table className="iw-ve__table">
+                                <thead>
+                                    <tr>
+                                        <th>{translate('iw_sulu_tailwind_theme.variant_preview_table_head')}</th>
+                                        <th>{translate('iw_sulu_tailwind_theme.variant_preview_table_head')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
+                                        <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
+                                        <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
+                                    </tr>
+                                    <tr className="iw-ve__table-row--hover">
+                                        <td>{translate('iw_sulu_tailwind_theme.variant_preview_table_cell')}</td>
+                                        <td>
+                                            {/* The label is dimmed, not the cell: opacity on a
+                                                <td> makes its BACKGROUND translucent too, so the
+                                                hover colour showed through darker on one cell
+                                                than on the other. */}
+                                            <span className="iw-ve__table-state">
+                                                {translate('iw_sulu_tailwind_theme.variant_preview_table_hover')}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        ))}
                         {this.renderButton()}
                         {this.renderRegion('form', 'iw-ve__form-wrap', (
                             <div>
@@ -496,14 +566,51 @@ export default class VariantEditor extends React.Component {
 
         const value = this.colors[key];
 
+        if ('lineStyle' === field.kind) {
+            return (
+                <div className="iw-ve__setting iw-ve__setting--wide" key={key}>
+                    <span className="iw-ve__setting-label">{translate(field.label)}</span>
+                    <div className="iw-ve__widths">
+                        {['', ...LINE_STYLES].map((style) => (
+                            <button
+                                className="iw-ve__width"
+                                data-ve-selected={String(style) === String(value || '') ? 'true' : 'false'}
+                                key={style || 'default'}
+                                onClick={() => this.commit(key, style)}
+                                type="button"
+                            >
+                                {translate(style
+                                    ? 'iw_sulu_tailwind_theme.variant_line_' + style
+                                    : 'iw_sulu_tailwind_theme.variant_border_default')}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
         if ('width' === field.kind) {
             // The width means nothing until the border has a colour, and saying
             // so beats offering buttons that quietly do nothing.
+            //
+            // Table rules are the exception: they are drawn whether or not a
+            // colour was picked, so their width is meaningful on its own and
+            // greying it out would hide a setting that works.
             const colorKey = key.replace(/Width$/, '');
-            const hasColor = !!this.colors[colorKey];
+            const drawnByDefault = 'tableBorderWidth' === key;
+            const hasColor = !!this.colors[colorKey] || drawnByDefault;
+
+            // Empty means "no border" on a surface, whose border is off until
+            // asked for. On table rules, which are drawn anyway, empty means
+            // "the default one" and a zero has to be offered separately - the
+            // two would otherwise be the same button saying opposite things.
+            const widths = drawnByDefault ? [0, ...WIDTHS] : WIDTHS;
+            const emptyLabel = drawnByDefault
+                ? 'iw_sulu_tailwind_theme.variant_border_default'
+                : 'iw_sulu_tailwind_theme.variant_border_none';
 
             return (
-                <div className="iw-ve__setting" key={key}>
+                <div className={'iw-ve__setting' + (drawnByDefault ? ' iw-ve__setting--wide' : '')} key={key}>
                     <span className="iw-ve__setting-label">{translate(field.label)}</span>
                     <div className="iw-ve__widths">
                         <button
@@ -513,9 +620,9 @@ export default class VariantEditor extends React.Component {
                             onClick={() => this.commit(key, '')}
                             type="button"
                         >
-                            {translate('iw_sulu_tailwind_theme.variant_border_none')}
+                            {translate(emptyLabel)}
                         </button>
-                        {WIDTHS.map((width) => (
+                        {widths.map((width) => (
                             <button
                                 className="iw-ve__width"
                                 data-ve-selected={String(width) === String(value) ? 'true' : 'false'}
