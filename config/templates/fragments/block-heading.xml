@@ -45,7 +45,7 @@
         <params>
             <param name="context" value="blocks"/>
         </params>
-        <tag name="sulu.block_preview" priority="80"/>
+        <tag name="sulu.block_preview" priority="90"/>
     </property>
     <xi:include href="block-title-tag.xml"
                 xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>

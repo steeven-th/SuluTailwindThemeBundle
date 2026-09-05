@@ -94,12 +94,17 @@ final class BlockPreviewContractTest extends TestCase
     }
 
     /**
-     * Titles rank above body text, which ranks above subtitles.
+     * A header reads in the order the form is filled in.
+     *
+     * Title, subtitle, then the body. Ranking the body above the subtitle
+     * follows from "text if there is one, subtitle otherwise", but that rule
+     * says which one carries more, not which comes first on a block that has
+     * both - and a header that lists them out of form order reads as scrambled.
      */
     #[Test]
-    public function theHeaderReadsTitleThenTextThenSubtitle(): void
+    public function theHeaderReadsInFormOrder(): void
     {
-        $expected = ['title' => 100, 'text' => 90, 'subTitle' => 80];
+        $expected = ['title' => 100, 'subTitle' => 90, 'text' => 80];
         $seen = [];
 
         foreach (self::blockFiles() as $path) {
@@ -129,9 +134,10 @@ final class BlockPreviewContractTest extends TestCase
                     (string) $expected[$name],
                     $tag->getAttribute('priority'),
                     \sprintf(
-                        'In %s the %s field ranks out of order. A header reads title, then body '
-                        . 'text, then subtitle, and one block ordering them differently makes '
-                        . 'the whole page harder to scan, not just that block.',
+                        'In %s the %s field ranks out of order. A header reads title, then '
+                        . 'subtitle, then body text - the order the form is filled in - and one '
+                        . 'block ordering them differently makes the whole page harder to scan, '
+                        . 'not just that block.',
                         basename($path),
                         $name,
                     ),
@@ -140,8 +146,8 @@ final class BlockPreviewContractTest extends TestCase
         }
 
         self::assertSame(
-            ['title', 'text', 'subTitle'],
-            array_values(array_intersect(['title', 'text', 'subTitle'], array_keys($seen))),
+            ['title', 'subTitle', 'text'],
+            array_values(array_intersect(['title', 'subTitle', 'text'], array_keys($seen))),
             'All three ranks must be in use, or this test is guarding an order nothing follows.',
         );
     }

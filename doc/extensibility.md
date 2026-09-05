@@ -79,7 +79,8 @@ to. Every field that should show there has to carry the tag, including the
 title. Tagging the body text of a sub-block and nothing else leaves its header
 naming rows by their first sentence.
 
-In this bundle the ranks are title `100`, body text `90`, subtitle `80`.
+In this bundle the ranks are title `100`, subtitle `90`, body text `80` - the
+order the form is filled in, which is the order a header reads best in.
 
 ## 2. Naming the field so it persists
 
