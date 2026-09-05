@@ -766,6 +766,29 @@ SuluTailwindThemeBundle/
 └── public/js/              # Admin React components
 ```
 
+### Running the tests
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
+The suite is mostly contract tests: they read the templates, the form XML and
+the compiled CSS to check things that no single file can enforce on its own.
+
+One of them parses the admin JavaScript. Those components are compiled by the
+host application and never here, so a syntax error in this repository would
+otherwise surface as a broken admin build in someone else's project. It borrows
+a `@babel/parser` from wherever one is installed - `public/js/node_modules`,
+`node_modules`, or a Sulu application sitting next to the bundle - and **skips**
+when there is none, so a contributor without a JavaScript toolchain does not get
+a red suite over a check they cannot run. Installing one locally is enough to
+turn it on:
+
+```bash
+npm install --no-save @babel/parser --prefix public/js
+```
+
 ## Available translations
 
 * English
