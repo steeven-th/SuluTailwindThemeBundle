@@ -1,5 +1,12 @@
 // @flow
-import {blockPreviewTransformerRegistry, fieldRegistry} from 'sulu-admin-bundle/containers';
+import {
+    blockPreviewTransformerRegistry,
+    ckeditorConfigRegistry,
+    ckeditorPluginRegistry,
+    fieldRegistry,
+} from 'sulu-admin-bundle/containers';
+import {FontSize} from '@ckeditor/ckeditor5-font';
+import {translate} from 'sulu-admin-bundle/utils';
 import {formToolbarActionRegistry} from 'sulu-admin-bundle/views/Form';
 import {viewRegistry} from 'sulu-admin-bundle/containers';
 import initializer from 'sulu-admin-bundle/services/initializer';
@@ -19,6 +26,9 @@ import TitleEditor from './components/TitleEditor/TitleEditor';
 import BlockScopeSelector from './components/BlockScopeSelector/BlockScopeSelector';
 import VariantEditor from './components/VariantEditor/VariantEditor';
 import TitleBlockPreviewTransformer from './blockPreview/TitleBlockPreviewTransformer';
+import QuotePlugin from './ckeditor/QuotePlugin';
+import TextColorPlugin from './ckeditor/TextColorPlugin';
+import UppercasePlugin from './ckeditor/UppercasePlugin';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
 
@@ -76,4 +86,45 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         new TitleBlockPreviewTransformer(),
         2048,
     );
+
+    // Rich-text tools. Registered rather than bolted onto a text editor of our
+    // own, so they reach every text_editor field - the pages, articles and
+    // snippets of Sulu included, not just the blocks of this bundle.
+    ckeditorPluginRegistry.add(TextColorPlugin);
+    ckeditorPluginRegistry.add(UppercasePlugin);
+    ckeditorPluginRegistry.add(QuotePlugin);
+    ckeditorPluginRegistry.add(FontSize);
+
+    ckeditorConfigRegistry.add((config) => ({
+        // Appended, never replaced: the config function receives what Sulu and
+        // any other bundle put there first.
+        toolbar: [...config.toolbar, 'fontSize', 'iwTextColor', 'iwUppercase', 'iwQuote'],
+        fontSize: {
+            // Classes rather than inline sizes, so a size follows the
+            // typography of the theme instead of freezing a number into the
+            // content. The names are the scale the Typography tab already
+            // speaks - `sm`, `lg`, `xl` - not a list of pixels.
+            //
+            // `default` is a plain string on purpose: that is how CKEditor
+            // spells "no size attribute", and it is what removes one.
+            options: [
+                {
+                    title: translate('iw_sulu_tailwind_theme.font_size_sm'),
+                    model: 'sm',
+                    view: {name: 'span', classes: 'iw-size--sm'},
+                },
+                'default',
+                {
+                    title: translate('iw_sulu_tailwind_theme.font_size_lg'),
+                    model: 'lg',
+                    view: {name: 'span', classes: 'iw-size--lg'},
+                },
+                {
+                    title: translate('iw_sulu_tailwind_theme.font_size_xl'),
+                    model: 'xl',
+                    view: {name: 'span', classes: 'iw-size--xl'},
+                },
+            ],
+        },
+    }));
 });

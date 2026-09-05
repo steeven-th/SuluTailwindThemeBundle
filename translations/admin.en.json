@@ -302,6 +302,13 @@
     "iw_sulu_tailwind_theme.variant_preview_form_error": "error",
     "iw_sulu_tailwind_theme.variant_zone_text": "Text",
     "iw_sulu_tailwind_theme.variant_zone_block": "Block",
+    "iw_sulu_tailwind_theme.font_size_sm": "Small",
+    "iw_sulu_tailwind_theme.font_size_lg": "Large",
+    "iw_sulu_tailwind_theme.font_size_xl": "Extra large",
+    "iw_sulu_tailwind_theme.editor_text_color": "Text colour",
+    "iw_sulu_tailwind_theme.editor_uppercase": "Uppercase",
+    "iw_sulu_tailwind_theme.editor_quote": "Quote",
+
     "iw_sulu_tailwind_theme.variant_zone_table": "Table",
     "iw_sulu_tailwind_theme.variant_table_head_bg": "Header background",
     "iw_sulu_tailwind_theme.variant_table_head_text": "Header text",
