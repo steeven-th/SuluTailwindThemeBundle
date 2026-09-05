@@ -163,7 +163,11 @@ export default class ColorTokenEditor extends React.Component {
         // Without this the editor asks for a colour and shows a closed input
         // to click again.
         if (this.props.autoOpen) {
-            this.setState({popoverOpen: true});
+            // Next tick, not this one: the popover measures its anchor to
+            // place itself, and on the mount that created the anchor there is
+            // nothing laid out yet to measure - it lands in the top left
+            // corner of the screen.
+            setTimeout(() => this.setState({popoverOpen: true}), 0);
         }
     }
 

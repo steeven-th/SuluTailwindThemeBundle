@@ -205,6 +205,10 @@ export default class TextColorPlugin extends Plugin {
                                 autoOpen={true}
                                 onChange={this.handleChange}
                                 onFinish={this.handleFinish}
+                                // The palette tab is opt-in, and it is the
+                                // whole point here: without it the editor
+                                // offers a colour wheel and no theme at all.
+                                schemaOptions={{show_palette: {value: true}}}
                                 value={this.value}
                             />
                         )

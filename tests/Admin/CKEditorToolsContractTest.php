@@ -166,6 +166,25 @@ final class CKEditorToolsContractTest extends TestCase
     }
 
     /**
+     * The editor's picker offers the theme palette.
+     *
+     * The palette tab is opt-in on the picker, off by default. Without it the
+     * button opens a colour wheel and the theme is nowhere in sight - which is
+     * the opposite of why the picker was reused rather than rebuilt: a colour
+     * chosen outside the palette cannot follow the theme.
+     */
+    #[Test]
+    public function theEditorPickerOffersThePalette(): void
+    {
+        self::assertMatchesRegularExpression(
+            '/show_palette: \{value: true\}/',
+            self::read('public/js/ckeditor/TextColorPlugin.js'),
+            'The palette tab must be turned on, or the editor offers a colour wheel and no '
+            . 'theme colours at all.',
+        );
+    }
+
+    /**
      * Classes the plugins and the editor config put into the content.
      *
      * @return array<string, string> class => where it comes from
