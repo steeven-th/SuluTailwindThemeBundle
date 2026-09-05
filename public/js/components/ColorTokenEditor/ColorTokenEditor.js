@@ -157,6 +157,14 @@ export default class ColorTokenEditor extends React.Component {
     componentDidMount() {
         ensurePickerStyles();
         this._loadPaletteFromForm();
+
+        // A caller that mounts this in answer to a click of its own - the
+        // editor toolbar does - has already had the click that opens it.
+        // Without this the editor asks for a colour and shows a closed input
+        // to click again.
+        if (this.props.autoOpen) {
+            this.setState({popoverOpen: true});
+        }
     }
 
     /**

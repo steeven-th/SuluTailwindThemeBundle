@@ -102,6 +102,70 @@ final class CKEditorToolsContractTest extends TestCase
     }
 
     /**
+     * Every class the editor writes also shows inside the editor.
+     *
+     * The theme stylesheet is compiled for the site and never loaded in the
+     * admin, so a class alone changes the page and nothing under the cursor.
+     * The button then looks broken while being perfectly correct, which is
+     * exactly how the first version of these tools felt.
+     */
+    #[Test]
+    public function everyClassTheEditorWritesShowsInTheEditor(): void
+    {
+        $styles = self::read('public/js/ckeditor/editorStyles.js');
+        $missing = [];
+
+        foreach (self::classesWritten() as $class => $where) {
+            // The colour is the one class the admin cannot fake, its value
+            // living in the theme. It has an editing conversion instead.
+            if ('iw-text--' === $class) {
+                continue;
+            }
+
+            if (!str_contains($styles, '.ck-content .' . $class)) {
+                $missing[] = \sprintf('%s (written by %s)', $class, $where);
+            }
+        }
+
+        self::assertSame(
+            [],
+            $missing,
+            "The editor writes a class that has no effect inside the editor. The text changes on\n"
+            . "the page and not under the cursor, which reads as a button that did nothing:\n  "
+            . implode("\n  ", $missing),
+        );
+    }
+
+    /**
+     * The colour is resolved for the editing view.
+     *
+     * It cannot travel as a class there: the class points at a palette
+     * variable the admin has never loaded. So the stored data keeps the class
+     * and the editing view gets the resolved colour inline - two conversions
+     * from one attribute, which is the whole reason CKEditor separates them.
+     */
+    #[Test]
+    public function theColourIsResolvedForTheEditingView(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        foreach (['dataDowncast', 'editingDowncast'] as $pipeline) {
+            self::assertStringContainsString(
+                \sprintf("conversion.for('%s')", $pipeline),
+                $source,
+                'The colour needs both pipelines: a class to store, a resolved colour to show.',
+            );
+        }
+
+        self::assertMatchesRegularExpression(
+            '/editingDowncast[\s\S]{0,400}resolveRef\(/',
+            $source,
+            'The editing view must resolve the reference against the palette, or a palette '
+            . 'colour shows as nothing in the editor.',
+        );
+    }
+
+    /**
      * Classes the plugins and the editor config put into the content.
      *
      * @return array<string, string> class => where it comes from

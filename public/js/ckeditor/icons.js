@@ -18,8 +18,11 @@ export const COLOR_ICON =
 
 export const UPPERCASE_ICON =
     '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">'
-    + '<path d="M4.6 15 8.2 5h1.6l3.6 10h-1.8l-.9-2.6H7.3L6.4 15H4.6zm3.2-4.1h2.4L9 7.1l-1.2 3.8z"/>'
-    + '<path d="M14.2 15 16.8 8h1.2l2.6 7h-1.4l-.6-1.8h-2.4L15.6 15h-1.4z" transform="scale(.72) translate(4 4)"/>'
+    // Two capital As, large and plain. The first drawing packed a big A and a
+    // small one into the same 20 units and neither read at toolbar size - the
+    // shape has to survive being 12 pixels wide, so it carries no detail.
+    + '<text x="10" y="15" font-family="Arial, Helvetica, sans-serif" font-size="14"'
+    + ' font-weight="700" text-anchor="middle">AA</text>'
     + '</svg>';
 
 export const QUOTE_ICON =

@@ -7,6 +7,9 @@ import {Plugin} from '@ckeditor/ckeditor5-core';
 import {translate} from 'sulu-admin-bundle/utils';
 import {ButtonView} from '@ckeditor/ckeditor5-ui';
 import ColorTokenEditor from '../components/ColorTokenEditor/ColorTokenEditor';
+import themeConfigStore from '../stores/themeConfigStore';
+import {resolveRef} from '../utils/colorRefResolver';
+import ensureEditorStyles from './editorStyles';
 import {COLOR_ICON} from './icons';
 
 /**
@@ -49,6 +52,7 @@ export default class TextColorPlugin extends Plugin {
     }
 
     init() {
+        ensureEditorStyles();
         this.defineSchema();
         this.defineConverters();
         this.defineButton();
@@ -78,9 +82,10 @@ export default class TextColorPlugin extends Plugin {
     defineConverters() {
         const {conversion} = this.editor;
 
-        // One stored value, two renderings. The reference is what the theme can
-        // follow later, so it is kept as written rather than resolved here.
-        conversion.for('downcast').attributeToElement({
+        // What is SAVED: a class for a palette pick, an inline colour otherwise.
+        // The reference is what the theme can follow later, so it is kept as
+        // written rather than resolved here.
+        conversion.for('dataDowncast').attributeToElement({
             model: ATTRIBUTE,
             view: (value, {writer}) => {
                 if ('string' !== typeof value || '' === value) {
@@ -96,6 +101,27 @@ export default class TextColorPlugin extends Plugin {
                 }
 
                 return writer.createAttributeElement('span', {style: 'color:' + value}, {priority: 7});
+            },
+        });
+
+        // What is SHOWN in the editor: always an inline colour, resolved from
+        // the palette. The class alone would do nothing there - the theme
+        // stylesheet is compiled for the site and never loaded in the admin,
+        // so the text changed on the page and not under the cursor.
+        conversion.for('editingDowncast').attributeToElement({
+            model: ATTRIBUTE,
+            view: (value, {writer}) => {
+                if ('string' !== typeof value || '' === value) {
+                    return null;
+                }
+
+                const resolved = resolveRef(value, themeConfigStore.palette);
+
+                return writer.createAttributeElement(
+                    'span',
+                    {style: 'color:' + resolved},
+                    {priority: 7},
+                );
             },
         });
 
@@ -160,19 +186,29 @@ export default class TextColorPlugin extends Plugin {
 
     mountPicker() {
         this.element = document.createElement('div');
-        this.editor.sourceElement.appendChild(this.element);
+        this.element.className = 'iw-ckeditor-color-picker';
+
+        // Under the toolbar and inside the editor's own element, so the picker
+        // opens where the button is rather than at the bottom of the page. In
+        // the flow rather than floating: pushing the content down beats
+        // guessing an offset that a scrolled form would get wrong.
+        const view = this.editor.ui.view;
+        const host = (view && view.element) || this.editor.sourceElement;
+        host.insertBefore(this.element, host.firstChild ? host.firstChild.nextSibling : null);
 
         render(
             (
                 <Observer>
-                    {() => (
-                        <div hidden={!this.open}>
+                    {() => (this.open
+                        ? (
                             <ColorTokenEditor
+                                autoOpen={true}
                                 onChange={this.handleChange}
                                 onFinish={this.handleFinish}
                                 value={this.value}
                             />
-                        </div>
+                        )
+                        : null
                     )}
                 </Observer>
             ),
