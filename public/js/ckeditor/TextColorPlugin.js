@@ -56,7 +56,6 @@ export default class TextColorPlugin extends Plugin {
         this.defineSchema();
         this.defineConverters();
         this.defineButton();
-        this.mountPicker();
     }
 
     destroy() {
@@ -167,6 +166,14 @@ export default class TextColorPlugin extends Plugin {
             }
 
             this.listenTo(button, 'execute', action(() => {
+                // Mounted on the first click rather than in init(): CKEditor
+                // builds its interface after the plugins run, so there is no
+                // editor element to attach to yet at that point. The picker
+                // ended up in the source element, which CKEditor hides - and a
+                // popover measuring an anchor of no size places itself in the
+                // corner of the screen.
+                this.mountPicker();
+
                 this.value = this.currentValue();
                 this.open = true;
             }));
@@ -185,16 +192,19 @@ export default class TextColorPlugin extends Plugin {
     }
 
     mountPicker() {
+        if (this.element) {
+            return;
+        }
+
         this.element = document.createElement('div');
         this.element.className = 'iw-ckeditor-color-picker';
 
-        // Under the toolbar and inside the editor's own element, so the picker
-        // opens where the button is rather than at the bottom of the page. In
-        // the flow rather than floating: pushing the content down beats
-        // guessing an offset that a scrolled form would get wrong.
-        const view = this.editor.ui.view;
-        const host = (view && view.element) || this.editor.sourceElement;
-        host.insertBefore(this.element, host.firstChild ? host.firstChild.nextSibling : null);
+        // Right under the toolbar, inside the editor's rendered element, so
+        // the picker opens where the button is. In the flow rather than
+        // floating: pushing the content down beats guessing an offset that a
+        // scrolled form would get wrong.
+        const editable = this.editor.ui.view.editable.element;
+        editable.parentNode.insertBefore(this.element, editable);
 
         render(
             (

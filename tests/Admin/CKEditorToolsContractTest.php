@@ -166,6 +166,42 @@ final class CKEditorToolsContractTest extends TestCase
     }
 
     /**
+     * The picker attaches to the rendered editor, not to the source element.
+     *
+     * CKEditor builds its interface after the plugins run, so `init()` is too
+     * early to reach for it - and the fallback, the source element, is the one
+     * CKEditor hides once it has taken over. A popover measuring an anchor of
+     * no size places itself in the corner of the screen, which is exactly what
+     * it did.
+     */
+    #[Test]
+    public function thePickerAttachesToTheRenderedEditor(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        self::assertStringNotContainsString(
+            'this.mountPicker();\n    }',
+            $source,
+            'The picker must not be mounted from init(), where the editor interface does not '
+            . 'exist yet.',
+        );
+
+        self::assertStringContainsString(
+            'this.editor.ui.view.editable.element',
+            $source,
+            'The picker must attach beside the editable area of the rendered editor, so the '
+            . 'popover has a laid-out anchor to measure.',
+        );
+
+        self::assertStringNotContainsString(
+            'this.editor.sourceElement',
+            $source,
+            'The source element is hidden once CKEditor takes over: anything anchored there has '
+            . 'no size, and a popover lands in the corner of the screen.',
+        );
+    }
+
+    /**
      * The editor's picker offers the theme palette.
      *
      * The palette tab is opt-in on the picker, off by default. Without it the
