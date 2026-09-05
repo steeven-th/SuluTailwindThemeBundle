@@ -68,11 +68,13 @@
                                     <params>
                                         <param name="context" value="blocks"/>
                                     </params>
+                                    <tag name="sulu.block_preview" priority="100"/>
                                 </property>
 
                                 <property name="text" type="text_editor">
                                     <meta><title>iw_sulu_tailwind_theme.text</title></meta>
-                                </property>
+                                    <tag name="sulu.block_preview" priority="80"/>
+                </property>
 
                                 <!-- The destination of the card as a whole, shown only
                                      when the block makes its cards clickable. Two

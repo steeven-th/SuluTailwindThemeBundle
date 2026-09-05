@@ -20,8 +20,10 @@
             <title>iw_sulu_tailwind_theme.title</title>
             <info_text>iw_sulu_tailwind_theme.title_info</info_text>
         </meta>
+        <tag name="sulu.block_preview" priority="100"/>
     </property>
     <property name="subTitle" type="text_line">
         <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
+        <tag name="sulu.block_preview" priority="90"/>
     </property>
 </properties>

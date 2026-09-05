@@ -38,12 +38,14 @@
         <params>
             <param name="context" value="blocks"/>
         </params>
+        <tag name="sulu.block_preview" priority="100"/>
     </property>
     <property name="subTitle" type="iw_theme_title_editor">
         <meta><title>iw_sulu_tailwind_theme.subtitle</title></meta>
         <params>
             <param name="context" value="blocks"/>
         </params>
+        <tag name="sulu.block_preview" priority="90"/>
     </property>
     <xi:include href="block-title-tag.xml"
                 xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>

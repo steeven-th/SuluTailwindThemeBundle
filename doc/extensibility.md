@@ -46,6 +46,42 @@ The theme forms are `iw_theme_config_details`, `iw_theme_config_colors`,
 `iw_theme_config_footer`, `iw_theme_config_components` and
 `iw_theme_config_articles`.
 
+### Showing a field in a collapsed block
+
+A page holds a dozen blocks, collapsed by default, so their headers are how an
+editor finds the one they came for. Sulu fills those headers on its own,
+picking up to three fields from the field types it can render.
+
+Two things decide what shows up, and each is useless without the other:
+
+- **A transformer for the field type.** Sulu ships them for its own types. A
+  custom type has none, so its values are skipped entirely - which is what
+  happened to every title in this bundle until `iw_theme_title_editor` got
+  one. Register yours beside the field itself:
+
+  ```js
+  import {blockPreviewTransformerRegistry} from 'sulu-admin-bundle/containers';
+
+  blockPreviewTransformerRegistry.add('my_field', new MyTransformer(), 1024);
+  ```
+
+  A transformer is one method, `transform(value)`, returning a React node.
+
+- **The `sulu.block_preview` tag**, which takes over from the automatic pick:
+
+  ```xml
+  <tag name="sulu.block_preview" priority="100"/>
+  ```
+
+**The catch:** one tag switches the automatic pick off for the whole
+**container** it sits in - the block, or the repeatable sub-block it belongs
+to. Every field that should show there has to carry the tag, including the
+title. Tagging the body text of a sub-block and nothing else leaves its header
+naming rows by their first sentence.
+
+In this bundle the ranks are title `100`, subtitle `90`, body text `80` - the
+order the form is filled in, which is the order a header reads best in.
+
 ## 2. Naming the field so it persists
 
 **The prefix is not cosmetic.** The bundle validates incoming theme data against

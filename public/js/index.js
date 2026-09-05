@@ -1,5 +1,5 @@
 // @flow
-import {fieldRegistry} from 'sulu-admin-bundle/containers';
+import {blockPreviewTransformerRegistry, fieldRegistry} from 'sulu-admin-bundle/containers';
 import {formToolbarActionRegistry} from 'sulu-admin-bundle/views/Form';
 import {viewRegistry} from 'sulu-admin-bundle/containers';
 import initializer from 'sulu-admin-bundle/services/initializer';
@@ -18,6 +18,7 @@ import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePick
 import TitleEditor from './components/TitleEditor/TitleEditor';
 import BlockScopeSelector from './components/BlockScopeSelector/BlockScopeSelector';
 import VariantEditor from './components/VariantEditor/VariantEditor';
+import TitleBlockPreviewTransformer from './blockPreview/TitleBlockPreviewTransformer';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
 
@@ -61,4 +62,18 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);
     fieldRegistry.add('iw_theme_block_scope', BlockScopeSelector);
     fieldRegistry.add('iw_theme_variant_editor', VariantEditor);
+
+    // What a collapsed block shows in its header. Sulu picks those fields from
+    // the types it can render, so a type of ours was simply never considered:
+    // block headers fell back to the heading-level select and the body text,
+    // and a page of blocks was hard to read through.
+    //
+    // The priority only decides the order among untagged blocks. Where the
+    // title fields carry `sulu.block_preview` it is the tag that ranks them,
+    // and this registration is what lets them render at all.
+    blockPreviewTransformerRegistry.add(
+        'iw_theme_title_editor',
+        new TitleBlockPreviewTransformer(),
+        2048,
+    );
 });
