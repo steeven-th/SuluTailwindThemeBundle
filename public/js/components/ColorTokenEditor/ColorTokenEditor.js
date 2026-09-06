@@ -157,6 +157,18 @@ export default class ColorTokenEditor extends React.Component {
     componentDidMount() {
         ensurePickerStyles();
         this._loadPaletteFromForm();
+
+        // A caller that mounts this in answer to a click of its own - the
+        // editor toolbar does - has already had the click that opens it.
+        // Without this the editor asks for a colour and shows a closed input
+        // to click again.
+        if (this.props.autoOpen) {
+            // Next tick, not this one: the popover measures its anchor to
+            // place itself, and on the mount that created the anchor there is
+            // nothing laid out yet to measure - it lands in the top left
+            // corner of the screen.
+            setTimeout(() => this.setState({popoverOpen: true}), 0);
+        }
     }
 
     /**
@@ -201,6 +213,13 @@ export default class ColorTokenEditor extends React.Component {
         this.setState({popoverOpen: false});
         if (this.props.onFinish) {
             this.props.onFinish();
+        }
+
+        // A caller that opened this itself needs to know it is over. In a form
+        // the input stays and there is nothing to tell; mounted for one pick,
+        // the input is all that is left on screen once the popover goes.
+        if (this.props.onClose) {
+            this.props.onClose();
         }
     };
 
@@ -565,8 +584,18 @@ export default class ColorTokenEditor extends React.Component {
 
         const showClear = !disabled && false !== clearable && !!internalValue;
 
+        // The input is the field in a form, and pointless when the picker was
+        // opened for a single pick: the palette IS the interface then, and a
+        // hex box under the toolbar only raises the question of what it is
+        // for. Collapsed rather than removed, because the popover measures it
+        // to place itself.
+        const inputStyle = this.props.hideInput
+            ? {height: 0, overflow: 'hidden'}
+            : undefined;
+
         return (
             <Fragment>
+                <div style={inputStyle}>
                 <Input
                     disabled={!!disabled}
                     icon="su-square"
@@ -582,6 +611,7 @@ export default class ColorTokenEditor extends React.Component {
                     valid={!error}
                     value={internalValue}
                 />
+                </div>
                 <Popover
                     anchorElement={this.anchorRef}
                     horizontalOffset={35}

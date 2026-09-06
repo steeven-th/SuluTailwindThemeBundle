@@ -46,6 +46,36 @@ The theme forms are `iw_theme_config_details`, `iw_theme_config_colors`,
 `iw_theme_config_footer`, `iw_theme_config_components` and
 `iw_theme_config_articles`.
 
+### Adding a tool to the rich-text editor
+
+Sulu exposes `ckeditorPluginRegistry` and `ckeditorConfigRegistry` from
+`sulu-admin-bundle/containers`. A config function **receives the config built
+so far**, so append to the toolbar rather than replacing it — what is already
+there belongs to Sulu and to whatever other bundle ran first.
+
+```js
+ckeditorPluginRegistry.add(MyPlugin);
+ckeditorConfigRegistry.add((config) => ({
+    toolbar: [...config.toolbar, 'myButton'],
+}));
+```
+
+**CKEditor drops what its schema does not declare.** An attribute a plugin
+applies but never declares survives until the content is saved and read back,
+so it works while you test it and is gone the next morning. Every plugin must
+extend the schema and register both conversions — `elementToElement()` covers
+both directions at once, an attribute needs `for('upcast')` and
+`for('downcast')` separately.
+
+The bundle's own tools follow one rule: **write classes, never inline styles**,
+so what an editor applies keeps following the theme. A colour picked from the
+palette is stored as a reference and rendered as `iw-text--primary-500`; only a
+colour chosen outside the palette falls back to an inline value, since nothing
+in the theme can follow it. Sizes and capitals are classes for the same reason.
+
+A class the editor writes has to exist in the compiled CSS, or the content
+stores it, the editor shows it, and the page renders plain text.
+
 ### Showing a field in a collapsed block
 
 A page holds a dozen blocks, collapsed by default, so their headers are how an

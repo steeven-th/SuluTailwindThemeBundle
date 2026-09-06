@@ -1,0 +1,394 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ItechWorld\SuluTailwindThemeBundle\Tests\Admin;
+
+use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Guards the rich-text tools added to Sulu's editor.
+ *
+ * Two failures are possible here and both are silent.
+ *
+ * CKEditor drops whatever its schema does not declare. An attribute that is
+ * applied but never declared survives until the content is saved and read back
+ * - so it works while you test it, and the colour is gone the next morning.
+ * Every plugin therefore has to extend the schema, and this checks that it did.
+ *
+ * And a class the editor writes into the content means nothing unless the
+ * stylesheet defines it. A size or a colour would then be stored, reloaded,
+ * displayed in the editor, and render as plain text on the page.
+ */
+final class CKEditorToolsContractTest extends TestCase
+{
+    /**
+     * Every plugin declares what it stores.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function plugins(): array
+    {
+        return [
+            'text colour' => ['TextColorPlugin'],
+            'uppercase' => ['UppercasePlugin'],
+            'quote' => ['QuotePlugin'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('plugins')]
+    public function everyPluginDeclaresItsSchema(string $plugin): void
+    {
+        $source = self::read('public/js/ckeditor/' . $plugin . '.js');
+
+        self::assertMatchesRegularExpression(
+            '/schema\.(extend|register)\(/',
+            $source,
+            \sprintf(
+                '%s applies something CKEditor was never told about. It works until the content '
+                . 'is saved and read back, then the markup is stripped on load - which looks like '
+                . 'it was never applied rather than like a bug.',
+                $plugin,
+            ),
+        );
+
+        // Either the one-way form, or `conversion.elementToElement()`, which
+        // registers both directions at once - the shorthand a plain element
+        // like a quotation can use, where an attribute cannot.
+        self::assertMatchesRegularExpression(
+            "/conversion\.(for\('upcast'\)|elementToElement\()/",
+            $source,
+            \sprintf(
+                '%s writes markup it cannot read back. The content would lose it on every '
+                . 'reopen, silently.',
+                $plugin,
+            ),
+        );
+    }
+
+    /**
+     * Every class the editor writes is defined by the stylesheet.
+     */
+    #[Test]
+    public function everyClassTheEditorWritesIsStyled(): void
+    {
+        $css = $this->compileCss();
+        $missing = [];
+
+        foreach (self::classesWritten() as $class => $where) {
+            // Colour classes are generated per palette entry, so the prefix is
+            // what can be checked - the names come from the theme.
+            $needle = 'iw-text--' === $class ? '.iw-text--' : '.' . $class . ' ';
+
+            if (!str_contains($css, $needle) && !str_contains($css, '.' . $class . '{')) {
+                $missing[] = \sprintf('%s (written by %s)', $class, $where);
+            }
+        }
+
+        self::assertSame(
+            [],
+            $missing,
+            "The editor writes a class the stylesheet never defines. The content stores it, the\n"
+            . "editor shows it, and the page renders plain text - the setting looks applied and\n"
+            . "does nothing:\n  " . implode("\n  ", $missing),
+        );
+    }
+
+    /**
+     * Every class the editor writes also shows inside the editor.
+     *
+     * The theme stylesheet is compiled for the site and never loaded in the
+     * admin, so a class alone changes the page and nothing under the cursor.
+     * The button then looks broken while being perfectly correct, which is
+     * exactly how the first version of these tools felt.
+     */
+    #[Test]
+    public function everyClassTheEditorWritesShowsInTheEditor(): void
+    {
+        $styles = self::read('public/js/ckeditor/editorStyles.js');
+        $missing = [];
+
+        foreach (self::classesWritten() as $class => $where) {
+            // The colour is the one class the admin cannot fake, its value
+            // living in the theme. It has an editing conversion instead.
+            if ('iw-text--' === $class) {
+                continue;
+            }
+
+            if (!str_contains($styles, '.ck-content .' . $class)) {
+                $missing[] = \sprintf('%s (written by %s)', $class, $where);
+            }
+        }
+
+        self::assertSame(
+            [],
+            $missing,
+            "The editor writes a class that has no effect inside the editor. The text changes on\n"
+            . "the page and not under the cursor, which reads as a button that did nothing:\n  "
+            . implode("\n  ", $missing),
+        );
+    }
+
+    /**
+     * The colour is resolved for the editing view.
+     *
+     * It cannot travel as a class there: the class points at a palette
+     * variable the admin has never loaded. So the stored data keeps the class
+     * and the editing view gets the resolved colour inline - two conversions
+     * from one attribute, which is the whole reason CKEditor separates them.
+     */
+    #[Test]
+    public function theColourIsResolvedForTheEditingView(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        foreach (['dataDowncast', 'editingDowncast'] as $pipeline) {
+            self::assertStringContainsString(
+                \sprintf("conversion.for('%s')", $pipeline),
+                $source,
+                'The colour needs both pipelines: a class to store, a resolved colour to show.',
+            );
+        }
+
+        self::assertMatchesRegularExpression(
+            '/editingDowncast[\s\S]{0,400}resolveRef\(/',
+            $source,
+            'The editing view must resolve the reference against the palette, or a palette '
+            . 'colour shows as nothing in the editor.',
+        );
+    }
+
+    /**
+     * The colour panel closes on the button, and on nothing else.
+     *
+     * The picker calls `onFinish` on every colour it is handed - that is what
+     * a Sulu form field does, and it is how the form knows to validate. Wiring
+     * a close to that signal shut the panel the moment a slider moved, which
+     * made the custom colour tab unusable.
+     */
+    #[Test]
+    public function theColourPanelIsClosedByItsButtonAlone(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        self::assertMatchesRegularExpression(
+            '/handleFinish = \(\) => \{\}/',
+            $source,
+            'Closing on onFinish closes the panel on every interaction: picking a colour, '
+            . 'dragging a slider, typing a hex.',
+        );
+
+        self::assertStringContainsString(
+            'this.open = !this.open;',
+            $source,
+            'The button must toggle the panel.',
+        );
+
+        // The picker is an input plus a popover. Left mounted after the
+        // popover closes, the input sits under the toolbar doing nothing until
+        // the button is pressed again.
+        self::assertStringContainsString(
+            'onClose={this.handleClose}',
+            $source,
+            'The panel must come down when the popover closes, or its input is stranded under '
+            . 'the toolbar.',
+        );
+
+        // The palette is the interface here. A hex box under the toolbar only
+        // raises the question of what it is for.
+        self::assertStringContainsString(
+            'hideInput={true}',
+            $source,
+            'The picker input has no purpose when the picker is opened for a single pick.',
+        );
+    }
+
+    /**
+     * A button lights up on the text under the caret, and follows it there.
+     *
+     * That is what bold and italic do, and a button that says nothing about
+     * the text it is over leaves an editor guessing whether a word already
+     * carries a colour.
+     *
+     * Two events, not one: `change` alone fires when the document is edited,
+     * so a button caught up only once something was typed. Moving the caret
+     * across a coloured word left it dark.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function statefulPlugins(): array
+    {
+        return [
+            'text colour' => ['TextColorPlugin'],
+            'uppercase' => ['UppercasePlugin'],
+            'quote' => ['QuotePlugin'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('statefulPlugins')]
+    public function everyButtonFollowsTheCaret(string $plugin): void
+    {
+        $source = self::read('public/js/ckeditor/' . $plugin . '.js');
+
+        self::assertStringContainsString(
+            'button.isOn =',
+            $source,
+            \sprintf('%s must light its button on the text it applies to.', $plugin),
+        );
+
+        self::assertStringContainsString(
+            "'change:range'",
+            $source,
+            \sprintf(
+                '%s must refresh on caret moves too. Watching document changes alone leaves the '
+                . 'button dark until something is typed.',
+                $plugin,
+            ),
+        );
+    }
+
+    /**
+     * The picker attaches to the rendered editor, not to the source element.
+     *
+     * CKEditor builds its interface after the plugins run, so `init()` is too
+     * early to reach for it - and the fallback, the source element, is the one
+     * CKEditor hides once it has taken over. A popover measuring an anchor of
+     * no size places itself in the corner of the screen, which is exactly what
+     * it did.
+     */
+    #[Test]
+    public function thePickerAttachesToTheRenderedEditor(): void
+    {
+        $source = self::read('public/js/ckeditor/TextColorPlugin.js');
+
+        self::assertStringNotContainsString(
+            'this.mountPicker();\n    }',
+            $source,
+            'The picker must not be mounted from init(), where the editor interface does not '
+            . 'exist yet.',
+        );
+
+        self::assertStringContainsString(
+            'this.editor.ui.view.editable.element',
+            $source,
+            'The picker must attach beside the editable area of the rendered editor, so the '
+            . 'popover has a laid-out anchor to measure.',
+        );
+
+        self::assertStringNotContainsString(
+            'this.editor.sourceElement',
+            $source,
+            'The source element is hidden once CKEditor takes over: anything anchored there has '
+            . 'no size, and a popover lands in the corner of the screen.',
+        );
+    }
+
+    /**
+     * The editor's picker offers the theme palette.
+     *
+     * The palette tab is opt-in on the picker, off by default. Without it the
+     * button opens a colour wheel and the theme is nowhere in sight - which is
+     * the opposite of why the picker was reused rather than rebuilt: a colour
+     * chosen outside the palette cannot follow the theme.
+     */
+    #[Test]
+    public function theEditorPickerOffersThePalette(): void
+    {
+        self::assertMatchesRegularExpression(
+            '/show_palette: \{value: true\}/',
+            self::read('public/js/ckeditor/TextColorPlugin.js'),
+            'The palette tab must be turned on, or the editor offers a colour wheel and no '
+            . 'theme colours at all.',
+        );
+    }
+
+    /**
+     * Classes the plugins and the editor config put into the content.
+     *
+     * @return array<string, string> class => where it comes from
+     */
+    private static function classesWritten(): array
+    {
+        $found = [];
+
+        $index = self::read('public/js/index.js');
+        self::assertGreaterThan(
+            0,
+            preg_match_all("/classes: '(iw-[a-z-]+)'/", $index, $matches),
+            'The font size options must name the classes they write.',
+        );
+        foreach ($matches[1] as $class) {
+            $found[$class] = 'the font size options';
+        }
+
+        foreach (['UppercasePlugin', 'TextColorPlugin'] as $plugin) {
+            $source = self::read('public/js/ckeditor/' . $plugin . '.js');
+            if (1 === preg_match("/CLASS_NAME = '([a-z-]+)'/", $source, $one)) {
+                $found[$one[1]] = $plugin;
+            }
+            if (1 === preg_match("/CLASS_PREFIX = '([a-z-]+)'/", $source, $prefix)) {
+                $found[$prefix[1]] = $plugin;
+            }
+        }
+
+        self::assertGreaterThan(3, \count($found));
+
+        return $found;
+    }
+
+    /**
+     * The tools reach the toolbar, and reach it by adding to it.
+     */
+    #[Test]
+    public function theToolbarIsExtendedRatherThanReplaced(): void
+    {
+        $index = self::read('public/js/index.js');
+
+        self::assertStringContainsString(
+            '...config.toolbar,',
+            $index,
+            'The toolbar must be appended to. Replacing it drops the buttons Sulu and any other '
+            . 'bundle put there, which is not ours to decide.',
+        );
+
+        foreach (['iwTextColor', 'iwUppercase', 'iwQuote', 'fontSize'] as $button) {
+            self::assertMatchesRegularExpression(
+                \sprintf("/toolbar: \\[[^\\]]*'%s'/", $button),
+                $index,
+                \sprintf('%s is registered but never shown, so nothing can reach it.', $button),
+            );
+        }
+    }
+
+    private function compileCss(): string
+    {
+        $compiler = new ThemeCompiler(sys_get_temp_dir(), new GoogleFontsResolver(), new OklchPaletteGenerator());
+
+        $ref = new \ReflectionClass(ThemeConfig::class);
+        $theme = $ref->newInstanceWithoutConstructor();
+        $tokens = ['colors' => [['role' => 'primary', 'slug' => 'marine', 'value' => '#1a3a6b']]];
+        foreach (['tokens' => $tokens, 'menuConfig' => [], 'blockStyles' => [], 'label' => 'Test'] as $property => $value) {
+            if ($ref->hasProperty($property)) {
+                $ref->getProperty($property)->setValue($theme, $value);
+            }
+        }
+
+        return (string) (new \ReflectionMethod(ThemeCompiler::class, 'generateCss'))->invoke($compiler, $theme);
+    }
+
+    private static function read(string $relative): string
+    {
+        $path = \dirname(__DIR__, 2) . '/' . $relative;
+        self::assertFileExists($path);
+
+        return (string) file_get_contents($path);
+    }
+}

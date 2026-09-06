@@ -294,6 +294,8 @@ class ThemeCompiler
 
         // Theme-default radius utility classes (blocks without a per-block
         // radius override fall back to these)
+        $css .= $this->generateRichTextClasses();
+
         $css .= $this->generateRadiusUtilityClasses();
 
         // Same idea for the block paddings: a block that never chose one
@@ -1115,6 +1117,39 @@ class ThemeCompiler
      *
      * @return string CSS class declarations (e.g. `.iw-text--primary-500 { ... }`)
      */
+    /**
+     * Generate the utility classes the rich-text editor applies.
+     *
+     * The editor offers a size and a capitals toggle. Both travel as classes
+     * rather than as inline styles, for the same reason the colours do: a size
+     * written into the content freezes a number there, and stops following the
+     * theme the day the typography changes.
+     *
+     * Sizes point at the scale variables the typography section emits, so the
+     * three the editor offers are the three the theme already defines.
+     *
+     * @return string CSS class declarations
+     */
+    private function generateRichTextClasses(): string
+    {
+        $css = "/* Rich-text editor utility classes */\n";
+
+        foreach (['sm', 'lg', 'xl'] as $size) {
+            $css .= ".iw-size--{$size} {\n";
+            $css .= "  font-size: var(--font-size-{$size});\n";
+            $css .= "}\n";
+        }
+
+        // Capitals as a transform, never as changed characters: the wording is
+        // kept, the editor can take it off, and a screen reader still reads a
+        // word rather than spelling out an acronym.
+        $css .= ".iw-uppercase {\n";
+        $css .= "  text-transform: uppercase;\n";
+        $css .= "}\n";
+
+        return $css . "\n";
+    }
+
     private function generateTextColorClasses(): string
     {
         if (null === $this->colorSet) {

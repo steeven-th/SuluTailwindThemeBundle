@@ -302,6 +302,13 @@
     "iw_sulu_tailwind_theme.variant_preview_form_error": "Fehler",
     "iw_sulu_tailwind_theme.variant_zone_text": "Texte",
     "iw_sulu_tailwind_theme.variant_zone_block": "Block",
+    "iw_sulu_tailwind_theme.font_size_sm": "Klein",
+    "iw_sulu_tailwind_theme.font_size_lg": "Groß",
+    "iw_sulu_tailwind_theme.font_size_xl": "Sehr groß",
+    "iw_sulu_tailwind_theme.editor_text_color": "Textfarbe",
+    "iw_sulu_tailwind_theme.editor_uppercase": "Großbuchstaben",
+    "iw_sulu_tailwind_theme.editor_quote": "Zitat",
+
     "iw_sulu_tailwind_theme.variant_zone_table": "Tabelle",
     "iw_sulu_tailwind_theme.variant_table_head_bg": "Hintergrund der Kopfzeile",
     "iw_sulu_tailwind_theme.variant_table_head_text": "Text der Kopfzeile",

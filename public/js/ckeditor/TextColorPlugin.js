@@ -1,0 +1,290 @@
+// @flow
+import React from 'react';
+import {render, unmountComponentAtNode} from 'react-dom';
+import {action, observable} from 'mobx';
+import {Observer} from 'mobx-react';
+import {Plugin} from '@ckeditor/ckeditor5-core';
+import {translate} from 'sulu-admin-bundle/utils';
+import {ButtonView} from '@ckeditor/ckeditor5-ui';
+import ColorTokenEditor from '../components/ColorTokenEditor/ColorTokenEditor';
+import themeConfigStore from '../stores/themeConfigStore';
+import {resolveRef} from '../utils/colorRefResolver';
+import ensureEditorStyles from './editorStyles';
+import {COLOR_ICON} from './icons';
+
+/**
+ * The model attribute holding a colour on a run of text.
+ */
+const ATTRIBUTE = 'iwTextColor';
+
+/**
+ * Prefix of the classes the theme compiler emits for palette colours.
+ *
+ * `generateTextColorClasses()` writes one per role, per brand slug and per
+ * shade, each pointing at the palette variable rather than repeating a hex.
+ * That is what makes a coloured word follow the theme when the palette
+ * changes, and it is why a palette pick is stored as a reference here.
+ */
+const CLASS_PREFIX = 'iw-text--';
+
+/**
+ * Colours a run of text, from the theme palette or freely.
+ *
+ * The editor gets the same picker as the theme settings, so the palette and a
+ * free colour sit behind one button. What is stored differs, and deliberately:
+ *
+ *   - a palette pick becomes `<span class="iw-text--primary-500">`, which
+ *     follows the theme - recolour the palette and the text recolours with it
+ *   - a free colour becomes `<span style="color: #abc123">`, which cannot
+ *     follow anything, and is the price of picking outside the palette
+ *
+ * The picker itself is mounted the way Sulu mounts its link overlays: a div
+ * beside the editor, React rendered into it, wrapped in an `Observer` so the
+ * palette arriving later redraws it. That last part matters - the theme config
+ * is loaded per webspace, after the editor is built.
+ */
+export default class TextColorPlugin extends Plugin {
+    @observable open: boolean = false;
+    @observable value: ?string = undefined;
+
+    static get pluginName(): string {
+        return 'IwTextColor';
+    }
+
+    init() {
+        ensureEditorStyles();
+        this.defineSchema();
+        this.defineConverters();
+        this.defineButton();
+    }
+
+    destroy() {
+        super.destroy();
+
+        if (this.element) {
+            unmountComponentAtNode(this.element);
+            this.element.remove();
+        }
+    }
+
+    /**
+     * CKEditor drops what its schema does not declare.
+     *
+     * Without this the span survives until the content is saved and reloaded,
+     * then vanishes - the worst kind of bug to meet, since it looks like it
+     * worked.
+     */
+    defineSchema() {
+        this.editor.model.schema.extend('$text', {allowAttributes: ATTRIBUTE});
+    }
+
+    defineConverters() {
+        const {conversion} = this.editor;
+
+        // What is SAVED: a class for a palette pick, an inline colour otherwise.
+        // The reference is what the theme can follow later, so it is kept as
+        // written rather than resolved here.
+        conversion.for('dataDowncast').attributeToElement({
+            model: ATTRIBUTE,
+            view: (value, {writer}) => {
+                if ('string' !== typeof value || '' === value) {
+                    return null;
+                }
+
+                if (0 === value.indexOf('ref:')) {
+                    return writer.createAttributeElement(
+                        'span',
+                        {class: CLASS_PREFIX + value.substring(4)},
+                        {priority: 7},
+                    );
+                }
+
+                return writer.createAttributeElement('span', {style: 'color:' + value}, {priority: 7});
+            },
+        });
+
+        // What is SHOWN in the editor: always an inline colour, resolved from
+        // the palette. The class alone would do nothing there - the theme
+        // stylesheet is compiled for the site and never loaded in the admin,
+        // so the text changed on the page and not under the cursor.
+        conversion.for('editingDowncast').attributeToElement({
+            model: ATTRIBUTE,
+            view: (value, {writer}) => {
+                if ('string' !== typeof value || '' === value) {
+                    return null;
+                }
+
+                const resolved = resolveRef(value, themeConfigStore.palette);
+
+                return writer.createAttributeElement(
+                    'span',
+                    {style: 'color:' + resolved},
+                    {priority: 7},
+                );
+            },
+        });
+
+        // Reading back: a class of ours becomes a reference again, an inline
+        // colour stays a colour. Anything else is left alone.
+        conversion.for('upcast').elementToAttribute({
+            view: {name: 'span', classes: new RegExp('^' + CLASS_PREFIX)},
+            model: {
+                key: ATTRIBUTE,
+                value: (viewElement) => {
+                    const found = Array.from(viewElement.getClassNames())
+                        .find((name) => 0 === name.indexOf(CLASS_PREFIX));
+
+                    return found ? 'ref:' + found.substring(CLASS_PREFIX.length) : null;
+                },
+            },
+        });
+
+        conversion.for('upcast').elementToAttribute({
+            view: {name: 'span', styles: {color: /.*/}},
+            model: {
+                key: ATTRIBUTE,
+                value: (viewElement) => viewElement.getStyle('color') || null,
+            },
+        });
+    }
+
+    defineButton() {
+        this.editor.ui.componentFactory.add('iwTextColor', (locale) => {
+            const button = new ButtonView(locale);
+
+            button.set({
+                icon: COLOR_ICON,
+                label: translate('iw_sulu_tailwind_theme.editor_text_color'),
+                tooltip: true,
+            });
+
+            // Greyed out on an empty selection: colouring nothing would store
+            // an attribute the editor cannot see and cannot remove.
+            const command = this.editor.commands.get('bold');
+            if (command) {
+                button.bind('isEnabled').to(command, 'isEnabled');
+            }
+
+            button.set({isToggleable: true});
+            this.button = button;
+
+            // Lit when the caret sits on coloured text, like bold and italic.
+            // The panel being open is not what the light means - a toolbar
+            // button says something about the text, not about itself.
+            const refresh = () => {
+                button.isOn = undefined !== this.currentValue();
+            };
+            this.listenTo(this.editor.model.document, 'change', refresh);
+            this.listenTo(this.editor.model.document.selection, 'change:range', refresh);
+            refresh();
+
+            this.listenTo(button, 'execute', action(() => {
+                // Mounted on the first click rather than in init(): CKEditor
+                // builds its interface after the plugins run, so there is no
+                // editor element to attach to yet at that point. The picker
+                // ended up in the source element, which CKEditor hides - and a
+                // popover measuring an anchor of no size places itself in the
+                // corner of the screen.
+                this.mountPicker();
+
+                // A toggle, and it has to be: the picker reports every colour
+                // it is handed as finished, which is what a Sulu form field
+                // does, so closing on that signal closed the panel the moment
+                // a slider moved. The button is the only thing that closes it.
+                this.open = !this.open;
+
+                if (this.open) {
+                    this.value = this.currentValue();
+                } else {
+                    this.editor.editing.view.focus();
+                }
+            }));
+
+            return button;
+        });
+    }
+
+    /**
+     * The colour already on the selection, so reopening shows what is set.
+     */
+    currentValue(): ?string {
+        const selection = this.editor.model.document.selection;
+
+        return selection.getAttribute(ATTRIBUTE);
+    }
+
+    mountPicker() {
+        if (this.element) {
+            return;
+        }
+
+        this.element = document.createElement('div');
+        this.element.className = 'iw-ckeditor-color-picker';
+
+        // Right under the toolbar, inside the editor's rendered element, so
+        // the picker opens where the button is. In the flow rather than
+        // floating: pushing the content down beats guessing an offset that a
+        // scrolled form would get wrong.
+        const editable = this.editor.ui.view.editable.element;
+        editable.parentNode.insertBefore(this.element, editable);
+
+        render(
+            (
+                <Observer>
+                    {() => (this.open
+                        ? (
+                            <ColorTokenEditor
+                                autoOpen={true}
+                                hideInput={true}
+                                onChange={this.handleChange}
+                                onClose={this.handleClose}
+                                onFinish={this.handleFinish}
+                                // The palette tab is opt-in, and it is the
+                                // whole point here: without it the editor
+                                // offers a colour wheel and no theme at all.
+                                schemaOptions={{show_palette: {value: true}}}
+                                value={this.value}
+                            />
+                        )
+                        : null
+                    )}
+                </Observer>
+            ),
+            this.element,
+        );
+    }
+
+    handleChange = action((value: ?string) => {
+        this.value = value;
+
+        this.editor.model.change((writer) => {
+            const ranges = this.editor.model.document.selection.getRanges();
+
+            for (const range of ranges) {
+                if (value) {
+                    writer.setAttribute(ATTRIBUTE, value, range);
+                } else {
+                    writer.removeAttribute(ATTRIBUTE, range);
+                }
+            }
+        });
+    });
+
+    /**
+     * The picker reports a colour as finished on every interaction, the way a
+     * Sulu form field does. Nothing to do with it here: only the popover
+     * closing means the pick is over.
+     */
+    handleFinish = () => {};
+
+    /**
+     * The popover closed, so the panel has nothing left to show.
+     *
+     * The picker is a form field: an input, and a popover above it. In a form
+     * the input is the field and stays. Mounted for one pick, it would sit
+     * under the toolbar with nothing to do until the button was pressed again.
+     */
+    handleClose = action(() => {
+        this.open = false;
+    });
+}

@@ -4,6 +4,7 @@
     "license": "MIT",
     "peerDependencies": {
         "react": "^16.2.0 || ^17.0.0 || ^18.0.0",
-        "sulu-admin-bundle": "*"
+        "sulu-admin-bundle": "*",
+        "@ckeditor/ckeditor5-font": "^48.0.0"
     }
 }
