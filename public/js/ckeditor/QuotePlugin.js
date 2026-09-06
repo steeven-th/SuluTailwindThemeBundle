@@ -54,6 +54,7 @@ export default class QuotePlugin extends Plugin {
                 button.isOn = this.isInQuote();
             };
             this.listenTo(this.editor.model.document, 'change', refresh);
+            this.listenTo(this.editor.model.document.selection, 'change:range', refresh);
             refresh();
 
             this.listenTo(button, 'execute', () => {

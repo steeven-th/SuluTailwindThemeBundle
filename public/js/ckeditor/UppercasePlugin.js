@@ -63,6 +63,7 @@ export default class UppercasePlugin extends Plugin {
                 button.isOn = true === selection.getAttribute(ATTRIBUTE);
             };
             this.listenTo(this.editor.model.document, 'change', refresh);
+            this.listenTo(selection, 'change:range', refresh);
             refresh();
 
             const bold = this.editor.commands.get('bold');

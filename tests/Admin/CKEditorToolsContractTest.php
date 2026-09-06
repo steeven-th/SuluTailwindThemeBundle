@@ -211,6 +211,51 @@ final class CKEditorToolsContractTest extends TestCase
     }
 
     /**
+     * A button lights up on the text under the caret, and follows it there.
+     *
+     * That is what bold and italic do, and a button that says nothing about
+     * the text it is over leaves an editor guessing whether a word already
+     * carries a colour.
+     *
+     * Two events, not one: `change` alone fires when the document is edited,
+     * so a button caught up only once something was typed. Moving the caret
+     * across a coloured word left it dark.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function statefulPlugins(): array
+    {
+        return [
+            'text colour' => ['TextColorPlugin'],
+            'uppercase' => ['UppercasePlugin'],
+            'quote' => ['QuotePlugin'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('statefulPlugins')]
+    public function everyButtonFollowsTheCaret(string $plugin): void
+    {
+        $source = self::read('public/js/ckeditor/' . $plugin . '.js');
+
+        self::assertStringContainsString(
+            'button.isOn =',
+            $source,
+            \sprintf('%s must light its button on the text it applies to.', $plugin),
+        );
+
+        self::assertStringContainsString(
+            "'change:range'",
+            $source,
+            \sprintf(
+                '%s must refresh on caret moves too. Watching document changes alone leaves the '
+                . 'button dark until something is typed.',
+                $plugin,
+            ),
+        );
+    }
+
+    /**
      * The picker attaches to the rendered editor, not to the source element.
      *
      * CKEditor builds its interface after the plugins run, so `init()` is too

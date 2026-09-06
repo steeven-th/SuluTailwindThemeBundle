@@ -168,6 +168,16 @@ export default class TextColorPlugin extends Plugin {
             button.set({isToggleable: true});
             this.button = button;
 
+            // Lit when the caret sits on coloured text, like bold and italic.
+            // The panel being open is not what the light means - a toolbar
+            // button says something about the text, not about itself.
+            const refresh = () => {
+                button.isOn = undefined !== this.currentValue();
+            };
+            this.listenTo(this.editor.model.document, 'change', refresh);
+            this.listenTo(this.editor.model.document.selection, 'change:range', refresh);
+            refresh();
+
             this.listenTo(button, 'execute', action(() => {
                 // Mounted on the first click rather than in init(): CKEditor
                 // builds its interface after the plugins run, so there is no
@@ -182,7 +192,6 @@ export default class TextColorPlugin extends Plugin {
                 // does, so closing on that signal closed the panel the moment
                 // a slider moved. The button is the only thing that closes it.
                 this.open = !this.open;
-                button.isOn = this.open;
 
                 if (this.open) {
                     this.value = this.currentValue();
@@ -277,6 +286,5 @@ export default class TextColorPlugin extends Plugin {
      */
     handleClose = action(() => {
         this.open = false;
-        this.button.isOn = false;
     });
 }
