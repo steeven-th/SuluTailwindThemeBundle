@@ -40,12 +40,14 @@ export default function ensureEditorStyles() {
         '  margin-left: 0;',
         '  font-style: italic;',
         '}',
-        /* The colour picker, opened from the toolbar. Sits between the toolbar
-           and the text, framed so it reads as a panel and not as content. */
-        '.iw-ckeditor-color-picker:not(:empty) {',
-        '  padding: 8px;',
-        '  border-bottom: 1px solid var(--ck-color-toolbar-border, #ccced1);',
-        '  background: var(--ck-color-toolbar-background, #fafafa);',
+        /* The colour picker's anchor, between the toolbar and the text. It
+           shows nothing: the popover is the interface, and the input it
+           measures to place itself is collapsed. So it takes no height either
+           - a panel opening and closing there would shift the toolbar and the
+           text every time the button is pressed. */
+        '.iw-ckeditor-color-picker {',
+        '  height: 0;',
+        '  overflow: visible;',
         '}',
     ].join('\n');
 
