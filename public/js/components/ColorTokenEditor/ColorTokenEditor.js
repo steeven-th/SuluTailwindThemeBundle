@@ -584,8 +584,18 @@ export default class ColorTokenEditor extends React.Component {
 
         const showClear = !disabled && false !== clearable && !!internalValue;
 
+        // The input is the field in a form, and pointless when the picker was
+        // opened for a single pick: the palette IS the interface then, and a
+        // hex box under the toolbar only raises the question of what it is
+        // for. Collapsed rather than removed, because the popover measures it
+        // to place itself.
+        const inputStyle = this.props.hideInput
+            ? {height: 0, overflow: 'hidden'}
+            : undefined;
+
         return (
             <Fragment>
+                <div style={inputStyle}>
                 <Input
                     disabled={!!disabled}
                     icon="su-square"
@@ -601,6 +611,7 @@ export default class ColorTokenEditor extends React.Component {
                     valid={!error}
                     value={internalValue}
                 />
+                </div>
                 <Popover
                     anchorElement={this.anchorRef}
                     horizontalOffset={35}

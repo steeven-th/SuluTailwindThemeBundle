@@ -200,6 +200,14 @@ final class CKEditorToolsContractTest extends TestCase
             'The panel must come down when the popover closes, or its input is stranded under '
             . 'the toolbar.',
         );
+
+        // The palette is the interface here. A hex box under the toolbar only
+        // raises the question of what it is for.
+        self::assertStringContainsString(
+            'hideInput={true}',
+            $source,
+            'The picker input has no purpose when the picker is opened for a single pick.',
+        );
     }
 
     /**

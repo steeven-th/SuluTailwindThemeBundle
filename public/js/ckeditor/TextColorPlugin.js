@@ -226,6 +226,7 @@ export default class TextColorPlugin extends Plugin {
                         ? (
                             <ColorTokenEditor
                                 autoOpen={true}
+                                hideInput={true}
                                 onChange={this.handleChange}
                                 onClose={this.handleClose}
                                 onFinish={this.handleFinish}

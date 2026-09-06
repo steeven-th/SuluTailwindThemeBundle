@@ -13,8 +13,16 @@
 
 export const COLOR_ICON =
     '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">'
-    + '<path d="M7.3 12.2h5.4l1.1 2.8h2L10.9 3H9.1L3.2 15h2l1.1-2.8zm2.7-6.9 2 5.2H8l2-5.2z"/>'
-    + '<path d="M3 16.5h14V19H3z"/></svg>';
+    // A painter's palette. The underlined A that came first says "text", which
+    // every other button in the toolbar also says - the colour is the part
+    // worth drawing.
+    + '<path d="M10 2.2c-4.4 0-8 2.9-8 6.6 0 3.6 3.6 6.6 8 6.6.9 0 1.6-.7 1.6-1.5'
+    + ' 0-.4-.2-.8-.4-1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.6-1.5h1.9c2.3 0 4.1-1.7'
+    + ' 4.1-3.8 0-3-3.7-4.4-8.4-4.4z"/>'
+    + '<circle cx="6" cy="7.4" r="1.15" fill="#fff"/>'
+    + '<circle cx="10" cy="5.6" r="1.15" fill="#fff"/>'
+    + '<circle cx="14" cy="7.4" r="1.15" fill="#fff"/>'
+    + '</svg>';
 
 export const UPPERCASE_ICON =
     '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">'
