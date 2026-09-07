@@ -1004,12 +1004,17 @@ img.object-cover {
     --iw-accordion-card-bg: transparent;
 }
 
-.iw-block-accordion--headed .iw-accordion__item {
+/* Doubled class on purpose. Each layout sets this padding on the item with the
+   same specificity as a single `--headed` selector would, so which one wins
+   would come down to their order in this file - and `--bordered` is declared
+   below, which is exactly how it kept its padding and its question stopped
+   short of the edges. */
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__item {
     padding-inline: 0;
 }
 
-.iw-block-accordion--headed .iw-accordion__summary,
-.iw-block-accordion--headed .iw-accordion__panel {
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__summary,
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__panel {
     padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
 }
 
