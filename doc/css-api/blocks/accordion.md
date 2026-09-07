@@ -60,17 +60,65 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `--iw-accordion-card-padding-x` | `1.25rem` | Inline padding of an item in `--cards` and `--bordered`. |
 | `--iw-block-accordion-cards-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. Falls back to the site-wide component gap set in the admin (Defaults > Blocks). |
 
-### Colors and rules
+### Surface
+
+All three layouts sit on the **paragraph surface of the variant**, the same one
+every card of the bundle takes: `--cards` puts it on each item, `--list` and
+`--bordered` on the box they draw. A variant therefore colours an accordion the
+same way whichever layout is picked.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-accordion-rule-color` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Rules and borders. Follows the active block variant. |
-| `--iw-accordion-rule-width` | `1px` | Rule and border width. |
-| `--iw-accordion-card-surface` | `var(--iw-article-card-surface, transparent)` | Card background in `--cards`. Follows the site-wide card surface. |
-| `--iw-accordion-summary-color-hover` | `var(--color-primary)` | Row color on hover. |
+| `--iw-accordion-surface-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Fill of the `--list` and `--bordered` box. |
+| `--iw-accordion-card-bg` | same | Fill of each item in `--cards`. |
+
+### Fill (FAQ styling)
+
+The **Fill** setting (`headerSurface`, in the block's *Settings*) decides what
+the accordion sits on. All three values take their colours from surfaces the
+variant already defines, so nothing here introduces a colour of its own.
+
+| Value | Box | Question | Answer |
+|-------|-----|----------|--------|
+| `paragraph` (default) | paragraph surface | shares it | shares it |
+| `accent` | paragraph surface | **accent surface**, which owns its text colour so the question stays legible | paragraph surface |
+| `none` | no fill | no fill | no fill |
+
+The default is filled, because a variant that defines a paragraph surface
+expects it everywhere else too. `none` is the way to put an accordion straight
+on the page.
+
+With `accent`, the inline padding moves from the item to the question and
+answer rows: left on the item, the coloured bar would start `1.25rem` in and
+leave a strip of the box showing down both sides.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-accordion-summary-bg` | `var(--iw-variant-accent-bg, var(--color-accent))` | Question background under `accent`. |
+| `--iw-accordion-panel-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Answer background under `accent`. |
+| `--iw-accordion-panel-filled-padding-bottom` | `1rem` | Bottom padding of a filled answer. |
+
+A variant that defines no accent surface falls back to the theme's
+`--color-accent`, so the setting is never inert.
+
+### Colors and rules
+
+> **Changed in 3.0.0** - `--iw-accordion-card-surface` is now `--iw-accordion-card-bg`, and the
+> `--cards` style takes the **paragraph surface of the variant** rather than the site-wide card
+> colour. Its border comes from that surface too, so a variant that asks for no border no longer
+> gets a hairline: this is the rule the eight other cards of the bundle already followed, and the
+> accordion was the one exception. Override `--iw-accordion-card-bg` to restore a colour of your
+> own, and set `--iw-variant-paragraph-border-width` on the variant to bring the frame back.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-accordion-rule-color` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Separator rules: between items in `--list`, inside the box in `--bordered`, and the box itself. Follows the active block variant. |
+| `--iw-accordion-rule-width` | `1px` | Rule width. |
+| `--iw-accordion-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background in `--cards`. Takes the paragraph surface of the variant, like every other card of the bundle. |
+| `--iw-accordion-summary-color-hover` | `var(--iw-variant-link-hover, var(--color-primary))` | Row color on hover. Follows the variant's link color, falling back to the theme primary. |
 | `--iw-accordion-icon-color` | `currentColor` | Icon color. |
 | `--iw-accordion-content-color` | `inherit` | Answer text color. |
-| `--iw-accordion-focus-color` | `var(--color-primary)` | Keyboard focus ring color. |
+| `--iw-accordion-focus-color` | `var(--iw-variant-link-color, var(--color-primary))` | Keyboard focus ring color. |
 | `--iw-accordion-focus-width` | `2px` | Focus ring width. |
 | `--iw-accordion-focus-offset` | `2px` | Focus ring offset. |
 

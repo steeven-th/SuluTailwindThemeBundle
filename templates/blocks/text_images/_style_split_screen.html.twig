@@ -129,7 +129,8 @@
                 imageFormat: format|default('iw_theme_16_9'),
                 aspectRatio: '16/9',
                 imageRadius: imageRadiusClass|default(''),
-                blockPrefix: 'iw-block-text-images'
+                blockPrefix: 'iw-block-text-images',
+                paragraphRadius: paragraphRadiusClass
             } only %}
         {% elseif resolvedImages|length == 1 %}
                 {% set media = resolvedImages[0] %}

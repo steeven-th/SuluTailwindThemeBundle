@@ -936,3 +936,109 @@ leaves those fields empty is unchanged.
 modifiers, and `.iw-block__action` on each button; `--iw-block-cta-actions-gap`
 and `--iw-block-cta-actions-margin-top` become `--iw-block-actions-gap` and
 `--iw-block-actions-margin-top`.
+
+## Accordion cards follow the variant
+
+The `--cards` style of the accordion drew its own hairline border and took the
+site-wide card colour, while the eight other cards of the bundle had moved to
+the **paragraph surface of the variant**. Two blocks under one variant looked
+like two designs, and no amount of variant configuration closed the gap.
+
+The accordion now follows the same rule as the rest:
+
+```css
+/* before */
+background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface, transparent));
+border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, …);
+
+/* after */
+background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+border: var(--iw-variant-paragraph-border-width, 0) solid var(--iw-variant-paragraph-border, transparent);
+```
+
+**What changes on a site:** accordion cards take the colour of the variant
+instead of the admin card colour, and they lose their border unless the variant
+asks for one. That border was never requested by anyone - it is the same
+correction the other cards received.
+
+**To keep the old look:**
+
+```css
+.iw-block-accordion--cards .iw-accordion__item {
+    --iw-accordion-card-bg: var(--iw-article-card-surface, transparent);
+}
+```
+
+and set a border width on the variant itself, which frames every card of the
+page consistently rather than the accordion alone.
+
+**Renamed:** `--iw-accordion-card-surface` → `--iw-accordion-card-bg`.
+
+The `--list` and `--bordered` layouts take that same surface on the box they
+draw, where they previously had none. The three layouts now fill identically,
+which is what lets a variant colour an accordion without knowing which one an
+editor picked. To keep a bare accordion:
+
+```css
+.iw-block-accordion--list,
+.iw-block-accordion--bordered {
+    --iw-accordion-surface-bg: transparent;
+}
+```
+
+Accordions are filled **by default**: the new Fill setting starts on the
+paragraph surface, since that is what a variant defining one expects
+everywhere else. Set it to *No fill* for an accordion that sits straight on the
+page, which is how they rendered before.
+
+`--list` also gained the corner radius the two other layouts already had, and
+the `overflow: hidden` that makes it clip. It never had one: with no fill of
+its own the square corners went unnoticed, and they showed the moment a row got
+a background.
+
+The row hover and the focus ring now read `--iw-variant-link-hover` and
+`--iw-variant-link-color`, falling back to the theme primary as before. A
+variant that sets no link colour is unaffected.
+
+
+## The text widget takes the paragraph surface
+
+The rich text a two-zone block puts in its second zone rendered on nothing at
+all: `iw-widget__text` carried no surface, where every other rich text of the
+bundle carries `iw-block__text` and gets the paragraph surface of the variant
+with it. A theme with a paragraph background and light text left that one panel
+unreadable, and it was the last place in the bundle where that could happen.
+
+It now carries both classes - `iw-block__text` for the surface,
+`iw-widget__text` kept as the hook a project may already target.
+
+**What changes on a site:** a text widget under a variant with a paragraph
+background gains that background, its padding and its radius, matching the text
+zone beside it. Under a variant without one, nothing changes.
+
+
+## The form's info panel takes the paragraph surface
+
+In `form --split`, the panel beside the form took the **block** background -
+the colour of the very thing it sits inside - with white text over it. On any
+variant where block and panel agreed it dissolved into the block, and no
+variant setting could pull it apart. Meanwhile `form --card`, one rule below,
+already took the paragraph surface like every other card of the bundle.
+
+The panel now takes that same surface, border included, and its title,
+subtitle and text follow the variant instead of a hard-coded white.
+
+**What changes on a site:** the info panel switches from the block colour to
+the paragraph surface of the variant, and its text from white to the variant's
+colours. To keep the old look:
+
+```css
+.iw-block-form--split .iw-block-form__info {
+    --iw-block-form-info-bg: var(--iw-variant-block-bg, var(--color-primary));
+    --iw-block-form-info-color: #fff;
+}
+```
+
+A rich text widget inside that panel no longer paints the surface a second
+time: the panel carries it, so the widget would have drawn a smaller rectangle
+of the same colour floating in the middle of it.

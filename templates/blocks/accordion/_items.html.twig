@@ -16,8 +16,17 @@
      - itemTitleTag: heading tag for each question ('h3'..'h5' or 'none')
      - iconStyle: 'chevron' | 'plus' | 'arrow' | 'none'
      - itemClass: extra classes for a single item (radius on the cards style)
+     - headerSurface: 'none' | 'accent' | 'paragraph' - the surface the summary
+       takes. The panel below it takes the paragraph surface whenever the
+       summary takes one, so a coloured header always reads against a content
+       area of its own rather than against the block.
 #}
 {% set itemTitleTag = itemTitleTag|default('h3') %}
+{% set headerSurface = headerSurface|default('paragraph') %}
+{# `iw-surface--accent` is what carries the accent text colour, so the summary
+   gets it for free rather than through a rule of its own. #}
+{% set summarySurfaceClass = headerSurface == 'accent'
+    ? ' iw-accordion__summary--accent iw-surface--accent' : '' %}
 {% set iconStyle = iconStyle|default('chevron') %}
 
 {% for item in items %}
@@ -28,7 +37,7 @@
             {% if groupName|default('') is not empty %}name="{{ groupName }}"{% endif %}
             {% if item.itemOpen|default(false) %}open{% endif %}
         >
-            <summary class="iw-accordion__summary">
+            <summary class="iw-accordion__summary{{ summarySurfaceClass }}">
                 {% if itemTitleTag == 'none' %}
                     <span class="iw-accordion__title">{{ item.itemTitle }}</span>
                 {% else %}
@@ -58,7 +67,7 @@
             </summary>
 
             {% if item.itemContent|default('') is not empty %}
-                <div class="iw-accordion__panel">
+                <div class="iw-accordion__panel{{ headerSurface == 'accent' ? ' iw-accordion__panel--filled' : '' }}">
                     <div class="iw-accordion__content prose max-w-none">
                         {{ item.itemContent|raw }}
                     </div>

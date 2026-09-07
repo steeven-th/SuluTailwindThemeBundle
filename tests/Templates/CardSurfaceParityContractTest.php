@@ -148,7 +148,11 @@ final class CardSurfaceParityContractTest extends TestCase
             }
 
             $body = $matches[2];
-            if (!preg_match('/--iw-[a-z-]*(?:card|item|info)-(?:bg|border)\b/', $body)) {
+            // `surface` alongside `bg`: the accordion named its background
+            // `--iw-accordion-card-surface` and was skipped here for it, which
+            // is how it kept a hairline border and the site-wide card colour
+            // while the other eight cards had moved to the variant.
+            if (!preg_match('/--iw-[a-z-]*(?:card|item|info)-(?:bg|surface|border)\b/', $body)) {
                 continue;
             }
 

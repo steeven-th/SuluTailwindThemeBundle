@@ -866,13 +866,14 @@ img.object-cover {
 }
 
 .iw-block-accordion .iw-accordion__summary:hover {
-    color: var(--iw-accordion-summary-color-hover, var(--color-primary));
+    color: var(--iw-accordion-summary-color-hover, var(--iw-variant-link-hover, var(--color-primary)));
 }
 
 /* Keyboard focus must stay visible: <summary> is the interactive element and
    its focus ring is the only cue for keyboard users. */
 .iw-block-accordion .iw-accordion__summary:focus-visible {
-    outline: var(--iw-accordion-focus-width, 2px) solid var(--iw-accordion-focus-color, var(--color-primary));
+    outline: var(--iw-accordion-focus-width, 2px) solid
+        var(--iw-accordion-focus-color, var(--iw-variant-link-color, var(--color-primary)));
     outline-offset: var(--iw-accordion-focus-offset, 2px);
 }
 
@@ -947,6 +948,24 @@ img.object-cover {
 }
 
 /* Mode: --list — rules between items */
+/* Mode: --list - rules between items, on the surface of the variant.
+
+   The fill is the same one `--cards` puts on each item and `--bordered` on its
+   box: three layouts, one surface, so a variant colours an accordion the same
+   way whichever is picked.
+
+   `overflow: hidden` is what the radius needs to actually clip: without it the
+   first and last rows keep square corners over a rounded box, which only shows
+   once a row has a fill of its own - a coloured header, for instance. */
+.iw-block-accordion--list {
+    background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    overflow: hidden;
+}
+
+.iw-block-accordion--list .iw-accordion__item {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+}
+
 .iw-block-accordion--list .iw-accordion__item + .iw-accordion__item {
     border-top: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
 }
@@ -960,13 +979,64 @@ img.object-cover {
 
 .iw-block-accordion--cards .iw-accordion__item {
     padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
-    background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface, transparent));
-    border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-variant-paragraph-border, transparent);
+}
+
+/* Question styling (the accordion's fill setting).
+
+   Three states, and the default is a filled accordion because that is what a
+   variant with a paragraph surface expects everywhere else:
+
+     - `paragraph` (default): the box carries the paragraph surface, questions
+       and answers share it. Nothing extra to paint.
+     - `accent`: the question takes the accent surface, the only one that owns
+       a text colour, so it stays legible whatever the editor picked.
+       `.iw-surface--accent` in the markup applies that colour.
+     - `none`: no fill at all, for an accordion that sits directly on the page.
+
+   With a coloured question the inline padding moves from the item to the rows:
+   left on the item, the fill would start 1.25rem in and leave a strip of the
+   box showing down both sides. */
+.iw-block-accordion--fill-none {
+    --iw-accordion-surface-bg: transparent;
+    --iw-accordion-card-bg: transparent;
+}
+
+/* Doubled class on purpose. Each layout sets this padding on the item with the
+   same specificity as a single `--headed` selector would, so which one wins
+   would come down to their order in this file - and `--bordered` is declared
+   below, which is exactly how it kept its padding and its question stopped
+   short of the edges. */
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__item {
+    padding-inline: 0;
+}
+
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__summary,
+.iw-block-accordion.iw-block-accordion--headed .iw-accordion__panel {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+}
+
+.iw-block-accordion .iw-accordion__summary--accent {
+    background-color: var(--iw-accordion-summary-bg, var(--iw-variant-accent-bg, var(--color-accent)));
+}
+
+/* Hovering a coloured bar must not swap its text for a colour chosen against
+   another background: the surface already guarantees this one. */
+.iw-block-accordion .iw-accordion__summary--accent:hover {
+    color: inherit;
+}
+
+.iw-block-accordion .iw-accordion__panel--filled {
+    padding-bottom: var(--iw-accordion-panel-filled-padding-bottom, 1rem);
+    background-color: var(--iw-accordion-panel-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
 }
 
 /* Mode: --bordered — single box, inner rules between items */
 .iw-block-accordion--bordered {
     border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
 }
 
 .iw-block-accordion--bordered .iw-accordion__item {
@@ -3397,20 +3467,41 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-form-success-dark-icon-color, var(--color-success-300, #86efac));
 }
 
-/* --split info side: the primary-color panel that hosts the duplicated title
-   + subtitle. Exposed as a CSS variable so a theme can override without
-   rewriting the template. */
+/* --split info side: the panel beside the form, holding the duplicated title
+   and subtitle plus the widget.
+
+   It is a card, so it takes the paragraph surface like `--card` right below
+   and like every other card of the bundle. It used to take the BLOCK
+   background, which is the colour of the thing it sits inside: the panel then
+   dissolved into the block on any variant where the two agreed, and a variant
+   could not colour it apart. Its text follows the same surface rather than a
+   white of its own, which was only ever right on a dark primary.
+
+   Still overridable through `--iw-block-form-info-*` for a project that wants
+   this one panel to differ. */
 .iw-block-form--split .iw-block-form__info {
-    background-color: var(--iw-block-form-info-bg, var(--iw-variant-block-bg, var(--color-primary)));
-    color: var(--iw-block-form-info-color, #fff);
+    background-color: var(--iw-block-form-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-block-form-info-border, var(--iw-variant-paragraph-border, transparent));
+    color: var(--iw-block-form-info-color, var(--iw-variant-paragraph-color, inherit));
 }
 
 .iw-block-form--split .iw-block-form__info-title {
-    color: var(--iw-block-form-info-title-color, var(--iw-block-form-info-color, #fff));
+    color: var(--iw-block-form-info-title-color, var(--iw-variant-title-color, inherit));
 }
 
 .iw-block-form--split .iw-block-form__info-subtitle {
-    color: var(--iw-block-form-info-subtitle-color, var(--iw-block-form-info-color, rgb(255 255 255 / 0.8)));
+    color: var(--iw-block-form-info-subtitle-color, var(--iw-variant-subtitle-color, inherit));
+}
+
+/* The panel already IS the paragraph surface, so a rich text inside it must not
+   paint that surface again: a second, smaller rectangle of the same colour
+   floating in the middle of the panel is exactly what that produced. Same rule
+   as an accordion, whose box carries the surface for its rows. */
+.iw-block-form--split .iw-block-form__info .iw-block__text {
+    background-color: transparent;
+    padding: 0;
+    margin-block: 0;
 }
 
 /* --card surface. It is a card like the others, so it takes the paragraph

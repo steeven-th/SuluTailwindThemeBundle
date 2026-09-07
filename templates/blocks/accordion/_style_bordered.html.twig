@@ -16,7 +16,13 @@
 
         {# The radius sits on the box, so `overflow-hidden` keeps the first and
            last summaries from square-cornering out of it on hover/open. #}
-        <div class="iw-block-accordion iw-block-accordion--bordered iw-accordion--icon-{{ iconPosition|default('right') }} {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} overflow-hidden"
+        {# One fill setting, three states: the paragraph surface (default), the
+           accent surface on the question, or nothing at all. #}
+        {% set fill = headerSurface|default('paragraph') %}
+        {% set fillClass = fill == 'none'
+            ? ' iw-block-accordion--fill-none'
+            : (fill == 'accent' ? ' iw-block-accordion--headed' : '') %}
+        <div class="iw-block-accordion iw-block-accordion--bordered{{ fillClass }} iw-accordion--icon-{{ iconPosition|default('right') }} {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} overflow-hidden"
              data-controller="accordion"
              data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
         >
@@ -25,7 +31,8 @@
                 baseId: baseId,
                 groupName: groupName,
                 itemTitleTag: itemTitleTag|default('h3'),
-                iconStyle: iconStyle|default('chevron')
+                iconStyle: iconStyle|default('chevron'),
+                headerSurface: fill
             } only %}
         </div>
 

@@ -16,7 +16,13 @@
         {% set baseId = iw_sulu_tailwind_theme_unique_id('accordion') %}
         {% set groupName = (singleOpen|default(false)) ? baseId : '' %}
 
-        <div class="iw-block-accordion iw-block-accordion--list iw-accordion--icon-{{ iconPosition|default('right') }}"
+        {# One fill setting, three states: the paragraph surface (default), the
+           accent surface on the question, or nothing at all. #}
+        {% set fill = headerSurface|default('paragraph') %}
+        {% set fillClass = fill == 'none'
+            ? ' iw-block-accordion--fill-none'
+            : (fill == 'accent' ? ' iw-block-accordion--headed' : '') %}
+        <div class="iw-block-accordion iw-block-accordion--list{{ fillClass }} iw-accordion--icon-{{ iconPosition|default('right') }} {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
              data-controller="accordion"
              data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
         >
@@ -25,7 +31,8 @@
                 baseId: baseId,
                 groupName: groupName,
                 itemTitleTag: itemTitleTag|default('h3'),
-                iconStyle: iconStyle|default('chevron')
+                iconStyle: iconStyle|default('chevron'),
+                headerSurface: fill
             } only %}
         </div>
 
