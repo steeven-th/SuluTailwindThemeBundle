@@ -17,7 +17,7 @@
             <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                     location: location,
-                    title: title|default(''),
+                    title: location.title|default(title|default('')),
                     address: formattedAddress,
                     popup: not hasInfo,
                     mapClass: 'iw-block-location__map w-full h-[400px] md:h-[500px]'
