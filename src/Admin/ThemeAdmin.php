@@ -278,13 +278,25 @@ class ThemeAdmin extends Admin
     {
         $listToolbarActions = [];
         $formToolbarActions = [];
+        // Transfer actions live on the Details tab only. They act on the theme
+        // as a whole rather than on the tab being edited, and repeating them
+        // above every tab would only crowd the toolbar.
+        $detailsToolbarActions = [];
 
         if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::ADD)) {
             $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
+            // Pulling a theme in from another installation starts here: the
+            // list is where a theme that does not exist yet can be created.
+            $listToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.import');
         }
 
         if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             $formToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.save');
+            $detailsToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.import');
+        }
+
+        if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
+            $detailsToolbarActions[] = new ToolbarAction('iw_sulu_tailwind_theme.export');
         }
 
         if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::DELETE)) {
@@ -337,7 +349,7 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_details')
                     ->setTabTitle('iw_sulu_tailwind_theme.details')
-                    ->addToolbarActions($formToolbarActions)
+                    ->addToolbarActions(array_merge($formToolbarActions, $detailsToolbarActions))
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 

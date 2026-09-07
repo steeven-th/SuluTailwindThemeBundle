@@ -1,10 +1,7 @@
 // @flow
 import {reaction} from 'mobx';
 import {translate} from 'sulu-admin-bundle/utils';
-import {Requester} from 'sulu-admin-bundle/services';
-import Config from 'sulu-admin-bundle/services/Config';
-import initializer from 'sulu-admin-bundle/services/initializer';
-import themeConfigStore from '../../stores/themeConfigStore';
+import reloadThemeConfig from '../../utils/reloadThemeConfig';
 import AbstractFormToolbarAction from 'sulu-admin-bundle/views/Form/toolbarActions/AbstractFormToolbarAction';
 
 /**
@@ -13,10 +10,8 @@ import AbstractFormToolbarAction from 'sulu-admin-bundle/views/Form/toolbarActio
  * This ensures that palette colors, button previews, and variant data
  * reflect the latest theme state across all tabs and components.
  *
- * Instead of calling initializer.initialize() (which reloads the entire
- * admin config including navigation and breaks navigation item IDs),
- * this fetches only the config endpoint and re-runs our bundle's
- * update config hooks.
+ * The reload itself lives in reloadThemeConfig(), shared with the theme
+ * import actions, which leave the stored theme just as changed as a save does.
  */
 export default class SaveWithConfigReloadAction extends AbstractFormToolbarAction {
     /** @type {Function|null} Disposer for the save reaction */
@@ -36,17 +31,9 @@ export default class SaveWithConfigReloadAction extends AbstractFormToolbarActio
                     () => this.resourceFormStore.saving,
                     (isSaving: boolean) => {
                         if (!isSaving) {
-                            // Save completed — reload the bundle config and
-                            // invalidate the webspace cache so components re-fetch
-                            themeConfigStore.invalidate();
-                            Requester.get(Config.endpoints.config).then((config) => {
-                                const bundleConfig = config['iw_sulu_tailwind_theme'];
-                                if (bundleConfig && initializer.updateConfigHooks['iw_sulu_tailwind_theme']) {
-                                    initializer.updateConfigHooks['iw_sulu_tailwind_theme'].forEach((hook) => {
-                                        hook(bundleConfig, true);
-                                    });
-                                }
-                            });
+                            // Save completed - the palette, buttons and variants
+                            // the other tabs display are now out of date.
+                            reloadThemeConfig();
 
                             if (this._saveDisposer) {
                                 this._saveDisposer();
