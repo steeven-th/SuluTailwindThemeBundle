@@ -195,8 +195,11 @@ class ThemeFormMapper
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
         'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition',
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
+        'logoTransparentDesktop', 'logoTransparentMobile',
         'fullscreenImage', 'twoColumns',
         'sidebarPosition', 'sidebarWidth', 'transparentNavbar', 'scrollBg', 'scrollHide',
+        // Bar chrome, read by ThemeCompiler::compileMenu().
+        'borderWidth', 'shadow', 'bgOpacity', 'blur',
         'clickParentPageNavbar',
         'megamenuSource',
         'subMenuPanels', 'clickParentPagePanels',
