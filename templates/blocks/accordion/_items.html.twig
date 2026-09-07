@@ -22,12 +22,11 @@
        area of its own rather than against the block.
 #}
 {% set itemTitleTag = itemTitleTag|default('h3') %}
-{% set headerSurface = headerSurface|default('none') %}
+{% set headerSurface = headerSurface|default('paragraph') %}
 {# `iw-surface--accent` is what carries the accent text colour, so the summary
    gets it for free rather than through a rule of its own. #}
 {% set summarySurfaceClass = headerSurface == 'accent'
-    ? ' iw-accordion__summary--accent iw-surface--accent'
-    : (headerSurface == 'paragraph' ? ' iw-accordion__summary--paragraph' : '') %}
+    ? ' iw-accordion__summary--accent iw-surface--accent' : '' %}
 {% set iconStyle = iconStyle|default('chevron') %}
 
 {% for item in items %}
@@ -68,7 +67,7 @@
             </summary>
 
             {% if item.itemContent|default('') is not empty %}
-                <div class="iw-accordion__panel{{ headerSurface != 'none' ? ' iw-accordion__panel--filled' : '' }}">
+                <div class="iw-accordion__panel{{ headerSurface == 'accent' ? ' iw-accordion__panel--filled' : '' }}">
                     <div class="iw-accordion__content prose max-w-none">
                         {{ item.itemContent|raw }}
                     </div>

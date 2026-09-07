@@ -123,11 +123,11 @@
                         <info_text>iw_sulu_tailwind_theme.accordion_header_surface_info</info_text>
                     </meta>
                     <params>
-                        <param name="default_value" value="none"/>
+                        <param name="default_value" value="paragraph"/>
                         <param name="values" type="collection">
-                            <param name="none"><meta><title>iw_sulu_tailwind_theme.accordion_header_surface_none</title></meta></param>
-                            <param name="accent"><meta><title>iw_sulu_tailwind_theme.accordion_header_surface_accent</title></meta></param>
                             <param name="paragraph"><meta><title>iw_sulu_tailwind_theme.accordion_header_surface_paragraph</title></meta></param>
+                            <param name="accent"><meta><title>iw_sulu_tailwind_theme.accordion_header_surface_accent</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.accordion_header_surface_none</title></meta></param>
                         </param>
                     </params>
                 </property>

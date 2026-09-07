@@ -986,6 +986,11 @@ editor picked. To keep a bare accordion:
 }
 ```
 
+Accordions are filled **by default**: the new Fill setting starts on the
+paragraph surface, since that is what a variant defining one expects
+everywhere else. Set it to *No fill* for an accordion that sits straight on the
+page, which is how they rendered before.
+
 `--list` also gained the corner radius the two other layouts already had, and
 the `overflow: hidden` that makes it clip. It never had one: with no fill of
 its own the square corners went unnoticed, and they showed the moment a row got

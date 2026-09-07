@@ -984,49 +984,47 @@ img.object-cover {
         var(--iw-variant-paragraph-border, transparent);
 }
 
-/* Filled header (the "Fond de l'en-tête" setting).
+/* Question styling (the accordion's fill setting).
 
-   A FAQ reads best when the question is a coloured bar and the answer sits on
-   its own, quieter ground. Both come from surfaces the variant already
-   defines, so this adds no colour of its own and no new field to configure:
+   Three states, and the default is a filled accordion because that is what a
+   variant with a paragraph surface expects everywhere else:
 
-     - `--accent` puts the summary on the accent surface. That surface owns a
-       text colour, so the question stays legible whatever the editor picked -
-       `.iw-surface--accent` in the markup is what applies it.
-     - `--paragraph` puts the summary on the paragraph surface, for a soberer
-       header that still separates from the block.
+     - `paragraph` (default): the box carries the paragraph surface, questions
+       and answers share it. Nothing extra to paint.
+     - `accent`: the question takes the accent surface, the only one that owns
+       a text colour, so it stays legible whatever the editor picked.
+       `.iw-surface--accent` in the markup applies that colour.
+     - `none`: no fill at all, for an accordion that sits directly on the page.
 
-   The panel then takes the paragraph surface, so the answer never shares the
-   header's colour. `--accent` aside, the two would be the same fill and the
-   whole point would be lost.
-
-   Padding is restored on both: the bare accordion has none horizontally, and a
-   coloured bar whose text touches its edge reads as a mistake. */
-.iw-block-accordion .iw-accordion__summary--accent,
-.iw-block-accordion .iw-accordion__summary--paragraph {
-    padding-inline: var(--iw-accordion-summary-filled-padding-x, 1rem);
-    border-radius: var(--iw-accordion-summary-radius, inherit);
+   With a coloured question the inline padding moves from the item to the rows:
+   left on the item, the fill would start 1.25rem in and leave a strip of the
+   box showing down both sides. */
+.iw-block-accordion--fill-none {
+    --iw-accordion-surface-bg: transparent;
+    --iw-accordion-card-bg: transparent;
 }
 
-.iw-block-accordion .iw-accordion__summary--paragraph {
-    background-color: var(--iw-accordion-summary-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+.iw-block-accordion--headed .iw-accordion__item {
+    padding-inline: 0;
 }
 
-/* The accent surface paints the summary itself; the class in the markup only
-   carries the text colour, which is the half a background cannot guarantee. */
+.iw-block-accordion--headed .iw-accordion__summary,
+.iw-block-accordion--headed .iw-accordion__panel {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+}
+
 .iw-block-accordion .iw-accordion__summary--accent {
     background-color: var(--iw-accordion-summary-bg, var(--iw-variant-accent-bg, var(--color-accent)));
 }
 
 /* Hovering a coloured bar must not swap its text for a colour chosen against
    another background: the surface already guarantees this one. */
-.iw-block-accordion .iw-accordion__summary--accent:hover,
-.iw-block-accordion .iw-accordion__summary--paragraph:hover {
+.iw-block-accordion .iw-accordion__summary--accent:hover {
     color: inherit;
 }
 
 .iw-block-accordion .iw-accordion__panel--filled {
-    padding: var(--iw-accordion-panel-filled-padding-y, 1rem) var(--iw-accordion-panel-filled-padding-x, 1rem);
+    padding-bottom: var(--iw-accordion-panel-filled-padding-bottom, 1rem);
     background-color: var(--iw-accordion-panel-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
 }
 
