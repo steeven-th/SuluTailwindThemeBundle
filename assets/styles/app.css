@@ -866,13 +866,14 @@ img.object-cover {
 }
 
 .iw-block-accordion .iw-accordion__summary:hover {
-    color: var(--iw-accordion-summary-color-hover, var(--color-primary));
+    color: var(--iw-accordion-summary-color-hover, var(--iw-variant-link-hover, var(--color-primary)));
 }
 
 /* Keyboard focus must stay visible: <summary> is the interactive element and
    its focus ring is the only cue for keyboard users. */
 .iw-block-accordion .iw-accordion__summary:focus-visible {
-    outline: var(--iw-accordion-focus-width, 2px) solid var(--iw-accordion-focus-color, var(--color-primary));
+    outline: var(--iw-accordion-focus-width, 2px) solid
+        var(--iw-accordion-focus-color, var(--iw-variant-link-color, var(--color-primary)));
     outline-offset: var(--iw-accordion-focus-offset, 2px);
 }
 
@@ -960,8 +961,9 @@ img.object-cover {
 
 .iw-block-accordion--cards .iw-accordion__item {
     padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
-    background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface, transparent));
-    border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-variant-paragraph-border, transparent);
 }
 
 /* Mode: --bordered — single box, inner rules between items */

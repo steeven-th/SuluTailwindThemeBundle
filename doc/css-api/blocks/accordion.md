@@ -62,15 +62,22 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 
 ### Colors and rules
 
+> **Changed in 3.0.0** - `--iw-accordion-card-surface` is now `--iw-accordion-card-bg`, and the
+> `--cards` style takes the **paragraph surface of the variant** rather than the site-wide card
+> colour. Its border comes from that surface too, so a variant that asks for no border no longer
+> gets a hairline: this is the rule the eight other cards of the bundle already followed, and the
+> accordion was the one exception. Override `--iw-accordion-card-bg` to restore a colour of your
+> own, and set `--iw-variant-paragraph-border-width` on the variant to bring the frame back.
+
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-accordion-rule-color` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Rules and borders. Follows the active block variant. |
-| `--iw-accordion-rule-width` | `1px` | Rule and border width. |
-| `--iw-accordion-card-surface` | `var(--iw-article-card-surface, transparent)` | Card background in `--cards`. Follows the site-wide card surface. |
-| `--iw-accordion-summary-color-hover` | `var(--color-primary)` | Row color on hover. |
+| `--iw-accordion-rule-color` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Separator rules: between items in `--list`, inside the box in `--bordered`, and the box itself. Follows the active block variant. |
+| `--iw-accordion-rule-width` | `1px` | Rule width. |
+| `--iw-accordion-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background in `--cards`. Takes the paragraph surface of the variant, like every other card of the bundle. |
+| `--iw-accordion-summary-color-hover` | `var(--iw-variant-link-hover, var(--color-primary))` | Row color on hover. Follows the variant's link color, falling back to the theme primary. |
 | `--iw-accordion-icon-color` | `currentColor` | Icon color. |
 | `--iw-accordion-content-color` | `inherit` | Answer text color. |
-| `--iw-accordion-focus-color` | `var(--color-primary)` | Keyboard focus ring color. |
+| `--iw-accordion-focus-color` | `var(--iw-variant-link-color, var(--color-primary))` | Keyboard focus ring color. |
 | `--iw-accordion-focus-width` | `2px` | Focus ring width. |
 | `--iw-accordion-focus-offset` | `2px` | Focus ring offset. |
 

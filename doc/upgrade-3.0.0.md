@@ -936,3 +936,44 @@ leaves those fields empty is unchanged.
 modifiers, and `.iw-block__action` on each button; `--iw-block-cta-actions-gap`
 and `--iw-block-cta-actions-margin-top` become `--iw-block-actions-gap` and
 `--iw-block-actions-margin-top`.
+
+## Accordion cards follow the variant
+
+The `--cards` style of the accordion drew its own hairline border and took the
+site-wide card colour, while the eight other cards of the bundle had moved to
+the **paragraph surface of the variant**. Two blocks under one variant looked
+like two designs, and no amount of variant configuration closed the gap.
+
+The accordion now follows the same rule as the rest:
+
+```css
+/* before */
+background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface, transparent));
+border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, …);
+
+/* after */
+background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+border: var(--iw-variant-paragraph-border-width, 0) solid var(--iw-variant-paragraph-border, transparent);
+```
+
+**What changes on a site:** accordion cards take the colour of the variant
+instead of the admin card colour, and they lose their border unless the variant
+asks for one. That border was never requested by anyone - it is the same
+correction the other cards received.
+
+**To keep the old look:**
+
+```css
+.iw-block-accordion--cards .iw-accordion__item {
+    --iw-accordion-card-bg: var(--iw-article-card-surface, transparent);
+}
+```
+
+and set a border width on the variant itself, which frames every card of the
+page consistently rather than the accordion alone.
+
+**Renamed:** `--iw-accordion-card-surface` → `--iw-accordion-card-bg`.
+
+The row hover and the focus ring now read `--iw-variant-link-hover` and
+`--iw-variant-link-color`, falling back to the theme primary as before. A
+variant that sets no link colour is unaffected.
