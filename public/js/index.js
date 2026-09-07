@@ -8,6 +8,7 @@ import {
 import {FontSize} from '@ckeditor/ckeditor5-font';
 import {translate} from 'sulu-admin-bundle/utils';
 import {formToolbarActionRegistry} from 'sulu-admin-bundle/views/Form';
+import {listToolbarActionRegistry} from 'sulu-admin-bundle/views/List';
 import {viewRegistry} from 'sulu-admin-bundle/containers';
 import initializer from 'sulu-admin-bundle/services/initializer';
 import themeConfigStore from './stores/themeConfigStore';
@@ -31,6 +32,9 @@ import TextColorPlugin from './ckeditor/TextColorPlugin';
 import UppercasePlugin from './ckeditor/UppercasePlugin';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
+import ExportToolbarAction from './components/ThemeTransfer/ExportToolbarAction';
+import ImportFormToolbarAction from './components/ThemeTransfer/ImportFormToolbarAction';
+import ImportListToolbarAction from './components/ThemeTransfer/ImportListToolbarAction';
 
 /**
  * Register all custom field types for the SuluTailwindThemeBundle admin interface.
@@ -58,6 +62,13 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
 
     viewRegistry.add('iw_sulu_tailwind_theme.webspace_theme_form', WebspaceThemeForm);
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.save', SaveWithConfigReloadAction);
+
+    // Theme transfer. The same key names a form action and a list action: the
+    // two registries are separate, and a theme is imported from either place -
+    // over the one being edited, or as a new one from the list.
+    formToolbarActionRegistry.add('iw_sulu_tailwind_theme.export', ExportToolbarAction);
+    formToolbarActionRegistry.add('iw_sulu_tailwind_theme.import', ImportFormToolbarAction);
+    listToolbarActionRegistry.add('iw_sulu_tailwind_theme.import', ImportListToolbarAction);
 
     fieldRegistry.add('iw_theme_variant_picker', VariantPicker);
     fieldRegistry.add('iw_theme_style_picker', StylePicker);

@@ -44,6 +44,16 @@ services:
         tags:
             - { name: 'controller.service_arguments' }
 
+    ItechWorld\SuluTailwindThemeBundle\Controller\Admin\ThemeTransferController:
+        autowire: true
+        autoconfigure: true
+        public: true
+        arguments:
+            $webspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+            $securityChecker: '@sulu_security.security_checker'
+        tags:
+            - { name: 'controller.service_arguments' }
+
     ItechWorld\SuluTailwindThemeBundle\Controller\Admin\WebspaceThemeController:
         autowire: true
         autoconfigure: true
@@ -106,6 +116,19 @@ services:
         arguments:
             - '@itech_world.sulu_tailwind_theme.slug_validator'
             - '@itech_world.sulu_tailwind_theme.custom_field_sanitizer'
+
+    # Theme ⇄ portable JSON file. Both sides go through the form mapper, so a
+    # token added to a form travels without being listed here as well.
+    itech_world.sulu_tailwind_theme.exporter:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeExporter
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.form_mapper'
+
+    itech_world.sulu_tailwind_theme.importer:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeImporter
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.form_mapper'
+            - '@itech_world.sulu_tailwind_theme.repository'
 
     itech_world.sulu_tailwind_theme.block_template_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver
@@ -276,6 +299,24 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\ThemeExportCommand:
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.repository'
+            - '@itech_world.sulu_tailwind_theme.exporter'
+        tags:
+            - { name: 'console.command' }
+
+    ItechWorld\SuluTailwindThemeBundle\Command\ThemeImportCommand:
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.importer'
+            - '@itech_world.sulu_tailwind_theme.repository'
+            - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.compiler'
+            - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+            - '@itech_world.sulu_tailwind_theme.typography_weight_validator'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\ThemeCompileCommand:
         arguments:
             - '@itech_world.sulu_tailwind_theme.repository'
@@ -333,6 +374,8 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver: '@itech_world.sulu_tailwind_theme.config_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator: '@itech_world.sulu_tailwind_theme.slug_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper: '@itech_world.sulu_tailwind_theme.form_mapper'
+    ItechWorld\SuluTailwindThemeBundle\Service\ThemeExporter: '@itech_world.sulu_tailwind_theme.exporter'
+    ItechWorld\SuluTailwindThemeBundle\Service\ThemeImporter: '@itech_world.sulu_tailwind_theme.importer'
     ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator: '@itech_world.sulu_tailwind_theme.typography_weight_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver: '@itech_world.sulu_tailwind_theme.block_template_resolver'
