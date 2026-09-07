@@ -24,7 +24,7 @@
     <div class="iw-block-form iw-block-form--split iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ isFormRight ? ' iw-split-cols--reverse' : '' }}">
         {% if isFormRight %}
             {# Widget first (LEFT desktop / TOP mobile), form after #}
-            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
+            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)]">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                     widget: widget|default([]),
                     imageFormat: 'iw_theme_4_3',
@@ -53,7 +53,7 @@
                 } only %}
             </div>
 
-            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)] bg-[var(--color-primary)] text-white">
+            <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)]">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                     widget: widget|default([]),
                     imageFormat: 'iw_theme_4_3',

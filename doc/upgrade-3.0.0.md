@@ -1015,3 +1015,30 @@ It now carries both classes - `iw-block__text` for the surface,
 **What changes on a site:** a text widget under a variant with a paragraph
 background gains that background, its padding and its radius, matching the text
 zone beside it. Under a variant without one, nothing changes.
+
+
+## The form's info panel takes the paragraph surface
+
+In `form --split`, the panel beside the form took the **block** background -
+the colour of the very thing it sits inside - with white text over it. On any
+variant where block and panel agreed it dissolved into the block, and no
+variant setting could pull it apart. Meanwhile `form --card`, one rule below,
+already took the paragraph surface like every other card of the bundle.
+
+The panel now takes that same surface, border included, and its title,
+subtitle and text follow the variant instead of a hard-coded white.
+
+**What changes on a site:** the info panel switches from the block colour to
+the paragraph surface of the variant, and its text from white to the variant's
+colours. To keep the old look:
+
+```css
+.iw-block-form--split .iw-block-form__info {
+    --iw-block-form-info-bg: var(--iw-variant-block-bg, var(--color-primary));
+    --iw-block-form-info-color: #fff;
+}
+```
+
+A rich text widget inside that panel no longer paints the surface a second
+time: the panel carries it, so the widget would have drawn a smaller rectangle
+of the same colour floating in the middle of it.
