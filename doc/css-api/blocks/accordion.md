@@ -60,6 +60,33 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `--iw-accordion-card-padding-x` | `1.25rem` | Inline padding of an item in `--cards` and `--bordered`. |
 | `--iw-block-accordion-cards-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. Falls back to the site-wide component gap set in the admin (Defaults > Blocks). |
 
+### Header background (FAQ style)
+
+A FAQ reads best when the question is a coloured bar and the answer sits on its
+own, quieter ground. The **Header background** setting (`headerSurface`, in the
+block's *Settings*) does exactly that, reusing surfaces the variant already
+defines - it introduces no colour of its own and no field to configure.
+
+| Value | Summary | Panel |
+|-------|---------|-------|
+| `none` (default) | unchanged, no background | unchanged |
+| `accent` | the variant's **accent surface**, which owns its text colour, so the question stays legible whatever the editor picked | the **paragraph surface** |
+| `paragraph` | the **paragraph surface**, for a soberer header | the **paragraph surface** |
+
+It combines with all three layouts: a coloured header works on `--list`,
+`--cards` and `--bordered` alike.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-accordion-summary-bg` | the surface chosen by the setting | Header background, to override one accordion. |
+| `--iw-accordion-panel-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Panel background when a header surface is set. |
+| `--iw-accordion-summary-filled-padding-x` | `1rem` | Inline padding of a filled header. |
+| `--iw-accordion-panel-filled-padding-y` / `-x` | `1rem` | Padding of a filled panel. |
+| `--iw-accordion-summary-radius` | `inherit` | Corner radius of a filled header. |
+
+A variant that defines no accent surface falls back to the theme's
+`--color-accent`, so the setting is never inert.
+
 ### Colors and rules
 
 > **Changed in 3.0.0** - `--iw-accordion-card-surface` is now `--iw-accordion-card-bg`, and the

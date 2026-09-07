@@ -888,6 +888,11 @@
     "iw_sulu_tailwind_theme.accordion_single_open_info": "Opening an item closes the previous one.",
     "iw_sulu_tailwind_theme.accordion_faq_schema": "FAQ markup (schema.org)",
     "iw_sulu_tailwind_theme.accordion_faq_schema_info": "Describes the block as a list of frequently asked questions for search engines. Only enable it when the content really is questions and answers.",
+    "iw_sulu_tailwind_theme.accordion_header_surface": "Header background",
+    "iw_sulu_tailwind_theme.accordion_header_surface_info": "Colours the question bar and puts the answer on a ground of its own. The colours come from the surfaces of the variant.",
+    "iw_sulu_tailwind_theme.accordion_header_surface_none": "None",
+    "iw_sulu_tailwind_theme.accordion_header_surface_accent": "Accent surface",
+    "iw_sulu_tailwind_theme.accordion_header_surface_paragraph": "Paragraph surface",
     "iw_sulu_tailwind_theme.title_level_h5": "Heading 5 (h5)",
 
     "iw_sulu_tailwind_theme.iframe_url": "Address to embed",
