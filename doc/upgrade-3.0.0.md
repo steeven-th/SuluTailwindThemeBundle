@@ -974,6 +974,23 @@ page consistently rather than the accordion alone.
 
 **Renamed:** `--iw-accordion-card-surface` → `--iw-accordion-card-bg`.
 
+The `--list` and `--bordered` layouts take that same surface on the box they
+draw, where they previously had none. The three layouts now fill identically,
+which is what lets a variant colour an accordion without knowing which one an
+editor picked. To keep a bare accordion:
+
+```css
+.iw-block-accordion--list,
+.iw-block-accordion--bordered {
+    --iw-accordion-surface-bg: transparent;
+}
+```
+
+`--list` also gained the corner radius the two other layouts already had, and
+the `overflow: hidden` that makes it clip. It never had one: with no fill of
+its own the square corners went unnoticed, and they showed the moment a row got
+a background.
+
 The row hover and the focus ring now read `--iw-variant-link-hover` and
 `--iw-variant-link-color`, falling back to the theme primary as before. A
 variant that sets no link colour is unaffected.

@@ -948,6 +948,24 @@ img.object-cover {
 }
 
 /* Mode: --list — rules between items */
+/* Mode: --list - rules between items, on the surface of the variant.
+
+   The fill is the same one `--cards` puts on each item and `--bordered` on its
+   box: three layouts, one surface, so a variant colours an accordion the same
+   way whichever is picked.
+
+   `overflow: hidden` is what the radius needs to actually clip: without it the
+   first and last rows keep square corners over a rounded box, which only shows
+   once a row has a fill of its own - a coloured header, for instance. */
+.iw-block-accordion--list {
+    background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    overflow: hidden;
+}
+
+.iw-block-accordion--list .iw-accordion__item {
+    padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
+}
+
 .iw-block-accordion--list .iw-accordion__item + .iw-accordion__item {
     border-top: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
 }
@@ -1015,6 +1033,7 @@ img.object-cover {
 /* Mode: --bordered — single box, inner rules between items */
 .iw-block-accordion--bordered {
     border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
 }
 
 .iw-block-accordion--bordered .iw-accordion__item {

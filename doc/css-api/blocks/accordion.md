@@ -60,10 +60,22 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `--iw-accordion-card-padding-x` | `1.25rem` | Inline padding of an item in `--cards` and `--bordered`. |
 | `--iw-block-accordion-cards-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. Falls back to the site-wide component gap set in the admin (Defaults > Blocks). |
 
-### Header background (FAQ style)
+### Surface
+
+All three layouts sit on the **paragraph surface of the variant**, the same one
+every card of the bundle takes: `--cards` puts it on each item, `--list` and
+`--bordered` on the box they draw. A variant therefore colours an accordion the
+same way whichever layout is picked.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-accordion-surface-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Fill of the `--list` and `--bordered` box. |
+| `--iw-accordion-card-bg` | same | Fill of each item in `--cards`. |
+
+### Question styling (FAQ)
 
 A FAQ reads best when the question is a coloured bar and the answer sits on its
-own, quieter ground. The **Header background** setting (`headerSurface`, in the
+own, quieter ground. The **Question styling** setting (`headerSurface`, in the
 block's *Settings*) does exactly that, reusing surfaces the variant already
 defines - it introduces no colour of its own and no field to configure.
 
