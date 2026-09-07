@@ -999,3 +999,19 @@ a background.
 The row hover and the focus ring now read `--iw-variant-link-hover` and
 `--iw-variant-link-color`, falling back to the theme primary as before. A
 variant that sets no link colour is unaffected.
+
+
+## The text widget takes the paragraph surface
+
+The rich text a two-zone block puts in its second zone rendered on nothing at
+all: `iw-widget__text` carried no surface, where every other rich text of the
+bundle carries `iw-block__text` and gets the paragraph surface of the variant
+with it. A theme with a paragraph background and light text left that one panel
+unreadable, and it was the last place in the bundle where that could happen.
+
+It now carries both classes - `iw-block__text` for the surface,
+`iw-widget__text` kept as the hook a project may already target.
+
+**What changes on a site:** a text widget under a variant with a paragraph
+background gains that background, its padding and its radius, matching the text
+zone beside it. Under a variant without one, nothing changes.

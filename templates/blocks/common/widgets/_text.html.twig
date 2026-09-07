@@ -1,6 +1,15 @@
-{# Widget: a rich text panel beside the block's own text. #}
+{# Widget: a rich text panel beside the block's own text.
+
+   Carries `iw-block__text` like every other rich text of the bundle: that is
+   the class the variant paints its paragraph surface on, so a widget text sits
+   on the same ground as the text zone next to it instead of on nothing at all.
+   Without it a theme with a paragraph background and light text left this one
+   panel unreadable.
+
+   `iw-widget__text` stays alongside it: nothing in the bundle styles it, but it
+   is the hook a project would have used to target this panel specifically. #}
 {% if text is defined and text is not empty %}
-    <div class="iw-widget__text prose max-w-none">
+    <div class="iw-widget__text iw-block__text prose max-w-none {% if paragraphRadius is defined and paragraphRadius %}{{ paragraphRadius }}{% endif %}">
         {{ text|raw }}
     </div>
 {% endif %}

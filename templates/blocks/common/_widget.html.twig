@@ -11,6 +11,7 @@
      - imageFormat  : Sulu format key for the images
      - aspectRatio  : ratio token for the image slider
      - blockPrefix  : BEM prefix of the calling block, for the wrapper class
+     - paragraphRadius : radius class of the paragraph surface, for the text widget
 
    A block that offers no widget, or an editor who left it empty, renders
    nothing at all rather than an empty box.
@@ -45,7 +46,8 @@
             } only %}
         {% elseif kind == 'text' %}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/widgets/_text.html.twig' with {
-                text: item.text|default('')
+                text: item.text|default(''),
+                paragraphRadius: paragraphRadius|default('')
             } only %}
         {% else %}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/widgets/_image.html.twig' with {
