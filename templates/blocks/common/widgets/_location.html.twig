@@ -10,7 +10,7 @@
     <div class="iw-widget__map-wrap{% if imageRadius|default('') %} {{ imageRadius }} overflow-hidden{% endif %}">
         {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
             location: location,
-            title: 'iw_sulu_tailwind_theme.widget_location'|trans,
+            title: location.title|default(''),
             address: formattedAddress,
             mapClass: 'iw-widget__map w-full aspect-[4/3]'
         } only %}
