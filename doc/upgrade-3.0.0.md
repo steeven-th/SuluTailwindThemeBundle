@@ -821,6 +821,27 @@ gains the separator, the variant separator mode and this gap. Its subtitle is
 unaffected, it remains the attribution printed under the quote.
 `BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
 
+### New block field: highlight the figures (key figures)
+
+The counter of a key figure took the paragraph colour while the label under it
+took the title colour, so the number - the point of the block - read quieter
+than its own caption. The cards block had no such problem: `.iw-card__number`
+has always used the variant's highlight colour.
+
+**Settings > Highlight the figures** (`highlightNumbers`) closes that gap, and
+it is **on by default**, blocks already published included. The colour is the
+variant's existing *highlight colour* (Colours > Highlight colour), the one
+already driving the `[[marked]]` words of a title, so there is no new colour to
+pick and one setting governs all three.
+
+The `--progress` style is left out: its percentage accompanies a bar rather
+than leading the block, and would compete with the colour of the bar itself.
+
+**What this means for an existing site**: key figures blocks change colour on
+deploy, from the paragraph colour to the highlight colour of their variant.
+Untick the setting per block to get the previous look back, or repoint
+`--iw-key-figure-counter-highlight-color` for something else entirely.
+
 ### New block field: image scrim, and the text over an image follows the variant
 
 Three `text_images` styles lay the text over the image and darken it so the text

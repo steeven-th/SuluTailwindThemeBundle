@@ -1785,6 +1785,19 @@ img.object-cover {
     font-size: var(--iw-key-figure-counter-size, 1.5rem);
 }
 
+/* The figure leads the block, so it takes the variant's highlight colour - the
+   one already colouring the [[marked]] words of a title and the number of a
+   card. Without it the counter took the paragraph colour and came out quieter
+   than the label under it, which wears the title colour.
+
+   On unless the editor turns it off (Settings > Highlight the figures). Same
+   specificity as the rule above, so it follows it and wins by order; a variant
+   names no `span`, so nothing further has to be outranked. */
+.iw-block-key-figures--highlight .iw-key-figure__counter {
+    color: var(--iw-key-figure-counter-highlight-color,
+        var(--iw-variant-highlight, var(--color-accent)));
+}
+
 .iw-block-key-figures .iw-key-figure__counter--md {
     font-size: var(--iw-key-figure-counter-size-md, 1.5rem);
 }

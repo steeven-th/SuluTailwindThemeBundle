@@ -836,6 +836,8 @@
     "iw_sulu_tailwind_theme.mosaic_gap": "Espacement entre les images",
     "iw_sulu_tailwind_theme.gallery_gap": "Espacement entre les images",
     "iw_sulu_tailwind_theme.image_gap_theme": "Défaut (thème)",
+    "iw_sulu_tailwind_theme.highlight_numbers": "Mettre en avant les chiffres",
+    "iw_sulu_tailwind_theme.highlight_numbers_info": "Les chiffres prennent la couleur de mise en avant de la variante, réglable dans Couleurs. Décoché, ils gardent la couleur du texte.",
     "iw_sulu_tailwind_theme.image_scrim": "Voile sur l'image",
     "iw_sulu_tailwind_theme.image_scrim_info": "Assombrit l'image pour que le texte posé dessus reste lisible. Sans voile, choisissez une variante dont le texte contraste avec votre image.",
     "iw_sulu_tailwind_theme.image_scrim_none": "Aucun",

@@ -836,6 +836,8 @@
     "iw_sulu_tailwind_theme.mosaic_gap": "Abstand zwischen den Bildern",
     "iw_sulu_tailwind_theme.gallery_gap": "Abstand zwischen den Bildern",
     "iw_sulu_tailwind_theme.image_gap_theme": "Standard (Theme)",
+    "iw_sulu_tailwind_theme.highlight_numbers": "Zahlen hervorheben",
+    "iw_sulu_tailwind_theme.highlight_numbers_info": "Die Zahlen übernehmen die Hervorhebungsfarbe der Variante, einstellbar unter Farben. Ohne Haken behalten sie die Textfarbe.",
     "iw_sulu_tailwind_theme.image_scrim": "Bildabdunklung",
     "iw_sulu_tailwind_theme.image_scrim_info": "Dunkelt das Bild ab, damit der darüberliegende Text lesbar bleibt. Ohne Abdunklung wählen Sie eine Variante, deren Text sich von Ihrem Bild abhebt.",
     "iw_sulu_tailwind_theme.image_scrim_none": "Keine",

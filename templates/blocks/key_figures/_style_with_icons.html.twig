@@ -2,6 +2,11 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
+{#- The figures take the variant's highlight colour unless the editor turns it
+    off. `?? true` keeps the default for content published before the setting
+    existed, where `|default(true)` would read an explicit false as empty and
+    put the highlight back. -#}
+{% set highlightClass = (highlightNumbers ?? true) ? ' iw-block-key-figures--highlight' : '' %}
     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
         title: title|default(''),
         subTitle: subTitle|default(''),
@@ -20,7 +25,7 @@
         {% set colsLg = figures|length > 4 ? 4 : figures|length %}
         <div
             data-controller="key-figures"
-            class="iw-block-key-figures iw-block-key-figures--with-icons iw-block-key-figures--cols-{{ colsLg }}"
+            class="iw-block-key-figures iw-block-key-figures--with-icons iw-block-key-figures--cols-{{ colsLg }}{{ highlightClass }}"
         >
             {% for figure in figures %}
                 <div class="iw-key-figure iw-key-figure--with-icon">
