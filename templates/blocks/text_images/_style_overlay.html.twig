@@ -127,13 +127,11 @@
     {% set isRight = contentRight|default(false) %}
 
     {# Overlay — below lg: uniform dark cover (content spans full width).
-       From lg: directional gradient, dark on the text side, transparent on the image side. #}
-    {% set gradientDir = isRight ? 'to left' : 'to right' %}
+       From lg: directional gradient, dark on the text side, transparent on the
+       image side. The gradient lives in the stylesheet; only its direction
+       travels from here, through the reverse modifier. #}
     <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--mobile absolute inset-0 bg-black/60 lg:hidden"></div>
-    <div
-        class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--gradient absolute inset-0 hidden lg:block"
-        style="background: linear-gradient({{ gradientDir }}, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, transparent 100%);"
-    ></div>
+    <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--gradient{{ isRight ? ' iw-block-text-images__bg-overlay--gradient-reverse' : '' }} absolute inset-0 hidden lg:block"></div>
 
     {# Content — gets the section padding, container wraps only the text #}
     <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">

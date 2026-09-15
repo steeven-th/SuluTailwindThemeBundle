@@ -55,7 +55,9 @@ Text + image block with seven layout styles selectable from the admin. The block
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-text-images-bg-overlay-color` | `rgb(0 0 0 / 0.6)` | Background color of the dark `__bg-overlay` above the hero image (applies to `--hero-banner`, `--overlay` mobile, `--classic` background mode). |
+| `--iw-block-text-images-bg-overlay-color` | `rgb(0 0 0 / 0.6)` | Background color of the dark `__bg-overlay` above the hero image (applies to `--hero-banner`, `--overlay` mobile, `--classic` background mode). The `--overlay` desktop gradient paints its own stops, so it follows `--iw-block-text-images-gradient-direction` rather than this colour. |
+| `--iw-block-text-images-gradient-direction` | `to right` | Direction of the `--overlay` desktop gradient. Set to `to left` by `.iw-block-text-images__bg-overlay--gradient-reverse` when the content sits on the right. |
+| `--iw-block-text-images-sidebar-sticky-top` | `6rem` | How far below the top of the viewport the `--sidebar` image stops. Assumes a sticky header of that height. |
 | `--iw-block-text-images-mosaic-gap` | `var(--iw-cards-gap, 1.5rem)` | Spacing between the images of the mosaic grid. Overridden per block by the editor's `iw-gap--*` choice; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
 | `--iw-block-text-images-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the text zone and the image zone, side by side or stacked. Halved below the `md` breakpoint. Falls back to the site-wide block gap set in the admin (Defaults > Blocks). In `--fullwidth` the section itself is the flex column carrying the gap, and the content padding adds to it. |
 
@@ -78,6 +80,16 @@ Other layout/spacing/typography choices are driven by Tailwind utilities compose
 ```css
 .iw-block-text-images--sidebar .iw-block-text-images__image-wrap {
     position: static;
+}
+```
+
+To keep the sticky behaviour but change how far the image stops below the top of
+the viewport, set the offset instead. The default assumes a sticky header about
+`6rem` tall:
+
+```css
+.iw-block-text-images--sidebar {
+    --iw-block-text-images-sidebar-sticky-top: 4.5rem;
 }
 ```
 
@@ -111,20 +123,26 @@ stacking below the breakpoint and the reverse modifier working. See
 
 ### Custom gradient direction for `--overlay` (e.g. top-to-bottom instead of left-to-right)
 
-The directional gradient is built inline in Twig via `linear-gradient({{ gradientDir }}, …)` so a CSS override has to set its own gradient on the gradient element:
+The direction is a token, so only the angle has to change:
 
 ```css
-.iw-block-text-images--overlay .iw-block-text-images__bg-overlay--gradient {
-    background: linear-gradient(to bottom,
-        rgba(0,0,0,0.8) 0%,
-        rgba(0,0,0,0.55) 40%,
-        rgba(0,0,0,0.15) 70%,
-        transparent 100%
-    ) !important;
+.iw-block-text-images--overlay {
+    --iw-block-text-images-gradient-direction: to bottom;
 }
 ```
 
-(The `!important` is needed because the gradient is set inline by Twig.)
+The block flips the gradient itself when the content sits on the right, by adding
+`.iw-block-text-images__bg-overlay--gradient-reverse`, which sets the same token
+to `to left`. Target that modifier if the two sides need different angles.
+
+Replacing the whole gradient works the same way as any other rule, no
+`!important` involved:
+
+```css
+.iw-block-text-images--overlay .iw-block-text-images__bg-overlay--gradient {
+    background: radial-gradient(circle at 30% 50%, rgb(0 0 0 / 0.85), transparent 70%);
+}
+```
 
 ## Width split
 

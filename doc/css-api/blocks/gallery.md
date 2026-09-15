@@ -52,7 +52,7 @@ Sizing, radius and aspect ratios are driven by Tailwind utility classes emitted 
 | `.iw-block-gallery__thumbnails-track` | The scrollable track holding the thumbnails. |
 | `.iw-block-gallery__thumbnail` | A single `<button>` thumbnail. |
 | `.iw-block-gallery__thumbnail-img` | The `<img>` inside the thumbnail. |
-| `.iw-block-gallery__thumbnails-nav` | Prev/Next arrows for the thumbnail strip (carry `--prev` / `--next` modifier). |
+| `.iw-block-gallery__thumbnails-nav` | Prev/Next arrows for the thumbnail strip (carry `--prev` / `--next` modifier). Also carry `.iw-gallery-nav`, whose `--iw-gallery-nav-*` defaults they invert: these arrows sit on the block background rather than on an image, so they are dark translucent instead of white. Override them on this class. |
 | `.iw-block-gallery__nav` | Prev/Next arrows for the main slider/carousel (carry `--prev` / `--next` modifier). Also carry `.iw-gallery-nav`. |
 | `.iw-block-gallery__dots` | The dot indicators bar (`--slider-single`, `--wide-carousel`). |
 | `.iw-block-gallery__dot` | A single dot indicator (`<button>`). |
@@ -123,6 +123,20 @@ Navigation arrows and dot indicators are **only rendered when there is more than
 
 ```css
 .iw-block-gallery {
+    --iw-gallery-nav-bg: var(--color-accent);
+    --iw-gallery-nav-color: var(--color-background);
+    --iw-gallery-nav-bg-hover: var(--color-accent-700);
+}
+```
+
+The arrows of the `--filmstrip` thumbnail strip are the one exception. They
+declare these three variables on themselves, to stay visible on the light block
+background instead of on a photo, and a declaration on the element always wins
+over one inherited from an ancestor. Include them explicitly when the whole set
+must match:
+
+```css
+.iw-block-gallery__thumbnails-nav {
     --iw-gallery-nav-bg: var(--color-accent);
     --iw-gallery-nav-color: var(--color-background);
     --iw-gallery-nav-bg-hover: var(--color-accent-700);

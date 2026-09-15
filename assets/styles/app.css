@@ -2979,13 +2979,44 @@ img.object-cover {
     background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
 }
 
-/* The --overlay style renders two overlays (mobile uniform + desktop
-   gradient); the mobile one is the same as the default, the gradient
-   variant ships its directional linear-gradient inline via Twig and can
-   be re-themed via the same CSS variable since it falls back to the
-   same default. */
+/* The --overlay style renders two overlays: a uniform one on mobile, where the
+   content spans the full width, and a directional gradient from lg, dark on the
+   text side and clear on the image side. */
 .iw-block-text-images--overlay .iw-block-text-images__bg-overlay--mobile {
     background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+}
+
+/* The gradient used to be built inline in Twig, which forced an !important on
+   any project that wanted another angle - the documented recipe said so. Only
+   the direction ever changed, so it is the direction that travels, as a token:
+   the gradient itself is written once and a project can now restyle it the
+   usual way. Declared after the base overlay because it replaces that
+   background-color at equal specificity. */
+.iw-block-text-images__bg-overlay--gradient {
+    background: linear-gradient(
+        var(--iw-block-text-images-gradient-direction, to right),
+        rgb(0 0 0 / 0.8) 0%,
+        rgb(0 0 0 / 0.55) 40%,
+        rgb(0 0 0 / 0.15) 70%,
+        transparent 100%
+    );
+}
+
+/* Content on the right: the dark end of the gradient follows it. */
+.iw-block-text-images__bg-overlay--gradient-reverse {
+    --iw-block-text-images-gradient-direction: to left;
+}
+
+/* The sidebar image follows the text column, staying in view while the text
+   scrolls past it. The offset assumes a sticky header, so it is exposed: the
+   header of a project is not the header of this one. Scoped to --sidebar, as
+   --fullwidth uses the same wrapper and must not stick.
+
+   This was an inline style, which quietly made a documented recipe - "force the
+   sidebar image to stretch instead of sticking" - impossible to apply. */
+.iw-block-text-images--sidebar .iw-block-text-images__image-wrap {
+    position: sticky;
+    top: var(--iw-block-text-images-sidebar-sticky-top, 6rem);
 }
 
 /* ─── Block: gallery ───────────────────────────────────────────────────── */
@@ -3121,6 +3152,21 @@ img.object-cover {
 .iw-gallery-nav--sm {
     --_size: 2rem;
     --_icon: 1rem;
+}
+
+/* The arrows of the filmstrip thumbnail strip sit on the block background, not
+   on an image, so they invert the defaults of the component: the translucent
+   white made for arrows over a photo disappears on a light background.
+
+   A single class is enough, and deliberately so: `.iw-gallery-nav` only ever
+   reads these three variables as fallbacks, it never declares them, so nothing
+   has to be outranked and a project override stays as cheap as everywhere else.
+   Both templates used to carry the values inline, which is what kept these two
+   arrows out of any re-theming. */
+.iw-block-gallery__thumbnails-nav {
+    --iw-gallery-nav-bg: rgb(0 0 0 / 0.08);
+    --iw-gallery-nav-bg-hover: rgb(0 0 0 / 0.2);
+    --iw-gallery-nav-color: currentColor;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
