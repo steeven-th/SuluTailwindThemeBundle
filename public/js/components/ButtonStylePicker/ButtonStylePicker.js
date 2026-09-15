@@ -5,6 +5,7 @@ import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
+import buttonBorder from '../../utils/buttonBorder';
 
 /**
  * ButtonStylePicker field component for the Sulu admin.
@@ -156,9 +157,9 @@ export default class ButtonStylePicker extends React.Component {
                         backgroundColor: btnData.bg || '#ccc',
                         color: btnData.text || '#fff',
                         borderRadius: btnData.radius || '8px',
-                        border: btnData.border && btnData.border !== 'none'
-                            ? `1px solid ${btnData.border}`
-                            : '1px solid transparent',
+                        // Transparent rather than absent when the button draws
+                        // none, so the preview keeps the same size either way.
+                        border: buttonBorder(btnData) || '1px solid transparent',
                         fontSize: '11px',
                         fontWeight: '600',
                         lineHeight: '1.4',
