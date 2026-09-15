@@ -853,6 +853,12 @@ block keeps showing the editor's own file. It can be run twice - a pictogram
 already moved is left alone. Without it, a stored media sits under a field now
 read as an icon name, and no pictogram is rendered.
 
+**Pages, snippets and articles are all covered**, since those three blocks can
+be placed on any of them. The command reads `pa_page_dimension_contents`,
+`sn_snippet_dimension_contents` and `ar_article_dimension_contents`, skipping
+the last one when SuluArticleBundle is not installed, and reports what it moved
+table by table. MySQL and PostgreSQL are both supported.
+
 In exchange, those three blocks gain what the buttons have: the theme library,
 a size, and - where it makes sense - a side and a spacing.
 

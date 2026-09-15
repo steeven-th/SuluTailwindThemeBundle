@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * This command moves it: the media goes to `iconMedia`, and `iconCustom` is
  * turned on so the block keeps showing the editor's own file. Nothing else
- * changes, and a page already migrated is left alone, so it can be run twice.
+ * changes, and content already migrated is left alone, so it can be run twice.
  */
 #[AsCommand(
     name: 'iw-sulu:theme:migrate-icons',
@@ -44,6 +44,20 @@ class IconsMigrateCommand extends Command
         'key_figures' => ['items' => 'figures', 'field' => 'image'],
     ];
 
+    /**
+     * Every table holding block content, in the order they are reported.
+     *
+     * The three blocks that carry a pictogram can be placed on a page, on a
+     * snippet and on an article alike, and all three tables store their content
+     * in the same column. The article table only exists when SuluArticleBundle
+     * is installed, hence the existence check before reading any of them.
+     */
+    private const TABLES = [
+        'pa_page_dimension_contents',
+        'sn_snippet_dimension_contents',
+        'ar_article_dimension_contents',
+    ];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -60,7 +74,8 @@ class IconsMigrateCommand extends Command
                   <info>php bin/console iw-sulu:theme:migrate-icons --dry-run</info>
                   <info>php bin/console iw-sulu:theme:migrate-icons</info>
 
-                It can be run twice: a pictogram already moved is left alone.
+                Pages, snippets and articles are all covered. It can be run
+                twice: a pictogram already moved is left alone.
                 HELP);
     }
 
@@ -75,17 +90,79 @@ class IconsMigrateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
         $connection = $this->entityManager->getConnection();
+        $schemaManager = $connection->createSchemaManager();
 
+        $report = [];
+        $absent = [];
+        $moved = 0;
+
+        foreach (self::TABLES as $table) {
+            if (!$schemaManager->tablesExist([$table])) {
+                $absent[] = $table;
+
+                continue;
+            }
+
+            $result = $this->migrateTable($connection, $table, $dryRun);
+
+            $moved += $result['moved'];
+            $report[] = [$table, (string) $result['moved'], (string) $result['rows']];
+        }
+
+        if ([] !== $absent) {
+            $io->note(\sprintf('Not installed here, skipped: %s.', implode(', ', $absent)));
+        }
+
+        if (0 === $moved) {
+            $io->success('No pictogram left to move.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->table(['Table', 'Pictograms moved', 'Rows touched'], $report);
+
+        if ($dryRun) {
+            $io->note('Dry run: nothing was written.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->success('Pictograms moved onto the shared picker.');
+        $io->writeln('  Clear the content cache so the content is rendered again:');
+        $io->writeln('  <info>php bin/console cache:pool:clear cache.app</info>');
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Migrate one content table and report what it held.
+     *
+     * @param Connection $connection The database connection
+     * @param string     $table      One of self::TABLES, never user input
+     * @param bool       $dryRun     Whether to leave the rows untouched
+     *
+     * @return array{moved: int, rows: int} Pictograms moved, and rows they sat in
+     */
+    private function migrateTable(Connection $connection, string $table, bool $dryRun): array
+    {
+        // The column is read under an explicit lower-case alias. An unquoted
+        // identifier is folded to lower case by PostgreSQL, which returns the
+        // row under `templatedata` and not under the name written here, so
+        // reading `templateData` back worked on MySQL and on nothing else.
+        // The alias settles the key on both engines.
         $rows = $connection->fetchAllAssociative(
-            'SELECT id, templateData FROM pa_page_dimension_contents WHERE templateData IS NOT NULL',
+            \sprintf(
+                'SELECT id, templateData AS template_data FROM %s WHERE templateData IS NOT NULL',
+                $table,
+            ),
         );
 
-        $pages = 0;
+        $touched = 0;
         $moved = 0;
 
         foreach ($rows as $row) {
             /** @var array<string, mixed>|null $data */
-            $data = json_decode((string) $row['templateData'], true);
+            $data = json_decode((string) $row['template_data'], true);
 
             if (!\is_array($data) || !isset($data['blocks']) || !\is_array($data['blocks'])) {
                 continue;
@@ -98,40 +175,22 @@ class IconsMigrateCommand extends Command
                 continue;
             }
 
-            ++$pages;
+            ++$touched;
             $moved += $count;
 
             if (!$dryRun) {
+                // Left unquoted on purpose, the mirror image of the SELECT:
+                // DBAL writes `SET templateData = ?`, which PostgreSQL folds
+                // onto the real column. Quoting it would miss it.
                 $connection->update(
-                    'pa_page_dimension_contents',
+                    $table,
                     ['templateData' => json_encode($data, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)],
                     ['id' => $row['id']],
                 );
             }
         }
 
-        if (0 === $moved) {
-            $io->success('No pictogram left to move.');
-
-            return Command::SUCCESS;
-        }
-
-        $io->definitionList(
-            ['Pictograms moved' => (string) $moved],
-            ['Rows touched' => (string) $pages],
-        );
-
-        if ($dryRun) {
-            $io->note('Dry run: nothing was written.');
-
-            return Command::SUCCESS;
-        }
-
-        $io->success('Pictograms moved onto the shared picker.');
-        $io->writeln('  Clear the content cache so the pages are rendered again:');
-        $io->writeln('  <info>php bin/console cache:pool:clear cache.app</info>');
-
-        return Command::SUCCESS;
+        return ['moved' => $moved, 'rows' => $touched];
     }
 
     /**
