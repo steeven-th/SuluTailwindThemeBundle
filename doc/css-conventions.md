@@ -238,6 +238,14 @@ Then apply the new modifier from a template override:
 Only **classes and variables documented under the `iw-*` namespace** are
 considered stable API.
 
+You should never need `!important`, and if you do, it is a bug on our side: the
+templates carry no fixed value in a `style` attribute, precisely because such a
+value would outrank anything you write. The only inline styles left inject a
+value that exists at render time (a media URL, a ratio, a height typed in the
+admin) or hold the initial state of a component its JS controller owns.
+`InlineStyleContractTest` enforces it, so report the case rather than working
+around it.
+
 ---
 
 ## Migration from pre-3.0.0 conventions
