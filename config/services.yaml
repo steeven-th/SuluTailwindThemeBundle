@@ -137,6 +137,12 @@ services:
     itech_world.sulu_tailwind_theme.language_label_resolver:
         class: ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver
 
+    # Renders one icon of the theme library as inline SVG. Reads the very same
+    # directories the admin offers through Sulu's icon overlay, so what an
+    # editor picks and what a page prints cannot drift apart.
+    itech_world.sulu_tailwind_theme.icon_renderer:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer
+
     # Renders the lightweight markup of the title editor (highlighted words,
     # palette colors, line breaks) to HTML.
     itech_world.sulu_tailwind_theme.title_markup_renderer:
@@ -255,6 +261,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.form_success_resolver'
             - '@itech_world.sulu_tailwind_theme.language_label_resolver'
             - '@itech_world.sulu_tailwind_theme.title_markup_renderer'
+            - '@itech_world.sulu_tailwind_theme.icon_renderer'
             - '@?sulu_core.webspace.request_analyzer'
             - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
             - '%itech_world_sulu_tailwind_theme.turnstile.site_key%'
@@ -334,6 +341,10 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\IconsSyncCommand:
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\FontsSyncCommand:
         arguments:
             - '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
@@ -388,6 +399,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+    ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer: '@itech_world.sulu_tailwind_theme.icon_renderer'
     ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer: '@itech_world.sulu_tailwind_theme.title_markup_renderer'
     ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension: '@itech_world.sulu_tailwind_theme.twig_extension'
     ItechWorld\SuluTailwindThemeBundle\Twig\ArticleExtension: '@itech_world.sulu_tailwind_theme.article_twig_extension'

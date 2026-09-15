@@ -236,6 +236,23 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                 ],
             ]);
 
+            // The icon library the theme offers wherever an editor picks a
+            // pictogram. Sulu already carries the whole chain - the
+            // `single_icon_selection` field, its searchable overlay, and an
+            // `svg://` provider that reads a directory of files and caches it -
+            // so the bundle only has to say where its icons live.
+            //
+            // Two sets rather than one: outline and solid are the same 324
+            // icons in two weights, and an editor picks a weight, not a
+            // library. Heroicons ships them under MIT, see
+            // assets/icons/heroicons/LICENSE.
+            $builder->prependExtensionConfig('sulu_admin', [
+                'icon_sets' => [
+                    'iw_theme_outline' => 'svg://' . __DIR__ . '/../assets/icons/heroicons/24/outline',
+                    'iw_theme_solid' => 'svg://' . __DIR__ . '/../assets/icons/heroicons/24/solid',
+                ],
+            ]);
+
             // Register page template directories
             $builder->prependExtensionConfig('sulu_admin', [
                 'templates' => [

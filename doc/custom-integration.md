@@ -311,6 +311,51 @@ for content that is already published.
 Order inside `settings`: the block's own settings first, then the shared group
 of spacing, radius and background.
 
+### The icon library
+
+The theme ships [Heroicons](https://heroicons.com/) 2.2.0 under MIT, in two
+weights of the same 324 icons, under `assets/icons/heroicons/24/{outline,solid}`.
+
+**Offering the picker in your own template.** The field is Sulu's own, pointed
+at one of the two sets the bundle registers:
+
+```xml
+<property name="icon" type="single_icon_selection" colspan="6">
+    <meta><title>iw_sulu_tailwind_theme.icon</title></meta>
+    <params>
+        <param name="icon_set" value="iw_theme_outline"/>
+    </params>
+</property>
+```
+
+Render what it stores with `iw_sulu_tailwind_theme_icon()`, see
+[`twig-reference.md`](./twig-reference.md).
+
+**Why the icons are committed rather than installed.** The admin reads them from
+disk through Sulu's `svg://` provider, so a project installing the theme with
+composer has to get them - without a node toolchain anywhere near its production
+server. Updating them is therefore deliberate:
+
+```bash
+npm pack heroicons && tar -xzf heroicons-*.tgz
+php bin/console iw-sulu:theme:sync-icons --source=package --dry-run
+```
+
+**Using your own icons instead.** Register another set the same way the bundle
+does, in your own bundle or in `config/packages/sulu_admin.yaml`:
+
+```yaml
+sulu_admin:
+    icon_sets:
+        my_icons: 'svg://%kernel.project_dir%/assets/icons'
+```
+
+Anything in that directory shows up in the overlay. Icons painting themselves
+with `currentColor` follow the text like the bundled ones; icons with hard-coded
+colours keep them.
+
+---
+
 ### The widget zone
 
 A block pairing content with a second zone lets the editor choose what that zone
