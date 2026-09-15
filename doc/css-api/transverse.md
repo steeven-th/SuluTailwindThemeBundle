@@ -893,9 +893,9 @@ Behavior (configured in **Theme > Components > Maps**):
 
 | Class | Role |
 |-------|------|
-| `.iw-location-map` | Root container (carries the Stimulus controller and the sizing utilities). |
+| `.iw-location-map` | Root container (carries the Stimulus controller and the sizing utilities). A flex column, so the canvas follows the height of this box wherever it comes from - a fixed height, a `min-height` or an `aspect-ratio`. Give it one: a map has no height of its own. |
 | `.iw-location-map--cooperative` | Added in `Ctrl + scroll` mode; restores `touch-action: pan-x pan-y` on the Leaflet container. |
-| `.iw-location-map__canvas` | The node Leaflet mounts into (fills the root). |
+| `.iw-location-map__canvas` | The node Leaflet mounts into (takes the remaining height of the root). |
 | `.iw-location-map__marker` | The themed SVG pin (Leaflet DivIcon). |
 | `.iw-location-map__marker--custom` | Added when a custom marker image is configured (the inner `<img>` fills the box, `object-fit: contain`). |
 | `.iw-location-map__popup` | Popup pane class (passed to `bindPopup`). |

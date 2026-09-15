@@ -5732,11 +5732,48 @@ aside .iw-toc {
        ~1000) below the site header, modals and lightboxes. */
     z-index: 0;
     isolation: isolate;
+    /* A column so the canvas takes the height of this box whatever gives it
+       one: a fixed height, a min-height or an aspect ratio. A canvas in
+       height: 100% needed every ancestor to carry a resolved length, and a
+       min-height is not one - inside a grid aligned to the centre the chain
+       broke and the map measured nothing at all. */
+    display: flex;
+    flex-direction: column;
 }
 
 .iw-location-map__canvas {
     width: 100%;
-    height: 100%;
+    /* Takes what is left of the column. min-height: 0 because a flex item
+       refuses by default to go below the size of its content, and Leaflet
+       fills the canvas with absolutely positioned panes. */
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* The map column of the "map with info" style.
+
+   A map has no height of its own - Leaflet fills it with absolutely positioned
+   panes - so it always takes the height of the row, whatever the editor chose
+   for the vertical alignment of the zones. That choice keeps ruling the info
+   zone, which does have a height of its own. Centring a map only shrank it to
+   its 300px floor.
+
+   A flex column at every step rather than height: 100%, because a grid item
+   stretched by its row has no resolved height to hand down to a child. */
+.iw-block-location__map-col {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+.iw-block-location__map-col > .iw-block-location__map-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.iw-block-location__map-col .iw-location-map {
+    flex: 1 1 auto;
 }
 
 .iw-location-map .leaflet-container {
