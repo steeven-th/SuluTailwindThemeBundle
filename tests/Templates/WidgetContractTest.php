@@ -31,6 +31,7 @@ final class WidgetContractTest extends TestCase
      */
     private const BLOCKS_WITH_WIDGET = [
         'blocks/text_images.xml',
+        'blocks/accordion.xml',
         'blocks-form/form.xml',
         'blocks-form-bundle/form.xml',
     ];

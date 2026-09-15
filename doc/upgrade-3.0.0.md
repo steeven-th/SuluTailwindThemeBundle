@@ -833,6 +833,17 @@ The images now sit in `.iw-widget__image-wrap`, which carries the class and
 clips to it, for a single image as for a carousel. `WidgetContractTest` now
 fails any widget handed a radius that puts it nowhere.
 
+### New accordion style: split
+
+The accordion gains a fourth style, **Split**: the questions in one column of
+the shared split grid, a widget in the other - a text, a picture, a video or a
+map, the same catalogue the form block offers. It comes with the settings that
+go with two zones (which side the questions take, the width share, the vertical
+alignment, the media radius) and writes no CSS of its own, the two-zone layout
+being shared with `text_images`, `form` and `location`.
+
+A pure addition: no existing block changes.
+
 ### New block field: highlight the figures (key figures)
 
 The counter of a key figure took the paragraph colour while the label under it

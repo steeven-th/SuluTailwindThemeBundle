@@ -1,6 +1,6 @@
 # Block: accordion — CSS API
 
-Collapsible content block (FAQ and the like) with three layout styles: a plain list separated by rules (`--list`), one card per item (`--cards`), and a single bordered box with inner rules (`--bordered`).
+Collapsible content block (FAQ and the like) with four layout styles: a plain list separated by rules (`--list`), one card per item (`--cards`), a single bordered box with inner rules (`--bordered`), and the questions beside a widget (`--split`).
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 
@@ -29,6 +29,11 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `.iw-block-accordion--list` | Plain list, rules between items. |
 | `.iw-block-accordion--cards` | One surface per item, spaced by the shared cards gap. |
 | `.iw-block-accordion--bordered` | Single bordered box, inner rules between items. |
+| `.iw-block-accordion--split` | The questions sit in one column of the shared split grid, a widget in the other. The accordion itself keeps the `--list` look; only the layout around it changes. |
+| `.iw-block-accordion__split` | The grid wrapper of `--split`. Carries the shared `.iw-split-cols` / `.iw-split-gap` classes, so the width share (Settings > Width split), the vertical alignment and the reversal all behave as they do on `text_images` and `form`. |
+| `.iw-block-accordion__content` | The grid slot holding the accordion in `--split`. Placement only, the accordion inside it is the component. |
+| `.iw-block-accordion__widget-zone` | The grid slot holding the widget in `--split`. |
+| `.iw-block-accordion__widget` | Set by the shared widget partial on the widget it renders, as `blockPrefix` does on every two-zone block. |
 | `.iw-accordion--icon-left` | Icon before the title (visual reorder only — the DOM keeps the title first). |
 | `.iw-accordion--icon-right` | Icon after the title (default). |
 
@@ -188,3 +193,4 @@ The whole animation sits inside `@media (prefers-reduced-motion: no-preference)`
     transition: none;
 }
 ```
+
