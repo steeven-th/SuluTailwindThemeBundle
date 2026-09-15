@@ -821,6 +821,37 @@ gains the separator, the variant separator mode and this gap. Its subtitle is
 unaffected, it remains the attribution printed under the quote.
 `BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
 
+### New block field: image scrim, and the text over an image follows the variant
+
+Three `text_images` styles lay the text over the image and darken it so the text
+stays readable: `--hero-banner`, `--overlay`, and `--classic` once its image
+becomes a background. That veil was fixed at 60% black, owned by the bundle.
+
+It is now **Settings > Images > Image scrim** (`imageScrim`), with four steps -
+*None*, *Light*, *Medium*, *Strong* - and *Medium* reproduces the previous 60%
+exactly, so nothing moves until an editor changes it. The `--overlay` gradient
+keeps its four stops proportional to the chosen strength.
+
+Two of those styles also forced their text to white through a `text-white`
+utility on the content wrapper. That forcing stopped working a while ago: a
+variant declares its colours on `.iw-variant--N h1…h6`, `.iw-variant--N
+.iw-block__subtitle` and `.iw-variant--N p`, which all outrank a `color`
+inherited from an ancestor. The result was a block where the title and the text
+followed the variant while anything the variant did not name stayed white.
+
+The dead forcing is gone, and so is the `prose-invert` class the three templates
+carried, which was never defined anywhere: this bundle deliberately does not
+ship `@tailwindcss/typography`.
+
+`--hero-banner` and `--overlay` also painted their veil whether or not the block
+carried an image, greying the block over nothing and dragging the text down with
+it. They now paint it only over an image, the way `--classic` always has.
+
+**What this means for an existing site**: the text of these three styles follows
+the block variant, like every other block. If yours look washed out, either pick
+a variant whose text contrasts with the veil, or lower the scrim. Blocks already
+in place keep the veil they had, unless they never had an image to veil.
+
 ### New block field: image spacing (mosaic, gallery grid & masonry)
 
 Three image grids gain a per-block **Image spacing** field, left on *Theme

@@ -2971,20 +2971,35 @@ img.object-cover {
     gap: var(--iw-gap-choice, var(--iw-block-text-images-mosaic-gap, var(--iw-blocks-image-gap, 1.5rem)));
 }
 
-/* --hero-banner / --overlay / --classic (background mode) all render a dark
-   overlay above the background image. The overlay color is exposed as a
-   custom property so a theme can change the opacity without rewriting the
-   template's Tailwind utility. */
+/* --hero-banner / --overlay / --classic (background mode) all lay the text over
+   the image and darken it so the text stays readable. How much is the editor's
+   call, through Settings > Images > Image scrim, which emits one of the four
+   strength classes below; the colour stays a custom property for a theme that
+   wants something other than black.
+
+   The strength drives an alpha, not a colour, so a theme can restyle the veil
+   and keep the four steps working. It used to be fixed at 60% with no way out,
+   which handed the editor half a contract: free to pick a light variant for the
+   text, with no say on the background that text lands on. */
 .iw-block-text-images__bg-overlay {
-    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+    background-color: var(--iw-block-text-images-bg-overlay-color,
+        rgb(0 0 0 / var(--iw-block-text-images-scrim-strength, 0.6)));
 }
 
-/* The --overlay style renders two overlays: a uniform one on mobile, where the
+/* The four steps, enumerated the way every other editor-picked scale in this
+   stylesheet is, so they stay overridable in one place. `none` keeps the
+   element in the flow and simply paints nothing. */
+.iw-block-text-images--scrim-none { --iw-block-text-images-scrim-strength: 0; }
+.iw-block-text-images--scrim-light { --iw-block-text-images-scrim-strength: 0.35; }
+.iw-block-text-images--scrim-medium { --iw-block-text-images-scrim-strength: 0.6; }
+.iw-block-text-images--scrim-strong { --iw-block-text-images-scrim-strength: 0.82; }
+
+/* The --overlay style renders two veils: a uniform one on mobile, where the
    content spans the full width, and a directional gradient from lg, dark on the
-   text side and clear on the image side. */
-.iw-block-text-images--overlay .iw-block-text-images__bg-overlay--mobile {
-    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
-}
+   text side and clear on the image side. The mobile one is the plain veil above
+   and needs no rule of its own - it used to have one, repeating the same
+   declaration at a higher specificity, which was harmless until the strength
+   became a token and that copy started pinning it to the old fixed 60%. */
 
 /* The gradient used to be built inline in Twig, which forced an !important on
    any project that wanted another angle - the documented recipe said so. Only
@@ -2993,11 +3008,15 @@ img.object-cover {
    usual way. Declared after the base overlay because it replaces that
    background-color at equal specificity. */
 .iw-block-text-images__bg-overlay--gradient {
+    /* The four stops keep the proportions they had at 60%: the dark end sits a
+       third above the strength, the middle just under it, the far end a
+       quarter of it. Multiplying rather than enumerating keeps the gradient
+       written once, and an alpha above 1 is clamped by the browser. */
     background: linear-gradient(
         var(--iw-block-text-images-gradient-direction, to right),
-        rgb(0 0 0 / 0.8) 0%,
-        rgb(0 0 0 / 0.55) 40%,
-        rgb(0 0 0 / 0.15) 70%,
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 1.33)) 0%,
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 0.92)) 40%,
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 0.25)) 70%,
         transparent 100%
     );
 }

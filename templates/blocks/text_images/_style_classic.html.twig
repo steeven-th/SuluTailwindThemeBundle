@@ -103,12 +103,13 @@
                     pictureClasses: 'absolute inset-0 w-full h-full',
                 }) }}
                 {# Dark overlay for text readability — hidden when paragraph has its own bg #}
-                <div class="iw-block-text-images__bg-overlay absolute inset-0 bg-black/60"></div>
+                {% set scrimClass = 'iw-block-text-images--scrim-' ~ (imageScrim|default('medium') in ['none', 'light', 'medium', 'strong'] ? imageScrim|default('medium') : 'medium') %}
+                <div class="iw-block-text-images__bg-overlay {{ scrimClass }} absolute inset-0"></div>
             {% endif %}
 
             <div class="relative z-10 w-full">
                 {% if text is defined and text is not empty %}
-                    <div class="iw-block__text prose prose-invert max-w-none {{ paragraphRadiusClass }}">
+                    <div class="iw-block__text prose max-w-none {{ paragraphRadiusClass }}">
                         {{ text|raw }}
                     </div>
                 {% endif %}

@@ -33,6 +33,10 @@
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
 {% set variantSlug = iw_sulu_tailwind_theme_variant_slug(variant|default(null), allVariants) %}
 {% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+{#- Scrim strength picked by the editor (Settings > Images). The class rides on
+    the veil itself rather than on the section, so the three styles emit it the
+    same way - classic has no section of its own, it extends the block wrapper. -#}
+{% set scrimClass = 'iw-block-text-images--scrim-' ~ (imageScrim|default('medium') in ['none', 'light', 'medium', 'strong'] ? imageScrim|default('medium') : 'medium') %}
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
 
@@ -91,15 +95,18 @@
         }) }}
     {% endif %}
 
-    {# Uniform dark overlay for text readability (content is always centered) #}
-    <div class="iw-block-text-images__bg-overlay absolute inset-0 bg-black/60"></div>
+    {# Uniform veil for text readability (content is always centered). Only over
+       an image: with none, it greyed the block over nothing. #}
+    {% if heroImageId %}
+        <div class="iw-block-text-images__bg-overlay {{ scrimClass }} absolute inset-0"></div>
+    {% endif %}
 
     {# Content — centered over the image, always interior container. The block
        max width caps that container, the background image stays full-bleed. #}
     {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
     <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
         <div class="container mx-auto {{ maxWidthClass }}">
-            <div class="iw-block__content iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white"{{ contentSurfaceAttrs|raw }}>
+            <div class="iw-block__content iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center"{{ contentSurfaceAttrs|raw }}>
                 <div class="max-w-4xl mx-auto">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),
@@ -110,7 +117,7 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert prose-lg max-w-2xl mx-auto {{ paragraphRadiusClass }}">
+                        <div class="iw-block__text iw-block-text-images__text prose prose-lg max-w-2xl mx-auto {{ paragraphRadiusClass }}">
                             {{ text|raw }}
                         </div>
                     {% endif %}

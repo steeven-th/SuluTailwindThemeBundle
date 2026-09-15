@@ -56,6 +56,7 @@ Text + image block with seven layout styles selectable from the admin. The block
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-block-text-images-bg-overlay-color` | `rgb(0 0 0 / 0.6)` | Background color of the dark `__bg-overlay` above the hero image (applies to `--hero-banner`, `--overlay` mobile, `--classic` background mode). The `--overlay` desktop gradient paints its own stops, so it follows `--iw-block-text-images-gradient-direction` rather than this colour. |
+| `--iw-block-text-images-scrim-strength` | `0.6` | Alpha of the veil darkening the image under the text, in `--hero-banner`, `--overlay` and `--classic` in background mode. Set by the four `--scrim-*` classes the editor picks from (Settings > Images > Image scrim): `none` 0, `light` 0.35, `medium` 0.6, `strong` 0.82. The `--overlay` gradient keeps its four stops proportional to it. |
 | `--iw-block-text-images-gradient-direction` | `to right` | Direction of the `--overlay` desktop gradient. Set to `to left` by `.iw-block-text-images__bg-overlay--gradient-reverse` when the content sits on the right. |
 | `--iw-block-text-images-sidebar-sticky-top` | `6rem` | How far below the top of the viewport the `--sidebar` image stops. Assumes a sticky header of that height. |
 | `--iw-block-text-images-mosaic-gap` | `var(--iw-cards-gap, 1.5rem)` | Spacing between the images of the mosaic grid. Overridden per block by the editor's `iw-gap--*` choice; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
@@ -120,6 +121,28 @@ stacking below the breakpoint and the reverse modifier working. See
     letter-spacing: 0.02em;
 }
 ```
+
+### Text colour over an image
+
+The three styles that lay text over an image do not paint that text: the block
+variant does, as everywhere else. Pick a variant whose text contrasts with the
+veil you chose - a light variant over `none`, a variant with light text over
+`medium` or `strong`.
+
+To force a colour regardless of the variant, target the block:
+
+```css
+.iw-block-text-images--hero-banner .iw-block__title,
+.iw-block-text-images--hero-banner .iw-block__subtitle,
+.iw-block-text-images--hero-banner .iw-block__text p {
+    color: #fff;
+}
+```
+
+The selector has to be that explicit: the variant declares its colours on
+`.iw-variant--N h1…h6`, `.iw-variant--N .iw-block__subtitle` and
+`.iw-variant--N p`, so a single `color` on an ancestor is inherited and loses to
+every one of them.
 
 ### Custom gradient direction for `--overlay` (e.g. top-to-bottom instead of left-to-right)
 
