@@ -284,15 +284,17 @@ the fields an editor already knows from the other blocks.
 | `block-card-radius.xml` | `cardRadius`, for blocks repeating a card | settings |
 | `block-image-radius.xml` | `imageRadius`, for blocks rendering images | settings |
 | `block-paragraph-radius.xml` | `paragraphRadius`, for a text panel | settings |
-| `block-background.xml` | `showBackground` | settings |
+| `block-surfaces.xml` | `showBackground` + `showBlockBorder` + `showContentBackground` + `showContentBorder`, the four switches over what the colour variant paints | settings |
+| `block-background.xml` | `showBackground` alone, included by `block-surfaces.xml` | settings |
 
 > **Note:** The `href` path is relative to your template file location. Adjust `../../../vendor/` according to where your template sits relative to the project root. Typically, for templates in `config/templates/pages/`, the path is `../../../vendor/itech-world/sulu-tailwind-theme-bundle/config/templates/fragments/...`.
 
 ### Composite and granular fragments
 
 `block-spacing.xml` is itself built from `block-margins`, `block-lateral-margins`,
-`block-max-width` and `block-paddings`, and `block-heading.xml` from
-`block-title-tag` and `block-title-alignment`. Include the composite for the
+`block-max-width` and `block-paddings`, `block-heading.xml` from
+`block-title-tag` and `block-title-alignment`, and `block-surfaces.xml`
+from `block-background` plus the three switches that go with it. Include the composite for the
 usual case, one include and the canonical field order:
 
 ```xml

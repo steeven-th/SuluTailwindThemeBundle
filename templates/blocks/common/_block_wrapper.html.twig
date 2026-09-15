@@ -54,6 +54,15 @@
    `false` from the admin toggle disable the background. Twig's `|default(true)`
    would wrongly treat `false` as empty and reapply the default. #}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
+{#- The border of the same surface is a separate answer: a filled block with
+    no outline and an outlined block with no fill are both common asks. -#}
+{% set borderAttr = (showBlockBorder ?? true) ? 'data-has-border="true"' : '' %}
+{#- Content surface, background and border. Carried by the wrapper it paints
+    on, so the stylesheet can hang each half off its own attribute. Turning
+    both off takes the padding of that surface with them: it has none of its
+    own, so the only question it answers is whether the surface exists. -#}
+{% set contentSurfaceAttrs = ((showContentBackground ?? true) ? ' data-content-bg="true"' : '')
+    ~ ((showContentBorder ?? true) ? ' data-content-border="true"' : '') %}
 
 {#- Effective padding per axis, theme defaults resolved. Reading the raw value
     here would read "follow the theme" as "no padding" and strip the corners of
@@ -91,6 +100,7 @@
 <section
     class="block {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
     {{ bgAttr|raw }}
+    {{ borderAttr|raw }}
     data-controller="lightbox"
 >
     {# One inner wrapper around the whole content, title included. It used to
@@ -108,7 +118,7 @@
         edge of the viewport rounds nothing. Harmless without a surface, where
         there is no background for the corner to cut. -#}
     {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ innerMaxWidthClass ~ ' ' ~ resolvedParagraphRadius %}
-    <div class="{{ ('iw-block__content ' ~ innerWrapperClass)|trim }}">
+    <div class="{{ ('iw-block__content ' ~ innerWrapperClass)|trim }}"{{ contentSurfaceAttrs|raw }}>
         {{ block('block_content') }}
 
         {% if not (ctaInline|default(false)) %}

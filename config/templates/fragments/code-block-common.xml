@@ -131,6 +131,6 @@
     <xi:include href="block-card-radius.xml"
                 xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-    <xi:include href="block-background.xml"
+    <xi:include href="block-surfaces.xml"
                 xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 </properties>

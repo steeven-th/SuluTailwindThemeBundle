@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: which parts of its colour variant a block actually paints.
+
+    A variant describes two surfaces that reach every block: the block itself,
+    and the content wrapper inside it. Each of them has a background and a
+    border, and each of those four is an independent answer. An outlined block
+    with no fill is a common ask, and so is a filled block with no outline: the
+    variant proposes, the block disposes.
+
+    Everything is on by default, so a block that never opens this group keeps
+    the whole variant, which is what published content already does.
+
+    The two surfaces a variant can also paint, the paragraph and the accent,
+    are deliberately absent. The paragraph exists on five blocks out of sixteen
+    and the accent on two, so a checkbox for them would do nothing on every
+    other block, and a dead checkbox teaches editors that our settings do not
+    work. They get their own fragment the day a block needs them.
+
+    It closes the `settings` section, after the radius fields:
+
+        <xi:include href="../fragments/block-surfaces.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    Every block includes it, `separator` excepted: that one paints a surface
+    like the others but declares its own background toggler, since a rule or a
+    gap is something an editor fills and unfills often.
+    `BlockSurfaceToggleContractTest` keeps that exception list honest.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <!--
+        A heading, and a deliberate one: it names the group, and it spans the
+        full width, which resets the two-column grid. Without that reset an odd
+        number of half-width fields above pushes every pair below out of step,
+        and a margin selector full of boxes ends up beside a plain select. The
+        count above cannot be fixed by hand either, since visibility conditions
+        change it at runtime.
+
+        It also moves these fields out from under the radius heading, where the
+        lone background checkbox used to read as a corner setting.
+    -->
+    <property name="surfacesHeading" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.settings_group_surfaces</title></meta>
+            </param>
+        </params>
+    </property>
+
+    <!--
+        The block background keeps its own fragment and its original property
+        name. Both are public: a project composing its own blocks may include
+        the fragment directly, and every page already published carries the
+        `showBackground` key.
+    -->
+    <xi:include href="block-background.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    <property name="showBlockBorder" type="checkbox" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.show_block_border</title></meta>
+        <params>
+            <param name="default_value" value="true"/>
+        </params>
+    </property>
+
+    <property name="showContentBackground" type="checkbox" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.show_content_background</title></meta>
+        <params>
+            <param name="default_value" value="true"/>
+        </params>
+    </property>
+
+    <!--
+        Turning both content fields off removes the padding of that surface as
+        well, since it has none of its own: the block pads itself through its
+        own fields, the content surface only through a theme token. So the only
+        question it can answer is whether it exists at all.
+    -->
+    <property name="showContentBorder" type="checkbox" colspan="6">
+        <meta><title>iw_sulu_tailwind_theme.show_content_border</title></meta>
+        <params>
+            <param name="default_value" value="true"/>
+        </params>
+    </property>
+</properties>

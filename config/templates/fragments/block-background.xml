@@ -6,13 +6,15 @@
     blends into the page. On, the variant fills the block surface, and the
     radius and lateral margins start to matter.
 
-    It closes the `settings` section, after the radius fields:
-
-        <xi:include href="../fragments/block-background.xml"
-                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+    The border of that same surface is a separate answer and lives in
+    `block-surfaces.xml`, which includes this fragment and groups the four
+    background and border switches. Blocks include that one, not this one.
+    This file stays on its own because the property name is carried by every
+    page already published, and because a project composing its own blocks may
+    want the background switch alone.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="showBackground" type="checkbox">
+    <property name="showBackground" type="checkbox" colspan="6">
         <meta><title>iw_sulu_tailwind_theme.show_background</title></meta>
         <params>
             <param name="default_value" value="true"/>

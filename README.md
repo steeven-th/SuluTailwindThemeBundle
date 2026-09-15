@@ -45,7 +45,7 @@
 * **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--<slug>` classes, `.iw-button--<slug>` styles
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
-* **Block variants**: Slug-named per-block color schemes applied via CSS custom properties
+* **Block variants**: Slug-named per-block color schemes applied via CSS custom properties. Each block keeps four switches over what its variant actually paints - block background, block border, content background, content border - so one block can drop the outline or the fill without a variant of its own
 * **Menu configuration**: Configurable menu type, colors, animation, and display options, plus the bar chrome — bottom rule, drop shadow, background opacity and backdrop blur — and a transparent-mode logo variant that cross-fades with the background on scroll
 * **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config

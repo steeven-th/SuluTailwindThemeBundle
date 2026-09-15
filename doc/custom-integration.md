@@ -408,6 +408,9 @@ Use the block wrapper `embed` to benefit from all variant/margin/padding logic:
     lateralMargins: block.lateralMargins|default('exterior'),
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
+    showBlockBorder: block.showBlockBorder|default(true),
+    showContentBackground: block.showContentBackground|default(true),
+    showContentBorder: block.showContentBorder|default(true),
     paragraphRadius: block.paragraphRadius|default(''),
     maxWidth: block.maxWidth|default(''),
 } %}

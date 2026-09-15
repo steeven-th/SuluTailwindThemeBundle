@@ -125,6 +125,10 @@ final class SurfaceUsageContractTest extends TestCase
     /**
      * The content surface paints the content container, and only that.
      *
+     * Both halves of it: the background and the border are emitted as separate
+     * rules so a block can switch off either one, and each must still land on
+     * the container rather than on the block or on the text.
+     *
      * It is emitted by the compiler rather than written in app.css, so this
      * checks the compiler output rather than the stylesheet.
      */
@@ -135,11 +139,13 @@ final class SurfaceUsageContractTest extends TestCase
             \dirname(__DIR__, 2) . '/src/Service/ThemeCompiler.php',
         );
 
-        self::assertStringContainsString(
-            '.iw-variant--{$index} .iw-block__content {',
-            $compiler,
-            'The content surface must paint the content container.',
-        );
+        foreach (['data-content-bg', 'data-content-border'] as $half) {
+            self::assertStringContainsString(
+                '.iw-variant--{$index} .iw-block__content[' . $half . '=\"true\"] {',
+                $compiler,
+                \sprintf('The %s half of the content surface must paint the content container.', $half),
+            );
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import {translate} from 'sulu-admin-bundle/utils';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
+import buttonBorder from '../../utils/buttonBorder';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
 import {WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
 
@@ -544,8 +545,9 @@ export default class VariantEditor extends React.Component {
             color: button.text || 'inherit',
         };
 
-        if (button.border) {
-            style.border = (button.borderWidth || 1) + 'px solid ' + button.border;
+        const border = buttonBorder(button);
+        if (border) {
+            style.border = border;
         }
 
         return (
