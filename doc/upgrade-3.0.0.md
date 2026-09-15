@@ -821,6 +821,18 @@ gains the separator, the variant separator mode and this gap. Its subtitle is
 unaffected, it remains the attribution printed under the quote.
 `BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
 
+### Fixed: the image widget ignored the block's image radius
+
+**Image radius** reached the image widget and stopped there. It was handed to
+the slider, which owns no radius on purpose and expects the calling template to
+wrap and clip it - and the widget wrapped nothing. The video and the map widgets
+each had their wrapper, so the setting worked on every kind except images, on
+`text_images` and both form blocks alike.
+
+The images now sit in `.iw-widget__image-wrap`, which carries the class and
+clips to it, for a single image as for a carousel. `WidgetContractTest` now
+fails any widget handed a radius that puts it nowhere.
+
 ### New block field: highlight the figures (key figures)
 
 The counter of a key figure took the paragraph colour while the label under it
