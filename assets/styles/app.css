@@ -4181,10 +4181,24 @@ section.block:has([data-slider-fullbleed-value]) {
     width: 100%;
 }
 
+/* The title of the banner is the h1 of the page, so it takes the h1 size of the
+   theme. It used to carry a clamp of its own, which nothing could reach: the
+   variable in front of it is never written by the compiler, so the hard-coded
+   range was always the answer, whatever the admin asked for. A theme with a
+   display scale saw its banner capped well under its h1 and passed by the
+   titles of its own blocks, since those do read the scale.
+
+   The scale is already fluid where it needs to be, the compiler emits headings
+   above 2rem as a clamp, so following it here keeps the hierarchy true at every
+   width by construction rather than by hand. The literal clamp stays as a last
+   resort for a page rendered without a compiled theme.
+
+   Weight and line height stay put: a title sitting on a photograph has its own
+   legibility constraints, which the typographic scale knows nothing about. */
 .iw-page-hero__title {
     margin: 0;
     color: var(--iw-page-hero-title-color, #fff);
-    font-size: var(--iw-page-hero-title-size, clamp(1.75rem, 4vw, 3rem));
+    font-size: var(--iw-page-hero-title-size, var(--font-size-h1, clamp(1.75rem, 4vw, 3rem)));
     font-weight: var(--iw-page-hero-title-weight, 700);
     line-height: var(--iw-page-hero-title-line-height, 1.15);
     text-shadow: var(--iw-page-hero-title-shadow, 0 1px 3px rgba(0, 0, 0, 0.4));
