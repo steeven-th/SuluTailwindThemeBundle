@@ -609,6 +609,29 @@ class ThemeCompiler
         // Global card grid gap — every card grid/list/carousel falls back to this
         // token so a single admin setting harmonizes spacing across blocks.
         $css .= "  --iw-cards-gap: {$gap};\n";
+
+        // Same idea for the type inside a card. Five families of card shipped
+        // five different title sizes, and one of them was written in this file
+        // rather than behind a variable, so nothing could line them up.
+        //
+        // Emitted only when the field holds something: left empty, the token
+        // stays undefined and every family keeps the size it ships with, which
+        // is what an existing site expects on upgrade. The fallback in the
+        // stylesheet cannot do that work, since a token set to nothing is still
+        // set and would win over it.
+        foreach (['cardTitleSize' => 'title', 'cardTextSize' => 'text'] as $key => $part) {
+            $size = trim((string) ($tokens[$key] ?? ''));
+            if ('' === $size) {
+                continue;
+            }
+
+            // Stored as a number of rem, like every size of the typography tab.
+            if (preg_match('/^\d+(\.\d+)?$/', $size)) {
+                $size .= 'rem';
+            }
+
+            $css .= "  --iw-cards-{$part}-size: {$size};\n";
+        }
         $css .= "  --iw-article-card-surface: {$surfaceValue};\n";
         $css .= "  --iw-article-card-padding: {$padding};\n";
         $css .= "  --iw-article-card-border: {$borderValue};\n";
@@ -715,7 +738,7 @@ class ThemeCompiler
         // the heading family of a level in the Typography tab reaches the card.
         $css .= "  font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));\n";
         $css .= "  font-weight: 600;\n";
-        $css .= "  font-size: 1.125rem;\n";
+        $css .= "  font-size: var(--iw-article-card-title-size, var(--iw-cards-title-size, 1.125rem));\n";
         $css .= "  line-height: 1.375;\n";
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
@@ -742,7 +765,7 @@ class ThemeCompiler
         $css .= "  margin-bottom: 0.5rem;\n";
         $css .= "}\n";
         $css .= ".iw-article-card__excerpt {\n";
-        $css .= "  font-size: 0.875rem;\n";
+        $css .= "  font-size: var(--iw-article-card-excerpt-size, var(--iw-cards-text-size, 0.875rem));\n";
         $css .= "  color: var(--iw-article-card-text-color, var(--color-secondary-600));\n";
         $css .= "  display: -webkit-box;\n";
         $css .= "  -webkit-line-clamp: 2;\n";

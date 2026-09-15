@@ -1100,6 +1100,10 @@
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Card image ratio",
     "iw_sulu_tailwind_theme.card_gap": "Card spacing",
+    "iw_sulu_tailwind_theme.card_title_size": "Title size",
+    "iw_sulu_tailwind_theme.card_title_size_info": "In rem. Left empty, every family of cards keeps the size it ships with. Filled, they all follow.",
+    "iw_sulu_tailwind_theme.card_text_size": "Text size",
+    "iw_sulu_tailwind_theme.card_text_size_info": "In rem. Left empty, every family of cards keeps the size it ships with.",
     "iw_sulu_tailwind_theme.card_gap_info": "Applies to the article card grids (lists, grid, carousel, featured). Image grids and the other component grids have their own settings under \"Defaults > Blocks\".",
     "iw_sulu_tailwind_theme.card_gap_very_compact": "Very compact - 8 px (gap-2)",
     "iw_sulu_tailwind_theme.card_gap_compact": "Compact - 16 px (gap-4)",

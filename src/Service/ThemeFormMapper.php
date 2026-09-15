@@ -170,6 +170,7 @@ class ThemeFormMapper
         'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
+        'cardTitleSize', 'cardTextSize',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
         // Social sharing fallback (Open Graph / Twitter Card thumbnail).

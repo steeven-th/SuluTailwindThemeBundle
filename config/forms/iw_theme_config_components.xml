@@ -224,6 +224,38 @@
                 </property>
 
                 <!-- Content colors (empty = theme defaults) -->
+                <!--
+                    Sizes of the card title and text, shared by every family of
+                    card. Left empty each family keeps the size it ships with,
+                    so a site upgrading sees nothing move. Filled, they all
+                    follow, which is the point: a card title is a component, not
+                    a step of the heading scale, and nothing else was lining
+                    them up.
+                -->
+                <property name="cardTitleSize" type="number" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.card_title_size</title>
+                        <info_text>iw_sulu_tailwind_theme.card_title_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0.5"/>
+                        <param name="max" value="4"/>
+                        <param name="step" value="0.0625"/>
+                    </params>
+                </property>
+
+                <property name="cardTextSize" type="number" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.card_text_size</title>
+                        <info_text>iw_sulu_tailwind_theme.card_text_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0.5"/>
+                        <param name="max" value="3"/>
+                        <param name="step" value="0.0625"/>
+                    </params>
+                </property>
+
                 <property name="cardTitleColor" type="iw_theme_color_token_editor" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.card_title_color</title></meta>
                     <params><param name="show_palette" value="true"/></params>

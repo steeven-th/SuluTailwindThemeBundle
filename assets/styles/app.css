@@ -1217,6 +1217,7 @@ img.object-cover {
 
 .iw-block-document .iw-document-card__title {
     display: block;
+    font-size: var(--iw-document-card-title-size, var(--iw-cards-title-size, inherit));
     font-weight: var(--iw-document-card-title-weight, 500);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1307,7 +1308,7 @@ img.object-cover {
 
 .iw-block-linked-pages .iw-linked-page-card__title {
     display: block;
-    font-size: var(--iw-linked-page-card-title-size, 1.125rem);
+    font-size: var(--iw-linked-page-card-title-size, var(--iw-cards-title-size, 1.125rem));
     font-weight: var(--iw-linked-page-card-title-weight, 600);
     transition: color var(--iw-linked-page-card-transition-duration, 0.3s) ease;
 }
@@ -1318,7 +1319,7 @@ img.object-cover {
 
 .iw-block-linked-pages .iw-linked-page-card__excerpt {
     margin-top: var(--iw-linked-page-card-excerpt-margin-top, 0.5rem);
-    font-size: var(--iw-linked-page-card-excerpt-size, 0.875rem);
+    font-size: var(--iw-linked-page-card-excerpt-size, var(--iw-cards-text-size, 0.875rem));
     opacity: var(--iw-linked-page-card-excerpt-opacity, 0.75);
     display: -webkit-box;
     -webkit-line-clamp: var(--iw-linked-page-card-excerpt-lines, 3);
@@ -2818,7 +2819,7 @@ img.object-cover {
 .iw-block-article-featured .iw-featured-article-card__title {
     font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));
     font-weight: 600;
-    font-size: var(--iw-featured-article-card-title-size, 1.25rem);
+    font-size: var(--iw-featured-article-card-title-size, var(--iw-cards-title-size, 1.25rem));
     line-height: 1.375;
     margin-bottom: var(--iw-featured-article-card-title-margin-bottom, 0.5rem);
     color: var(--iw-featured-article-card-title-color, var(--color-text));
@@ -2865,7 +2866,7 @@ img.object-cover {
 
 /* Excerpt */
 .iw-block-article-featured .iw-featured-article-card__excerpt {
-    font-size: var(--iw-featured-article-card-excerpt-size, 0.875rem);
+    font-size: var(--iw-featured-article-card-excerpt-size, var(--iw-cards-text-size, 0.875rem));
     color: var(--iw-featured-article-card-excerpt-color, var(--color-secondary-600));
     margin-bottom: var(--iw-featured-article-card-excerpt-margin-bottom, 0.5rem);
     display: -webkit-box;
@@ -5836,14 +5837,14 @@ aside .iw-toc {
 
 .iw-card__title {
     margin: 0;
-    font-size: var(--iw-card-title-size, 1.0625rem);
+    font-size: var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem));
     font-weight: 600;
     color: var(--iw-variant-title-color, inherit);
 }
 
 .iw-card__text {
     flex: 1 1 auto;
-    font-size: var(--iw-card-text-size, 0.9375rem);
+    font-size: var(--iw-card-text-size, var(--iw-cards-text-size, 0.9375rem));
     line-height: 1.6;
 }
 
