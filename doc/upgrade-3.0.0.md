@@ -793,7 +793,7 @@ override the token for a single block - see
 
 **Defaults > Blocks > Gap between titles and content** (`defaults.titleGap`,
 default `1.5rem`) drives the space below the titles group of every block that
-renders it through `blocks/common/_titles.html.twig` - 43 templates. It compiles
+renders it through `blocks/common/_titles.html.twig` - 57 templates. It compiles
 to `--iw-blocks-title-gap` and is consumed by the new `.iw-block__titles`
 wrapper.
 
@@ -809,10 +809,17 @@ Two form styles carried their own margin on top of that and no longer do:
 | Form `--centered` | `2rem` (`mt-8`) below the titles | the theme title gap |
 | Form `--card` | `1.5rem` (`mt-6`) inside the card, below nothing, adding to its `p-8` | removed, the card's own padding stands alone |
 
-Blocks that render their titles inline instead of through the partial (`cta` in
-its three styles, `text_images` in `--hero-banner`, `--overlay` and
-`--split-screen`, `text` in `--quote`) are untouched: there the title and the
-text are one zone, and the spacing between them is typographic rhythm.
+Two styles render their title without the partial and stay untouched: the
+gallery in `--wide-carousel` and the location block in `--overlay`. Both paint
+the title onto a medium - inside the cartouche over the slides, and on the
+header of the floating card over the map - where a rule under the heading reads
+as noise and the "image" separator mode has nowhere to land.
+
+`text` in `--quote` used to be on that list and no longer is: it renders a
+heading above a quote like any other block, so it goes through the partial and
+gains the separator, the variant separator mode and this gap. Its subtitle is
+unaffected, it remains the attribution printed under the quote.
+`BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
 
 ### New block field: image spacing (mosaic, gallery grid & masonry)
 

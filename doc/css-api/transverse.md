@@ -264,7 +264,7 @@ The space between a block's titles group (title, subtitle, separator) and its
 content is a second site-wide token: **Settings > Themes > Defaults > Blocks >
 Gap between titles and content** (`defaults.titleGap`), compiled to
 `--iw-blocks-title-gap` and consumed by `.iw-block__titles`, the wrapper emitted
-by `blocks/common/_titles.html.twig` for all 43 block templates that use it.
+by `blocks/common/_titles.html.twig` for all 57 block templates that use it.
 
 ```css
 .iw-block__titles { margin-bottom: var(--iw-block-titles-gap, var(--iw-blocks-title-gap, 1.5rem)); }
