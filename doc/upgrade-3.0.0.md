@@ -793,7 +793,7 @@ override the token for a single block - see
 
 **Defaults > Blocks > Gap between titles and content** (`defaults.titleGap`,
 default `1.5rem`) drives the space below the titles group of every block that
-renders it through `blocks/common/_titles.html.twig` - 43 templates. It compiles
+renders it through `blocks/common/_titles.html.twig` - 57 templates. It compiles
 to `--iw-blocks-title-gap` and is consumed by the new `.iw-block__titles`
 wrapper.
 
@@ -809,10 +809,59 @@ Two form styles carried their own margin on top of that and no longer do:
 | Form `--centered` | `2rem` (`mt-8`) below the titles | the theme title gap |
 | Form `--card` | `1.5rem` (`mt-6`) inside the card, below nothing, adding to its `p-8` | removed, the card's own padding stands alone |
 
-Blocks that render their titles inline instead of through the partial (`cta` in
-its three styles, `text_images` in `--hero-banner`, `--overlay` and
-`--split-screen`, `text` in `--quote`) are untouched: there the title and the
-text are one zone, and the spacing between them is typographic rhythm.
+Two styles render their title without the partial and stay untouched: the
+gallery in `--wide-carousel` and the location block in `--overlay`. Both paint
+the title onto a medium - inside the cartouche over the slides, and on the
+header of the floating card over the map - where a rule under the heading reads
+as noise and the "image" separator mode has nowhere to land.
+
+`text` in `--quote` used to be on that list and no longer is: it renders a
+heading above a quote like any other block, so it goes through the partial and
+gains the separator, the variant separator mode and this gap. Its subtitle is
+unaffected, it remains the attribution printed under the quote.
+`BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
+
+### New block field: image scrim, and the text over an image follows the variant
+
+Three `text_images` styles lay the text over the image and darken it so the text
+stays readable: `--hero-banner`, `--overlay`, and `--classic` once its image
+becomes a background. That veil was fixed at 60% black, owned by the bundle.
+
+It is now **Settings > Images > Image scrim** (`imageScrim`), with four steps -
+*None*, *Light*, *Medium*, *Strong* - and *Medium* reproduces the previous 60%
+exactly, so nothing moves until an editor changes it. The `--overlay` gradient
+keeps its four stops proportional to the chosen strength.
+
+Two of those styles also forced their text to white through a `text-white`
+utility on the content wrapper. That forcing stopped working a while ago: a
+variant declares its colours on `.iw-variant--N h1…h6`, `.iw-variant--N
+.iw-block__subtitle` and `.iw-variant--N p`, which all outrank a `color`
+inherited from an ancestor. The result was a block where the title and the text
+followed the variant while anything the variant did not name stayed white.
+
+The dead forcing is gone, and so is the `prose-invert` class the three templates
+carried, which was never defined anywhere: this bundle deliberately does not
+ship `@tailwindcss/typography`.
+
+`--hero-banner` and `--overlay` also painted their veil whether or not the block
+carried an image, greying the block over nothing and dragging the text down with
+it. They now paint it only over an image, the way `--classic` always has.
+
+Two other places tried to pin a text colour and lost the same cascade fight, and
+they keep the forcing because there the block paints the background itself: the
+title and subtitle in the `--wide-carousel` cartouche (gallery), which came out
+in the variant's heading colour over black, and the floating card of the
+location block in `--overlay`, whose rule claimed to override the variant and
+tied with it. Both now win, and both expose their colour as a token -
+`--iw-block-gallery-overlay-title-color`, `--iw-block-gallery-overlay-subtitle-color`
+and the existing `--iw-block-location-card-color`. The rule of thumb: whoever
+guarantees the background guarantees what reads on it, which is exactly the
+contract `.iw-surface--accent` already had.
+
+**What this means for an existing site**: the text of these three styles follows
+the block variant, like every other block. If yours look washed out, either pick
+a variant whose text contrasts with the veil, or lower the scrim. Blocks already
+in place keep the veil they had, unless they never had an image to veil.
 
 ### New block field: image spacing (mosaic, gallery grid & masonry)
 

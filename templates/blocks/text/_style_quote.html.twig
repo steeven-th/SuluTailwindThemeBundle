@@ -2,14 +2,21 @@
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
-    {% set alignMap = {'left': 'text-left', 'center': 'text-center', 'right': 'text-right'} %}
-    {% set titleAlignClass = alignMap[titleAlignment|default('left')]|default('text-left') %}
-    {% set titleTag = iw_sulu_tailwind_theme_heading_tag(titleTag|default('h2')) %}
-
     <div class="iw-block-text iw-block-text--quote">
-        {% if title is defined and title is not empty %}
-            <{{ titleTag }} class="iw-block__title text-2xl md:text-3xl font-[var(--font-h2-weight)] mb-6 {{ titleAlignClass }}">{{ iw_sulu_tailwind_theme_title_markup(title) }}</{{ titleTag }}>
-        {% endif %}
+        {# The heading goes through the shared group like every other block, so
+           the separator, the variant's separator mode and the theme title gap
+           reach this style too - it used to render the title on its own and was
+           the last block left without a rule under it.
+
+           The subtitle stays out of it: here it is the attribution of the quote
+           below, not a tagline, and the <footer> is where it belongs. #}
+        {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+            title: title|default(''),
+            subTitle: '',
+            titleAlignment: titleAlignment|default('left'),
+            titleTag: titleTag|default('h2'),
+            variant: variant|default(0)
+        } only %}
 
         {% if text is defined and text is not empty %}
             <blockquote class="iw-block-text__quote">
@@ -18,7 +25,7 @@
                 </div>
                 {% if subTitle is defined and subTitle is not empty %}
                     <footer class="iw-block-text__quote-footer">
-                        — {{ iw_sulu_tailwind_theme_title_markup(subTitle) }}
+                        - {{ iw_sulu_tailwind_theme_title_markup(subTitle) }}
                     </footer>
                 {% endif %}
             </blockquote>

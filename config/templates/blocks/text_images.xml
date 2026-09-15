@@ -315,6 +315,35 @@
                         </param>
                     </params>
                 </property>
+                <!--
+                    Scrim strength. Three styles lay the text over the image and
+                    darken it so the text stays readable: hero_banner, overlay,
+                    and classic once its image becomes a background. That veil
+                    used to be fixed at 60% and owned by the bundle, which left
+                    the editor holding half a contract - free to pick a light
+                    variant for the text, with no say on the background it lands
+                    on. Both halves are his now.
+
+                    "Theme default" is deliberately absent: the veil belongs to
+                    one block over one image, not to a site-wide rhythm the way
+                    spacings and radii do.
+                -->
+                <property name="imageScrim" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'hero_banner' OR __parent.style == 'overlay' OR (__parent.style == 'classic' AND __parent.imagePosition == 'background')">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.image_scrim</title>
+                        <info_text>iw_sulu_tailwind_theme.image_scrim_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="medium"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.image_scrim_none</title></meta></param>
+                            <param name="light"><meta><title>iw_sulu_tailwind_theme.image_scrim_light</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.image_scrim_medium</title></meta></param>
+                            <param name="strong"><meta><title>iw_sulu_tailwind_theme.image_scrim_strong</title></meta></param>
+                        </param>
+                    </params>
+                </property>
                 <property name="showImagesName" type="checkbox"
                           visibleCondition="__parent.style != 'overlay' AND __parent.style != 'hero_banner'">
                     <meta>

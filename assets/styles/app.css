@@ -2948,6 +2948,22 @@ img.object-cover {
     --iw-split-gap: var(--iw-block-text-images-gap, var(--iw-blocks-gap, 1.5rem));
 }
 
+/* The rich text of a text/images zone carries no vertical margin of its own.
+   Its zone already spaces the title, the text and the buttons, so the 1rem the
+   paragraph surface adds around `.iw-block__text` doubles that rhythm and
+   pushes the text off the vertical centre of the zone.
+
+   The class is tripled to reach (0,3,0): the rule it answers is
+   `.iw-variant--N .iw-block__text` (0,2,0), emitted by ThemeCompiler into a
+   stylesheet loaded after this one, so equal specificity would lose. The five
+   templates used to carry `style="margin-block: 0"` instead - which is what an
+   inline style is always for, winning a cascade fight, and is also how a
+   half-finished edit managed to break one of them out of an unclosed
+   attribute. */
+.iw-block-text-images__text.iw-block-text-images__text.iw-block-text-images__text {
+    margin-block: 0;
+}
+
 /* Spacing between the images inside the mosaic - a grid of images, so it
    follows the site-wide image gap rather than the split-zones gap. The editor
    can override it per block (Content > Image spacing). */
@@ -2955,21 +2971,71 @@ img.object-cover {
     gap: var(--iw-gap-choice, var(--iw-block-text-images-mosaic-gap, var(--iw-blocks-image-gap, 1.5rem)));
 }
 
-/* --hero-banner / --overlay / --classic (background mode) all render a dark
-   overlay above the background image. The overlay color is exposed as a
-   custom property so a theme can change the opacity without rewriting the
-   template's Tailwind utility. */
+/* --hero-banner / --overlay / --classic (background mode) all lay the text over
+   the image and darken it so the text stays readable. How much is the editor's
+   call, through Settings > Images > Image scrim, which emits one of the four
+   strength classes below; the colour stays a custom property for a theme that
+   wants something other than black.
+
+   The strength drives an alpha, not a colour, so a theme can restyle the veil
+   and keep the four steps working. It used to be fixed at 60% with no way out,
+   which handed the editor half a contract: free to pick a light variant for the
+   text, with no say on the background that text lands on. */
 .iw-block-text-images__bg-overlay {
-    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+    background-color: var(--iw-block-text-images-bg-overlay-color,
+        rgb(0 0 0 / var(--iw-block-text-images-scrim-strength, 0.6)));
 }
 
-/* The --overlay style renders two overlays (mobile uniform + desktop
-   gradient); the mobile one is the same as the default, the gradient
-   variant ships its directional linear-gradient inline via Twig and can
-   be re-themed via the same CSS variable since it falls back to the
-   same default. */
-.iw-block-text-images--overlay .iw-block-text-images__bg-overlay--mobile {
-    background-color: var(--iw-block-text-images-bg-overlay-color, rgb(0 0 0 / 0.6));
+/* The four steps, enumerated the way every other editor-picked scale in this
+   stylesheet is, so they stay overridable in one place. `none` keeps the
+   element in the flow and simply paints nothing. */
+.iw-block-text-images--scrim-none { --iw-block-text-images-scrim-strength: 0; }
+.iw-block-text-images--scrim-light { --iw-block-text-images-scrim-strength: 0.35; }
+.iw-block-text-images--scrim-medium { --iw-block-text-images-scrim-strength: 0.6; }
+.iw-block-text-images--scrim-strong { --iw-block-text-images-scrim-strength: 0.82; }
+
+/* The --overlay style renders two veils: a uniform one on mobile, where the
+   content spans the full width, and a directional gradient from lg, dark on the
+   text side and clear on the image side. The mobile one is the plain veil above
+   and needs no rule of its own - it used to have one, repeating the same
+   declaration at a higher specificity, which was harmless until the strength
+   became a token and that copy started pinning it to the old fixed 60%. */
+
+/* The gradient used to be built inline in Twig, which forced an !important on
+   any project that wanted another angle - the documented recipe said so. Only
+   the direction ever changed, so it is the direction that travels, as a token:
+   the gradient itself is written once and a project can now restyle it the
+   usual way. Declared after the base overlay because it replaces that
+   background-color at equal specificity. */
+.iw-block-text-images__bg-overlay--gradient {
+    /* The four stops keep the proportions they had at 60%: the dark end sits a
+       third above the strength, the middle just under it, the far end a
+       quarter of it. Multiplying rather than enumerating keeps the gradient
+       written once, and an alpha above 1 is clamped by the browser. */
+    background: linear-gradient(
+        var(--iw-block-text-images-gradient-direction, to right),
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 1.33)) 0%,
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 0.92)) 40%,
+        rgb(0 0 0 / calc(var(--iw-block-text-images-scrim-strength, 0.6) * 0.25)) 70%,
+        transparent 100%
+    );
+}
+
+/* Content on the right: the dark end of the gradient follows it. */
+.iw-block-text-images__bg-overlay--gradient-reverse {
+    --iw-block-text-images-gradient-direction: to left;
+}
+
+/* The sidebar image follows the text column, staying in view while the text
+   scrolls past it. The offset assumes a sticky header, so it is exposed: the
+   header of a project is not the header of this one. Scoped to --sidebar, as
+   --fullwidth uses the same wrapper and must not stick.
+
+   This was an inline style, which quietly made a documented recipe - "force the
+   sidebar image to stretch instead of sticking" - impossible to apply. */
+.iw-block-text-images--sidebar .iw-block-text-images__image-wrap {
+    position: sticky;
+    top: var(--iw-block-text-images-sidebar-sticky-top, 6rem);
 }
 
 /* ─── Block: gallery ───────────────────────────────────────────────────── */
@@ -3105,6 +3171,21 @@ img.object-cover {
 .iw-gallery-nav--sm {
     --_size: 2rem;
     --_icon: 1rem;
+}
+
+/* The arrows of the filmstrip thumbnail strip sit on the block background, not
+   on an image, so they invert the defaults of the component: the translucent
+   white made for arrows over a photo disappears on a light background.
+
+   A single class is enough, and deliberately so: `.iw-gallery-nav` only ever
+   reads these three variables as fallbacks, it never declares them, so nothing
+   has to be outranked and a project override stays as cheap as everywhere else.
+   Both templates used to carry the values inline, which is what kept these two
+   arrows out of any re-theming. */
+.iw-block-gallery__thumbnails-nav {
+    --iw-gallery-nav-bg: rgb(0 0 0 / 0.08);
+    --iw-gallery-nav-bg-hover: rgb(0 0 0 / 0.2);
+    --iw-gallery-nav-color: currentColor;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3391,6 +3472,27 @@ img.object-cover {
 .iw-parallax.iw-parallax--strong { height: 145%; top: -22.5%; }
 .iw-parallax.iw-parallax--extreme { height: 160%; top: -30%; }
 
+/* The wide-carousel title sits in a translucent dark cartouche the template
+   always paints, so the block owns the colour of the text on it - the same
+   contract as the location card and `.iw-surface--accent`: whoever guarantees
+   the background guarantees what reads on it.
+
+   Two classes (0,2,0) beat the `.iw-variant--N h1…h6` and `.iw-variant--N p`
+   of a variant, both (0,1,1), in a stylesheet loaded after this one. The
+   templates used to say it with `text-white`, a single class that lost to
+   both: the title came out in the variant's heading colour over a black
+   cartouche, which is as unreadable as it sounds.
+
+   Both colours go through a token, for a project that paints the cartouche
+   differently. */
+.iw-block-gallery__overlay-content .iw-block-gallery__overlay-title {
+    color: var(--iw-block-gallery-overlay-title-color, #fff);
+}
+
+.iw-block-gallery__overlay-content .iw-block-gallery__overlay-subtitle {
+    color: var(--iw-block-gallery-overlay-subtitle-color, rgb(255 255 255 / 0.8));
+}
+
 /* Wide-carousel height spacer in parallax mode (fixed viewport-based height). */
 .iw-wide-carousel-spacer--parallax { height: clamp(300px, 60vh, 700px); }
 
@@ -3623,19 +3725,25 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-block-location-card-color, #000);
 }
 
-/* Force the card text color on all children — overrides per-variant rules
-   like .iw-variant--* p so the overlay reads correctly against the blurred
-   map even when the variant uses a contrasted palette. */
-.iw-block-location__card p,
-.iw-block-location__card span,
-.iw-block-location__card a:not(.iw-button--variant),
-.iw-block-location__card li,
-.iw-block-location__card h1,
-.iw-block-location__card h2,
-.iw-block-location__card h3,
-.iw-block-location__card h4,
-.iw-block-location__card h5,
-.iw-block-location__card h6 {
+/* The card paints its own light surface over the map, so it owns the colour of
+   the text on it: a variant with a light palette would otherwise write white on
+   white. This is the same contract as `.iw-surface--accent` - whoever guarantees
+   the background guarantees what reads on it.
+
+   The class is doubled to reach (0,2,1). A variant declares `.iw-variant--N p`
+   and `.iw-variant--N h1…h6`, both (0,1,1), in a stylesheet loaded after this
+   one, so the single class this rule used to carry tied and lost - it claimed to
+   override the variant and never did. */
+.iw-block-location__card.iw-block-location__card p,
+.iw-block-location__card.iw-block-location__card span,
+.iw-block-location__card.iw-block-location__card a:not(.iw-button--variant),
+.iw-block-location__card.iw-block-location__card li,
+.iw-block-location__card.iw-block-location__card h1,
+.iw-block-location__card.iw-block-location__card h2,
+.iw-block-location__card.iw-block-location__card h3,
+.iw-block-location__card.iw-block-location__card h4,
+.iw-block-location__card.iw-block-location__card h5,
+.iw-block-location__card.iw-block-location__card h6 {
     color: var(--iw-block-location-card-color, #000);
 }
 

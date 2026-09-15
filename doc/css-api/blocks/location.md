@@ -78,7 +78,7 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 | `--iw-block-location-card-radius` | `var(--radius-img, 0.5rem)` | Card border-radius. |
 | `--iw-block-location-card-shadow` | `0 8px 32px rgba(0, 0, 0, 0.18)` | Card box-shadow on desktop. |
 | `--iw-block-location-card-blur` | `12px` | Backdrop-filter blur on desktop. |
-| `--iw-block-location-card-color` | `#000` | Default text color inside the card. Applied to every text child to override variant rules. |
+| `--iw-block-location-card-color` | `#000` | Text colour inside the floating card. The block paints its own light surface over the map, so it paints the text on it too, rather than the variant - which would write white on white on a light palette. Applied to every text child through a doubled class, so it actually outranks the variant rules. |
 | `--iw-block-location-card-header-hover-bg` | `rgba(0, 0, 0, 0.04)` | Hover background of the toggle header. |
 | `--iw-block-location-card-divider` | `rgba(0, 0, 0, 0.15)` | Color of the subtle separator between header and body. |
 | `--iw-block-location-card-bg-mobile` | `#fff` | Background of the card on `≤ 768px` (bottom-sheet mode, no blur). |

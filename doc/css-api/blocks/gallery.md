@@ -52,7 +52,7 @@ Sizing, radius and aspect ratios are driven by Tailwind utility classes emitted 
 | `.iw-block-gallery__thumbnails-track` | The scrollable track holding the thumbnails. |
 | `.iw-block-gallery__thumbnail` | A single `<button>` thumbnail. |
 | `.iw-block-gallery__thumbnail-img` | The `<img>` inside the thumbnail. |
-| `.iw-block-gallery__thumbnails-nav` | Prev/Next arrows for the thumbnail strip (carry `--prev` / `--next` modifier). |
+| `.iw-block-gallery__thumbnails-nav` | Prev/Next arrows for the thumbnail strip (carry `--prev` / `--next` modifier). Also carry `.iw-gallery-nav`, whose `--iw-gallery-nav-*` defaults they invert: these arrows sit on the block background rather than on an image, so they are dark translucent instead of white. Override them on this class. |
 | `.iw-block-gallery__nav` | Prev/Next arrows for the main slider/carousel (carry `--prev` / `--next` modifier). Also carry `.iw-gallery-nav`. |
 | `.iw-block-gallery__dots` | The dot indicators bar (`--slider-single`, `--wide-carousel`). |
 | `.iw-block-gallery__dot` | A single dot indicator (`<button>`). |
@@ -72,6 +72,8 @@ The gap between images is exposed as dedicated variables, each falling back to t
 | `--iw-gap-choice` | unset | Set by the `iw-gap--*` class the editor picks in **Content > Image spacing** (`--grid` and `--masonry`). Read before the per-block variable and the theme token; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
 | `--iw-block-gallery-grid-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap in `--grid`. |
 | `--iw-block-gallery-masonry-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Column gap + item vertical rhythm in `--masonry`. |
+| `--iw-block-gallery-overlay-title-color` | `#fff` | Title in the `--wide-carousel` cartouche. The block paints this text itself, rather than the variant, because it also paints the dark cartouche under it. |
+| `--iw-block-gallery-overlay-subtitle-color` | `rgb(255 255 255 / 0.8)` | Subtitle in the same cartouche. |
 | `--iw-block-gallery-slider-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap between slides in the default `--slider` track. |
 
 Navigation arrows and dot indicators are **only rendered when there is more than one image** in the block (single-image galleries get a clean static layout). The thumbnail strip in `--filmstrip` follows the same rule. Beyond the gap variables above, the Gallery block exposes very few custom properties of its own because layout / sizing are driven by Tailwind utilities composed in Twig. Theming is mostly done by:
@@ -123,6 +125,20 @@ Navigation arrows and dot indicators are **only rendered when there is more than
 
 ```css
 .iw-block-gallery {
+    --iw-gallery-nav-bg: var(--color-accent);
+    --iw-gallery-nav-color: var(--color-background);
+    --iw-gallery-nav-bg-hover: var(--color-accent-700);
+}
+```
+
+The arrows of the `--filmstrip` thumbnail strip are the one exception. They
+declare these three variables on themselves, to stay visible on the light block
+background instead of on a photo, and a declaration on the element always wins
+over one inherited from an ancestor. Include them explicitly when the whole set
+must match:
+
+```css
+.iw-block-gallery__thumbnails-nav {
     --iw-gallery-nav-bg: var(--color-accent);
     --iw-gallery-nav-color: var(--color-background);
     --iw-gallery-nav-bg-hover: var(--color-accent-700);

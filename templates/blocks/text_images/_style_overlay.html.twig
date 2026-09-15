@@ -33,6 +33,10 @@
 {% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
 {% set variantSlug = iw_sulu_tailwind_theme_variant_slug(variant|default(null), allVariants) %}
 {% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+{#- Scrim strength picked by the editor (Settings > Images). The class rides on
+    the veil itself rather than on the section, so the three styles emit it the
+    same way - classic has no section of its own, it extends the block wrapper. -#}
+{% set scrimClass = 'iw-block-text-images--scrim-' ~ (imageScrim|default('medium') in ['none', 'light', 'medium', 'strong'] ? imageScrim|default('medium') : 'medium') %}
 {% set mtClass = marginTop|default('mt-0') %}
 {% set mbClass = marginBottom|default('mb-0') %}
 
@@ -126,14 +130,18 @@
     {# Content position: left (default) or right #}
     {% set isRight = contentRight|default(false) %}
 
-    {# Overlay — below lg: uniform dark cover (content spans full width).
-       From lg: directional gradient, dark on the text side, transparent on the image side. #}
-    {% set gradientDir = isRight ? 'to left' : 'to right' %}
-    <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--mobile absolute inset-0 bg-black/60 lg:hidden"></div>
-    <div
-        class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--gradient absolute inset-0 hidden lg:block"
-        style="background: linear-gradient({{ gradientDir }}, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 70%, transparent 100%);"
-    ></div>
+    {# Veil — below lg: uniform dark cover (content spans full width).
+       From lg: directional gradient, dark on the text side, transparent on the
+       image side. The gradient lives in the stylesheet; only its direction
+       travels from here, through the reverse modifier.
+
+       No image, nothing to veil: it used to be painted anyway, greying the
+       block over nothing and dragging the text down with it. Same condition as
+       the image itself, the way --classic has always done it. #}
+    {% if bgMediaId %}
+        <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--mobile {{ scrimClass }} absolute inset-0 lg:hidden"></div>
+        <div class="iw-block-text-images__bg-overlay iw-block-text-images__bg-overlay--gradient{{ isRight ? ' iw-block-text-images__bg-overlay--gradient-reverse' : '' }} {{ scrimClass }} absolute inset-0 hidden lg:block"></div>
+    {% endif %}
 
     {# Content — gets the section padding, container wraps only the text #}
     <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
@@ -141,7 +149,7 @@
         <div class="{{ innerWrapperClass|trim }}">
         {% endif %}
             <div class="iw-block__content iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex items-center{{ isRight ? ' lg:justify-end' : '' }}"{{ contentSurfaceAttrs|raw }}>
-                <div class="lg:max-w-2xl text-white">
+                <div class="lg:max-w-2xl">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),
                         subTitle: subTitle|default(''),
@@ -151,8 +159,13 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}
+                        <div class="iw-block__text iw-block-text-images__text prose max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}">
+                            {{ text|raw }}
+                        </div>
+                    {% endif %}
 
+                    {# Buttons close the zone, under the text, as in every other
+                       text/images style. #}
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
                         buttons: ctaButtons|default([]),
                         buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
@@ -160,10 +173,6 @@
                         direction: ctaDirection|default('row'),
                         titleAlignment: titleAlignment|default('left')
                     } only %}
-" style="margin-block: 0;">
-                            {{ text|raw }}
-                        </div>
-                    {% endif %}
                 </div>
             </div>
 

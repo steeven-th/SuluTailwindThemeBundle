@@ -76,7 +76,7 @@ Class names emitted by the shared `_titles.html.twig` and `_paragraph.html.twig`
 | Class | Role |
 |-------|------|
 | `.iw-block__title` | `<h2>` title rendered by the titles helper |
-| `.iw-block__subtitle` | `<h3>` subtitle rendered by the titles helper |
+| `.iw-block__subtitle` | `<p>` subtitle rendered by the titles helper |
 | `.iw-block__text` | `.prose`-styled rich text block rendered by the paragraph helper |
 | `.iw-block__separator` | Optional image separator inside the titles helper |
 

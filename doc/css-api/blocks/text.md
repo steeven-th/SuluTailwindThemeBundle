@@ -15,7 +15,7 @@ Rich-text block with three layout styles selectable from the admin: a default si
 | `.iw-block-text` | Root wrapper around the block content. Hook only — no visual styling. |
 | `.iw-block-text--one-column` | Default single-column layout. CKEditor handles inline text alignment. |
 | `.iw-block-text--two-columns` | Two-column flow on desktop. |
-| `.iw-block-text--quote` | Decorative pull-quote with a colored left border. |
+| `.iw-block-text--quote` | Decorative pull-quote with a colored left border. Its heading goes through the shared titles group like the other two styles, so it carries the separator and the theme title gap. The subtitle does not: in this style it is the attribution, printed in the blockquote footer. |
 
 ### Elements
 
@@ -29,7 +29,7 @@ Rich-text block with three layout styles selectable from the admin: a default si
 Generic helpers used inside (see [`../../css-variables.md#generic-block-helpers`](../../css-variables.md#generic-block-helpers)):
 
 - `.iw-block__title` — the `<h2>` rendered by the titles helper
-- `.iw-block__subtitle` — the `<h3>` rendered by the titles helper
+- `.iw-block__subtitle` — the `<p>` rendered by the titles helper (a tagline is not a heading)
 - `.iw-block__text` — the rich-text `<div>` rendered by the paragraph helper
 
 ---
