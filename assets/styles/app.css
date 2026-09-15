@@ -6010,12 +6010,18 @@ aside .iw-toc {
     color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
 }
 
+/* The hover of a card comes from Components > Cards, like every other family.
+   It used to be written here, so the one block most pages are built from was
+   also the one nobody could tune: six settings drove the article cards and none
+   of them reached this. The literals stay behind the tokens for a page rendered
+   without a compiled theme. */
 a.iw-card {
-    transition: transform .15s ease, box-shadow .15s ease;
+    transition: transform var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease),
+        box-shadow var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease);
 }
 
 a.iw-card:hover {
-    transform: translateY(-2px);
+    transform: var(--iw-cards-hover-transform, translateY(-2px));
 }
 
 @media (prefers-reduced-motion: reduce) {

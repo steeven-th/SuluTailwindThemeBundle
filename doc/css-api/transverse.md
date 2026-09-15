@@ -133,6 +133,25 @@ Size modifiers of a layout stay out of it. The featured article card has a hero
 step and a small step, `--iw-featured-article-card-title-size-hero` and
 `-sm`, which exist to draw a difference a single token would flatten.
 
+### Hover
+
+The same section drives the hover of every card, through two mechanisms that
+answer to one field. An article card carries a modifier class its template picks
+per block, the Cards block reads tokens:
+
+| Token | From |
+|---|---|
+| `--iw-cards-hover-transform` | Components > Cards > **Hover transform** (`cardHoverTransform`) |
+| `--iw-cards-hover-duration` | Components > Cards > **Duration** (`cardHoverDuration`) |
+| `--iw-cards-hover-easing` | Components > Cards > **Easing** (`cardHoverEasing`) |
+
+`cardHoverTransform` defaults to `lift`, the small rise the Cards block has
+always drawn. A card you can click that answers nothing on hover reads as broken
+rather than as restraint, so that is the default for every family now.
+
+The shadow of a card at rest stays a per-block choice (`shadow` on the block),
+not a site-wide one: it says how a particular card sits on its page.
+
 Colours are a separate matter and do not belong here: a card inside a block
 takes them from the colour variant, which is what makes a block coherent with
 itself. Only the type and the hover are site-wide.

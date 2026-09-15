@@ -638,6 +638,22 @@ class ThemeCompiler
         $css .= "  --iw-article-card-hover-border-color: {$hoverBorderValue};\n";
         $css .= "  --iw-article-card-hover-duration: {$hoverDuration};\n";
         $css .= "  --iw-article-card-hover-easing: {$hoverEasing};\n";
+
+        // The same hover, published as site-wide tokens. Article cards carry it
+        // as a modifier class, chosen per block by the template, but the Cards
+        // block has no such plumbing and had its lift written into the
+        // stylesheet. Reading a token lets one admin setting reach both without
+        // putting an `article-card` class on a card that is not one.
+        //
+        // A theme that was never saved holds no key at all, and it must land on
+        // the same lift as the field default rather than on the catalogue one:
+        // that catalogue answers to the buttons as well, where `none` is right.
+        $hoverTransform = ButtonEffectCatalog::resolveTransform(
+            (string) ($tokens['cardHoverTransform'] ?? 'lift')
+        );
+        $css .= "  --iw-cards-hover-transform: {$hoverTransform};\n";
+        $css .= "  --iw-cards-hover-duration: {$hoverDuration};\n";
+        $css .= "  --iw-cards-hover-easing: {$hoverEasing};\n";
         $css .= "  --iw-article-card-title-color: {$titleColor};\n";
         $css .= "  --iw-article-card-text-color: {$textColor};\n";
         $css .= "  --iw-article-card-badge-bg: {$badgeBg};\n";

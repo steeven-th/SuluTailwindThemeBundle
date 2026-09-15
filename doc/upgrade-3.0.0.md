@@ -1124,3 +1124,44 @@ h1 of the site, set the variable that was always meant for it:
 Weight and line height are unchanged: a title over a photograph has legibility
 constraints the scale knows nothing about. The subtitle keeps its own range too,
 being a tagline rather than a heading.
+
+## One setting drives the type and the hover of every card (new, visual)
+
+**Components > Cards** drove the article cards and nothing else. The Cards
+block, which most pages are actually built from, lived on stylesheet defaults:
+its title size, its text size and its hover were written in `app.css`, and the
+hover of the article card title size was written in the compiler, where no
+project could reach it at all.
+
+Five families of card shipped five title sizes, between 1.0625rem and 1.25rem.
+Two new fields now line them up, **Title size** and **Text size**, published as
+`--iw-cards-title-size` and `--iw-cards-text-size`. Each family keeps a variable
+of its own in front of the token, so one can still be tuned alone from a
+stylesheet.
+
+**Leave the two fields empty and nothing changes.** The tokens are then not
+emitted at all and every family keeps the size it ships with.
+
+**`cardHoverTransform` now defaults to `lift`** and reaches every family, where
+it used to default to `none` and reach the article cards only. What you see
+depends on whether the field was ever saved, and the two cases go opposite ways:
+
+- **A theme that never saved it**, a preset or a fresh install, holds no value
+  at all and takes the new default. Article cards start rising slightly on
+  hover, the way the cards of the Cards block always have.
+- **A theme saved while the default was `none`** holds that `none` in its
+  tokens, and a stored value always wins over a default. The setting now reaches
+  the Cards block too, so **its cards stop rising**. That is most sites in
+  production.
+
+There is no way to tell a deliberate `none` from an inherited one, so the stored
+value is honoured either way. If the Cards block should keep its lift, set
+**Components > Cards > Hover transform** to *Lift* once, which also gives the
+article cards of that site the same hover.
+
+To go the other way and keep every card still, *None* in the same field covers
+both families.
+
+The colours of a card are untouched and stay out of this section: a card inside
+a block takes them from the colour variant, which is what keeps a block coherent
+with itself.

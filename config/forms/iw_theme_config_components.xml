@@ -311,10 +311,16 @@
                 </property>
 
                 <!-- Hover effects -->
+                <!--
+                    Defaults to the lift the Cards block has always drawn: this
+                    setting now drives every family of card, and a card you can
+                    click that answers nothing on hover reads as broken rather
+                    than as restraint.
+                -->
                 <property name="cardHoverTransform" type="single_select" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform</title></meta>
                     <params>
-                        <param name="default_value" value="none"/>
+                        <param name="default_value" value="lift"/>
                         <param name="values" type="collection">
                             <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_none</title></meta></param>
                             <param name="lift"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift</title></meta></param>
