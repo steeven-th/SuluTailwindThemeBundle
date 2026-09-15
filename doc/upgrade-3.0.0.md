@@ -844,6 +844,17 @@ being shared with `text_images`, `form` and `location`.
 
 A pure addition: no existing block changes.
 
+### New widget: the accordion
+
+The accordion also becomes a **widget**, offered by `text_images` and both form
+blocks: questions beside a text, beside a form, beside a picture. It reuses the
+accordion's own items partial, so the native `<details>` markup, the icons and
+the surfaces are the block's rather than a copy. Three settings - the questions,
+the icon, whether one answer closes the others - and the defaults for the rest.
+
+The accordion block does not offer it, its split zone already sitting beside an
+accordion.
+
 ### New block field: highlight the figures (key figures)
 
 The counter of a key figure took the paragraph colour while the label under it

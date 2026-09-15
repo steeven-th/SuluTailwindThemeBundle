@@ -39,7 +39,7 @@ panel around it:
 | Class | Role |
 |-------|------|
 | `.iw-block-form__widget` | Stable hook on the widget wrapper. Always present in `--split`. |
-| `.iw-widget--text` / `--image` / `--video` / `--location` | Set by the shared widget partial according to the kind. |
+| `.iw-widget--text` / `--image` / `--video` / `--location` / `--accordion` | Set by the shared widget partial according to the kind. |
 | `.iw-block-form__image` | The `<img>` inside `--image`. |
 | `.iw-block-form__map-wrap` | Wrapper around the Leaflet map (carries the `imageRadius` class + `overflow-hidden`; theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-form__map` | The map container inside `--location` (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |

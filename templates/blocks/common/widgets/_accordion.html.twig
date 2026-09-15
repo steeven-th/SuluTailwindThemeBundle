@@ -1,0 +1,30 @@
+{# Widget: collapsible questions beside the block's own zone.
+
+   The markup is the accordion block's own, included rather than copied, so the
+   native details/summary accessibility, the icon set and the surfaces stay in
+   one place. What differs is only what a widget cannot know: it carries no
+   heading level choice (h3, the default, is right under a block title) and no
+   FAQ schema, which belongs to a page's dedicated FAQ rather than to a panel
+   sitting beside something else.
+
+   The wrapper repeats the block's own classes, `iw-block-accordion` included:
+   that is what the stylesheet and the theme variants paint, so a widget
+   accordion reads exactly like the block. #}
+{% if items is defined and items is iterable and items is not empty %}
+    {% set baseId = iw_sulu_tailwind_theme_unique_id('accordion-widget') %}
+    {% set groupName = (singleOpen|default(false)) ? baseId : '' %}
+
+    <div class="iw-widget__accordion iw-block-accordion iw-block-accordion--list iw-accordion--icon-right"
+         data-controller="accordion"
+         data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
+    >
+        {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_items.html.twig' with {
+            items: items,
+            baseId: baseId,
+            groupName: groupName,
+            itemTitleTag: 'h3',
+            iconStyle: iconStyle|default('chevron'),
+            headerSurface: 'paragraph'
+        } only %}
+    </div>
+{% endif %}

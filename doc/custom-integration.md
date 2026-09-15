@@ -314,8 +314,8 @@ of spacing, radius and background.
 ### The widget zone
 
 A block pairing content with a second zone lets the editor choose what that zone
-holds: images, a video, a map or a text panel. The zone is a Sulu **block type**,
-not a select with conditions:
+holds: images, a video, a map, a text panel or an accordion. The zone is a Sulu
+**block type**, not a select with conditions:
 
 ```xml
 <block name="widget" default-type="image" minOccurs="1" maxOccurs="1">
@@ -337,7 +337,17 @@ here, three levels deep for one field. A block type carries the choice itself,
 and the conditions left are between siblings.
 
 **Each block composes its own catalogue.** Offering a kind costs an include, so
-a block offers what makes sense for it and nothing else.
+a block offers what makes sense for it and nothing else. The accordion widget
+shows what that buys: `text_images` and both form blocks offer it, while the
+accordion block in its `--split` style does not, its zone already sitting beside
+an accordion. Restricting by composition costs an include left out; restricting
+by condition would cost a matrix.
+
+**A widget can reuse a block's own markup.** The accordion widget includes
+`blocks/accordion/_items.html.twig`, the same partial the four accordion styles
+use, so the native `<details>` accessibility, the icons and the surfaces have
+one home. A widget that renders something a block already renders should include
+it rather than restate it.
 
 **Two shapes at render time.** A `maxOccurs="1"` block is stored as a one-item
 list but reaches the template as the item itself, so `widget|first` returns the

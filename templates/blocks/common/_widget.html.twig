@@ -44,6 +44,12 @@
                 location: item.location|default(null),
                 imageRadius: imageRadius|default('')
             } only %}
+        {% elseif kind == 'accordion' %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/common/widgets/_accordion.html.twig' with {
+                items: item.items|default([]),
+                iconStyle: item.iconStyle|default('chevron'),
+                singleOpen: item.singleOpen|default(false)
+            } only %}
         {% elseif kind == 'text' %}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/widgets/_text.html.twig' with {
                 text: item.text|default(''),

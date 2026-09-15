@@ -71,6 +71,8 @@
                                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
                         <xi:include href="../fragments/widgets/location.xml"
                                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                        <xi:include href="../fragments/widgets/accordion.xml"
+                                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
                     </types>
                 </block>
 

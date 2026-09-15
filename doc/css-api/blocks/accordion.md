@@ -194,3 +194,29 @@ The whole animation sits inside `@media (prefers-reduced-motion: no-preference)`
 }
 ```
 
+
+---
+
+## The accordion as a widget
+
+The same questions can be rendered as the second zone of another block, through
+the shared widget catalogue: `text_images` and both form blocks offer an
+**Accordion** widget. It reuses `blocks/accordion/_items.html.twig`, so the
+markup contract above holds there too, native `<details>` included.
+
+It carries three settings of its own - the questions, the icon and whether one
+answer closes the others - and takes the defaults for the rest: heading level
+`h3`, paragraph surface, no FAQ schema. The wrapper repeats the block classes:
+
+```html
+<div class="iw-widget iw-widget--accordion ...">
+    <div class="iw-widget__accordion iw-block-accordion iw-block-accordion--list iw-accordion--icon-right">
+```
+
+That repetition is deliberate: `.iw-block-accordion` is what the stylesheet and
+the theme variants paint, so a widget accordion needs no rule of its own and
+cannot drift from the block. Target `.iw-widget__accordion` to style only the
+widget form of it.
+
+The accordion block does not offer this widget in its `--split` style: the zone
+already sits beside an accordion.

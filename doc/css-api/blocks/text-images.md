@@ -36,7 +36,7 @@ Text + image block with seven layout styles selectable from the admin. The block
 | Class | Role |
 |-------|------|
 | `.iw-widget__image-wrap` | Wrapper around the images of the `--image` widget. Carries the block's **Image radius** class and clips to it, the way `.iw-widget__video-wrap` and `.iw-widget__map-wrap` do for their own kinds. |
-| `.iw-widget` / `.iw-widget--image` / `--video` / `--location` / `--text` | The media zone, whatever the editor put in it. The zone is a shared widget since 3.0.0, so a video, a map or a text panel can stand where the images used to. See [custom-integration.md](../../custom-integration.md#the-widget-zone). |
+| `.iw-widget` / `.iw-widget--image` / `--video` / `--location` / `--text` / `--accordion` | The media zone, whatever the editor put in it. The zone is a shared widget since 3.0.0, so a video, a map or a text panel can stand where the images used to. See [custom-integration.md](../../custom-integration.md#the-widget-zone). |
 | `.iw-widget__video-wrap` / `.iw-widget__video` | The video frame, embedded or hosted. With a preview image it becomes a facade: the frame loads on click, so nothing reaches the platform before that. |
 | `.iw-block-text-images__image` | The `<img>` background in `--hero-banner` and `--overlay` (positioned `absolute inset-0 w-full h-full object-cover`). |
 | `.iw-block-text-images__bg-overlay` | Dark overlay above the background image. Default color is `rgb(0 0 0 / 0.6)`. In `--overlay`, paired with sub-modifiers `--mobile` (uniform on `<lg`) and `--gradient` (directional gradient on `lg+`). |
