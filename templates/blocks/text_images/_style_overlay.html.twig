@@ -151,8 +151,13 @@
                     } only %}
 
                     {% if text is defined and text is not empty %}
-                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}
+                        <div class="iw-block__text iw-block-text-images__text prose prose-invert max-w-none{% if hasParagraphBg %} {{ paragraphRadiusClass }}{% endif %}">
+                            {{ text|raw }}
+                        </div>
+                    {% endif %}
 
+                    {# Buttons close the zone, under the text, as in every other
+                       text/images style. #}
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
                         buttons: ctaButtons|default([]),
                         buttonsView: ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [],
@@ -160,10 +165,6 @@
                         direction: ctaDirection|default('row'),
                         titleAlignment: titleAlignment|default('left')
                     } only %}
-" style="margin-block: 0;">
-                            {{ text|raw }}
-                        </div>
-                    {% endif %}
                 </div>
             </div>
 

@@ -2948,6 +2948,22 @@ img.object-cover {
     --iw-split-gap: var(--iw-block-text-images-gap, var(--iw-blocks-gap, 1.5rem));
 }
 
+/* The rich text of a text/images zone carries no vertical margin of its own.
+   Its zone already spaces the title, the text and the buttons, so the 1rem the
+   paragraph surface adds around `.iw-block__text` doubles that rhythm and
+   pushes the text off the vertical centre of the zone.
+
+   The class is tripled to reach (0,3,0): the rule it answers is
+   `.iw-variant--N .iw-block__text` (0,2,0), emitted by ThemeCompiler into a
+   stylesheet loaded after this one, so equal specificity would lose. The five
+   templates used to carry `style="margin-block: 0"` instead - which is what an
+   inline style is always for, winning a cascade fight, and is also how a
+   half-finished edit managed to break one of them out of an unclosed
+   attribute. */
+.iw-block-text-images__text.iw-block-text-images__text.iw-block-text-images__text {
+    margin-block: 0;
+}
+
 /* Spacing between the images inside the mosaic - a grid of images, so it
    follows the site-wide image gap rather than the split-zones gap. The editor
    can override it per block (Content > Image spacing). */
