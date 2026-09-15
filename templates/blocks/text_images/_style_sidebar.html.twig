@@ -67,6 +67,15 @@
 {% set sectionMaxWidthClass = (lateralMode == 'exterior') ? maxWidthClass : '' %}
 {% set innerWrapperClass = ((lateralMode == 'interior') ? 'container mx-auto ' : '') ~ ((lateralMode == 'exterior') ? '' : maxWidthClass) %}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
+{#- The border of the same surface is a separate answer: a filled block with
+    no outline and an outlined block with no fill are both common asks. -#}
+{% set borderAttr = (showBlockBorder ?? true) ? 'data-has-border="true"' : '' %}
+{#- Content surface, background and border. Carried by the wrapper it paints
+    on, so the stylesheet can hang each half off its own attribute. Turning
+    both off takes the padding of that surface with them: it has none of its
+    own, so the only question it answers is whether the surface exists. -#}
+{% set contentSurfaceAttrs = ((showContentBackground ?? true) ? ' data-content-bg="true"' : '')
+    ~ ((showContentBorder ?? true) ? ' data-content-border="true"' : '') %}
 
 {# Block radius: only in exterior mode. #}
 {% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
@@ -91,6 +100,7 @@
 <section
     class="block iw-block-text-images iw-block-text-images--sidebar iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }}"
     {{ bgAttr|raw }}
+    {{ borderAttr|raw }}
     data-controller="lightbox"
 >
     {% if innerWrapperClass|trim %}
@@ -109,7 +119,7 @@
         {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'stretch') %}
         <div class="iw-block-text-images__grid iw-split-gap iw-split-cols {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}{{ isRight ? ' iw-split-cols--reverse' : '' }}">
             {# Main text area — 3/5 = 60% #}
-            <div class="iw-block__content iw-block-text-images__content{{ isRight ? ' md:order-2' : ' md:order-1' }}">
+            <div class="iw-block__content iw-block-text-images__content{{ isRight ? ' md:order-2' : ' md:order-1' }}"{{ contentSurfaceAttrs|raw }}>
                 {% if text is defined and text is not empty %}
                     <div class="iw-block__text iw-block-text-images__text prose max-w-none {{ paragraphRadiusClass }}" style="margin-block: 0;">
                         {{ text|raw }}

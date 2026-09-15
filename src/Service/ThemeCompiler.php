@@ -3192,12 +3192,13 @@ class ThemeCompiler
                 $css .= "}\n";
             }
 
-            // Block surface border. Unlike the background it does NOT hang off
-            // `[data-has-bg]`: an outlined block with no fill is a common ask,
-            // and tying the two would make it unreachable.
+            // Block surface border. It hangs off an attribute of its own, not
+            // off `[data-has-bg]`: an outlined block with no fill is a common
+            // ask, and so is a filled block with no outline, so tying the two
+            // would make one of them unreachable.
             $blockBorder = trim($this->resolveColorValue((string) ($props['blockBorder'] ?? '')));
             if ('' !== $blockBorder) {
-                $css .= ".iw-variant--{$index} {\n";
+                $css .= ".iw-variant--{$index}[data-has-border=\"true\"] {\n";
                 $css .= "  border: var(--iw-variant-block-border-width, 1px) solid {$blockBorder};\n";
                 $css .= "}\n";
             }
@@ -3211,20 +3212,34 @@ class ThemeCompiler
             // and list colors of the variant already cover its text, and they
             // are more specific: a color here would have painted almost
             // nothing while looking like it should paint everything.
+            //
+            // Background and border are emitted as two rules rather than one,
+            // each behind the attribute the block sets for it, so that either
+            // half can be switched off from the block settings without taking
+            // the other with it.
+            //
+            // The padding is repeated in both, which is deliberate. It belongs
+            // to whichever half is still painting: a border with the text
+            // against it is as bad as a background, and the two rules carry the
+            // same declaration, so an overlap costs nothing. Written once in a
+            // rule of its own it would either survive both halves being off, or
+            // need a third selector to say what these two already say.
             $contentBg = trim($this->resolveColorValue((string) ($props['contentBg'] ?? '')));
             $contentBorder = trim($this->resolveColorValue((string) ($props['contentBorder'] ?? '')));
-            if ('' !== $contentBg || '' !== $contentBorder) {
-                $css .= ".iw-variant--{$index} .iw-block__content {\n";
-                if ('' !== $contentBg) {
-                    $css .= "  background-color: {$contentBg};\n";
-                }
-                if ('' !== $contentBorder) {
-                    $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
-                }
-                // Inside this rule, so it only applies where the surface paints
-                // something. Unconditional, it would move every block of every
-                // existing site, including those with no content surface at all.
-                $css .= "  padding: var(--iw-surface-content-padding-y, 1.5rem) var(--iw-surface-content-padding-x, 1.5rem);\n";
+            // Inside these rules, so padding only applies where the surface
+            // paints something. Unconditional, it would move every block of
+            // every existing site, including those with no content surface.
+            $contentPadding = "  padding: var(--iw-surface-content-padding-y, 1.5rem) var(--iw-surface-content-padding-x, 1.5rem);\n";
+            if ('' !== $contentBg) {
+                $css .= ".iw-variant--{$index} .iw-block__content[data-content-bg=\"true\"] {\n";
+                $css .= "  background-color: {$contentBg};\n";
+                $css .= $contentPadding;
+                $css .= "}\n";
+            }
+            if ('' !== $contentBorder) {
+                $css .= ".iw-variant--{$index} .iw-block__content[data-content-border=\"true\"] {\n";
+                $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
+                $css .= $contentPadding;
                 $css .= "}\n";
             }
 

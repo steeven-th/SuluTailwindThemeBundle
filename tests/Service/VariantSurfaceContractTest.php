@@ -255,16 +255,25 @@ final class VariantSurfaceContractTest extends TestCase
     /**
      * The block border does not depend on the block having a background.
      *
-     * An outlined block with no fill is a common ask, and the background hangs
-     * off `[data-has-bg]`, so tying them would make it unreachable.
+     * An outlined block with no fill is a common ask, and so is a filled block
+     * with no outline. Each hangs off its own attribute, so switching one off
+     * in the block settings leaves the other alone. Sharing `[data-has-bg]`
+     * would make one of the two unreachable.
      */
     #[Test]
     public function theBlockBorderDrawsWithoutABackground(): void
     {
         $css = $this->compile(['blockBorder' => '#abcdef']);
 
-        self::assertStringContainsString('#abcdef', $css);
-        self::assertStringNotContainsString('data-has-bg="true"', self::ruleFor($css, '.iw-variant--test {'));
+        $rule = self::ruleFor($css, '.iw-variant--test[data-has-border="true"] {');
+        self::assertStringContainsString('#abcdef', $rule);
+        self::assertStringNotContainsString(
+            'data-has-bg="true"',
+            $css,
+            'A variant with a border and no background must emit no background rule at all: '
+            . 'the border hanging off that attribute would make an outlined block with no '
+            . 'fill unreachable.',
+        );
     }
 
     /**

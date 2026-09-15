@@ -37,6 +37,15 @@
 {% set mbClass = marginBottom|default('mb-0') %}
 
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
+{#- The border of the same surface is a separate answer: a filled block with
+    no outline and an outlined block with no fill are both common asks. -#}
+{% set borderAttr = (showBlockBorder ?? true) ? 'data-has-border="true"' : '' %}
+{#- Content surface, background and border. Carried by the wrapper it paints
+    on, so the stylesheet can hang each half off its own attribute. Turning
+    both off takes the padding of that surface with them: it has none of its
+    own, so the only question it answers is whether the surface exists. -#}
+{% set contentSurfaceAttrs = ((showContentBackground ?? true) ? ' data-content-bg="true"' : '')
+    ~ ((showContentBorder ?? true) ? ' data-content-border="true"' : '') %}
 
 {# Block radius: applied from sm: breakpoint only (edge-to-edge on mobile). #}
 {% set blockRadiusClass = iw_sulu_tailwind_theme_radius_class('card', blockRadius|default('')) %}
@@ -69,6 +78,7 @@
 <section
     class="block iw-block-text-images iw-block-text-images--hero-banner {{ variantClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} relative overflow-hidden"
     {{ bgAttr|raw }}
+    {{ borderAttr|raw }}
 >
     {# Background image — covers the entire section (focus-point aware) #}
     {% if heroImageId %}
@@ -89,7 +99,7 @@
     {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
     <div class="iw-block-text-images__content-wrap relative z-10 {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
         <div class="container mx-auto {{ maxWidthClass }}">
-            <div class="iw-block__content iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white">
+            <div class="iw-block__content iw-block-text-images__content min-h-[300px] md:min-h-[400px] flex flex-col items-center justify-center text-center text-white"{{ contentSurfaceAttrs|raw }}>
                 <div class="max-w-4xl mx-auto">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                         title: title|default(''),

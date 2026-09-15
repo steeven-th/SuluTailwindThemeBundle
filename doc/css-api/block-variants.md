@@ -22,7 +22,10 @@ The **slug is stable** on purpose: a variant's user-facing label can change with
 | Class | Role |
 |-------|------|
 | `.iw-variant--{slug}` | Root selector applied to every block using this variant. Sets the per-variant custom properties listed below. |
-| `.iw-variant--{slug}[data-has-bg="true"]` | Applies the variant background color when the block's "Show background" toggle is on. |
+| `.iw-variant--{slug}[data-has-bg="true"]` | Applies the variant background colour, when the block keeps its **Block background** switch on. |
+| `.iw-variant--{slug}[data-has-border="true"]` | Applies the variant block border, when the block keeps its **Block border** switch on. |
+| `.iw-block__content[data-content-bg="true"]` | Applies the content surface background, when the block keeps its **Content background** switch on. |
+| `.iw-block__content[data-content-border="true"]` | Applies the content surface border, when the block keeps its **Content border** switch on. |
 
 ---
 
@@ -149,7 +152,7 @@ Additionally:
   element **not** listed in the table below therefore inherits the *heading* color,
   which is rarely what you want for body content — add it to the paragraph rule
   rather than leaving it to inherit.
-- `background-color` is applied via the `[data-has-bg="true"]` selector — only when the **Show background** checkbox is checked
+- `background-color` is applied via the `[data-has-bg="true"]` selector, only when the **Block background** checkbox is checked. The block border, the content background and the content border each hang off an attribute of their own, in the same way
 
 The compiler also injects per-variant form variables (`--form-bg`, `--form-text`, `--form-label`, `--form-border`, `--form-border-focus`, `--form-border-error`, `--form-placeholder`) when the variant defines them. See [`forms.md`](./forms.md) for the form API.
 
@@ -250,8 +253,8 @@ construction rather than by manual tuning.
 
 | Surface | Painted on | Notes |
 |---|---|---|
-| Block | `.iw-variant--{slug}` | Background hangs off `[data-has-bg]`, the border does not: an outlined block with no fill is a normal thing to want |
-| Content | `.iw-block__content` | Everything the block holds, title included. Only visible where the block has padding. Carries no text color: the title, subtitle and paragraph colors already cover its text, and are more specific |
+| Block | `.iw-variant--{slug}` | Background hangs off `[data-has-bg]` and the border off `[data-has-border]`, never the same one: an outlined block with no fill and a filled block with no outline are both normal things to want |
+| Content | `.iw-block__content` | Everything the block holds, title included. Background and border hang off `[data-content-bg]` and `[data-content-border]`. Carries no text colour: the title, subtitle and paragraph colours already cover its text, and are more specific |
 | Paragraph | `.iw-block__text` | The rich-text area. See the section below |
 | Accent | *(no rule of its own)* | Published for whatever puts an element forward, such as a highlighted card. Deliberately not applied to every block |
 
@@ -270,6 +273,42 @@ from `_block_wrapper`, which always opens it - it used to appear only when it
 carried the container or the max-width cap, and a target that comes and goes
 cannot be styled. Six `text_images` styles build their own `<section>` and carry
 the class themselves. A contract test refuses a style that has neither.
+
+### Switching a surface off from the block
+
+A variant proposes, a block disposes. **Settings > Backgrounds and borders**
+holds four checkboxes, all on by default, and each drops one half of one
+surface:
+
+| Checkbox | Property | Drops |
+|---|---|---|
+| Block background | `showBackground` | `[data-has-bg]`, so the block background |
+| Block border | `showBlockBorder` | `[data-has-border]`, so the block border |
+| Content background | `showContentBackground` | `[data-content-bg]` |
+| Content border | `showContentBorder` | `[data-content-border]` |
+
+They are switches over what is painted, not new colours: a site keeps its
+variants, and an editor who wants one block lighter than the rest no longer has
+to duplicate a variant to get it.
+
+**The padding of the content surface goes with the surface.** Turn both of its
+switches off and the padding leaves too, because that surface has no padding of
+its own to fall back on, only a theme token. The block is the opposite case: its
+padding comes from its own fields, the editor sets it per block, so it never
+follows the background or the border. A block with no fill keeps its spacing.
+
+Published content carries none of these keys, and every one of them reads as on
+when absent, so nothing moves on an existing site until an editor unticks a box.
+
+The paragraph and accent surfaces have no switches. The paragraph exists on five
+blocks out of sixteen and the accent on two, so the checkboxes would do nothing
+on every other block, and a checkbox that does nothing teaches editors that our
+settings are broken. The accent one would also let a page be published with its
+text unreadable, which is the single thing that surface exists to prevent.
+
+A project composing its own blocks includes `block-surfaces.xml` and carries the
+attributes on its markup. Extending `blocks/common/_block_wrapper.html.twig`
+does both at once.
 
 ## Which surface paints what
 
@@ -406,6 +445,9 @@ The bundle provides `@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.h
     lateralMargins: block.lateralMargins|default('exterior'),
     blockRadius: block.blockRadius|default(''),
     showBackground: block.showBackground|default(true),
+    showBlockBorder: block.showBlockBorder|default(true),
+    showContentBackground: block.showContentBackground|default(true),
+    showContentBorder: block.showContentBorder|default(true),
     paragraphRadius: block.paragraphRadius|default(''),
     maxWidth: block.maxWidth|default(''),
 } %}

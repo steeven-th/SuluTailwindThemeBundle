@@ -1042,3 +1042,49 @@ colours. To keep the old look:
 A rich text widget inside that panel no longer paints the surface a second
 time: the panel carries it, so the widget would have drawn a smaller rectangle
 of the same colour floating in the middle of it.
+
+## A block can drop the background or the border of its variant (new)
+
+Only one half of one surface could be switched off from a block: **Couleur de
+fond**, which dropped the block background and nothing else. The block border,
+and both halves of the content surface, were whatever the variant said. A site
+that wanted one block without the thin outline its variant draws had to
+duplicate the variant, which is how a palette of four colours turns into eight
+entries that must be kept in step by hand.
+
+**Settings > Backgrounds and borders** now holds four checkboxes, all on by
+default:
+
+| Checkbox | Property | What it drops |
+|---|---|---|
+| Fond du bloc | `showBackground` | The block background (unchanged, renamed) |
+| Bordure du bloc | `showBlockBorder` | The block border |
+| Fond du contenu | `showContentBackground` | The content surface background |
+| Bordure du contenu | `showContentBorder` | The content surface border |
+
+The old label said "Couleur de fond" without saying which of the four surfaces
+it meant. It now says "Fond du bloc", and the three new ones follow the wording
+already used by the variant editor.
+
+The block `text` gained the group with the others. It was the only block with a
+block radius and no background switch, so its surface was painted whether the
+editor wanted it or not.
+
+**Migration.** Nothing to change in your content: published pages carry none of
+these keys and every one of them reads as on when absent, so a site renders
+exactly as before until an editor unticks a box. Recompile the themes
+(`php bin/console iw-sulu:theme:compile`), since the block border and the
+content surface now hang off attributes the previous stylesheets do not know:
+without it the new checkboxes do nothing.
+
+**Custom blocks.** A block that builds its own `<section>` instead of extending
+`blocks/common/_block_wrapper.html.twig` must carry `data-has-bg`,
+`data-has-border` on the section and `data-content-bg`, `data-content-border` on
+its `.iw-block__content`, or the surfaces they gate stop painting on it. A
+contract test checks the blocks of the bundle, not yours.
+
+**Turning both content switches off also removes the padding of that surface.**
+It has none of its own, only a theme token, so the only question it can answer
+is whether the surface exists at all. The padding of the block itself never
+follows: the editor sets it field by field, and a block with no fill keeps its
+spacing.

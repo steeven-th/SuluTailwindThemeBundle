@@ -44,6 +44,15 @@
 
 {% set sectionContainerClass = (lateralMode == 'exterior') ? 'container mx-auto' : '' %}
 {% set bgAttr = (showBackground ?? true) ? 'data-has-bg="true"' : '' %}
+{#- The border of the same surface is a separate answer: a filled block with
+    no outline and an outlined block with no fill are both common asks. -#}
+{% set borderAttr = (showBlockBorder ?? true) ? 'data-has-border="true"' : '' %}
+{#- Content surface, background and border. Carried by the wrapper it paints
+    on, so the stylesheet can hang each half off its own attribute. Turning
+    both off takes the padding of that surface with them: it has none of its
+    own, so the only question it answers is whether the surface exists. -#}
+{% set contentSurfaceAttrs = ((showContentBackground ?? true) ? ' data-content-bg="true"' : '')
+    ~ ((showContentBorder ?? true) ? ' data-content-border="true"' : '') %}
 
 {# Block radius: only in exterior mode.
    Applied from sm: breakpoint only (edge-to-edge on mobile). #}
@@ -104,6 +113,7 @@
 <section
     class="block iw-block-text-images iw-block-text-images--split-screen iw-block-text-images--lateral-mode-{{ lateralMode }} {{ variantClass }} {{ sectionContainerClass }} {{ mtClass }} {{ mbClass }} {{ radiusClasses }} overflow-hidden"
     {{ bgAttr|raw }}
+    {{ borderAttr|raw }}
     data-controller="lightbox"
 >
     {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
@@ -213,7 +223,7 @@
            the column is then centered inside its half rather than pushed
            against the image, `.iw-block-maxw` owning both margins. #}
         {% set maxWidthClass = iw_sulu_tailwind_theme_max_width_class(maxWidth|default(''), type|default(''), style|default('')) %}
-        <div class="iw-block__content iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}">
+        <div class="iw-block__content iw-block-text-images__content {{ contentMobileOrder }} {{ isRight ? 'lg:order-2' : 'lg:order-1' }} flex items-center {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }}"{{ contentSurfaceAttrs|raw }}>
             <div class="w-full max-w-2xl{{ isRight ? ' ml-auto' : '' }} {{ maxWidthClass }}">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                     title: title|default(''),
