@@ -190,6 +190,20 @@
                     </params>
                 </property>
 
+                <!-- Space between a button's pictogram and its label. Each
+                     button can override it from its own Icon / text spacing
+                     field. -->
+                <property name="defaults_buttonIconGap" type="iw_theme_margin_selector" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.defaults_buttonIconGap</title>
+                        <info_text>iw_sulu_tailwind_theme.defaults_buttonIconGap_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="prefix" value="gap"/>
+                        <param name="default_value" value="gap-2"/>
+                    </params>
+                </property>
+
                 <!-- Spacing inside the component grids that are not article
                      cards (accordion, documents, linked pages, testimonials,
                      key figures). Article card grids follow the card spacing

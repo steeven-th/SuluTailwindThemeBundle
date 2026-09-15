@@ -163,6 +163,7 @@ class ThemeAdmin extends Admin
             ['key' => 'list', 'label' => 'iw_sulu_tailwind_theme.style.list'],
             ['key' => 'cards', 'label' => 'iw_sulu_tailwind_theme.style.cards'],
             ['key' => 'bordered', 'label' => 'iw_sulu_tailwind_theme.style.bordered'],
+            ['key' => 'split', 'label' => 'iw_sulu_tailwind_theme.style.split'],
         ],
         'iframe' => [
             ['key' => 'default', 'label' => 'iw_sulu_tailwind_theme.style.default'],

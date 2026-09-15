@@ -821,6 +821,95 @@ gains the separator, the variant separator mode and this gap. Its subtitle is
 unaffected, it remains the attribution printed under the quote.
 `BlockTitleSeparatorContractTest` now holds the rule and the two exemptions.
 
+### Fixed: the image widget ignored the block's image radius
+
+**Image radius** reached the image widget and stopped there. It was handed to
+the slider, which owns no radius on purpose and expects the calling template to
+wrap and clip it - and the widget wrapped nothing. The video and the map widgets
+each had their wrapper, so the setting worked on every kind except images, on
+`text_images` and both form blocks alike.
+
+The images now sit in `.iw-widget__image-wrap`, which carries the class and
+clips to it, for a single image as for a carousel. `WidgetContractTest` now
+fails any widget handed a radius that puts it nowhere.
+
+### Pictograms move onto the shared picker (breaking, migration provided)
+
+Cards, timeline steps and key figures carried a pictogram long before the theme
+had an icon library, each through a media field of its own: `icon` on a card,
+`icon` on a step, `image` on a key figure. Those names are now the shared ones,
+where `icon` holds a library name and `iconMedia` holds a media.
+
+**Run the migration once, on every environment holding content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-icons --dry-run
+php bin/console iw-sulu:theme:migrate-icons
+php bin/console cache:pool:clear cache.app
+```
+
+It moves each stored media to `iconMedia` and turns `iconCustom` on, so the
+block keeps showing the editor's own file. It can be run twice - a pictogram
+already moved is left alone. Without it, a stored media sits under a field now
+read as an icon name, and no pictogram is rendered.
+
+In exchange, those three blocks gain what the buttons have: the theme library,
+a size, and - where it makes sense - a side and a spacing.
+
+**One rendering changes.** A media SVG used to be shown as it is, and still is
+everywhere except on buttons, where it is masked and takes the colour of the
+label. A library icon on a card, a step or a figure takes the variant's
+highlight colour, the one already colouring the marked words of a title.
+
+### New theme setting: the marker pictogram
+
+**Components > Maps** gains an icon picker beside the marker colour and the
+marker media. A media still wins over it. The map controller reads the SVG from
+a `<template>` rather than an attribute.
+
+### New: an icon library, and pictograms on buttons
+
+The theme now ships [Heroicons](https://heroicons.com/) 2.2.0 under MIT, 324
+icons in two weights, offered through Sulu's own icon overlay with search. No
+configuration is needed: the bundle registers the sets itself.
+
+Buttons are the first to use it. A call-to-action can carry a pictogram, taken
+from that library or from the media library, placed left or right of the label,
+with its own size and spacing. Nothing changes on existing buttons - the fields
+are empty and no icon is printed.
+
+The icons paint themselves with `currentColor`, so one icon reads correctly on
+every button style without a colour setting. A media icon follows the same rule
+when it is an SVG; a bitmap is shown as it is, since masking a logo would turn
+it into a silhouette.
+
+Two site-wide settings come with it: **Defaults > Button icon / text spacing**,
+and the per-button override beside it. Render an icon anywhere with
+`iw_sulu_tailwind_theme_icon()`, see
+[`twig-reference.md`](./css-api/../twig-reference.md).
+
+### New accordion style: split
+
+The accordion gains a fourth style, **Split**: the questions in one column of
+the shared split grid, a widget in the other - a text, a picture, a video or a
+map, the same catalogue the form block offers. It comes with the settings that
+go with two zones (which side the questions take, the width share, the vertical
+alignment, the media radius) and writes no CSS of its own, the two-zone layout
+being shared with `text_images`, `form` and `location`.
+
+A pure addition: no existing block changes.
+
+### New widget: the accordion
+
+The accordion also becomes a **widget**, offered by `text_images` and both form
+blocks: questions beside a text, beside a form, beside a picture. It reuses the
+accordion's own items partial, so the native `<details>` markup, the icons and
+the surfaces are the block's rather than a copy. Three settings - the questions,
+the icon, whether one answer closes the others - and the defaults for the rest.
+
+The accordion block does not offer it, its split zone already sitting beside an
+accordion.
+
 ### New block field: highlight the figures (key figures)
 
 The counter of a key figure took the paragraph colour while the label under it

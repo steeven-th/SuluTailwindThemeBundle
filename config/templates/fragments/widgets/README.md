@@ -27,5 +27,11 @@ offers the map and nothing else, so it stays the map block rather than becoming
 another `text_images`. Restricting by composition costs one include, restricting
 by condition would cost a matrix.
 
+**Why a block composes its own catalogue, again.** The accordion widget is the
+clearest case: `text_images` and the two form blocks offer it, the accordion
+block in its split style does not. Its zone already sits beside an accordion,
+and questions beside questions is the one arrangement that block cannot need.
+That exclusion costs an include left out, not a condition.
+
 Render them through `blocks/common/_widget.html.twig`, which dispatches on the
 type the editor picked.

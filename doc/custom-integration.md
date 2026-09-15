@@ -311,11 +311,119 @@ for content that is already published.
 Order inside `settings`: the block's own settings first, then the shared group
 of spacing, radius and background.
 
+### The icon library
+
+The theme ships [Heroicons](https://heroicons.com/) 2.2.0 under MIT, in two
+weights of the same 324 icons, under `assets/icons/heroicons/24/{outline,solid}`.
+
+**Offering the picker in your own template.** The field is Sulu's own, pointed
+at one of the two sets the bundle registers:
+
+```xml
+<property name="icon" type="single_icon_selection" colspan="6">
+    <meta><title>iw_sulu_tailwind_theme.icon</title></meta>
+    <params>
+        <param name="icon_set" value="iw_theme_outline"/>
+    </params>
+</property>
+```
+
+Render what it stores with `iw_sulu_tailwind_theme_icon()`, see
+[`twig-reference.md`](./twig-reference.md).
+
+**Why the icons are committed rather than installed.** The admin reads them from
+disk through Sulu's `svg://` provider, so a project installing the theme with
+composer has to get them - without a node toolchain anywhere near its production
+server. Updating them is therefore deliberate:
+
+```bash
+npm pack heroicons && tar -xzf heroicons-*.tgz
+php bin/console iw-sulu:theme:sync-icons --source=package --dry-run
+```
+
+**Using your own icons instead.** Register another set the same way the bundle
+does, in your own bundle or in `config/packages/sulu_admin.yaml`:
+
+```yaml
+sulu_admin:
+    icon_sets:
+        my_icons: 'svg://%kernel.project_dir%/assets/icons'
+```
+
+Anything in that directory shows up in the overlay. Icons painting themselves
+with `currentColor` follow the text like the bundled ones; icons with hard-coded
+colours keep them.
+
+---
+
+### The pictogram of a block element
+
+A card, a timeline step, a key figure and a call-to-action button all carry a
+pictogram the same way, through two shared fragments and one partial:
+
+```xml
+<xi:include href="../fragments/icon-picker.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+<!-- Only where the pictogram sits in line with a label -->
+<xi:include href="../fragments/icon-placement.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+```
+
+```twig
+{% set iconOutput %}
+    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        item: card,
+        class: 'iw-card__icon-img'
+    } only -%}
+{% endset %}
+
+{% if iconOutput|trim is not empty %}
+    <span class="iw-card__icon">{{ iconOutput }}</span>
+{% endif %}
+```
+
+Capture the output before deciding on a wrapper: the partial renders nothing at
+all when no pictogram was picked, so an empty slot is never opened.
+
+**Two fragments, because placement is not universal.** A pictogram beside a
+label has a side and a gap; one standing above a title has neither, and offering
+the fields there would be settings that do nothing.
+
+**Three renderings, one rule.** A library icon carries no colour of its own, so
+it takes the one it is given. A file the editor picked keeps its colours, unless
+the caller asks for `recolor` - which only a block painting its own background
+does, and only a button does today.
+
+| Source | Rendering | Colour |
+|---|---|---|
+| Theme library | inline SVG | `--iw-icon-color`, else the surrounding text |
+| Media, SVG | `<img>`, or a mask with `recolor` | its own, or the surrounding text |
+| Media, bitmap | `<img>` | its own, always |
+
+**Sizing.** The slot hands its default size down through `--iw-icon-size` and
+**declares no width of its own** - a slot holding a width lets a larger
+pictogram spill over whatever sits beside it instead of pushing it aside:
+
+```css
+.iw-card__icon {
+    --iw-icon-size: var(--iw-card-icon-size, 1.6rem);
+    --iw-icon-color: var(--iw-card-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+}
+```
+
+**Markup, not an attribute.** The icon comes back as Twig `Markup`, so it
+survives being stored in a variable without being escaped. The same property
+makes it unfit for an HTML attribute, where its own quotes close the attribute
+early. A JS controller needing the source reads it from a `<template>`, the way
+the location map hands its marker to Leaflet.
+
+---
+
 ### The widget zone
 
 A block pairing content with a second zone lets the editor choose what that zone
-holds: images, a video, a map or a text panel. The zone is a Sulu **block type**,
-not a select with conditions:
+holds: images, a video, a map, a text panel or an accordion. The zone is a Sulu
+**block type**, not a select with conditions:
 
 ```xml
 <block name="widget" default-type="image" minOccurs="1" maxOccurs="1">
@@ -337,7 +445,17 @@ here, three levels deep for one field. A block type carries the choice itself,
 and the conditions left are between siblings.
 
 **Each block composes its own catalogue.** Offering a kind costs an include, so
-a block offers what makes sense for it and nothing else.
+a block offers what makes sense for it and nothing else. The accordion widget
+shows what that buys: `text_images` and both form blocks offer it, while the
+accordion block in its `--split` style does not, its zone already sitting beside
+an accordion. Restricting by composition costs an include left out; restricting
+by condition would cost a matrix.
+
+**A widget can reuse a block's own markup.** The accordion widget includes
+`blocks/accordion/_items.html.twig`, the same partial the four accordion styles
+use, so the native `<details>` accessibility, the icons and the surfaces have
+one home. A widget that renders something a block already renders should include
+it rather than restate it.
 
 **Two shapes at render time.** A `maxOccurs="1"` block is stored as a one-item
 list but reaches the template as the item itself, so `widget|first` returns the

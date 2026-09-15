@@ -257,6 +257,83 @@ a:hover {
     text-align: center;
 }
 
+/* A button carrying a pictogram becomes a row, so the icon and the label sit on
+   one baseline whatever their heights. Only then: a plain button keeps the
+   inline-block the theme gives it, and its centring above.
+
+   `inline-flex` rather than `flex` so the button still shrinks to its content
+   inside the actions row, which lays the buttons out itself.
+
+   The class is doubled to reach (0,2,0). ThemeCompiler writes
+   `display: inline-block` on every `.iw-button--<name>` it generates, into a
+   stylesheet loaded after this one: a single class ties with it and loses, the
+   button stays inline-block and the icon drops onto its own line - which is
+   exactly what it did. */
+.iw-button--with-icon.iw-button--with-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--iw-button-icon-gap, 0.5rem);
+}
+
+/* The icon follows the font size of the button it sits in, so a small button
+   gets a small icon for free - but never past 24px, beyond which a pictogram
+   stops reading as a sign beside a label and starts competing with it.
+
+   `flex-shrink: 0` because a long label must eat the space, never the icon,
+   and `currentColor` is inherited - which is the whole point of inlining the
+   SVG rather than linking it. */
+/* Any pictogram of the theme, wherever it is rendered. The size follows the
+   font size of what it sits in, so a small button gets a small icon for free -
+   never past 24px, beyond which a sign starts competing with what it signs.
+   `--iw-icon-size` pins it when the editor picks a size.
+
+   `flex-shrink: 0` because a long label must eat the space, never the icon. */
+.iw-icon {
+    width: var(--iw-icon-size, min(1.25em, 24px));
+    height: var(--iw-icon-size, min(1.25em, 24px));
+    flex-shrink: 0;
+    /* A library icon carries no colour of its own, so it takes the one the
+       block hands it. Unset, that is the colour of the surrounding text, which
+       is what a button wants; a block wanting its pictograms to stand out sets
+       the variable on the slot instead. */
+    color: var(--iw-icon-color, currentColor);
+}
+
+/* A media SVG, masked so it takes the colour of the text like a library icon:
+   one file for every context instead of one file per colour. */
+.iw-icon--mask {
+    display: inline-block;
+    background-color: currentColor;
+    -webkit-mask-image: var(--iw-icon-media);
+    mask-image: var(--iw-icon-media);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* A bitmap is shown as it is: masking it would keep only its shape. */
+.iw-icon--image {
+    object-fit: contain;
+}
+
+/* On a button, the icon also answers to the button's own size variable, kept
+   for the sites that already set it. */
+.iw-button__icon {
+    width: var(--iw-button-icon-size, var(--iw-icon-size, min(1.25em, 24px)));
+    height: var(--iw-button-icon-size, var(--iw-icon-size, min(1.25em, 24px)));
+}
+
+
+/* Nothing of its own: the label is a hook for a project that wants to reach
+   the text without reaching the icon beside it. */
+.iw-button__label {
+    display: inline;
+}
+
 /* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
    masonry) stores one of these class names, and the class only feeds
    `--iw-gap-choice`: the block's own rule keeps ownership of the `gap`
@@ -1851,8 +1928,11 @@ img.object-cover {
 
 /* Shared icon wrapper */
 .iw-block-key-figures .iw-key-figure__icon {
-    width: var(--iw-key-figure-icon-size, 3rem);
-    height: var(--iw-key-figure-icon-size, 3rem);
+    --iw-icon-color: var(--iw-key-figure-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    /* Same rule as the card slot: the icon carries the size, the slot follows,
+       so a larger one takes the room it needs. */
+    --iw-icon-size: var(--iw-key-figure-icon-size, 3rem);
+    width: fit-content;
     margin-inline: auto;
     margin-bottom: var(--iw-key-figure-icon-margin-bottom, 0.75rem);
 }
@@ -2193,6 +2273,7 @@ img.object-cover {
 .iw-timeline-step__icon {
     display: flex;
     margin-bottom: 0.75rem;
+    --iw-icon-color: var(--iw-timeline-icon-color, var(--iw-variant-highlight, var(--color-accent)));
 }
 
 .iw-timeline-step__icon-img {
@@ -5651,11 +5732,48 @@ aside .iw-toc {
        ~1000) below the site header, modals and lightboxes. */
     z-index: 0;
     isolation: isolate;
+    /* A column so the canvas takes the height of this box whatever gives it
+       one: a fixed height, a min-height or an aspect ratio. A canvas in
+       height: 100% needed every ancestor to carry a resolved length, and a
+       min-height is not one - inside a grid aligned to the centre the chain
+       broke and the map measured nothing at all. */
+    display: flex;
+    flex-direction: column;
 }
 
 .iw-location-map__canvas {
     width: 100%;
-    height: 100%;
+    /* Takes what is left of the column. min-height: 0 because a flex item
+       refuses by default to go below the size of its content, and Leaflet
+       fills the canvas with absolutely positioned panes. */
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* The map column of the "map with info" style.
+
+   A map has no height of its own - Leaflet fills it with absolutely positioned
+   panes - so it always takes the height of the row, whatever the editor chose
+   for the vertical alignment of the zones. That choice keeps ruling the info
+   zone, which does have a height of its own. Centring a map only shrank it to
+   its 300px floor.
+
+   A flex column at every step rather than height: 100%, because a grid item
+   stretched by its row has no resolved height to hand down to a child. */
+.iw-block-location__map-col {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+.iw-block-location__map-col > .iw-block-location__map-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.iw-block-location__map-col .iw-location-map {
+    flex: 1 1 auto;
 }
 
 .iw-location-map .leaflet-container {
@@ -5946,14 +6064,24 @@ aside .iw-toc {
     justify-content: center;
 }
 
+/* The slot the pictogram sits in. It hands its size down through
+   `--iw-icon-size`, so the public `--iw-card-icon-size` token keeps working
+   while the icon itself is the shared component - and an editor picking a size
+   on the card still wins, that value landing on the icon itself. */
 .iw-card__icon {
     flex: 0 0 auto;
+    --iw-icon-color: var(--iw-card-icon-color, var(--iw-variant-highlight, var(--color-accent)));
     display: block;
-    width: var(--iw-card-icon-size, 1.6rem);
+    /* The slot takes the width of the icon in it, rather than setting one of
+       its own: a size picked on the card lands on the icon, and a slot holding
+       its own width would let a larger icon spill over the title beside it
+       instead of pushing it. The public token still decides the default, now by
+       way of the icon. */
+    --iw-icon-size: var(--iw-card-icon-size, 1.6rem);
 }
 
 .iw-card__head--stacked .iw-card__icon {
-    width: var(--iw-card-icon-size-stacked, 3rem);
+    --iw-icon-size: var(--iw-card-icon-size-stacked, 3rem);
 }
 
 .iw-card__title {

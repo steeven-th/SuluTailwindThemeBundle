@@ -1,0 +1,77 @@
+{# Accordion block — questions beside a widget.
+
+   The second zone holds whatever the editor picked: a text, a picture, a video
+   or a map. `contentRight` decides which side the questions take, through the
+   shared split grid: the `--reverse` modifier swaps the grid definition and the
+   order classes place each zone, so the two zones keep one DOM order and the
+   markup is written once. `ContentPositionContractTest` compares this reading
+   of the field with the other styles that offer it.
+
+   The questions come from the shared items partial, like the three other
+   styles, so the icons, the surfaces and the native details/summary
+   accessibility stay in one place. The two-zone layout is shared too, so this
+   style writes no CSS of its own. #}
+{% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
+
+{% block block_content %}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
+        title: title|default(''),
+        subTitle: subTitle|default(''),
+        titleAlignment: titleAlignment|default('left'),
+        titleTag: titleTag|default('h2'),
+        variant: variant|default(0)
+    } only %}
+
+    {% if items is defined and items is iterable %}
+        {% set baseId = iw_sulu_tailwind_theme_unique_id('accordion') %}
+        {% set groupName = (singleOpen|default(false)) ? baseId : '' %}
+
+        {# One fill setting, three states, exactly as the other styles read it. #}
+        {% set fill = headerSurface|default('paragraph') %}
+        {% set fillClass = fill == 'none'
+            ? ' iw-block-accordion--fill-none'
+            : (fill == 'accent' ? ' iw-block-accordion--headed' : '') %}
+
+        {% set isRight = contentRight|default(false) %}
+        {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '1-2') %}
+        {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'start') %}
+
+        <div class="iw-block-accordion__split iw-split-gap iw-split-cols iw-split-cols--from-lg {{ splitClass }}{{ alignClass ? ' ' ~ alignClass : '' }}{{ isRight ? ' iw-split-cols--reverse' : '' }}">
+            {# The column places the zone, the accordion inside it stays the
+               component the stylesheet and the variants paint: one class for
+               the grid slot, one for the thing in it. #}
+            <div class="iw-block-accordion__content{{ isRight ? ' lg:order-2' : ' lg:order-1' }}">
+                <div class="iw-block-accordion iw-block-accordion--split{{ fillClass }} iw-accordion--icon-{{ iconPosition|default('right') }} {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
+                     data-controller="accordion"
+                     data-accordion-single-open-value="{{ (singleOpen|default(false)) ? 'true' : 'false' }}"
+                >
+                    {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_items.html.twig' with {
+                        items: items,
+                        baseId: baseId,
+                        groupName: groupName,
+                        itemTitleTag: itemTitleTag|default('h3'),
+                        iconStyle: iconStyle|default('chevron'),
+                        headerSurface: fill
+                    } only %}
+                </div>
+            </div>
+
+            <div class="iw-block-accordion__widget-zone{{ isRight ? ' lg:order-1' : ' lg:order-2' }}">
+                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+                    widget: widget|default([]),
+                    imageFormat: 'iw_theme_4_3',
+                    aspectRatio: '4/3',
+                    imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
+                    paragraphRadius: iw_sulu_tailwind_theme_radius_class('paragraph', paragraphRadius|default('')),
+                    blockPrefix: 'iw-block-accordion'
+                } only %}
+            </div>
+        </div>
+
+        {% if faqSchema|default(false) %}
+            {% include '@ItechWorldSuluTailwindTheme/blocks/accordion/_faq_schema.html.twig' with {
+                items: items
+            } only %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

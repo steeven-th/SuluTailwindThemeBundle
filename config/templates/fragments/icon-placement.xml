@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: where a pictogram sits next to its label, and how far from it.
+
+    Only for a pictogram rendered in line with text - a button, a link. One
+    standing above a title has no side to take, and the field would be a setting
+    that does nothing.
+
+    Include it right after `icon-picker.xml`:
+
+        <xi:include href="../fragments/icon-placement.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="iconPosition" type="single_select" colspan="6"
+              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
+        <meta><title>iw_sulu_tailwind_theme.button_icon_position</title></meta>
+        <params>
+            <param name="default_value" value="right"/>
+            <param name="values" type="collection">
+                <param name="left"><meta><title>iw_sulu_tailwind_theme.position_left</title></meta></param>
+                <param name="right"><meta><title>iw_sulu_tailwind_theme.position_right</title></meta></param>
+            </param>
+        </params>
+    </property>
+    <property name="iconGap" type="iw_theme_margin_selector" colspan="12"
+              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
+        <meta>
+            <title>iw_sulu_tailwind_theme.button_icon_gap</title>
+            <info_text>iw_sulu_tailwind_theme.button_icon_gap_info</info_text>
+        </meta>
+        <params>
+            <param name="prefix" value="gap"/>
+            <param name="default_value" value=""/>
+            <param name="theme_key" value="buttonIconGap"/>
+        </params>
+    </property>
+</properties>

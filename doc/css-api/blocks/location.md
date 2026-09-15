@@ -29,6 +29,7 @@ The address card displayed in `--fullwidth` and `--map-with-info` is shared. The
 
 | Class | Role |
 |-------|------|
+| `.iw-block-location__map-col` | Map column of `--map-with-info`. Always stretched to the height of the row, whatever the "zones alignment" setting says, and hands that height down to the map. A map has no height of its own, so aligning it would only shrink it to its floor. |
 | `.iw-block-location__map-wrap` | Wrapper around the Leaflet map. Carries the `imageRadius` class + `overflow-hidden` (theme default via `iw-radius--image` when the field is empty). |
 | `.iw-block-location__map` | The map container (also carries `.iw-location-map`, see the [location map API](../transverse.md#location-map-leaflet)). |
 | `.iw-block-location__info` | Info column wrapper (rendered in `--fullwidth` and `--map-with-info`). |

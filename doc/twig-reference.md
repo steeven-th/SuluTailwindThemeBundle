@@ -19,6 +19,57 @@ Returns the web-accessible path to the compiled CSS file for the active theme.
 
 ---
 
+### `iw_sulu_tailwind_theme_icon()`
+
+Renders one icon of the theme library as inline SVG.
+
+The library is [Heroicons](https://heroicons.com/) 2.2.0, shipped with the
+bundle under MIT, in two weights of the same 324 icons. Editors pick from it
+through Sulu's icon overlay, which reads the very same files, so what is picked
+and what is rendered cannot drift apart.
+
+```twig
+{{ iw_sulu_tailwind_theme_icon('arrow-right') }}
+{{ iw_sulu_tailwind_theme_icon(iconName, 'solid', {class: 'iw-icon w-5 h-5'}) }}
+```
+
+**Parameters:**
+
+| Name | Type | Default | Purpose |
+|---|---|---|---|
+| `name` | `string\|null` | — | The icon name, as stored by the admin (e.g. `arrow-right`). |
+| `style` | `string\|null` | `outline` | The weight: `outline` or `solid`. Anything else falls back to `outline`. |
+| `attributes` | `array` | `{}` | Attributes for the `<svg>`, typically a class. An attribute already on the icon is replaced, not duplicated. |
+
+**Returns:** `string` (HTML safe) — the SVG markup, or an **empty string** when
+the icon does not exist. Nothing is rendered rather than a placeholder, so a
+page whose icon disappeared upstream keeps its layout.
+
+**Why inline rather than an `<img>` or a CSS mask.** Every Heroicon paints
+itself with `currentColor`: inlined, it takes the colour of the text around it.
+That is what makes one icon read correctly on a primary button, on a dark
+variant and inside a link, without a colour setting or a rule of its own.
+
+> The name indexes a file and comes from stored content, so it is validated
+> rather than trusted: anything that is not a plain icon name renders nothing.
+
+---
+
+### `iw_sulu_tailwind_theme_has_icon()`
+
+Whether an icon exists in the library, for a template deciding on the markup
+around it - a gap, a wrapper - without rendering it twice.
+
+```twig
+{% if iw_sulu_tailwind_theme_has_icon(iconName) %}
+    <span class="iw-button__icon">{{ iw_sulu_tailwind_theme_icon(iconName) }}</span>
+{% endif %}
+```
+
+**Returns:** `bool`
+
+---
+
 ### `iw_sulu_tailwind_theme_fonts_link()`
 
 Returns HTML `<link>` tags for Google Fonts preconnect and stylesheet.

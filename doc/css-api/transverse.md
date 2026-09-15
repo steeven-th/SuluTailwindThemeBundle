@@ -577,6 +577,40 @@ column instead, so the buttons stay attached to the copy that leads to them.
 The button label comes from the title set in the link attributes, then the
 linked page or media title, then the raw URL.
 
+### A button with a pictogram
+
+A button can carry an icon, taken from the theme library (Heroicons) or from the
+media library. It then becomes a row rather than a block of text:
+
+```html
+<a class="iw-button--primary iw-block__action iw-button--with-icon"
+   style="--iw-button-icon-gap: 1rem; --iw-button-icon-size: 32px">
+    <svg class="iw-button__icon">…</svg>
+    <span class="iw-button__label">Label</span>
+</a>
+```
+
+| Class | Role |
+|---|---|
+| `.iw-button--with-icon` | Present only when the button carries an icon. Turns it into a centred `inline-flex` row. The class is doubled in the stylesheet so it outranks the `display` the theme writes on `.iw-button--<slug>` from a stylesheet loaded later. |
+| `.iw-button__icon` | The icon itself, sized and prevented from shrinking. |
+| `.iw-button__icon--media` | An SVG from the media library, painted as a mask filled with `currentColor`. |
+| `.iw-button__icon--image` | A bitmap from the media library, shown as it is - a mask would keep only its shape and turn a logo into a silhouette. |
+| `.iw-button__label` | The text. A hook for reaching the label without reaching the icon. |
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `--iw-button-icon-gap` | theme default, `0.5rem` out of the box | Space between the icon and the label. Set site-wide under **Defaults > Button icon / text spacing**, and per button from its own field. |
+| `--iw-button-icon-size` | `min(1.25em, 24px)` | Icon size. On *Automatic* it follows the font size of the button without growing past 24px; a button can pin it to a fixed size instead. |
+
+Both are set on the element when the editor picks something, so a project
+restyling them targets `.iw-button--with-icon` and wins by proximity.
+
+**The icons paint themselves with `currentColor`**, which is why a single icon
+reads correctly on a primary button, on a dark variant and on an accent surface
+without a colour setting of its own. A media icon gets the same treatment when
+it is an SVG, through the mask.
+
 ---
 
 ## Breadcrumbs
@@ -859,9 +893,9 @@ Behavior (configured in **Theme > Components > Maps**):
 
 | Class | Role |
 |-------|------|
-| `.iw-location-map` | Root container (carries the Stimulus controller and the sizing utilities). |
+| `.iw-location-map` | Root container (carries the Stimulus controller and the sizing utilities). A flex column, so the canvas follows the height of this box wherever it comes from - a fixed height, a `min-height` or an `aspect-ratio`. Give it one: a map has no height of its own. |
 | `.iw-location-map--cooperative` | Added in `Ctrl + scroll` mode; restores `touch-action: pan-x pan-y` on the Leaflet container. |
-| `.iw-location-map__canvas` | The node Leaflet mounts into (fills the root). |
+| `.iw-location-map__canvas` | The node Leaflet mounts into (takes the remaining height of the root). |
 | `.iw-location-map__marker` | The themed SVG pin (Leaflet DivIcon). |
 | `.iw-location-map__marker--custom` | Added when a custom marker image is configured (the inner `<img>` fills the box, `object-fit: contain`). |
 | `.iw-location-map__popup` | Popup pane class (passed to `bindPopup`). |

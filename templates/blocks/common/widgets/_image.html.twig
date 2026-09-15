@@ -9,11 +9,24 @@
 {% set imageList = images|default([]) %}
 {% set imageList = imageList.ids|default(imageList) %}
 
-{% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
-    images: imageList,
-    imageFormat: imageFormat|default('iw_theme_16_9'),
-    showName: showName|default(false),
-    autoplay: true,
-    aspectRatio: aspectRatio|default('16/9'),
-    imageRadius: imageRadius|default('')
-} only %}
+{#- The radius is carried here, on a wrapper, because the slider deliberately
+    owns none: it expects the consuming template to round and clip it, which is
+    what `text_images` does with its own image wrapper. This widget had no such
+    wrapper, so "Image radius" reached the slider and stopped there - the one
+    widget of the catalogue ignoring the setting, while the video and the map
+    both honour it through a wrapper of their own.
+
+    `overflow-hidden` goes with the radius and only with it: the corners belong
+    to the frame, and the slides inside are absolutely positioned. -#}
+{% set wrapRadius = imageRadius|default('') %}
+
+<div class="iw-widget__image-wrap{% if wrapRadius %} {{ wrapRadius }} overflow-hidden{% endif %}">
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
+        images: imageList,
+        imageFormat: imageFormat|default('iw_theme_16_9'),
+        showName: showName|default(false),
+        autoplay: true,
+        aspectRatio: aspectRatio|default('16/9'),
+        imageRadius: imageRadius|default('')
+    } only %}
+</div>

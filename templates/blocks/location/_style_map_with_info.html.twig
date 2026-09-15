@@ -21,14 +21,17 @@
         {% set splitClass = iw_sulu_tailwind_theme_media_ratio_class(mediaRatio|default(''), '2-3') %}
         {% set alignClass = iw_sulu_tailwind_theme_zones_align_class(zonesAlign|default(''), 'center') %}
         <div class="iw-block-location iw-block-location--map-with-info iw-split-gap iw-split-cols iw-split-cols--from-lg iw-split-cols--reverse {{ splitClass }}{{ alignClass ? " " ~ alignClass : "" }}">
-            {# Map — 2 columns #}
-            <div>
-                <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden h-full min-h-[300px]">
+            {# Map - 2 columns. The column hands its height down to the map in CSS
+               rather than through h-full: a grid item carries no resolved height
+               of its own, so a percentage height would fall back to the height
+               of the content, and a map has none of its own. #}
+            <div class="iw-block-location__map-col">
+                <div class="iw-block-location__map-wrap {{ iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) }} overflow-hidden min-h-[300px]">
                     {% include '@ItechWorldSuluTailwindTheme/components/_location_map.html.twig' with {
                         location: location,
                         title: location.title|default(title|default('')),
                         address: formattedAddress,
-                        mapClass: 'iw-block-location__map w-full h-full min-h-[300px]'
+                        mapClass: 'iw-block-location__map w-full'
                     } only %}
                 </div>
             </div>

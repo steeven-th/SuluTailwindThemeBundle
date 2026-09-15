@@ -1,6 +1,6 @@
 # Block: accordion — CSS API
 
-Collapsible content block (FAQ and the like) with three layout styles: a plain list separated by rules (`--list`), one card per item (`--cards`), and a single bordered box with inner rules (`--bordered`).
+Collapsible content block (FAQ and the like) with four layout styles: a plain list separated by rules (`--list`), one card per item (`--cards`), a single bordered box with inner rules (`--bordered`), and the questions beside a widget (`--split`).
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 
@@ -29,6 +29,11 @@ Each `<details>` carries an `id` of the form `iw-accordion-{n}-{item}`, so a spe
 | `.iw-block-accordion--list` | Plain list, rules between items. |
 | `.iw-block-accordion--cards` | One surface per item, spaced by the shared cards gap. |
 | `.iw-block-accordion--bordered` | Single bordered box, inner rules between items. |
+| `.iw-block-accordion--split` | The questions sit in one column of the shared split grid, a widget in the other. The accordion itself keeps the `--list` look; only the layout around it changes. |
+| `.iw-block-accordion__split` | The grid wrapper of `--split`. Carries the shared `.iw-split-cols` / `.iw-split-gap` classes, so the width share (Settings > Width split), the vertical alignment and the reversal all behave as they do on `text_images` and `form`. |
+| `.iw-block-accordion__content` | The grid slot holding the accordion in `--split`. Placement only, the accordion inside it is the component. |
+| `.iw-block-accordion__widget-zone` | The grid slot holding the widget in `--split`. |
+| `.iw-block-accordion__widget` | Set by the shared widget partial on the widget it renders, as `blockPrefix` does on every two-zone block. |
 | `.iw-accordion--icon-left` | Icon before the title (visual reorder only — the DOM keeps the title first). |
 | `.iw-accordion--icon-right` | Icon after the title (default). |
 
@@ -188,3 +193,30 @@ The whole animation sits inside `@media (prefers-reduced-motion: no-preference)`
     transition: none;
 }
 ```
+
+
+---
+
+## The accordion as a widget
+
+The same questions can be rendered as the second zone of another block, through
+the shared widget catalogue: `text_images` and both form blocks offer an
+**Accordion** widget. It reuses `blocks/accordion/_items.html.twig`, so the
+markup contract above holds there too, native `<details>` included.
+
+It carries three settings of its own - the questions, the icon and whether one
+answer closes the others - and takes the defaults for the rest: heading level
+`h3`, paragraph surface, no FAQ schema. The wrapper repeats the block classes:
+
+```html
+<div class="iw-widget iw-widget--accordion ...">
+    <div class="iw-widget__accordion iw-block-accordion iw-block-accordion--list iw-accordion--icon-right">
+```
+
+That repetition is deliberate: `.iw-block-accordion` is what the stylesheet and
+the theme variants paint, so a widget accordion needs no rule of its own and
+cannot drift from the block. Target `.iw-widget__accordion` to style only the
+widget form of it.
+
+The accordion block does not offer this widget in its `--split` style: the zone
+already sits beside an accordion.

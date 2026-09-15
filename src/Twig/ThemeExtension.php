@@ -13,6 +13,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\FormSuccessResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
@@ -25,6 +26,7 @@ use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 use Twig\Environment;
+use Twig\Markup;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFunction;
@@ -98,6 +100,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly FormSuccessResolver $formSuccessResolver,
         private readonly LanguageLabelResolver $languageLabelResolver,
         private readonly TitleMarkupRenderer $titleMarkupRenderer,
+        private readonly IconRenderer $iconRenderer,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
         private readonly bool $turnstileEnabled = false,
         private readonly ?string $turnstileSiteKey = null,
@@ -142,6 +145,14 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
                 'is_safe' => ['html'],
             ]),
             new TwigFunction('iw_sulu_tailwind_theme_title_text', $this->getTitleText(...)),
+            // The SVG comes from the bundle's own files, never from user input:
+            // the stored value only picks which file, and an unknown name
+            // renders nothing at all.
+            new TwigFunction('iw_sulu_tailwind_theme_icon', $this->getIcon(...), [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('iw_sulu_tailwind_theme_has_icon', $this->hasIcon(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_spacing_length', $this->getSpacingLength(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
@@ -681,6 +692,71 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getTitleText(?string $text): string
     {
         return $this->titleMarkupRenderer->toPlainText($text);
+    }
+
+    /**
+     * Render an icon of the theme library as inline SVG.
+     *
+     * Inline rather than an <img>, because every icon of the library paints
+     * itself with `currentColor`: it takes the colour of the text around it, so
+     * one icon reads correctly on a primary button, on a dark variant and in a
+     * link without a rule of its own.
+     *
+     * Returned as `Markup` rather than a plain string: `is_safe` only survives
+     * as long as the call is printed on the spot, and a template that stores the
+     * icon in a variable first - to decide on a wrapper, or to place it before
+     * or after a label - would print escaped SVG source. `Markup` carries its
+     * own safety wherever it goes, so no caller has to remember `|raw`.
+     *
+     * An absent icon comes back as an empty string, not as empty markup: an
+     * object is always truthy in Twig, and `{% if icon %}` has to answer the
+     * question it looks like it is asking.
+     *
+     * @param string|null          $name       The icon name stored by the admin (e.g. "arrow-right")
+     * @param string|null          $style      "outline" or "solid"; anything else falls back to outline
+     * @param array<string, mixed> $attributes Attributes for the <svg>, typically a class
+     *
+     * @return Markup|string The SVG markup, or an empty string when the icon does not exist
+     */
+    public function getIcon(?string $name, ?string $style = null, array $attributes = []): Markup|string
+    {
+        $svg = $this->iconRenderer->render($name, $style, $attributes);
+
+        return '' === $svg ? '' : new Markup($svg, 'UTF-8');
+    }
+
+    /**
+     * The CSS length a spacing step stands for.
+     *
+     * The spacing picker stores steps (`gap-6`), the same ones the theme
+     * defaults use, and this is the conversion the compiler already applies to
+     * them. Templates need it whenever a block offers the picker for something
+     * the stylesheet reads as a custom property rather than as a class - so the
+     * block scale and the theme scale stay the same scale, instead of a short
+     * list copied beside a long one.
+     *
+     * @param string|null $stored The stored step (e.g. "gap-6"), or a raw length
+     *
+     * @return string The length (e.g. "1.5rem"), or an empty string when nothing is stored
+     */
+    public function getSpacingLength(?string $stored): string
+    {
+        if (null === $stored || '' === $stored) {
+            return '';
+        }
+
+        return ThemeCompiler::spacingToLength($stored);
+    }
+
+    /**
+     * Whether an icon exists, for a template deciding on the markup around it.
+     *
+     * @param string|null $name  The icon name stored by the admin
+     * @param string|null $style "outline" or "solid"
+     */
+    public function hasIcon(?string $name, ?string $style = null): bool
+    {
+        return $this->iconRenderer->has($name, $style);
     }
 
     /**

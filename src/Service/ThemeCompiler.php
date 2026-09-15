@@ -1594,6 +1594,10 @@ class ThemeCompiler
         $titleGap = self::spacingToLength((string) ($defaults['titleGap'] ?? 'gap-6'));
         $imageGap = self::spacingToLength((string) ($defaults['imageGap'] ?? 'gap-6'));
         $componentGap = self::spacingToLength((string) ($defaults['componentGap'] ?? 'gap-6'));
+        // Space between a button's pictogram and its label. A button can still
+        // step away from it through its own Icon / text spacing field, whose
+        // classes set the same variable closer to the element.
+        $buttonIconGap = self::spacingToLength((string) ($defaults['buttonIconGap'] ?? 'gap-2'));
         $maxWidth = self::MAX_WIDTH_MAP[(string) ($defaults['blockMaxWidth'] ?? 'none')] ?? 'none';
 
         // Space between a surface and what sits on it. The paragraph defaults
@@ -1609,6 +1613,7 @@ class ThemeCompiler
         $css .= "  --iw-blocks-title-gap: {$titleGap};\n";
         $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
         $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
+        $css .= "  --iw-button-icon-gap: {$buttonIconGap};\n";
         $css .= "  --iw-blocks-max-width: {$maxWidth};\n";
         $css .= "  --iw-surface-content-padding-x: {$contentPadX};\n";
         $css .= "  --iw-surface-content-padding-y: {$contentPadY};\n";
@@ -1737,7 +1742,7 @@ class ThemeCompiler
      *
      * @return string The CSS length, e.g. "1.25rem"
      */
-    private static function spacingToLength(string $stored): string
+    public static function spacingToLength(string $stored): string
     {
         // Already a length: a value typed by hand, or one stored before the
         // spacing picker replaced the dropdown here.

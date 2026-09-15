@@ -18,7 +18,8 @@
     column of a two-zone layout - sets `ctaInline` and includes the partial
     itself.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template">
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
     <property name="ctaHeading" type="heading">
         <params>
             <param name="label">
@@ -49,6 +50,15 @@
                             <param name="enable_attributes" value="true"/>
                         </params>
                     </property>
+                    <!--
+                        The pictogram and where it sits. Shared fragments: the
+                        same picker serves every block that carries one, and a
+                        copy here would drift the day one of them gains a field.
+                    -->
+                    <xi:include href="icon-picker.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                    <xi:include href="icon-placement.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                     <property name="style" type="iw_theme_button_style_picker" colspan="12">
                         <meta>
                             <title>iw_sulu_tailwind_theme.cta_button_style</title>

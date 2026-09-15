@@ -94,15 +94,14 @@
                                     </params>
                                 </property>
 
-                                <property name="icon" type="single_media_selection" colspan="6">
-                                    <meta>
-                                        <title>iw_sulu_tailwind_theme.timeline_icon</title>
-                                        <info_text>iw_sulu_tailwind_theme.timeline_icon_info</info_text>
-                                    </meta>
-                                    <params>
-                                        <param name="types" value="image"/>
-                                    </params>
-                                </property>
+                                <!--
+                                    The pictogram of the step, shared picker. The
+                                    media field it replaces was named `icon`; the
+                                    migration command moves those values to
+                                    `iconMedia`.
+                                -->
+                                <xi:include href="../fragments/icon-picker.xml"
+                                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
                                 <property name="title" type="text_line">
                                     <meta><title>iw_sulu_tailwind_theme.title</title></meta>

@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<!--
+    Widget: a list of collapsible questions.
+
+    The same accordion the block of that name renders, as the second zone of a
+    two-zone block: questions beside a text, beside a form, beside a picture.
+    It reuses `blocks/accordion/_items.html.twig`, so the markup, the native
+    details/summary accessibility and the icon set are the block's, not a copy.
+
+    Three settings and no more. The questions, the icon, and whether one answer
+    closes the others are what an editor changes; the heading level and the
+    header surface are left at their defaults because a widget sits in a context
+    it cannot see, and a form as long as the block itself would defeat the point
+    of putting an accordion in a zone.
+
+    A block whose own subject IS the accordion does not offer this widget: the
+    accordion block in its split style holds a text, a picture, a video or a map
+    beside its questions, not more questions.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="accordion">
+        <meta>
+            <title>iw_sulu_tailwind_theme.widget_accordion</title>
+        </meta>
+        <properties>
+            <block name="items" default-type="item" minOccurs="1">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.accordion_items</title>
+                </meta>
+                <types>
+                    <type name="item">
+                        <meta>
+                            <title>iw_sulu_tailwind_theme.accordion_item</title>
+                        </meta>
+                        <properties>
+                            <property name="itemTitle" type="text_line">
+                                <meta><title>iw_sulu_tailwind_theme.accordion_item_title</title></meta>
+                            </property>
+                            <property name="itemContent" type="text_editor">
+                                <meta><title>iw_sulu_tailwind_theme.accordion_item_content</title></meta>
+                            </property>
+                            <property name="itemOpen" type="checkbox">
+                                <meta>
+                                    <title>iw_sulu_tailwind_theme.accordion_item_open</title>
+                                    <info_text>iw_sulu_tailwind_theme.accordion_item_open_info</info_text>
+                                </meta>
+                                <params>
+                                    <param name="default_value" value="false"/>
+                                </params>
+                            </property>
+                        </properties>
+                    </type>
+                </types>
+            </block>
+
+            <property name="iconStyle" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.accordion_icon_style</title></meta>
+                <params>
+                    <param name="default_value" value="chevron"/>
+                    <param name="values" type="collection">
+                        <param name="chevron"><meta><title>iw_sulu_tailwind_theme.accordion_icon_chevron</title></meta></param>
+                        <param name="plus"><meta><title>iw_sulu_tailwind_theme.accordion_icon_plus</title></meta></param>
+                        <param name="arrow"><meta><title>iw_sulu_tailwind_theme.accordion_icon_arrow</title></meta></param>
+                        <param name="none"><meta><title>iw_sulu_tailwind_theme.accordion_icon_none</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="singleOpen" type="checkbox" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.accordion_single_open</title>
+                    <info_text>iw_sulu_tailwind_theme.accordion_single_open_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="false"/>
+                </params>
+            </property>
+        </properties>
+    </type>
+</types>

@@ -31,6 +31,7 @@ final class WidgetContractTest extends TestCase
      */
     private const BLOCKS_WITH_WIDGET = [
         'blocks/text_images.xml',
+        'blocks/accordion.xml',
         'blocks-form/form.xml',
         'blocks-form-bundle/form.xml',
     ];
@@ -105,6 +106,61 @@ final class WidgetContractTest extends TestCase
 
         self::assertFileExists(
             \sprintf('%s/templates/blocks/common/widgets/_%s.html.twig', self::root(), $kind),
+        );
+    }
+
+    /**
+     * A widget handed a radius puts it on something.
+     *
+     * The dispatcher passes the block's radius classes down to each widget, and
+     * a widget is free to ignore one it has no use for - but ignoring one it was
+     * given is invisible: the markup renders, the setting is stored, and only
+     * the corners stay square. That is exactly what the image widget did. It
+     * forwarded `imageRadius` to the slider, which owns no radius on purpose and
+     * expects its caller to wrap and clip - and the widget wrapped nothing. The
+     * video and the map both had their wrapper, so the setting worked
+     * everywhere except on images.
+     */
+    #[Test]
+    #[DataProvider('widgetTypes')]
+    public function aWidgetHandedARadiusAppliesIt(string $path): void
+    {
+        $kind = basename($path, '.xml');
+        $dispatcher = (string) file_get_contents(
+            self::root() . '/templates/blocks/common/_widget.html.twig',
+        );
+
+        // The include block this kind gets, to see what is handed to it.
+        self::assertSame(
+            1,
+            preg_match(
+                '/widgets\/_' . preg_quote($kind, '/') . '\.html\.twig\x27 with \{(.*?)\} only/s',
+                $dispatcher,
+                $handed,
+            ),
+            \sprintf('The dispatcher must include the %s partial with its parameters.', $kind),
+        );
+
+        if (!str_contains($handed[1], 'Radius')) {
+            // Nothing to apply: the accordion widget rounds nothing of its own.
+            self::assertTrue(true);
+
+            return;
+        }
+
+        $partial = (string) file_get_contents(
+            \sprintf('%s/templates/blocks/common/widgets/_%s.html.twig', self::root(), $kind),
+        );
+
+        self::assertMatchesRegularExpression(
+            '/class="[^"]*\{\{[^}]*Radius[^}]*\}\}[^"]*"/',
+            $partial,
+            \sprintf(
+                'The %s widget is handed a radius and never puts it in a class, so the setting '
+                . 'reaches it and stops there. Wrap what it renders and carry the class on the '
+                . 'wrapper, with overflow-hidden, as the video and map widgets do.',
+                $kind,
+            ),
         );
     }
 

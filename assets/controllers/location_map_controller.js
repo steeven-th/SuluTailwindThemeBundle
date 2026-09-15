@@ -22,6 +22,15 @@ import 'leaflet/dist/leaflet.css';
  * as values. Attribution is always displayed (OSM/Carto tile usage policies).
  */
 export default class extends Controller {
+    /**
+     * The marker pictogram of the theme library, when one is set.
+     *
+     * A <template> rather than a value: SVG source carries quotes, and an
+     * attribute holding them closes early and spills the rest of the tag into
+     * the page.
+     */
+    static targets = ['markerIcon'];
+
     static values = {
         lat: Number,
         lng: Number,
@@ -32,6 +41,7 @@ export default class extends Controller {
         scrollZoom: { type: String, default: 'ctrl' },
         /** Custom marker image URL (media library); empty = themed SVG pin. */
         markerUrl: { type: String, default: '' },
+
         popup: { type: Boolean, default: true },
         popupTitle: { type: String, default: '' },
         popupAddress: { type: String, default: '' },
@@ -173,6 +183,19 @@ export default class extends Controller {
             return L.divIcon({
                 className: 'iw-location-map__marker iw-location-map__marker--custom',
                 html: img,
+                iconSize: [36, 36],
+                iconAnchor: [18, 36],
+                popupAnchor: [0, -36],
+            });
+        }
+
+        // A pictogram from the theme library, in the shape of a pin: it paints
+        // itself with currentColor like the built-in one, so the marker colour
+        // of the theme keeps driving it.
+        if (this.hasMarkerIconTarget && this.markerIconTarget.innerHTML.trim()) {
+            return L.divIcon({
+                className: 'iw-location-map__marker iw-location-map__marker--icon',
+                html: this.markerIconTarget.innerHTML,
                 iconSize: [36, 36],
                 iconAnchor: [18, 36],
                 popupAnchor: [0, -36],

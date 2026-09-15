@@ -35,6 +35,7 @@ final class ContentPositionContractTest extends TestCase
         return [
             'text_images/sidebar' => ['templates/blocks/text_images/_style_sidebar.html.twig'],
             'text_images/split_screen' => ['templates/blocks/text_images/_style_split_screen.html.twig'],
+            'accordion/split' => ['templates/blocks/accordion/_style_split.html.twig'],
         ];
     }
 

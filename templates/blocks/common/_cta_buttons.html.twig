@@ -61,12 +61,43 @@
                        expression into `&quot;`, which yields `target=&quot;_blank&quot;`
                        and a link that never opens in a new tab. A literal string
                        escapes the same way the moment a variable joins it. #}
+                    {# The pictogram, when the editor picked one. It is inlined
+                       rather than linked, so it paints itself with the colour of
+                       the label beside it - the same icon reads correctly on a
+                       primary button, on a dark variant and on an accent surface
+                       without a rule of its own.
+
+                       `aria-hidden` stays as Heroicons ships it: the icon
+                       repeats what the label already says, and a screen reader
+                       announcing "arrow right" after the label helps nobody. A
+                       button with no label would be another matter, and this
+                       block has none - the label falls back to the URL. #}
+                    {#- The pictogram, rendered by the shared partial: the
+                        same markup and the same three renderings serve every
+                        block that carries one. Captured rather than printed on
+                        the spot, because the label sits between the two places
+                        it can go. -#}
+                    {% set ctaIconOutput %}
+                        {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                            item: cta,
+                            class: 'iw-button__icon',
+                            recolor: true
+                        } only -%}
+                    {% endset %}
+                    {% set ctaHasIcon = ctaIconOutput|trim is not empty %}
+                    {% set ctaIconLeft = (cta.iconPosition|default('right')) == 'left' %}
+                    {% set ctaIconGap = iw_sulu_tailwind_theme_spacing_length(cta.iconGap|default('')) %}
+                    {% set ctaIconVars = ctaIconGap ? '--iw-button-icon-gap: ' ~ ctaIconGap ~ ';' : '' %}
+
                     <a href="{{ ctaUrl }}"
-                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action"
+                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action{{ ctaHasIcon ? ' iw-button--with-icon' : '' }}"
+                       {% if ctaHasIcon and ctaIconVars %}style="{{ ctaIconVars }}"{% endif %}
                        {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
                        {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                     >
-                        {{ ctaLabel }}
+                        {% if ctaHasIcon and ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
+                        <span class="iw-button__label">{{ ctaLabel }}</span>
+                        {% if ctaHasIcon and not ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
                     </a>
                 {% endif %}
             {% endfor %}

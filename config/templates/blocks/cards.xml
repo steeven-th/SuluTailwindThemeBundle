@@ -41,15 +41,16 @@
                                 <!-- The icon is a media rather than a picker from a
                                      set: the bundle ships no icon library, and the
                                      timeline established this. An SVG scales. -->
-                                <property name="icon" type="single_media_selection" colspan="6">
-                                    <meta>
-                                        <title>iw_sulu_tailwind_theme.cards_icon</title>
-                                        <info_text>iw_sulu_tailwind_theme.cards_icon_info</info_text>
-                                    </meta>
-                                    <params>
-                                        <param name="types" value="image"/>
-                                    </params>
-                                </property>
+                                <!--
+                                    The pictogram of the card. Shared picker, so
+                                    a card takes one from the theme library or
+                                    from the media library like a button does.
+                                    The media field it replaces was named `icon`;
+                                    the migration command moves those values to
+                                    `iconMedia`.
+                                -->
+                                <xi:include href="../fragments/icon-picker.xml"
+                                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
                                 <property name="image" type="single_media_selection" colspan="6">
                                     <meta>
@@ -135,7 +136,16 @@
                                                         <param name="enable_attributes" value="true"/>
                                                     </params>
                                                 </property>
-                                                <property name="style" type="iw_theme_button_style_picker" colspan="12">
+                    <!--
+                        The pictogram and where it sits. Shared fragments: the
+                        same picker serves every block that carries one, and a
+                        copy here would drift the day one of them gains a field.
+                    -->
+                    <xi:include href="../fragments/icon-picker.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                    <xi:include href="../fragments/icon-placement.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                    <property name="style" type="iw_theme_button_style_picker" colspan="12">
                                                     <meta>
                                                         <title>iw_sulu_tailwind_theme.cta_button_style</title>
                                                     </meta>
