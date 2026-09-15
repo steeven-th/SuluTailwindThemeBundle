@@ -3270,6 +3270,21 @@ class ThemeCompiler
             // so anything that paints the accent surface later - a badge, a
             // callout - is covered without a rule of its own.
             $css .= ".iw-variant--{$index} .iw-surface--accent,\n";
+            // Headings and the subtitle, which the list below used to leave out.
+            // Both are coloured by a rule of their own further up - the heading
+            // one is a class and a type, the subtitle two classes - and plain
+            // inheritance carries no specificity at all, so a title on the
+            // accent surface kept the colour picked against the ordinary
+            // background while the paragraph beside it followed the surface.
+            // That is what an accordion question is: a heading, so a coloured
+            // FAQ bar showed its question in the title colour of the variant.
+            $css .= ".iw-variant--{$index} .iw-surface--accent h1,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h2,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h3,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h4,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h5,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h6,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent .iw-block__subtitle,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent p,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent li,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent dt,\n";

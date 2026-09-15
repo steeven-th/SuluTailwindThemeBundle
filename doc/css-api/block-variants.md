@@ -133,8 +133,9 @@ past them:
 ```
 
 The compiler then emits, per variant, the text colour for that class and
-everything inside it - paragraphs, list items, definition lists, captions and
-links in every state - at a specificity that beats the variant rules. Without
+everything inside it - **headings, the block subtitle**, paragraphs, list
+items, definition lists, captions, table cells and links in every state - at a
+specificity that beats the variant rules. Without
 it the element keeps the paragraph colour, which was chosen against a
 completely different background and has no reason to be readable on the accent
 one. That is the point of the surface owning a text colour at all.
