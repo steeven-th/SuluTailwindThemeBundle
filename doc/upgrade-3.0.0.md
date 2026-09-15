@@ -833,6 +833,27 @@ The images now sit in `.iw-widget__image-wrap`, which carries the class and
 clips to it, for a single image as for a carousel. `WidgetContractTest` now
 fails any widget handed a radius that puts it nowhere.
 
+### New: an icon library, and pictograms on buttons
+
+The theme now ships [Heroicons](https://heroicons.com/) 2.2.0 under MIT, 324
+icons in two weights, offered through Sulu's own icon overlay with search. No
+configuration is needed: the bundle registers the sets itself.
+
+Buttons are the first to use it. A call-to-action can carry a pictogram, taken
+from that library or from the media library, placed left or right of the label,
+with its own size and spacing. Nothing changes on existing buttons - the fields
+are empty and no icon is printed.
+
+The icons paint themselves with `currentColor`, so one icon reads correctly on
+every button style without a colour setting. A media icon follows the same rule
+when it is an SVG; a bitmap is shown as it is, since masking a logo would turn
+it into a silhouette.
+
+Two site-wide settings come with it: **Defaults > Button icon / text spacing**,
+and the per-button override beside it. Render an icon anywhere with
+`iw_sulu_tailwind_theme_icon()`, see
+[`twig-reference.md`](./css-api/../twig-reference.md).
+
 ### New accordion style: split
 
 The accordion gains a fourth style, **Split**: the questions in one column of

@@ -152,6 +152,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
                 'is_safe' => ['html'],
             ]),
             new TwigFunction('iw_sulu_tailwind_theme_has_icon', $this->hasIcon(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_spacing_length', $this->getSpacingLength(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
@@ -722,6 +723,29 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         $svg = $this->iconRenderer->render($name, $style, $attributes);
 
         return '' === $svg ? '' : new Markup($svg, 'UTF-8');
+    }
+
+    /**
+     * The CSS length a spacing step stands for.
+     *
+     * The spacing picker stores steps (`gap-6`), the same ones the theme
+     * defaults use, and this is the conversion the compiler already applies to
+     * them. Templates need it whenever a block offers the picker for something
+     * the stylesheet reads as a custom property rather than as a class - so the
+     * block scale and the theme scale stay the same scale, instead of a short
+     * list copied beside a long one.
+     *
+     * @param string|null $stored The stored step (e.g. "gap-6"), or a raw length
+     *
+     * @return string The length (e.g. "1.5rem"), or an empty string when nothing is stored
+     */
+    public function getSpacingLength(?string $stored): string
+    {
+        if (null === $stored || '' === $stored) {
+            return '';
+        }
+
+        return ThemeCompiler::spacingToLength($stored);
     }
 
     /**

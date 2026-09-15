@@ -577,6 +577,40 @@ column instead, so the buttons stay attached to the copy that leads to them.
 The button label comes from the title set in the link attributes, then the
 linked page or media title, then the raw URL.
 
+### A button with a pictogram
+
+A button can carry an icon, taken from the theme library (Heroicons) or from the
+media library. It then becomes a row rather than a block of text:
+
+```html
+<a class="iw-button--primary iw-block__action iw-button--with-icon"
+   style="--iw-button-icon-gap: 1rem; --iw-button-icon-size: 32px">
+    <svg class="iw-button__icon">…</svg>
+    <span class="iw-button__label">Label</span>
+</a>
+```
+
+| Class | Role |
+|---|---|
+| `.iw-button--with-icon` | Present only when the button carries an icon. Turns it into a centred `inline-flex` row. The class is doubled in the stylesheet so it outranks the `display` the theme writes on `.iw-button--<slug>` from a stylesheet loaded later. |
+| `.iw-button__icon` | The icon itself, sized and prevented from shrinking. |
+| `.iw-button__icon--media` | An SVG from the media library, painted as a mask filled with `currentColor`. |
+| `.iw-button__icon--image` | A bitmap from the media library, shown as it is - a mask would keep only its shape and turn a logo into a silhouette. |
+| `.iw-button__label` | The text. A hook for reaching the label without reaching the icon. |
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `--iw-button-icon-gap` | theme default, `0.5rem` out of the box | Space between the icon and the label. Set site-wide under **Defaults > Button icon / text spacing**, and per button from its own field. |
+| `--iw-button-icon-size` | `min(1.25em, 24px)` | Icon size. On *Automatic* it follows the font size of the button without growing past 24px; a button can pin it to a fixed size instead. |
+
+Both are set on the element when the editor picks something, so a project
+restyling them targets `.iw-button--with-icon` and wins by proximity.
+
+**The icons paint themselves with `currentColor`**, which is why a single icon
+reads correctly on a primary button, on a dark variant and on an accent surface
+without a colour setting of its own. A media icon gets the same treatment when
+it is an SVG, through the mask.
+
 ---
 
 ## Breadcrumbs

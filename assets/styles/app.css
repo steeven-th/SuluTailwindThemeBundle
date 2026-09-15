@@ -257,6 +257,72 @@ a:hover {
     text-align: center;
 }
 
+/* A button carrying a pictogram becomes a row, so the icon and the label sit on
+   one baseline whatever their heights. Only then: a plain button keeps the
+   inline-block the theme gives it, and its centring above.
+
+   `inline-flex` rather than `flex` so the button still shrinks to its content
+   inside the actions row, which lays the buttons out itself.
+
+   The class is doubled to reach (0,2,0). ThemeCompiler writes
+   `display: inline-block` on every `.iw-button--<name>` it generates, into a
+   stylesheet loaded after this one: a single class ties with it and loses, the
+   button stays inline-block and the icon drops onto its own line - which is
+   exactly what it did. */
+.iw-button--with-icon.iw-button--with-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--iw-button-icon-gap, 0.5rem);
+}
+
+/* The icon follows the font size of the button it sits in, so a small button
+   gets a small icon for free - but never past 24px, beyond which a pictogram
+   stops reading as a sign beside a label and starts competing with it.
+
+   `flex-shrink: 0` because a long label must eat the space, never the icon,
+   and `currentColor` is inherited - which is the whole point of inlining the
+   SVG rather than linking it. */
+.iw-button__icon {
+    width: var(--iw-button-icon-size, min(1.25em, 24px));
+    height: var(--iw-button-icon-size, min(1.25em, 24px));
+    flex-shrink: 0;
+}
+
+/* A pictogram taken from the media library rather than from the icon library.
+   Painted as a mask filled with `currentColor`, so one file reads on every
+   button style exactly like a library icon - the alternative being one file per
+   button colour, and a contrast nobody checks.
+
+   The url arrives through `--iw-button-icon-media`, set by the template: it
+   only exists at render time, which is what a custom property in a style
+   attribute is for. */
+.iw-button__icon--media {
+    background-color: currentColor;
+    -webkit-mask-image: var(--iw-button-icon-media);
+    mask-image: var(--iw-button-icon-media);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* A bitmap pictogram is shown as it is: a mask would keep only its shape and
+   fill it with the label colour, turning a logo or an avatar into a silhouette.
+   It still gets the size and the alignment of an icon. */
+.iw-button__icon--image {
+    object-fit: contain;
+}
+
+
+/* Nothing of its own: the label is a hook for a project that wants to reach
+   the text without reaching the icon beside it. */
+.iw-button__label {
+    display: inline;
+}
+
 /* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
    masonry) stores one of these class names, and the class only feeds
    `--iw-gap-choice`: the block's own rule keeps ownership of the `gap`

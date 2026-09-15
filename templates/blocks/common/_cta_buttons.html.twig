@@ -61,12 +61,98 @@
                        expression into `&quot;`, which yields `target=&quot;_blank&quot;`
                        and a link that never opens in a new tab. A literal string
                        escapes the same way the moment a variable joins it. #}
+                    {# The pictogram, when the editor picked one. It is inlined
+                       rather than linked, so it paints itself with the colour of
+                       the label beside it - the same icon reads correctly on a
+                       primary button, on a dark variant and on an accent surface
+                       without a rule of its own.
+
+                       `aria-hidden` stays as Heroicons ships it: the icon
+                       repeats what the label already says, and a screen reader
+                       announcing "arrow right" after the label helps nobody. A
+                       button with no label would be another matter, and this
+                       block has none - the label falls back to the URL. #}
+                    {#- `?? false` rather than `|default(false)`: the toggle is
+                        off by default, and a button saved before it existed has
+                        no key at all. -#}
+                    {% set ctaIconCustom = cta.iconCustom ?? false %}
+                    {% set ctaIcon = ctaIconCustom ? '' : cta.icon|default('') %}
+                    {# `width`/`height` as attributes, not only in CSS: they are
+                       what sizes the icon before the stylesheet has a say, and
+                       what keeps it a pictogram rather than a full-size drawing
+                       if the theme CSS is stale or a project drops the class.
+                       The CSS rule still wins wherever it applies. #}
+                    {% set ctaIconMarkup = iw_sulu_tailwind_theme_icon(ctaIcon, 'outline', {
+                        class: 'iw-button__icon',
+                        width: 24,
+                        height: 24
+                    }) %}
+
+                    {#- A pictogram of the project instead. Painted as a mask, so
+                        it takes the colour of the label exactly like a library
+                        icon: one file reads on every button style rather than
+                        one file per style.
+
+                        The url travels through a custom property, which is what
+                        an inline style is legitimately for - a value that only
+                        exists at render time. A media deleted from the library
+                        resolves to null and the button simply loses its icon. -#}
+                    {% set ctaIconMediaUrl = '' %}
+                    {% set ctaIconMediaVector = false %}
+                    {% set ctaIconMediaAlt = '' %}
+                    {% if ctaIconCustom and cta.iconMedia.id is defined %}
+                        {% set ctaIconMediaResolved = sulu_resolve_media(cta.iconMedia.id, app.request.locale) %}
+                        {% if ctaIconMediaResolved is not null %}
+                            {#- A vector is recoloured, a bitmap is shown as it is.
+                                The mask keeps only the shape of what it is given:
+                                a one-colour SVG comes out as a pictogram in the
+                                colour of the label, which is the point - but a
+                                photo or a logo comes out as a flat silhouette,
+                                which is never what anyone meant. `_image.html.twig`
+                                tells the two apart the same way. -#}
+                            {% set ctaIconMediaVector = 'image/svg+xml' == ctaIconMediaResolved.mimeType|default('') %}
+                            {% set ctaIconMediaUrl = ctaIconMediaVector
+                                ? ctaIconMediaResolved.url
+                                : ctaIconMediaResolved.thumbnails['50x50']|default(ctaIconMediaResolved.url) %}
+                            {% set ctaIconMediaAlt = ctaIconMediaResolved.title|default('') %}
+                        {% endif %}
+                    {% endif %}
+                    {% set ctaHasIcon = ctaIconMarkup or ctaIconMediaUrl %}
+                    {% set ctaIconLeft = (cta.iconPosition|default('right')) == 'left' %}
+                    {#- Gap and size travel as custom properties rather than as
+                        classes: the gap uses the theme's own spacing picker,
+                        whose scale is open-ended, and enumerating it in CSS
+                        would mean keeping a copy of it in step. A style
+                        attribute carrying a computed value is what it is for.
+
+                        Empty means "follow the theme": nothing is printed and
+                        the rule keeps the token the theme compiled. -#}
+                    {% set ctaIconGap = iw_sulu_tailwind_theme_spacing_length(cta.iconGap|default('')) %}
+                    {% set ctaIconSize = cta.iconSize|default('') %}
+                    {% set ctaIconVars = (ctaIconGap ? '--iw-button-icon-gap: ' ~ ctaIconGap ~ ';' : '')
+                        ~ (ctaIconSize ? '--iw-button-icon-size: ' ~ ctaIconSize ~ 'px;' : '') %}
+
                     <a href="{{ ctaUrl }}"
-                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action"
+                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action{{ ctaHasIcon ? ' iw-button--with-icon' : '' }}"
+                       {% if ctaHasIcon and ctaIconVars %}style="{{ ctaIconVars }}"{% endif %}
                        {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
                        {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                     >
-                        {{ ctaLabel }}
+                        {% set ctaIconOutput %}
+                            {%- if ctaIconMarkup -%}
+                                {{ ctaIconMarkup }}
+                            {%- elseif ctaIconMediaUrl and ctaIconMediaVector -%}
+                                <span class="iw-button__icon iw-button__icon--media" style="--iw-button-icon-media: url('{{ ctaIconMediaUrl }}')" aria-hidden="true"></span>
+                            {%- elseif ctaIconMediaUrl -%}
+                                {#- Decorative beside a label that already says it,
+                                    hence the empty alt. -#}
+                                <img class="iw-button__icon iw-button__icon--image" src="{{ ctaIconMediaUrl }}" alt="" width="24" height="24" loading="lazy">
+                            {%- endif -%}
+                        {% endset %}
+
+                        {% if ctaHasIcon and ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
+                        <span class="iw-button__label">{{ ctaLabel }}</span>
+                        {% if ctaHasIcon and not ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
                     </a>
                 {% endif %}
             {% endfor %}
