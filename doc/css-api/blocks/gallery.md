@@ -72,6 +72,8 @@ The gap between images is exposed as dedicated variables, each falling back to t
 | `--iw-gap-choice` | unset | Set by the `iw-gap--*` class the editor picks in **Content > Image spacing** (`--grid` and `--masonry`). Read before the per-block variable and the theme token; see [`transverse.md#editor-picked-spacing-iw-gap`](../transverse.md#editor-picked-spacing-iw-gap). |
 | `--iw-block-gallery-grid-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap in `--grid`. |
 | `--iw-block-gallery-masonry-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Column gap + item vertical rhythm in `--masonry`. |
+| `--iw-block-gallery-overlay-title-color` | `#fff` | Title in the `--wide-carousel` cartouche. The block paints this text itself, rather than the variant, because it also paints the dark cartouche under it. |
+| `--iw-block-gallery-overlay-subtitle-color` | `rgb(255 255 255 / 0.8)` | Subtitle in the same cartouche. |
 | `--iw-block-gallery-slider-gap` | `var(--iw-blocks-image-gap, 1.5rem)` | Gap between slides in the default `--slider` track. |
 
 Navigation arrows and dot indicators are **only rendered when there is more than one image** in the block (single-image galleries get a clean static layout). The thumbnail strip in `--filmstrip` follows the same rule. Beyond the gap variables above, the Gallery block exposes very few custom properties of its own because layout / sizing are driven by Tailwind utilities composed in Twig. Theming is mostly done by:

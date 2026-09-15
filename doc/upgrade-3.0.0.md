@@ -847,6 +847,17 @@ ship `@tailwindcss/typography`.
 carried an image, greying the block over nothing and dragging the text down with
 it. They now paint it only over an image, the way `--classic` always has.
 
+Two other places tried to pin a text colour and lost the same cascade fight, and
+they keep the forcing because there the block paints the background itself: the
+title and subtitle in the `--wide-carousel` cartouche (gallery), which came out
+in the variant's heading colour over black, and the floating card of the
+location block in `--overlay`, whose rule claimed to override the variant and
+tied with it. Both now win, and both expose their colour as a token -
+`--iw-block-gallery-overlay-title-color`, `--iw-block-gallery-overlay-subtitle-color`
+and the existing `--iw-block-location-card-color`. The rule of thumb: whoever
+guarantees the background guarantees what reads on it, which is exactly the
+contract `.iw-surface--accent` already had.
+
 **What this means for an existing site**: the text of these three styles follows
 the block variant, like every other block. If yours look washed out, either pick
 a variant whose text contrasts with the veil, or lower the scrim. Blocks already

@@ -3472,6 +3472,27 @@ img.object-cover {
 .iw-parallax.iw-parallax--strong { height: 145%; top: -22.5%; }
 .iw-parallax.iw-parallax--extreme { height: 160%; top: -30%; }
 
+/* The wide-carousel title sits in a translucent dark cartouche the template
+   always paints, so the block owns the colour of the text on it - the same
+   contract as the location card and `.iw-surface--accent`: whoever guarantees
+   the background guarantees what reads on it.
+
+   Two classes (0,2,0) beat the `.iw-variant--N h1…h6` and `.iw-variant--N p`
+   of a variant, both (0,1,1), in a stylesheet loaded after this one. The
+   templates used to say it with `text-white`, a single class that lost to
+   both: the title came out in the variant's heading colour over a black
+   cartouche, which is as unreadable as it sounds.
+
+   Both colours go through a token, for a project that paints the cartouche
+   differently. */
+.iw-block-gallery__overlay-content .iw-block-gallery__overlay-title {
+    color: var(--iw-block-gallery-overlay-title-color, #fff);
+}
+
+.iw-block-gallery__overlay-content .iw-block-gallery__overlay-subtitle {
+    color: var(--iw-block-gallery-overlay-subtitle-color, rgb(255 255 255 / 0.8));
+}
+
 /* Wide-carousel height spacer in parallax mode (fixed viewport-based height). */
 .iw-wide-carousel-spacer--parallax { height: clamp(300px, 60vh, 700px); }
 
@@ -3704,19 +3725,25 @@ section.block:has([data-slider-fullbleed-value]) {
     color: var(--iw-block-location-card-color, #000);
 }
 
-/* Force the card text color on all children — overrides per-variant rules
-   like .iw-variant--* p so the overlay reads correctly against the blurred
-   map even when the variant uses a contrasted palette. */
-.iw-block-location__card p,
-.iw-block-location__card span,
-.iw-block-location__card a:not(.iw-button--variant),
-.iw-block-location__card li,
-.iw-block-location__card h1,
-.iw-block-location__card h2,
-.iw-block-location__card h3,
-.iw-block-location__card h4,
-.iw-block-location__card h5,
-.iw-block-location__card h6 {
+/* The card paints its own light surface over the map, so it owns the colour of
+   the text on it: a variant with a light palette would otherwise write white on
+   white. This is the same contract as `.iw-surface--accent` - whoever guarantees
+   the background guarantees what reads on it.
+
+   The class is doubled to reach (0,2,1). A variant declares `.iw-variant--N p`
+   and `.iw-variant--N h1…h6`, both (0,1,1), in a stylesheet loaded after this
+   one, so the single class this rule used to carry tied and lost - it claimed to
+   override the variant and never did. */
+.iw-block-location__card.iw-block-location__card p,
+.iw-block-location__card.iw-block-location__card span,
+.iw-block-location__card.iw-block-location__card a:not(.iw-button--variant),
+.iw-block-location__card.iw-block-location__card li,
+.iw-block-location__card.iw-block-location__card h1,
+.iw-block-location__card.iw-block-location__card h2,
+.iw-block-location__card.iw-block-location__card h3,
+.iw-block-location__card.iw-block-location__card h4,
+.iw-block-location__card.iw-block-location__card h5,
+.iw-block-location__card.iw-block-location__card h6 {
     color: var(--iw-block-location-card-color, #000);
 }
 
