@@ -18,7 +18,8 @@
     column of a two-zone layout - sets `ctaInline` and includes the partial
     itself.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template">
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
     <property name="ctaHeading" type="heading">
         <params>
             <param name="label">
@@ -50,99 +51,14 @@
                         </params>
                     </property>
                     <!--
-                        The pictogram, picked from the theme icon library
-                        (Heroicons, two weights). Sulu's own field reads the very
-                        same files the renderer prints, through the `svg://`
-                        provider the bundle registers, so what is picked and what
-                        is rendered cannot drift apart.
+                        The pictogram and where it sits. Shared fragments: the
+                        same picker serves every block that carries one, and a
+                        copy here would drift the day one of them gains a field.
                     -->
-                    <property name="iconCustom" type="checkbox" colspan="12">
-                        <meta>
-                            <info_text>iw_sulu_tailwind_theme.button_icon_custom_info</info_text>
-                        </meta>
-                        <params>
-                            <param name="type" value="toggler"/>
-                            <param name="default_value" value="false"/>
-                            <param name="label">
-                                <meta><title>iw_sulu_tailwind_theme.button_icon_custom</title></meta>
-                            </param>
-                        </params>
-                    </property>
-                    <property name="icon" type="single_icon_selection" colspan="12"
-                              visibleCondition="__parent.iconCustom != true">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.button_icon</title>
-                            <info_text>iw_sulu_tailwind_theme.button_icon_info</info_text>
-                        </meta>
-                        <params>
-                            <param name="icon_set" value="iw_theme_outline"/>
-                        </params>
-                    </property>
-                    <!--
-                        A pictogram of the project rather than of the library: a
-                        logo, a trade symbol. Rendered as a mask, so it takes the
-                        colour of the label like a library icon does - a button
-                        is not where a multicolour drawing belongs, and the
-                        contrast has to hold on every button style.
-                    -->
-                    <property name="iconMedia" type="single_media_selection" colspan="12"
-                              visibleCondition="__parent.iconCustom == true">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.button_icon_media</title>
-                            <info_text>iw_sulu_tailwind_theme.button_icon_media_info</info_text>
-                        </meta>
-                        <params>
-                            <param name="types" value="image"/>
-                        </params>
-                    </property>
-                    <property name="iconPosition" type="single_select" colspan="6"
-                              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
-                        <meta><title>iw_sulu_tailwind_theme.button_icon_position</title></meta>
-                        <params>
-                            <param name="default_value" value="right"/>
-                            <param name="values" type="collection">
-                                <param name="left"><meta><title>iw_sulu_tailwind_theme.position_left</title></meta></param>
-                                <param name="right"><meta><title>iw_sulu_tailwind_theme.position_right</title></meta></param>
-                            </param>
-                        </params>
-                    </property>
-                    <property name="iconSize" type="single_select" colspan="6"
-                              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.button_icon_size</title>
-                            <info_text>iw_sulu_tailwind_theme.button_icon_size_info</info_text>
-                        </meta>
-                        <params>
-                            <param name="default_value" value=""/>
-                            <param name="values" type="collection">
-                                <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
-                                <param name="16"><meta><title>16 px</title></meta></param>
-                                <param name="24"><meta><title>24 px</title></meta></param>
-                                <param name="32"><meta><title>32 px</title></meta></param>
-                                <param name="48"><meta><title>48 px</title></meta></param>
-                                <param name="64"><meta><title>64 px</title></meta></param>
-                                <param name="72"><meta><title>72 px</title></meta></param>
-                            </param>
-                        </params>
-                    </property>
-                    <!--
-                        The same spacing picker the theme defaults use, so the
-                        block scale and the site scale are one scale. A short
-                        list copied beside a long one is exactly what an editor
-                        notices first.
-                    -->
-                    <property name="iconGap" type="iw_theme_margin_selector" colspan="12"
-                              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.button_icon_gap</title>
-                            <info_text>iw_sulu_tailwind_theme.button_icon_gap_info</info_text>
-                        </meta>
-                        <params>
-                            <param name="prefix" value="gap"/>
-                            <param name="default_value" value=""/>
-                            <param name="theme_key" value="buttonIconGap"/>
-                        </params>
-                    </property>
+                    <xi:include href="icon-picker.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                    <xi:include href="icon-placement.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                     <property name="style" type="iw_theme_button_style_picker" colspan="12">
                         <meta>
                             <title>iw_sulu_tailwind_theme.cta_button_style</title>

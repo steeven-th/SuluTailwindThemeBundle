@@ -34,21 +34,23 @@
     {% set dateLabel = rawDate %}
 {% endif %}
 
-{% set iconMedia = step.icon|default(null) %}
-{% set hasIcon = iconMedia is not empty %}
+{#- The pictogram, from the shared picker. Captured once: the marker takes it
+    when the block asks for an icon marker, the card takes it otherwise, and it
+    is the same icon either way. -#}
+{% set iconOutput %}
+    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        item: step,
+        class: 'iw-timeline-step__icon-img'
+    } only -%}
+{% endset %}
+{% set hasIcon = iconOutput|trim is not empty %}
 
 <li class="iw-timeline-step iw-timeline-step--{{ state }}">
     {# The marker sits on the line. Its content is a block-wide decision, so
        every step reads the same way. #}
     <div class="iw-timeline-step__marker" aria-hidden="true">
         {% if marker == 'icon' and hasIcon %}
-            {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
-                media: iconMedia,
-                format: 'iw_theme_icon',
-                alt: '',
-                classes: 'iw-timeline-step__marker-icon',
-                raw: true
-            } only %}
+            <span class="iw-timeline-step__marker-icon">{{ iconOutput }}</span>
         {% elseif marker == 'number' %}
             <span class="iw-timeline-step__marker-number">{{ index }}</span>
         {% elseif marker == 'date' and dateLabel is not empty %}
@@ -66,15 +68,7 @@
         {# Shown in the card whenever the marker holds something else, so a step
            icon is never lost just because the marker was set to numbers. #}
         {% if hasIcon and marker != 'icon' %}
-            <div class="iw-timeline-step__icon">
-                {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
-                    media: iconMedia,
-                    format: 'iw_theme_icon',
-                    alt: '',
-                    classes: 'iw-timeline-step__icon-img',
-                    raw: true
-                } only %}
-            </div>
+            <div class="iw-timeline-step__icon">{{ iconOutput }}</div>
         {% endif %}
 
         {% if dateLabel is not empty and marker != 'date' %}

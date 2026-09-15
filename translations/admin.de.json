@@ -1326,6 +1326,8 @@
     "iw_sulu_tailwind_theme.components_maps_custom_attribution": "Benutzerdefinierte Attribution",
     "iw_sulu_tailwind_theme.components_maps_custom_attribution_info": "Auf der Karte angezeigter Attributionstext (HTML erlaubt). Bitte die Bedingungen des Kartenanbieters beachten.",
     "iw_sulu_tailwind_theme.components_maps_marker_color": "Markerfarbe",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon": "Marker-Symbol",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon_info": "Ein Symbol aus der Theme-Bibliothek anstelle des Standard-Markers. Es übernimmt die oben eingestellte Marker-Farbe. Ein unten gewähltes Medium hat Vorrang.",
     "iw_sulu_tailwind_theme.components_maps_marker_media": "Benutzerdefinierter Marker (Bild)",
     "iw_sulu_tailwind_theme.components_maps_marker_media_info": "Ersetzt den Standard-Pin durch ein Bild aus der Mediathek (PNG oder SVG, idealerweise mit der Spitze unten in der Mitte). Die Markerfarbe wird dann ignoriert.",
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup-Hintergrund",

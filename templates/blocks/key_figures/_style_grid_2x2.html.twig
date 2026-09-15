@@ -26,15 +26,14 @@
             {% for figure in figures %}
                 <div class="iw-key-figure iw-key-figure--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {# Icon / Image #}
-                    {% if figure.image is defined and figure.image.id is defined %}
-                        {% set media = sulu_resolve_media(figure.image.id, app.request.locale) %}
-                        <div class="iw-key-figure__icon">
-                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
-                                media: media,
-                                format: 'iw_theme_1_1',
-                                classes: 'iw-key-figure__icon-img',
-                            }) }}
-                        </div>
+                    {% set figureIcon %}
+                        {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                            item: figure,
+                            class: 'iw-key-figure__icon-img'
+                        } only -%}
+                    {% endset %}
+                    {% if figureIcon|trim is not empty %}
+                        <div class="iw-key-figure__icon">{{ figureIcon }}</div>
                     {% endif %}
 
                     {% if figure.number is defined and figure.number is not empty %}

@@ -193,6 +193,53 @@ final class IconRendererTest extends TestCase
     }
 
     /**
+     * No template drops an icon into an HTML attribute.
+     *
+     * `getIcon` returns `Markup`, which is what lets a template store an icon in
+     * a variable and print it later without Twig escaping the SVG source. The
+     * flip side is that Twig will not escape it in an attribute either: the
+     * quotes of the SVG close the attribute, and the rest of the tag lands in
+     * the page as text. That is what a map marker did, printing its own data
+     * attributes above the map.
+     *
+     * Markup belongs between tags. A controller that needs the source reads it
+     * from a `<template>`, the way the location map does.
+     */
+    #[Test]
+    public function noTemplatePutsAnIconInAnAttribute(): void
+    {
+        $offenders = [];
+
+        $directory = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(\dirname(__DIR__, 2) . '/templates', \FilesystemIterator::SKIP_DOTS),
+        );
+
+        /** @var \SplFileInfo $file */
+        foreach ($directory as $file) {
+            if (!$file->isFile() || 'twig' !== $file->getExtension()) {
+                continue;
+            }
+
+            $contents = (string) file_get_contents((string) $file->getPathname());
+
+            // An attribute opening on a print that resolves to an icon: either
+            // the call itself, or a variable holding what the call returned.
+            if (1 === preg_match('/="\{\{[^}]*iw_sulu_tailwind_theme_icon\s*\(/', $contents)
+                || 1 === preg_match('/="\{\{\s*\w*[Ii]conOutput\s*\}\}/', $contents)) {
+                $offenders[] = basename((string) $file->getPathname());
+            }
+        }
+
+        self::assertSame(
+            [],
+            $offenders,
+            'These templates print an icon inside an HTML attribute, where its own quotes close '
+            . 'the attribute early: ' . implode(', ', $offenders) . '. Print it between tags, or '
+            . 'hand the source to a controller through a <template>.',
+        );
+    }
+
+    /**
      * The two weights hold the same icons.
      *
      * They are one library in two weights, so an editor switching weight keeps

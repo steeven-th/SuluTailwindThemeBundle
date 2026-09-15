@@ -1,0 +1,201 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ItechWorld\SuluTailwindThemeBundle\Command;
+
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+/**
+ * Moves the pictograms of published content onto the shared icon picker.
+ *
+ * Several blocks carried a pictogram long before the theme had an icon library,
+ * each through a media field of its own: `icon` on a card, `icon` on a timeline
+ * step, `image` on a key figure. Those names are now the shared ones, where
+ * `icon` holds a library name and `iconMedia` holds a media - so a stored media
+ * sitting under `icon` would be read as an icon name and render nothing.
+ *
+ * This command moves it: the media goes to `iconMedia`, and `iconCustom` is
+ * turned on so the block keeps showing the editor's own file. Nothing else
+ * changes, and a page already migrated is left alone, so it can be run twice.
+ */
+#[AsCommand(
+    name: 'iw-sulu:theme:migrate-icons',
+    description: 'Move block pictograms onto the shared icon picker',
+)]
+class IconsMigrateCommand extends Command
+{
+    /**
+     * Block type => the media field it used to carry its pictogram in.
+     *
+     * The key is the `type` stored on each block, so a block of another kind
+     * holding a field of the same name is never touched.
+     */
+    private const MOVES = [
+        'cards' => ['items' => 'items', 'field' => 'icon'],
+        'timeline' => ['items' => 'steps', 'field' => 'icon'],
+        'key_figures' => ['items' => 'figures', 'field' => 'image'],
+    ];
+
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what would change without writing anything')
+            ->setHelp(<<<'HELP'
+                Run it once after upgrading, on every environment holding content:
+
+                  <info>php bin/console iw-sulu:theme:migrate-icons --dry-run</info>
+                  <info>php bin/console iw-sulu:theme:migrate-icons</info>
+
+                It can be run twice: a pictogram already moved is left alone.
+                HELP);
+    }
+
+    /**
+     * @param InputInterface  $input  The console input
+     * @param OutputInterface $output The console output
+     *
+     * @return int The command exit code
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $dryRun = (bool) $input->getOption('dry-run');
+        $connection = $this->entityManager->getConnection();
+
+        $rows = $connection->fetchAllAssociative(
+            'SELECT id, templateData FROM pa_page_dimension_contents WHERE templateData IS NOT NULL',
+        );
+
+        $pages = 0;
+        $moved = 0;
+
+        foreach ($rows as $row) {
+            /** @var array<string, mixed>|null $data */
+            $data = json_decode((string) $row['templateData'], true);
+
+            if (!\is_array($data) || !isset($data['blocks']) || !\is_array($data['blocks'])) {
+                continue;
+            }
+
+            $count = 0;
+            $data['blocks'] = $this->migrateBlocks($data['blocks'], $count);
+
+            if (0 === $count) {
+                continue;
+            }
+
+            ++$pages;
+            $moved += $count;
+
+            if (!$dryRun) {
+                $connection->update(
+                    'pa_page_dimension_contents',
+                    ['templateData' => json_encode($data, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES)],
+                    ['id' => $row['id']],
+                );
+            }
+        }
+
+        if (0 === $moved) {
+            $io->success('No pictogram left to move.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->definitionList(
+            ['Pictograms moved' => (string) $moved],
+            ['Rows touched' => (string) $pages],
+        );
+
+        if ($dryRun) {
+            $io->note('Dry run: nothing was written.');
+
+            return Command::SUCCESS;
+        }
+
+        $io->success('Pictograms moved onto the shared picker.');
+        $io->writeln('  Clear the content cache so the pages are rendered again:');
+        $io->writeln('  <info>php bin/console cache:pool:clear cache.app</info>');
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param array<int|string, mixed> $blocks
+     *
+     * @return array<int|string, mixed>
+     */
+    private function migrateBlocks(array $blocks, int &$count): array
+    {
+        foreach ($blocks as $index => $block) {
+            if (!\is_array($block)) {
+                continue;
+            }
+
+            $type = $block['type'] ?? null;
+
+            if (!\is_string($type) || !isset(self::MOVES[$type])) {
+                continue;
+            }
+
+            $move = self::MOVES[$type];
+            $listKey = $move['items'];
+
+            if (!isset($block[$listKey]) || !\is_array($block[$listKey])) {
+                continue;
+            }
+
+            foreach ($block[$listKey] as $itemIndex => $item) {
+                if (!\is_array($item)) {
+                    continue;
+                }
+
+                $block[$listKey][$itemIndex] = $this->migrateItem($item, $move['field'], $count);
+            }
+
+            $blocks[$index] = $block;
+        }
+
+        return $blocks;
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     *
+     * @return array<string, mixed>
+     */
+    private function migrateItem(array $item, string $field, int &$count): array
+    {
+        // Already moved, or nothing to move. A media picker opened and left
+        // empty stores `{id: null}`, which is not a pictogram.
+        if (isset($item['iconMedia']) || !isset($item[$field]) || !\is_array($item[$field])) {
+            return $item;
+        }
+
+        if (!isset($item[$field]['id']) || null === $item[$field]['id']) {
+            return $item;
+        }
+
+        $item['iconMedia'] = $item[$field];
+        $item['iconCustom'] = true;
+        unset($item[$field]);
+
+        ++$count;
+
+        return $item;
+    }
+}

@@ -1424,6 +1424,8 @@
     "iw_sulu_tailwind_theme.components_maps_custom_attribution": "Attribution personnalisée",
     "iw_sulu_tailwind_theme.components_maps_custom_attribution_info": "Texte d'attribution affiché sur la carte (HTML autorisé). Pensez à respecter les conditions du fournisseur de tuiles.",
     "iw_sulu_tailwind_theme.components_maps_marker_color": "Couleur du marqueur",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon": "Picto du repère",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon_info": "Picto de la bibliothèque du thème, à la place du repère par défaut. Il prend la couleur du repère réglée ci-dessus. Un média choisi en dessous l'emporte.",
     "iw_sulu_tailwind_theme.components_maps_marker_media": "Marqueur personnalisé (image)",
     "iw_sulu_tailwind_theme.components_maps_marker_media_info": "Remplace le pin par défaut par une image de la médiathèque (PNG ou SVG, idéalement avec la pointe en bas au centre). La couleur du marqueur est alors ignorée.",
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Fond de l'infobulle",

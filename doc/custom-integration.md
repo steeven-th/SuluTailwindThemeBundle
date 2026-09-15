@@ -356,6 +356,69 @@ colours keep them.
 
 ---
 
+### The pictogram of a block element
+
+A card, a timeline step, a key figure and a call-to-action button all carry a
+pictogram the same way, through two shared fragments and one partial:
+
+```xml
+<xi:include href="../fragments/icon-picker.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+<!-- Only where the pictogram sits in line with a label -->
+<xi:include href="../fragments/icon-placement.xml"
+            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+```
+
+```twig
+{% set iconOutput %}
+    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        item: card,
+        class: 'iw-card__icon-img'
+    } only -%}
+{% endset %}
+
+{% if iconOutput|trim is not empty %}
+    <span class="iw-card__icon">{{ iconOutput }}</span>
+{% endif %}
+```
+
+Capture the output before deciding on a wrapper: the partial renders nothing at
+all when no pictogram was picked, so an empty slot is never opened.
+
+**Two fragments, because placement is not universal.** A pictogram beside a
+label has a side and a gap; one standing above a title has neither, and offering
+the fields there would be settings that do nothing.
+
+**Three renderings, one rule.** A library icon carries no colour of its own, so
+it takes the one it is given. A file the editor picked keeps its colours, unless
+the caller asks for `recolor` - which only a block painting its own background
+does, and only a button does today.
+
+| Source | Rendering | Colour |
+|---|---|---|
+| Theme library | inline SVG | `--iw-icon-color`, else the surrounding text |
+| Media, SVG | `<img>`, or a mask with `recolor` | its own, or the surrounding text |
+| Media, bitmap | `<img>` | its own, always |
+
+**Sizing.** The slot hands its default size down through `--iw-icon-size` and
+**declares no width of its own** - a slot holding a width lets a larger
+pictogram spill over whatever sits beside it instead of pushing it aside:
+
+```css
+.iw-card__icon {
+    --iw-icon-size: var(--iw-card-icon-size, 1.6rem);
+    --iw-icon-color: var(--iw-card-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+}
+```
+
+**Markup, not an attribute.** The icon comes back as Twig `Markup`, so it
+survives being stored in a variable without being escaped. The same property
+makes it unfit for an HTML attribute, where its own quotes close the attribute
+early. A JS controller needing the source reads it from a `<template>`, the way
+the location map hands its marker to Leaflet.
+
+---
+
 ### The widget zone
 
 A block pairing content with a second zone lets the editor choose what that zone

@@ -1,0 +1,64 @@
+{# The pictogram an element carries, from the theme library or from the media
+   library.
+
+   Expected variables:
+     - item        : the data holding the icon fields (a button, a card, a step)
+     - class       : extra classes for the icon itself
+     - blockPrefix : BEM prefix of the calling block, for a hook of its own
+
+   Returns nothing at all when no icon was picked, so a caller can test the
+   output before opening a wrapper around it.
+
+   Parameters, continued:
+     - recolor : repaint a media SVG with the surrounding colour. On by the
+       caller that paints its own background - a button - and off everywhere
+       else.
+
+   A library icon is always inlined and always follows the colour around it:
+   Heroicons carry no colour of their own, so there is nothing to preserve.
+   Which colour that is comes from `--iw-icon-color`, which a block sets for its
+   own slot - accent on a card, the label colour on a button.
+
+   A media file is the editor's own, so it keeps its colours by default: a brand
+   logo on a card has to stay that brand's. Only `recolor` overrides that, and
+   only for an SVG, where the mask can fill a shape with the current colour. A
+   bitmap is never masked - a mask keeps the shape and turns an avatar into a
+   silhouette.
+
+   The size travels as a custom property rather than a class: the field offers a
+   handful of steps today and enumerating them in CSS would mean keeping a copy
+   of that list in step. #}
+{% set iconCustom = item.iconCustom ?? false %}
+{% set iconName = iconCustom ? '' : item.icon|default('') %}
+{% set iconSize = item.iconSize|default('') %}
+{% set iconClass = ('iw-icon ' ~ (class|default('')) ~ (blockPrefix|default('') ? ' ' ~ blockPrefix ~ '__icon' : ''))|trim %}
+
+{% set iconMediaUrl = '' %}
+{% set iconMediaVector = false %}
+{% if iconCustom and item.iconMedia.id is defined %}
+    {% set iconMediaResolved = sulu_resolve_media(item.iconMedia.id, app.request.locale) %}
+    {% if iconMediaResolved is not null %}
+        {% set iconMediaVector = 'image/svg+xml' == iconMediaResolved.mimeType|default('') %}
+        {% set iconMediaUrl = iconMediaVector
+            ? iconMediaResolved.url
+            : iconMediaResolved.thumbnails['50x50']|default(iconMediaResolved.url) %}
+    {% endif %}
+{% endif %}
+
+{%- if iconName and iw_sulu_tailwind_theme_has_icon(iconName) -%}
+    {{ iw_sulu_tailwind_theme_icon(iconName, 'outline', {
+        class: iconClass,
+        width: 24,
+        height: 24,
+        style: iconSize ? '--iw-icon-size: ' ~ iconSize ~ 'px' : false
+    }) }}
+{%- elseif iconMediaUrl and iconMediaVector and recolor|default(false) -%}
+    <span class="{{ iconClass }} iw-icon--mask"
+          style="--iw-icon-media: url('{{ iconMediaUrl }}'){{ iconSize ? '; --iw-icon-size: ' ~ iconSize ~ 'px' : '' }}"
+          aria-hidden="true"></span>
+{%- elseif iconMediaUrl -%}
+    {#- Decorative: whatever it stands beside already says it. -#}
+    <img class="{{ iconClass }} iw-icon--image" src="{{ iconMediaUrl }}" alt=""
+         width="24" height="24" loading="lazy"
+         {%- if iconSize %} style="--iw-icon-size: {{ iconSize }}px"{% endif %}>
+{%- endif -%}

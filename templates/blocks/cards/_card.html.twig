@@ -33,7 +33,15 @@
      - clickable     : bool, whole card becomes the link target
    ───────────────────────────────────────────────────────────────────────── #}
 
-{% set icon = card.icon|default(null) %}
+{#- The pictogram is rendered by the shared partial, which reads the picker
+    fields straight off the card. Captured first so the head can decide whether
+    to open a slot for it. -#}
+{% set iconOutput %}
+    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        item: card,
+        class: 'iw-card__icon-img'
+    } only -%}
+{% endset %}
 {% set image = card.image|default(null) %}
 {% set title = card.title|default('') %}
 {% set text = card.text|default('') %}
@@ -41,7 +49,7 @@
 
 {# A media picker that was opened and left empty stores `{id: null}`, which is
    truthy in Twig. Only the id says whether anything was chosen. #}
-{% set hasIcon = icon.id|default(null) is not null %}
+{% set hasIcon = iconOutput|trim is not empty %}
 {% set hasImage = image.id|default(null) is not null %}
 
 {#- Either the card leads somewhere as a whole, or it holds buttons leading to
@@ -94,13 +102,7 @@
 
         <div class="iw-card__head{{ iconAbove ? ' iw-card__head--stacked' : '' }}">
             {% if hasIcon %}
-                <span class="iw-card__icon">
-                    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
-                        media: icon,
-                        format: 'iw_theme_1_1',
-                        alt: ''
-                    } only %}
-                </span>
+                <span class="iw-card__icon">{{ iconOutput }}</span>
             {% endif %}
 
             {% if title is not empty %}

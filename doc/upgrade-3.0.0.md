@@ -833,6 +833,40 @@ The images now sit in `.iw-widget__image-wrap`, which carries the class and
 clips to it, for a single image as for a carousel. `WidgetContractTest` now
 fails any widget handed a radius that puts it nowhere.
 
+### Pictograms move onto the shared picker (breaking, migration provided)
+
+Cards, timeline steps and key figures carried a pictogram long before the theme
+had an icon library, each through a media field of its own: `icon` on a card,
+`icon` on a step, `image` on a key figure. Those names are now the shared ones,
+where `icon` holds a library name and `iconMedia` holds a media.
+
+**Run the migration once, on every environment holding content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-icons --dry-run
+php bin/console iw-sulu:theme:migrate-icons
+php bin/console cache:pool:clear cache.app
+```
+
+It moves each stored media to `iconMedia` and turns `iconCustom` on, so the
+block keeps showing the editor's own file. It can be run twice - a pictogram
+already moved is left alone. Without it, a stored media sits under a field now
+read as an icon name, and no pictogram is rendered.
+
+In exchange, those three blocks gain what the buttons have: the theme library,
+a size, and - where it makes sense - a side and a spacing.
+
+**One rendering changes.** A media SVG used to be shown as it is, and still is
+everywhere except on buttons, where it is masked and takes the colour of the
+label. A library icon on a card, a step or a figure takes the variant's
+highlight colour, the one already colouring the marked words of a title.
+
+### New theme setting: the marker pictogram
+
+**Components > Maps** gains an icon picker beside the marker colour and the
+marker media. A media still wins over it. The map controller reads the SVG from
+a `<template>` rather than an attribute.
+
 ### New: an icon library, and pictograms on buttons
 
 The theme now ships [Heroicons](https://heroicons.com/) 2.2.0 under MIT, 324

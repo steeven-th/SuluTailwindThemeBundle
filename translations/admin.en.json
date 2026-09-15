@@ -1333,6 +1333,8 @@
     "iw_sulu_tailwind_theme.components_maps_custom_attribution": "Custom attribution",
     "iw_sulu_tailwind_theme.components_maps_custom_attribution_info": "Attribution text displayed on the map (HTML allowed). Make sure to comply with your tile provider's terms.",
     "iw_sulu_tailwind_theme.components_maps_marker_color": "Marker color",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon": "Marker icon",
+    "iw_sulu_tailwind_theme.components_maps_marker_icon_info": "An icon from the theme library, instead of the default marker. It takes the marker colour set above. A media picked below wins over it.",
     "iw_sulu_tailwind_theme.components_maps_marker_media": "Custom marker (image)",
     "iw_sulu_tailwind_theme.components_maps_marker_media_info": "Replaces the default pin with an image from the media library (PNG or SVG, ideally with the tip at the bottom center). The marker color is ignored in that case.",
     "iw_sulu_tailwind_theme.components_maps_popup_bg": "Popup background",

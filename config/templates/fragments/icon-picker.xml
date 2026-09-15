@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: the pictogram a block element can carry.
+
+    One picker, two sources. The theme library (Heroicons, shipped with the
+    bundle) covers what a sign usually has to say; the media library covers what
+    only this project has - a logo, a trade symbol. A toggle decides, so the two
+    never compete for the same slot.
+
+    Include it inside the type of a repeatable block, or in a section:
+
+        <xi:include href="../fragments/icon-picker.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+    The conditions read `__parent`, which resolves to the item the fields sit in
+    whatever the nesting depth - an item of a repeatable block, or the block
+    itself for a field declared in a section. Render it with
+    `blocks/common/_icon.html.twig`.
+
+    Blocks whose pictogram sits beside a label add `icon-placement.xml` for the
+    side and the spacing; a pictogram standing above a title needs neither.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="iconCustom" type="checkbox" colspan="12">
+        <meta>
+            <info_text>iw_sulu_tailwind_theme.button_icon_custom_info</info_text>
+        </meta>
+        <params>
+            <param name="type" value="toggler"/>
+            <param name="default_value" value="false"/>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.button_icon_custom</title></meta>
+            </param>
+        </params>
+    </property>
+    <property name="icon" type="single_icon_selection" colspan="12"
+              visibleCondition="__parent.iconCustom != true">
+        <meta>
+            <title>iw_sulu_tailwind_theme.button_icon</title>
+            <info_text>iw_sulu_tailwind_theme.button_icon_info</info_text>
+        </meta>
+        <params>
+            <param name="icon_set" value="iw_theme_outline"/>
+        </params>
+    </property>
+    <property name="iconMedia" type="single_media_selection" colspan="12"
+              visibleCondition="__parent.iconCustom == true">
+        <meta>
+            <title>iw_sulu_tailwind_theme.button_icon_media</title>
+            <info_text>iw_sulu_tailwind_theme.button_icon_media_info</info_text>
+        </meta>
+        <params>
+            <param name="types" value="image"/>
+        </params>
+    </property>
+    <property name="iconSize" type="single_select" colspan="6"
+              visibleCondition="__parent.icon != null OR __parent.iconMedia != null">
+        <meta>
+            <title>iw_sulu_tailwind_theme.button_icon_size</title>
+            <info_text>iw_sulu_tailwind_theme.button_icon_size_info</info_text>
+        </meta>
+        <params>
+            <param name="default_value" value=""/>
+            <param name="values" type="collection">
+                <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                <param name="16"><meta><title>16 px</title></meta></param>
+                <param name="24"><meta><title>24 px</title></meta></param>
+                <param name="32"><meta><title>32 px</title></meta></param>
+                <param name="48"><meta><title>48 px</title></meta></param>
+                <param name="64"><meta><title>64 px</title></meta></param>
+                <param name="72"><meta><title>72 px</title></meta></param>
+            </param>
+        </params>
+    </property>
+</properties>

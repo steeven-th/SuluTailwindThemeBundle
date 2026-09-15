@@ -80,7 +80,9 @@ final class ButtonIconContractTest extends TestCase
     #[Test]
     public function theIconSideIsRevealedThroughTheParentScope(): void
     {
-        foreach (['config/templates/fragments/cta-buttons.xml', 'config/templates/blocks/cards.xml'] as $relative) {
+        // The fields live in the shared fragments now, which is the point of
+        // the factoring: one place declares them, one place has to be right.
+        foreach (['config/templates/fragments/icon-picker.xml', 'config/templates/fragments/icon-placement.xml'] as $relative) {
             $xml = (string) file_get_contents(self::root() . '/' . $relative);
 
             // Matched on the parent reference rather than on the whole
@@ -102,6 +104,60 @@ final class ButtonIconContractTest extends TestCase
                 \sprintf('%s names an icon field without __parent, which never matches.', $relative),
             );
         }
+    }
+
+    /**
+     * No slot holding a pictogram pins a width of its own.
+     *
+     * The size an editor picks lands on the icon, through `--iw-icon-size`. A
+     * slot that also declares a `width` keeps that width whatever the icon does,
+     * so a larger pictogram spills out of it and over whatever sits beside -
+     * which is what a 64px icon did to the title of a card, rather than pushing
+     * it aside.
+     *
+     * Slots hand their default size down instead, which is what the
+     * `--iw-icon-size` declaration next to the class does.
+     */
+    #[Test]
+    public function noIconSlotPinsItsOwnWidth(): void
+    {
+        $css = (string) file_get_contents(self::root() . '/assets/styles/app.css');
+
+        $offenders = [];
+
+        foreach (['.iw-card__icon', '.iw-key-figure__icon', '.iw-timeline-step__icon'] as $slot) {
+            // Every rule declaring that slot on its own, body included.
+            preg_match_all(
+                '/' . preg_quote($slot, '/') . '[^{,]*\{([^}]*)\}/',
+                $css,
+                $rules,
+            );
+
+            foreach ($rules[1] as $body) {
+                if (!str_contains($body, '--iw-icon-size')) {
+                    continue;
+                }
+
+                // The value is read rather than excluded inside the pattern: a
+                // negative lookahead placed after `\s*` lets the engine backtrack
+                // the whitespace away and match anyway, which is how `fit-content`
+                // slipped through the first version of this test.
+                if (1 !== preg_match('/(?<!-)\bwidth:\s*([^;]+);/', $body, $declared)) {
+                    continue;
+                }
+
+                if (!\in_array(trim($declared[1]), ['fit-content', 'auto', 'max-content'], true)) {
+                    $offenders[] = $slot;
+                }
+            }
+        }
+
+        self::assertSame(
+            [],
+            array_unique($offenders),
+            'These icon slots hand a size to their icon and pin a width too, so a larger icon '
+            . 'overflows them instead of taking the room: ' . implode(', ', array_unique($offenders)),
+        );
     }
 
     /**

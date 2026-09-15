@@ -29,16 +29,15 @@
         >
             {% for figure in figures %}
                 <div class="iw-key-figure iw-key-figure--with-icon">
-                    {# Icon / Image #}
-                    {% if figure.image is defined and figure.image.id is defined %}
-                        {% set media = sulu_resolve_media(figure.image.id, app.request.locale) %}
-                        <div class="iw-key-figure__icon iw-key-figure__icon--lg">
-                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
-                                media: media,
-                                format: 'iw_theme_1_1',
-                                classes: 'iw-key-figure__icon-img',
-                            }) }}
-                        </div>
+                    {# Icon #}
+                    {% set figureIcon %}
+                        {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                            item: figure,
+                            class: 'iw-key-figure__icon-img'
+                        } only -%}
+                    {% endset %}
+                    {% if figureIcon|trim is not empty %}
+                        <div class="iw-key-figure__icon iw-key-figure__icon--lg">{{ figureIcon }}</div>
                     {% endif %}
 
                     {% if figure.number is defined and figure.number is not empty %}
