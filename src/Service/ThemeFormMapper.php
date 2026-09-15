@@ -161,7 +161,8 @@ class ThemeFormMapper
         'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
         // Leaflet maps (location block, form widget).
         'components_mapsTileProvider', 'components_mapsCustomTileUrl', 'components_mapsCustomAttribution',
-        'components_mapsScrollZoom', 'components_mapsMarkerColor', 'components_mapsMarkerMedia',
+        'components_mapsScrollZoom', 'components_mapsMarkerColor', 'components_mapsMarkerIcon',
+        'components_mapsMarkerMedia',
         'components_mapsPopupBg', 'components_mapsPopupText',
         'components_mapsControlsBg', 'components_mapsControlsText',
         // Site-wide card appearance (moved from the Articles tab in 3.0).

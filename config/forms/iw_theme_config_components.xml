@@ -534,6 +534,21 @@
                 </property>
 
                 <!-- Custom marker image from the media library, replaces the themed SVG pin. -->
+                <!--
+                    The pictogram of the marker, from the theme library. The
+                    media below wins when both are set: a file an editor went
+                    and picked is a more deliberate choice than a name left over
+                    from an earlier one.
+                -->
+                <property name="components_mapsMarkerIcon" type="single_icon_selection" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_maps_marker_icon</title>
+                        <info_text>iw_sulu_tailwind_theme.components_maps_marker_icon_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="icon_set" value="iw_theme_outline"/>
+                    </params>
+                </property>
                 <property name="components_mapsMarkerMedia" type="single_media_selection" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_maps_marker_media</title>

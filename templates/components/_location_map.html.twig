@@ -49,6 +49,19 @@
         {% endif %}
     {% endif %}
 
+    {#- The marker pictogram, from the theme library. The controller builds a
+        Leaflet DivIcon, which takes markup, and the icon files live on the
+        server - so the SVG travels in a <template> below rather than in a data
+        attribute: its own quotes would close the attribute and spill the rest
+        of the tag into the page as text, which is exactly what they did.
+
+        A media wins over it: going and picking a file is the more deliberate
+        of the two. -#}
+    {% set markerIconName = iw_sulu_tailwind_theme.components_mapsMarkerIcon|default('') %}
+    {% set markerSvg = (markerUrl is null and markerIconName)
+        ? iw_sulu_tailwind_theme_icon(markerIconName, 'solid', {'aria-hidden': 'true'})
+        : '' %}
+
     <div class="iw-location-map {{ mapClass|default('') }}"
          role="region"
          aria-label="{{ mapLabel }}"
@@ -60,6 +73,7 @@
          data-location-map-attribution-value="{{ tileAttribution }}"
          data-location-map-scroll-zoom-value="{{ iw_sulu_tailwind_theme.components_mapsScrollZoom|default('ctrl') }}"
          data-location-map-marker-url-value="{{ markerUrl ?? '' }}"
+
          data-location-map-popup-value="{{ (popup ?? true) ? 'true' : 'false' }}"
          data-location-map-popup-title-value="{{ iw_sulu_tailwind_theme_title_text(title|default('')) }}"
          data-location-map-popup-address-value="{{ address|default('') }}"
@@ -69,6 +83,9 @@
          data-location-map-hint-scroll-mac-value="{{ 'iw_sulu_tailwind_theme.map_hint_scroll_mac'|trans }}"
          data-location-map-hint-touch-value="{{ 'iw_sulu_tailwind_theme.map_hint_touch'|trans }}"
     >
+        {%- if markerSvg -%}
+            <template data-location-map-target="markerIcon">{{ markerSvg }}</template>
+        {%- endif -%}
         <noscript>
             <a href="{{ externalUrl }}" target="_blank" rel="noopener noreferrer" class="iw-location-map__noscript">
                 {{ 'iw_sulu_tailwind_theme.open_map'|trans }} &#8599;
