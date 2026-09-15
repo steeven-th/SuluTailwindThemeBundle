@@ -1217,6 +1217,7 @@ img.object-cover {
 
 .iw-block-document .iw-document-card__title {
     display: block;
+    font-size: var(--iw-document-card-title-size, var(--iw-cards-title-size, inherit));
     font-weight: var(--iw-document-card-title-weight, 500);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1307,7 +1308,7 @@ img.object-cover {
 
 .iw-block-linked-pages .iw-linked-page-card__title {
     display: block;
-    font-size: var(--iw-linked-page-card-title-size, 1.125rem);
+    font-size: var(--iw-linked-page-card-title-size, var(--iw-cards-title-size, 1.125rem));
     font-weight: var(--iw-linked-page-card-title-weight, 600);
     transition: color var(--iw-linked-page-card-transition-duration, 0.3s) ease;
 }
@@ -1318,7 +1319,7 @@ img.object-cover {
 
 .iw-block-linked-pages .iw-linked-page-card__excerpt {
     margin-top: var(--iw-linked-page-card-excerpt-margin-top, 0.5rem);
-    font-size: var(--iw-linked-page-card-excerpt-size, 0.875rem);
+    font-size: var(--iw-linked-page-card-excerpt-size, var(--iw-cards-text-size, 0.875rem));
     opacity: var(--iw-linked-page-card-excerpt-opacity, 0.75);
     display: -webkit-box;
     -webkit-line-clamp: var(--iw-linked-page-card-excerpt-lines, 3);
@@ -2818,7 +2819,7 @@ img.object-cover {
 .iw-block-article-featured .iw-featured-article-card__title {
     font-family: var(--font-h3-family, var(--font-family-heading, sans-serif));
     font-weight: 600;
-    font-size: var(--iw-featured-article-card-title-size, 1.25rem);
+    font-size: var(--iw-featured-article-card-title-size, var(--iw-cards-title-size, 1.25rem));
     line-height: 1.375;
     margin-bottom: var(--iw-featured-article-card-title-margin-bottom, 0.5rem);
     color: var(--iw-featured-article-card-title-color, var(--color-text));
@@ -2865,7 +2866,7 @@ img.object-cover {
 
 /* Excerpt */
 .iw-block-article-featured .iw-featured-article-card__excerpt {
-    font-size: var(--iw-featured-article-card-excerpt-size, 0.875rem);
+    font-size: var(--iw-featured-article-card-excerpt-size, var(--iw-cards-text-size, 0.875rem));
     color: var(--iw-featured-article-card-excerpt-color, var(--color-secondary-600));
     margin-bottom: var(--iw-featured-article-card-excerpt-margin-bottom, 0.5rem);
     display: -webkit-box;
@@ -4181,10 +4182,24 @@ section.block:has([data-slider-fullbleed-value]) {
     width: 100%;
 }
 
+/* The title of the banner is the h1 of the page, so it takes the h1 size of the
+   theme. It used to carry a clamp of its own, which nothing could reach: the
+   variable in front of it is never written by the compiler, so the hard-coded
+   range was always the answer, whatever the admin asked for. A theme with a
+   display scale saw its banner capped well under its h1 and passed by the
+   titles of its own blocks, since those do read the scale.
+
+   The scale is already fluid where it needs to be, the compiler emits headings
+   above 2rem as a clamp, so following it here keeps the hierarchy true at every
+   width by construction rather than by hand. The literal clamp stays as a last
+   resort for a page rendered without a compiled theme.
+
+   Weight and line height stay put: a title sitting on a photograph has its own
+   legibility constraints, which the typographic scale knows nothing about. */
 .iw-page-hero__title {
     margin: 0;
     color: var(--iw-page-hero-title-color, #fff);
-    font-size: var(--iw-page-hero-title-size, clamp(1.75rem, 4vw, 3rem));
+    font-size: var(--iw-page-hero-title-size, var(--font-size-h1, clamp(1.75rem, 4vw, 3rem)));
     font-weight: var(--iw-page-hero-title-weight, 700);
     line-height: var(--iw-page-hero-title-line-height, 1.15);
     text-shadow: var(--iw-page-hero-title-shadow, 0 1px 3px rgba(0, 0, 0, 0.4));
@@ -5822,14 +5837,14 @@ aside .iw-toc {
 
 .iw-card__title {
     margin: 0;
-    font-size: var(--iw-card-title-size, 1.0625rem);
+    font-size: var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem));
     font-weight: 600;
     color: var(--iw-variant-title-color, inherit);
 }
 
 .iw-card__text {
     flex: 1 1 auto;
-    font-size: var(--iw-card-text-size, 0.9375rem);
+    font-size: var(--iw-card-text-size, var(--iw-cards-text-size, 0.9375rem));
     line-height: 1.6;
 }
 
@@ -5995,12 +6010,18 @@ aside .iw-toc {
     color: var(--iw-variant-link-hover, var(--iw-variant-link-color, inherit));
 }
 
+/* The hover of a card comes from Components > Cards, like every other family.
+   It used to be written here, so the one block most pages are built from was
+   also the one nobody could tune: six settings drove the article cards and none
+   of them reached this. The literals stay behind the tokens for a page rendered
+   without a compiled theme. */
 a.iw-card {
-    transition: transform .15s ease, box-shadow .15s ease;
+    transition: transform var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease),
+        box-shadow var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease);
 }
 
 a.iw-card:hover {
-    transform: translateY(-2px);
+    transform: var(--iw-cards-hover-transform, translateY(-2px));
 }
 
 @media (prefers-reduced-motion: reduce) {

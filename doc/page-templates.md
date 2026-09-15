@@ -77,7 +77,7 @@ Public BEM classes (styleable in your theme without touching the Twig):
 | `.iw-page-hero--shade-{none\|light\|medium\|strong}` | Readability veil (`--iw-page-hero-shade`, `--iw-page-hero-shade-opacity`) |
 | `.iw-page-hero--x-{left\|center\|right}` | Horizontal text alignment (overlay + below) |
 | `.iw-page-hero__inner` / `.iw-page-hero__caption` | Overlay content wrapper / below-image wrapper |
-| `.iw-page-hero__title` (+ `--below`) | The H1 (`--iw-page-hero-title-*`) |
+| `.iw-page-hero__title` (+ `--below`) | The H1. Its size is the h1 of the theme scale, fluid clamp included, so the banner cannot be passed by the blocks of its own page. Override with `--iw-page-hero-title-size`, and the rest with `--iw-page-hero-title-*` |
 | `.iw-page-hero__subtitle` (+ `--below`) | The tagline (`--iw-page-hero-subtitle-*`) |
 | `.iw-page-hero__breadcrumb` (+ `--above`) | Breadcrumb trail. The modifier moves its margin to the other side, for a breadcrumb sitting above the titles |
 | `.iw-page-hero:not(.iw-page-hero--no-image) .iw-page-hero__overlay .iw-page-hero__breadcrumb` | The one case with light colors and a shadow (`--iw-page-hero-breadcrumb-*`): sitting over the image. Everywhere else the breadcrumb keeps the colors set in **Components → Breadcrumb** |

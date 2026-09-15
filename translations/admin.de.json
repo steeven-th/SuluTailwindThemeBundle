@@ -1093,6 +1093,10 @@
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Bild-Verhältnis der Karten",
     "iw_sulu_tailwind_theme.card_gap": "Kartenabstand",
+    "iw_sulu_tailwind_theme.card_title_size": "Titelgröße",
+    "iw_sulu_tailwind_theme.card_title_size_info": "In rem. Leer behält jede Kartenfamilie ihre eigene Größe. Ausgefüllt folgen alle.",
+    "iw_sulu_tailwind_theme.card_text_size": "Textgröße",
+    "iw_sulu_tailwind_theme.card_text_size_info": "In rem. Leer behält jede Kartenfamilie ihre eigene Größe.",
     "iw_sulu_tailwind_theme.card_gap_info": "Gilt für Raster mit Artikelkarten (Listen, Raster, Karussell, Hervorhebung). Bildraster und die übrigen Komponentenraster haben eigene Einstellungen unter „Standardwerte > Blöcke“.",
     "iw_sulu_tailwind_theme.card_gap_very_compact": "Sehr kompakt - 8 px (gap-2)",
     "iw_sulu_tailwind_theme.card_gap_compact": "Kompakt - 16 px (gap-4)",

@@ -1191,6 +1191,10 @@
 
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Ratio image des cartes",
     "iw_sulu_tailwind_theme.card_gap": "Espacement entre cartes",
+    "iw_sulu_tailwind_theme.card_title_size": "Taille du titre",
+    "iw_sulu_tailwind_theme.card_title_size_info": "En rem. Vide, chaque famille de cartes garde sa taille d'origine. Renseignée, toutes la suivent.",
+    "iw_sulu_tailwind_theme.card_text_size": "Taille du texte",
+    "iw_sulu_tailwind_theme.card_text_size_info": "En rem. Vide, chaque famille de cartes garde sa taille d'origine.",
     "iw_sulu_tailwind_theme.card_gap_info": "S'applique aux grilles de cartes d'articles (listes, grille, carrousel, mise en avant). Les grilles d'images et les autres grilles de composants ont leurs propres réglages dans « Réglages par défaut > Blocs ».",
     "iw_sulu_tailwind_theme.card_gap_very_compact": "Très compact - 8 px (gap-2)",
     "iw_sulu_tailwind_theme.card_gap_compact": "Compact - 16 px (gap-4)",

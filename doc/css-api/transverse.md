@@ -103,6 +103,59 @@ The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery
 
 ---
 
+## Card type
+
+Five families of card ship five title sizes, from 1.0625rem to 1.25rem, because
+each was written where its block was. Two site-wide tokens line them up:
+
+| Admin setting | Token | Sizes |
+|---|---|---|
+| Components > Cards > **Title size** (`cardTitleSize`) | `--iw-cards-title-size` | The title of every card |
+| Components > Cards > **Text size** (`cardTextSize`) | `--iw-cards-text-size` | The text or excerpt of every card |
+
+Each family keeps a variable of its own in front of the token, so one family can
+still be tuned alone from a stylesheet:
+
+```css
+font-size: var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem));
+```
+
+**Leave the fields empty and nothing changes.** The token is then not emitted at
+all, and every family keeps the size it ships with. Emitting it empty would not
+do: a token set to nothing is still set, so it would win over the literal and
+collapse every card to the browser default.
+
+The families reached: the Cards block (`.iw-card`), article cards
+(`.iw-article-card`), the featured article card, linked page cards and document
+cards.
+
+Size modifiers of a layout stay out of it. The featured article card has a hero
+step and a small step, `--iw-featured-article-card-title-size-hero` and
+`-sm`, which exist to draw a difference a single token would flatten.
+
+### Hover
+
+The same section drives the hover of every card, through two mechanisms that
+answer to one field. An article card carries a modifier class its template picks
+per block, the Cards block reads tokens:
+
+| Token | From |
+|---|---|
+| `--iw-cards-hover-transform` | Components > Cards > **Hover transform** (`cardHoverTransform`) |
+| `--iw-cards-hover-duration` | Components > Cards > **Duration** (`cardHoverDuration`) |
+| `--iw-cards-hover-easing` | Components > Cards > **Easing** (`cardHoverEasing`) |
+
+`cardHoverTransform` defaults to `lift`, the small rise the Cards block has
+always drawn. A card you can click that answers nothing on hover reads as broken
+rather than as restraint, so that is the default for every family now.
+
+The shadow of a card at rest stays a per-block choice (`shadow` on the block),
+not a site-wide one: it says how a particular card sits on its page.
+
+Colours are a separate matter and do not belong here: a card inside a block
+takes them from the colour variant, which is what makes a block coherent with
+itself. Only the type and the hover are site-wide.
+
 ## Split block gap
 
 Blocks built from two content zones - text + images, form + widget, map + info,
