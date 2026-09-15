@@ -836,6 +836,8 @@
     "iw_sulu_tailwind_theme.mosaic_gap": "Image spacing",
     "iw_sulu_tailwind_theme.gallery_gap": "Image spacing",
     "iw_sulu_tailwind_theme.image_gap_theme": "Theme default",
+    "iw_sulu_tailwind_theme.highlight_numbers": "Highlight the figures",
+    "iw_sulu_tailwind_theme.highlight_numbers_info": "The figures take the highlight colour of the variant, set under Colours. Unchecked, they keep the text colour.",
     "iw_sulu_tailwind_theme.image_scrim": "Image scrim",
     "iw_sulu_tailwind_theme.image_scrim_info": "Darkens the image so the text over it stays readable. With no scrim, pick a variant whose text contrasts with your image.",
     "iw_sulu_tailwind_theme.image_scrim_none": "None",

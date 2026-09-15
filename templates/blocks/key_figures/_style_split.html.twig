@@ -9,9 +9,14 @@
 {% set ctaBlockKey = _key|default(null) %}
 
 {% block block_content %}
+{#- The figures take the variant's highlight colour unless the editor turns it
+    off. `?? true` keeps the default for content published before the setting
+    existed, where `|default(true)` would read an explicit false as empty and
+    put the highlight back. -#}
+{% set highlightClass = (highlightNumbers ?? true) ? ' iw-block-key-figures--highlight' : '' %}
     {% set figuresRight = not (contentRight|default(false)) %}
 
-    <div class="iw-block-key-figures iw-block-key-figures--split iw-split-gap">
+    <div class="iw-block-key-figures iw-block-key-figures--split iw-split-gap{{ highlightClass }}">
         <div class="iw-block-key-figures__content{{ figuresRight ? '' : ' iw-block-key-figures__content--last' }}">
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_titles.html.twig' with {
                 title: title|default(''),

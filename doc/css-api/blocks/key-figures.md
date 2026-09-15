@@ -21,6 +21,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `.iw-block-key-figures--timeline` | Vertical timeline with dots and alternating cards. |
 | `.iw-block-key-figures--with-icons` | Grid with large icons (1–4 columns on desktop). |
 | `.iw-block-key-figures--split` | Text (titles, rich text, action buttons) on one side, figures stacked on the other from `lg`. Replaces the CTA block's counter accessory, removed in 3.0.0. |
+| `.iw-block-key-figures--highlight` | Present unless the editor unticks **Settings > Highlight the figures**. Paints the counters with the variant's highlight colour, the one already colouring the `[[marked]]` words of a title. Not offered on `--progress`, whose percentage accompanies its bar. |
 | `.iw-block-key-figures--cols-1` to `--cols-4` | Column-count modifier used together with `--with-icons` to select the desktop layout. |
 | `.iw-block-key-figures__content` | Text zone of `--split`; `--last` moves it after the figures on desktop. |
 | `.iw-block-key-figures__figures` | Figures zone of `--split`; `--first` moves it before the text on desktop. |
@@ -70,7 +71,8 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-key-figure-counter-color` | `var(--iw-variant-paragraph-color, inherit)` | Counter color. |
+| `--iw-key-figure-counter-color` | `var(--iw-variant-paragraph-color, inherit)` | Counter colour when the figures are not highlighted. |
+| `--iw-key-figure-counter-highlight-color` | `var(--iw-variant-highlight, var(--color-accent))` | Counter colour under `.iw-block-key-figures--highlight`. Follows the variant's highlight colour by default, so one setting governs the marked words of a title, the number of a card and the figures here. |
 | `--iw-key-figure-counter-weight` | `700` | Counter font-weight. |
 | `--iw-key-figure-counter-size` | `1.5rem` | Default counter size. |
 | `--iw-key-figure-counter-size-md` | `1.5rem` | `__counter--md` mobile size. |
