@@ -502,14 +502,59 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: menu tab ────────────────────────────────
+            // ── Edit form: menu group (second row of tabs) ─────────
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu', '/menu')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_menu')
-                    ->setTabTitle('iw_sulu_tailwind_theme.menu')
-                    ->addToolbarActions($formToolbarActions)
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.menu_group',
+                    '/menu',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.menu')
                     ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: menu, configuration tab ─────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu', '/configuration')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_settings')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_settings')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, display tab ───────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu_display', '/display')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_display')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_display')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, chrome tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(
+                    static::EDIT_FORM_VIEW . '.menu_appearance',
+                    '/chrome',
+                )
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_appearance')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_appearance')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, colors tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu_colors', '/colors')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_colors')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_colors')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
             );
 
             // ── Edit form: footer tab ──────────────────────────────
