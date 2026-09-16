@@ -14,21 +14,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Moves the pictograms of published content onto the shared icon picker.
+ * Moves the pictograms of key figures onto the shared icon picker.
  *
- * Several blocks carried a pictogram long before the theme had an icon library,
- * each through a media field of its own: `icon` on a card, `icon` on a timeline
- * step, `image` on a key figure. Those names are now the shared ones, where
- * `icon` holds a library name and `iconMedia` holds a media - so a stored media
- * sitting under `icon` would be read as an icon name and render nothing.
+ * A key figure carried its pictogram in a media field named `image` long before
+ * the theme had an icon library. That name is now the shared one, where `icon`
+ * holds a library name and `iconMedia` holds a media - so a media stored the old
+ * way renders nothing at all.
  *
  * This command moves it: the media goes to `iconMedia`, and `iconCustom` is
  * turned on so the block keeps showing the editor's own file. Nothing else
  * changes, and content already migrated is left alone, so it can be run twice.
+ *
+ * Only key figures are covered, on purpose. Cards and timelines carry a
+ * pictogram too, but both blocks were born in 3.0.0 and no published site ever
+ * stored one the old way.
  */
 #[AsCommand(
     name: 'iw-sulu:theme:migrate-icons',
-    description: 'Move block pictograms onto the shared icon picker',
+    description: 'Move key figure pictograms onto the shared icon picker',
 )]
 class IconsMigrateCommand extends Command
 {
@@ -36,11 +39,10 @@ class IconsMigrateCommand extends Command
      * Block type => the media field it used to carry its pictogram in.
      *
      * The key is the `type` stored on each block, so a block of another kind
-     * holding a field of the same name is never touched.
+     * holding a field of the same name is never touched - `image` is a common
+     * enough name for that to matter.
      */
     private const MOVES = [
-        'cards' => ['items' => 'items', 'field' => 'icon'],
-        'timeline' => ['items' => 'steps', 'field' => 'icon'],
         'key_figures' => ['items' => 'figures', 'field' => 'image'],
     ];
 
@@ -69,13 +71,15 @@ class IconsMigrateCommand extends Command
         $this
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what would change without writing anything')
             ->setHelp(<<<'HELP'
-                Run it once after upgrading, on every environment holding content:
+                Run it once when upgrading from 2.x, on every environment
+                holding content:
 
                   <info>php bin/console iw-sulu:theme:migrate-icons --dry-run</info>
                   <info>php bin/console iw-sulu:theme:migrate-icons</info>
 
-                Pages, snippets and articles are all covered. It can be run
-                twice: a pictogram already moved is left alone.
+                It covers the pictograms of key figures, on pages, snippets and
+                articles alike. It can be run twice: a pictogram already moved
+                is left alone.
                 HELP);
     }
 

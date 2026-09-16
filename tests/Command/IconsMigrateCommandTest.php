@@ -31,7 +31,7 @@ final class IconsMigrateCommandTest extends TestCase
     private array $updates = [];
 
     /**
-     * One card holding a media under the old field name.
+     * One key figure holding a media under the old field name.
      *
      * @return string The stored JSON of a row
      */
@@ -40,9 +40,9 @@ final class IconsMigrateCommandTest extends TestCase
         return json_encode([
             'blocks' => [
                 [
-                    'type' => 'cards',
-                    'items' => [
-                        ['title' => 'A card', 'icon' => ['id' => 12, 'ids' => [12]]],
+                    'type' => 'key_figures',
+                    'figures' => [
+                        ['number' => '42', 'image' => ['id' => 12, 'ids' => [12]]],
                     ],
                 ],
             ],
@@ -112,11 +112,11 @@ final class IconsMigrateCommandTest extends TestCase
         self::assertCount(1, $this->updates, 'the row holding a pictogram was not migrated');
 
         $written = json_decode((string) $this->updates[0]['data']['templateData'], true);
-        $item = $written['blocks'][0]['items'][0];
+        $item = $written['blocks'][0]['figures'][0];
 
         self::assertSame(['id' => 12, 'ids' => [12]], $item['iconMedia']);
         self::assertTrue($item['iconCustom']);
-        self::assertArrayNotHasKey('icon', $item, 'the old field must be cleared, it now means an icon name');
+        self::assertArrayNotHasKey('image', $item, 'the old field must be cleared, it now means something else');
         self::assertSame(['id' => 7], $this->updates[0]['criteria']);
     }
 
@@ -204,9 +204,9 @@ final class IconsMigrateCommandTest extends TestCase
         $migrated = json_encode([
             'blocks' => [
                 [
-                    'type' => 'cards',
-                    'items' => [
-                        ['title' => 'A card', 'iconCustom' => true, 'iconMedia' => ['id' => 12, 'ids' => [12]]],
+                    'type' => 'key_figures',
+                    'figures' => [
+                        ['number' => '42', 'iconCustom' => true, 'iconMedia' => ['id' => 12, 'ids' => [12]]],
                     ],
                 ],
             ],
@@ -221,6 +221,31 @@ final class IconsMigrateCommandTest extends TestCase
 
         self::assertSame([], $this->updates);
         self::assertStringContainsString('No pictogram left to move', $tester->getDisplay());
+    }
+
+    /**
+     * Cards and timelines carry a pictogram too, but both blocks were born in
+     * 3.0.0: no published site ever stored one the old way, so the command has
+     * no business rewriting a field it happens to recognise.
+     */
+    #[Test]
+    public function itLeavesBlocksBornInThisVersionAlone(): void
+    {
+        $content = json_encode([
+            'blocks' => [
+                ['type' => 'cards', 'items' => [['title' => 'A card', 'icon' => ['id' => 12, 'ids' => [12]]]]],
+                ['type' => 'timeline', 'steps' => [['title' => 'A step', 'icon' => ['id' => 13, 'ids' => [13]]]]],
+            ],
+        ], \JSON_THROW_ON_ERROR);
+
+        $tester = $this->tester(
+            ['pa_page_dimension_contents' => [['id' => 1, 'template_data' => $content]]],
+            ['pa_page_dimension_contents'],
+        );
+
+        $tester->execute([]);
+
+        self::assertSame([], $this->updates);
     }
 
     /**

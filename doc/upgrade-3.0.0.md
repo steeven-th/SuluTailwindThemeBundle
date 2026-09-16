@@ -835,10 +835,9 @@ fails any widget handed a radius that puts it nowhere.
 
 ### Pictograms move onto the shared picker (breaking, migration provided)
 
-Cards, timeline steps and key figures carried a pictogram long before the theme
-had an icon library, each through a media field of its own: `icon` on a card,
-`icon` on a step, `image` on a key figure. Those names are now the shared ones,
-where `icon` holds a library name and `iconMedia` holds a media.
+A key figure carried its pictogram in a media field named `image`. That name is
+now the shared one, where `icon` holds a library name and `iconMedia` holds a
+media, so a media stored the old way renders nothing at all.
 
 **Run the migration once, on every environment holding content:**
 
@@ -850,17 +849,20 @@ php bin/console cache:pool:clear cache.app
 
 It moves each stored media to `iconMedia` and turns `iconCustom` on, so the
 block keeps showing the editor's own file. It can be run twice - a pictogram
-already moved is left alone. Without it, a stored media sits under a field now
-read as an icon name, and no pictogram is rendered.
+already moved is left alone.
 
-**Pages, snippets and articles are all covered**, since those three blocks can
-be placed on any of them. The command reads `pa_page_dimension_contents`,
+**Pages, snippets and articles are all covered**, since the block can be placed
+on any of them. The command reads `pa_page_dimension_contents`,
 `sn_snippet_dimension_contents` and `ar_article_dimension_contents`, skipping
 the last one when SuluArticleBundle is not installed, and reports what it moved
 table by table. MySQL and PostgreSQL are both supported.
 
-In exchange, those three blocks gain what the buttons have: the theme library,
-a size, and - where it makes sense - a side and a spacing.
+Cards and timeline steps carry a pictogram too, and through the same shared
+picker, but both blocks appear in this version: nothing of theirs needs moving,
+and the migration leaves them alone.
+
+In exchange, key figures gain what the buttons have: the theme library, a size,
+and a spacing.
 
 **One rendering changes.** A media SVG used to be shown as it is, and still is
 everywhere except on buttons, where it is masked and takes the colour of the
