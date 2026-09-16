@@ -797,20 +797,55 @@ Tailwind's preflight removes list markers site-wide (`list-style: none` on `ol` 
 
 ---
 
-## Gallery navigation
+## Navigation controls
 
-Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sliders, testimonial slider, linked-pages carousel, etc.).
+The arrows, dots and chevrons that move a visitor through a block. They split
+by what they sit on, which is the rule the surfaces follow too: whoever
+guarantees the background guarantees what reads on it.
 
-| Class | Role |
-|-------|------|
-| `.iw-gallery-nav` | Base arrow button (size `40x40`, rounded full, current color) |
-| `.iw-gallery-nav--sm` | Smaller variant for inline contexts (thumbnail strip, etc.) |
+### On the content
+
+Accordion chevrons, the dots under a carousel, list chevrons. The text around
+them is painted by the variant, so following it is the right default, and the
+theme setting only overrules that.
+
+```
+--iw-block-<name>-…  →  --iw-controls-on-content-color  →  currentColor
+```
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `--iw-gallery-nav-color` | Arrow icon color | `currentColor` |
-| `--iw-gallery-nav-bg` | Background at rest | `color-mix(in srgb, currentColor 8%, transparent)` |
-| `--iw-gallery-nav-bg-hover` | Background on hover | `color-mix(in srgb, currentColor 15%, transparent)` |
+| `--iw-controls-on-content-color` | Colour of every control over content | unset, so `currentColor` |
+| `--iw-accordion-icon-color` | The accordion chevron alone | the shared token |
+| `--iw-block-linked-pages-nav-color` | The dots of a linked-pages carousel | the shared token |
+| `--iw-block-testimonial-dot-color` | The dots of a testimonial slider | the shared token |
+
+Set from **Settings > Themes > Default settings > Navigation > Arrows and
+dots**. Left empty nothing is emitted at all, so an existing site does not
+move.
+
+### On a media
+
+The arrows over a gallery photo. A variant can say nothing about a photograph
+the editor chose, so these carry their own colour and their own veil.
+
+| Class | Role |
+|-------|------|
+| `.iw-gallery-nav` | Base arrow button (`3rem`, round, white on a white veil) |
+| `.iw-gallery-nav--sm` | Smaller variant for inline contexts (thumbnail strip) |
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--iw-gallery-nav-color` | Arrow colour | `white` |
+| `--iw-gallery-nav-bg` | Background at rest | `rgba(255, 255, 255, 0.2)` |
+| `--iw-gallery-nav-bg-hover` | Background on hover | `rgba(255, 255, 255, 0.4)` |
+| `--iw-gallery-nav-radius` | Shape of the button | `9999px` |
+| `--iw-gallery-nav-size` | Button size | `3rem` |
+| `--iw-gallery-nav-icon-size` | Arrow size inside it | `1.5rem` |
+
+Setting the background from the admin derives the hover state from it, moving
+it 15% towards the arrow colour: a veil set to dark would otherwise brighten
+back to white under the pointer.
 
 **Override example:**
 ```css
@@ -820,6 +855,16 @@ Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sli
     --iw-gallery-nav-bg-hover: rgba(0, 0, 0, 0.12);
 }
 ```
+
+### The arrow itself
+
+One partial draws every arrow in the bundle -
+`components/_nav_arrow.html.twig` - and the theme picks the pictogram once for
+the whole site, from **Arrow pictogram** in the same tab. The direction is a
+class the stylesheet turns (`.iw-nav-arrow--prev`, `--up`, `--down`), so one
+arrow is chosen rather than four that would have to agree with each other.
+
+Left empty, the chevron these templates have always drawn is used.
 
 ---
 

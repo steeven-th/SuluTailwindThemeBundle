@@ -160,17 +160,29 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="components_backToTopIcon" type="single_select" colspan="6"
-                          visibleCondition="components_backToTopEnabled == true">
-                    <meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon</title></meta>
+                <property name="backToTopIconHeading" type="heading">
                     <params>
-                        <param name="default_value" value="arrow"/>
-                        <param name="values" type="collection">
-                            <param name="arrow"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_arrow</title></meta></param>
-                            <param name="chevron"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_chevron</title></meta></param>
-                            <param name="chevron_double"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_chevron_double</title></meta></param>
-                            <param name="arrow_line"><meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_arrow_line</title></meta></param>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.config_group_icon</title></meta>
                         </param>
+                    </params>
+                </property>
+
+                <!--
+                    The whole library rather than the four shapes this field
+                    used to offer. Those four are still stored on existing
+                    themes and still render: the template reads them through a
+                    table of equivalents, which is enough when the old set of
+                    values is finite and known - cheaper than a migration
+                    command, and it cannot half-run.
+                -->
+                <property name="components_backToTopIcon" type="single_icon_selection" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_back_to_top_icon</title>
+                    </meta>
+                    <params>
+                        <param name="icon_set" value="iw_theme_outline"/>
                     </params>
                 </property>
 
