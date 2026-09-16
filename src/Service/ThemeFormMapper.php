@@ -155,7 +155,7 @@ class ThemeFormMapper
         'components_sidebarStyle', 'components_filtersShowSearch', 'components_filtersShowSort',
         'components_filtersShowCategories', 'components_filtersShowTags',
         'components_backToTopEnabled', 'components_backToTopThreshold',
-        'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg',
+        'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg', 'components_backToTopHoverBg',
         'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
         'components_paginationText', 'components_paginationAccent',
         // Navigation controls: the arrows, dots and chevrons of a block.

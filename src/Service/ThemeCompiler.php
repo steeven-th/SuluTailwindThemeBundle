@@ -502,12 +502,21 @@ class ThemeCompiler
         $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
         $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
 
+        // The hover state has to follow the background it hovers. Its default
+        // was mixed from the accent surface, so a button given a background of
+        // its own jumped back to the theme accent under the pointer.
+        $hoverBg = $this->surfaceValue(
+            $tokens['components_backToTopHoverBg'] ?? '',
+            "color-mix(in srgb, {$bg}, var(--color-text) 15%)",
+        );
+
         $css = "  /* Back-to-top (site-wide) */\n";
         $css .= "  --iw-back-to-top-radius: {$radius};\n";
         $css .= "  --iw-back-to-top-size: {$button};\n";
         $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
         $css .= "  --iw-back-to-top-bg: {$bg};\n";
         $css .= "  --iw-back-to-top-color: {$color};\n";
+        $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
 
         return $css . "\n";
     }

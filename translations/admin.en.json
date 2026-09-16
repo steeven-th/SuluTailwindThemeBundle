@@ -1238,6 +1238,8 @@
     "iw_sulu_tailwind_theme.components_back_to_top_size_md": "Medium",
     "iw_sulu_tailwind_theme.components_back_to_top_size_lg": "Large",
     "iw_sulu_tailwind_theme.components_back_to_top_bg": "Background color",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg": "Background on hover",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg_info": "Background of the button under the pointer. Empty: the chosen background mixed towards the text colour, so the button reacts whatever background it was given.",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_color": "Icon color",
     "iw_sulu_tailwind_theme.components_back_to_top_icon": "Icon",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_media": "Custom icon",

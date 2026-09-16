@@ -1329,6 +1329,8 @@
     "iw_sulu_tailwind_theme.components_back_to_top_size_md": "Moyenne",
     "iw_sulu_tailwind_theme.components_back_to_top_size_lg": "Grande",
     "iw_sulu_tailwind_theme.components_back_to_top_bg": "Couleur de fond",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg": "Fond au survol",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg_info": "Fond du bouton quand la souris le survole. Vide : le fond choisi, mélangé vers la couleur du texte, pour que le bouton réagisse quel que soit son fond.",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_color": "Couleur de l'icône",
     "iw_sulu_tailwind_theme.components_back_to_top_icon": "Icône",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_media": "Icône personnalisée",

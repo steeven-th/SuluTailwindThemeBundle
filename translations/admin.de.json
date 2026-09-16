@@ -1231,6 +1231,8 @@
     "iw_sulu_tailwind_theme.components_back_to_top_size_md": "Mittel",
     "iw_sulu_tailwind_theme.components_back_to_top_size_lg": "Groß",
     "iw_sulu_tailwind_theme.components_back_to_top_bg": "Hintergrundfarbe",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg": "Hintergrund beim Hover",
+    "iw_sulu_tailwind_theme.components_back_to_top_hover_bg_info": "Hintergrund der Schaltfläche unter dem Zeiger. Leer: der gewählte Hintergrund, zur Textfarbe hin gemischt, damit die Schaltfläche bei jedem Hintergrund reagiert.",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_color": "Symbolfarbe",
     "iw_sulu_tailwind_theme.components_back_to_top_icon": "Symbol",
     "iw_sulu_tailwind_theme.components_back_to_top_icon_media": "Eigenes Symbol",

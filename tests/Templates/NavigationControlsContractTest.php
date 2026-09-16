@@ -94,4 +94,47 @@ final class NavigationControlsContractTest extends TestCase
 
         return (string) file_get_contents($path);
     }
+
+    /**
+     * Every button holding an arrow over a media wears the shared class.
+     *
+     * The colour and the veil of those buttons are read by `.iw-gallery-nav`
+     * and by nothing else, so a slider that dresses its own buttons is a
+     * slider the theme cannot reach. The image slider did exactly that, with
+     * `bg-black/40 text-white rounded-full` written into the markup: neither
+     * the admin nor an integrator could touch it, and it was invisible until
+     * someone set a colour and watched that one slider ignore it.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function mediaSliders(): array
+    {
+        return [
+            'gallery slider' => ['templates/blocks/gallery/_style_slider.html.twig'],
+            'gallery carousel' => ['templates/blocks/gallery/_style_carousel.html.twig'],
+            'gallery wide carousel' => ['templates/blocks/gallery/_style_wide_carousel.html.twig'],
+            'gallery filmstrip' => ['templates/blocks/gallery/_style_filmstrip.html.twig'],
+            'testimonial slider' => ['templates/blocks/testimonial/_style_slider.html.twig'],
+            'image slider' => ['templates/blocks/common/_image_slider.html.twig'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('mediaSliders')]
+    public function everyArrowOverAMediaWearsTheSharedClass(string $relative): void
+    {
+        $path = \dirname(__DIR__, 2) . '/' . $relative;
+        self::assertFileExists($path);
+
+        $template = (string) file_get_contents($path);
+
+        self::assertStringContainsString(
+            'iw-gallery-nav',
+            $template,
+            \sprintf(
+                '%s draws arrows over a media without the shared class, so the theme colours never reach them.',
+                basename($relative),
+            ),
+        );
+    }
 }

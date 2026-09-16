@@ -154,6 +154,17 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
+                <!-- Empty: the background mixed towards the text, so the button
+                     reacts whatever background it was given. -->
+                <property name="components_backToTopHoverBg" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_back_to_top_hover_bg</title>
+                        <info_text>iw_sulu_tailwind_theme.components_back_to_top_hover_bg_info</info_text>
+                    </meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
                 <property name="components_backToTopIconColor" type="iw_theme_color_token_editor" colspan="6"
                           visibleCondition="components_backToTopEnabled == true">
                     <meta><title>iw_sulu_tailwind_theme.components_back_to_top_icon_color</title></meta>
