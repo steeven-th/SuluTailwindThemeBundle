@@ -354,14 +354,51 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: colors tab ──────────────────────────────
+            // ── Edit form: colors group (second row of tabs) ───────
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors', '/colors')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_colors')
-                    ->setTabTitle('iw_sulu_tailwind_theme.colors')
-                    ->addToolbarActions($formToolbarActions)
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.colors_group',
+                    '/colors',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.colors')
                     ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: colors, palette tab ─────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors', '/palette')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_palette')
+                    ->setTabTitle('iw_sulu_tailwind_theme.colors_section_main')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
+            );
+
+            // ── Edit form: colors, text tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors_text', '/text')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_text')
+                    ->setTabTitle('iw_sulu_tailwind_theme.colors_section_text')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
+            );
+
+            // ── Edit form: colors, surfaces tab ────────────────────
+            // These six were a section of the components tab. They name colours
+            // every transverse component shares, which makes them a palette.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(
+                    static::EDIT_FORM_VIEW . '.colors_surfaces',
+                    '/surfaces',
+                )
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_surfaces')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_surfaces')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
             );
 
             // ── Edit form: typography tab ──────────────────────────

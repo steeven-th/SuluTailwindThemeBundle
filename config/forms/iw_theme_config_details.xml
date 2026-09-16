@@ -22,5 +22,33 @@
                 <info_text>iw_sulu_tailwind_theme.label_info</info_text>
             </meta>
         </property>
+
+        <!--
+            Social preview, which used to be a section of its own holding a
+            single field. It belongs with what identifies the theme rather than
+            with the components: it is the picture the site shares under its
+            own name.
+        -->
+        <property name="sharingHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.components_section_sharing</title></meta>
+                </param>
+            </params>
+        </property>
+
+        <!-- Last-resort share thumbnail. Used only when the page provides
+             neither an excerpt image nor a hero image, so that a page built
+             out of blocks (the home page, typically) still shares with a
+             picture. Served through the iw_og_image format (1200x630). -->
+        <property name="components_shareDefaultImage" type="single_media_selection" colspan="12">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_share_default_image</title>
+                <info_text>iw_sulu_tailwind_theme.components_share_default_image_info</info_text>
+            </meta>
+            <params>
+                <param name="types" value="image"/>
+            </params>
+        </property>
     </properties>
 </form>

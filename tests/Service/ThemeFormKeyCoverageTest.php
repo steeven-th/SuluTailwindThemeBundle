@@ -21,31 +21,91 @@ use PHPUnit\Framework\TestCase;
  * `pageHero_breadcrumbPosition` shipped broken.
  *
  * It happened a second time, to six fields of the menu form at once - the two
- * transparent-mode logos and the whole bar chrome (border, shadow, background
- * opacity, blur) - because this test only looked at two of the four forms
- * whose fields the mapper carries by name. Hence the prefixes below: the menu
- * and footer lists store keys unprefixed, and comparing them to the XML takes
- * that into account rather than leaving those forms unchecked.
+ * transparent-mode logos and the whole bar chrome - because this test only
+ * looked at two of the four forms whose fields the mapper carries by name. It
+ * now finds the forms itself rather than holding a list, so a form added to
+ * `config/forms` is covered the day it lands.
  */
 final class ThemeFormKeyCoverageTest extends TestCase
 {
     /**
-     * The config forms whose scalar fields the mapper carries by name.
+     * Prefixes the mapper carries wholesale, whatever the field is called.
      *
-     * Checked against every list at once rather than one per form: a form
-     * carries fields from more than one, the articles one holding `components_*`
-     * settings among its own.
+     * Each is read by an unflatten pass that walks the data looking for the
+     * prefix, so a new field under one of them needs no list entry. The menu
+     * and footer prefixes are deliberately absent: those two carry only the
+     * names they list, which is exactly how six menu fields went missing.
+     *
+     * @var list<string>
+     */
+    private const CARRIED_PREFIXES = [
+        ThemeFormMapper::PREFIX_COLORS,
+        ThemeFormMapper::PREFIX_BORDERS,
+        ThemeFormMapper::PREFIX_DEFAULTS,
+        ThemeFormMapper::PREFIX_CUSTOM,
+        ThemeFormMapper::PREFIX_MENU_COLORS,
+        ThemeFormMapper::PREFIX_MENU_CUSTOM,
+        ThemeFormMapper::PREFIX_FOOTER_CUSTOM,
+        'typography_',
+    ];
+
+    /**
+     * Fields that belong to the record rather than to its tokens.
+     *
+     * @var list<string>
+     */
+    private const RECORD_FIELDS = ['name', 'label', 'palette', 'blockStyles'];
+
+    /**
+     * Every theme config form, found rather than listed.
      *
      * @return array<string, array{0: string}>
      */
     public static function forms(): array
     {
-        return [
-            'components' => ['iw_theme_config_components'],
-            'articles' => ['iw_theme_config_articles'],
-            'menu' => ['iw_theme_config_menu'],
-            'footer' => ['iw_theme_config_footer'],
-        ];
+        $found = [];
+        foreach (glob(self::root() . '/config/forms/iw_theme_config_*.xml') ?: [] as $path) {
+            $found[basename($path, '.xml')] = [$path];
+        }
+
+        self::assertNotEmpty($found, 'No theme config form was found, so this test guards nothing.');
+
+        return $found;
+    }
+
+    /**
+     * Every scalar field of the form is a key the mapper knows.
+     */
+    #[Test]
+    #[DataProvider('forms')]
+    public function everyFieldOfTheFormIsCarriedByTheMapper(string $path): void
+    {
+        $known = self::carriedFieldNames();
+
+        $missing = [];
+        foreach (self::flatFields($path) as $name) {
+            foreach (self::CARRIED_PREFIXES as $prefix) {
+                if (str_starts_with($name, $prefix)) {
+                    continue 2;
+                }
+            }
+
+            if (\in_array($name, self::RECORD_FIELDS, true) || \in_array($name, $known, true)) {
+                continue;
+            }
+
+            $missing[] = $name;
+        }
+
+        self::assertSame(
+            [],
+            $missing,
+            \sprintf(
+                "%s offers fields the mapper does not carry, so they revert on save:\n  %s",
+                basename($path),
+                implode("\n  ", $missing),
+            ),
+        );
     }
 
     /**
@@ -53,7 +113,8 @@ final class ThemeFormKeyCoverageTest extends TestCase
      *
      * The component and article lists already hold their prefix, the menu and
      * footer ones do not: they are keys of their own JSON column, and the form
-     * prefix is added by the mapper.
+     * prefix is added by the mapper. The button globals are listed the same
+     * way, by name and not by prefix.
      *
      * @return list<string>
      */
@@ -69,52 +130,47 @@ final class ThemeFormKeyCoverageTest extends TestCase
             ThemeFormMapper::ARTICLE_KEYS,
             $prefixed(ThemeFormMapper::PREFIX_MENU, ThemeFormMapper::MENU_SCALAR_KEYS),
             $prefixed(ThemeFormMapper::PREFIX_FOOTER, ThemeFormMapper::FOOTER_SCALAR_KEYS),
+            $prefixed(ThemeFormMapper::PREFIX_BUTTONS, ThemeFormMapper::BUTTON_GLOBAL_PROPS),
         );
     }
 
     /**
-     * Every scalar field of the form is a key the mapper knows.
+     * The fields of a form that reach the mapper as flat keys.
+     *
+     * A heading holds no value. A field declared inside a block is not a flat
+     * key either: it names a property of a repeated item, which the mapper
+     * rebuilds from the block as a whole, so `slug` in the buttons form is not
+     * a setting called `slug`.
+     *
+     * @return list<string>
      */
-    #[Test]
-    #[DataProvider('forms')]
-    public function everyFieldOfTheFormIsCarriedByTheMapper(string $form): void
+    private static function flatFields(string $path): array
     {
-        $xml = (string) file_get_contents(
-            \dirname(__DIR__, 2) . '/config/forms/' . $form . '.xml',
-        );
-        self::assertNotSame('', $xml, $form . '.xml could not be read.');
+        $document = new \DOMDocument();
+        self::assertTrue($document->load($path));
 
-        preg_match_all('/<property name="(\w+)" type="([\w_]+)"/', $xml, $matches, \PREG_SET_ORDER);
-        self::assertNotEmpty($matches, $form . '.xml declares no field, which cannot be right.');
+        $xpath = new \DOMXPath($document);
+        $xpath->registerNamespace('sulu', 'http://schemas.sulu.io/template/template');
 
-        $known = self::carriedFieldNames();
+        $fields = $xpath->query('//sulu:property[not(ancestor::sulu:block)]');
+        self::assertNotFalse($fields);
 
-        $missing = [];
-        foreach ($matches as [, $name, $type]) {
-            // A heading holds no value, and a block is mapped by its own code.
-            if ('heading' === $type) {
+        $names = [];
+        foreach ($fields as $field) {
+            \assert($field instanceof \DOMElement);
+
+            if ('heading' === $field->getAttribute('type')) {
                 continue;
             }
 
-            // Menu colors are carried by prefix rather than by name, so the
-            // mapper needs no list of them and neither does this.
-            if (str_starts_with($name, ThemeFormMapper::PREFIX_MENU_COLORS)) {
-                continue;
-            }
-
-            if (!\in_array($name, $known, true)) {
-                $missing[] = $name;
-            }
+            $names[] = $field->getAttribute('name');
         }
 
-        self::assertSame(
-            [],
-            $missing,
-            \sprintf(
-                "%s.xml offers fields the mapper does not carry, so they revert on save:\n  %s",
-                $form,
-                implode("\n  ", $missing),
-            ),
-        );
+        return $names;
+    }
+
+    private static function root(): string
+    {
+        return \dirname(__DIR__, 2);
     }
 }

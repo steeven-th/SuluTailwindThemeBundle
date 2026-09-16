@@ -11,47 +11,6 @@
     <key>iw_theme_config_components</key>
 
     <properties>
-        <!-- Surfaces section: semantic colors shared by every transverse component
-             (filter sidebar, pagination, breadcrumb, badges). Leave a field empty
-             to derive it automatically from the theme (works light AND dark). -->
-        <section name="componentsSurfaces">
-            <meta>
-                <title>iw_sulu_tailwind_theme.components_section_surfaces</title>
-                <info_text>iw_sulu_tailwind_theme.components_section_surfaces_info</info_text>
-            </meta>
-            <properties>
-                <property name="components_surfaceBg" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_bg</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="components_surfaceText" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_text</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="components_surfaceMuted" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_muted</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="components_surfaceBorder" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_border</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="components_surfaceAccent" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_accent</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="components_surfaceOnAccent" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.components_surface_on_accent</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-            </properties>
-        </section>
-
         <!-- Pagination colors (empty = inherit the global surfaces) -->
         <section name="componentsPagination">
             <meta>
@@ -852,27 +811,5 @@
             </properties>
         </section>
 
-        <!-- Sharing - social preview (Open Graph / Twitter Card) fallbacks. -->
-        <section name="componentsSharing">
-            <meta>
-                <title>iw_sulu_tailwind_theme.components_section_sharing</title>
-                <info_text>iw_sulu_tailwind_theme.components_section_sharing_info</info_text>
-            </meta>
-            <properties>
-                <!-- Last-resort share thumbnail. Used only when the page provides
-                     neither an excerpt image nor a hero image, so that a page built
-                     out of blocks (the home page, typically) still shares with a
-                     picture. Served through the iw_og_image format (1200x630). -->
-                <property name="components_shareDefaultImage" type="single_media_selection" colspan="6">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.components_share_default_image</title>
-                        <info_text>iw_sulu_tailwind_theme.components_share_default_image_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="types" value="image"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
     </properties>
 </form>
