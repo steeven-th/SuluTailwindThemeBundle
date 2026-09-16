@@ -16,18 +16,21 @@
             <meta>
                 <title>iw_sulu_tailwind_theme.colors_text</title>
             </meta>
+            <params><param name="show_palette" value="true"/></params>
         </property>
 
         <property name="colors_link" type="iw_theme_color_token_editor" colspan="4">
             <meta>
                 <title>iw_sulu_tailwind_theme.colors_link</title>
             </meta>
+            <params><param name="show_palette" value="true"/></params>
         </property>
 
         <property name="colors_linkHover" type="iw_theme_color_token_editor" colspan="4">
             <meta>
                 <title>iw_sulu_tailwind_theme.colors_linkHover</title>
             </meta>
+            <params><param name="show_palette" value="true"/></params>
         </property>
 
         <property name="bordersHeading" type="heading">

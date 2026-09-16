@@ -54,6 +54,20 @@ by slug only (`--color-<slug>`, `role: null`).
 | `--color-linkHover` | Link hover color |
 | `--color-border` | Default border color |
 
+All four are set under **Settings > Themes > Colors > Text and borders**, and
+each can name a palette color rather than a hex value, so recoloring the theme
+recolors them too.
+
+`--color-border` is emitted whether or not it is set: left empty, it is mixed
+from the text and the background, which keeps a border visible on a light
+theme and on a dark one alike.
+
+**A variant wins over it.** Where a block carries a color variant, the rules,
+the separators and the form outlines inside it read the variant's own colors
+first, and never reach `--color-border`. It applies to what sits outside a
+variant: the chrome of an article page, the transverse components whose own
+border is left empty, and any block with no variant on it.
+
 ### Color palettes (OKLCH)
 
 For **every** palette color (each role and each brand color), 11 shades are
