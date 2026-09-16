@@ -427,15 +427,25 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: defaults tab (borders + site-wide block defaults) ──
+            // ── Edit form: defaults, spacing and radius tab ────────
             // First tab of the group, hence the priority: clicking the group
             // itself redirects to the child with the highest one.
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/general')
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/spacing')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_defaults')
+                    ->setFormKey('iw_theme_config_defaults_spacing')
                     ->setTabTitle('iw_sulu_tailwind_theme.defaults_general')
                     ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: defaults, blocks tab ────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults_blocks', '/blocks')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults_blocks')
+                    ->setTabTitle('iw_sulu_tailwind_theme.defaults_section_blocks')
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
@@ -446,6 +456,38 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_buttons')
                     ->setTabTitle('iw_sulu_tailwind_theme.buttons')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: cards tab ───────────────────────────────
+            // Site-wide card appearance, which the cards block, an article
+            // listing and a related row all read.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.cards', '/cards')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_cards')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_cards')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: cartography tab ─────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.maps', '/cartography')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_maps')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_maps')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: navigation tab ──────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.navigation', '/navigation')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_navigation')
+                    ->setTabTitle('iw_sulu_tailwind_theme.config_group_navigation')
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );

@@ -1,148 +1,17 @@
 <?xml version="1.0" ?>
+<!--
+    Admin form: Default settings tab, Blocks sub-tab.
+
+    The gaps a block leaves between its own parts, how wide it may grow, and
+    how its images are delivered.
+-->
 <form xmlns="http://schemas.sulu.io/template/template"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
 >
-    <key>iw_theme_config_defaults</key>
+    <key>iw_theme_config_defaults_blocks</key>
 
     <properties>
-        <section name="borderRadii">
-            <meta>
-                <title>iw_sulu_tailwind_theme.borders_radii</title>
-            </meta>
-            <properties>
-                <property name="borders_cardRadius" type="iw_theme_radius_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.borders_cardRadius</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="rounded-none"/>
-                    </params>
-                </property>
-
-                <property name="borders_imageRadius" type="iw_theme_radius_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.borders_imageRadius</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="rounded-none"/>
-                    </params>
-                </property>
-
-                <property name="borders_paragraphRadius" type="iw_theme_radius_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.borders_paragraphRadius</title>
-                    </meta>
-                    <params>
-                        <param name="default_value" value="rounded-none"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
-        <!-- Site-wide block defaults: settings shared by every block that are
-             not tied to a single component (components have their own tab). -->
-        <!-- The padding a block takes when the editor never chose one. Same
-             selector as the block field, so the two read the same, and the
-             shipped defaults are the ones the block fields used to carry: a
-             site that never opens this section renders as before. -->
-        <section name="blockPadding">
-            <meta>
-                <title>iw_sulu_tailwind_theme.defaults_section_block_padding</title>
-                <info_text>iw_sulu_tailwind_theme.defaults_section_block_padding_info</info_text>
-            </meta>
-            <properties>
-                <property name="defaults_blockPaddingTop" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_blockPaddingTop</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingTop_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="pt"/>
-                        <param name="default_value" value="pt-5"/>
-                    </params>
-                </property>
-
-                <property name="defaults_blockPaddingBottom" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_blockPaddingBottom</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingBottom_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="pb"/>
-                        <param name="default_value" value="pb-5"/>
-                    </params>
-                </property>
-
-                <property name="defaults_blockPaddingLateral" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_blockPaddingLateral</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="px"/>
-                        <param name="default_value" value="px-5"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
-        <!-- Space between a surface and what sits on it. Only surfaces that
-             paint something need it: the compiler emits these paddings inside
-             the rules already guarded by "has a background or a border", so a
-             block with neither keeps its current layout. -->
-        <section name="surfacePadding">
-            <meta>
-                <title>iw_sulu_tailwind_theme.defaults_section_surface_padding</title>
-                <info_text>iw_sulu_tailwind_theme.defaults_section_surface_padding_info</info_text>
-            </meta>
-            <properties>
-                <property name="defaults_contentPaddingX" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_contentPaddingX</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingX_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="px"/>
-                        <param name="default_value" value="px-6"/>
-                    </params>
-                </property>
-
-                <property name="defaults_contentPaddingY" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_contentPaddingY</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_contentPaddingY_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="py"/>
-                        <param name="default_value" value="py-6"/>
-                    </params>
-                </property>
-
-                <property name="defaults_paragraphPaddingX" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingX</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="px"/>
-                        <param name="default_value" value="px-6"/>
-                    </params>
-                </property>
-
-                <property name="defaults_paragraphPaddingY" type="iw_theme_margin_selector" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.defaults_paragraphPaddingY</title>
-                        <info_text>iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="prefix" value="py"/>
-                        <param name="default_value" value="py-4"/>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
         <section name="blockDefaults">
             <meta>
                 <title>iw_sulu_tailwind_theme.defaults_section_blocks</title>
@@ -255,6 +124,29 @@
                         <title>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope_info</info_text>
                     </meta>
+                </property>
+            </properties>
+        </section>
+
+        <!--
+            Image delivery, which used to be a section of its own holding a
+            single checkbox. It belongs with the block defaults: what it
+            changes is how every block serves its images.
+        -->
+        <section name="blockImages">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_images</title>
+            </meta>
+            <properties>
+                <!-- AVIF <source> in the <picture> pipeline. Default on; turn it off
+                     when the server's imagine driver (GD/Imagick) cannot encode AVIF
+                     (WebP + original stay served regardless). -->
+                <property name="imageAvif" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.image_avif</title></meta></param>
+                    </params>
                 </property>
             </properties>
         </section>
