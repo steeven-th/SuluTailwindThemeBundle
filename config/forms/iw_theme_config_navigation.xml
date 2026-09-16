@@ -358,6 +358,46 @@
                     </params>
                 </property>
 
+                <property name="controlsChevronHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_chevron</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <!--
+                    A chevron only says that something opens or leads somewhere:
+                    the end of a list row, a menu entry with children. It is not
+                    the arrow that moves a carousel, and the circled arrow that
+                    suits a carousel would be absurd at the end of a line.
+                -->
+                <property name="components_controlsChevronIcon" type="single_icon_selection" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_chevron_icon</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_chevron_icon_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="icon_set" value="iw_theme_outline"/>
+                    </params>
+                </property>
+
+                <property name="components_controlsChevronIconSize" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon_size</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                            <param name="12"><meta><title>12 px</title></meta></param>
+                            <param name="16"><meta><title>16 px</title></meta></param>
+                            <param name="20"><meta><title>20 px</title></meta></param>
+                            <param name="24"><meta><title>24 px</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="controlsButtonHeading" type="heading">
                     <params>
                         <param name="label">

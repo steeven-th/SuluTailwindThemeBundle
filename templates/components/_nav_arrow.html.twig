@@ -7,7 +7,17 @@
 
    Expected variables:
      - direction : 'next' | 'prev' | 'up' | 'down' (default 'next')
+     - role      : 'control' | 'chevron' (default 'control')
      - class     : extra classes for the svg
+
+   Two roles, two settings, because they are not the same object. A control is
+   the button that moves a carousel or a page: it acts, it is big, it can be a
+   circled arrow. A chevron only says that something opens or leads somewhere -
+   at the end of a list row, beside a menu entry - and the same circled arrow
+   would be absurd there. The breadcrumb separator is a third thing again and
+   takes neither: it marks hierarchy between two names, and has its own setting.
+
+   Between them they are still one decision each, made once for the whole site.
 
    What it draws is the pictogram pair the whole bundle offers - one from the
    theme library, or one of the project's own from the media library - so the
@@ -27,10 +37,19 @@
 
 {%- set direction = direction|default('next') -%}
 
-{%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsArrowIconCustom|default(false) -%}
-{%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsArrowIcon|default('') -%}
-{%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsArrowIconMedia|default(null) -%}
-{%- set arrowSize = iw_sulu_tailwind_theme.components_controlsArrowIconSize|default('') -%}
+{%- set role = role|default('control') -%}
+
+{%- if 'chevron' == role -%}
+    {%- set arrowCustom = false -%}
+    {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsChevronIcon|default('') -%}
+    {%- set arrowMedia = null -%}
+    {%- set arrowSize = iw_sulu_tailwind_theme.components_controlsChevronIconSize|default('') -%}
+{%- else -%}
+    {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsArrowIconCustom|default(false) -%}
+    {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsArrowIcon|default('') -%}
+    {%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsArrowIconMedia|default(null) -%}
+    {%- set arrowSize = iw_sulu_tailwind_theme.components_controlsArrowIconSize|default('') -%}
+{%- endif -%}
 
 {#- Callers pass the size they have always drawn at, as utility classes. Those
     weigh the same as the one carrying the chosen size, so the later of the two

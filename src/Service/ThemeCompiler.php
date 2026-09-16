@@ -1236,9 +1236,12 @@ class ThemeCompiler
         '.iw-pagination' => ['components_paginationRadius' => ['--iw-pagination-item-radius']],
         '.iw-tag' => ['components_tagRadius' => ['--iw-tag-radius']],
         '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            // The panels and the buttons opening them, which are containers.
+            // Not the fields inside the filter form: a select is not a panel,
+            // and a panel rounded to 16px does not make a select that should
+            // be. Those keep the radius of the theme.
             'components_sidebarRadius' => [
                 '--iw-article-filters-radius',
-                '--iw-article-filters-control-radius',
                 '--iw-article-filters-toggle-radius',
                 '--iw-toc-radius',
                 '--iw-toc-toggle-radius',

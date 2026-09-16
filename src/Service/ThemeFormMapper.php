@@ -167,6 +167,7 @@ class ThemeFormMapper
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',
+        'components_controlsChevronIcon', 'components_controlsChevronIconSize',
         'components_controlsArrowIcon', 'components_controlsArrowIconCustom',
         'components_controlsArrowIconMedia', 'components_controlsArrowIconSize',
         'components_controlsShape', 'components_controlsButtonSize',

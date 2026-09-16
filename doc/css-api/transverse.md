@@ -902,8 +902,19 @@ site. The direction is a class the stylesheet turns (`.iw-nav-arrow--prev`,
 `--up`, `--down`), so one arrow is chosen rather than four that would have to
 agree with each other.
 
-It offers the pair every pictogram of the bundle offers, and draws it through
-the same partial: one from the theme library, or one of the project's own from
+**Two roles, two settings**, because an arrow that acts and a chevron that
+hints are not the same object. A control moves a carousel or a page: it is a
+button, it can be a circled arrow. A chevron only says that something opens or
+leads somewhere - the end of a list row, a menu entry with children - and that
+same circled arrow would be absurd there. Pass `role: 'chevron'` to the partial
+for the second kind.
+
+The breadcrumb separator takes neither: it marks hierarchy between two names
+rather than pointing anywhere, and the breadcrumb already offers the choice of
+chevron, slash or dot.
+
+The control arrow offers the pair every pictogram of the bundle offers, and
+draws it through the same partial: one from the theme library, or one of the project's own from
 the media library, with a size of its own. An SVG from the media library is
 masked so it takes the arrow colour, like a library icon does.
 
