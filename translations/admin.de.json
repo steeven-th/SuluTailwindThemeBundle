@@ -174,6 +174,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Federn",
 
     "iw_sulu_tailwind_theme.defaults": "Standardwerte",
+    "iw_sulu_tailwind_theme.defaults_general": "Abstände und Radien",
     "iw_sulu_tailwind_theme.borders_radii": "Eckenradien",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Karten-Radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Bild-Radius",

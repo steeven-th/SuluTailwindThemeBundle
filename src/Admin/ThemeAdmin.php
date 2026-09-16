@@ -374,6 +374,35 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
+            // ── Edit form: default settings group (second row of tabs) ──
+            //
+            // The group holds no form of its own: it renders a row of tabs and
+            // hands the record down to whichever one is open. Sulu ships no
+            // view able to do that between a resource tab view and a form, so
+            // the type names one the bundle registers, see `NestedTabs.js`.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.defaults_group',
+                    '/defaults',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.defaults')
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: defaults tab (borders + site-wide block defaults) ──
+            // First tab of the group, hence the priority: clicking the group
+            // itself redirects to the child with the highest one.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/general')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults')
+                    ->setTabTitle('iw_sulu_tailwind_theme.defaults_general')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
             // ── Edit form: buttons tab ─────────────────────────────
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.buttons', '/buttons')
@@ -381,17 +410,7 @@ class ThemeAdmin extends Admin
                     ->setFormKey('iw_theme_config_buttons')
                     ->setTabTitle('iw_sulu_tailwind_theme.buttons')
                     ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW)
-            );
-
-            // ── Edit form: defaults tab (borders + site-wide block defaults) ──
-            $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/defaults')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_defaults')
-                    ->setTabTitle('iw_sulu_tailwind_theme.defaults')
-                    ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
             // ── Edit form: variants tab ────────────────────────────
