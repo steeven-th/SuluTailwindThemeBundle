@@ -158,6 +158,12 @@ class ThemeFormMapper
         'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg', 'components_backToTopHoverBg',
         'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
         'components_paginationText', 'components_paginationAccent',
+        'components_paginationBg', 'components_paginationBorder',
+        'components_paginationOnAccent', 'components_paginationRadius',
+        // Badges worn by an article: categories and tags.
+        'components_tagBg', 'components_tagText', 'components_tagBorder',
+        'components_tagAccent', 'components_tagRadius',
+        'components_sidebarRadius',
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',

@@ -797,6 +797,35 @@ Tailwind's preflight removes list markers site-wide (`list-style: none` on `ol` 
 
 ---
 
+## What a transverse component lets a theme set
+
+Every transverse component reads `var(--iw-<component>-…, var(--color-surface-…))`,
+so redefining a surface token **scoped to the component's root selector**
+restyles the whole of it without mapping each variable one by one. That is what
+the admin settings do, and it is why an empty field costs nothing: the
+component simply keeps inheriting the global surfaces.
+
+The reference set a component offers is therefore the surfaces plus the shape:
+
+| Setting | Token it redefines |
+|---------|--------------------|
+| Background | `--color-surface`, or the component's own background variable |
+| Text | `--color-surface-muted` |
+| Border | `--color-surface-border`, or the component's own |
+| Accent | `--color-surface-accent` |
+| Text on accent | `--color-surface-on-accent` |
+| Corner radius | the component's radius variable |
+
+**A token only reaches what reads it.** A pagination link and a tag had no
+background and no border at rest, so wiring a background setting to a surface
+token would have offered a field that changes nothing: both now draw them from
+variables of their own, transparent by default.
+`ComponentSettingsReachTheStylesheetTest` checks that every variable a setting
+writes is read somewhere in the stylesheet.
+
+A border colour also carries the width that makes it visible: asking for a
+border asks for the line, not for a colour nothing draws.
+
 ## Navigation controls
 
 The arrows, dots and chevrons that move a visitor through a block. They split

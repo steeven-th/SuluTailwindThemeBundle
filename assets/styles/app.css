@@ -4841,10 +4841,12 @@ span.iw-breadcrumbs__separator {
     align-items: center;
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
+    background-color: var(--iw-pagination-item-bg, transparent);
+    border: var(--iw-pagination-item-border-width, 0) solid var(--iw-pagination-item-border, transparent);
     font-size: 0.875rem;
     color: var(--iw-pagination-color, var(--color-surface-muted));
     text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .iw-pagination__link:hover,
@@ -4892,6 +4894,7 @@ span.iw-breadcrumbs__separator {
     font-weight: var(--iw-tag-font-weight, 500);
     border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
+    background-color: var(--iw-tag-bg, transparent);
     color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }

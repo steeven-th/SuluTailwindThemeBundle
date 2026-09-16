@@ -104,6 +104,22 @@
                     <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
                     <params><param name="show_palette" value="true"/></params>
                 </property>
+                <property name="components_paginationBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_paginationBorder" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <!-- The text of the page the visitor is on, which sits on the accent. -->
+                <property name="components_paginationOnAccent" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_on_accent</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+                <property name="components_paginationRadius" type="iw_theme_radius_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+                </property>
             </properties>
         </section>
 

@@ -1145,15 +1145,69 @@ class ThemeCompiler
             'components_sidebarAccent' => '--color-surface-accent',
         ],
         '.iw-pagination' => [
+            'components_paginationBg' => '--iw-pagination-item-bg',
             'components_paginationText' => '--color-surface-muted',
+            'components_paginationBorder' => '--iw-pagination-item-border',
             'components_paginationAccent' => '--color-surface-accent',
+            'components_paginationOnAccent' => '--color-surface-on-accent',
         ],
         '.iw-breadcrumbs' => [
             'components_breadcrumbText' => '--color-surface-muted',
             'components_breadcrumbCurrent' => '--color-surface-foreground',
             'components_breadcrumbAccent' => '--color-surface-accent',
         ],
+        '.iw-tag' => [
+            'components_tagBg' => '--iw-tag-bg',
+            'components_tagText' => '--color-surface-muted',
+            'components_tagBorder' => '--color-surface-border',
+            'components_tagAccent' => '--color-surface-accent',
+        ],
     ];
+
+    /**
+     * Per-component corner radius: selector => [config key => variables].
+     *
+     * A radius is not a surface, so it cannot ride the same map: the component
+     * reads it from a variable of its own rather than from a token every one of
+     * its rules falls back to. The shape of a thing is still part of how it
+     * looks, and leaving it out would have made these components settable in
+     * colour and fixed in form.
+     *
+     * A selector may drive more than one variable: the filters panel and the
+     * table of contents share one setting, as they already share their colours.
+     */
+    private const COMPONENT_RADIUS = [
+        '.iw-pagination' => ['components_paginationRadius' => ['--iw-pagination-item-radius']],
+        '.iw-tag' => ['components_tagRadius' => ['--iw-tag-radius']],
+        '.iw-article-filters, .iw-toc' => [
+            'components_sidebarRadius' => [
+                '--iw-article-filters-radius',
+                '--iw-article-filters-control-radius',
+                '--iw-toc-radius',
+            ],
+        ],
+    ];
+
+    /**
+     * The per-component surface overrides, for the test that checks the
+     * stylesheet reads what these write.
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function componentSurfaceOverrides(): array
+    {
+        return self::COMPONENT_SURFACE_OVERRIDES;
+    }
+
+    /**
+     * The per-component radius map, same purpose.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    public static function componentRadius(): array
+    {
+        return self::COMPONENT_RADIUS;
+    }
 
     /**
      * Generate per-component surface overrides. Each configured override
@@ -1170,7 +1224,7 @@ class ThemeCompiler
      */
     private function generateComponentSurfaceOverrides(array $tokens): string
     {
-        $css = '';
+        $css = $this->generateComponentRadii($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1179,6 +1233,44 @@ class ThemeCompiler
                     continue;
                 }
                 $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+            }
+            if ('.iw-pagination' === $selector && str_contains($declarations, '--iw-pagination-item-border:')) {
+                $declarations .= "  --iw-pagination-item-border-width: 1px;\n";
+            }
+
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component corner radius rules.
+     *
+     * Same shape as the surface overrides and the same rule: an unset value
+     * emits nothing, so a component keeps the radius its stylesheet draws.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentRadii(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_RADIUS as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $value = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $value) {
+                    continue;
+                }
+
+                $radius = str_starts_with($value, 'rounded-') ? $this->resolveRadius($value) : $value;
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: {$radius};\n";
+                }
             }
             if ('' !== $declarations) {
                 $css .= "{$selector} {\n{$declarations}}\n\n";
