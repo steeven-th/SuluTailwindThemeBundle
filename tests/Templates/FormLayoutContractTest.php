@@ -34,6 +34,12 @@ final class FormLayoutContractTest extends TestCase
     /**
      * Field types that render tall: a row of boxes, a picker, an editor.
      *
+     * Two types read like they belong here and do not, both of them drawing a
+     * single line: `single_icon_selection` is a `SingleItemSelection`, the name
+     * of the icon on one row, and `iw_theme_radius_selector` is a button that
+     * opens a popover rather than the row of shapes its name suggests. The
+     * margin selector, which does lay its steps out as a grid, stays.
+     *
      * The theme forms bring types the blocks never use. `iw_theme_font_picker`
      * draws its own tabs above a list, `iw_theme_article_style_picker` a grid
      * of wireframes, and the palette and variant editors a whole table of
@@ -44,10 +50,10 @@ final class FormLayoutContractTest extends TestCase
      * @var list<string>
      */
     private const TALL = [
-        'iw_theme_margin_selector', 'iw_theme_radius_selector', 'iw_theme_variant_picker',
+        'iw_theme_margin_selector', 'iw_theme_variant_picker',
         'iw_theme_style_picker', 'iw_theme_button_style_picker', 'iw_theme_block_scope',
         'iw_theme_title_editor', 'single_media_selection', 'media_selection', 'text_editor',
-        'text_area', 'location', 'smart_content', 'single_icon_selection',
+        'text_area', 'location', 'smart_content',
         'iw_theme_palette_editor', 'iw_theme_variant_editor', 'iw_theme_font_picker',
         'iw_theme_article_style_picker',
     ];

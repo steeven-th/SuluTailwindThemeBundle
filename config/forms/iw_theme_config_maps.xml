@@ -98,7 +98,7 @@
             </property>
 
             <!-- Custom marker image from the media library, replaces the themed SVG pin. -->
-            <property name="components_mapsMarkerMedia" type="single_media_selection" colspan="6">
+            <property name="components_mapsMarkerMedia" type="single_media_selection" colspan="12">
                 <meta>
                     <title>iw_sulu_tailwind_theme.components_maps_marker_media</title>
                     <info_text>iw_sulu_tailwind_theme.components_maps_marker_media_info</info_text>

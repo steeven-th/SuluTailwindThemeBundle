@@ -198,7 +198,7 @@
                 </property>
 
                 <!-- Custom icon from the media library, overrides the preset above. -->
-                <property name="components_backToTopIconMedia" type="single_media_selection" colspan="6"
+                <property name="components_backToTopIconMedia" type="single_media_selection" colspan="12"
                           visibleCondition="components_backToTopEnabled == true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_back_to_top_icon_media</title>
@@ -251,13 +251,6 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="controlsHoverHeading" type="heading">
-                    <params>
-                        <param name="label">
-                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_hover</title></meta>
-                        </param>
-                    </params>
-                </property>
 
                 <property name="components_controlsOnMediaBgHover" type="iw_theme_color_token_editor" colspan="6">
                     <meta>
@@ -294,7 +287,7 @@
                     </params>
                 </property>
 
-                <property name="components_controlsArrowIcon" type="single_icon_selection" colspan="12"
+                <property name="components_controlsArrowIcon" type="single_icon_selection" colspan="6"
                           visibleCondition="components_controlsArrowIconCustom != true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_controls_arrow_icon</title>
@@ -342,7 +335,7 @@
                 </property>
 
                 <!-- The disc the arrows over a media sit in. -->
-                <property name="components_controlsShape" type="iw_theme_radius_selector" colspan="12">
+                <property name="components_controlsShape" type="iw_theme_radius_selector" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_controls_shape</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_shape_info</info_text>
