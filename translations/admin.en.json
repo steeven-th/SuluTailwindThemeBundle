@@ -1236,6 +1236,7 @@
     "iw_sulu_tailwind_theme.components_controls_arrow_icon_size_info": "Empty: the size each control already uses, which is not the same everywhere - a gallery arrow is larger than a list chevron.",
     "iw_sulu_tailwind_theme.components_controls_group_button": "Button",
     "iw_sulu_tailwind_theme.components_controls_group_chevron": "Chevron",
+    "iw_sulu_tailwind_theme.components_controls_group_arrow": "Navigation arrow",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon": "Chevron pictogram",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon_info": "The hint at the end of a list row and in menus: it says an item leads somewhere or opens. Distinct from the carousel arrow, which is a button that acts. Empty: the default chevron.",
     "iw_sulu_tailwind_theme.components_controls_button_size": "Button size",

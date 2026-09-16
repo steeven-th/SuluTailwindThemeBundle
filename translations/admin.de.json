@@ -1229,6 +1229,7 @@
     "iw_sulu_tailwind_theme.components_controls_arrow_icon_size_info": "Leer: die Größe, die jedes Bedienelement bereits verwendet und die nicht überall gleich ist - ein Galeriepfeil ist größer als ein Listenpfeil.",
     "iw_sulu_tailwind_theme.components_controls_group_button": "Schaltfläche",
     "iw_sulu_tailwind_theme.components_controls_group_chevron": "Chevron",
+    "iw_sulu_tailwind_theme.components_controls_group_arrow": "Navigationspfeil",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon": "Chevron-Piktogramm",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon_info": "Der Hinweis am Ende einer Listenzeile und in Menüs: Er zeigt an, dass ein Eintrag irgendwohin führt oder sich öffnet. Getrennt vom Karussellpfeil, der eine handelnde Schaltfläche ist. Leer: das Standard-Chevron.",
     "iw_sulu_tailwind_theme.components_controls_button_size": "Größe der Schaltfläche",

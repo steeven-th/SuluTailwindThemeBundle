@@ -16,7 +16,11 @@
     Parameters:
     - threshold: scroll distance in px before the button appears (default 400)
 #}
-{% set btIconMedia = iw_sulu_tailwind_theme.components_backToTopIconMedia|default(null) %}
+{# The media only counts when the toggle asks for it, as everywhere else the
+   bundle offers this pair: leaving a media behind after switching back would
+   otherwise keep overriding the icon. #}
+{% set btIconCustom = iw_sulu_tailwind_theme.components_backToTopIconCustom|default(false) %}
+{% set btIconMedia = btIconCustom ? iw_sulu_tailwind_theme.components_backToTopIconMedia|default(null) : null %}
 {#  The field offered four shapes before it offered the whole library, and
     those four are still stored on existing themes. Each has an exact
     equivalent, so they are read through this table rather than migrated: the

@@ -168,6 +168,8 @@ class ThemeFormMapper
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',
         'components_controlsChevronIcon', 'components_controlsChevronIconSize',
+        'components_controlsChevronIconCustom', 'components_controlsChevronIconMedia',
+        'components_backToTopIconCustom',
         'components_controlsArrowIcon', 'components_controlsArrowIconCustom',
         'components_controlsArrowIconMedia', 'components_controlsArrowIconSize',
         'components_controlsShape', 'components_controlsButtonSize',

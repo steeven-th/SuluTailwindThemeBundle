@@ -1327,6 +1327,7 @@
     "iw_sulu_tailwind_theme.components_controls_arrow_icon_size_info": "Vide : la taille que chaque contrôle utilise déjà, qui n'est pas la même partout - une flèche de galerie est plus grande qu'un chevron de liste.",
     "iw_sulu_tailwind_theme.components_controls_group_button": "Bouton",
     "iw_sulu_tailwind_theme.components_controls_group_chevron": "Chevron",
+    "iw_sulu_tailwind_theme.components_controls_group_arrow": "Flèche de navigation",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon": "Pictogramme de chevron",
     "iw_sulu_tailwind_theme.components_controls_chevron_icon_info": "Indicateur en bout de ligne de liste et dans les menus : il signale qu'un élément mène quelque part ou s'ouvre. Distinct de la flèche des carrousels, qui est un bouton d'action. Vide : le chevron par défaut.",
     "iw_sulu_tailwind_theme.components_controls_button_size": "Taille du bouton",

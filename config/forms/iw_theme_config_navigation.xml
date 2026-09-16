@@ -212,15 +212,28 @@
                 </property>
 
                 <!--
-                    The whole library rather than the four shapes this field
-                    used to offer. Those four are still stored on existing
-                    themes and still render: the template reads them through a
-                    table of equivalents, which is enough when the old set of
-                    values is finite and known - cheaper than a migration
-                    command, and it cannot half-run.
+                    The same pair as the arrows and the chevrons: one from the
+                    theme library, or one of the project's own, a toggle
+                    deciding which. The four shapes this field used to offer are
+                    still stored on existing themes and still render, read
+                    through a table of equivalents.
                 -->
-                <property name="components_backToTopIcon" type="single_icon_selection" colspan="6"
+                <property name="components_backToTopIconCustom" type="checkbox" colspan="12"
                           visibleCondition="components_backToTopEnabled == true">
+                    <meta>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_backToTopIcon" type="single_icon_selection" colspan="6"
+                          visibleCondition="components_backToTopEnabled == true AND components_backToTopIconCustom != true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_back_to_top_icon</title>
                     </meta>
@@ -229,17 +242,17 @@
                     </params>
                 </property>
 
-                <!-- Custom icon from the media library, overrides the preset above. -->
                 <property name="components_backToTopIconMedia" type="single_media_selection" colspan="12"
-                          visibleCondition="components_backToTopEnabled == true">
+                          visibleCondition="components_backToTopEnabled == true AND components_backToTopIconCustom == true">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.components_back_to_top_icon_media</title>
-                        <info_text>iw_sulu_tailwind_theme.components_back_to_top_icon_media_info</info_text>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon_media</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_media_info</info_text>
                     </meta>
                     <params>
                         <param name="types" value="image"/>
                     </params>
                 </property>
+
             </properties>
         </section>
 
@@ -295,7 +308,7 @@
                 <property name="controlsIconHeading" type="heading">
                     <params>
                         <param name="label">
-                            <meta><title>iw_sulu_tailwind_theme.config_group_icon</title></meta>
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_arrow</title></meta>
                         </param>
                     </params>
                 </property>
@@ -372,13 +385,38 @@
                     the arrow that moves a carousel, and the circled arrow that
                     suits a carousel would be absurd at the end of a line.
                 -->
-                <property name="components_controlsChevronIcon" type="single_icon_selection" colspan="6">
+                <property name="components_controlsChevronIconCustom" type="checkbox" colspan="12">
+                    <meta>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_controlsChevronIcon" type="single_icon_selection" colspan="6"
+                          visibleCondition="components_controlsChevronIconCustom != true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_controls_chevron_icon</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_chevron_icon_info</info_text>
                     </meta>
                     <params>
                         <param name="icon_set" value="iw_theme_outline"/>
+                    </params>
+                </property>
+
+                <property name="components_controlsChevronIconMedia" type="single_media_selection" colspan="12"
+                          visibleCondition="components_controlsChevronIconCustom == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon_media</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_media_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
                     </params>
                 </property>
 

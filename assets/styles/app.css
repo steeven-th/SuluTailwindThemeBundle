@@ -1485,8 +1485,8 @@ img.object-cover {
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav--next { right: 0; }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--iw-icon-size, 1.25rem);
+    height: var(--iw-icon-size, 1.25rem);
 }
 
 /* Dots — slider controller toggles inline opacity at runtime;
@@ -1543,8 +1543,10 @@ img.object-cover {
 
 .iw-block-linked-pages--list .iw-block-linked-pages__list-chevron {
     flex: none;
-    width: var(--iw-block-linked-pages-list-chevron-size, 1.25rem);
-    height: var(--iw-block-linked-pages-list-chevron-size, 1.25rem);
+    /* The chosen size first: this selector outweighs `.iw-icon`, so naming it
+       here is what lets a size set in the admin reach this chevron. */
+    width: var(--iw-icon-size, var(--iw-block-linked-pages-list-chevron-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-block-linked-pages-list-chevron-size, 1.25rem));
     opacity: var(--iw-block-linked-pages-list-chevron-opacity, 0.5);
     transition: opacity 0.2s ease;
 }
@@ -2465,8 +2467,8 @@ img.object-cover {
 }
 
 .iw-block-timeline__nav-icon {
-    width: var(--iw-timeline-nav-icon-size, 1.25rem);
-    height: var(--iw-timeline-nav-icon-size, 1.25rem);
+    width: var(--iw-icon-size, var(--iw-timeline-nav-icon-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-timeline-nav-icon-size, 1.25rem));
 }
 
 @media (min-width: 768px) {
@@ -2680,8 +2682,8 @@ img.object-cover {
 }
 
 .iw-block-article-carousel__nav-icon {
-    width: var(--iw-block-article-carousel-nav-icon-size, 1.25rem);
-    height: var(--iw-block-article-carousel-nav-icon-size, 1.25rem);
+    width: var(--iw-icon-size, var(--iw-block-article-carousel-nav-icon-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-block-article-carousel-nav-icon-size, 1.25rem));
 }
 
 .iw-block-article-carousel__track {
@@ -4863,8 +4865,8 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-pagination__arrow svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--iw-icon-size, 1.25rem);
+    height: var(--iw-icon-size, 1.25rem);
 }
 
 .iw-pagination__ellipsis {

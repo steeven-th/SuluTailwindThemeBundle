@@ -40,9 +40,9 @@
 {%- set role = role|default('control') -%}
 
 {%- if 'chevron' == role -%}
-    {%- set arrowCustom = false -%}
+    {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsChevronIconCustom|default(false) -%}
     {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsChevronIcon|default('') -%}
-    {%- set arrowMedia = null -%}
+    {%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsChevronIconMedia|default(null) -%}
     {%- set arrowSize = iw_sulu_tailwind_theme.components_controlsChevronIconSize|default('') -%}
 {%- else -%}
     {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsArrowIconCustom|default(false) -%}
