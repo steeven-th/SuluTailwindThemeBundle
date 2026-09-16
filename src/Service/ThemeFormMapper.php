@@ -161,7 +161,10 @@ class ThemeFormMapper
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',
-        'components_controlsArrowIcon', 'components_controlsShape',
+        'components_controlsArrowIcon', 'components_controlsArrowIconCustom',
+        'components_controlsArrowIconMedia', 'components_controlsArrowIconSize',
+        'components_controlsShape', 'components_controlsButtonSize',
+        'components_controlsOnMediaBgHover',
         'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
         // Leaflet maps (location block, form widget).
         'components_mapsTileProvider', 'components_mapsCustomTileUrl', 'components_mapsCustomAttribution',

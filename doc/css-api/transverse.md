@@ -859,10 +859,26 @@ back to white under the pointer.
 ### The arrow itself
 
 One partial draws every arrow in the bundle -
-`components/_nav_arrow.html.twig` - and the theme picks the pictogram once for
-the whole site, from **Arrow pictogram** in the same tab. The direction is a
-class the stylesheet turns (`.iw-nav-arrow--prev`, `--up`, `--down`), so one
-arrow is chosen rather than four that would have to agree with each other.
+`components/_nav_arrow.html.twig` - and the theme picks it once for the whole
+site. The direction is a class the stylesheet turns (`.iw-nav-arrow--prev`,
+`--up`, `--down`), so one arrow is chosen rather than four that would have to
+agree with each other.
+
+It offers the pair every pictogram of the bundle offers, and draws it through
+the same partial: one from the theme library, or one of the project's own from
+the media library, with a size of its own. An SVG from the media library is
+masked so it takes the arrow colour, like a library icon does.
+
+| Setting | What it does |
+|---------|--------------|
+| Custom pictogram | Switches from the theme library to the media library |
+| Arrow pictogram / Arrow image | The pictogram itself, from either source |
+| Pictogram size | Empty: the size each control already draws at, which differs between a gallery arrow and a list chevron |
+| Button size | The disc of the arrows over a media, which sizes the arrow inside it |
+
+A size chosen in the admin wins over the utility classes a caller passes: the
+partial drops their `w-*` and `h-*` when one is set, since both weigh the same
+in the cascade and the outcome would otherwise depend on stylesheet order.
 
 Left empty, the chevron these templates have always drawn is used.
 

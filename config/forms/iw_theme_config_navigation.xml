@@ -251,20 +251,51 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="controlsShapeHeading" type="heading">
+                <property name="controlsHoverHeading" type="heading">
                     <params>
                         <param name="label">
-                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_shape</title></meta>
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_hover</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_controlsOnMediaBgHover" type="iw_theme_color_token_editor" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_on_media_bg_hover</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_on_media_bg_hover_info</info_text>
+                    </meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="controlsIconHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.config_group_icon</title></meta>
                         </param>
                     </params>
                 </property>
 
                 <!--
-                    One arrow for the whole site, turned to face the right way
-                    rather than chosen four times over. Empty keeps the chevron
-                    these templates have always drawn.
+                    The same pair every pictogram of the bundle offers: one from
+                    the theme library, or one of the project's own from the
+                    media library. A toggle decides, so the two never compete
+                    for the same slot.
                 -->
-                <property name="components_controlsArrowIcon" type="single_icon_selection" colspan="6">
+                <property name="components_controlsArrowIconCustom" type="checkbox" colspan="12">
+                    <meta>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="false"/>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_arrow_icon_custom</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_controlsArrowIcon" type="single_icon_selection" colspan="12"
+                          visibleCondition="components_controlsArrowIconCustom != true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_controls_arrow_icon</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_info</info_text>
@@ -274,13 +305,66 @@
                     </params>
                 </property>
 
+                <property name="components_controlsArrowIconMedia" type="single_media_selection" colspan="12"
+                          visibleCondition="components_controlsArrowIconCustom == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon_media</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_media_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+
+                <property name="components_controlsArrowIconSize" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon_size</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                            <param name="16"><meta><title>16 px</title></meta></param>
+                            <param name="24"><meta><title>24 px</title></meta></param>
+                            <param name="32"><meta><title>32 px</title></meta></param>
+                            <param name="48"><meta><title>48 px</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="controlsButtonHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_button</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- The disc the arrows over a media sit in. -->
-                <property name="components_controlsShape" type="iw_theme_radius_selector" colspan="6">
+                <property name="components_controlsShape" type="iw_theme_radius_selector" colspan="12">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_controls_shape</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_shape_info</info_text>
                     </meta>
                 </property>
+
+                <property name="components_controlsButtonSize" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_button_size</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_button_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                            <param name="sm"><meta><title>iw_sulu_tailwind_theme.components_controls_button_size_sm</title></meta></param>
+                            <param name="md"><meta><title>iw_sulu_tailwind_theme.components_controls_button_size_md</title></meta></param>
+                            <param name="lg"><meta><title>iw_sulu_tailwind_theme.components_controls_button_size_lg</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
             </properties>
         </section>
     </properties>

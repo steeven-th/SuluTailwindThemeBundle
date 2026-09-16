@@ -9,6 +9,13 @@
      - direction : 'next' | 'prev' | 'up' | 'down' (default 'next')
      - class     : extra classes for the svg
 
+   What it draws is the pictogram pair the whole bundle offers - one from the
+   theme library, or one of the project's own from the media library - so the
+   arrows are set up exactly like the pictogram of a button or of a card, down
+   to the size. `_icon.html.twig` already knows how to draw that pair, mask an
+   SVG so it takes the surrounding colour, and size it, so the settings are
+   handed to it as the item it expects.
+
    The direction is a class, `iw-nav-arrow--prev` and friends, which the
    stylesheet turns. It is applied as a rotation rather than as a second
    choice: a person setting up a theme picks one arrow, not four that have to
@@ -19,14 +26,37 @@
    so a site that never opens the setting does not move. #}
 
 {%- set direction = direction|default('next') -%}
-{%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsArrowIcon|default(null) -%}
-{%- set arrowClass = ('iw-nav-arrow iw-nav-arrow--' ~ direction ~ ' ' ~ (class|default('')))|trim -%}
 
-{%- if arrowIcon %}
-    {{ iw_sulu_tailwind_theme_icon(arrowIcon, 'outline', {
+{%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsArrowIconCustom|default(false) -%}
+{%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsArrowIcon|default('') -%}
+{%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsArrowIconMedia|default(null) -%}
+{%- set arrowSize = iw_sulu_tailwind_theme.components_controlsArrowIconSize|default('') -%}
+
+{#- Callers pass the size they have always drawn at, as utility classes. Those
+    weigh the same as the one carrying the chosen size, so the later of the two
+    in the stylesheet would win and a size set in the admin would be ignored
+    here and obeyed elsewhere. When a size is set, they step aside. -#}
+{%- set callerClass = class|default('') -%}
+{%- if arrowSize -%}
+    {%- set callerClass = callerClass|split(' ')|filter(c => c starts with 'w-' or c starts with 'h-' ? false : true)|join(' ') -%}
+{%- endif -%}
+{%- set arrowClass = ('iw-nav-arrow iw-nav-arrow--' ~ direction ~ ' ' ~ callerClass)|trim -%}
+
+{%- set hasArrow = arrowCustom ? (arrowMedia is not null) : (arrowIcon is not empty) -%}
+
+{%- if hasArrow %}
+    {#- An arrow is a sign, not a picture of the project: a custom SVG takes the
+        colour around it like a library one does, hence `recolor`. -#}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        'item': {
+            'iconCustom': arrowCustom,
+            'icon': arrowIcon,
+            'iconMedia': arrowMedia,
+            'iconSize': arrowSize,
+        },
         'class': arrowClass,
-        'aria-hidden': 'true',
-    }) }}
+        'recolor': true,
+    } only %}
 {%- else %}
     <svg class="{{ arrowClass }}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

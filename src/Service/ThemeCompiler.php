@@ -574,9 +574,28 @@ class ThemeCompiler
             // The hover state has to follow the background it hovers, or a veil
             // set to dark would brighten back to white under the pointer. It
             // moves towards the colour of the arrow itself, which is by
-            // definition what reads on that veil.
+            // definition what reads on that veil - unless a colour was chosen
+            // for it, which wins.
             $towards = '' !== $onMedia ? $this->resolveColorValue($onMedia) : '#fff';
-            $css .= "  --iw-gallery-nav-bg-hover: color-mix(in srgb, {$resolved}, {$towards} 15%);\n";
+            $hover = $this->surfaceValue(
+                $tokens['components_controlsOnMediaBgHover'] ?? '',
+                "color-mix(in srgb, {$resolved}, {$towards} 15%)",
+            );
+            $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
+        } elseif ('' !== (string) ($tokens['components_controlsOnMediaBgHover'] ?? '')) {
+            // A hover colour with no background of its own still applies, over
+            // the white veil the stylesheet draws at rest.
+            $hover = $this->resolveColorValue((string) $tokens['components_controlsOnMediaBgHover']);
+            $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
+        }
+
+        // The size of the button, which drives the arrow inside it too.
+        $sizes = ['sm' => ['2.25rem', '1rem'], 'md' => ['3rem', '1.5rem'], 'lg' => ['4rem', '2rem']];
+        $buttonSize = (string) ($tokens['components_controlsButtonSize'] ?? '');
+        if (isset($sizes[$buttonSize])) {
+            [$button, $icon] = $sizes[$buttonSize];
+            $css .= "  --iw-gallery-nav-size: {$button};\n";
+            $css .= "  --iw-gallery-nav-icon-size: {$icon};\n";
         }
 
         $shape = (string) ($tokens['components_controlsShape'] ?? '');

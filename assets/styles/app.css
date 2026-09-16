@@ -3278,9 +3278,13 @@ img.object-cover {
     background: var(--_bg-hover);
 }
 
-.iw-gallery-nav svg {
-    width: var(--_icon);
-    height: var(--_icon);
+/* The button sizes the arrow it holds, unless a pictogram size was chosen:
+   this selector outranks `.iw-icon`, so without naming that variable here a
+   size set in the admin would be silently overruled inside these buttons. */
+.iw-gallery-nav svg,
+.iw-gallery-nav .iw-icon {
+    width: var(--iw-icon-size, var(--_icon));
+    height: var(--iw-icon-size, var(--_icon));
 }
 
 /* Smaller variant for inline contexts (thumbnail strip, etc.) */
