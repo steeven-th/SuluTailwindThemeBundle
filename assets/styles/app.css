@@ -5498,7 +5498,7 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-toc__link:hover {
-    color: var(--iw-toc-link-hover, var(--color-surface-foreground));
+    color: var(--iw-toc-link-hover, var(--color-surface-accent));
 }
 
 /* Scroll-spy marker: the section currently being read. */

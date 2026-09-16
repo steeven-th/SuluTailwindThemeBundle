@@ -816,6 +816,14 @@ The reference set a component offers is therefore the surfaces plus the shape:
 | Text on accent | `--color-surface-on-accent` |
 | Corner radius | the component's radius variable |
 | Shadow | the shadow of the box itself, and of whatever floats: a drawer, an edge button |
+| Inner spacing | the padding of the component, from the same scale the blocks use |
+| Gap | the distance between its items |
+| Text size | the size of its text |
+
+A padding that is not square stays that way: a tag is padded three times wider
+than it is tall, a pagination item one and a half, and the single setting keeps
+that ratio through a `calc()`. A pill padded evenly stops being a pill, and the
+shape is part of what the component is.
 
 **A token only reaches what reads it.** A pagination link and a tag had no
 background and no border at rest, so wiring a background setting to a surface

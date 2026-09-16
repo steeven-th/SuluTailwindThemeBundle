@@ -1189,6 +1189,58 @@ class ThemeCompiler
     ];
 
     /**
+     * Per-component spacing: selector => [config key => variables].
+     *
+     * The values come from the same picker the blocks use, so a theme saying
+     * "gap-6" means the same distance in a block and in a component.
+     *
+     * A variable may carry a ratio: a tag is padded three times wider than it
+     * is tall, a pagination item one and a half. One setting drives both axes
+     * and keeps that proportion, because a pill padded evenly stops being a
+     * pill - the shape is part of what the component is, not a detail the
+     * setting should flatten.
+     *
+     * @var array<string, array<string, list<string|array{0: string, 1: float}>>>
+     */
+    private const COMPONENT_SPACING = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            'components_sidebarPadding' => [
+                '--iw-article-filters-padding',
+                '--iw-article-filters-drawer-padding',
+                '--iw-toc-padding',
+            ],
+            'components_sidebarGap' => [
+                '--iw-article-filters-group-gap',
+                '--iw-toc-gap',
+            ],
+        ],
+        '.iw-tag, .iw-tags' => [
+            'components_tagPadding' => [['--iw-tag-padding', 3.0]],
+            'components_tagGap' => ['--iw-tags-gap'],
+        ],
+        '.iw-pagination' => [
+            'components_paginationPadding' => [['--iw-pagination-item-padding', 1.5]],
+            'components_paginationGap' => ['--iw-pagination-gap'],
+        ],
+        '.iw-breadcrumbs' => [
+            'components_breadcrumbGap' => ['--iw-breadcrumbs-gap'],
+        ],
+    ];
+
+    /**
+     * Per-component text size: selector => [config key => variables].
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const COMPONENT_TEXT_SIZE = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            'components_sidebarFontSize' => ['--iw-article-filters-font-size', '--iw-toc-font-size'],
+        ],
+        '.iw-tag' => ['components_tagFontSize' => ['--iw-tag-font-size']],
+        '.iw-breadcrumbs' => ['components_breadcrumbFontSize' => ['--iw-breadcrumbs-font-size']],
+    ];
+
+    /**
      * The shadow scale, shared by everything that casts one.
      *
      * The steps are the ones the card hover already offered, so a theme saying
@@ -1304,7 +1356,10 @@ class ThemeCompiler
      */
     private function generateComponentSurfaceOverrides(array $tokens): string
     {
-        $css = $this->generateComponentRadii($tokens) . $this->generateComponentShadows($tokens);
+        $css = $this->generateComponentRadii($tokens)
+            . $this->generateComponentShadows($tokens)
+            . $this->generateComponentSpacing($tokens)
+            . $this->generateComponentTextSizes($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1380,6 +1435,74 @@ class ThemeCompiler
 
                 foreach ($variables as $variable) {
                     $declarations .= "  {$variable}: " . self::SHADOWS[$step] . ";\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component spacing rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentSpacing(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_SPACING as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $stored = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $stored) {
+                    continue;
+                }
+
+                $length = self::spacingToLength($stored);
+                foreach ($variables as $variable) {
+                    if (\is_array($variable)) {
+                        [$name, $ratio] = $variable;
+                        $declarations .= "  {$name}: {$length} calc({$length} * {$ratio});\n";
+
+                        continue;
+                    }
+
+                    $declarations .= "  {$variable}: {$length};\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component text size rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentTextSizes(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_TEXT_SIZE as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $size = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $size) {
+                    continue;
+                }
+
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: {$size};\n";
                 }
             }
             if ('' !== $declarations) {

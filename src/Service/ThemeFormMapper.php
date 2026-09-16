@@ -165,6 +165,11 @@ class ThemeFormMapper
         'components_tagAccent', 'components_tagRadius',
         'components_sidebarRadius', 'components_sidebarShadow', 'components_backToTopShadow',
         'components_paginationShadow', 'components_tagShadow', 'components_controlsShadow',
+        // Spacing and text size, per component.
+        'components_sidebarPadding', 'components_sidebarGap', 'components_sidebarFontSize',
+        'components_tagPadding', 'components_tagGap', 'components_tagFontSize',
+        'components_paginationPadding', 'components_paginationGap',
+        'components_breadcrumbGap', 'components_breadcrumbFontSize',
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',

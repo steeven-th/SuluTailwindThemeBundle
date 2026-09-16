@@ -12,6 +12,22 @@
     <key>iw_theme_config_navigation</key>
 
     <properties>
+                <property name="paginationSpacingHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_group_spacing</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_paginationPadding" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_padding</title></meta>
+                </property>
+
+                <property name="components_paginationGap" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_gap</title></meta>
+                </property>
+
         <!-- Breadcrumb section -->
         <section name="componentsBreadcrumb">
             <meta>
@@ -29,6 +45,20 @@
                 <property name="components_breadcrumbAccent" type="iw_theme_color_token_editor" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
                     <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_breadcrumbFontSize" type="single_select" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_font_size</title></meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px</title></meta></param>
+                            <param name="0.875rem"><meta><title>14 px</title></meta></param>
+                            <param name="1rem"><meta><title>16 px</title></meta></param>
+                            <param name="1.125rem"><meta><title>18 px</title></meta></param>
+                        </param>
+                    </params>
                 </property>
 
                 <property name="breadcrumbs_enabled" type="single_select" colspan="6">
@@ -117,6 +147,7 @@
                     <meta><title>iw_sulu_tailwind_theme.components_label_on_accent</title></meta>
                     <params><param name="show_palette" value="true"/></params>
                 </property>
+
                 <property name="components_paginationShadow" type="single_select" colspan="6">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_label_shadow</title>
@@ -271,6 +302,18 @@
 
             </properties>
         </section>
+
+                <property name="breadcrumbSpacingHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_group_spacing</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="components_breadcrumbGap" type="iw_theme_margin_selector" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.components_label_gap</title></meta>
+                </property>
 
         <!--
             The arrows, dots and chevrons that move a visitor through a block.
