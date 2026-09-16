@@ -488,6 +488,18 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
+            // ── Edit form: tags tab ────────────────────────────────
+            // The component drawing them takes any list, so they belong with
+            // what applies site-wide rather than under one kind of content.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.tags', '/tags')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_tags')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_tags')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
             // ── Edit form: navigation tab ──────────────────────────
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.navigation', '/navigation')

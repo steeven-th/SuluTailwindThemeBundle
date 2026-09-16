@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Default settings tab, Tags sub-tab.
+
+    The pills a taxonomy is shown as. The component that draws them is generic
+    - it takes a list of anything and renders it as pills - and only articles
+    call it today, which is why these settings sit with the site-wide defaults
+    rather than under Articles: someone looking for where tags are styled has
+    no reason to look inside one kind of content.
+
+    Not to be confused with the badge of a card, which is the label a card
+    carries on its image and is set in the Cards sub-tab.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_tags</key>
+
+    <properties>
+        <property name="components_tagBg" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagText" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagBorder" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagAccent" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagRadius" type="iw_theme_radius_selector" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+        </property>
+    </properties>
+</form>

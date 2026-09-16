@@ -104,39 +104,5 @@
                     </param>
                 </params>
             </property>
-
-        <!--
-            The badges an article wears: its categories and its tags. They read
-            the shared surfaces like every transverse component, so an empty
-            field keeps them following the theme.
-        -->
-        <property name="tagsHeading" type="heading">
-            <params>
-                <param name="label">
-                    <meta><title>iw_sulu_tailwind_theme.components_section_tags</title></meta>
-                </param>
-            </params>
-        </property>
-
-        <property name="components_tagBg" type="iw_theme_color_token_editor" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
-            <params><param name="show_palette" value="true"/></params>
-        </property>
-        <property name="components_tagText" type="iw_theme_color_token_editor" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_text</title></meta>
-            <params><param name="show_palette" value="true"/></params>
-        </property>
-        <property name="components_tagBorder" type="iw_theme_color_token_editor" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
-            <params><param name="show_palette" value="true"/></params>
-        </property>
-        <!-- What a tag turns to under the pointer. -->
-        <property name="components_tagAccent" type="iw_theme_color_token_editor" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
-            <params><param name="show_palette" value="true"/></params>
-        </property>
-        <property name="components_tagRadius" type="iw_theme_radius_selector" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
-        </property>
     </properties>
 </form>
