@@ -1,6 +1,6 @@
 # Block: location — CSS API
 
-Map block backed by the native Sulu `location` field. Renders an interactive **Leaflet** map centered on the chosen coordinates (shared [location map component](../transverse.md#location-map-leaflet) — tile provider, scroll-zoom behavior and colors are configured in **Theme > Components > Maps**), with four layout styles selectable from the admin:
+Map block backed by the native Sulu `location` field. Renders an interactive **Leaflet** map centered on the chosen coordinates (shared [location map component](../transverse.md#location-map-leaflet) — tile provider, scroll-zoom behavior and colors are configured in **Settings > Themes > Default settings > Cartography**), with four layout styles selectable from the admin:
 
 - `--map-only`: just the map.
 - `--fullwidth`: map + info column stacked below (title, address card, optional rich text, "open in maps" link).

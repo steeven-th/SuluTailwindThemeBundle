@@ -259,6 +259,8 @@ class ThemeAdmin extends Admin
             $themeItem->setIcon('su-paint');
             $themeItem->setView(static::LIST_VIEW);
 
+            // Under Settings, and staying there: every item of the first level
+            // opens a menu of its own, and the theme pages are one destination.
             try {
                 $navigationItemCollection->get(Admin::SETTINGS_NAVIGATION_ITEM)->addChild($themeItem);
             } catch (\Exception) {

@@ -258,7 +258,7 @@ Derived from the `body` assignment:
 
 ## Border variables
 
-Generated from the **Border radii** section of the **Settings > Themes > Defaults** tab.
+Generated from the **Settings > Themes > Default settings > Spacing and radius** sub-tab.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
@@ -292,7 +292,7 @@ The compiler also emits theme-default utility classes (plus `sm:` variants) that
 
 ## Block default variables
 
-Generated from the **Blocks** section of the **Settings > Themes > Defaults** tab.
+Generated from the **Settings > Themes > Default settings > Blocks** sub-tab.
 These are the site-wide defaults shared by every block that are not tied to a
 single component (components have their own tab).
 

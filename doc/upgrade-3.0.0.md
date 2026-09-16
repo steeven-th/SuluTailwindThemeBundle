@@ -128,7 +128,7 @@ to opt out.
 ### Theme-following defaults
 
 The new fields default to **"Theme default"** (empty value): the element then
-follows the matching value from **Settings > Themes > Borders** through the
+follows the matching value from **Settings > Themes > Default settings > Spacing and radius** through the
 compiled `iw-radius--paragraph` / `iw-radius--card` / `iw-radius--image`
 utility classes. Changing the theme borders config updates every
 non-overridden block — no content edit needed. Editors can still override any

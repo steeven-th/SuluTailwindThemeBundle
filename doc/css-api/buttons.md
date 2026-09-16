@@ -1,6 +1,6 @@
 # Buttons — CSS API
 
-Buttons are the most theme-driven component of the bundle. Their visual identity (background, text, border, radius, hover effects) is fully derived from the admin **Settings > Themes > Buttons** tab and compiled into `:root` custom properties by the `ThemeCompiler`.
+Buttons are the most theme-driven component of the bundle. Their visual identity (background, text, border, radius, hover effects) is fully derived from the admin **Settings > Themes > Default settings > Buttons** tab and compiled into `:root` custom properties by the `ThemeCompiler`.
 
 This page lists every CSS variable and class involved.
 

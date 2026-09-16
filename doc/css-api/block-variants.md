@@ -1,6 +1,6 @@
 # Block variants — CSS API
 
-Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Block variants**. Each variant has a stable **slug** (its identifier), separate from its user-facing label.
+Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Variants**. Each variant has a stable **slug** (its identifier), separate from its user-facing label.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../css-conventions.md`](../css-conventions.md).
 

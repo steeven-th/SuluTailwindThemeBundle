@@ -1135,8 +1135,20 @@ class ThemeCompiler
             }
         }
 
-        foreach ($this->colorSet->getTextColors() as $key => $value) {
+        $semantic = $this->colorSet->getTextColors();
+        foreach ($semantic as $key => $value) {
             $css .= "  --color-{$key}: " . $this->resolveColorValue($value) . ";\n";
+        }
+
+        // The border colour is read in about two dozen places - the rules of an
+        // accordion, the separators of a list, the outline of a form field - and
+        // each of them used to fall back to a grey written into the stylesheet,
+        // which no theme could change and which stayed light on a dark theme.
+        // It is emitted whether or not it was set, the unset value being mixed
+        // from the text and the background the way the surfaces already are, so
+        // it follows the theme in both directions.
+        if (!isset($semantic['border'])) {
+            $css .= '  --color-border: color-mix(in srgb, var(--color-text) 18%, var(--color-background));' . "\n";
         }
 
         return $css . "\n";

@@ -30,7 +30,10 @@
 
     "iw_sulu_tailwind_theme.colors": "Farben",
     "iw_sulu_tailwind_theme.colors_section_main": "Palette",
-    "iw_sulu_tailwind_theme.colors_section_text": "Text",
+    "iw_sulu_tailwind_theme.colors_section_text": "Text und Rahmen",
+    "iw_sulu_tailwind_theme.colors_section_borders": "Rahmen",
+    "iw_sulu_tailwind_theme.colors_border": "Rahmenfarbe",
+    "iw_sulu_tailwind_theme.colors_border_info": "Die Linie zwischen den Elementen: Akkordeon-Trennlinien, Listentrenner, Umrisse von Formularfeldern, Rahmen eines Testimonials. Leer lassen für eine aus Text und Hintergrund gemischte Farbe, die in hellen wie dunklen Themes sichtbar bleibt.",
     "iw_sulu_tailwind_theme.colors_primary": "Primärfarbe",
     "iw_sulu_tailwind_theme.colors_secondary": "Sekundärfarbe",
     "iw_sulu_tailwind_theme.colors_background": "Hintergrundfarbe",

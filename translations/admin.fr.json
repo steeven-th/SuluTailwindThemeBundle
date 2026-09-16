@@ -30,7 +30,10 @@
 
     "iw_sulu_tailwind_theme.colors": "Couleurs",
     "iw_sulu_tailwind_theme.colors_section_main": "Palette",
-    "iw_sulu_tailwind_theme.colors_section_text": "Texte",
+    "iw_sulu_tailwind_theme.colors_section_text": "Texte et bordures",
+    "iw_sulu_tailwind_theme.colors_section_borders": "Bordures",
+    "iw_sulu_tailwind_theme.colors_border": "Couleur des bordures",
+    "iw_sulu_tailwind_theme.colors_border_info": "Trait tracé entre les éléments : filets d'un accordéon, séparateurs de liste, contour des champs de formulaire, cadre d'un témoignage. Laissez vide pour une couleur calculée à partir du texte et du fond, qui reste visible en thème clair comme en sombre.",
     "iw_sulu_tailwind_theme.colors_primary": "Couleur primaire",
     "iw_sulu_tailwind_theme.colors_secondary": "Couleur secondaire",
     "iw_sulu_tailwind_theme.colors_background": "Couleur de fond",

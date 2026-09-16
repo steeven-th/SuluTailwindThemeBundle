@@ -30,7 +30,10 @@
 
     "iw_sulu_tailwind_theme.colors": "Colors",
     "iw_sulu_tailwind_theme.colors_section_main": "Palette",
-    "iw_sulu_tailwind_theme.colors_section_text": "Text",
+    "iw_sulu_tailwind_theme.colors_section_text": "Text and borders",
+    "iw_sulu_tailwind_theme.colors_section_borders": "Borders",
+    "iw_sulu_tailwind_theme.colors_border": "Border color",
+    "iw_sulu_tailwind_theme.colors_border_info": "The line drawn between things: accordion rules, list separators, form field outlines, the frame of a testimonial. Leave empty for a color mixed from the text and the background, which stays visible on a light theme and a dark one alike.",
     "iw_sulu_tailwind_theme.colors_primary": "Primary color",
     "iw_sulu_tailwind_theme.colors_secondary": "Secondary color",
     "iw_sulu_tailwind_theme.colors_background": "Background color",

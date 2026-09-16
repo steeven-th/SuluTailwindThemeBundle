@@ -23,6 +23,18 @@ namespace ItechWorld\SuluTailwindThemeBundle\Color;
 final class ColorSet
 {
     /**
+     * The semantic colours, which carry no shades and are stored apart.
+     *
+     * `border` joined them rather than becoming an eleventh palette role: a
+     * role owns a hex value the compiler derives ten shades from, while a
+     * border wants no shades and, left empty, a value mixed from the text and
+     * the background so it follows a dark theme on its own.
+     *
+     * @var list<string>
+     */
+    public const SEMANTIC_KEYS = ['text', 'link', 'linkHover', 'border'];
+
+    /**
      * @param list<array{role: string|null, slug: string, value: string}> $colors      Palette colors (roles + brand)
      * @param array<string, string>                                        $textColors  Semantic text assignments
      */
@@ -82,7 +94,7 @@ final class ColorSet
                 }
                 if (ColorRoles::isRole($key)) {
                     $configuredRoles[$key] = ['slug' => $key, 'value' => $value];
-                } elseif (\in_array($key, ['text', 'link', 'linkHover'], true)) {
+                } elseif (\in_array($key, self::SEMANTIC_KEYS, true)) {
                     $legacyText[$key] = $value;
                 }
             }
@@ -113,7 +125,7 @@ final class ColorSet
         $textColors = [];
         $rawText = $tokens['textColors'] ?? $legacyText;
         if (\is_array($rawText)) {
-            foreach (['text', 'link', 'linkHover'] as $key) {
+            foreach (self::SEMANTIC_KEYS as $key) {
                 if (isset($rawText[$key]) && \is_string($rawText[$key])) {
                     $textColors[$key] = $rawText[$key];
                 }
@@ -134,7 +146,7 @@ final class ColorSet
     }
 
     /**
-     * Get the semantic text assignments (text/link/linkHover).
+     * Get the semantic assignments (text/link/linkHover/border).
      *
      * @return array<string, string>
      */

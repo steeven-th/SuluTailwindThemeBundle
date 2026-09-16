@@ -160,7 +160,7 @@ itself. Only the type and the hover are site-wide.
 
 Blocks built from two content zones - text + images, form + widget, map + info,
 CTA + accessory - share a single gap token so the whole site breathes the same
-way. It is set in the admin under **Settings > Themes > Defaults > Blocks >
+way. It is set in the admin under **Settings > Themes > Default settings > Blocks >
 Gap between zones** (`defaults.blockGap`) and compiled to `--iw-blocks-gap`.
 
 | Level (admin) | Tailwind | Value |
@@ -261,7 +261,7 @@ deduced from a lateral padding of 0.
 ## Block titles gap
 
 The space between a block's titles group (title, subtitle, separator) and its
-content is a second site-wide token: **Settings > Themes > Defaults > Blocks >
+content is a second site-wide token: **Settings > Themes > Default settings > Blocks >
 Gap between titles and content** (`defaults.titleGap`), compiled to
 `--iw-blocks-title-gap` and consumed by `.iw-block__titles`, the wrapper emitted
 by `blocks/common/_titles.html.twig` for all 57 block templates that use it.
@@ -297,7 +297,7 @@ there the title and the text belong to the same zone.
 
 A block spans the page container, which climbs to 96rem: a title and two lines
 of text end up stretched across the whole screen. The maximum width caps that,
-site-wide from **Settings > Themes > Defaults > Blocks > Maximum content
+site-wide from **Settings > Themes > Default settings > Blocks > Maximum content
 width** (`defaults.blockMaxWidth`, compiled to `--iw-blocks-max-width`) and per
 block from its **Settings > Maximum content width** field (`maxWidth`). The
 block field wins, an empty value follows the theme, and `none` opts a single
@@ -347,7 +347,7 @@ utility and widen every block instead of leaving it alone.
 ### Which blocks the theme width reaches
 
 Every block carries the field, but the theme default does not reach all of them
-by default. **Settings > Themes > Defaults > Blocks > Blocks the maximum width
+by default. **Settings > Themes > Default settings > Blocks > Blocks the maximum width
 applies to** opens a modal listing the block types on the left and, on the
 right, the styles of the selected one with the same wireframes the editor sees
 when picking a style. Ticking works at both levels.
@@ -617,7 +617,7 @@ it is an SVG, through the mask.
 
 Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Reusable on any page, not article-specific.
 
-**Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Components** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (theme → Components tab): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
+**Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Navigation** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (**Settings > Themes > Default settings > Navigation**): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
 
 **Manual rendering.** The low-level partial `templates/components/_breadcrumbs.html.twig` takes `items` (an array of `{title, url}`, last item = current page) and an optional `separator` (`chevron` | `slash` | `dot`), for fully custom trails.
 
@@ -884,7 +884,7 @@ Aspect-ratio sizing reuses the shared `.iw-ratio--*` utilities.
 
 Interactive Leaflet map rendered by the `location-map` Stimulus controller for every Sulu `location` field: the four location block styles, the CTA location accessory and the form location widget. All call sites go through the shared partial `templates/components/_location_map.html.twig`.
 
-Behavior (configured in **Theme > Components > Maps**):
+Behavior (configured in **Settings > Themes > Default settings > Cartography**):
 
 - **Tile provider**: OpenStreetMap (default), Carto Voyager / Positron / Dark Matter, or a custom tile URL template + attribution. The provider attribution is always displayed (OSM/Carto tile usage policies).
 - **Scroll zoom**: cooperative by default — the page keeps scrolling over the map unless `Ctrl`/`Cmd` is held; on touch devices one finger scrolls the page and two fingers pan/zoom. A translated hint overlay appears when a blocked gesture is attempted. Can be switched to "always on" or "disabled".
