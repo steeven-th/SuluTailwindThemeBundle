@@ -164,6 +164,7 @@ class ThemeFormMapper
         'components_tagBg', 'components_tagText', 'components_tagBorder',
         'components_tagAccent', 'components_tagRadius',
         'components_sidebarRadius', 'components_sidebarShadow', 'components_backToTopShadow',
+        'components_paginationShadow', 'components_tagShadow', 'components_controlsShadow',
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',

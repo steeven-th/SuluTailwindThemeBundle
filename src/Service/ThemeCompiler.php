@@ -594,6 +594,11 @@ class ThemeCompiler
             $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
         }
 
+        $controlsShadow = trim((string) ($tokens['components_controlsShadow'] ?? ''));
+        if (isset(self::SHADOWS[$controlsShadow])) {
+            $css .= '  --iw-gallery-nav-shadow: ' . self::SHADOWS[$controlsShadow] . ";\n";
+        }
+
         // The size of the button, which drives the arrow inside it too.
         $sizes = ['sm' => ['2.25rem', '1rem'], 'md' => ['3rem', '1.5rem'], 'lg' => ['4rem', '2rem']];
         $buttonSize = (string) ($tokens['components_controlsButtonSize'] ?? '');
@@ -1213,11 +1218,15 @@ class ThemeCompiler
             // of the table of contents. The filters toggle sits in the flow of
             // the page and draws none, which is why it is absent here.
             'components_sidebarShadow' => [
+                '--iw-article-filters-shadow',
                 '--iw-article-filters-drawer-shadow',
+                '--iw-toc-shadow',
                 '--iw-toc-drawer-shadow',
                 '--iw-toc-toggle-shadow',
             ],
         ],
+        '.iw-pagination' => ['components_paginationShadow' => ['--iw-pagination-item-shadow']],
+        '.iw-tag' => ['components_tagShadow' => ['--iw-tag-shadow']],
     ];
 
     /**

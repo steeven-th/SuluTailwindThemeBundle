@@ -815,7 +815,7 @@ The reference set a component offers is therefore the surfaces plus the shape:
 | Accent | `--color-surface-accent` |
 | Text on accent | `--color-surface-on-accent` |
 | Corner radius | the component's radius variable |
-| Shadow | the shadow variables of whatever floats: a drawer, an edge button |
+| Shadow | the shadow of the box itself, and of whatever floats: a drawer, an edge button |
 
 **A token only reaches what reads it.** A pagination link and a tag had no
 background and no border at rest, so wiring a background setting to a surface

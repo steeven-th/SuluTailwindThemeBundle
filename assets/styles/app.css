@@ -3271,6 +3271,7 @@ img.object-cover {
     -webkit-backdrop-filter: blur(8px);
     color: var(--_color);
     border: none;
+    box-shadow: var(--iw-gallery-nav-shadow, none);
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
@@ -4845,6 +4846,7 @@ span.iw-breadcrumbs__separator {
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
     background-color: var(--iw-pagination-item-bg, transparent);
     border: var(--iw-pagination-item-border-width, 0) solid var(--iw-pagination-item-border, transparent);
+    box-shadow: var(--iw-pagination-item-shadow, none);
     font-size: 0.875rem;
     color: var(--iw-pagination-color, var(--color-surface-muted));
     text-decoration: none;
@@ -4897,6 +4899,7 @@ span.iw-breadcrumbs__separator {
     border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
     background-color: var(--iw-tag-bg, transparent);
+    box-shadow: var(--iw-tag-shadow, none);
     color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -5112,6 +5115,7 @@ span.iw-breadcrumbs__separator {
     background-color: var(--iw-article-filters-bg, var(--color-surface));
     border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
     border-radius: var(--iw-article-filters-radius, var(--border-radius));
+    box-shadow: var(--iw-article-filters-shadow, none);
 }
 
 .iw-article-filters__header {
@@ -5464,6 +5468,7 @@ span.iw-breadcrumbs__separator {
     background-color: var(--iw-toc-bg, var(--color-surface));
     border: var(--iw-toc-border, 1px solid var(--color-surface-border));
     border-radius: var(--iw-toc-radius, var(--border-radius));
+    box-shadow: var(--iw-toc-shadow, none);
 }
 
 .iw-toc__summary {
