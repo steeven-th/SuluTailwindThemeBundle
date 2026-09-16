@@ -141,4 +141,48 @@ final class ThemeViewTreeContractTest extends TestCase
 
         return $views;
     }
+
+    /**
+     * The tabs of the first row read from the general to the particular.
+     *
+     * The order is a decision rather than an accident: a variant combines
+     * colours and surfaces defined before it, so it comes after them and
+     * before the block defaults that use it. Nothing enforces it at runtime -
+     * Sulu sorts by `tabOrder` and treats a missing one as zero, so a tab
+     * added without one lands wherever the declarations happen to fall.
+     */
+    #[Test]
+    public function theFirstRowReadsFromTheGeneralToTheParticular(): void
+    {
+        $expected = [
+            ThemeAdmin::EDIT_FORM_VIEW . '.details',
+            ThemeAdmin::EDIT_FORM_VIEW . '.colors_group',
+            ThemeAdmin::EDIT_FORM_VIEW . '.typography',
+            ThemeAdmin::EDIT_FORM_VIEW . '.variants',
+            ThemeAdmin::EDIT_FORM_VIEW . '.defaults_group',
+            ThemeAdmin::EDIT_FORM_VIEW . '.menu_group',
+            ThemeAdmin::EDIT_FORM_VIEW . '.footer',
+            ThemeAdmin::EDIT_FORM_VIEW . '.pages',
+            ThemeAdmin::EDIT_FORM_VIEW . '.articles_group',
+        ];
+
+        $tabs = [];
+        foreach ($this->views() as $name => $view) {
+            if (ThemeAdmin::EDIT_FORM_VIEW !== $view->getParent()) {
+                continue;
+            }
+
+            $order = $view->getOption('tabOrder');
+            self::assertIsInt(
+                $order,
+                \sprintf('%s is a tab of the first row with no tabOrder, so its place is left to chance.', $name),
+            );
+
+            $tabs[$name] = $order;
+        }
+
+        asort($tabs);
+
+        self::assertSame($expected, array_keys($tabs));
+    }
 }

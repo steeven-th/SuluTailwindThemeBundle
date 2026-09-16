@@ -1216,6 +1216,8 @@
 
     "iw_sulu_tailwind_theme.articles": "Articles",
     "iw_sulu_tailwind_theme.articles_section_page_styles": "Styles des pages",
+    "iw_sulu_tailwind_theme.articles_section_filters": "Filtres et sommaire",
+    "iw_sulu_tailwind_theme.articles_group_toc": "Sommaire",
     "iw_sulu_tailwind_theme.articles_section_listing": "Listing",
     "iw_sulu_tailwind_theme.articles_section_card_appearance": "Apparence des cartes",
     "iw_sulu_tailwind_theme.articles_section_display": "Éléments affichés",

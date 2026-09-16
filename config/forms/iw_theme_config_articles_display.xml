@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Articles tab, Displayed items sub-tab.
+
+    What an article shows about itself: dates, authors, categories, tags,
+    excerpts.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_articles_display</key>
+
+    <properties>
+            <property name="articles_showDates" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.articles_show_dates</title></meta>
+                <params>
+                    <param name="default_value" value="both"/>
+                    <param name="values" type="collection">
+                        <param name="hidden"><meta><title>iw_sulu_tailwind_theme.articles_visibility_hidden</title></meta></param>
+                        <param name="page"><meta><title>iw_sulu_tailwind_theme.articles_visibility_page</title></meta></param>
+                        <param name="listing"><meta><title>iw_sulu_tailwind_theme.articles_visibility_listing</title></meta></param>
+                        <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_visibility_both</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="articles_showAuthors" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.articles_show_authors</title></meta>
+                <params>
+                    <param name="default_value" value="both"/>
+                    <param name="values" type="collection">
+                        <param name="hidden"><meta><title>iw_sulu_tailwind_theme.articles_visibility_hidden</title></meta></param>
+                        <param name="page"><meta><title>iw_sulu_tailwind_theme.articles_visibility_page</title></meta></param>
+                        <param name="listing"><meta><title>iw_sulu_tailwind_theme.articles_visibility_listing</title></meta></param>
+                        <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_visibility_both</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- How an author's name is written out. No "nickname" option:
+                 a Sulu contact has no such field, and the only pseudonym in
+                 the system is the account login. A pen name goes through a
+                 "custom" additional author, whose name is free text. -->
+            <property name="articles_authorNameFormat" type="single_select" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.articles_author_name_format</title>
+                    <info_text>iw_sulu_tailwind_theme.articles_author_name_format_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="full"/>
+                    <param name="values" type="collection">
+                        <param name="full"><meta><title>iw_sulu_tailwind_theme.articles_author_name_full</title></meta></param>
+                        <param name="first"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first</title></meta></param>
+                        <param name="last"><meta><title>iw_sulu_tailwind_theme.articles_author_name_last</title></meta></param>
+                        <param name="first_initial"><meta><title>iw_sulu_tailwind_theme.articles_author_name_first_initial</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="articles_showAuthorAvatars" type="checkbox" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.articles_show_author_avatars</title>
+                    <info_text>iw_sulu_tailwind_theme.articles_show_author_avatars_info</info_text>
+                </meta>
+                <params>
+                    <param name="type" value="toggler"/>
+                    <param name="default_value" value="true"/>
+                </params>
+            </property>
+
+            <property name="articles_showCategories" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.articles_show_categories</title></meta>
+                <params>
+                    <param name="default_value" value="both"/>
+                    <param name="values" type="collection">
+                        <param name="hidden"><meta><title>iw_sulu_tailwind_theme.articles_visibility_hidden</title></meta></param>
+                        <param name="page"><meta><title>iw_sulu_tailwind_theme.articles_visibility_page</title></meta></param>
+                        <param name="listing"><meta><title>iw_sulu_tailwind_theme.articles_visibility_listing</title></meta></param>
+                        <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_visibility_both</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="articles_showTags" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.articles_show_tags</title></meta>
+                <params>
+                    <param name="default_value" value="page"/>
+                    <param name="values" type="collection">
+                        <param name="hidden"><meta><title>iw_sulu_tailwind_theme.articles_visibility_hidden</title></meta></param>
+                        <param name="page"><meta><title>iw_sulu_tailwind_theme.articles_visibility_page</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="articles_showExcerpts" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.articles_show_excerpts</title></meta>
+                <params>
+                    <param name="default_value" value="listing"/>
+                    <param name="values" type="collection">
+                        <param name="hidden"><meta><title>iw_sulu_tailwind_theme.articles_visibility_hidden</title></meta></param>
+                        <param name="listing"><meta><title>iw_sulu_tailwind_theme.articles_visibility_listing</title></meta></param>
+                        <param name="both"><meta><title>iw_sulu_tailwind_theme.articles_visibility_both</title></meta></param>
+                    </param>
+                </params>
+            </property>
+    </properties>
+</form>

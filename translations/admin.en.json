@@ -1125,6 +1125,8 @@
 
     "iw_sulu_tailwind_theme.articles": "Articles",
     "iw_sulu_tailwind_theme.articles_section_page_styles": "Page styles",
+    "iw_sulu_tailwind_theme.articles_section_filters": "Filters and contents",
+    "iw_sulu_tailwind_theme.articles_group_toc": "Table of contents",
     "iw_sulu_tailwind_theme.articles_section_listing": "Listing",
     "iw_sulu_tailwind_theme.articles_section_card_appearance": "Card appearance",
     "iw_sulu_tailwind_theme.articles_section_display": "Display elements",

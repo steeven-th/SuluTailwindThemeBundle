@@ -1118,6 +1118,8 @@
 
     "iw_sulu_tailwind_theme.articles": "Artikel",
     "iw_sulu_tailwind_theme.articles_section_page_styles": "Seitenstile",
+    "iw_sulu_tailwind_theme.articles_section_filters": "Filter und Inhaltsverzeichnis",
+    "iw_sulu_tailwind_theme.articles_group_toc": "Inhaltsverzeichnis",
     "iw_sulu_tailwind_theme.articles_section_listing": "Listing",
     "iw_sulu_tailwind_theme.articles_section_card_appearance": "Karten-Erscheinungsbild",
     "iw_sulu_tailwind_theme.articles_section_display": "Angezeigte Elemente",
