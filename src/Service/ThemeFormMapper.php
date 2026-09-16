@@ -163,7 +163,7 @@ class ThemeFormMapper
         // Badges worn by an article: categories and tags.
         'components_tagBg', 'components_tagText', 'components_tagBorder',
         'components_tagAccent', 'components_tagRadius',
-        'components_sidebarRadius',
+        'components_sidebarRadius', 'components_sidebarShadow', 'components_backToTopShadow',
         // Navigation controls: the arrows, dots and chevrons of a block.
         'components_controlsOnContentColor', 'components_controlsOnMediaColor',
         'components_controlsOnMediaBg',
@@ -181,7 +181,7 @@ class ThemeFormMapper
         // Site-wide card appearance (moved from the Articles tab in 3.0).
         'cardImageRatio', 'cardGap', 'cardSurface', 'cardPadding', 'cardImagePadded',
         'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
-        'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
+        'cardShadow', 'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         'cardTitleSize', 'cardTextSize',

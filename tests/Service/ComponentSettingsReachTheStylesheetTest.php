@@ -40,6 +40,14 @@ final class ComponentSettingsReachTheStylesheetTest extends TestCase
             }
         }
 
+        foreach (ThemeCompiler::componentShadow() as $selector => $map) {
+            foreach ($map as $key => $variables) {
+                foreach ($variables as $variable) {
+                    $found[$selector . ' / ' . $key . ' / ' . $variable] = [$variable];
+                }
+            }
+        }
+
         foreach (ThemeCompiler::componentRadius() as $selector => $map) {
             foreach ($map as $key => $variables) {
                 foreach ($variables as $variable) {

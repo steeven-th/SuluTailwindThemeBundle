@@ -518,6 +518,11 @@ class ThemeCompiler
         $css .= "  --iw-back-to-top-color: {$color};\n";
         $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
 
+        $shadow = trim((string) ($tokens['components_backToTopShadow'] ?? ''));
+        if (isset(self::SHADOWS[$shadow])) {
+            $css .= '  --iw-back-to-top-shadow: ' . self::SHADOWS[$shadow] . ";\n";
+        }
+
         return $css . "\n";
     }
 
@@ -708,6 +713,15 @@ class ThemeCompiler
         $badgeText = $this->surfaceValue($tokens['cardBadgeText'] ?? '', 'var(--color-primary-700)');
 
         $css = "  /* Card (site-wide) */\n";
+
+        // The hover shadow has always been settable while the resting one was
+        // not, so a theme could say how a card lifts but not whether it sits
+        // flat to begin with.
+        $cardShadow = trim((string) ($tokens['cardShadow'] ?? ''));
+        if (isset(self::SHADOWS[$cardShadow])) {
+            $css .= '  --iw-card-shadow: ' . self::SHADOWS[$cardShadow] . ";\n";
+        }
+
         // Global card grid gap — every card grid/list/carousel falls back to this
         // token so a single admin setting harmonizes spacing across blocks.
         $css .= "  --iw-cards-gap: {$gap};\n";
@@ -1170,6 +1184,43 @@ class ThemeCompiler
     ];
 
     /**
+     * The shadow scale, shared by everything that casts one.
+     *
+     * The steps are the ones the card hover already offered, so a theme saying
+     * "md" means the same depth wherever it says it. The menu keeps a scale of
+     * its own for now, named subtle and strong, which predates this one.
+     *
+     * @var array<string, string>
+     */
+    private const SHADOWS = [
+        'none' => 'none',
+        'sm' => '0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        'md' => '0 4px 12px -2px rgb(0 0 0 / 0.12)',
+        'lg' => '0 12px 28px -6px rgb(0 0 0 / 0.18)',
+    ];
+
+    /**
+     * Per-component shadow: selector => [config key => variables].
+     *
+     * Same shape as the radius map, and the same reason for being apart from
+     * the surfaces: a shadow is not a colour a component falls back to, it is a
+     * variable of its own. Panels list the shadow of their drawer and of the
+     * button opening it, which are the two things that float.
+     */
+    private const COMPONENT_SHADOW = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            // What floats casts a shadow: the two drawers, and the edge button
+            // of the table of contents. The filters toggle sits in the flow of
+            // the page and draws none, which is why it is absent here.
+            'components_sidebarShadow' => [
+                '--iw-article-filters-drawer-shadow',
+                '--iw-toc-drawer-shadow',
+                '--iw-toc-toggle-shadow',
+            ],
+        ],
+    ];
+
+    /**
      * Per-component corner radius: selector => [config key => variables].
      *
      * A radius is not a surface, so it cannot ride the same map: the component
@@ -1207,6 +1258,16 @@ class ThemeCompiler
     }
 
     /**
+     * The per-component shadow map, same purpose.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    public static function componentShadow(): array
+    {
+        return self::COMPONENT_SHADOW;
+    }
+
+    /**
      * The per-component radius map, same purpose.
      *
      * @return array<string, array<string, list<string>>>
@@ -1231,7 +1292,7 @@ class ThemeCompiler
      */
     private function generateComponentSurfaceOverrides(array $tokens): string
     {
-        $css = $this->generateComponentRadii($tokens);
+        $css = $this->generateComponentRadii($tokens) . $this->generateComponentShadows($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1277,6 +1338,36 @@ class ThemeCompiler
                 $radius = str_starts_with($value, 'rounded-') ? $this->resolveRadius($value) : $value;
                 foreach ($variables as $variable) {
                     $declarations .= "  {$variable}: {$radius};\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component shadow rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentShadows(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_SHADOW as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $step = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $step || !isset(self::SHADOWS[$step])) {
+                    continue;
+                }
+
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: " . self::SHADOWS[$step] . ";\n";
                 }
             }
             if ('' !== $declarations) {

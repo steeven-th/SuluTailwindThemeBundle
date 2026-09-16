@@ -56,7 +56,8 @@ final class ScopedComponentSettingsCoverTheirPartsTest extends TestCase
     public function everyPartDrawnOutsideItsComponentIsCoveredByTheSelector(): void
     {
         $selectors = implode(' ', array_keys(ThemeCompiler::componentSurfaceOverrides()))
-            . ' ' . implode(' ', array_keys(ThemeCompiler::componentRadius()));
+            . ' ' . implode(' ', array_keys(ThemeCompiler::componentRadius()))
+            . ' ' . implode(' ', array_keys(ThemeCompiler::componentShadow()));
 
         $uncovered = [];
         foreach (self::CONTAINERS as $family => $container) {
