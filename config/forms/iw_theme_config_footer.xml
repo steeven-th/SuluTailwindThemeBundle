@@ -33,8 +33,12 @@
                     </params>
                 </property>
 
-                <!-- Footer color is a named color variant applied on the <footer> -->
-                <property name="footerConfig_variant" type="iw_theme_variant_picker" colspan="6">
+                <!--
+                    Footer color is a named color variant applied on the <footer>.
+                    Full width, as in `block-variant.xml`: the picker draws a grid
+                    of thumbnails, and half a row is too narrow to lay them out.
+                -->
+                <property name="footerConfig_variant" type="iw_theme_variant_picker" colspan="12">
                     <meta>
                         <title>iw_sulu_tailwind_theme.footer_variant</title>
                         <info_text>iw_sulu_tailwind_theme.footer_variant_info</info_text>
@@ -55,7 +59,9 @@
                     </meta>
                 </property>
 
-                <property name="footerConfig_logo" type="single_media_selection" colspan="6"
+                <!-- Full width: a media selection is taller than the toggle that
+                     reveals it, and the row would read broken with both on it. -->
+                <property name="footerConfig_logo" type="single_media_selection" colspan="12"
                           visibleCondition="footerConfig_displayLogo == true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.footer_logo</title>

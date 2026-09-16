@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Default settings tab, Cartography sub-tab.
+
+    Leaflet maps, as drawn by the location block and the form widget. Named
+    cartography rather than maps because in French "cartes" is already what a
+    card is called, and the two would collide in the same form.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_maps</key>
+
+    <properties>
+            <!--
+                Three subjects follow one another here: the base map, the
+                marker, then the popup and the controls. Each opens with a
+                heading, which closes the row before it and names the group.
+            -->
+            <property name="mapsBasemapHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.config_group_basemap</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="components_mapsTileProvider" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_tile_provider</title></meta>
+                <params>
+                    <param name="default_value" value="osm"/>
+                    <param name="values" type="collection">
+                        <param name="osm"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_osm</title></meta></param>
+                        <param name="carto_voyager"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_voyager</title></meta></param>
+                        <param name="carto_positron"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_positron</title></meta></param>
+                        <param name="carto_dark"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_carto_dark</title></meta></param>
+                        <param name="custom"><meta><title>iw_sulu_tailwind_theme.components_maps_provider_custom</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="components_mapsScrollZoom" type="single_select" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom</title></meta>
+                <params>
+                    <param name="default_value" value="ctrl"/>
+                    <param name="values" type="collection">
+                        <param name="ctrl"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_ctrl</title></meta></param>
+                        <param name="always"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_always</title></meta></param>
+                        <param name="never"><meta><title>iw_sulu_tailwind_theme.components_maps_scroll_zoom_never</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="components_mapsCustomTileUrl" type="text_line" colspan="6"
+                      visibleCondition="components_mapsTileProvider == 'custom'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_maps_custom_tile_url</title>
+                    <info_text>iw_sulu_tailwind_theme.components_maps_custom_tile_url_info</info_text>
+                </meta>
+            </property>
+
+            <property name="components_mapsCustomAttribution" type="text_line" colspan="6"
+                      visibleCondition="components_mapsTileProvider == 'custom'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_maps_custom_attribution</title>
+                    <info_text>iw_sulu_tailwind_theme.components_maps_custom_attribution_info</info_text>
+                </meta>
+            </property>
+
+            <property name="mapsMarkerHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.config_group_marker</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <!--
+                Which marker first, then what colour it takes. The two
+                pickers sit side by side because both draw a grid: pairing
+                either of them with the colour field below would leave a
+                one-line input beside a panel of thumbnails.
+
+                The pictogram of the marker comes from the theme library.
+                The media wins when both are set: a file an editor went and
+                picked is a more deliberate choice than a name left over
+                from an earlier one.
+            -->
+            <property name="components_mapsMarkerIcon" type="single_icon_selection" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_maps_marker_icon</title>
+                    <info_text>iw_sulu_tailwind_theme.components_maps_marker_icon_info</info_text>
+                </meta>
+                <params>
+                    <param name="icon_set" value="iw_theme_outline"/>
+                </params>
+            </property>
+
+            <!-- Custom marker image from the media library, replaces the themed SVG pin. -->
+            <property name="components_mapsMarkerMedia" type="single_media_selection" colspan="12">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_maps_marker_media</title>
+                    <info_text>iw_sulu_tailwind_theme.components_maps_marker_media_info</info_text>
+                </meta>
+                <params>
+                    <param name="types" value="image"/>
+                </params>
+            </property>
+
+            <property name="components_mapsMarkerColor" type="iw_theme_color_token_editor" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_marker_color</title></meta>
+                <params><param name="show_palette" value="true"/></params>
+            </property>
+
+            <property name="mapsPopupHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.config_group_popup</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="components_mapsPopupBg" type="iw_theme_color_token_editor" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_popup_bg</title></meta>
+                <params><param name="show_palette" value="true"/></params>
+            </property>
+
+            <property name="components_mapsPopupText" type="iw_theme_color_token_editor" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_popup_text</title></meta>
+                <params><param name="show_palette" value="true"/></params>
+            </property>
+
+            <property name="components_mapsControlsBg" type="iw_theme_color_token_editor" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_controls_bg</title></meta>
+                <params><param name="show_palette" value="true"/></params>
+            </property>
+
+            <property name="components_mapsControlsText" type="iw_theme_color_token_editor" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.components_maps_controls_text</title></meta>
+                <params><param name="show_palette" value="true"/></params>
+            </property>
+    </properties>
+</form>

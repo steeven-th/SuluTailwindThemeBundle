@@ -52,7 +52,11 @@
                                 <xi:include href="../fragments/icon-picker.xml"
                                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-                                <property name="image" type="single_media_selection" colspan="6">
+                                <!-- Full width, like the media of the picker above:
+                                     the icon fragment ends on a half-width size
+                                     select, and a media selection landing beside
+                                     it breaks the row. -->
+                                <property name="image" type="single_media_selection" colspan="12">
                                     <meta>
                                         <title>iw_sulu_tailwind_theme.cards_image</title>
                                         <info_text>iw_sulu_tailwind_theme.cards_image_info</info_text>

@@ -40,11 +40,18 @@ also override an existing property by redeclaring its name.
 </form>
 ```
 
-The theme forms are `iw_theme_config_details`, `iw_theme_config_colors`,
-`iw_theme_config_typography`, `iw_theme_config_buttons`,
-`iw_theme_config_defaults`, `iw_theme_config_variants`, `iw_theme_config_menu`,
-`iw_theme_config_footer`, `iw_theme_config_components` and
-`iw_theme_config_articles`.
+A tab of the theme configuration is one form, and a tab holding a second row
+of tabs is one form per sub-tab: `iw_theme_config_colors_palette`,
+`iw_theme_config_colors_text` and `iw_theme_config_colors_surfaces` are the
+three of the Colors tab. `ThemeAdmin` names them, and `config/forms` is
+declared as a whole, so a file dropped in there is found by its `<key>`.
+
+Which form a field lives in changes nothing to how it is stored: the mapper
+reads a flat set of names and never looks at the form it came from, so a field
+can move from one tab to another without touching the data. What it does have
+to have is its name in `ThemeFormMapper`, or a prefix the mapper carries
+wholesale - `ThemeFormKeyCoverageTest` walks every form in the directory and
+fails on a field that would silently revert on save.
 
 ### Adding a tool to the rich-text editor
 

@@ -195,12 +195,12 @@ final class PageHeroSettingsContractTest extends TestCase
      */
     private static function declaredSettings(): array
     {
-        $form = self::read('config/forms/iw_theme_config_components.xml');
+        $form = self::read('config/forms/iw_theme_config_pages.xml');
 
         self::assertGreaterThan(
             0,
             preg_match_all('/name="(pageHero_[A-Za-z]+)"/', $form, $matches),
-            'The components form declares no banner setting.',
+            'The pages form declares no banner setting.',
         );
 
         return array_values(array_unique($matches[1]));

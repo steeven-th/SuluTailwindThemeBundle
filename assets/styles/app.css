@@ -967,7 +967,7 @@ img.object-cover {
     flex: none;
     width: var(--iw-accordion-icon-size, 1.25rem);
     height: var(--iw-accordion-icon-size, 1.25rem);
-    color: var(--iw-accordion-icon-color, currentColor);
+    color: var(--iw-accordion-icon-color, var(--iw-controls-on-content-color, currentColor));
     transition: transform var(--iw-accordion-transition-duration, 200ms) ease;
 }
 
@@ -1485,8 +1485,8 @@ img.object-cover {
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav--next { right: 0; }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--iw-icon-size, 1.25rem);
+    height: var(--iw-icon-size, 1.25rem);
 }
 
 /* Dots — slider controller toggles inline opacity at runtime;
@@ -1503,7 +1503,7 @@ img.object-cover {
     width: var(--iw-block-linked-pages-dot-size, 0.625rem);
     height: var(--iw-block-linked-pages-dot-size, 0.625rem);
     border-radius: 9999px;
-    background-color: var(--iw-block-linked-pages-nav-color, var(--iw-variant-hr-color, var(--color-primary)));
+    background-color: var(--iw-block-linked-pages-nav-color, var(--iw-controls-on-content-color, currentColor));
     opacity: var(--iw-block-linked-pages-dot-opacity, 0.3);
     transition: opacity 0.2s ease;
     border: none;
@@ -1543,8 +1543,10 @@ img.object-cover {
 
 .iw-block-linked-pages--list .iw-block-linked-pages__list-chevron {
     flex: none;
-    width: var(--iw-block-linked-pages-list-chevron-size, 1.25rem);
-    height: var(--iw-block-linked-pages-list-chevron-size, 1.25rem);
+    /* The chosen size first: this selector outweighs `.iw-icon`, so naming it
+       here is what lets a size set in the admin reach this chevron. */
+    width: var(--iw-icon-size, var(--iw-block-linked-pages-list-chevron-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-block-linked-pages-list-chevron-size, 1.25rem));
     opacity: var(--iw-block-linked-pages-list-chevron-opacity, 0.5);
     transition: opacity 0.2s ease;
 }
@@ -1713,7 +1715,7 @@ img.object-cover {
     width: var(--iw-block-testimonial-dot-size, 0.625rem);
     height: var(--iw-block-testimonial-dot-size, 0.625rem);
     border-radius: 9999px;
-    background-color: currentColor;
+    background-color: var(--iw-block-testimonial-dot-color, var(--iw-controls-on-content-color, currentColor));
     opacity: var(--iw-block-testimonial-dot-opacity, 0.3);
     transition: opacity 0.2s ease;
     border: none;
@@ -2465,8 +2467,8 @@ img.object-cover {
 }
 
 .iw-block-timeline__nav-icon {
-    width: var(--iw-timeline-nav-icon-size, 1.25rem);
-    height: var(--iw-timeline-nav-icon-size, 1.25rem);
+    width: var(--iw-icon-size, var(--iw-timeline-nav-icon-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-timeline-nav-icon-size, 1.25rem));
 }
 
 @media (min-width: 768px) {
@@ -2680,8 +2682,8 @@ img.object-cover {
 }
 
 .iw-block-article-carousel__nav-icon {
-    width: var(--iw-block-article-carousel-nav-icon-size, 1.25rem);
-    height: var(--iw-block-article-carousel-nav-icon-size, 1.25rem);
+    width: var(--iw-icon-size, var(--iw-block-article-carousel-nav-icon-size, 1.25rem));
+    height: var(--iw-icon-size, var(--iw-block-article-carousel-nav-icon-size, 1.25rem));
 }
 
 .iw-block-article-carousel__track {
@@ -3224,6 +3226,28 @@ img.object-cover {
    the look without rewriting the template. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   Navigation arrows
+   The chevron of any control that moves the visitor: carousel and slider
+   buttons, list rows, pagination, menu panels. One pictogram is chosen for the
+   whole site and turned to face the right way, rather than four that would
+   have to agree with each other.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* No size here on purpose: each caller keeps the one it already had, whether
+   that is a utility class or a rule of its own. This class only turns. */
+.iw-nav-arrow--prev {
+    transform: rotate(180deg);
+}
+
+.iw-nav-arrow--up {
+    transform: rotate(270deg);
+}
+
+.iw-nav-arrow--down {
+    transform: rotate(90deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    Shared gallery navigation arrows
    Used across all gallery layouts.  Override the --iw-gallery-nav-* custom
    properties on a parent element to theme all arrows inside it at once.
@@ -3241,12 +3265,13 @@ img.object-cover {
     justify-content: center;
     width: var(--_size);
     height: var(--_size);
-    border-radius: 9999px;
+    border-radius: var(--iw-gallery-nav-radius, 9999px);
     background: var(--_bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     color: var(--_color);
     border: none;
+    box-shadow: var(--iw-gallery-nav-shadow, none);
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
@@ -3256,9 +3281,13 @@ img.object-cover {
     background: var(--_bg-hover);
 }
 
-.iw-gallery-nav svg {
-    width: var(--_icon);
-    height: var(--_icon);
+/* The button sizes the arrow it holds, unless a pictogram size was chosen:
+   this selector outranks `.iw-icon`, so without naming that variable here a
+   size set in the admin would be silently overruled inside these buttons. */
+.iw-gallery-nav svg,
+.iw-gallery-nav .iw-icon {
+    width: var(--iw-icon-size, var(--_icon));
+    height: var(--iw-icon-size, var(--_icon));
 }
 
 /* Smaller variant for inline contexts (thumbnail strip, etc.) */
@@ -4815,10 +4844,13 @@ span.iw-breadcrumbs__separator {
     align-items: center;
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
+    background-color: var(--iw-pagination-item-bg, transparent);
+    border: var(--iw-pagination-item-border-width, 0) solid var(--iw-pagination-item-border, transparent);
+    box-shadow: var(--iw-pagination-item-shadow, none);
     font-size: 0.875rem;
     color: var(--iw-pagination-color, var(--color-surface-muted));
     text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .iw-pagination__link:hover,
@@ -4835,8 +4867,8 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-pagination__arrow svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--iw-icon-size, 1.25rem);
+    height: var(--iw-icon-size, 1.25rem);
 }
 
 .iw-pagination__ellipsis {
@@ -4866,6 +4898,8 @@ span.iw-breadcrumbs__separator {
     font-weight: var(--iw-tag-font-weight, 500);
     border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
+    background-color: var(--iw-tag-bg, transparent);
+    box-shadow: var(--iw-tag-shadow, none);
     color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -5081,6 +5115,7 @@ span.iw-breadcrumbs__separator {
     background-color: var(--iw-article-filters-bg, var(--color-surface));
     border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
     border-radius: var(--iw-article-filters-radius, var(--border-radius));
+    box-shadow: var(--iw-article-filters-shadow, none);
 }
 
 .iw-article-filters__header {
@@ -5433,6 +5468,7 @@ span.iw-breadcrumbs__separator {
     background-color: var(--iw-toc-bg, var(--color-surface));
     border: var(--iw-toc-border, 1px solid var(--color-surface-border));
     border-radius: var(--iw-toc-radius, var(--border-radius));
+    box-shadow: var(--iw-toc-shadow, none);
 }
 
 .iw-toc__summary {
@@ -5462,7 +5498,7 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-toc__link:hover {
-    color: var(--iw-toc-link-hover, var(--color-surface-foreground));
+    color: var(--iw-toc-link-hover, var(--color-surface-accent));
 }
 
 /* Scroll-spy marker: the section currently being read. */

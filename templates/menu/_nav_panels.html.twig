@@ -44,7 +44,7 @@
                     data-action="menu#closePanel"
                     class="iw-menu__panel-back iw-menu__text"
                     aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'prev', 'class': 'w-5 h-5'} only %}
             </button>
             {% if parentLinkable %}
                 {# Linkable → iw-menu__text carries the hover feedback of a link. #}
@@ -62,7 +62,7 @@
                             data-menu-panel-id-param="{{ panelId }}-{{ loop.index }}"
                             class="iw-menu__panel-item iw-menu__text--level-2">
                         <span>{{ child.title }}</span>
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
                     </button>
                 {% else %}
                     <a href="{{ sulu_content_path(child.url) }}" class="iw-menu__panel-item iw-menu__text--level-2 no-underline">
@@ -91,7 +91,7 @@
                             data-menu-panel-id-param="p-{{ loop.index }}"
                             class="iw-menu__panel-item iw-menu__text iw-menu__divider border-b">
                         <span class="text-lg font-medium">{{ item.title }}</span>
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
                     </button>
                 {% else %}
                     <a href="{{ sulu_content_path(item.url) }}"

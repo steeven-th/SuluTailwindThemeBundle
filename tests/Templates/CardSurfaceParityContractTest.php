@@ -125,6 +125,15 @@ final class CardSurfaceParityContractTest extends TestCase
             return true;
         }
 
+        // A transverse component is not a card: it lives outside the blocks, so
+        // no variant applies to it, and it draws from the semantic surfaces
+        // instead. A pagination link names its own background
+        // `--iw-pagination-item-bg`, which reads like the hook of a card
+        // without being one.
+        if (str_contains($selector, '.iw-pagination') || str_contains($selector, '.iw-tag')) {
+            return true;
+        }
+
         return str_contains($selector, '__info')
             && str_contains($body, 'var(--iw-variant-block-bg');
     }

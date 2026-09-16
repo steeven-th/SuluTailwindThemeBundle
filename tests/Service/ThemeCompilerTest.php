@@ -351,4 +351,83 @@ final class ThemeCompilerTest extends TestCase
             $css,
         );
     }
+
+    /**
+     * The border colour is emitted whether or not the theme sets one.
+     *
+     * It is read in about two dozen places - accordion rules, list separators,
+     * form outlines - each of which used to fall back to a grey written into
+     * the stylesheet: not settable, and still light on a dark theme. Emitting
+     * it always is what makes those places follow the theme, so the unset case
+     * matters as much as the set one.
+     */
+    #[Test]
+    public function itEmitsTheBorderColourEvenWhenTheThemeSetsNone(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringContainsString(
+            '--color-border: color-mix(in srgb, var(--color-text) 18%, var(--color-background));',
+            $css,
+            'An unset border colour must still be emitted, mixed from the text and the background.',
+        );
+    }
+
+    #[Test]
+    public function itEmitsTheBorderColourTheThemeSets(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'textColors' => ['border' => '#c0ffee'],
+        ]);
+
+        self::assertStringContainsString('--color-border: #c0ffee;', $css);
+        self::assertStringNotContainsString(
+            '--color-border: color-mix',
+            $css,
+            'The derived default must not be emitted alongside the value the theme sets.',
+        );
+    }
+
+    /**
+     * A theme that sets no control colour writes none.
+     *
+     * The controls follow the text around them, which the variant paints, so
+     * an untouched setting has to leave every existing site exactly as it is.
+     */
+    #[Test]
+    public function itWritesNoControlColourWhenNoneIsSet(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringNotContainsString('--iw-controls-on-content-color', $css);
+        self::assertStringNotContainsString('--iw-gallery-nav-color', $css);
+        self::assertStringNotContainsString('Navigation controls', $css);
+    }
+
+    #[Test]
+    public function itWritesTheControlColoursTheThemeSets(): void
+    {
+        $css = $this->compileCss([
+            'colors' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b']],
+            'components_controlsOnContentColor' => '#123456',
+            'components_controlsOnMediaColor' => '#abcdef',
+            'components_controlsOnMediaBg' => '#000000',
+        ]);
+
+        self::assertStringContainsString('--iw-controls-on-content-color: #123456;', $css);
+        self::assertStringContainsString('--iw-gallery-nav-color: #abcdef;', $css);
+        self::assertStringContainsString('--iw-gallery-nav-bg: #000000;', $css);
+
+        // The hover state moves towards the arrow colour, so a veil set to dark
+        // does not brighten back to white under the pointer.
+        self::assertStringContainsString(
+            '--iw-gallery-nav-bg-hover: color-mix(in srgb, #000000, #abcdef 15%);',
+            $css,
+        );
+    }
 }

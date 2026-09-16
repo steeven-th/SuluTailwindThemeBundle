@@ -69,7 +69,7 @@ final class CardHoverContractTest extends TestCase
     #[Test]
     public function theAdminDefaultAndTheCompilerDefaultAgree(): void
     {
-        $form = self::read('config/forms/iw_theme_config_components.xml');
+        $form = self::read('config/forms/iw_theme_config_cards.xml');
 
         self::assertSame(
             1,

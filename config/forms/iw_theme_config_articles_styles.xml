@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Articles tab, Styles sub-tab.
+
+    Which layout each kind of article takes, and which one a listing takes.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_articles_styles</key>
+
+    <properties>
+            <property name="articles_newsStyle" type="iw_theme_article_style_picker" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.articles_news_style</title></meta>
+                <params>
+                    <param name="article_type" value="news"/>
+                </params>
+            </property>
+
+            <property name="articles_eventStyle" type="iw_theme_article_style_picker" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.articles_event_style</title></meta>
+                <params>
+                    <param name="article_type" value="event"/>
+                </params>
+            </property>
+
+            <property name="articles_blogStyle" type="iw_theme_article_style_picker" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.articles_blog_style</title></meta>
+                <params>
+                    <param name="article_type" value="blog"/>
+                </params>
+            </property>
+
+            <property name="articles_listingStyle" type="iw_theme_article_style_picker" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.articles_listing_style</title></meta>
+                <params>
+                    <param name="article_type" value="listing"/>
+                </params>
+            </property>
+    </properties>
+</form>

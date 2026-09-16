@@ -13,6 +13,7 @@ import {viewRegistry} from 'sulu-admin-bundle/containers';
 import initializer from 'sulu-admin-bundle/services/initializer';
 import themeConfigStore from './stores/themeConfigStore';
 import WebspaceThemeForm from './components/WebspaceThemeForm/WebspaceThemeForm';
+import NestedTabs from './components/NestedTabs/NestedTabs';
 import VariantPicker from './components/VariantPicker/VariantPicker';
 import StylePicker from './components/StylePicker/StylePicker';
 import MarginSelector from './components/MarginSelector/MarginSelector';
@@ -61,6 +62,11 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     }
 
     viewRegistry.add('iw_sulu_tailwind_theme.webspace_theme_form', WebspaceThemeForm);
+
+    // A second row of tabs inside the theme form. Sulu ships the tab view but
+    // not one that can sit between a resource tab view and a form, see the
+    // component for why.
+    viewRegistry.add('iw_sulu_tailwind_theme.nested_tabs', NestedTabs);
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.save', SaveWithConfigReloadAction);
 
     // Theme transfer. The same key names a form action and a list action: the

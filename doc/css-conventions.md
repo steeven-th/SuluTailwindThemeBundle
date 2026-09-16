@@ -136,6 +136,7 @@ prefixed with `--iw-`:
 --color-accent
 --color-text
 --color-link
+--color-border
 --color-background
 --font-family-heading
 --font-family-body

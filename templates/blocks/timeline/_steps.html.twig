@@ -47,9 +47,7 @@
                     class="iw-block-timeline__nav-button iw-block-timeline__nav-button--prev"
                     aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_previous'|trans }}"
                 >
-                    <svg class="iw-block-timeline__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev', 'class': 'iw-block-timeline__nav-icon'} only %}
                 </button>
                 <button
                     type="button"
@@ -57,9 +55,7 @@
                     class="iw-block-timeline__nav-button iw-block-timeline__nav-button--next"
                     aria-label="{{ 'iw_sulu_tailwind_theme.article.pagination_next'|trans }}"
                 >
-                    <svg class="iw-block-timeline__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next', 'class': 'iw-block-timeline__nav-icon'} only %}
                 </button>
             </div>
         {% endif %}

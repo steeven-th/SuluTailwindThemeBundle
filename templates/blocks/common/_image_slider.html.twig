@@ -73,23 +73,19 @@
         {# Navigation arrows #}
         <button
             type="button"
-            class="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
+            class="iw-gallery-nav iw-gallery-nav--sm absolute left-2 top-1/2 -translate-y-1/2 z-10"
             data-action="slider#prev"
             aria-label="Previous"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev', 'class': 'w-5 h-5'} only %}
         </button>
         <button
             type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors"
+            class="iw-gallery-nav iw-gallery-nav--sm absolute right-2 top-1/2 -translate-y-1/2 z-10"
             data-action="slider#next"
             aria-label="Next"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
+            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next', 'class': 'w-5 h-5'} only %}
         </button>
 
         {# Dot indicators — overlaid on the image, a few pixels from the bottom edge #}

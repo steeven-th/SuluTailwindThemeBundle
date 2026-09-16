@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Guards how the admin form of a block reads, not what it holds.
+ * Guards how an admin form reads, not what it holds.
  *
  * Sulu lays fields out on a twelve column grid, filling rows as it goes. Two
  * `colspan="6"` fields share a row, and an odd number of them pushes every
@@ -22,7 +22,11 @@ use PHPUnit\Framework\TestCase;
  * resets the row whatever came before. `type="heading"` does that and names
  * the group at the same time.
  *
- * This test walks the resolved template, fragments included, and fails on any
+ * The rule covers the block templates and the theme configuration forms alike:
+ * a colour field beside a grid of button thumbnails reads no better on a
+ * settings page than it does in a block.
+ *
+ * This test walks the resolved document, fragments included, and fails on any
  * row pairing a tall field with a short one.
  */
 final class FormLayoutContractTest extends TestCase
@@ -30,13 +34,28 @@ final class FormLayoutContractTest extends TestCase
     /**
      * Field types that render tall: a row of boxes, a picker, an editor.
      *
+     * Two types read like they belong here and do not, both of them drawing a
+     * single line: `single_icon_selection` is a `SingleItemSelection`, the name
+     * of the icon on one row, and `iw_theme_radius_selector` is a button that
+     * opens a popover rather than the row of shapes its name suggests. The
+     * margin selector, which does lay its steps out as a grid, stays.
+     *
+     * The theme forms bring types the blocks never use. `iw_theme_font_picker`
+     * draws its own tabs above a list, `iw_theme_article_style_picker` a grid
+     * of wireframes, and the palette and variant editors a whole table of
+     * colours. `iw_theme_weight_picker` and `iw_theme_color_token_editor` look
+     * like they belong here but do not: both render a single line, a Sulu
+     * `SingleSelect` and an `Input`.
+     *
      * @var list<string>
      */
     private const TALL = [
-        'iw_theme_margin_selector', 'iw_theme_radius_selector', 'iw_theme_variant_picker',
+        'iw_theme_margin_selector', 'iw_theme_variant_picker',
         'iw_theme_style_picker', 'iw_theme_button_style_picker', 'iw_theme_block_scope',
         'iw_theme_title_editor', 'single_media_selection', 'media_selection', 'text_editor',
-        'text_area', 'location', 'smart_content', 'single_icon_selection',
+        'text_area', 'location', 'smart_content',
+        'iw_theme_palette_editor', 'iw_theme_variant_editor', 'iw_theme_font_picker',
+        'iw_theme_article_style_picker',
     ];
 
     /**
@@ -57,31 +76,78 @@ final class FormLayoutContractTest extends TestCase
     }
 
     /**
+     * The theme configuration forms, which render in the admin like any block.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function configForms(): array
+    {
+        $found = [];
+        foreach (glob(self::root() . '/config/forms/*.xml') ?: [] as $path) {
+            $found['forms/' . basename($path)] = [$path];
+        }
+
+        self::assertNotEmpty($found);
+
+        return $found;
+    }
+
+    /**
+     * Every document the row rule applies to.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function layoutDocuments(): array
+    {
+        return array_merge(self::blockTemplates(), self::configForms());
+    }
+
+    /**
      * No row pairs a tall field with a short one.
      */
     #[Test]
-    #[DataProvider('blockTemplates')]
+    #[DataProvider('layoutDocuments')]
     public function noRowPairsATallFieldWithAShortOne(string $path): void
     {
         $document = new \DOMDocument();
         self::assertTrue($document->load($path));
-        self::assertNotFalse($document->xinclude());
+
+        // `xinclude()` reports false when the document has nothing to include,
+        // which every configuration form is the case of: the fragments belong
+        // to the blocks.
+        if (str_contains((string) file_get_contents($path), 'xi:include')) {
+            self::assertNotFalse($document->xinclude());
+        }
 
         $xpath = new \DOMXPath($document);
         $xpath->registerNamespace('sulu', 'http://schemas.sulu.io/template/template');
 
-        $sections = $xpath->query('//sulu:section');
-        self::assertNotFalse($sections);
+        // Every `properties` element opens a grid of its own: the root one, the
+        // one inside a section, and the one inside each type of a block. The
+        // theme forms use all three, `details` holding fields straight at the
+        // root and `buttons` wrapping its own in a block.
+        $containers = $xpath->query('//sulu:properties');
+        self::assertNotFalse($containers);
 
         $mismatched = [];
-        foreach ($sections as $section) {
-            $fields = $xpath->query('sulu:properties/sulu:property', $section);
-            self::assertNotFalse($fields);
+        foreach ($containers as $container) {
+            $children = $xpath->query('*', $container);
+            self::assertNotFalse($children);
 
             $row = [];
             $filled = 0;
-            foreach ($fields as $field) {
+            foreach ($children as $field) {
                 \assert($field instanceof \DOMElement);
+
+                // A nested section or block takes the full width and closes the
+                // row before it, exactly as a full-width field does. Its own
+                // fields are walked when the loop reaches its `properties`.
+                if ('property' !== $field->localName) {
+                    $row = [];
+                    $filled = 0;
+                    continue;
+                }
+
                 $span = (int) ($field->getAttribute('colspan') ?: 12);
 
                 // A full-width field closes the row it sits on, whatever it holds.

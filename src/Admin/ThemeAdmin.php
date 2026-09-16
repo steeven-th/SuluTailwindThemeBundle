@@ -259,6 +259,8 @@ class ThemeAdmin extends Admin
             $themeItem->setIcon('su-paint');
             $themeItem->setView(static::LIST_VIEW);
 
+            // Under Settings, and staying there: every item of the first level
+            // opens a menu of its own, and the theme pages are one destination.
             try {
                 $navigationItemCollection->get(Admin::SETTINGS_NAVIGATION_ITEM)->addChild($themeItem);
             } catch (\Exception) {
@@ -350,18 +352,57 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_details')
                     ->setTabTitle('iw_sulu_tailwind_theme.details')
+                    ->setTabOrder(10)
                     ->addToolbarActions(array_merge($formToolbarActions, $detailsToolbarActions))
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: colors tab ──────────────────────────────
+            // ── Edit form: colors group (second row of tabs) ───────
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors', '/colors')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_colors')
-                    ->setTabTitle('iw_sulu_tailwind_theme.colors')
-                    ->addToolbarActions($formToolbarActions)
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.colors_group',
+                    '/colors',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.colors')
+                    ->setOption('tabOrder', 20)
                     ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: colors, palette tab ─────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors', '/palette')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_palette')
+                    ->setTabTitle('iw_sulu_tailwind_theme.colors_section_main')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
+            );
+
+            // ── Edit form: colors, text tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.colors_text', '/text')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_text')
+                    ->setTabTitle('iw_sulu_tailwind_theme.colors_section_text')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
+            );
+
+            // ── Edit form: colors, surfaces tab ────────────────────
+            // These six were a section of the components tab. They name colours
+            // every transverse component shares, which makes them a palette.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(
+                    static::EDIT_FORM_VIEW . '.colors_surfaces',
+                    '/surfaces',
+                )
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_surfaces')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_surfaces')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
             );
 
             // ── Edit form: typography tab ──────────────────────────
@@ -370,8 +411,49 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_typography')
                     ->setTabTitle('iw_sulu_tailwind_theme.typography')
+                    ->setTabOrder(30)
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: default settings group (second row of tabs) ──
+            //
+            // The group holds no form of its own: it renders a row of tabs and
+            // hands the record down to whichever one is open. Sulu ships no
+            // view able to do that between a resource tab view and a form, so
+            // the type names one the bundle registers, see `NestedTabs.js`.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.defaults_group',
+                    '/defaults',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.defaults')
+                    ->setOption('tabOrder', 50)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: defaults, spacing and radius tab ────────
+            // First tab of the group, hence the priority: clicking the group
+            // itself redirects to the child with the highest one.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/spacing')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults_spacing')
+                    ->setTabTitle('iw_sulu_tailwind_theme.defaults_general')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: defaults, blocks tab ────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults_blocks', '/blocks')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults_blocks')
+                    ->setTabTitle('iw_sulu_tailwind_theme.defaults_section_blocks')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
             // ── Edit form: buttons tab ─────────────────────────────
@@ -381,17 +463,51 @@ class ThemeAdmin extends Admin
                     ->setFormKey('iw_theme_config_buttons')
                     ->setTabTitle('iw_sulu_tailwind_theme.buttons')
                     ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
-            // ── Edit form: defaults tab (borders + site-wide block defaults) ──
+            // ── Edit form: cards tab ───────────────────────────────
+            // Site-wide card appearance, which the cards block, an article
+            // listing and a related row all read.
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults', '/defaults')
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.cards', '/cards')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_defaults')
-                    ->setTabTitle('iw_sulu_tailwind_theme.defaults')
+                    ->setFormKey('iw_theme_config_cards')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_cards')
                     ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: cartography tab ─────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.maps', '/cartography')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_maps')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_maps')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: tags tab ────────────────────────────────
+            // The component drawing them takes any list, so they belong with
+            // what applies site-wide rather than under one kind of content.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.tags', '/tags')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_tags')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_tags')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
+            // ── Edit form: navigation tab ──────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.navigation', '/navigation')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_navigation')
+                    ->setTabTitle('iw_sulu_tailwind_theme.config_group_navigation')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
             // ── Edit form: variants tab ────────────────────────────
@@ -400,18 +516,65 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_variants')
                     ->setTabTitle('iw_sulu_tailwind_theme.variants')
+                    ->setTabOrder(40)
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: menu tab ────────────────────────────────
+            // ── Edit form: menu group (second row of tabs) ─────────
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu', '/menu')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_menu')
-                    ->setTabTitle('iw_sulu_tailwind_theme.menu')
-                    ->addToolbarActions($formToolbarActions)
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.menu_group',
+                    '/menu',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.menu')
+                    ->setOption('tabOrder', 60)
                     ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: menu, configuration tab ─────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu', '/configuration')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_settings')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_settings')
+                    ->setTabPriority(10)
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, display tab ───────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu_display', '/display')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_display')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_display')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, chrome tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(
+                    static::EDIT_FORM_VIEW . '.menu_appearance',
+                    '/chrome',
+                )
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_appearance')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_appearance')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
+            );
+
+            // ── Edit form: menu, colors tab ────────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.menu_colors', '/colors')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_menu_colors')
+                    ->setTabTitle('iw_sulu_tailwind_theme.menu_colors')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.menu_group')
             );
 
             // ── Edit form: footer tab ──────────────────────────────
@@ -420,29 +583,88 @@ class ThemeAdmin extends Admin
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_footer')
                     ->setTabTitle('iw_sulu_tailwind_theme.footer')
+                    ->setTabOrder(70)
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: components tab (site-wide transverse components) ──
+            // ── Edit form: pages tab (site-wide page banner) ───────
+            // Mirror of the articles tab: how the banner of a page is drawn
+            // everywhere. What a page puts in it lives in the page itself.
             $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.components', '/components')
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.pages', '/pages')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_components')
-                    ->setTabTitle('iw_sulu_tailwind_theme.components')
+                    ->setFormKey('iw_theme_config_pages')
+                    ->setTabTitle('iw_sulu_tailwind_theme.pages')
+                    ->setTabOrder(80)
                     ->addToolbarActions($formToolbarActions)
                     ->setParent(static::EDIT_FORM_VIEW)
             );
 
-            // ── Edit form: articles tab (only if article_templates enabled) ──
+            // ── Edit form: articles group (only if article_templates enabled) ──
             if ($this->articleTemplatesEnabled) {
                 $viewCollection->add(
-                    $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.articles', '/articles')
-                        ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                        ->setFormKey('iw_theme_config_articles')
-                        ->setTabTitle('iw_sulu_tailwind_theme.articles')
-                        ->addToolbarActions($formToolbarActions)
+                    $this->viewBuilderFactory->createViewBuilder(
+                        static::EDIT_FORM_VIEW . '.articles_group',
+                        '/articles',
+                        'iw_sulu_tailwind_theme.nested_tabs',
+                    )
+                        ->setOption('tabTitle', 'iw_sulu_tailwind_theme.articles')
+                    ->setOption('tabOrder', 90)
                         ->setParent(static::EDIT_FORM_VIEW)
+                );
+
+                // ── Edit form: articles, styles tab ────────────────
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createFormViewBuilder(
+                        static::EDIT_FORM_VIEW . '.articles',
+                        '/styles',
+                    )
+                        ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                        ->setFormKey('iw_theme_config_articles_styles')
+                        ->setTabTitle('iw_sulu_tailwind_theme.articles_section_page_styles')
+                        ->setTabPriority(10)
+                        ->addToolbarActions($formToolbarActions)
+                        ->setParent(static::EDIT_FORM_VIEW . '.articles_group')
+                );
+
+                // ── Edit form: articles, filters and contents tab ──
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createFormViewBuilder(
+                        static::EDIT_FORM_VIEW . '.articles_filters',
+                        '/filters',
+                    )
+                        ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                        ->setFormKey('iw_theme_config_articles_filters')
+                        ->setTabTitle('iw_sulu_tailwind_theme.articles_section_filters')
+                        ->addToolbarActions($formToolbarActions)
+                        ->setParent(static::EDIT_FORM_VIEW . '.articles_group')
+                );
+
+                // ── Edit form: articles, displayed items tab ───────
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createFormViewBuilder(
+                        static::EDIT_FORM_VIEW . '.articles_display',
+                        '/display',
+                    )
+                        ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                        ->setFormKey('iw_theme_config_articles_display')
+                        ->setTabTitle('iw_sulu_tailwind_theme.articles_section_display')
+                        ->addToolbarActions($formToolbarActions)
+                        ->setParent(static::EDIT_FORM_VIEW . '.articles_group')
+                );
+
+                // ── Edit form: articles, reading components tab ────
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createFormViewBuilder(
+                        static::EDIT_FORM_VIEW . '.articles_reading',
+                        '/reading',
+                    )
+                        ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                        ->setFormKey('iw_theme_config_articles_reading')
+                        ->setTabTitle('iw_sulu_tailwind_theme.articles_section_reading_components')
+                        ->addToolbarActions($formToolbarActions)
+                        ->setParent(static::EDIT_FORM_VIEW . '.articles_group')
                 );
             }
         }

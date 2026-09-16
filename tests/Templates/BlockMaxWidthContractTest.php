@@ -173,7 +173,7 @@ final class BlockMaxWidthContractTest extends TestCase
     #[Test]
     public function theScopeFieldIsWiredFromTheFormToTheAdminConfig(): void
     {
-        $form = (string) file_get_contents(self::root() . '/config/forms/iw_theme_config_defaults.xml');
+        $form = (string) file_get_contents(self::root() . '/config/forms/iw_theme_config_defaults_blocks.xml');
         self::assertStringContainsString('type="iw_theme_block_scope"', $form);
 
         // Disabled, never hidden: a field that disappears takes its third of
@@ -199,7 +199,7 @@ final class BlockMaxWidthContractTest extends TestCase
     #[Test]
     public function theStepsMatchAcrossFormFragmentAndCss(): void
     {
-        $themeSteps = self::selectValues(self::root() . '/config/forms/iw_theme_config_defaults.xml', 'defaults_blockMaxWidth');
+        $themeSteps = self::selectValues(self::root() . '/config/forms/iw_theme_config_defaults_blocks.xml', 'defaults_blockMaxWidth');
         $blockSteps = self::selectValues(self::root() . '/config/templates/fragments/block-max-width.xml', 'maxWidth');
 
         self::assertSame(array_merge(['none'], self::STEPS), $themeSteps);

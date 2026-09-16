@@ -160,7 +160,7 @@ itself. Only the type and the hover are site-wide.
 
 Blocks built from two content zones - text + images, form + widget, map + info,
 CTA + accessory - share a single gap token so the whole site breathes the same
-way. It is set in the admin under **Settings > Themes > Defaults > Blocks >
+way. It is set in the admin under **Settings > Themes > Default settings > Blocks >
 Gap between zones** (`defaults.blockGap`) and compiled to `--iw-blocks-gap`.
 
 | Level (admin) | Tailwind | Value |
@@ -261,7 +261,7 @@ deduced from a lateral padding of 0.
 ## Block titles gap
 
 The space between a block's titles group (title, subtitle, separator) and its
-content is a second site-wide token: **Settings > Themes > Defaults > Blocks >
+content is a second site-wide token: **Settings > Themes > Default settings > Blocks >
 Gap between titles and content** (`defaults.titleGap`), compiled to
 `--iw-blocks-title-gap` and consumed by `.iw-block__titles`, the wrapper emitted
 by `blocks/common/_titles.html.twig` for all 57 block templates that use it.
@@ -297,7 +297,7 @@ there the title and the text belong to the same zone.
 
 A block spans the page container, which climbs to 96rem: a title and two lines
 of text end up stretched across the whole screen. The maximum width caps that,
-site-wide from **Settings > Themes > Defaults > Blocks > Maximum content
+site-wide from **Settings > Themes > Default settings > Blocks > Maximum content
 width** (`defaults.blockMaxWidth`, compiled to `--iw-blocks-max-width`) and per
 block from its **Settings > Maximum content width** field (`maxWidth`). The
 block field wins, an empty value follows the theme, and `none` opts a single
@@ -347,7 +347,7 @@ utility and widen every block instead of leaving it alone.
 ### Which blocks the theme width reaches
 
 Every block carries the field, but the theme default does not reach all of them
-by default. **Settings > Themes > Defaults > Blocks > Blocks the maximum width
+by default. **Settings > Themes > Default settings > Blocks > Blocks the maximum width
 applies to** opens a modal listing the block types on the left and, on the
 right, the styles of the selected one with the same wireframes the editor sees
 when picking a style. Ticking works at both levels.
@@ -617,7 +617,7 @@ it is an SVG, through the mask.
 
 Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Reusable on any page, not article-specific.
 
-**Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Components** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (theme → Components tab): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
+**Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Navigation** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (**Settings > Themes > Default settings > Navigation**): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
 
 **Manual rendering.** The low-level partial `templates/components/_breadcrumbs.html.twig` takes `items` (an array of `{title, url}`, last item = current page) and an optional `separator` (`chevron` | `slash` | `dot`), for fully custom trails.
 
@@ -797,20 +797,101 @@ Tailwind's preflight removes list markers site-wide (`list-style: none` on `ol` 
 
 ---
 
-## Gallery navigation
+## What a transverse component lets a theme set
 
-Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sliders, testimonial slider, linked-pages carousel, etc.).
+Every transverse component reads `var(--iw-<component>-…, var(--color-surface-…))`,
+so redefining a surface token **scoped to the component's root selector**
+restyles the whole of it without mapping each variable one by one. That is what
+the admin settings do, and it is why an empty field costs nothing: the
+component simply keeps inheriting the global surfaces.
 
-| Class | Role |
-|-------|------|
-| `.iw-gallery-nav` | Base arrow button (size `40x40`, rounded full, current color) |
-| `.iw-gallery-nav--sm` | Smaller variant for inline contexts (thumbnail strip, etc.) |
+The reference set a component offers is therefore the surfaces plus the shape:
+
+| Setting | Token it redefines |
+|---------|--------------------|
+| Background | `--color-surface`, or the component's own background variable |
+| Text | `--color-surface-muted` |
+| Border | `--color-surface-border`, or the component's own |
+| Accent | `--color-surface-accent` |
+| Text on accent | `--color-surface-on-accent` |
+| Corner radius | the component's radius variable |
+| Shadow | the shadow of the box itself, and of whatever floats: a drawer, an edge button |
+| Inner spacing | the padding of the component, from the same scale the blocks use |
+| Gap | the distance between its items |
+| Text size | the size of its text |
+
+A padding that is not square stays that way: a tag is padded three times wider
+than it is tall, a pagination item one and a half, and the single setting keeps
+that ratio through a `calc()`. A pill padded evenly stops being a pill, and the
+shape is part of what the component is.
+
+**A token only reaches what reads it.** A pagination link and a tag had no
+background and no border at rest, so wiring a background setting to a surface
+token would have offered a field that changes nothing: both now draw them from
+variables of their own, transparent by default.
+`ComponentSettingsReachTheStylesheetTest` checks that every variable a setting
+writes is read somewhere in the stylesheet.
+
+A border colour also carries the width that makes it visible: asking for a
+border asks for the line, not for a colour nothing draws.
+
+**A part drawn outside its component has to be named too.** Scoping works by
+inheritance, so the button opening the filter drawer - rendered by the listing
+page, beside the panel rather than inside it - kept the global surfaces while
+the panel followed the setting. The scoped selector names it explicitly, and
+`ScopedComponentSettingsCoverTheirPartsTest` reads the templates to catch the
+next part that moves out. The backdrop is deliberately left out: it is a veil
+dimming the page, not a surface of the component.
+
+## Navigation controls
+
+The arrows, dots and chevrons that move a visitor through a block. They split
+by what they sit on, which is the rule the surfaces follow too: whoever
+guarantees the background guarantees what reads on it.
+
+### On the content
+
+Accordion chevrons, the dots under a carousel, list chevrons. The text around
+them is painted by the variant, so following it is the right default, and the
+theme setting only overrules that.
+
+```
+--iw-block-<name>-…  →  --iw-controls-on-content-color  →  currentColor
+```
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `--iw-gallery-nav-color` | Arrow icon color | `currentColor` |
-| `--iw-gallery-nav-bg` | Background at rest | `color-mix(in srgb, currentColor 8%, transparent)` |
-| `--iw-gallery-nav-bg-hover` | Background on hover | `color-mix(in srgb, currentColor 15%, transparent)` |
+| `--iw-controls-on-content-color` | Colour of every control over content | unset, so `currentColor` |
+| `--iw-accordion-icon-color` | The accordion chevron alone | the shared token |
+| `--iw-block-linked-pages-nav-color` | The dots of a linked-pages carousel | the shared token |
+| `--iw-block-testimonial-dot-color` | The dots of a testimonial slider | the shared token |
+
+Set from **Settings > Themes > Default settings > Navigation > Arrows and
+dots**. Left empty nothing is emitted at all, so an existing site does not
+move.
+
+### On a media
+
+The arrows over a gallery photo. A variant can say nothing about a photograph
+the editor chose, so these carry their own colour and their own veil.
+
+| Class | Role |
+|-------|------|
+| `.iw-gallery-nav` | Base arrow button (`3rem`, round, white on a white veil) |
+| `.iw-gallery-nav--sm` | Smaller variant for inline contexts (thumbnail strip) |
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `--iw-gallery-nav-color` | Arrow colour | `white` |
+| `--iw-gallery-nav-bg` | Background at rest | `rgba(255, 255, 255, 0.2)` |
+| `--iw-gallery-nav-bg-hover` | Background on hover | `rgba(255, 255, 255, 0.4)` |
+| `--iw-gallery-nav-radius` | Shape of the button | `9999px` |
+| `--iw-gallery-nav-size` | Button size | `3rem` |
+| `--iw-gallery-nav-icon-size` | Arrow size inside it | `1.5rem` |
+
+Setting the background from the admin derives the hover state from it, moving
+it 15% towards the arrow colour: a veil set to dark would otherwise brighten
+back to white under the pointer.
 
 **Override example:**
 ```css
@@ -820,6 +901,43 @@ Shared `prev/next` arrow buttons used by every slider in the bundle (gallery sli
     --iw-gallery-nav-bg-hover: rgba(0, 0, 0, 0.12);
 }
 ```
+
+### The arrow itself
+
+One partial draws every arrow in the bundle -
+`components/_nav_arrow.html.twig` - and the theme picks it once for the whole
+site. The direction is a class the stylesheet turns (`.iw-nav-arrow--prev`,
+`--up`, `--down`), so one arrow is chosen rather than four that would have to
+agree with each other.
+
+**Two roles, two settings**, because an arrow that acts and a chevron that
+hints are not the same object. A control moves a carousel or a page: it is a
+button, it can be a circled arrow. A chevron only says that something opens or
+leads somewhere - the end of a list row, a menu entry with children - and that
+same circled arrow would be absurd there. Pass `role: 'chevron'` to the partial
+for the second kind.
+
+The breadcrumb separator takes neither: it marks hierarchy between two names
+rather than pointing anywhere, and the breadcrumb already offers the choice of
+chevron, slash or dot.
+
+The control arrow offers the pair every pictogram of the bundle offers, and
+draws it through the same partial: one from the theme library, or one of the project's own from
+the media library, with a size of its own. An SVG from the media library is
+masked so it takes the arrow colour, like a library icon does.
+
+| Setting | What it does |
+|---------|--------------|
+| Custom pictogram | Switches from the theme library to the media library |
+| Arrow pictogram / Arrow image | The pictogram itself, from either source |
+| Pictogram size | Empty: the size each control already draws at, which differs between a gallery arrow and a list chevron |
+| Button size | The disc of the arrows over a media, which sizes the arrow inside it |
+
+A size chosen in the admin wins over the utility classes a caller passes: the
+partial drops their `w-*` and `h-*` when one is set, since both weigh the same
+in the cascade and the outcome would otherwise depend on stylesheet order.
+
+Left empty, the chevron these templates have always drawn is used.
 
 ---
 
@@ -884,7 +1002,7 @@ Aspect-ratio sizing reuses the shared `.iw-ratio--*` utilities.
 
 Interactive Leaflet map rendered by the `location-map` Stimulus controller for every Sulu `location` field: the four location block styles, the CTA location accessory and the form location widget. All call sites go through the shared partial `templates/components/_location_map.html.twig`.
 
-Behavior (configured in **Theme > Components > Maps**):
+Behavior (configured in **Settings > Themes > Default settings > Cartography**):
 
 - **Tile provider**: OpenStreetMap (default), Carto Voyager / Positron / Dark Matter, or a custom tile URL template + attribution. The provider attribution is always displayed (OSM/Carto tile usage policies).
 - **Scroll zoom**: cooperative by default — the page keeps scrolling over the map unless `Ctrl`/`Cmd` is held; on touch devices one finger scrolls the page and two fingers pan/zoom. A translated hint overlay appears when a blocked gesture is attempted. Can be switched to "always on" or "disabled".

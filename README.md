@@ -696,7 +696,7 @@ See **[Demo content](doc/demo-content.md)** for what gets created and how to rem
 
 The bundle registers two types of security contexts:
 
-* **Theme catalog**: `sulu.iw_sulu_tailwind_theme.themes` with VIEW, ADD, EDIT, and DELETE permissions (Settings > Themes CRUD).
+* **Theme catalog**: `sulu.iw_sulu_tailwind_theme.themes` with VIEW, ADD, EDIT, and DELETE permissions (Themes CRUD).
 * **Per-webspace theme assignment**: `sulu.iw_sulu_tailwind_theme.{webspaceKey}.themes` with VIEW and EDIT permissions. Controls who can see and modify the "Theme" tab for each webspace.
 
 Configure role access in **Settings > Roles**. After upgrading, make sure to update roles to include the new per-webspace security contexts.

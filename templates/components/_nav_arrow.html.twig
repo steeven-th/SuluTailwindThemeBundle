@@ -1,0 +1,84 @@
+{# The arrow of a navigation control, wherever one is drawn.
+
+   Thirty-two of these were written by hand across fifteen templates, each one
+   a `<path>` nobody could change without editing Twig. They are the same
+   object: a chevron saying which way something moves. One place decides what
+   it looks like, and the theme decides once for the whole site.
+
+   Expected variables:
+     - direction : 'next' | 'prev' | 'up' | 'down' (default 'next')
+     - role      : 'control' | 'chevron' (default 'control')
+     - class     : extra classes for the svg
+
+   Two roles, two settings, because they are not the same object. A control is
+   the button that moves a carousel or a page: it acts, it is big, it can be a
+   circled arrow. A chevron only says that something opens or leads somewhere -
+   at the end of a list row, beside a menu entry - and the same circled arrow
+   would be absurd there. The breadcrumb separator is a third thing again and
+   takes neither: it marks hierarchy between two names, and has its own setting.
+
+   Between them they are still one decision each, made once for the whole site.
+
+   What it draws is the pictogram pair the whole bundle offers - one from the
+   theme library, or one of the project's own from the media library - so the
+   arrows are set up exactly like the pictogram of a button or of a card, down
+   to the size. `_icon.html.twig` already knows how to draw that pair, mask an
+   SVG so it takes the surrounding colour, and size it, so the settings are
+   handed to it as the item it expects.
+
+   The direction is a class, `iw-nav-arrow--prev` and friends, which the
+   stylesheet turns. It is applied as a rotation rather than as a second
+   choice: a person setting up a theme picks one arrow, not four that have to
+   agree with each other, and a pictogram with no direction of its own - a dot,
+   a cross - still works, it simply turns.
+
+   With nothing set, the chevron below is the one these templates already drew,
+   so a site that never opens the setting does not move. #}
+
+{%- set direction = direction|default('next') -%}
+
+{%- set role = role|default('control') -%}
+
+{%- if 'chevron' == role -%}
+    {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsChevronIconCustom|default(false) -%}
+    {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsChevronIcon|default('') -%}
+    {%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsChevronIconMedia|default(null) -%}
+    {%- set arrowSize = iw_sulu_tailwind_theme.components_controlsChevronIconSize|default('') -%}
+{%- else -%}
+    {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsArrowIconCustom|default(false) -%}
+    {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsArrowIcon|default('') -%}
+    {%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsArrowIconMedia|default(null) -%}
+    {%- set arrowSize = iw_sulu_tailwind_theme.components_controlsArrowIconSize|default('') -%}
+{%- endif -%}
+
+{#- Callers pass the size they have always drawn at, as utility classes. Those
+    weigh the same as the one carrying the chosen size, so the later of the two
+    in the stylesheet would win and a size set in the admin would be ignored
+    here and obeyed elsewhere. When a size is set, they step aside. -#}
+{%- set callerClass = class|default('') -%}
+{%- if arrowSize -%}
+    {%- set callerClass = callerClass|split(' ')|filter(c => c starts with 'w-' or c starts with 'h-' ? false : true)|join(' ') -%}
+{%- endif -%}
+{%- set arrowClass = ('iw-nav-arrow iw-nav-arrow--' ~ direction ~ ' ' ~ callerClass)|trim -%}
+
+{%- set hasArrow = arrowCustom ? (arrowMedia is not null) : (arrowIcon is not empty) -%}
+
+{%- if hasArrow %}
+    {#- An arrow is a sign, not a picture of the project: a custom SVG takes the
+        colour around it like a library one does, hence `recolor`. -#}
+    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+        'item': {
+            'iconCustom': arrowCustom,
+            'icon': arrowIcon,
+            'iconMedia': arrowMedia,
+            'iconSize': arrowSize,
+        },
+        'class': arrowClass,
+        'recolor': true,
+    } only %}
+{%- else %}
+    <svg class="{{ arrowClass }}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 5l7 7-7 7"/>
+    </svg>
+{%- endif %}

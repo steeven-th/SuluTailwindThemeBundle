@@ -26,6 +26,10 @@
                         {% elseif separator == 'dot' %}
                             <span class="iw-breadcrumbs__separator" aria-hidden="true">&middot;</span>
                         {% else %}
+                            {# Its own chevron on purpose: this is a mark of
+                               hierarchy between two names, not an arrow that
+                               acts, and the separator setting right above
+                               already offers the choice of what it looks like. #}
                             <svg class="iw-breadcrumbs__separator" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>

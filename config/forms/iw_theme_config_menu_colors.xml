@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Menu tab, Colors sub-tab.
+
+    Every colour of the menu, from the bar itself down to the third level and
+    the burger icon.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_menu_colors</key>
+
+    <properties>
+            <property name="menuConfig_colors_bg" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_bg</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_text" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_text</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_textHover" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_textHover</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_secondBg" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_secondBg</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_secondText" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_secondText</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_secondTextHover" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_secondTextHover</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_thirdBg" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_thirdBg</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_thirdText" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_thirdText</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_divider" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_divider</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_burgerOpen" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_burgerOpen</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_burgerClose" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_burgerClose</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_socialMedia" type="iw_theme_color_token_editor" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_socialMedia</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_socialMediaHover" type="iw_theme_color_token_editor" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_socialMediaHover</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+    </properties>
+</form>

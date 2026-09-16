@@ -253,6 +253,7 @@ class ThemeCompiler
         $css .= $this->generateColorVariables();
         $css .= $this->generatePaletteVariables();
         $css .= $this->generateSurfaceVariables($tokens);
+        $css .= $this->generateControlVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
         $css .= $this->generateBlockDefaultVariables($tokens['defaults'] ?? []);
@@ -501,14 +502,125 @@ class ThemeCompiler
         $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
         $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
 
+        // The hover state has to follow the background it hovers. Its default
+        // was mixed from the accent surface, so a button given a background of
+        // its own jumped back to the theme accent under the pointer.
+        $hoverBg = $this->surfaceValue(
+            $tokens['components_backToTopHoverBg'] ?? '',
+            "color-mix(in srgb, {$bg}, var(--color-text) 15%)",
+        );
+
         $css = "  /* Back-to-top (site-wide) */\n";
         $css .= "  --iw-back-to-top-radius: {$radius};\n";
         $css .= "  --iw-back-to-top-size: {$button};\n";
         $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
         $css .= "  --iw-back-to-top-bg: {$bg};\n";
         $css .= "  --iw-back-to-top-color: {$color};\n";
+        $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
+
+        $shadow = trim((string) ($tokens['components_backToTopShadow'] ?? ''));
+        if (isset(self::SHADOWS[$shadow])) {
+            $css .= '  --iw-back-to-top-shadow: ' . self::SHADOWS[$shadow] . ";\n";
+        }
 
         return $css . "\n";
+    }
+
+    /**
+     * Generate CSS custom properties for the navigation controls.
+     *
+     * The arrows, dots and chevrons that move a visitor through a block. Six
+     * templates carried them and agreed on nothing: white on a white veil for
+     * a gallery, the variant rule colour for the dots of one carousel, plain
+     * `currentColor` for the dots of another, and none of it settable.
+     *
+     * They split by what they sit on, which is the rule the surfaces already
+     * follow - whoever guarantees the background guarantees what reads on it:
+     *
+     *   - on the content (accordion chevron, dots under a carousel): the
+     *     variant paints the text around them, so following it is the right
+     *     default and the setting is only a way to overrule it;
+     *   - on a media (the arrows over a gallery photo): the variant can say
+     *     nothing about a photograph the editor chose, so those carry their
+     *     own colour and their own veil, white by default because contrast is
+     *     what commands there.
+     *
+     * Each block keeps its own `--iw-block-*` hook above these, so a single
+     * block can still be dressed on its own.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateControlVariables(array $tokens): string
+    {
+        $css = '';
+
+        // Unset: the controls follow the text around them, which the variant
+        // paints - so a site that never opens this setting does not move.
+        $onContent = (string) ($tokens['components_controlsOnContentColor'] ?? '');
+        if ('' !== $onContent) {
+            $css .= '  --iw-controls-on-content-color: ' . $this->resolveColorValue($onContent) . ";\n";
+        }
+
+        // Same for the media side: what is not set is left to the stylesheet,
+        // whose defaults are the white and the white veil that have always
+        // been there. Emitting them here would say the same thing twice.
+        $onMedia = (string) ($tokens['components_controlsOnMediaColor'] ?? '');
+        if ('' !== $onMedia) {
+            $css .= '  --iw-gallery-nav-color: ' . $this->resolveColorValue($onMedia) . ";\n";
+        }
+
+        $onMediaBg = (string) ($tokens['components_controlsOnMediaBg'] ?? '');
+        if ('' !== $onMediaBg) {
+            $resolved = $this->resolveColorValue($onMediaBg);
+            $css .= "  --iw-gallery-nav-bg: {$resolved};\n";
+
+            // The hover state has to follow the background it hovers, or a veil
+            // set to dark would brighten back to white under the pointer. It
+            // moves towards the colour of the arrow itself, which is by
+            // definition what reads on that veil - unless a colour was chosen
+            // for it, which wins.
+            $towards = '' !== $onMedia ? $this->resolveColorValue($onMedia) : '#fff';
+            $hover = $this->surfaceValue(
+                $tokens['components_controlsOnMediaBgHover'] ?? '',
+                "color-mix(in srgb, {$resolved}, {$towards} 15%)",
+            );
+            $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
+        } elseif ('' !== (string) ($tokens['components_controlsOnMediaBgHover'] ?? '')) {
+            // A hover colour with no background of its own still applies, over
+            // the white veil the stylesheet draws at rest.
+            $hover = $this->resolveColorValue((string) $tokens['components_controlsOnMediaBgHover']);
+            $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
+        }
+
+        $controlsShadow = trim((string) ($tokens['components_controlsShadow'] ?? ''));
+        if (isset(self::SHADOWS[$controlsShadow])) {
+            $css .= '  --iw-gallery-nav-shadow: ' . self::SHADOWS[$controlsShadow] . ";\n";
+        }
+
+        // The size of the button, which drives the arrow inside it too.
+        $sizes = ['sm' => ['2.25rem', '1rem'], 'md' => ['3rem', '1.5rem'], 'lg' => ['4rem', '2rem']];
+        $buttonSize = (string) ($tokens['components_controlsButtonSize'] ?? '');
+        if (isset($sizes[$buttonSize])) {
+            [$button, $icon] = $sizes[$buttonSize];
+            $css .= "  --iw-gallery-nav-size: {$button};\n";
+            $css .= "  --iw-gallery-nav-icon-size: {$icon};\n";
+        }
+
+        $shape = (string) ($tokens['components_controlsShape'] ?? '');
+        if ('' !== $shape) {
+            $radius = str_starts_with($shape, 'rounded-') ? $this->resolveRadius($shape) : $shape;
+            $css .= "  --iw-gallery-nav-radius: {$radius};\n";
+        }
+
+        // A heading with nothing under it is noise: a theme that sets none of
+        // these writes nothing at all.
+        if ('' === $css) {
+            return '';
+        }
+
+        return "  /* Navigation controls (site-wide) */\n" . $css . "\n";
     }
 
     /**
@@ -606,6 +718,15 @@ class ThemeCompiler
         $badgeText = $this->surfaceValue($tokens['cardBadgeText'] ?? '', 'var(--color-primary-700)');
 
         $css = "  /* Card (site-wide) */\n";
+
+        // The hover shadow has always been settable while the resting one was
+        // not, so a theme could say how a card lifts but not whether it sits
+        // flat to begin with.
+        $cardShadow = trim((string) ($tokens['cardShadow'] ?? ''));
+        if (isset(self::SHADOWS[$cardShadow])) {
+            $css .= '  --iw-card-shadow: ' . self::SHADOWS[$cardShadow] . ";\n";
+        }
+
         // Global card grid gap — every card grid/list/carousel falls back to this
         // token so a single admin setting harmonizes spacing across blocks.
         $css .= "  --iw-cards-gap: {$gap};\n";
@@ -1035,7 +1156,12 @@ class ThemeCompiler
     private const COMPONENT_SURFACE_OVERRIDES = [
         // The sidebar colors are shared with the table of contents: both are
         // article side panels and wear the same skin (one admin section).
-        '.iw-article-filters, .iw-toc' => [
+        //
+        // The toggle opening the panel on a small screen is rendered by the
+        // page, outside the panel it opens, so scoping to the panel alone left
+        // it painted by the global surfaces while the panel followed the
+        // setting - a difference nobody sees until they look at a phone.
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
             'components_sidebarBg' => '--color-surface',
             'components_sidebarText' => '--color-surface-foreground',
             'components_sidebarMuted' => '--color-surface-muted',
@@ -1043,15 +1169,177 @@ class ThemeCompiler
             'components_sidebarAccent' => '--color-surface-accent',
         ],
         '.iw-pagination' => [
+            'components_paginationBg' => '--iw-pagination-item-bg',
             'components_paginationText' => '--color-surface-muted',
+            'components_paginationBorder' => '--iw-pagination-item-border',
             'components_paginationAccent' => '--color-surface-accent',
+            'components_paginationOnAccent' => '--color-surface-on-accent',
         ],
         '.iw-breadcrumbs' => [
             'components_breadcrumbText' => '--color-surface-muted',
             'components_breadcrumbCurrent' => '--color-surface-foreground',
             'components_breadcrumbAccent' => '--color-surface-accent',
         ],
+        '.iw-tag' => [
+            'components_tagBg' => '--iw-tag-bg',
+            'components_tagText' => '--color-surface-muted',
+            'components_tagBorder' => '--color-surface-border',
+            'components_tagAccent' => '--color-surface-accent',
+        ],
     ];
+
+    /**
+     * Per-component spacing: selector => [config key => variables].
+     *
+     * The values come from the same picker the blocks use, so a theme saying
+     * "gap-6" means the same distance in a block and in a component.
+     *
+     * A variable may carry a ratio: a tag is padded three times wider than it
+     * is tall, a pagination item one and a half. One setting drives both axes
+     * and keeps that proportion, because a pill padded evenly stops being a
+     * pill - the shape is part of what the component is, not a detail the
+     * setting should flatten.
+     *
+     * @var array<string, array<string, list<string|array{0: string, 1: float}>>>
+     */
+    private const COMPONENT_SPACING = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            'components_sidebarPadding' => [
+                '--iw-article-filters-padding',
+                '--iw-article-filters-drawer-padding',
+                '--iw-toc-padding',
+            ],
+            'components_sidebarGap' => [
+                '--iw-article-filters-group-gap',
+                '--iw-toc-gap',
+            ],
+        ],
+        '.iw-tag, .iw-tags' => [
+            'components_tagPadding' => [['--iw-tag-padding', 3.0]],
+            'components_tagGap' => ['--iw-tags-gap'],
+        ],
+        '.iw-pagination' => [
+            'components_paginationPadding' => [['--iw-pagination-item-padding', 1.5]],
+            'components_paginationGap' => ['--iw-pagination-gap'],
+        ],
+        '.iw-breadcrumbs' => [
+            'components_breadcrumbGap' => ['--iw-breadcrumbs-gap'],
+        ],
+    ];
+
+    /**
+     * Per-component text size: selector => [config key => variables].
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const COMPONENT_TEXT_SIZE = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            'components_sidebarFontSize' => ['--iw-article-filters-font-size', '--iw-toc-font-size'],
+        ],
+        '.iw-tag' => ['components_tagFontSize' => ['--iw-tag-font-size']],
+        '.iw-breadcrumbs' => ['components_breadcrumbFontSize' => ['--iw-breadcrumbs-font-size']],
+    ];
+
+    /**
+     * The shadow scale, shared by everything that casts one.
+     *
+     * The steps are the ones the card hover already offered, so a theme saying
+     * "md" means the same depth wherever it says it. The menu keeps a scale of
+     * its own for now, named subtle and strong, which predates this one.
+     *
+     * @var array<string, string>
+     */
+    private const SHADOWS = [
+        'none' => 'none',
+        'sm' => '0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        'md' => '0 4px 12px -2px rgb(0 0 0 / 0.12)',
+        'lg' => '0 12px 28px -6px rgb(0 0 0 / 0.18)',
+    ];
+
+    /**
+     * Per-component shadow: selector => [config key => variables].
+     *
+     * Same shape as the radius map, and the same reason for being apart from
+     * the surfaces: a shadow is not a colour a component falls back to, it is a
+     * variable of its own. Panels list the shadow of their drawer and of the
+     * button opening it, which are the two things that float.
+     */
+    private const COMPONENT_SHADOW = [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            // What floats casts a shadow: the two drawers, and the edge button
+            // of the table of contents. The filters toggle sits in the flow of
+            // the page and draws none, which is why it is absent here.
+            'components_sidebarShadow' => [
+                '--iw-article-filters-shadow',
+                '--iw-article-filters-drawer-shadow',
+                '--iw-toc-shadow',
+                '--iw-toc-drawer-shadow',
+                '--iw-toc-toggle-shadow',
+            ],
+        ],
+        '.iw-pagination' => ['components_paginationShadow' => ['--iw-pagination-item-shadow']],
+        '.iw-tag' => ['components_tagShadow' => ['--iw-tag-shadow']],
+    ];
+
+    /**
+     * Per-component corner radius: selector => [config key => variables].
+     *
+     * A radius is not a surface, so it cannot ride the same map: the component
+     * reads it from a variable of its own rather than from a token every one of
+     * its rules falls back to. The shape of a thing is still part of how it
+     * looks, and leaving it out would have made these components settable in
+     * colour and fixed in form.
+     *
+     * A selector may drive more than one variable: the filters panel and the
+     * table of contents share one setting, as they already share their colours.
+     */
+    private const COMPONENT_RADIUS = [
+        '.iw-pagination' => ['components_paginationRadius' => ['--iw-pagination-item-radius']],
+        '.iw-tag' => ['components_tagRadius' => ['--iw-tag-radius']],
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
+            // The panels and the buttons opening them, which are containers.
+            // Not the fields inside the filter form: a select is not a panel,
+            // and a panel rounded to 16px does not make a select that should
+            // be. Those keep the radius of the theme.
+            'components_sidebarRadius' => [
+                '--iw-article-filters-radius',
+                '--iw-article-filters-toggle-radius',
+                '--iw-toc-radius',
+                '--iw-toc-toggle-radius',
+            ],
+        ],
+    ];
+
+    /**
+     * The per-component surface overrides, for the test that checks the
+     * stylesheet reads what these write.
+     *
+     * @return array<string, array<string, string>>
+     */
+    public static function componentSurfaceOverrides(): array
+    {
+        return self::COMPONENT_SURFACE_OVERRIDES;
+    }
+
+    /**
+     * The per-component shadow map, same purpose.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    public static function componentShadow(): array
+    {
+        return self::COMPONENT_SHADOW;
+    }
+
+    /**
+     * The per-component radius map, same purpose.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    public static function componentRadius(): array
+    {
+        return self::COMPONENT_RADIUS;
+    }
 
     /**
      * Generate per-component surface overrides. Each configured override
@@ -1068,7 +1356,10 @@ class ThemeCompiler
      */
     private function generateComponentSurfaceOverrides(array $tokens): string
     {
-        $css = '';
+        $css = $this->generateComponentRadii($tokens)
+            . $this->generateComponentShadows($tokens)
+            . $this->generateComponentSpacing($tokens)
+            . $this->generateComponentTextSizes($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1077,6 +1368,142 @@ class ThemeCompiler
                     continue;
                 }
                 $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+            }
+            if ('.iw-pagination' === $selector && str_contains($declarations, '--iw-pagination-item-border:')) {
+                $declarations .= "  --iw-pagination-item-border-width: 1px;\n";
+            }
+
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component corner radius rules.
+     *
+     * Same shape as the surface overrides and the same rule: an unset value
+     * emits nothing, so a component keeps the radius its stylesheet draws.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentRadii(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_RADIUS as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $value = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $value) {
+                    continue;
+                }
+
+                $radius = str_starts_with($value, 'rounded-') ? $this->resolveRadius($value) : $value;
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: {$radius};\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component shadow rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentShadows(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_SHADOW as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $step = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $step || !isset(self::SHADOWS[$step])) {
+                    continue;
+                }
+
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: " . self::SHADOWS[$step] . ";\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component spacing rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentSpacing(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_SPACING as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $stored = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $stored) {
+                    continue;
+                }
+
+                $length = self::spacingToLength($stored);
+                foreach ($variables as $variable) {
+                    if (\is_array($variable)) {
+                        [$name, $ratio] = $variable;
+                        $declarations .= "  {$name}: {$length} calc({$length} * {$ratio});\n";
+
+                        continue;
+                    }
+
+                    $declarations .= "  {$variable}: {$length};\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Generate the per-component text size rules.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentTextSizes(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_TEXT_SIZE as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $size = trim((string) ($tokens[$key] ?? ''));
+                if ('' === $size) {
+                    continue;
+                }
+
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: {$size};\n";
+                }
             }
             if ('' !== $declarations) {
                 $css .= "{$selector} {\n{$declarations}}\n\n";
@@ -1135,8 +1562,20 @@ class ThemeCompiler
             }
         }
 
-        foreach ($this->colorSet->getTextColors() as $key => $value) {
+        $semantic = $this->colorSet->getTextColors();
+        foreach ($semantic as $key => $value) {
             $css .= "  --color-{$key}: " . $this->resolveColorValue($value) . ";\n";
+        }
+
+        // The border colour is read in about two dozen places - the rules of an
+        // accordion, the separators of a list, the outline of a form field - and
+        // each of them used to fall back to a grey written into the stylesheet,
+        // which no theme could change and which stayed light on a dark theme.
+        // It is emitted whether or not it was set, the unset value being mixed
+        // from the text and the background the way the surfaces already are, so
+        // it follows the theme in both directions.
+        if (!isset($semantic['border'])) {
+            $css .= '  --color-border: color-mix(in srgb, var(--color-text) 18%, var(--color-background));' . "\n";
         }
 
         return $css . "\n";

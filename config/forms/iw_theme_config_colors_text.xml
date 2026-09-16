@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Colors tab, Text and borders sub-tab.
+
+    The semantic colours: body text, links, and the border drawn between
+    things. Stored apart from the palette because they carry no shades.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_colors_text</key>
+
+    <properties>
+        <property name="colors_text" type="iw_theme_color_token_editor" colspan="4">
+            <meta>
+                <title>iw_sulu_tailwind_theme.colors_text</title>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+
+        <property name="colors_link" type="iw_theme_color_token_editor" colspan="4">
+            <meta>
+                <title>iw_sulu_tailwind_theme.colors_link</title>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+
+        <property name="colors_linkHover" type="iw_theme_color_token_editor" colspan="4">
+            <meta>
+                <title>iw_sulu_tailwind_theme.colors_linkHover</title>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+
+        <property name="bordersHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.colors_section_borders</title></meta>
+                </param>
+            </params>
+        </property>
+
+        <!--
+            The line drawn between things: the rules of an accordion, the
+            separators of a list, the outline of a form field, the frame of a
+            testimonial. Left empty it is mixed from the text and the
+            background, which keeps it visible on a light theme and on a dark
+            one alike.
+        -->
+        <property name="colors_border" type="iw_theme_color_token_editor" colspan="4">
+            <meta>
+                <title>iw_sulu_tailwind_theme.colors_border</title>
+                <info_text>iw_sulu_tailwind_theme.colors_border_info</info_text>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+    </properties>
+</form>
