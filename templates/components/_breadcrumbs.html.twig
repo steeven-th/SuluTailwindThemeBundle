@@ -26,9 +26,7 @@
                         {% elseif separator == 'dot' %}
                             <span class="iw-breadcrumbs__separator" aria-hidden="true">&middot;</span>
                         {% else %}
-                            <svg class="iw-breadcrumbs__separator" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
+                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next', 'class': 'iw-breadcrumbs__separator'} only %}
                         {% endif %}
                     {% else %}
                         <span itemprop="name" class="iw-breadcrumbs__current">{{ item.title }}</span>

@@ -87,7 +87,7 @@
                                                     class="iw-menu__text--level-2 flex items-center justify-between w-full px-4 py-2 text-sm transition-opacity hover:opacity-80 text-left cursor-pointer"
                                                 >
                                                     {{ child.title }}
-                                                    <svg class="w-3 h-3 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next', 'class': 'w-3 h-3 ml-2'} only %}
                                                 </button>
                                                 <div
                                                     data-menu-target="subdropdown"

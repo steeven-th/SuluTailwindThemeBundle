@@ -89,7 +89,7 @@
                         class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--prev absolute left-4 top-1/2 -translate-y-1/2 z-10"
                         aria-label="Previous"
                     >
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev'} only %}
                     </button>
                     <button
                         type="button"
@@ -97,7 +97,7 @@
                         class="iw-gallery-nav iw-block-gallery__nav iw-block-gallery__nav--next absolute right-4 top-1/2 -translate-y-1/2 z-10"
                         aria-label="Next"
                     >
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next'} only %}
                     </button>
                 {% endif %}
             </div>
@@ -116,7 +116,7 @@
                     class="iw-gallery-nav iw-gallery-nav--sm iw-block-gallery__thumbnails-nav iw-block-gallery__thumbnails-nav--prev"
                     aria-label="Previous thumbnails"
                 >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev'} only %}
                 </button>
 
                 {# Scrollable thumbnail track (no visible scrollbar) #}
@@ -151,7 +151,7 @@
                     class="iw-gallery-nav iw-gallery-nav--sm iw-block-gallery__thumbnails-nav iw-block-gallery__thumbnails-nav--next"
                     aria-label="Next thumbnails"
                 >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next'} only %}
                 </button>
             </div>
             {% endif %}

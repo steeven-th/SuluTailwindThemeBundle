@@ -187,5 +187,78 @@
                 </property>
             </properties>
         </section>
+
+        <!--
+            The arrows, dots and chevrons that move a visitor through a block.
+            They split by what they sit on, which is the rule the surfaces
+            already follow: whoever guarantees the background guarantees what
+            reads on it.
+        -->
+        <section name="componentsControls">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_controls</title>
+                <info_text>iw_sulu_tailwind_theme.components_section_controls_info</info_text>
+            </meta>
+            <properties>
+                <!-- On the content: the variant paints the text around them, so
+                     an empty field means they follow it. -->
+                <property name="components_controlsOnContentColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_on_content_color</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_on_content_color_info</info_text>
+                    </meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <!-- On a media: the variant can say nothing about a photograph
+                     the editor chose, so these carry their own colour. -->
+                <property name="components_controlsOnMediaColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_on_media_color</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_on_media_color_info</info_text>
+                    </meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="components_controlsOnMediaBg" type="iw_theme_color_token_editor" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_on_media_bg</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_on_media_bg_info</info_text>
+                    </meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="controlsShapeHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.components_controls_group_shape</title></meta>
+                        </param>
+                    </params>
+                </property>
+
+                <!--
+                    One arrow for the whole site, turned to face the right way
+                    rather than chosen four times over. Empty keeps the chevron
+                    these templates have always drawn.
+                -->
+                <property name="components_controlsArrowIcon" type="single_icon_selection" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_arrow_icon</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_arrow_icon_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="icon_set" value="iw_theme_outline"/>
+                    </params>
+                </property>
+
+                <!-- The disc the arrows over a media sit in. -->
+                <property name="components_controlsShape" type="iw_theme_radius_selector" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_controls_shape</title>
+                        <info_text>iw_sulu_tailwind_theme.components_controls_shape_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>

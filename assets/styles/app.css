@@ -967,7 +967,7 @@ img.object-cover {
     flex: none;
     width: var(--iw-accordion-icon-size, 1.25rem);
     height: var(--iw-accordion-icon-size, 1.25rem);
-    color: var(--iw-accordion-icon-color, currentColor);
+    color: var(--iw-accordion-icon-color, var(--iw-controls-on-content-color, currentColor));
     transition: transform var(--iw-accordion-transition-duration, 200ms) ease;
 }
 
@@ -1503,7 +1503,7 @@ img.object-cover {
     width: var(--iw-block-linked-pages-dot-size, 0.625rem);
     height: var(--iw-block-linked-pages-dot-size, 0.625rem);
     border-radius: 9999px;
-    background-color: var(--iw-block-linked-pages-nav-color, var(--iw-variant-hr-color, var(--color-primary)));
+    background-color: var(--iw-block-linked-pages-nav-color, var(--iw-controls-on-content-color, currentColor));
     opacity: var(--iw-block-linked-pages-dot-opacity, 0.3);
     transition: opacity 0.2s ease;
     border: none;
@@ -1713,7 +1713,7 @@ img.object-cover {
     width: var(--iw-block-testimonial-dot-size, 0.625rem);
     height: var(--iw-block-testimonial-dot-size, 0.625rem);
     border-radius: 9999px;
-    background-color: currentColor;
+    background-color: var(--iw-block-testimonial-dot-color, var(--iw-controls-on-content-color, currentColor));
     opacity: var(--iw-block-testimonial-dot-opacity, 0.3);
     transition: opacity 0.2s ease;
     border: none;
@@ -3224,6 +3224,28 @@ img.object-cover {
    the look without rewriting the template. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   Navigation arrows
+   The chevron of any control that moves the visitor: carousel and slider
+   buttons, list rows, pagination, menu panels. One pictogram is chosen for the
+   whole site and turned to face the right way, rather than four that would
+   have to agree with each other.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* No size here on purpose: each caller keeps the one it already had, whether
+   that is a utility class or a rule of its own. This class only turns. */
+.iw-nav-arrow--prev {
+    transform: rotate(180deg);
+}
+
+.iw-nav-arrow--up {
+    transform: rotate(270deg);
+}
+
+.iw-nav-arrow--down {
+    transform: rotate(90deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    Shared gallery navigation arrows
    Used across all gallery layouts.  Override the --iw-gallery-nav-* custom
    properties on a parent element to theme all arrows inside it at once.
@@ -3241,7 +3263,7 @@ img.object-cover {
     justify-content: center;
     width: var(--_size);
     height: var(--_size);
-    border-radius: 9999px;
+    border-radius: var(--iw-gallery-nav-radius, 9999px);
     background: var(--_bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);

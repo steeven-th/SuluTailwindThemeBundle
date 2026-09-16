@@ -81,9 +81,7 @@
                 class="iw-block-linked-pages__nav iw-block-linked-pages__nav--prev"
                 aria-label="Previous"
             >
-                <svg class="iw-block-linked-pages__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev', 'class': 'iw-block-linked-pages__nav-icon'} only %}
             </button>
             <button
                 type="button"
@@ -91,9 +89,7 @@
                 class="iw-block-linked-pages__nav iw-block-linked-pages__nav--next"
                 aria-label="Next"
             >
-                <svg class="iw-block-linked-pages__nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next', 'class': 'iw-block-linked-pages__nav-icon'} only %}
             </button>
 
             {# Dots — the slider controller drives the active state via inline opacity. #}

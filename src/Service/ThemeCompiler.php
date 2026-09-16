@@ -253,6 +253,7 @@ class ThemeCompiler
         $css .= $this->generateColorVariables();
         $css .= $this->generatePaletteVariables();
         $css .= $this->generateSurfaceVariables($tokens);
+        $css .= $this->generateControlVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
         $css .= $this->generateBorderVariables($tokens['borders'] ?? []);
         $css .= $this->generateBlockDefaultVariables($tokens['defaults'] ?? []);
@@ -509,6 +510,79 @@ class ThemeCompiler
         $css .= "  --iw-back-to-top-color: {$color};\n";
 
         return $css . "\n";
+    }
+
+    /**
+     * Generate CSS custom properties for the navigation controls.
+     *
+     * The arrows, dots and chevrons that move a visitor through a block. Six
+     * templates carried them and agreed on nothing: white on a white veil for
+     * a gallery, the variant rule colour for the dots of one carousel, plain
+     * `currentColor` for the dots of another, and none of it settable.
+     *
+     * They split by what they sit on, which is the rule the surfaces already
+     * follow - whoever guarantees the background guarantees what reads on it:
+     *
+     *   - on the content (accordion chevron, dots under a carousel): the
+     *     variant paints the text around them, so following it is the right
+     *     default and the setting is only a way to overrule it;
+     *   - on a media (the arrows over a gallery photo): the variant can say
+     *     nothing about a photograph the editor chose, so those carry their
+     *     own colour and their own veil, white by default because contrast is
+     *     what commands there.
+     *
+     * Each block keeps its own `--iw-block-*` hook above these, so a single
+     * block can still be dressed on its own.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateControlVariables(array $tokens): string
+    {
+        $css = '';
+
+        // Unset: the controls follow the text around them, which the variant
+        // paints - so a site that never opens this setting does not move.
+        $onContent = (string) ($tokens['components_controlsOnContentColor'] ?? '');
+        if ('' !== $onContent) {
+            $css .= '  --iw-controls-on-content-color: ' . $this->resolveColorValue($onContent) . ";\n";
+        }
+
+        // Same for the media side: what is not set is left to the stylesheet,
+        // whose defaults are the white and the white veil that have always
+        // been there. Emitting them here would say the same thing twice.
+        $onMedia = (string) ($tokens['components_controlsOnMediaColor'] ?? '');
+        if ('' !== $onMedia) {
+            $css .= '  --iw-gallery-nav-color: ' . $this->resolveColorValue($onMedia) . ";\n";
+        }
+
+        $onMediaBg = (string) ($tokens['components_controlsOnMediaBg'] ?? '');
+        if ('' !== $onMediaBg) {
+            $resolved = $this->resolveColorValue($onMediaBg);
+            $css .= "  --iw-gallery-nav-bg: {$resolved};\n";
+
+            // The hover state has to follow the background it hovers, or a veil
+            // set to dark would brighten back to white under the pointer. It
+            // moves towards the colour of the arrow itself, which is by
+            // definition what reads on that veil.
+            $towards = '' !== $onMedia ? $this->resolveColorValue($onMedia) : '#fff';
+            $css .= "  --iw-gallery-nav-bg-hover: color-mix(in srgb, {$resolved}, {$towards} 15%);\n";
+        }
+
+        $shape = (string) ($tokens['components_controlsShape'] ?? '');
+        if ('' !== $shape) {
+            $radius = str_starts_with($shape, 'rounded-') ? $this->resolveRadius($shape) : $shape;
+            $css .= "  --iw-gallery-nav-radius: {$radius};\n";
+        }
+
+        // A heading with nothing under it is noise: a theme that sets none of
+        // these writes nothing at all.
+        if ('' === $css) {
+            return '';
+        }
+
+        return "  /* Navigation controls (site-wide) */\n" . $css . "\n";
     }
 
     /**

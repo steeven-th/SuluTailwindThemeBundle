@@ -158,6 +158,10 @@ class ThemeFormMapper
         'components_backToTopShape', 'components_backToTopSize', 'components_backToTopBg',
         'components_backToTopIconColor', 'components_backToTopIcon', 'components_backToTopIconMedia',
         'components_paginationText', 'components_paginationAccent',
+        // Navigation controls: the arrows, dots and chevrons of a block.
+        'components_controlsOnContentColor', 'components_controlsOnMediaColor',
+        'components_controlsOnMediaBg',
+        'components_controlsArrowIcon', 'components_controlsShape',
         'components_breadcrumbText', 'components_breadcrumbCurrent', 'components_breadcrumbAccent',
         // Leaflet maps (location block, form widget).
         'components_mapsTileProvider', 'components_mapsCustomTileUrl', 'components_mapsCustomAttribution',

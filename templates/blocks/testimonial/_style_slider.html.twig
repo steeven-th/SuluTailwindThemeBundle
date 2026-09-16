@@ -77,9 +77,7 @@
                 class="iw-gallery-nav iw-block-testimonial__nav iw-block-testimonial__nav--prev"
                 aria-label="Previous"
             >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'prev'} only %}
             </button>
             <button
                 type="button"
@@ -87,9 +85,7 @@
                 class="iw-gallery-nav iw-block-testimonial__nav iw-block-testimonial__nav--next"
                 aria-label="Next"
             >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'direction': 'next'} only %}
             </button>
 
             {# Dots — slider controller drives the active state via inline opacity. #}
