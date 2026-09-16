@@ -63,6 +63,21 @@
                 <title>iw_sulu_tailwind_theme.components_section_sidebar</title>
             </meta>
             <properties>
+                <!--
+                    The section holds three subjects in a row: the colours of
+                    the sidebar, the style of its buttons, then what the filter
+                    panel shows. A heading between them closes the row and names
+                    the group, which is what keeps a one-line colour field from
+                    landing beside a grid of button thumbnails.
+                -->
+                <property name="sidebarColorsHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.config_group_colors</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="components_sidebarBg" type="iw_theme_color_token_editor" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
                     <params><param name="show_palette" value="true"/></params>
@@ -84,6 +99,14 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
+                <property name="sidebarButtonsHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.config_group_buttons</title></meta>
+                        </param>
+                    </params>
+                </property>
+
                 <property name="components_sidebarButtonStyle" type="iw_theme_button_style_picker" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_sidebar_button_style</title></meta>
                 </property>
@@ -92,6 +115,14 @@
                      it sits on the page background, so it has its own picker. -->
                 <property name="components_filtersToggleStyle" type="iw_theme_button_style_picker" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_filters_toggle_style</title></meta>
+                </property>
+
+                <property name="sidebarDisplayHeading" type="heading">
+                    <params>
+                        <param name="label">
+                            <meta><title>iw_sulu_tailwind_theme.config_group_display</title></meta>
+                        </param>
+                    </params>
                 </property>
 
                 <!-- Auto-submit the filter form on change (JS enhancement). When on,

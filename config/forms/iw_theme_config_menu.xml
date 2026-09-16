@@ -197,7 +197,9 @@
                     </params>
                 </property>
 
-                <property name="menuConfig_fullscreenImage" type="single_media_selection" colspan="6"
+                <!-- Full width: the only tall field of a section made of selects
+                     and toggles, so it would break whichever row it landed on. -->
+                <property name="menuConfig_fullscreenImage" type="single_media_selection" colspan="12"
                           visibleCondition="menuConfig_type == 'fullscreen'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.menu_fullscreenImage</title>

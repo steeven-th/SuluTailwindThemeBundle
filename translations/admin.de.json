@@ -414,6 +414,13 @@
     "iw_sulu_tailwind_theme.content_group_form": "Formular",
     "iw_sulu_tailwind_theme.settings_group_layout": "Anordnung",
 
+    "iw_sulu_tailwind_theme.config_group_colors": "Farben",
+    "iw_sulu_tailwind_theme.config_group_buttons": "Schaltflächen",
+    "iw_sulu_tailwind_theme.config_group_display": "Anzeige",
+    "iw_sulu_tailwind_theme.config_group_basemap": "Kartenhintergrund",
+    "iw_sulu_tailwind_theme.config_group_marker": "Markierung",
+    "iw_sulu_tailwind_theme.config_group_popup": "Sprechblase und Bedienelemente",
+
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Außen",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Innen",
     "iw_sulu_tailwind_theme.lateral_margins_none": "Keine",

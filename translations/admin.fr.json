@@ -414,6 +414,13 @@
     "iw_sulu_tailwind_theme.content_group_form": "Formulaire",
     "iw_sulu_tailwind_theme.settings_group_layout": "Disposition",
 
+    "iw_sulu_tailwind_theme.config_group_colors": "Couleurs",
+    "iw_sulu_tailwind_theme.config_group_buttons": "Boutons",
+    "iw_sulu_tailwind_theme.config_group_display": "Affichage",
+    "iw_sulu_tailwind_theme.config_group_basemap": "Fond de carte",
+    "iw_sulu_tailwind_theme.config_group_marker": "Marqueur",
+    "iw_sulu_tailwind_theme.config_group_popup": "Bulle et contrôles",
+
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Extérieur",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Intérieur",
     "iw_sulu_tailwind_theme.lateral_margins_none": "Aucune",

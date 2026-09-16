@@ -506,6 +506,19 @@ a checkbox pair well, a select and a margin selector do not.
 `FormLayoutContractTest` walks the resolved templates and fails on any row
 mixing the two.
 
+A tall field with no tall neighbour takes the full width instead of a heading.
+`block-variant.xml` does it for the variant picker, whose grid of thumbnails
+has no room in half a row, and the theme forms do it for their media
+selections. Both close the row the same way.
+
+The rule covers the blocks and the theme configuration forms alike: the same
+test walks `config/forms/*.xml`, where a one-line colour field beside a grid of
+button thumbnails reads no better than it does in a block. Those forms bring
+field types the blocks never use, and the tall ones are listed with the rest in
+the test: the palette and variant editors, the font picker and the article
+style picker. The weight picker and the colour token editor look like they
+belong there but do not, both rendering a single line.
+
 `BlockSectionsContractTest` enforces all of this on every block the bundle
 ships, both what Appearance may hold and what Content may hold.
 

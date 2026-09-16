@@ -414,6 +414,13 @@
     "iw_sulu_tailwind_theme.content_group_form": "Form",
     "iw_sulu_tailwind_theme.settings_group_layout": "Layout",
 
+    "iw_sulu_tailwind_theme.config_group_colors": "Colors",
+    "iw_sulu_tailwind_theme.config_group_buttons": "Buttons",
+    "iw_sulu_tailwind_theme.config_group_display": "Display",
+    "iw_sulu_tailwind_theme.config_group_basemap": "Base map",
+    "iw_sulu_tailwind_theme.config_group_marker": "Marker",
+    "iw_sulu_tailwind_theme.config_group_popup": "Popup and controls",
+
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Exterior",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Interior",
     "iw_sulu_tailwind_theme.lateral_margins_none": "None",
