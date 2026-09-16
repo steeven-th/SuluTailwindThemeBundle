@@ -826,6 +826,14 @@ writes is read somewhere in the stylesheet.
 A border colour also carries the width that makes it visible: asking for a
 border asks for the line, not for a colour nothing draws.
 
+**A part drawn outside its component has to be named too.** Scoping works by
+inheritance, so the button opening the filter drawer - rendered by the listing
+page, beside the panel rather than inside it - kept the global surfaces while
+the panel followed the setting. The scoped selector names it explicitly, and
+`ScopedComponentSettingsCoverTheirPartsTest` reads the templates to catch the
+next part that moves out. The backdrop is deliberately left out: it is a veil
+dimming the page, not a surface of the component.
+
 ## Navigation controls
 
 The arrows, dots and chevrons that move a visitor through a block. They split

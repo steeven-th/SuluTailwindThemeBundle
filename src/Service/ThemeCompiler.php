@@ -1137,7 +1137,12 @@ class ThemeCompiler
     private const COMPONENT_SURFACE_OVERRIDES = [
         // The sidebar colors are shared with the table of contents: both are
         // article side panels and wear the same skin (one admin section).
-        '.iw-article-filters, .iw-toc' => [
+        //
+        // The toggle opening the panel on a small screen is rendered by the
+        // page, outside the panel it opens, so scoping to the panel alone left
+        // it painted by the global surfaces while the panel followed the
+        // setting - a difference nobody sees until they look at a phone.
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
             'components_sidebarBg' => '--color-surface',
             'components_sidebarText' => '--color-surface-foreground',
             'components_sidebarMuted' => '--color-surface-muted',
@@ -1179,11 +1184,13 @@ class ThemeCompiler
     private const COMPONENT_RADIUS = [
         '.iw-pagination' => ['components_paginationRadius' => ['--iw-pagination-item-radius']],
         '.iw-tag' => ['components_tagRadius' => ['--iw-tag-radius']],
-        '.iw-article-filters, .iw-toc' => [
+        '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
             'components_sidebarRadius' => [
                 '--iw-article-filters-radius',
                 '--iw-article-filters-control-radius',
+                '--iw-article-filters-toggle-radius',
                 '--iw-toc-radius',
+                '--iw-toc-toggle-radius',
             ],
         ],
     ];
