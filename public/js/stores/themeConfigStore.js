@@ -1,5 +1,5 @@
 // @flow
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import {Requester} from 'sulu-admin-bundle/services';
 
 /**
@@ -19,31 +19,47 @@ const WEBSPACE_PATTERN = /\/webspaces\/([^/]+)/;
 const ARTICLE_RESOURCE_KEY = 'articles';
 
 /**
- * Shared MobX observable store for theme config data.
+ * The theme config the admin fields read, one entry per site.
  *
- * Holds the current webspace's variants, buttons, palette, borders and block
- * defaults.
- * Components decorated with @observer that read from this store
- * will automatically re-render when the data changes (e.g. on webspace switch).
+ * A page belongs to a single site and only ever needs one theme. An article
+ * does not: it can be published on several sites at once, each running its own
+ * theme, and the editor picks an appearance for each. So the store holds a
+ * theme per site and the fields read the one that is active.
+ *
+ * Components decorated with @observer that read from this store will
+ * automatically re-render when the active site or its data changes.
  */
 class ThemeConfigStore {
-    @observable variants: Array<Object> = [];
-    /** Ordered button styles: [{slug, label, bg, text, border, radius, ...}] */
-    @observable buttons: Array<Object> = [];
-    @observable palette: Object = {};
-    /** Ordered palette colors: [{role, slug, value, labelKey}] */
-    @observable colors: Array<Object> = [];
-    @observable borders: Object = {};
-    /** Site-wide block defaults, so a field can name the value it follows. */
-    @observable defaults: Object = {};
-    /** Which buttons the title editor offers, per context, for this site. */
-    @observable titleEditor: Object = {};
+    /**
+     * Theme config per webspace key, as the API returned it.
+     */
+    @observable _byWebspace: Object = {};
 
-    /** Track the currently loaded webspace to avoid redundant fetches */
-    _currentWebspace: ?string = null;
+    /**
+     * The project-wide config, read while no site is known yet.
+     *
+     * It carries the theme of whichever site happens to be first, so it is a
+     * starting point and never an answer: see the guard in index.js.
+     */
+    @observable _fallback: Object = {};
 
-    /** Track in-flight request to avoid duplicates */
-    _pendingWebspace: ?string = null;
+    /**
+     * The site whose theme the fields are currently showing.
+     */
+    @observable _activeWebspace: ?string = null;
+
+    /** Track in-flight requests to avoid duplicates, one entry per key */
+    _pending: Object = {};
+
+    /**
+     * Which sites have been loaded since the last invalidation.
+     *
+     * Kept apart from the data so an invalidation can force a re-fetch while
+     * what is on screen stays on screen. Dropping the data instead would show
+     * the fallback theme for the length of a round trip, which is the colors
+     * of some other site flashing in the form.
+     */
+    _fresh: Object = {};
 
     /** Whether the navigation watcher is already installed */
     _watching: boolean = false;
@@ -65,49 +81,150 @@ class ThemeConfigStore {
      */
     _articleDefaultWebspaces: Object = {};
 
-    @action update(data: Object) {
-        this.variants = data.variants || [];
-        this.buttons = data.buttons || [];
-        this.palette = data.palette || {};
-        this.colors = data.colors || [];
-        this.borders = data.borders || {};
-        this.defaults = data.defaults || {};
-        this.titleEditor = data.titleEditor || {};
-    }
-
     /**
-     * Invalidate the cached webspace so the next ensureWebspace() call
-     * will re-fetch from the API. Call this after theme edits/saves.
-     */
-    invalidate() {
-        this._currentWebspace = null;
-    }
-
-    /**
-     * Ensure the store has the theme config for the given webspace.
-     * Fetches from the API only if the webspace has changed.
+     * The config the fields read: the active site's, or the fallback.
      *
-     * @param {string} webspaceKey The webspace key to load config for
+     * @returns {Object} The theme config to display
      */
-    ensureWebspace(webspaceKey: string) {
-        if (!webspaceKey || webspaceKey === this._currentWebspace || webspaceKey === this._pendingWebspace) {
+    @computed get current(): Object {
+        const active = this._activeWebspace;
+
+        return (active && this._byWebspace[active]) || this._fallback;
+    }
+
+    @computed get variants(): Array<Object> {
+        return this.current.variants || [];
+    }
+
+    /** Ordered button styles: [{slug, label, bg, text, border, radius, ...}] */
+    @computed get buttons(): Array<Object> {
+        return this.current.buttons || [];
+    }
+
+    @computed get palette(): Object {
+        return this.current.palette || {};
+    }
+
+    /** Ordered palette colors: [{role, slug, value, labelKey}] */
+    @computed get colors(): Array<Object> {
+        return this.current.colors || [];
+    }
+
+    @computed get borders(): Object {
+        return this.current.borders || {};
+    }
+
+    /** Site-wide block defaults, so a field can name the value it follows. */
+    @computed get defaults(): Object {
+        return this.current.defaults || {};
+    }
+
+    /** Which buttons the title editor offers, per context, for this site. */
+    @computed get titleEditor(): Object {
+        return this.current.titleEditor || {};
+    }
+
+    /**
+     * The theme config of one named site, loaded or not.
+     *
+     * For the fields that have to show another site than the active one.
+     *
+     * @param {?string} webspaceKey The site to read
+     *
+     * @returns {Object} Its theme config, empty until it has been fetched
+     */
+    dataFor(webspaceKey: ?string): Object {
+        if (!webspaceKey) {
+            return {};
+        }
+
+        return this._byWebspace[webspaceKey] || {};
+    }
+
+    /**
+     * Whether the theme of a site is already in the store.
+     *
+     * @param {?string} webspaceKey The site to check
+     *
+     * @returns {boolean} True once its theme has been fetched
+     */
+    hasWebspace(webspaceKey: ?string): boolean {
+        return !!webspaceKey && !!this._byWebspace[webspaceKey];
+    }
+
+    /**
+     * Record the project-wide config, used while no site is known.
+     *
+     * @param {Object} data The config from the admin config endpoint
+     */
+    @action update(data: Object) {
+        this._fallback = data || {};
+    }
+
+    /**
+     * Drop every loaded theme so the next ensure call re-fetches.
+     *
+     * Called after a theme is edited, imported or saved. Which theme changed
+     * is not reported, and a site can share its theme with another, so keeping
+     * any of them would be a guess.
+     */
+    @action invalidate() {
+        this._fresh = {};
+        this._pending = {};
+    }
+
+    /**
+     * Ensure the store has the theme config of the given sites.
+     *
+     * Everything missing is fetched in a single request, so a form showing
+     * several sites does not fill in one piece at a time. A site already
+     * loaded or already being fetched is skipped.
+     *
+     * @param {Array<?string>} webspaceKeys The sites to load
+     */
+    ensureWebspaces(webspaceKeys: Array<?string>) {
+        const missing = (webspaceKeys || []).filter((key) =>
+            !!key && !this._fresh[key] && !this._pending[key]
+        );
+
+        if (0 === missing.length) {
             return;
         }
 
-        this._pendingWebspace = webspaceKey;
+        missing.forEach((key) => {
+            this._pending[key] = true;
+        });
 
-        Requester.get('/admin/api/iw-webspace-theme-config?webspace=' + webspaceKey)
+        Requester.get('/admin/api/iw-webspace-theme-config?webspaces=' + missing.join(','))
             .then(action((data) => {
-                // Only apply if this is still the latest request
-                if (this._pendingWebspace === webspaceKey) {
-                    this._currentWebspace = webspaceKey;
-                    this._pendingWebspace = null;
-                    this.update(data);
-                }
+                missing.forEach((key) => {
+                    delete this._pending[key];
+                    this._fresh[key] = true;
+
+                    if (data && data[key]) {
+                        this._byWebspace = {...this._byWebspace, [key]: data[key]};
+                    }
+                });
             }))
-            .catch(() => {
-                this._pendingWebspace = null;
-            });
+            .catch(action(() => {
+                missing.forEach((key) => {
+                    delete this._pending[key];
+                });
+            }));
+    }
+
+    /**
+     * Ensure the store has the theme config of one site, and show it.
+     *
+     * @param {string} webspaceKey The webspace key to load config for
+     */
+    @action ensureWebspace(webspaceKey: string) {
+        if (!webspaceKey) {
+            return;
+        }
+
+        this._activeWebspace = webspaceKey;
+        this.ensureWebspaces([webspaceKey]);
     }
 
     /**
@@ -159,6 +276,42 @@ class ThemeConfigStore {
     }
 
     /**
+     * Every site the form on screen is published on, main one first.
+     *
+     * An article can be published on several sites at once, and the editor
+     * picks an appearance for each, so all their themes are needed at the same
+     * time. Anything else answers with its single site, or nothing.
+     *
+     * @param {?Object} formInspector The form being edited, when there is one
+     *
+     * @returns {Array<string>} The webspace keys, without duplicates
+     */
+    webspacesOfForm(formInspector: ?Object): Array<string> {
+        const main = this.webspaceFromForm(formInspector);
+
+        if (!main) {
+            return [];
+        }
+
+        const additional = formInspector
+            ? formInspector.getValueByPath('/additionalWebspaces')
+            : null;
+
+        const keys = [main];
+
+        // May be a MobX observable array, which fails Array.isArray.
+        if (additional && additional.length) {
+            Array.from(additional).forEach((key) => {
+                if (typeof key === 'string' && key && -1 === keys.indexOf(key)) {
+                    keys.push(key);
+                }
+            });
+        }
+
+        return keys;
+    }
+
+    /**
      * The webspace the admin is currently editing.
      *
      * The URL first, then whatever the form on screen declared. Null outside
@@ -201,6 +354,14 @@ class ThemeConfigStore {
 
         if (webspaceKey) {
             this.ensureWebspace(webspaceKey);
+        }
+
+        // The other sites the article is published on, so switching to one of
+        // them shows its theme straight away rather than after a round trip.
+        const published = this.webspacesOfForm(formInspector);
+
+        if (published.length > 1) {
+            this.ensureWebspaces(published);
         }
     }
 
