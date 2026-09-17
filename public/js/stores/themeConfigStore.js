@@ -65,12 +65,29 @@ class ThemeConfigStore {
     _watching: boolean = false;
 
     /**
+     * The site whose appearance the editor is currently setting.
+     *
+     * Only ever set on an article published on several sites, where the fields
+     * write an override for the site named here rather than the value every
+     * site follows. Null means the main site, which is what an ordinary form
+     * always is.
+     */
+    @observable _editingWebspace: ?string = null;
+
+    /**
      * The site named by the form on screen, when the URL names none.
      *
      * Set by the fields of the form being edited and cleared on every move
      * between views, so it never outlives the form that declared it.
      */
     _formWebspace: ?string = null;
+
+    /**
+     * Readable name of each site, keyed by webspace key.
+     *
+     * So the appearance switch names sites the way the editor knows them.
+     */
+    _webspaceNames: Object = {};
 
     /**
      * Main webspace a new article lands in, per locale.
@@ -87,9 +104,31 @@ class ThemeConfigStore {
      * @returns {Object} The theme config to display
      */
     @computed get current(): Object {
-        const active = this._activeWebspace;
+        const active = this._editingWebspace || this._activeWebspace;
 
         return (active && this._byWebspace[active]) || this._fallback;
+    }
+
+    /**
+     * The site whose appearance is being set, or null for the main one.
+     *
+     * @returns {?string} The webspace key
+     */
+    @computed get editingWebspace(): ?string {
+        return this._editingWebspace;
+    }
+
+    /**
+     * Set the appearance to the given site, or back to the main one.
+     *
+     * @param {?string} webspaceKey The site to set, null for the main one
+     */
+    @action setEditingWebspace(webspaceKey: ?string) {
+        this._editingWebspace = webspaceKey || null;
+
+        if (webspaceKey) {
+            this.ensureWebspaces([webspaceKey]);
+        }
     }
 
     @computed get variants(): Array<Object> {
@@ -234,6 +273,26 @@ class ThemeConfigStore {
      */
     setArticleDefaultWebspaces(defaults: Object) {
         this._articleDefaultWebspaces = defaults || {};
+    }
+
+    /**
+     * Record the readable name of every site.
+     *
+     * @param {Object} names Webspace key to name, from the admin config
+     */
+    setWebspaceNames(names: Object) {
+        this._webspaceNames = names || {};
+    }
+
+    /**
+     * The readable name of a site, falling back to its key.
+     *
+     * @param {string} webspaceKey The site
+     *
+     * @returns {string} Its name, or the key when the project renamed it
+     */
+    webspaceName(webspaceKey: string): string {
+        return this._webspaceNames[webspaceKey] || webspaceKey;
     }
 
     /**
@@ -384,6 +443,7 @@ class ThemeConfigStore {
         this._watching = true;
         window.addEventListener('hashchange', () => {
             this._formWebspace = null;
+            this._editingWebspace = null;
             this.ensureCurrentWebspace();
         });
         this.ensureCurrentWebspace();

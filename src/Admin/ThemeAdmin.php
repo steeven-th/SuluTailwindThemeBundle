@@ -703,6 +703,22 @@ class ThemeAdmin extends Admin
      *
      * @return string The config key
      */
+    /**
+     * The readable name of every webspace, keyed by webspace key.
+     *
+     * @return array<string, string> Webspace key to name
+     */
+    private function webspaceNames(): array
+    {
+        $names = [];
+
+        foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
+            $names[$webspace->getKey()] = $webspace->getName();
+        }
+
+        return $names;
+    }
+
     public function getConfigKey(): ?string
     {
         return 'iw_sulu_tailwind_theme';
@@ -744,6 +760,9 @@ class ThemeAdmin extends Admin
             // before its first save. This is what the admin falls back to so
             // that a brand new article already shows the theme it will run.
             'articleDefaultWebspaces' => $this->articleWebspaceDefaults->byLocale(),
+            // Site names, so the appearance switch of an article names sites
+            // the way the editor knows them rather than by their key.
+            'webspaceNames' => $this->webspaceNames(),
             // Which buttons the title editor offers, per context. The field type
             // reads this as its DEFAULT: an explicit param in a template's XML
             // still wins, so a project can override one field without giving up

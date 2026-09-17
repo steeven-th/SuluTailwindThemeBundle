@@ -21,6 +21,14 @@ services:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
 
+    # Amends the article views built by SuluArticleBundle, hence the late
+    # priority declared by the class itself.
+    itech_world.sulu_tailwind_theme.article_appearance_admin:
+        class: ItechWorld\SuluTailwindThemeBundle\Admin\ArticleAppearanceAdmin
+        tags:
+            - { name: 'sulu.admin' }
+            - { name: 'sulu.context', context: 'admin' }
+
     itech_world.sulu_tailwind_theme.webspace_theme_admin:
         class: ItechWorld\SuluTailwindThemeBundle\Admin\WebspaceThemeAdmin
         arguments:
