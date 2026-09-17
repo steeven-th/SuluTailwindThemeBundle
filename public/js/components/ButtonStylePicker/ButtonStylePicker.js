@@ -6,6 +6,8 @@ import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
 import buttonBorder from '../../utils/buttonBorder';
+import {isOverridden, valueFor, withValue} from '../../utils/scopedValue';
+import {translate} from 'sulu-admin-bundle/utils';
 
 /**
  * ButtonStylePicker field component for the Sulu admin.
@@ -75,11 +77,26 @@ export default class ButtonStylePicker extends React.Component {
     }
 
     handleSelect = (key) => {
-        const {onChange, disabled} = this.props;
+        const {onChange, disabled, value} = this.props;
         if (!onChange || disabled) {
             return;
         }
-        onChange(key);
+
+        // On an article published on several sites the choice belongs to the
+        // site being set, see utils/scopedValue.
+        onChange(withValue(value, themeConfigStore.editingWebspace, key));
+    };
+
+    /**
+     * Drop the choice made for this site, so it follows the main one again.
+     */
+    handleFollowMain = () => {
+        const {onChange, disabled, value} = this.props;
+        if (!onChange || disabled) {
+            return;
+        }
+
+        onChange(withValue(value, themeConfigStore.editingWebspace, valueFor(value, null)));
     };
 
     /**
@@ -111,6 +128,8 @@ export default class ButtonStylePicker extends React.Component {
 
     render() {
         const {value, disabled} = this.props;
+        const editingWebspace = themeConfigStore.editingWebspace;
+        const selected = valueFor(value, editingWebspace);
         const buttons = this._getButtons();
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
@@ -131,11 +150,13 @@ export default class ButtonStylePicker extends React.Component {
         }
 
         return (
-            <div style={containerStyle}>
+            <div>
+                {this.renderSiteNotice(editingWebspace, value)}
+                <div style={containerStyle}>
                 {buttons.map((btnData) => {
                     const slug = btnData.slug;
                     const label = btnData.label || slug;
-                    const isSelected = value === slug;
+                    const isSelected = selected === slug;
                     const hasData = btnData && typeof btnData === 'object';
 
                     const cardStyle = {
@@ -208,6 +229,66 @@ export default class ButtonStylePicker extends React.Component {
                         </button>
                     );
                 })}
+                </div>
+            </div>
+        );
+    }
+
+    /**
+     * Say which site is being set, and whether it differs from the main one.
+     *
+     * Mirrors the notice of the variant picker on purpose: the two fields sit
+     * in the same panel and answer the same question.
+     *
+     * @param {?string} editingWebspace The site being set, null for the main one
+     * @param {*} value The stored value
+     *
+     * @returns {?React.Element} The notice, or nothing on the main site
+     */
+    renderSiteNotice(editingWebspace: ?string, value: mixed) {
+        if (!editingWebspace) {
+            return null;
+        }
+
+        const overridden = isOverridden(value, editingWebspace);
+
+        return (
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                flexWrap: 'wrap',
+                padding: '4px 4px 8px',
+                fontSize: '12px',
+                color: '#666',
+            }}>
+                <span>
+                    {translate(
+                        overridden
+                            ? 'iw_sulu_tailwind_theme.appearance_set_for_site'
+                            : 'iw_sulu_tailwind_theme.appearance_follows_main_site',
+                        {webspace: themeConfigStore.webspaceName(editingWebspace)}
+                    )}
+                </span>
+                {overridden
+                    ? (
+                        <button
+                            onClick={this.handleFollowMain}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                color: getSuluPrimaryColor(),
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                font: 'inherit',
+                            }}
+                            type="button"
+                        >
+                            {translate('iw_sulu_tailwind_theme.appearance_follow_main_site')}
+                        </button>
+                    )
+                    : null}
             </div>
         );
     }
