@@ -464,8 +464,12 @@ Article templates extend the project's `base.html.twig` — your menu, footer, a
 > itech_world_sulu_tailwind_theme:
 >     article_templates:
 >         enabled: true
->         types: ['news', 'event']  # blog_post will not be registered
+>         types: ['news', 'event']  # blog_post is not registered at all
 > ```
+>
+> A type left out brings nothing with it: no template, no list tab in the admin, and no security context of its own. Naming a type the bundle does not ship (`news`, `event`, `blog_post`) stops the build rather than registering nothing silently.
+>
+> To open a type to some editors only, keep it registered and use its security context: Sulu creates one per article group, so a role can be granted `news` alone. That is also the answer on a multi-site project, where an article chooses its site after it was created from a type.
 
 #### Article listing page (server-side filtering)
 

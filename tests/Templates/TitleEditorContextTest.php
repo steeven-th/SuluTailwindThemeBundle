@@ -137,8 +137,11 @@ final class TitleEditorContextTest extends TestCase
     private static function shippedTemplates(): array
     {
         $paths = [];
-        foreach (['blocks', 'blocks-code', 'blocks-code-open', 'blocks-form', 'blocks-form-bundle', 'pages', 'articles'] as $directory) {
-            foreach (glob(self::templatesDir() . '/' . $directory . '/*.xml') ?: [] as $path) {
+        // Articles sit one level deeper, a directory per type, which is what
+        // lets the `types` whitelist register them one by one.
+        foreach (['blocks/*', 'blocks-code/*', 'blocks-code-open/*', 'blocks-form/*',
+            'blocks-form-bundle/*', 'pages/*', 'articles/*/*'] as $pattern) {
+            foreach (glob(self::templatesDir() . '/' . $pattern . '.xml') ?: [] as $path) {
                 $paths[] = $path;
             }
         }

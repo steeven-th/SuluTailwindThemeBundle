@@ -161,7 +161,7 @@ final class TranslationParityTest extends TestCase
         $files = [];
         foreach (['templates/blocks', 'templates/blocks-code', 'templates/blocks-code-open',
             'templates/blocks-form', 'templates/blocks-form-bundle', 'templates/fragments',
-            'templates/fragments/widgets', 'templates/pages', 'templates/articles', 'forms'] as $directory) {
+            'templates/fragments/widgets', 'templates/pages', 'templates/articles/*', 'forms'] as $directory) {
             foreach (glob(\dirname(__DIR__, 2) . '/config/' . $directory . '/*.xml') ?: [] as $path) {
                 $files[] = $path;
             }

@@ -71,6 +71,16 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                             ->defaultValue(self::ARTICLE_TYPES)
                             ->scalarPrototype()->end()
                             ->info('Whitelist of article types to register (news, event, blog_post)')
+                            // A typo here used to register nothing and say
+                            // nothing. Naming a type the bundle does not ship
+                            // is a mistake worth stopping the build for.
+                            ->validate()
+                                ->ifTrue(static fn (array $types): bool => [] !== \array_diff($types, self::ARTICLE_TYPES))
+                                ->thenInvalid(
+                                    'Unknown article type in "itech_world_sulu_tailwind_theme.article_templates.types": %s. '
+                                    . 'The bundle ships "' . \implode('", "', self::ARTICLE_TYPES) . '".',
+                                )
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -514,12 +524,21 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
     }
 
     /**
-     * Register the article template directory based on configuration.
+     * Register the article templates the project asked for.
      *
      * Checks both that the SuluArticleBundle is available and that the
-     * developer has opted in via the article_templates config. All article
-     * templates live in a single config/templates/articles/ directory
-     * following the Sulu convention.
+     * developer has opted in via the article_templates config.
+     *
+     * Each type lives in its own directory under config/templates/articles/,
+     * and only the listed ones are registered. That layout is what makes the
+     * `types` whitelist mean anything: Sulu registers directories, so a single
+     * directory holding the three types could only ever be taken whole - which
+     * it was, silently, while the documentation promised otherwise.
+     *
+     * A type left out is not registered at all, so it brings no list tab and
+     * no security context either. Restricting types per site is a different
+     * question and has no answer here: an article is attached to a site in its
+     * own settings, long after it was created from a type.
      *
      * @param ContainerBuilder $builder The container builder
      */
@@ -538,12 +557,25 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             return;
         }
 
+        $directories = [];
+        foreach ($articleConfig['types'] as $type) {
+            $directory = __DIR__ . '/../config/templates/articles/' . $type;
+
+            if (!\is_dir($directory)) {
+                continue;
+            }
+
+            $directories['iw_sulu_tailwind_theme_' . $type] = $directory;
+        }
+
+        if ([] === $directories) {
+            return;
+        }
+
         $builder->prependExtensionConfig('sulu_admin', [
             'templates' => [
                 'article' => [
-                    'directories' => [
-                        'iw_sulu_tailwind_theme' => __DIR__ . '/../config/templates/articles',
-                    ],
+                    'directories' => $directories,
                 ],
             ],
         ]);

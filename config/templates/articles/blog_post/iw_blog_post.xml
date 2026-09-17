@@ -1,35 +1,35 @@
 <?xml version="1.0" ?>
 <!--
-    Article template: News.
-    Provides a news/press article structure with hero, authors, dates,
-    and content blocks. Categories, tags, description, and SEO are
-    handled by Sulu's native Excerpt tab.
+    Article template: Blog Post.
+    Provides a generic blog/journal article structure with authors, hero,
+    reading time, related articles, and content blocks. Categories, tags,
+    description, and SEO are handled by Sulu's native Excerpt tab.
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:xi="http://www.w3.org/2001/XInclude"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
-    <key>iw_news</key>
-    <group>news</group>
-    <view>@ItechWorldSuluTailwindTheme/articles/news</view>
+    <key>iw_blog_post</key>
+    <group>publications</group>
+    <view>@ItechWorldSuluTailwindTheme/articles/blog_post</view>
     <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 
     <meta>
-        <title>iw_sulu_tailwind_theme.article.news</title>
+        <title>iw_sulu_tailwind_theme.article.blog_post</title>
     </meta>
 
     <properties>
         <!-- Header -->
-        <xi:include href="../fragments/article-header.xml"
+        <xi:include href="../../fragments/article-header.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
         <!-- Hero section -->
         <section name="hero">
             <meta><title>iw_sulu_tailwind_theme.article.section_hero</title></meta>
             <properties>
-                <xi:include href="../fragments/article-hero.xml"
+                <xi:include href="../../fragments/article-hero.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
@@ -39,8 +39,15 @@
             <meta><title>iw_sulu_tailwind_theme.article.section_meta</title></meta>
             <properties>
                 <!-- Both the name-format property and the additional-authors block. -->
-                <xi:include href="../fragments/article-authors.xml"
+                <xi:include href="../../fragments/article-authors.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property|/sulu:properties/sulu:block)"/>
+
+                <property name="readingTime" type="text_line" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.reading_time</title>
+                        <info_text>iw_sulu_tailwind_theme.article.reading_time_info</info_text>
+                    </meta>
+                </property>
             </properties>
         </section>
 
@@ -48,7 +55,7 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.article.section_content</title></meta>
             <properties>
-                <xi:include href="../fragments/page-blocks.xml"
+                <xi:include href="../../fragments/page-blocks.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
             </properties>
         </section>

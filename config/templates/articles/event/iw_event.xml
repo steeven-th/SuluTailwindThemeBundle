@@ -22,14 +22,14 @@
 
     <properties>
         <!-- Header -->
-        <xi:include href="../fragments/article-header.xml"
+        <xi:include href="../../fragments/article-header.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
         <!-- Hero section -->
         <section name="hero">
             <meta><title>iw_sulu_tailwind_theme.article.section_hero</title></meta>
             <properties>
-                <xi:include href="../fragments/article-hero.xml"
+                <xi:include href="../../fragments/article-hero.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
@@ -111,7 +111,7 @@
         <section name="content">
             <meta><title>iw_sulu_tailwind_theme.article.section_content</title></meta>
             <properties>
-                <xi:include href="../fragments/page-blocks.xml"
+                <xi:include href="../../fragments/page-blocks.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:block)"/>
             </properties>
         </section>
