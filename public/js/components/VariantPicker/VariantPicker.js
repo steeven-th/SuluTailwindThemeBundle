@@ -73,7 +73,7 @@ export default class VariantPicker extends React.Component {
     state = {palette: null};
 
     componentDidMount() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
         // Colors edited in the palette tab of the same form are not saved yet,
         // and the variants reference them, so the wireframes need the form
@@ -95,7 +95,7 @@ export default class VariantPicker extends React.Component {
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**

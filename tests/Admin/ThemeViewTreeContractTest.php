@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Tests\Admin;
 use ItechWorld\SuluTailwindThemeBundle\Admin\ThemeAdmin;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\ArticleWebspaceDefaults;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use PHPUnit\Framework\Attributes\Test;
@@ -127,6 +128,7 @@ final class ThemeViewTreeContractTest extends TestCase
             $this->createStub(WebspaceThemeRepository::class),
             $this->createStub(WebspaceManagerInterface::class),
             $this->createStub(ThemeConfigResolver::class),
+            $this->createStub(ArticleWebspaceDefaults::class),
             true,
         );
 

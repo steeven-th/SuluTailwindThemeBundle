@@ -103,7 +103,7 @@ export default class RadiusSelector extends React.Component {
      * webspace being edited.
      */
     componentDidMount() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
         if (this.getThemeKey()) {
             return;
@@ -121,7 +121,7 @@ export default class RadiusSelector extends React.Component {
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**

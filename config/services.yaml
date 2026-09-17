@@ -14,6 +14,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.config_resolver'
+            - '@itech_world.sulu_tailwind_theme.article_webspace_defaults'
             - '%itech_world_sulu_tailwind_theme.article_templates_enabled%'
             - '%itech_world_sulu_tailwind_theme.title_editor%'
         tags:
@@ -99,6 +100,15 @@ services:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver
         arguments:
             - '@itech_world.sulu_tailwind_theme.palette_generator'
+
+    # Where a new article lands, so its first form shows the right theme. The
+    # Sulu service is optional on purpose: a project may run this bundle
+    # without SuluArticleBundle, and the admin has to boot either way.
+    itech_world.sulu_tailwind_theme.article_webspace_defaults:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ArticleWebspaceDefaults
+        arguments:
+            - '@sulu.core.localization_manager'
+            - '@?sulu_article.webspace_settings_configuration_resolver'
 
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator

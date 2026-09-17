@@ -229,7 +229,7 @@ class TitleEditor extends React.Component<*> {
 
     componentDidMount() {
         // The buttons offered here belong to the site being edited.
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
         ensureStyles();
 

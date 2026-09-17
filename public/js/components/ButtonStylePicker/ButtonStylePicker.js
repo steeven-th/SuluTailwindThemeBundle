@@ -29,12 +29,12 @@ export default class ButtonStylePicker extends React.Component {
 
     componentDidMount() {
         // The button previews are the edited site's, not the first site's.
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
         this._loadPalette();
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**
