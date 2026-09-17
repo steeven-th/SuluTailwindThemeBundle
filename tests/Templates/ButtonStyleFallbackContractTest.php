@@ -68,10 +68,20 @@ final class ButtonStyleFallbackContractTest extends TestCase
         );
 
         self::assertStringContainsString(
-            "cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant'",
+            "ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant'",
             $cta,
             'A CTA button with a style keeps it, one without must render the alias so the '
             . "variant's default button style finally reaches it.",
+        );
+
+        // The style is read through the per-site reduction rather than raw: an
+        // article published on several sites may name a different button style
+        // for each, and the raw value is then a map, not a slug.
+        self::assertStringContainsString(
+            "set ctaStyle = iw_sulu_tailwind_theme_site_value(cta.style|default(''))",
+            $cta,
+            'The stored style must go through iw_sulu_tailwind_theme_site_value, which is '
+            . 'what turns a per-site choice into the slug that applies here.',
         );
     }
 

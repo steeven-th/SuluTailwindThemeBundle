@@ -142,8 +142,10 @@
             {% endif %}
 
             {% if cardLinkLabel is not empty %}
+                {# A button style may name a choice per site, see iw_sulu_tailwind_theme_site_value. #}
+                {% set cardLinkStyle = iw_sulu_tailwind_theme_site_value(card.linkStyle|default('')) %}
                 <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
-                    <span class="{{ card.linkStyle|default('') ? 'iw-button--' ~ card.linkStyle : 'iw-button--variant' }} iw-block__action">{{ cardLinkLabel }}</span>
+                    <span class="{{ cardLinkStyle ? 'iw-button--' ~ cardLinkStyle : 'iw-button--variant' }} iw-block__action">{{ cardLinkLabel }}</span>
                 </span>
             {% endif %}
         {%- elseif hasButtons -%}

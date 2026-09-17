@@ -82,4 +82,21 @@ final class ButtonResolverTest extends TestCase
 
         self::assertSame('secondary', ButtonResolver::resolveSlug('secondary', $legacy));
     }
+
+    /**
+     * A button style is a theme's own slug just as a variant is, so it answers
+     * per site the same way once an article is published on several of them.
+     */
+    #[Test]
+    public function itResolvesTheStyleChosenForTheRenderedSite(): void
+    {
+        $siteA = [['slug' => 'primary'], ['slug' => 'ghost']];
+        $siteB = [['slug' => 'solid'], ['slug' => 'outline']];
+        $stored = ['_default' => 'ghost', 'site-b' => 'outline'];
+
+        self::assertSame('ghost', ButtonResolver::resolveSlug($stored, $siteA, 'site-a'));
+        self::assertSame('outline', ButtonResolver::resolveSlug($stored, $siteB, 'site-b'));
+        // site-b's theme does not define "ghost", so it takes its first button.
+        self::assertSame('solid', ButtonResolver::resolveSlug(['_default' => 'ghost'], $siteB, 'site-b'));
+    }
 }

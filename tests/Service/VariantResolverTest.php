@@ -105,6 +105,63 @@ final class VariantResolverTest extends TestCase
         self::assertSame('#000', $config['title']);
     }
 
+    /**
+     * An article published on two sites names a variant for each, and each
+     * site resolves it against its own theme.
+     */
+    #[Test]
+    public function itResolvesTheVariantChosenForTheRenderedSite(): void
+    {
+        $siteA = [['slug' => 'clair'], ['slug' => 'sombre']];
+        $siteB = [['slug' => 'neige'], ['slug' => 'nuit-noire']];
+        $stored = ['_default' => 'sombre', 'site-b' => 'nuit-noire'];
+
+        self::assertSame('sombre', VariantResolver::resolveSlug($stored, $siteA, 'site-a'));
+        self::assertSame('nuit-noire', VariantResolver::resolveSlug($stored, $siteB, 'site-b'));
+    }
+
+    /**
+     * The whole reason the fallback chain matters: a site the article never
+     * differentiated resolves the default slug against its own theme, which
+     * may not define it at all. Rendering unstyled would be worse than the
+     * first variant.
+     */
+    #[Test]
+    public function aSiteWithoutItsOwnChoiceFallsBackThroughItsOwnTheme(): void
+    {
+        $siteB = [['slug' => 'neige'], ['slug' => 'nuit-noire']];
+
+        self::assertSame('neige', VariantResolver::resolveSlug(['_default' => 'sombre'], $siteB, 'site-b'));
+    }
+
+    #[Test]
+    public function aScopedValueResolvesItsFullConfigToo(): void
+    {
+        $variants = [
+            ['slug' => 'neige', 'title' => '#111'],
+            ['slug' => 'nuit-noire', 'title' => '#fff'],
+        ];
+        $stored = ['_default' => 'sombre', 'site-b' => 'nuit-noire'];
+
+        $config = VariantResolver::resolveConfig($stored, $variants, 'site-b');
+
+        self::assertSame('nuit-noire', $config['slug']);
+        self::assertSame('#fff', $config['title']);
+    }
+
+    /**
+     * Rendering happens off-request too, in a command or a warm-up, where no
+     * site can be named.
+     */
+    #[Test]
+    public function withoutASiteAScopedValueTakesItsDefault(): void
+    {
+        $variants = [['slug' => 'clair'], ['slug' => 'sombre']];
+        $stored = ['_default' => 'sombre', 'site-b' => 'nuit-noire'];
+
+        self::assertSame('sombre', VariantResolver::resolveSlug($stored, $variants));
+    }
+
     #[Test]
     public function itSlugifiesAccentsAndSymbols(): void
     {
