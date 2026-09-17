@@ -274,7 +274,9 @@ services:
             - '@itech_world.sulu_tailwind_theme.icon_renderer'
             - '@?sulu_core.webspace.request_analyzer'
             - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
-            - '%itech_world_sulu_tailwind_theme.turnstile.site_key%'
+            # The site key is read per webspace: one project, several Cloudflare
+            # accounts.
+            - '@itech_world.sulu_tailwind_theme.webspace_settings'
             - '@request_stack'
             # Turnstile misconfigurations only show up once deployed, so they are
             # logged there rather than rendered on the page.

@@ -29,7 +29,7 @@
     },
     "suggest": {
         "sulu/form-bundle": "Required for SuluFormBundle integration in the form block (^3.0)",
-        "pixelopen/cloudflare-turnstile-bundle": "Required for the Cloudflare Turnstile form field (^0.5)",
+        "symfony/http-client": "Required to verify Cloudflare Turnstile tokens (^7.0)",
         "symfony/validator": "Required to handle a form submission with FormSubmissionHandler (^7.0)",
         "symfony/security-csrf": "Required to handle a form submission with FormSubmissionHandler (^7.0)"
     },

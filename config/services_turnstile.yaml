@@ -1,11 +1,43 @@
 services:
-    # Cloudflare Turnstile field for the SuluFormBundle form builder.
+    # Cloudflare Turnstile, imported from the bundle extension only when
+    # SuluFormBundle is installed and the feature is enabled.
     #
-    # Imported from the bundle extension only when SuluFormBundle AND
-    # pixelopen/cloudflare-turnstile-bundle are installed and the feature is
-    # enabled — the class type-hints both, so loading it unconditionally would
-    # break every project that does not use forms.
+    # The widget and the token check are the bundle's own rather than
+    # pixelopen/cloudflare-turnstile-bundle's: that one resolves its key pair
+    # when the container compiles, so a project serving several sites could
+    # only ever hold one Cloudflare account.
+
+    # Renders the challenge with the site key of the site being served.
+    itech_world.sulu_tailwind_theme.form.turnstile_type:
+        class: ItechWorld\SuluTailwindThemeBundle\Form\Type\TurnstileType
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.webspace_settings'
+            - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
+        tags:
+            - { name: 'form.type' }
+
+    # Verifies a token against the secret of that same site: crossing a site
+    # key with another site's secret rejects every visitor.
+    itech_world.sulu_tailwind_theme.turnstile_verifier:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\TurnstileVerifier
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.webspace_settings'
+            - '@http_client'
+            - '@?logger'
+
+    itech_world.sulu_tailwind_theme.turnstile_validator:
+        class: ItechWorld\SuluTailwindThemeBundle\Validator\TurnstileValidator
+        arguments:
+            - '@request_stack'
+            - '@itech_world.sulu_tailwind_theme.turnstile_verifier'
+            - '%itech_world_sulu_tailwind_theme.turnstile.enabled%'
+        tags:
+            - { name: 'validator.constraint_validator' }
+
+    # Offers the field in the Sulu form builder.
     itech_world.sulu_tailwind_theme.form.turnstile_field_type:
         class: ItechWorld\SuluTailwindThemeBundle\Form\Dynamic\TurnstileFieldType
         tags:
             - { name: 'sulu_form.dynamic.type', alias: 'turnstile' }
+
+    ItechWorld\SuluTailwindThemeBundle\Service\TurnstileVerifier: '@itech_world.sulu_tailwind_theme.turnstile_verifier'

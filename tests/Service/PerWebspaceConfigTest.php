@@ -70,6 +70,42 @@ final class PerWebspaceConfigTest extends TestCase
         ]]);
     }
 
+    #[Test]
+    public function itRefusesTurnstileEnabledWithoutKeys(): void
+    {
+        // A challenge without keys renders nothing and refuses every
+        // submission, so it has to be caught before the site is deployed.
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([[
+            'turnstile' => ['enabled' => true],
+        ]]);
+    }
+
+    #[Test]
+    public function aSiteOverridesItsTurnstileKeysAndNothingElse(): void
+    {
+        $config = $this->processConfig([[
+            'turnstile' => [
+                'enabled' => true,
+                'site_key' => 'project-key',
+                'secret_key' => 'project-secret',
+            ],
+            'webspaces' => [
+                'client-a' => ['turnstile' => ['site_key' => 'a-key', 'secret_key' => 'a-secret']],
+            ],
+        ]]);
+
+        $this->assertSame(
+            ['turnstile' => ['site_key' => 'a-key', 'secret_key' => 'a-secret']],
+            $config['webspaces']['client-a'],
+        );
+
+        // Whether the field exists at all is registered once for the whole
+        // admin, so a site cannot turn it on for itself.
+        $this->assertArrayNotHasKey('enabled', $config['webspaces']['client-a']['turnstile']);
+    }
+
     /**
      * Run raw config through the bundle's own definition.
      *

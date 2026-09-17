@@ -416,16 +416,14 @@ What can be overridden:
 |---|---|---|
 | `blocks.iframe.allowed_hosts` | yes | Read when the page renders, so each site answers for itself |
 | `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
+| `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
+| `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
 | `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
 | `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |
 
 ### Cloudflare Turnstile anti-spam field (optional, off by default)
 
 SuluFormBundle ships no active anti-spam protection: its honeypot defaults to `null` and its reCAPTCHA field only registers when the Google EWZ bundle is installed. This bundle adds an opt-in **Cloudflare Turnstile** field — free, privacy-friendly, and invisible for most visitors.
-
-```bash
-composer require pixelopen/cloudflare-turnstile-bundle
-```
 
 ```yaml
 itech_world_sulu_tailwind_theme:
@@ -437,9 +435,11 @@ itech_world_sulu_tailwind_theme:
 
 Editors then pick **Cloudflare Turnstile** in the form builder, in the *special* group. Submissions without a valid token are rejected server-side: no mail is sent and nothing is stored. The widget follows the block variant (light or dark) and the form locale on its own.
 
-This is the only place to configure it — the bundle forwards the credentials to `pixelopen/cloudflare-turnstile-bundle`. Left disabled, or with the package absent, nothing changes and the field is simply not offered.
+The widget, the field and the token verification are the bundle's own, so each site of a multi-site project can hold **its own Cloudflare account** — declare its key pair under [Per-site settings](#per-site-settings-multi-site-projects). A site that declares none uses the project pair. Keys stay in environment variables, never in the theme.
 
-> See **[Cloudflare Turnstile](doc/turnstile.md)** for the Cloudflare test keys, the appearance rules, and how to override the error message.
+Left disabled, nothing changes and the field is simply not offered. Enabled without declaring the keys stops the build rather than shipping a form that refuses every submission.
+
+> See **[Cloudflare Turnstile](doc/turnstile.md)** for the multi-site setup, the Cloudflare test keys, the appearance rules, and how to override the error message.
 
 ### Title editor buttons (optional)
 

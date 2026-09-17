@@ -21,6 +21,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
 use Psr\Log\LoggerInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -103,7 +104,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly IconRenderer $iconRenderer,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
         private readonly bool $turnstileEnabled = false,
-        private readonly ?string $turnstileSiteKey = null,
+        private readonly ?WebspaceSettings $webspaceSettings = null,
         private readonly ?RequestStack $requestStack = null,
         private readonly ?LoggerInterface $logger = null,
         private readonly bool $debug = false,
@@ -246,13 +247,15 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             return 'off';
         }
 
-        if (null === $this->turnstileSiteKey || '' === $this->turnstileSiteKey) {
-            $this->warnOnce('Cloudflare Turnstile is enabled but no site key is configured: no widget is rendered, while the server-side check still runs - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key.');
+        $siteKey = $this->resolveTurnstileSiteKey();
+
+        if (null === $siteKey) {
+            $this->warnOnce('Cloudflare Turnstile is enabled but no site key is configured for this site: no widget is rendered, while the server-side check still runs - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key, and its per-webspace override when the project serves several sites.');
 
             return 'missing_key';
         }
 
-        if (ItechWorldSuluTailwindThemeBundle::TURNSTILE_TEST_SITE_KEY === $this->turnstileSiteKey) {
+        if (ItechWorldSuluTailwindThemeBundle::TURNSTILE_TEST_SITE_KEY === $siteKey) {
             $this->warnOnce('Cloudflare Turnstile is enabled with the test site key, which validates every visitor: the challenge protects nothing. Set the real key in this environment.');
 
             return 'test_key';
@@ -285,8 +288,10 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      * Only for forms written in Twig template mode: the SuluFormBundle mode
      * gets its widget from a form field, which a hand-written form cannot use.
      * Without this, a project would have to declare the key a second time in
-     * its own configuration, next to the one this bundle already forwards to
-     * pixelopen - two places to keep in sync for one credential.
+     * its own configuration - two places to keep in sync for one credential.
+     *
+     * The key belongs to the site being served, so each site of a multi-site
+     * project renders the widget of its own Cloudflare account.
      *
      * The key is public by design, it ships in the HTML of every page carrying
      * the widget. The secret key is deliberately not exposed.
@@ -295,11 +300,23 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      */
     public function getTurnstileSiteKey(): ?string
     {
-        if (!$this->turnstileEnabled || null === $this->turnstileSiteKey || '' === $this->turnstileSiteKey) {
+        if (!$this->turnstileEnabled) {
             return null;
         }
 
-        return $this->turnstileSiteKey;
+        return $this->resolveTurnstileSiteKey();
+    }
+
+    /**
+     * The configured site key of the site being served, if any.
+     *
+     * @return string|null The site key, or null when this site has none
+     */
+    private function resolveTurnstileSiteKey(): ?string
+    {
+        $siteKey = $this->webspaceSettings?->get('turnstile.site_key');
+
+        return \is_string($siteKey) && '' !== $siteKey ? $siteKey : null;
     }
 
     /**

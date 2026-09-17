@@ -32,7 +32,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * offered there has to be readable through WebspaceSettings, and nothing
      * else should travel to it.
      */
-    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks'];
+    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks', 'turnstile'];
 
     /**
      * Extension alias of pixelopen/cloudflare-turnstile-bundle.
@@ -95,27 +95,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('turnstile')
-                    ->addDefaultsIfNotSet()
-                    ->info('Cloudflare Turnstile field for SuluFormBundle (requires pixelopen/cloudflare-turnstile-bundle)')
-                    ->children()
-                        ->booleanNode('enabled')
-                            ->defaultFalse()
-                            ->info('Offer the Turnstile field in the form builder and verify submitted tokens')
-                        ->end()
-                        ->scalarNode('site_key')
-                            ->defaultNull()
-                            ->info('Cloudflare site key (from env: %env(TURNSTILE_KEY)%)')
-                        ->end()
-                        ->scalarNode('secret_key')
-                            ->defaultNull()
-                            ->info('Cloudflare secret key (from env: %env(TURNSTILE_SECRET)%)')
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
             ->append($this->titleEditorNode(true))
             ->append($this->blocksNode(true))
+            ->append($this->turnstileNode(true))
             ->append($this->webspacesNode());
     }
 
@@ -154,6 +137,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             ->arrayPrototype()
                 ->append($this->titleEditorNode(false))
                 ->append($this->blocksNode(false))
+                ->append($this->turnstileNode(false))
             ->end();
 
         return $node;
@@ -305,6 +289,75 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
     }
 
     /**
+     * The `turnstile` node, as a project default or as a site override.
+     *
+     * A site overrides its key pair and nothing else. Whether the field exists
+     * at all stays project-wide: it decides whether the field type is
+     * registered in the form builder, which happens once for the whole admin.
+     *
+     * Keys stay where they are, in environment variables. The site key is
+     * public and already ships in the HTML, but the secret would otherwise end
+     * up in the database, in backups, and in the exported JSON of a theme.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `turnstile` node
+     */
+    private function turnstileNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('turnstile'))->getRootNode();
+
+        $node->info('Cloudflare Turnstile field for SuluFormBundle');
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $children = $node->children();
+
+        if ($withDefaults) {
+            $children->booleanNode('enabled')
+                ->defaultFalse()
+                ->info('Offer the Turnstile field in the form builder and verify submitted tokens. Project-wide: the field type is registered once for the whole admin.');
+        }
+
+        $siteKey = $children->scalarNode('site_key')
+            ->info('Cloudflare site key (from env: %env(TURNSTILE_KEY)%)');
+
+        $secretKey = $children->scalarNode('secret_key')
+            ->info('Cloudflare secret key (from env: %env(TURNSTILE_SECRET)%)');
+
+        if (!$withDefaults) {
+            return $node;
+        }
+
+        $siteKey->defaultNull();
+        $secretKey->defaultNull();
+
+        // Enabled without keys renders no widget while still refusing every
+        // submission, which reads as a broken form rather than a misconfigured
+        // one. It used to be caught by pixelopen, whose keys were required, and
+        // dropping that package would have dropped the guard with it.
+        //
+        // This sees the raw value, so `%env(TURNSTILE_KEY)%` always passes: the
+        // guard is against forgetting to declare the keys, not against an empty
+        // environment variable. That one surfaces at runtime as the
+        // `missing_key` status.
+        $node->validate()
+            ->ifTrue(static fn (array $turnstile): bool => ($turnstile['enabled'] ?? false)
+                && (null === ($turnstile['site_key'] ?? null) || null === ($turnstile['secret_key'] ?? null)))
+            ->thenInvalid(
+                'Cloudflare Turnstile is enabled but "site_key" and "secret_key" are not both configured '
+                . 'under "itech_world_sulu_tailwind_theme.turnstile". A challenge without keys renders '
+                . 'nothing and refuses every submission.',
+            )
+        ->end();
+
+        return $node;
+    }
+
+    /**
      * The code block opt-in. Project-wide only, never per site.
      *
      * @return ArrayNodeDefinition The `code` node
@@ -359,8 +412,9 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             ]);
         }
 
-        // Feed the Turnstile credentials to pixelopen from this bundle's own
-        // config, so a project has a single place to configure the feature.
+        // The bundle no longer uses pixelopen/cloudflare-turnstile-bundle, but a
+        // project may still have it installed. Keep feeding it credentials so
+        // its presence alone cannot stop the container from compiling.
         $this->prependTurnstileConfig($builder);
 
         // Register Doctrine ORM mapping for this bundle's entities
@@ -566,9 +620,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
 
         $container->import('../config/services.yaml');
 
-        // The Turnstile field bridges two optional bundles: it is only usable
-        // when both are present and the project opted in. Missing either one
-        // must leave the app booting normally, simply without the field.
+        // The Turnstile field rides on SuluFormBundle, which is optional: it is
+        // only usable when that bundle is present and the project opted in.
+        // Its absence must leave the app booting normally, simply without the
+        // field.
         //
         // Registration is checked against kernel.bundles rather than
         // class_exists(): a package can sit in vendor/ (so its classes
@@ -581,7 +636,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
     }
 
     /**
-     * Whether both bundles backing the Turnstile field are registered.
+     * Whether the bundle backing the Turnstile field is registered.
      *
      * @param ContainerBuilder $builder The container builder
      *
@@ -595,19 +650,27 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             return false;
         }
 
-        return \array_key_exists('SuluFormBundle', $bundles)
-            && \array_key_exists('PixelOpenCloudflareTurnstileBundle', $bundles);
+        return \array_key_exists('SuluFormBundle', $bundles);
     }
 
     /**
-     * Prepend the Turnstile credentials into pixelopen's extension.
+     * Prepend the Turnstile credentials into pixelopen's extension, if present.
      *
-     * That bundle requires `key` and `secret` to be set and non-empty, so
-     * installing it without configuring it prevents the container from
-     * compiling at all. Prepending keeps a project's own
-     * config/packages/pixel_open_cloudflare_turnstile.yaml authoritative (a
-     * prepended value always loses against an explicitly configured one) while
-     * making this bundle's `turnstile` node enough on its own.
+     * Nothing in this bundle depends on that package any more: the widget, the
+     * token check and the key pair are all resolved here, per site, which it
+     * cannot express. It is only handled because a project that installed it
+     * for the previous version - or for anything else - must keep booting: the
+     * package requires `key` and `secret` to be set and non-empty, so having it
+     * in vendor/ without configuring it prevents the container from compiling
+     * at all.
+     *
+     * Prepending keeps a project's own
+     * config/packages/pixel_open_cloudflare_turnstile.yaml authoritative: a
+     * prepended value always loses against an explicitly configured one.
+     *
+     * Only the project-wide pair travels here. A per-site override cannot: the
+     * package holds one pair for the whole application, which is the very
+     * limitation that made the bundle take the feature over.
      *
      * @param ContainerBuilder $builder The container builder
      */

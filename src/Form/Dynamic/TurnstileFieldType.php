@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Form\Dynamic;
 
-use PixelOpen\CloudflareTurnstileBundle\Type\TurnstileType;
-use PixelOpen\CloudflareTurnstileBundle\Validator\CloudflareTurnstile;
+use ItechWorld\SuluTailwindThemeBundle\Form\Type\TurnstileType;
+use ItechWorld\SuluTailwindThemeBundle\Validator\Turnstile;
 use Sulu\Bundle\FormBundle\Dynamic\FormFieldTypeConfiguration;
 use Sulu\Bundle\FormBundle\Dynamic\FormFieldTypeInterface;
 use Sulu\Bundle\FormBundle\Entity\FormField;
@@ -14,10 +14,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * Makes Cloudflare Turnstile selectable in Sulu's dynamic form builder.
  *
- * The bundle only bridges two worlds: the widget and the server-side token
- * check both come from pixelopen/cloudflare-turnstile-bundle, and the admin
- * side comes from SuluFormBundle. The service is registered only when both are
- * installed and the feature is enabled, so this class is never loaded otherwise.
+ * The admin side comes from SuluFormBundle. The widget and the token check are
+ * the bundle's own, because both have to answer for the site being served: the
+ * key pair is resolved per webspace, and a token only ever validates against
+ * the secret of the pair that issued it. The service is registered only when
+ * SuluFormBundle is installed and the feature is enabled, so this class is
+ * never loaded otherwise.
  *
  * @see \ItechWorld\SuluTailwindThemeBundle\ItechWorldSuluTailwindThemeBundle::loadExtension()
  */
@@ -25,11 +27,6 @@ class TurnstileFieldType implements FormFieldTypeInterface
 {
     /**
      * Violation message key, resolved in the `validators` domain.
-     *
-     * The bundle ships its own key instead of overriding pixelopen's
-     * `invalid_turnstile`: overriding another bundle's catalog entry depends on
-     * bundle registration order, and its French default ("Merci de cocher la
-     * case") describes a checkbox Turnstile usually does not show.
      */
     public const VIOLATION_MESSAGE = 'iw_sulu_tailwind_theme.turnstile_failed';
 
@@ -75,7 +72,7 @@ class TurnstileFieldType implements FormFieldTypeInterface
         // widget renders no input of its own, Cloudflare posts the token as a
         // separate `cf-turnstile-response` parameter, so NotBlank could never
         // pass and would make the form permanently unsubmittable.
-        $constraint = new CloudflareTurnstile();
+        $constraint = new Turnstile();
         $constraint->message = self::VIOLATION_MESSAGE;
 
         $options['constraints'] = [$constraint];
