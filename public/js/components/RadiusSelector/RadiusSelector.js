@@ -99,12 +99,13 @@ export default class RadiusSelector extends React.Component {
      * (default_value mode only). Uses setTimeout to ensure the Sulu form is
      * fully initialized before calling onChange, which avoids race conditions
      * with form state setup. In theme_key (adaptive) mode the field is left
-     * empty on purpose and the webspace theme config is loaded instead.
+     * empty on purpose, and the value it displays comes from the theme of the
+     * webspace being edited.
      */
     componentDidMount() {
-        if (this.getThemeKey()) {
-            this.syncWebspaceTheme();
+        themeConfigStore.ensureCurrentWebspace();
 
+        if (this.getThemeKey()) {
             return;
         }
 
@@ -120,9 +121,7 @@ export default class RadiusSelector extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this.getThemeKey()) {
-            this.syncWebspaceTheme();
-        }
+        themeConfigStore.ensureCurrentWebspace();
     }
 
     /**
@@ -134,18 +133,6 @@ export default class RadiusSelector extends React.Component {
         const {schemaOptions} = this.props;
 
         return (schemaOptions && schemaOptions.theme_key && schemaOptions.theme_key.value) || null;
-    }
-
-    /**
-     * Detect the current webspace from the URL hash and ensure
-     * the theme config store has the correct data loaded.
-     */
-    syncWebspaceTheme() {
-        const hash = window.location.hash || '';
-        const match = hash.match(/\/webspaces\/([^/]+)/);
-        if (match) {
-            themeConfigStore.ensureWebspace(match[1]);
-        }
     }
 
     @action setButtonRef = (ref) => {

@@ -73,7 +73,7 @@ export default class VariantPicker extends React.Component {
     state = {palette: null};
 
     componentDidMount() {
-        this._syncWebspaceTheme();
+        themeConfigStore.ensureCurrentWebspace();
 
         // Colors edited in the palette tab of the same form are not saved yet,
         // and the variants reference them, so the wireframes need the form
@@ -95,19 +95,7 @@ export default class VariantPicker extends React.Component {
     }
 
     componentDidUpdate() {
-        this._syncWebspaceTheme();
-    }
-
-    /**
-     * Detect the current webspace from the URL hash and ensure
-     * the theme config store has the correct data loaded.
-     */
-    _syncWebspaceTheme() {
-        const hash = window.location.hash || '';
-        const match = hash.match(/\/webspaces\/([^/]+)/);
-        if (match) {
-            themeConfigStore.ensureWebspace(match[1]);
-        }
+        themeConfigStore.ensureCurrentWebspace();
     }
 
     /**

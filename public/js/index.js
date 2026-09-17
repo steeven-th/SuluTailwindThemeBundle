@@ -48,6 +48,15 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     if (config) {
         // Apply initial theme data to the observable store
         themeConfigStore.update(config);
+
+        // What just landed is the project-wide config, so it carries the theme
+        // of the default webspace. On a multi-site project that is the wrong
+        // site the moment another one is being edited - and this hook runs
+        // again after every theme save. Mark the store stale and let the
+        // edited site's theme be fetched over it.
+        themeConfigStore.invalidate();
+        themeConfigStore.ensureCurrentWebspace();
+
         StylePicker.blockStyles = config.blockStyles || {};
         ArticleStylePicker.articleStyles = config.articleStyles || {};
         collapsibleSections.init(config.collapsibleSections || {});
@@ -60,6 +69,11 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     if (initialized) {
         return;
     }
+
+    // Follow the admin navigation for the rest of the session, so moving from
+    // one site to another reloads the theme even for a field that never thought
+    // to ask - and for the ones added later.
+    themeConfigStore.watchNavigation();
 
     viewRegistry.add('iw_sulu_tailwind_theme.webspace_theme_form', WebspaceThemeForm);
 
