@@ -380,6 +380,10 @@ services:
     # ─── Article discovery services (F2) ─────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService: ~
 
+    # Restricts a listing to the site being visited, which the Sulu article
+    # repository cannot express on its own.
+    ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository: ~
+
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleListingResolver: ~
 
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleFacetsService: ~

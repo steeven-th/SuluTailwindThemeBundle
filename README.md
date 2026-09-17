@@ -505,7 +505,7 @@ The **Filters** button has its own button-style picker under **Articles > Filter
 >
 > The index then stays up to date automatically as articles are published/unpublished. Category and tag filtering work without reindexing (they query the database directly).
 >
-> _Single-webspace note:_ article filtering targets the database directly and does not constrain by webspace. In a multi-webspace setup sharing the same articles, the listing is not scoped per webspace.
+> _Multi-webspace:_ a listing shows the articles of the site it is displayed on — the ones whose **main webspace** is that site, plus those listing it among their **additional webspaces** (article **Settings > Webspace**). Nothing to configure: the page takes the site it is served from.
 
 #### Site-wide components
 

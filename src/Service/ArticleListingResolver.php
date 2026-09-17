@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository;
 use Sulu\Article\Domain\Repository\ArticleRepositoryInterface;
 use Sulu\Content\Application\ContentManager\ContentManagerInterface;
 use Sulu\Content\Application\ContentResolver\ContentResolverInterface;
@@ -51,6 +52,7 @@ final class ArticleListingResolver
         private readonly ContentManagerInterface $contentManager,
         private readonly ContentResolverInterface $contentResolver,
         private readonly ArticleSearchService $articleSearchService,
+        private readonly WebspaceArticleRepository $webspaceArticleRepository,
     ) {
     }
 
@@ -160,6 +162,14 @@ final class ArticleListingResolver
      * smart_content "limit results" behaviour (the scope itself is bounded), and
      * the visitor paginates within the resulting set in stage 2.
      *
+     * The scope is also bounded by the site being visited: on a multi-site
+     * project an article belongs to one webspace (plus the additional ones it
+     * was given), and the listing of a site has no business showing the
+     * articles of its neighbour. That filter has to happen here, before the cap
+     * and the pagination of stage 2, which is why it goes through
+     * {@see WebspaceArticleRepository} rather than the Sulu repository — the
+     * latter knows nothing about webspaces.
+     *
      * @param array<string, mixed> $request
      *
      * @return string[] Scope UUIDs ordered by the admin default sort
@@ -199,10 +209,13 @@ final class ArticleListingResolver
             $filters['limit'] = (int) $limitResult;
         }
 
-        return array_values(iterator_to_array(
-            $this->articleRepository->findIdentifiersBy($filters, $baseSort),
-            false,
-        ));
+        $webspaceKey = $request['webspaceKey'] ?? null;
+
+        return $this->webspaceArticleRepository->findIdentifiersBy(
+            $filters,
+            $baseSort,
+            \is_string($webspaceKey) ? $webspaceKey : null,
+        );
     }
 
     /**
