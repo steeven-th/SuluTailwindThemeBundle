@@ -29,6 +29,8 @@ class ThemeConfigStore {
     @observable borders: Object = {};
     /** Site-wide block defaults, so a field can name the value it follows. */
     @observable defaults: Object = {};
+    /** Which buttons the title editor offers, per context, for this site. */
+    @observable titleEditor: Object = {};
 
     /** Track the currently loaded webspace to avoid redundant fetches */
     _currentWebspace: ?string = null;
@@ -46,6 +48,7 @@ class ThemeConfigStore {
         this.colors = data.colors || [];
         this.borders = data.borders || {};
         this.defaults = data.defaults || {};
+        this.titleEditor = data.titleEditor || {};
     }
 
     /**

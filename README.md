@@ -356,6 +356,8 @@ itech_world_sulu_tailwind_theme:
 
 An entry also covers its subdomains (`example.com` matches `widget.example.com`), matching whole labels only — `evil-example.com` does **not** match `example.com`. A URL outside the list simply renders nothing. Leave the list empty (the default) to allow any `https` host.
 
+On a multi-site project each site can pin its own providers — see [Per-site settings](#per-site-settings-multi-site-projects).
+
 ### Code block: allowing unsandboxed execution (optional, off by default)
 
 The code block lets editors paste a third-party widget. By default that markup always runs inside a sandboxed iframe: it can execute its own scripts, but cannot reach the page's DOM, cookies, or your admin session.
@@ -374,6 +376,48 @@ This does not disable the sandbox; it makes a *Run without isolation* checkbox a
 > ⚠️ **Understand what this grants.** Sulu has no per-block permission: anyone who can edit a page can use the block. With this enabled, an editor can execute arbitrary JavaScript on the public site — and, because Sulu's preview renders pages in a same-origin iframe, in the browser of any administrator who previews that page. In effect, every page editor becomes an administrator of the site. Read **[Code block security](doc/code-block-security.md)** before turning it on.
 >
 > Turning it back to `false` is an immediate, safe rollback: a stored `unsandboxed` value is ignored without the opt-in, so every existing block returns to the sandbox with no migration.
+
+> This one setting stays **project-wide** and cannot be set per site. Block templates are registered once for the whole admin, so opening it for one site would ship the checkbox to every site's forms — and a checkbox that does nothing on the page you are editing is worse than no checkbox. If a single site of the project must not have it, leave it off everywhere.
+
+### Per-site settings (multi-site projects)
+
+Bundle configuration is resolved once for the whole project, which is right for most settings and wrong for a few: the providers one site embeds have nothing to do with its neighbour's, and two sites with different style guides do not open the same editorial freedoms.
+
+A `webspaces` table overrides settings for one site, keyed by webspace key:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    # Project-wide values, used by every site that does not override them
+    title_editor:
+        blocks:
+            highlight: true
+            color: true
+    blocks:
+        iframe:
+            allowed_hosts: ['www.youtube.com']
+
+    webspaces:
+        client-a:
+            blocks:
+                iframe:
+                    allowed_hosts: ['calendly.com']   # this site embeds Calendly, not YouTube
+            title_editor:
+                blocks:
+                    color: false                      # stricter style guide on this site
+```
+
+**A site names only what it changes.** Above, `client-a` keeps `title_editor.blocks.highlight: true` from the project, because it never mentioned it. Anything absent falls through, so adding this table changes nothing for the sites that are not listed, and a single-site project never writes it.
+
+**A list is replaced, not merged.** `client-a` above allows Calendly and *not* YouTube. An allowlist that quietly gained entries from the project would be an allowlist nobody wrote.
+
+What can be overridden:
+
+| Setting | Per site | Why |
+|---|---|---|
+| `blocks.iframe.allowed_hosts` | yes | Read when the page renders, so each site answers for itself |
+| `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
+| `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
+| `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |
 
 ### Cloudflare Turnstile anti-spam field (optional, off by default)
 
@@ -413,6 +457,8 @@ itech_world_sulu_tailwind_theme:
 ```
 
 Those are the defaults, so leaving this out changes nothing. Values merge key by key: setting only `blocks.color` leaves the rest alone.
+
+Two sites of one project can open different editorial freedoms — see [Per-site settings](#per-site-settings-multi-site-projects). An article form reads the project-wide values, since an article is attached to a site in its own settings rather than at creation.
 
 > See **[Title editor](doc/title-editor.md)** for the stored syntax, the per-field XML override, and the CSS classes behind it.
 

@@ -24,14 +24,20 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
  *         blocks:
  *             iframe:
  *                 allowed_hosts: ['www.youtube.com', 'calendly.com']
+ *
+ * The list is read for the site being served, so a project running several
+ * sites gives each one its own providers rather than the union of everyone's —
+ * see {@see WebspaceSettings}.
  */
 class EmbedUrlValidator
 {
     /**
-     * @param list<string> $allowedHosts Hosts the block may embed; empty allows any host
+     * Where the allowlist is read: per site, at request time.
      */
+    private const SETTING = 'blocks.iframe.allowed_hosts';
+
     public function __construct(
-        private readonly array $allowedHosts = [],
+        private readonly WebspaceSettings $settings,
     ) {
     }
 
@@ -95,13 +101,15 @@ class EmbedUrlValidator
      */
     private function isHostAllowed(string $host): bool
     {
-        if ([] === $this->allowedHosts) {
+        $allowedHosts = $this->settings->get(self::SETTING);
+
+        if (!\is_array($allowedHosts) || [] === $allowedHosts) {
             return true;
         }
 
         $host = strtolower(rtrim($host, '.'));
 
-        foreach ($this->allowedHosts as $allowed) {
+        foreach ($allowedHosts as $allowed) {
             $allowed = strtolower(trim($allowed));
 
             if ('' === $allowed) {

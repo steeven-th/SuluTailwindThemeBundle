@@ -199,10 +199,20 @@ services:
         tags:
             - { name: 'kernel.event_subscriber' }
 
+    # The bundle settings as they stand for the site being served. A setting a
+    # site did not override reads exactly like before, so a single-site project
+    # never meets this service.
+    itech_world.sulu_tailwind_theme.webspace_settings:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings
+        arguments:
+            - '%itech_world_sulu_tailwind_theme.settings%'
+            - '%itech_world_sulu_tailwind_theme.settings_by_webspace%'
+            - '@?sulu_core.webspace.request_analyzer'
+
     itech_world.sulu_tailwind_theme.embed_url_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator
         arguments:
-            - '%itech_world_sulu_tailwind_theme.blocks.iframe.allowed_hosts%'
+            - '@itech_world.sulu_tailwind_theme.webspace_settings'
 
     itech_world.sulu_tailwind_theme.code_block_policy:
         class: ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy
@@ -406,6 +416,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler: '@itech_world.sulu_tailwind_theme.form_submission_handler'
     ItechWorld\SuluTailwindThemeBundle\Form\RequestDataMapper: '@itech_world.sulu_tailwind_theme.request_data_mapper'
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
+    ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings: '@itech_world.sulu_tailwind_theme.webspace_settings'
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
     ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'

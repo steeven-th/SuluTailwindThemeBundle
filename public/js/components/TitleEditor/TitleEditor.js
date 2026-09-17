@@ -6,6 +6,7 @@ import Button from 'sulu-admin-bundle/components/Button';
 import Popover from 'sulu-admin-bundle/components/Popover';
 import TextArea from 'sulu-admin-bundle/components/TextArea';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
+import themeConfigStore from '../../stores/themeConfigStore';
 
 /**
  * A marker, with an optional palette color prefix.
@@ -191,19 +192,18 @@ export function classifySelection(value: string, start: number, end: number): Ob
  * - `color`     same, for the palette button
  *
  * Which buttons show up is resolved in three steps, most specific first: an
- * explicit XML param, then the project's `title_editor` config for the
- * declared context, then the shipped default. A project that configures
- * nothing keeps the behavior it had.
+ * explicit XML param, then the `title_editor` config for the declared context,
+ * then the shipped default. A project that configures nothing keeps the
+ * behavior it had.
+ *
+ * That config is read for the site being edited, so two sites of one project
+ * can open different editorial freedoms. It arrives through the same store as
+ * the rest of the per-site config. An article form names no site - an article
+ * is attached to one in its own settings, later - so it reads the
+ * project-wide values.
  */
 @observer
 class TitleEditor extends React.Component<*> {
-    /**
-     * Per-context button defaults, from the project's YAML config.
-     *
-     * Filled once at boot by the admin config hook (see index.js). Empty when a
-     * project runs an older config: SHIPPED_DEFAULTS then applies.
-     */
-    static contextDefaults: Object = {};
 
     containerRef: ?HTMLElement = null;
 
@@ -228,6 +228,9 @@ class TitleEditor extends React.Component<*> {
     }
 
     componentDidMount() {
+        // The buttons offered here belong to the site being edited.
+        themeConfigStore.ensureCurrentWebspace();
+
         ensureStyles();
 
         const textarea = this.textarea;
@@ -428,7 +431,7 @@ class TitleEditor extends React.Component<*> {
 
         const context = schemaOptions?.context?.value || 'blocks';
         const shipped = SHIPPED_DEFAULTS[context] || SHIPPED_DEFAULTS.blocks;
-        const configured = TitleEditor.contextDefaults[context] || {};
+        const configured = themeConfigStore.titleEditor[context] || {};
 
         const showHighlight = boolOption(
             schemaOptions,

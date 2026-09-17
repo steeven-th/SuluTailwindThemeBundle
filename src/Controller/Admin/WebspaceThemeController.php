@@ -10,6 +10,7 @@ use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Security\SecuredControllerInterface;
@@ -40,6 +41,7 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
         private readonly ThemeCompiler $compiler,
         private readonly SecurityCheckerInterface $securityChecker,
         private readonly ThemeConfigResolver $themeConfigResolver,
+        private readonly WebspaceSettings $webspaceSettings,
     ) {
     }
 
@@ -168,6 +170,8 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
      *
      * Called by the admin JS when the user switches webspace in the page editor,
      * so that VariantPicker and ButtonStylePicker show the correct theme data.
+     * It also carries the per-site settings the admin fields need, which is why
+     * the response is not only the theme.
      *
      * @param Request $request The HTTP request (expects ?webspace=xxx)
      *
@@ -188,7 +192,13 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
 
         $theme = $this->webspaceThemeRepository->findThemeForWebspace($webspaceKey);
 
-        return new JsonResponse($this->themeConfigResolver->resolve($theme));
+        // Settings that are not part of the theme but still differ per site
+        // ride along: the fields asking for them are the very fields already
+        // waiting for this response, and one request beats two.
+        return new JsonResponse(\array_merge(
+            $this->themeConfigResolver->resolve($theme),
+            ['titleEditor' => $this->webspaceSettings->get('title_editor', $webspaceKey)],
+        ));
     }
 
     /**

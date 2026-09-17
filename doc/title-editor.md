@@ -121,6 +121,23 @@ Those are the defaults, so **a project that configures nothing keeps the shipped
 behavior**. Values merge key by key: setting only `blocks.color` leaves
 everything else untouched.
 
+On a multi-site project, a site can open different freedoms from its neighbour:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    webspaces:
+        client-a:
+            title_editor:
+                blocks:
+                    color: false
+```
+
+The field reads the settings of the site being edited, which it takes from the
+admin URL. A **page** form names its site, so it gets that site's settings. An
+**article** form does not: an article is attached to a site in its own settings
+tab, long after it was created, so the field falls back to the project-wide
+values there.
+
 Two contexts:
 
 | Context | Covers | Why that default |

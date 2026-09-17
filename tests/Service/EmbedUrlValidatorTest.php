@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator;
+use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,7 +17,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itAcceptsAPlainHttpsUrl(): void
     {
-        $validator = new EmbedUrlValidator();
+        $validator = $this->createValidator();
 
         self::assertSame(
             'https://calendly.com/demo?hide_gdpr_banner=1',
@@ -27,7 +28,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itTrimsSurroundingWhitespace(): void
     {
-        $validator = new EmbedUrlValidator();
+        $validator = $this->createValidator();
 
         self::assertSame('https://example.com/widget', $validator->validate('  https://example.com/widget  '));
     }
@@ -40,7 +41,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[DataProvider('provideDangerousOrInvalidUrls')]
     public function itRejectsDangerousOrInvalidUrls(string $url, string $why): void
     {
-        $validator = new EmbedUrlValidator();
+        $validator = $this->createValidator();
 
         self::assertNull($validator->validate($url), $why);
     }
@@ -69,7 +70,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itAllowsAnyHostWhenNoAllowlistIsConfigured(): void
     {
-        $validator = new EmbedUrlValidator();
+        $validator = $this->createValidator();
 
         self::assertSame('https://anything.example/x', $validator->validate('https://anything.example/x'));
     }
@@ -77,7 +78,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itAcceptsAHostOnTheAllowlist(): void
     {
-        $validator = new EmbedUrlValidator(['calendly.com', 'www.youtube.com']);
+        $validator = $this->createValidator(['calendly.com', 'www.youtube.com']);
 
         self::assertSame('https://calendly.com/demo', $validator->validate('https://calendly.com/demo'));
         self::assertSame('https://www.youtube.com/embed/x', $validator->validate('https://www.youtube.com/embed/x'));
@@ -86,7 +87,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itAcceptsASubdomainOfAnAllowedHost(): void
     {
-        $validator = new EmbedUrlValidator(['example.com']);
+        $validator = $this->createValidator(['example.com']);
 
         self::assertSame('https://widget.example.com/x', $validator->validate('https://widget.example.com/x'));
     }
@@ -94,7 +95,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itRejectsAHostOutsideTheAllowlist(): void
     {
-        $validator = new EmbedUrlValidator(['example.com']);
+        $validator = $this->createValidator(['example.com']);
 
         self::assertNull($validator->validate('https://evil.test/x'));
     }
@@ -106,7 +107,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itRejectsAHostThatMerelySuffixMatchesAnAllowedHost(): void
     {
-        $validator = new EmbedUrlValidator(['example.com']);
+        $validator = $this->createValidator(['example.com']);
 
         self::assertNull($validator->validate('https://evil-example.com/x'));
     }
@@ -118,7 +119,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itNormalisesATrailingDotInTheHost(): void
     {
-        $validator = new EmbedUrlValidator(['example.com']);
+        $validator = $this->createValidator(['example.com']);
 
         self::assertSame('https://example.com./x', $validator->validate('https://example.com./x'));
     }
@@ -126,7 +127,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itMatchesTheAllowlistCaseInsensitively(): void
     {
-        $validator = new EmbedUrlValidator(['Example.COM']);
+        $validator = $this->createValidator(['Example.COM']);
 
         self::assertSame('https://WWW.EXAMPLE.com/x', $validator->validate('https://WWW.EXAMPLE.com/x'));
     }
@@ -134,7 +135,7 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itIgnoresEmptyAllowlistEntries(): void
     {
-        $validator = new EmbedUrlValidator(['', '  ', 'example.com']);
+        $validator = $this->createValidator(['', '  ', 'example.com']);
 
         self::assertNull($validator->validate('https://evil.test/x'));
         self::assertSame('https://example.com/x', $validator->validate('https://example.com/x'));
@@ -143,8 +144,22 @@ final class EmbedUrlValidatorTest extends TestCase
     #[Test]
     public function itHandlesANullUrl(): void
     {
-        $validator = new EmbedUrlValidator();
+        $validator = $this->createValidator();
 
         self::assertNull($validator->validate(null));
+    }
+
+    /**
+     * A validator reading the allowlist of the site being served.
+     *
+     * @param list<string> $allowedHosts Hosts the iframe block may embed
+     *
+     * @return EmbedUrlValidator The validator under test
+     */
+    private function createValidator(array $allowedHosts = []): EmbedUrlValidator
+    {
+        return new EmbedUrlValidator(new WebspaceSettings([
+            'blocks' => ['iframe' => ['allowed_hosts' => $allowedHosts]],
+        ]));
     }
 }

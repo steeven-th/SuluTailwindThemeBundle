@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle;
 
 use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -22,6 +24,15 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * Available article template type keys.
      */
     private const ARTICLE_TYPES = ['news', 'event', 'blog_post'];
+
+    /**
+     * Settings a site may override, and the only ones.
+     *
+     * Keeps the `webspaces` node and the resolved settings in step: a section
+     * offered there has to be readable through WebspaceSettings, and nothing
+     * else should travel to it.
+     */
+    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks'];
 
     /**
      * Extension alias of pixelopen/cloudflare-turnstile-bundle.
@@ -102,66 +113,217 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('title_editor')
-                    ->addDefaultsIfNotSet()
-                    ->info('Which buttons the title editor field offers, per context. Defaults reproduce the shipped behavior, so leaving this out changes nothing.')
-                    ->children()
-                        ->arrayNode('blocks')
-                            ->addDefaultsIfNotSet()
-                            ->info('Block headings. Their accent color comes from the block variant, so the palette button is off by default.')
-                            ->children()
-                                ->booleanNode('highlight')
-                                    ->defaultTrue()
-                                    ->info('Offer the highlight button, which colors the selection with the variant highlight color')
-                                ->end()
-                                ->booleanNode('color')
-                                    ->defaultFalse()
-                                    ->info('Offer the palette button, letting an editor pick an explicit color per word')
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('pages')
-                            ->addDefaultsIfNotSet()
-                            ->info('Page hero titles and article subtitles. They sit outside any variant, so the palette button is on by default.')
-                            ->children()
-                                ->booleanNode('highlight')
-                                    ->defaultFalse()
-                                    ->info('Offer the highlight button')
-                                ->end()
-                                ->booleanNode('color')
-                                    ->defaultTrue()
-                                    ->info('Offer the palette button')
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-                ->arrayNode('blocks')
-                    ->addDefaultsIfNotSet()
-                    ->info('Per-block security settings')
-                    ->children()
-                        ->arrayNode('iframe')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('allowed_hosts')
-                                    ->defaultValue([])
-                                    ->scalarPrototype()->end()
-                                    ->info('Hosts the iframe block may embed (an entry also covers its subdomains). Empty allows any https host.')
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('code')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->booleanNode('allow_unsandboxed')
-                                    ->defaultFalse()
-                                    ->info('Expose a per-block checkbox letting editors run pasted markup directly in the page. Makes anyone able to edit a page able to execute JavaScript on the site, including in the admin preview. Leave false unless every editor is trusted at administrator level.')
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
+            ->end()
+            ->append($this->titleEditorNode(true))
+            ->append($this->blocksNode(true))
+            ->append($this->webspacesNode());
+    }
+
+    /**
+     * Per-site overrides of the settings that may legitimately differ.
+     *
+     * One project serves several sites, and a setting written for the project
+     * is not always right for each of them: the hosts one site embeds have
+     * nothing to do with its neighbour's, and two sites with different style
+     * guides do not open the same editorial freedoms.
+     *
+     * A site names only what it changes, everything else falling back to the
+     * project-wide value above, so a single-site project never writes this key
+     * and nothing changes for it.
+     *
+     * Not everything is overridable, deliberately. `blocks.code.allow_unsandboxed`
+     * decides whether an editor may run pasted markup straight in the page, and
+     * it stays a project-wide decision: opening it for one site would mean
+     * shipping the checkbox to the whole admin, and a checkbox that does
+     * nothing on the site you are editing is worse than no checkbox.
+     *
+     * @return ArrayNodeDefinition The `webspaces` node
+     */
+    private function webspacesNode(): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('webspaces'))->getRootNode();
+
+        $node
+            ->info('Per-webspace overrides, keyed by webspace key. A site inherits every setting it does not name.')
+            ->useAttributeAsKey('webspace')
+            // Keys here are webspace keys, and Symfony would otherwise turn
+            // "client-a" into "client_a" - a site that then matches nothing,
+            // silently, since an unknown key simply falls back to the project.
+            ->normalizeKeys(false)
+            ->arrayPrototype()
+                ->append($this->titleEditorNode(false))
+                ->append($this->blocksNode(false))
+            ->end();
+
+        return $node;
+    }
+
+    /**
+     * The `title_editor` node, as a project default or as a site override.
+     *
+     * The two differ on one point, and it matters: an override must carry no
+     * defaults at all. A node filled with defaults cannot say "I did not touch
+     * this", so merging it over the project config would silently reset every
+     * setting the site did not name.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `title_editor` node
+     */
+    private function titleEditorNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('title_editor'))->getRootNode();
+
+        $node->info('Which buttons the title editor field offers, per context. Defaults reproduce the shipped behavior, so leaving this out changes nothing.');
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $node->append($this->titleEditorContextNode(
+            'blocks',
+            $withDefaults,
+            highlightDefault: true,
+            colorDefault: false,
+            info: 'Block headings. Their accent color comes from the block variant, so the palette button is off by default.',
+        ));
+
+        $node->append($this->titleEditorContextNode(
+            'pages',
+            $withDefaults,
+            highlightDefault: false,
+            colorDefault: true,
+            info: 'Page hero titles and article subtitles. They sit outside any variant, so the palette button is on by default.',
+        ));
+
+        return $node;
+    }
+
+    /**
+     * One context of the title editor: the buttons it offers there.
+     *
+     * @param string $name             Context name, `blocks` or `pages`
+     * @param bool   $withDefaults     Whether the node carries the shipped defaults
+     * @param bool   $highlightDefault Shipped value of the highlight button
+     * @param bool   $colorDefault     Shipped value of the palette button
+     * @param string $info             What this context covers
+     *
+     * @return ArrayNodeDefinition The context node
+     */
+    private function titleEditorContextNode(
+        string $name,
+        bool $withDefaults,
+        bool $highlightDefault,
+        bool $colorDefault,
+        string $info,
+    ): ArrayNodeDefinition {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder($name))->getRootNode();
+
+        $node->info($info);
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $children = $node->children();
+
+        $highlight = $children->booleanNode('highlight')
+            ->info('Offer the highlight button, which colors the selection with the variant highlight color');
+
+        $color = $children->booleanNode('color')
+            ->info('Offer the palette button, letting an editor pick an explicit color per word');
+
+        if ($withDefaults) {
+            $highlight->defaultValue($highlightDefault);
+            $color->defaultValue($colorDefault);
+        }
+
+        return $node;
+    }
+
+    /**
+     * The `blocks` node, as a project default or as a site override.
+     *
+     * An override carries the iframe allowlist only: see webspacesNode() for
+     * why the code block opt-in stays project-wide.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `blocks` node
+     */
+    private function blocksNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('blocks'))->getRootNode();
+
+        $node->info('Per-block security settings');
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $node->append($this->iframeBlockNode($withDefaults));
+
+        if ($withDefaults) {
+            $node->append($this->codeBlockNode());
+        }
+
+        return $node;
+    }
+
+    /**
+     * The iframe block settings: which hosts an embed may come from.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `iframe` node
+     */
+    private function iframeBlockNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('iframe'))->getRootNode();
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        /** @var ArrayNodeDefinition $allowedHosts */
+        $allowedHosts = $node->children()
+            ->arrayNode('allowed_hosts')
+            ->info('Hosts the iframe block may embed (an entry also covers its subdomains). Empty allows any https host.');
+
+        $allowedHosts->scalarPrototype();
+
+        if ($withDefaults) {
+            $allowedHosts->defaultValue([]);
+        }
+
+        return $node;
+    }
+
+    /**
+     * The code block opt-in. Project-wide only, never per site.
+     *
+     * @return ArrayNodeDefinition The `code` node
+     */
+    private function codeBlockNode(): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('code'))->getRootNode();
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('allow_unsandboxed')
+                    ->defaultFalse()
+                    ->info('Expose a per-block checkbox letting editors run pasted markup directly in the page. Makes anyone able to edit a page able to execute JavaScript on the site, including in the admin preview. Leave false unless every editor is trusted at administrator level. Project-wide on purpose, it cannot be overridden per site.')
                 ->end()
             ->end();
+
+        return $node;
     }
 
     /**
@@ -372,6 +534,22 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.blocks.code.allow_unsandboxed',
             $config['blocks']['code']['allow_unsandboxed'],
+        );
+        // What WebspaceSettings resolves per site: the project-wide values, and
+        // the table of what each site changes. Passed as two plain arrays so
+        // the service never has to know the configuration tree.
+        $settings = [];
+        foreach (self::OVERRIDABLE_SECTIONS as $section) {
+            $settings[$section] = $config[$section];
+        }
+
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.settings',
+            $settings,
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.settings_by_webspace',
+            $config['webspaces'],
         );
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.turnstile.enabled',

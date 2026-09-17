@@ -1361,3 +1361,11 @@ Internally the templates moved to one directory per type
 (`config/templates/articles/news/iw_news.xml`), since Sulu registers directories
 rather than files. Only projects that pointed at those paths themselves are
 affected.
+
+## Per-site settings (new)
+
+A project serving several sites can now give each one its own iframe allowlist
+and its own title editor buttons, through a `webspaces` table keyed by webspace
+key. A site names only what it changes and inherits the rest, so nothing changes
+for projects that do not write the table. See the README section
+**Per-site settings** for the shape and for what is deliberately not overridable.
