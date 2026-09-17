@@ -356,6 +356,8 @@ itech_world_sulu_tailwind_theme:
 
 An entry also covers its subdomains (`example.com` matches `widget.example.com`), matching whole labels only — `evil-example.com` does **not** match `example.com`. A URL outside the list simply renders nothing. Leave the list empty (the default) to allow any `https` host.
 
+On a multi-site project each site can pin its own providers — see [Per-site settings](#per-site-settings-multi-site-projects).
+
 ### Code block: allowing unsandboxed execution (optional, off by default)
 
 The code block lets editors paste a third-party widget. By default that markup always runs inside a sandboxed iframe: it can execute its own scripts, but cannot reach the page's DOM, cookies, or your admin session.
@@ -375,13 +377,53 @@ This does not disable the sandbox; it makes a *Run without isolation* checkbox a
 >
 > Turning it back to `false` is an immediate, safe rollback: a stored `unsandboxed` value is ignored without the opt-in, so every existing block returns to the sandbox with no migration.
 
+> This one setting stays **project-wide** and cannot be set per site. Block templates are registered once for the whole admin, so opening it for one site would ship the checkbox to every site's forms — and a checkbox that does nothing on the page you are editing is worse than no checkbox. If a single site of the project must not have it, leave it off everywhere.
+
+### Per-site settings (multi-site projects)
+
+Bundle configuration is resolved once for the whole project, which is right for most settings and wrong for a few: the providers one site embeds have nothing to do with its neighbour's, and two sites with different style guides do not open the same editorial freedoms.
+
+A `webspaces` table overrides settings for one site, keyed by webspace key:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    # Project-wide values, used by every site that does not override them
+    title_editor:
+        blocks:
+            highlight: true
+            color: true
+    blocks:
+        iframe:
+            allowed_hosts: ['www.youtube.com']
+
+    webspaces:
+        client-a:
+            blocks:
+                iframe:
+                    allowed_hosts: ['calendly.com']   # this site embeds Calendly, not YouTube
+            title_editor:
+                blocks:
+                    color: false                      # stricter style guide on this site
+```
+
+**A site names only what it changes.** Above, `client-a` keeps `title_editor.blocks.highlight: true` from the project, because it never mentioned it. Anything absent falls through, so adding this table changes nothing for the sites that are not listed, and a single-site project never writes it.
+
+**A list is replaced, not merged.** `client-a` above allows Calendly and *not* YouTube. An allowlist that quietly gained entries from the project would be an allowlist nobody wrote.
+
+What can be overridden:
+
+| Setting | Per site | Why |
+|---|---|---|
+| `blocks.iframe.allowed_hosts` | yes | Read when the page renders, so each site answers for itself |
+| `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
+| `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
+| `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
+| `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
+| `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |
+
 ### Cloudflare Turnstile anti-spam field (optional, off by default)
 
 SuluFormBundle ships no active anti-spam protection: its honeypot defaults to `null` and its reCAPTCHA field only registers when the Google EWZ bundle is installed. This bundle adds an opt-in **Cloudflare Turnstile** field — free, privacy-friendly, and invisible for most visitors.
-
-```bash
-composer require pixelopen/cloudflare-turnstile-bundle
-```
 
 ```yaml
 itech_world_sulu_tailwind_theme:
@@ -393,9 +435,11 @@ itech_world_sulu_tailwind_theme:
 
 Editors then pick **Cloudflare Turnstile** in the form builder, in the *special* group. Submissions without a valid token are rejected server-side: no mail is sent and nothing is stored. The widget follows the block variant (light or dark) and the form locale on its own.
 
-This is the only place to configure it — the bundle forwards the credentials to `pixelopen/cloudflare-turnstile-bundle`. Left disabled, or with the package absent, nothing changes and the field is simply not offered.
+The widget, the field and the token verification are the bundle's own, so each site of a multi-site project can hold **its own Cloudflare account** — declare its key pair under [Per-site settings](#per-site-settings-multi-site-projects). A site that declares none uses the project pair. Keys stay in environment variables, never in the theme.
 
-> See **[Cloudflare Turnstile](doc/turnstile.md)** for the Cloudflare test keys, the appearance rules, and how to override the error message.
+Left disabled, nothing changes and the field is simply not offered. Enabled without declaring the keys stops the build rather than shipping a form that refuses every submission.
+
+> See **[Cloudflare Turnstile](doc/turnstile.md)** for the multi-site setup, the Cloudflare test keys, the appearance rules, and how to override the error message.
 
 ### Title editor buttons (optional)
 
@@ -413,6 +457,8 @@ itech_world_sulu_tailwind_theme:
 ```
 
 Those are the defaults, so leaving this out changes nothing. Values merge key by key: setting only `blocks.color` leaves the rest alone.
+
+Two sites of one project can open different editorial freedoms — see [Per-site settings](#per-site-settings-multi-site-projects). An article form reads the project-wide values, since an article is attached to a site in its own settings rather than at creation.
 
 > See **[Title editor](doc/title-editor.md)** for the stored syntax, the per-field XML override, and the CSS classes behind it.
 
@@ -464,8 +510,12 @@ Article templates extend the project's `base.html.twig` — your menu, footer, a
 > itech_world_sulu_tailwind_theme:
 >     article_templates:
 >         enabled: true
->         types: ['news', 'event']  # blog_post will not be registered
+>         types: ['news', 'event']  # blog_post is not registered at all
 > ```
+>
+> A type left out brings nothing with it: no template, no list tab in the admin, and no security context of its own. Naming a type the bundle does not ship (`news`, `event`, `blog_post`) stops the build rather than registering nothing silently.
+>
+> To open a type to some editors only, keep it registered and use its security context: Sulu creates one per article group, so a role can be granted `news` alone. That is also the answer on a multi-site project, where an article chooses its site after it was created from a type.
 
 #### Article listing page (server-side filtering)
 
@@ -505,7 +555,7 @@ The **Filters** button has its own button-style picker under **Articles > Filter
 >
 > The index then stays up to date automatically as articles are published/unpublished. Category and tag filtering work without reindexing (they query the database directly).
 >
-> _Single-webspace note:_ article filtering targets the database directly and does not constrain by webspace. In a multi-webspace setup sharing the same articles, the listing is not scoped per webspace.
+> _Multi-webspace:_ a listing shows the articles of the site it is displayed on — the ones whose **main webspace** is that site, plus those listing it among their **additional webspaces** (article **Settings > Webspace**). Nothing to configure: the page takes the site it is served from.
 
 #### Site-wide components
 

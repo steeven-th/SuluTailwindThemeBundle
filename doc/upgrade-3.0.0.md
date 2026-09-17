@@ -1332,3 +1332,63 @@ both families.
 The colours of a card are untouched and stay out of this section: a card inside
 a block takes them from the colour variant, which is what keeps a block coherent
 with itself.
+
+---
+
+## `article_templates.types` now filters (breaking, if you set it)
+
+The whitelist was documented since it shipped and applied by nothing: the bundle
+registered the whole article template directory whatever the list said. A project
+pinning two types got three, along with the admin list tab and the security
+context of the third.
+
+It now does what it says. **If you configured `types`, check what it names
+before upgrading**: a type left out is no longer registered at all, so its
+articles lose their template in the admin.
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    article_templates:
+        enabled: true
+        types: ['news', 'event']   # blog_post really is absent now
+```
+
+Leaving `types` out keeps all three, which is the default and the common case.
+Naming a type the bundle does not ship now stops the build instead of silently
+registering nothing.
+
+Internally the templates moved to one directory per type
+(`config/templates/articles/news/iw_news.xml`), since Sulu registers directories
+rather than files. Only projects that pointed at those paths themselves are
+affected.
+
+## Per-site settings (new)
+
+A project serving several sites can now give each one its own iframe allowlist
+and its own title editor buttons, through a `webspaces` table keyed by webspace
+key. A site names only what it changes and inherits the rest, so nothing changes
+for projects that do not write the table. See the README section
+**Per-site settings** for the shape and for what is deliberately not overridable.
+
+## Cloudflare Turnstile no longer uses pixelopen (breaking, if you use it)
+
+The anti-spam field used to be backed by `pixelopen/cloudflare-turnstile-bundle`. That
+package resolves its key pair when the container compiles and holds one pair for the whole
+application, so a project serving several sites could only ever use one Cloudflare account.
+
+The widget, the form field, the constraint and the token verification are now the bundle's
+own, and the key pair is resolved per site.
+
+**What to do:** nothing, if you configured Turnstile through
+`itech_world_sulu_tailwind_theme.turnstile` — which the documentation has always presented
+as the only place to configure it. `composer remove pixelopen/cloudflare-turnstile-bundle`
+is safe once you upgrade. Keeping it installed is safe too: the bundle still feeds it the
+project-wide pair, since that package refuses to boot without one.
+
+**What changes if you wrote code against it:** the constraint to use in your own DTOs is
+now `ItechWorld\SuluTailwindThemeBundle\Validator\Turnstile` instead of
+`PixelOpen\CloudflareTurnstileBundle\Validator\CloudflareTurnstile`, and
+`TurnstileVerifier` is injectable for a check outside a Symfony form.
+
+Verification needs a HTTP client: `composer require symfony/http-client` if your project
+has none.

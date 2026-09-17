@@ -76,6 +76,14 @@ Config is the ceiling; stored content can only sit under it. `CodeBlockPolicy` e
 
 Turning `allow_unsandboxed` back to `false` is therefore a safe, immediate rollback across all existing content. No migration, no sweep of stored blocks.
 
+## Why it is not a per-site setting
+
+Other settings of the bundle can be overridden per webspace. This one cannot, and the reason is the checkbox rather than the sandbox.
+
+Block templates are registered once for the whole admin: the opt-in decides which of two XML files is loaded, so it is resolved when the container compiles, before any site is in play. Making it per site would mean shipping the checkbox to every site's forms and refusing it later, at render time, on the sites that did not opt in. An editor would then tick a box that does nothing on the site they are editing — the sandbox would hold, which is the point, but the form would be lying.
+
+A setting that grants "anyone who can edit a page is effectively an administrator" is also the last place to want a subtlety. If one site of the project must not have it, leave it off for the project.
+
 ---
 
 ## Other guards

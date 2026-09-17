@@ -5,9 +5,9 @@ An opt-in anti-spam field for forms built with SuluFormBundle. Once enabled, edi
 a valid token are rejected server-side — no mail sent, nothing stored.
 
 Turnstile is Cloudflare's captcha alternative: free, privacy-friendly, and invisible for
-most visitors. The widget and the token verification come from
-[`pixelopen/cloudflare-turnstile-bundle`](https://github.com/Pixel-Open/cloudflare-turnstile-bundle);
-this bundle adds the Sulu side (the field type, its admin definition and its rendering).
+most visitors. The widget, the field type and the token verification are all the bundle's
+own, which is what lets a project serving several sites give each one its own Cloudflare
+account — see [Several sites, several accounts](#several-sites-several-accounts).
 
 > **Start with the honeypot.** SuluFormBundle ships a honeypot that costs nothing and stops
 > a good share of naive bots, but it is **off by default** (`sulu_form.honeypot.field` is
@@ -25,19 +25,14 @@ this bundle adds the Sulu side (the field type, its admin definition and its ren
 
 ## Install
 
+Nothing to install beyond SuluFormBundle and a HTTP client, both of which a Sulu project
+normally already has:
+
 ```bash
-composer require pixelopen/cloudflare-turnstile-bundle
+composer require symfony/http-client
 ```
 
-The package is a `suggest`, never a `require`: the feature stays optional and a project
-that does not want it installs nothing. Check that the bundle landed in
-`config/bundles.php` (its Flex recipe adds it):
-
-```php
-PixelOpen\CloudflareTurnstileBundle\PixelOpenCloudflareTurnstileBundle::class => ['all' => true],
-```
-
-Then get a site key and a secret key from the Cloudflare dashboard
+Get a site key and a secret key from the Cloudflare dashboard
 (*Turnstile → Add site*) and put them in `.env`:
 
 ```dotenv
@@ -56,10 +51,44 @@ itech_world_sulu_tailwind_theme:
         secret_key: '%env(TURNSTILE_SECRET)%'
 ```
 
-That is the only place to configure Turnstile. This bundle forwards the values to
-pixelopen itself, so **do not** also create `config/packages/pixel_open_cloudflare_turnstile.yaml`
-— its Flex recipe may have created one, and a project-level file wins over what this bundle
-forwards, which quietly splits the configuration in two.
+That is the only place to configure Turnstile.
+
+### Several sites, several accounts
+
+On a multi-site project each site can answer for its own Cloudflare account:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    turnstile:
+        enabled: true
+        site_key: '%env(TURNSTILE_KEY)%'          # used by every site that overrides nothing
+        secret_key: '%env(TURNSTILE_SECRET)%'
+
+    webspaces:
+        client-a:
+            turnstile:
+                site_key: '%env(TURNSTILE_CLIENT_A_KEY)%'
+                secret_key: '%env(TURNSTILE_CLIENT_A_SECRET)%'
+```
+
+The widget renders with the key of the site being visited, and the token is verified with
+that same site's secret — a token is only ever valid against the pair that issued it, so
+crossing them would reject every visitor.
+
+**Keys stay in environment variables**, never in the theme. The site key is public and
+already ships in the HTML, but a secret placed in the theme would travel into the database,
+into backups, and into the exported JSON of that theme.
+
+`enabled` stays project-wide: it decides whether the field type is registered in the form
+builder, which happens once for the whole admin. A site that overrides no key pair uses the
+project one, so equipping a single site with its own account is enough.
+
+> **Upgrading from 2.x:** the feature used to be backed by
+> [`pixelopen/cloudflare-turnstile-bundle`](https://github.com/Pixel-Open/cloudflare-turnstile-bundle),
+> which holds one key pair for the whole application and therefore cannot serve several
+> sites. It is no longer used, and `composer remove pixelopen/cloudflare-turnstile-bundle`
+> is safe. Keeping it installed is safe too: the bundle still feeds it the project-wide
+> pair, since that package refuses to boot without one.
 
 ### Using the field
 
@@ -100,17 +129,18 @@ is what it is for. The secret key never leaves the server.
 In SuluFormBundle mode the token is verified for you. In Twig template mode it is not, and a
 widget whose token nobody checks stops nothing at all - it only looks like it does.
 
-Cloudflare puts the token in the `cf-turnstile-response` field of the POST. With pixelopen
-installed, the shortest path is its constraint, on the property your DTO holds it in:
+Cloudflare puts the token in the `cf-turnstile-response` field of the POST. The shortest
+path is the bundle's own constraint, on the property your DTO holds it in — it verifies
+against the secret of the site being served, so it works the same on a multi-site project:
 
 ```php
-use PixelOpen\CloudflareTurnstileBundle\Validator\CloudflareTurnstile;
+use ItechWorld\SuluTailwindThemeBundle\Validator\Turnstile;
 
 final class ContactRequest
 {
     public function __construct(
         // …
-        #[CloudflareTurnstile]
+        #[Turnstile]
         public string $cfTurnstileResponse = '',
     ) {
     }
@@ -123,9 +153,17 @@ Read it from the request under its real name, which is not a valid PHP property 
 $token = (string) $request->request->get('cf-turnstile-response');
 ```
 
-Without pixelopen, POST the token and your secret key to
-`https://challenges.cloudflare.com/turnstile/v0/siteverify` and refuse the submission unless
-the answer says `success`. Never do that check client-side.
+Outside a Symfony form, inject `TurnstileVerifier` and ask it directly:
+
+```php
+use ItechWorld\SuluTailwindThemeBundle\Service\TurnstileVerifier;
+
+if (!$verifier->verify((string) $request->request->get('cf-turnstile-response'))) {
+    // refuse the submission
+}
+```
+
+Never do that check client-side.
 
 ---
 
@@ -193,16 +231,22 @@ Disabled means disabled end to end: the field is not offered in the form builder
 is rendered, and no token is verified. Existing forms that already hold a Turnstile field
 keep working — the field simply disappears from them.
 
-The app also boots normally when the feature is off and pixelopen is installed but not
-configured, which it otherwise refuses to do (that bundle marks its `key` and `secret` as
-required and non-empty). While disabled, this bundle feeds it Cloudflare's test keys as
-placeholders. It never does so when Turnstile is **enabled**: a challenge that validates
-everything is worse than no challenge, because it looks protected. Enabling without keys
-therefore fails at compile time, with pixelopen's own message:
+Enabling without declaring the keys fails at compile time rather than at the first
+submission:
 
 ```
-The child config "key" under "pixel_open_cloudflare_turnstile" must be configured.
+Cloudflare Turnstile is enabled but "site_key" and "secret_key" are not both configured
+under "itech_world_sulu_tailwind_theme.turnstile".
 ```
+
+That guard reads the configuration file, so `%env(TURNSTILE_KEY)%` always satisfies it: it
+catches a forgotten declaration, not an environment variable that is empty on the server.
+The second case surfaces at runtime as the `missing_key` status above.
+
+A project that still has `pixelopen/cloudflare-turnstile-bundle` installed keeps booting
+either way: that package marks its own `key` and `secret` as required and non-empty, so this
+bundle keeps feeding it the project-wide pair, and Cloudflare's test keys as placeholders
+while the feature is off.
 
 ---
 
@@ -247,11 +291,8 @@ submissions list, a line in the notification mail). The field is `mapped => fals
 never produces one.
 
 **Its own error message.** The violation uses the
-`iw_sulu_tailwind_theme.turnstile_failed` key from this bundle's `validators` catalog
-rather than pixelopen's `invalid_turnstile`. Overriding another bundle's catalog entry
-depends on bundle registration order, and its French default ("Merci de cocher la case")
-describes a checkbox Turnstile usually does not show. Override it in your project like any
-translation:
+`iw_sulu_tailwind_theme.turnstile_failed` key from this bundle's `validators` catalog.
+Override it in your project like any translation:
 
 ```json
 // translations/validators.fr.json

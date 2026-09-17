@@ -79,6 +79,10 @@ export default class MarginSelector extends React.Component {
      * calling onChange, which avoids race conditions with form state setup.
      */
     componentDidMount() {
+        // The spacing shown as "the theme's" is the edited site's, not the
+        // first site's.
+        themeConfigStore.ensureCurrentWebspace();
+
         // A field that follows the theme must be ALLOWED to stay empty, so no
         // default is forced onto it: writing one in would silently opt every
         // new block out of the theme default it is meant to take.
@@ -95,6 +99,10 @@ export default class MarginSelector extends React.Component {
                 setTimeout(() => onChange(defaultValue), 0);
             }
         }
+    }
+
+    componentDidUpdate() {
+        themeConfigStore.ensureCurrentWebspace();
     }
 
     /**

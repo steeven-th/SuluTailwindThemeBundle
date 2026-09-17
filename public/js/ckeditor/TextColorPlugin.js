@@ -52,6 +52,11 @@ export default class TextColorPlugin extends Plugin {
     }
 
     init() {
+        // The palette offered here belongs to the site being edited. Nothing
+        // else asks for it on an article or page form, so the request starts
+        // with the editor and the Observer below redraws once it lands.
+        themeConfigStore.ensureCurrentWebspace();
+
         ensureEditorStyles();
         this.defineSchema();
         this.defineConverters();
