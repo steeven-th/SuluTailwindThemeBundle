@@ -618,6 +618,8 @@ The same theme can be shared across multiple webspaces — they will share the s
 
 The theme list in **Settings > Themes** shows a "Webspaces" column indicating which webspaces use each theme.
 
+An article is not scoped to a webspace the way a page is: it declares a main one and may be published on others, each possibly running a different theme. Its content form then offers a switch to set the colour variant and the button style **per site**, while text and layout stay shared. See [Articles on several sites](doc/multi-site-articles.md).
+
 ### Page templates
 
 The bundle ships with a ready-to-use page template (`iw_theme_default`) that includes **17 block types**: `text`, `text_images`, `gallery`, `key_figures`, `timeline`, `linked_pages`, `location`, `form`, `document`, `testimonial`, `accordion`, `iframe`, `code`, `separator`, `article_list`, `article_carousel`, and `article_featured`. Call-to-action buttons are not a block of their own: every block above except `form` and `separator` carries its own list of buttons.
@@ -728,7 +730,8 @@ php bin/adminconsole iw-sulu:theme:sync-fonts
 # Migrate from isActive to multi-webspace (upgrade from previous version)
 php bin/adminconsole iw-sulu:theme:migrate-webspaces
 
-# Run integration diagnostics (check theme, CSS, assets, article bundle)
+# Run integration diagnostics (theme, CSS, assets, article bundle, and
+# per-site appearance choices naming a site their article left)
 php bin/adminconsole iw:tailwind-theme:check
 
 # Create a set of demo pages showing every block and its variants
@@ -795,6 +798,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, handling a submission on a cached page with `FormSubmissionHandler`, dev-only diagnostics |
 | [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |
+| [Articles on several sites](doc/multi-site-articles.md) | Picking a colour variant per site on an article published on more than one, how it is stored, and what a slug missing from the other theme falls back to |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
 | [Moving a theme between installations](doc/theme-transfer.md) | Export/import a theme as a JSON file: admin buttons, console commands, the API, and why images do not travel |

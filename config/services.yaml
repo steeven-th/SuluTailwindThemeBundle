@@ -118,6 +118,13 @@ services:
             - '@sulu.core.localization_manager'
             - '@?sulu_article.webspace_settings_configuration_resolver'
 
+    # Reports per-site appearance choices naming a site the article left. See
+    # the class for why they are reported rather than deleted.
+    itech_world.sulu_tailwind_theme.appearance_override_audit:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator
 
@@ -393,6 +400,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.compiler'
+            - '@itech_world.sulu_tailwind_theme.appearance_override_audit'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
         tags:

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -32,6 +33,7 @@ class ThemeCheckCommand extends Command
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly WebspaceManagerInterface $webspaceManager,
         private readonly ThemeCompiler $compiler,
+        private readonly AppearanceOverrideAudit $appearanceAudit,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
     ) {
@@ -143,8 +145,48 @@ class ThemeCheckCommand extends Command
             $checks[] = ['<fg=yellow>!</>', 'SuluArticleBundle', 'Not installed — article templates and blocks will be disabled'];
         }
 
+        // ── Check: per-site appearance choices nobody can reach ──
+        // Nothing breaks when one is left behind, which is why it takes a
+        // check to find them: the page renders the value every site follows
+        // and the admin never offers the site again.
+        if ($this->appearanceAudit->isSupported()) {
+            $orphans = $this->appearanceAudit->findOrphans();
+
+            if ([] === $orphans) {
+                $checks[] = ['<fg=green>✓</>', 'Per-site appearance', 'No override points at a site its article left'];
+            } else {
+                $checks[] = [
+                    '<fg=yellow>!</>',
+                    'Per-site appearance',
+                    \count($orphans) . ' override(s) name a site the article is not published on',
+                ];
+            }
+        }
+
         // ── Output table ──
         $io->table(['', 'Check', 'Result'], $checks);
+
+        if (isset($orphans) && [] !== $orphans) {
+            $io->section('Per-site appearance overrides pointing nowhere');
+            $io->text(
+                'Each row is a colour choice recorded for a site the article is no longer published on. '
+                . 'It changes nothing on the site, and the admin cannot offer to undo it. '
+                . 'Edit the block on the site it belongs to, or publish the article there again.',
+            );
+            $io->table(
+                ['Article', 'Locale', 'Stage', 'Site named', 'Property'],
+                array_map(
+                    static fn (array $orphan): array => [
+                        $orphan['article'],
+                        $orphan['locale'],
+                        $orphan['stage'],
+                        $orphan['webspace'],
+                        $orphan['property'],
+                    ],
+                    $orphans,
+                ),
+            );
+        }
 
         if ($hasErrors) {
             $io->error('Some critical checks failed. See above for details.');
