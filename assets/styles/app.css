@@ -1805,7 +1805,7 @@ img.object-cover {
 
 /* ─── Block: key_figures ──────────────────────────────────────────────── */
 /* Five layout modifiers:
-   - --grid-2x2   : 2-column card grid (max-width centered)
+   - --grid-2x2   : card grid, 2 to 4 columns (the name is the stored style key)
    - --inline     : centered flex row with large counters
    - --progress   : list of horizontal progress bars
    - --timeline   : vertical timeline with dots + cards (alternating sides on desktop)
@@ -1979,10 +1979,28 @@ img.object-cover {
     margin-inline: auto;
 }
 
+/* Two columns from the first breakpoint whatever the count asked for: three or
+   four of them only fit once there is desktop width, and the rule below takes
+   over there. */
 @media (min-width: 640px) {
     .iw-block-key-figures--grid-2x2 {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* How many columns the grid holds, from the `figureColumns` setting. It used to
+   be two, full stop, so three figures left one of them alone on a row. */
+@media (min-width: 1024px) {
+    .iw-block-key-figures--cols-1 { grid-template-columns: 1fr; }
+    .iw-block-key-figures--cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .iw-block-key-figures--cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .iw-block-key-figures--cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Past two columns the reading width the grid keeps by default is what makes
+   the cards cramped, so it steps aside. */
+.iw-block-key-figures--grid-wide {
+    max-width: var(--iw-block-key-figures-grid-wide-max-width, none);
 }
 
 /* A figure of the grid is an enclosed unit, so it is framed like every other

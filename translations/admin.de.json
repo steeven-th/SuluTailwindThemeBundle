@@ -608,7 +608,7 @@
 
     "iw_sulu_tailwind_theme.style.filmstrip": "Filmstreifen",
     "iw_sulu_tailwind_theme.style.inline": "Inline",
-    "iw_sulu_tailwind_theme.style.grid_2x2": "Raster 2×2",
+    "iw_sulu_tailwind_theme.style.grid_2x2": "Raster",
     "iw_sulu_tailwind_theme.style.progress": "Fortschrittsbalken",
     "iw_sulu_tailwind_theme.style.timeline": "Zeitleiste",
     "iw_sulu_tailwind_theme.style.alternate": "Abwechselnd",
@@ -891,6 +891,9 @@
     "iw_sulu_tailwind_theme.figure": "Kennzahl",
     "iw_sulu_tailwind_theme.image_icon": "Bild / Symbol",
     "iw_sulu_tailwind_theme.number": "Zahl",
+    "iw_sulu_tailwind_theme.figure_columns": "Spalten",
+    "iw_sulu_tailwind_theme.figure_columns_info": "Wie viele Kennzahlen sich auf dem Desktop eine Zeile teilen. Darunter faltet sich das Raster auf zwei Spalten und dann auf eine.",
+    "iw_sulu_tailwind_theme.figure_columns_auto": "Automatisch",
 
     "iw_sulu_tailwind_theme.links": "Links",
     "iw_sulu_tailwind_theme.internal_link": "Interner Link",

@@ -608,7 +608,7 @@
 
     "iw_sulu_tailwind_theme.style.filmstrip": "Pellicule",
     "iw_sulu_tailwind_theme.style.inline": "En ligne",
-    "iw_sulu_tailwind_theme.style.grid_2x2": "Grille 2×2",
+    "iw_sulu_tailwind_theme.style.grid_2x2": "Grille",
     "iw_sulu_tailwind_theme.style.progress": "Barres de progression",
     "iw_sulu_tailwind_theme.style.timeline": "Timeline",
     "iw_sulu_tailwind_theme.style.alternate": "Alternée",
@@ -891,6 +891,9 @@
     "iw_sulu_tailwind_theme.figure": "Chiffre",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icône",
     "iw_sulu_tailwind_theme.number": "Nombre",
+    "iw_sulu_tailwind_theme.figure_columns": "Colonnes",
+    "iw_sulu_tailwind_theme.figure_columns_info": "Combien de chiffres tiennent sur une ligne au format bureau. En dessous, la grille se replie sur deux colonnes puis sur une.",
+    "iw_sulu_tailwind_theme.figure_columns_auto": "Automatique",
 
     "iw_sulu_tailwind_theme.links": "Liens",
     "iw_sulu_tailwind_theme.internal_link": "Lien interne",

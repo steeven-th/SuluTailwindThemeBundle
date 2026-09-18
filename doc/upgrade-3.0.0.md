@@ -1466,3 +1466,12 @@ To keep the old look:
 **CSS hook renamed:** `--iw-key-figure-border` → `--iw-key-figure-card-border`. The
 name changed because its meaning did: it used to decide the colour of a border that
 was always drawn, it now decides the colour of one the variant decides to draw.
+
+### The grid holds 2 to 4 columns (new)
+
+**Settings > Columns** says how many figures share a row, `auto` giving each one a
+column of its own up to four. It was two and only two, so three figures left one of
+them alone on a row. Past two columns the reading-width cap steps aside, through the
+new `--grid-wide` modifier.
+
+Published blocks keep two columns, which is the default of the field.

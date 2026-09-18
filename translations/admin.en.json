@@ -608,7 +608,7 @@
 
     "iw_sulu_tailwind_theme.style.filmstrip": "Filmstrip",
     "iw_sulu_tailwind_theme.style.inline": "Inline",
-    "iw_sulu_tailwind_theme.style.grid_2x2": "Grid 2x2",
+    "iw_sulu_tailwind_theme.style.grid_2x2": "Grid",
     "iw_sulu_tailwind_theme.style.progress": "Progress bars",
     "iw_sulu_tailwind_theme.style.timeline": "Timeline",
     "iw_sulu_tailwind_theme.style.alternate": "Alternating",
@@ -891,6 +891,9 @@
     "iw_sulu_tailwind_theme.figure": "Figure",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icon",
     "iw_sulu_tailwind_theme.number": "Number",
+    "iw_sulu_tailwind_theme.figure_columns": "Columns",
+    "iw_sulu_tailwind_theme.figure_columns_info": "How many figures share a row on desktop. Below that width the grid folds to two columns, then to one.",
+    "iw_sulu_tailwind_theme.figure_columns_auto": "Automatic",
 
     "iw_sulu_tailwind_theme.links": "Links",
     "iw_sulu_tailwind_theme.internal_link": "Internal link",

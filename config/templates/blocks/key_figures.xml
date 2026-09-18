@@ -88,6 +88,29 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <!--
+                    How many columns the grid holds. It was two and only two,
+                    so three figures left one of them alone on a row. `auto`
+                    gives each figure a column of its own, up to four, which is
+                    what the dropped "with icons" style did.
+                -->
+                <property name="figureColumns" type="single_select" colspan="6"
+                          visibleCondition="__parent.style == 'grid_2x2'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.figure_columns</title>
+                        <info_text>iw_sulu_tailwind_theme.figure_columns_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="2"/>
+                        <param name="values" type="collection">
+                            <param name="auto"><meta><title>iw_sulu_tailwind_theme.figure_columns_auto</title></meta></param>
+                            <param name="2"><meta><title>iw_sulu_tailwind_theme.cards_columns_2</title></meta></param>
+                            <param name="3"><meta><title>iw_sulu_tailwind_theme.cards_columns_3</title></meta></param>
+                            <param name="4"><meta><title>iw_sulu_tailwind_theme.cards_columns_4</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- Side-by-side style: which side the figures sit on. -->
                 <property name="contentRight" type="checkbox"
                           visibleCondition="__parent.style == 'split'">

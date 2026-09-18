@@ -17,7 +17,9 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | Class | Role |
 |-------|------|
 | `.iw-block-key-figures` | Root wrapper. Hook only. |
-| `.iw-block-key-figures--grid-2x2` | 2-column card grid (centered, max-width). |
+| `.iw-block-key-figures--grid-2x2` | Card grid, 2 to 4 columns. The name is the style key stored on published blocks and in the block styles of every theme, so it kept it when the column count became a setting. |
+| `.iw-block-key-figures--cols-1` to `--cols-4` | How many columns `--grid-2x2` holds from `1024px`, from the **Settings > Columns** field. Below that width the grid folds to two columns, then to one. |
+| `.iw-block-key-figures--grid-wide` | Present past two columns: drops the reading-width cap, which leaves three or four cards too cramped to hold a counter. |
 | `.iw-block-key-figures--inline` | Centered flex row with large counters. |
 | `.iw-block-key-figures--progress` | Stack of horizontal progress bars. |
 | `.iw-block-key-figures--timeline` | Vertical timeline with dots and alternating cards. |
@@ -97,13 +99,14 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-key-figure-icon-color` | `var(--iw-variant-highlight, var(--color-accent))` | Pictogram colour. Library icons follow it, an editor's own media keeps its colours. |
 | `--iw-key-figure-icon-margin-bottom` | `0.75rem` | Space below the pictogram. |
 
-### Grid-2x2
+### Grid
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-block-key-figures-split-gap` | `var(--iw-blocks-gap, 1.5rem)` | Gap between the text zone and the figures in `--split`. |
 | `--iw-block-key-figures-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. |
-| `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Max-width of the grid (centered). |
+| `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Reading-width cap, applied up to two columns. |
+| `--iw-block-key-figures-grid-wide-max-width` | `none` | What replaces it past two columns, under `--grid-wide`. |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |
 | `--iw-key-figure-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent))` | Card background. The card declared none at all before 3.0.0, so no variant and no surface setting could fill it. |
 | `--iw-key-figure-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Text colour on that background. |
@@ -170,6 +173,14 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
     --iw-key-figure-counter-size-xl: 3rem;
     --iw-key-figure-counter-size-xl-md: 4rem;
     --iw-key-figure-counter-size-xl-lg: 5rem;
+}
+```
+
+### Fold the grid to three columns whatever the setting asks for
+
+```css
+.iw-block-key-figures--grid-2x2.iw-block-key-figures--cols-4 {
+    grid-template-columns: repeat(3, 1fr);
 }
 ```
 
