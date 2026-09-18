@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
@@ -18,6 +19,9 @@
     </areas>
 
     <properties>
+        <xi:include href="../fragments/snippet-area-notice.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
         <property name="title" type="text_line" mandatory="true">
             <meta>
                 <title>iw_sulu_tailwind_theme.snippet_title</title>

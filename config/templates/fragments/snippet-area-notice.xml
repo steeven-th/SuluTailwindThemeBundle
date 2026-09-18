@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: where a snippet assigned to an area actually appears.
+
+    Editing one of these snippets has no visible effect until a site points an
+    area at it, and that assignment lives in another part of the admin
+    entirely. An editor who has not been told goes looking for a bug.
+
+    It matters twice over on a multi-site project, where each site makes that
+    choice for itself: two sites can run two different menus, or share one.
+    That is the answer to "how do I get a different menu per site", and it is
+    worth saying here rather than only in the documentation, which the person
+    filling in this form is not reading.
+
+    Included as the first property of every area-assigned snippet:
+
+        <xi:include href="../fragments/snippet-area-notice.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="areaNotice" type="heading">
+        <params>
+            <param name="label">
+                <meta><title>iw_sulu_tailwind_theme.snippet_area_notice</title></meta>
+            </param>
+            <param name="description">
+                <meta><title>iw_sulu_tailwind_theme.snippet_area_notice_info</title></meta>
+            </param>
+            <param name="icon" value="su-webspace"/>
+        </params>
+    </property>
+</properties>
