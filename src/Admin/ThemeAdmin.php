@@ -489,9 +489,11 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
-            // ── Edit form: tags tab ────────────────────────────────
-            // The component drawing them takes any list, so they belong with
+            // ── Edit form: tags and badges tab ─────────────────────
+            // The components drawing them take any list, so they belong with
             // what applies site-wide rather than under one kind of content.
+            // A badge left unset follows the tags, the two being one idea in
+            // two shapes - see ThemeCompiler::SETTING_FALLBACKS.
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.tags', '/tags')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)

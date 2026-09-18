@@ -1516,3 +1516,57 @@ With **Content alignment** on centre and the pictogram above the title, the titl
 the number centred and the pictogram stayed against the left edge. The head is a flex
 column in that position, where the placement runs along `align-items` and not along
 `justify-content`, and only the second was named.
+
+## Tags and badges are one screen, and their hover is settable (breaking, admin)
+
+The **Tags** sub-tab of Default settings becomes **Tags and badges**, and what it sets
+now reaches everything wearing a label.
+
+### `components_tagAccent` → `components_tagHoverText` (breaking, admin)
+
+The Accent field painted nothing at rest: it drove the three properties of the hover
+state - a 10% tint for the background, the colour itself for the text, a 30% tint for
+the border - without its name saying which. It is replaced by three explicit fields,
+**Hover text**, **Hover background** and **Hover border**.
+
+`components_tagHoverText` alone still drives the whole state, the other two only part
+with the calculation. An existing `components_tagAccent` pre-fills it, so a theme keeps
+its look, and the old key is dropped on the next save.
+
+**What changes visually:** the hover now tints the resting background instead of mixing
+into `transparent`. A pill with a background used to turn *paler* under the pointer than
+it was at rest, which read as the setting only applying on hover.
+
+### A category badge follows the tags (fixed)
+
+`.iw-category-badge` - the label a category wears in a meta row, an editorial hero or a
+sidebar - read `--color-primary-100` / `--color-primary-700` straight from the
+stylesheet, reachable from no setting at all. Only the badge *of a card* was settable,
+under Cards.
+
+Every badge field now falls back to its tag counterpart (colours, radius, text size,
+padding, gap), and the card badge falls back to the site-wide badge. A theme that styles
+its tags gets matching badges everywhere without setting anything twice, and setting a
+badge field parts the two.
+
+**What changes visually:** a theme that set tag colours and left the badge alone now has
+badges in those colours rather than in the primary tint.
+
+### Tag colours reach a dark hero (fixed)
+
+The tag colours were written as `--color-surface-*` tokens, which the pill only reads as
+a fallback. The dark hero of the editorial style sets `--iw-tag-text` and
+`--iw-tag-border` on the wrapper to lighten the pills, and a fallback is never reached
+once the variable it backs is defined - so the setting lost in the one place the pills
+sit on a photograph, leaving white text on a pale background.
+
+The compiler now writes the pill's own variables, through `:where(.iw-tag)` so the rule
+carries no specificity: a class on the pill itself - a colour variant, a card badge -
+still outranks it.
+
+### The sidebar article style has a bottom margin (fixed)
+
+The *sidebar* blog style empties the article footer, and nothing stood between its last
+widget and the site footer. Its two-column body is now a `.iw-article-page__columns`,
+with `--iw-article-page-columns-gap-top` and `--iw-article-page-columns-gap-bottom`
+(`2rem` / `4rem`).
