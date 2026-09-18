@@ -4027,6 +4027,15 @@ section.block:has([data-slider-fullbleed-value]) {
     display: block;
 }
 
+/* Two-column body (the article "sidebar" style): content beside a column of
+   widgets. It carries the vertical rhythm of the whole body, the bottom half
+   included - the style empties the article footer, so nothing else stood
+   between the last widget and the site footer. */
+.iw-article-page__columns {
+    margin-top: var(--iw-article-page-columns-gap-top, 2rem);
+    margin-bottom: var(--iw-article-page-columns-gap-bottom, 4rem);
+}
+
 .iw-article-page__header {
     margin-bottom: var(--iw-article-page-header-margin-bottom, 1.5rem);
 }

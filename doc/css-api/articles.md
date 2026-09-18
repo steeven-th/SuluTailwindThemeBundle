@@ -122,6 +122,7 @@ The `<article>` root that hosts the hero, header, body and footer.
 | `.iw-article-page__subtitle` | Optional `<p>` subtitle |
 | `.iw-article-page__excerpt` | Lead paragraph — the excerpt description shown in the header when enabled (`--light` variant on dark heros) |
 | `.iw-article-page__body--dropcap` | Bare wrapper around the blocks — drops a large first letter on the first inner block (blog editorial style) without constraining the blocks' layout |
+| `.iw-article-page__columns` | Two-column body of the *sidebar* style (content beside its widget column). Carries the vertical rhythm of the body: `--iw-article-page-columns-gap-top` (`2rem`) and `--iw-article-page-columns-gap-bottom` (`4rem`) |
 | `.iw-article-page__footer` | Below-content footer (empty by default — excerpt, categories and tags live in the article header) |
 | `.iw-article-page__breadcrumb` | Container of the default breadcrumb placement, before the `<article>` landmark |
 
