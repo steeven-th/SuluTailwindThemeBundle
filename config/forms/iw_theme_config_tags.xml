@@ -1,15 +1,18 @@
 <?xml version="1.0" ?>
 <!--
-    Admin form: Default settings tab, Tags sub-tab.
+    Admin form: Default settings tab, Tags and badges sub-tab.
 
-    The pills a taxonomy is shown as. The component that draws them is generic
-    - it takes a list of anything and renders it as pills - and only articles
-    call it today, which is why these settings sit with the site-wide defaults
-    rather than under Articles: someone looking for where tags are styled has
-    no reason to look inside one kind of content.
+    Two shapes of the same idea - a word a piece of content is filed under.
+    A tag is the bordered pill of a taxonomy list, a badge the filled label a
+    category wears. The components drawing them are generic - they take a list
+    of anything - and only articles call them today, which is why these
+    settings sit with the site-wide defaults rather than under Articles:
+    someone looking for where labels are styled has no reason to look inside
+    one kind of content.
 
-    Not to be confused with the badge of a card, which is the label a card
-    carries on its image and is set in the Cards sub-tab.
+    A badge left unset follows the tags, so a theme styles its labels once.
+    The badge of a card keeps its own fields in the Cards sub-tab and falls
+    back to these.
 -->
 <form xmlns="http://schemas.sulu.io/template/template"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,6 +21,14 @@
     <key>iw_theme_config_tags</key>
 
     <properties>
+        <property name="tagsHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.components_group_tags</title></meta>
+                </param>
+            </params>
+        </property>
+
         <property name="components_tagBg" type="iw_theme_color_token_editor" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_bg</title></meta>
             <params><param name="show_palette" value="true"/></params>
@@ -28,10 +39,6 @@
         </property>
         <property name="components_tagBorder" type="iw_theme_color_token_editor" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
-            <params><param name="show_palette" value="true"/></params>
-        </property>
-        <property name="components_tagAccent" type="iw_theme_color_token_editor" colspan="6">
-            <meta><title>iw_sulu_tailwind_theme.components_label_accent</title></meta>
             <params><param name="show_palette" value="true"/></params>
         </property>
 
@@ -68,6 +75,36 @@
             </params>
         </property>
 
+        <property name="tagHoverHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.components_group_tag_hover</title></meta>
+                </param>
+            </params>
+        </property>
+
+        <!--
+            The text colour drives the whole hover state on its own: the
+            background is a tint of it over the resting one, the border a
+            stronger mix. The other two fields are there to part with that
+            when a plain colour is wanted.
+        -->
+        <property name="components_tagHoverText" type="iw_theme_color_token_editor" colspan="6">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_label_hover_text</title>
+                <info_text>iw_sulu_tailwind_theme.components_tag_hover_text_info</info_text>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagHoverBg" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_hover_bg</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_tagHoverBorder" type="iw_theme_color_token_editor" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_hover_border</title></meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+
         <property name="tagSpacingHeading" type="heading">
             <params>
                 <param name="label">
@@ -81,6 +118,62 @@
         </property>
 
         <property name="components_tagGap" type="iw_theme_margin_selector" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_gap</title></meta>
+        </property>
+
+        <property name="badgesHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.components_group_badges</title></meta>
+                </param>
+            </params>
+        </property>
+
+        <property name="components_badgeBg" type="iw_theme_color_token_editor" colspan="6">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_label_bg</title>
+                <info_text>iw_sulu_tailwind_theme.components_badge_inherit_info</info_text>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+        <property name="components_badgeText" type="iw_theme_color_token_editor" colspan="6">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_label_text</title>
+                <info_text>iw_sulu_tailwind_theme.components_badge_inherit_info</info_text>
+            </meta>
+            <params><param name="show_palette" value="true"/></params>
+        </property>
+
+        <property name="components_badgeRadius" type="iw_theme_radius_selector" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+        </property>
+        <property name="components_badgeFontSize" type="single_select" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_font_size</title></meta>
+            <params>
+                <param name="default_value" value=""/>
+                <param name="values" type="collection">
+                    <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                    <param name="0.75rem"><meta><title>12 px</title></meta></param>
+                    <param name="0.875rem"><meta><title>14 px</title></meta></param>
+                    <param name="1rem"><meta><title>16 px</title></meta></param>
+                    <param name="1.125rem"><meta><title>18 px</title></meta></param>
+                </param>
+            </params>
+        </property>
+
+        <property name="badgeSpacingHeading" type="heading">
+            <params>
+                <param name="label">
+                    <meta><title>iw_sulu_tailwind_theme.components_group_spacing</title></meta>
+                </param>
+            </params>
+        </property>
+
+        <property name="components_badgePadding" type="iw_theme_margin_selector" colspan="6">
+            <meta><title>iw_sulu_tailwind_theme.components_label_padding</title></meta>
+        </property>
+
+        <property name="components_badgeGap" type="iw_theme_margin_selector" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_gap</title></meta>
         </property>
     </properties>

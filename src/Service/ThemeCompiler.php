@@ -714,8 +714,17 @@ class ThemeCompiler
         // Content colors (empty = page-level defaults, which already adapt to the theme).
         $titleColor = $this->surfaceValue($tokens['cardTitleColor'] ?? '', 'var(--color-text)');
         $textColor = $this->surfaceValue($tokens['cardTextColor'] ?? '', 'var(--color-secondary-600)');
-        $badgeBg = $this->surfaceValue($tokens['cardBadgeBg'] ?? '', 'var(--color-primary-100)');
-        $badgeText = $this->surfaceValue($tokens['cardBadgeText'] ?? '', 'var(--color-primary-700)');
+        // The badge of a card is the same badge the rest of the site wears, so
+        // an unset card badge follows the site-wide one (itself following the
+        // tags) instead of jumping back to a primary tint.
+        $badgeBg = $this->surfaceValue(
+            $tokens['cardBadgeBg'] ?? '',
+            $this->surfaceValue($this->settingValue($tokens, 'components_badgeBg'), 'var(--color-primary-100)'),
+        );
+        $badgeText = $this->surfaceValue(
+            $tokens['cardBadgeText'] ?? '',
+            $this->surfaceValue($this->settingValue($tokens, 'components_badgeText'), 'var(--color-primary-700)'),
+        );
 
         $css = "  /* Card (site-wide) */\n";
 
@@ -1180,12 +1189,64 @@ class ThemeCompiler
             'components_breadcrumbCurrent' => '--color-surface-foreground',
             'components_breadcrumbAccent' => '--color-surface-accent',
         ],
+    ];
+
+    /**
+     * Components whose colours are written as their own variables rather than
+     * as surface tokens: selector => [config key => variables].
+     *
+     * A surface token is the right tool for a component built of many parts
+     * (a panel with headings, fields and buttons follows five tokens). A pill
+     * has three colours of its own, and routing them through the surfaces cost
+     * more than it saved: the component reads `var(--iw-tag-text, <surface>)`,
+     * so anything setting `--iw-tag-text` - the light tones of a dark hero,
+     * for one - silently outranked the setting, a fallback never being reached
+     * once the variable it backs is defined.
+     *
+     * Written through `:where()`, which carries no specificity: the declaration
+     * still lands on the element, so it beats a value inherited from a wrapper
+     * (the dark hero again), while a class placed on the pill itself - a colour
+     * variant, a card badge - keeps the upper hand.
+     *
+     * @var array<string, array<string, list<string>>>
+     */
+    private const COMPONENT_OWN_COLOR_VARIABLES = [
         '.iw-tag' => [
-            'components_tagBg' => '--iw-tag-bg',
-            'components_tagText' => '--color-surface-muted',
-            'components_tagBorder' => '--color-surface-border',
-            'components_tagAccent' => '--color-surface-accent',
+            'components_tagBg' => ['--iw-tag-bg'],
+            'components_tagText' => ['--iw-tag-text'],
+            'components_tagBorder' => ['--iw-tag-border'],
+            'components_tagHoverBg' => ['--iw-tag-hover-bg'],
+            'components_tagHoverText' => ['--iw-tag-hover-text'],
+            'components_tagHoverBorder' => ['--iw-tag-hover-border'],
         ],
+        '.iw-category-badge' => [
+            'components_badgeBg' => ['--iw-category-badge-bg'],
+            'components_badgeText' => ['--iw-category-badge-text'],
+        ],
+    ];
+
+    /**
+     * Settings that fall back to another setting when left empty.
+     *
+     * The badge of a category and the pill of a tag are two shapes of the same
+     * idea - a word a piece of content is filed under - so a theme that styles
+     * its tags gets matching badges without setting them twice. Setting a badge
+     * field parts the two.
+     *
+     * The tag hover text also lands here: it replaced an "Accent" field that
+     * drove the whole hover state without its name saying so, and reading the
+     * old key keeps a theme saved before the rename looking the same.
+     *
+     * @var array<string, string>
+     */
+    private const SETTING_FALLBACKS = [
+        'components_badgeBg' => 'components_tagBg',
+        'components_badgeText' => 'components_tagText',
+        'components_badgeRadius' => 'components_tagRadius',
+        'components_badgeFontSize' => 'components_tagFontSize',
+        'components_badgePadding' => 'components_tagPadding',
+        'components_badgeGap' => 'components_tagGap',
+        'components_tagHoverText' => 'components_tagAccent',
     ];
 
     /**
@@ -1218,6 +1279,10 @@ class ThemeCompiler
             'components_tagPadding' => [['--iw-tag-padding', 3.0]],
             'components_tagGap' => ['--iw-tags-gap'],
         ],
+        '.iw-category-badge, .iw-categories' => [
+            'components_badgePadding' => [['--iw-category-badge-padding', 3.0]],
+            'components_badgeGap' => ['--iw-categories-gap'],
+        ],
         '.iw-pagination' => [
             'components_paginationPadding' => [['--iw-pagination-item-padding', 1.5]],
             'components_paginationGap' => ['--iw-pagination-gap'],
@@ -1237,6 +1302,7 @@ class ThemeCompiler
             'components_sidebarFontSize' => ['--iw-article-filters-font-size', '--iw-toc-font-size'],
         ],
         '.iw-tag' => ['components_tagFontSize' => ['--iw-tag-font-size']],
+        '.iw-category-badge' => ['components_badgeFontSize' => ['--iw-category-badge-font-size']],
         '.iw-breadcrumbs' => ['components_breadcrumbFontSize' => ['--iw-breadcrumbs-font-size']],
     ];
 
@@ -1296,6 +1362,7 @@ class ThemeCompiler
     private const COMPONENT_RADIUS = [
         '.iw-pagination' => ['components_paginationRadius' => ['--iw-pagination-item-radius']],
         '.iw-tag' => ['components_tagRadius' => ['--iw-tag-radius']],
+        '.iw-category-badge' => ['components_badgeRadius' => ['--iw-category-badge-radius']],
         '.iw-article-filters, .iw-article-filters__toggle, .iw-toc' => [
             // The panels and the buttons opening them, which are containers.
             // Not the fields inside the filter form: a select is not a panel,
@@ -1319,6 +1386,27 @@ class ThemeCompiler
     public static function componentSurfaceOverrides(): array
     {
         return self::COMPONENT_SURFACE_OVERRIDES;
+    }
+
+    /**
+     * The per-component own colour variables, same purpose.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    public static function componentOwnColorVariables(): array
+    {
+        return self::COMPONENT_OWN_COLOR_VARIABLES;
+    }
+
+    /**
+     * The settings falling back to another setting, for the tests reading the
+     * chain rather than restating it.
+     *
+     * @return array<string, string>
+     */
+    public static function settingFallbacks(): array
+    {
+        return self::SETTING_FALLBACKS;
     }
 
     /**
@@ -1359,11 +1447,12 @@ class ThemeCompiler
         $css = $this->generateComponentRadii($tokens)
             . $this->generateComponentShadows($tokens)
             . $this->generateComponentSpacing($tokens)
-            . $this->generateComponentTextSizes($tokens);
+            . $this->generateComponentTextSizes($tokens)
+            . $this->generateComponentOwnColors($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
-                $value = trim((string) ($tokens[$key] ?? ''));
+                $value = $this->settingValue($tokens, $key);
                 if ('' === $value || 'none' === $value) {
                     continue;
                 }
@@ -1375,6 +1464,68 @@ class ThemeCompiler
 
             if ('' !== $declarations) {
                 $css .= "{$selector} {\n{$declarations}}\n\n";
+            }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Read a component setting, following the fallback chain when it is empty.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     * @param string               $key    Config key
+     *
+     * @return string The configured value, or '' when nothing is set
+     */
+    private function settingValue(array $tokens, string $key): string
+    {
+        $seen = [];
+        while (true) {
+            $value = trim((string) ($tokens[$key] ?? ''));
+            if ('' !== $value) {
+                return $value;
+            }
+
+            $fallback = self::SETTING_FALLBACKS[$key] ?? null;
+            // A cycle in the map would otherwise spin forever.
+            if (null === $fallback || isset($seen[$fallback])) {
+                return '';
+            }
+
+            $seen[$key] = true;
+            $key = $fallback;
+        }
+    }
+
+    /**
+     * Generate the rules writing a component's own colour variables.
+     *
+     * Emitted through `:where()` so the declaration carries no specificity of
+     * its own - see COMPONENT_OWN_COLOR_VARIABLES for why that matters.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateComponentOwnColors(array $tokens): string
+    {
+        $css = '';
+        foreach (self::COMPONENT_OWN_COLOR_VARIABLES as $selector => $map) {
+            $declarations = '';
+            foreach ($map as $key => $variables) {
+                $value = $this->settingValue($tokens, $key);
+                if ('' === $value || 'none' === $value) {
+                    continue;
+                }
+
+                $color = $this->resolveColorValue($value);
+                foreach ($variables as $variable) {
+                    $declarations .= "  {$variable}: {$color};\n";
+                }
+            }
+            if ('' !== $declarations) {
+                $css .= ":where({$selector}) {\n{$declarations}}\n\n";
             }
         }
 
@@ -1397,7 +1548,7 @@ class ThemeCompiler
         foreach (self::COMPONENT_RADIUS as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $variables) {
-                $value = trim((string) ($tokens[$key] ?? ''));
+                $value = $this->settingValue($tokens, $key);
                 if ('' === $value) {
                     continue;
                 }
@@ -1428,7 +1579,7 @@ class ThemeCompiler
         foreach (self::COMPONENT_SHADOW as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $variables) {
-                $step = trim((string) ($tokens[$key] ?? ''));
+                $step = $this->settingValue($tokens, $key);
                 if ('' === $step || !isset(self::SHADOWS[$step])) {
                     continue;
                 }
@@ -1458,7 +1609,7 @@ class ThemeCompiler
         foreach (self::COMPONENT_SPACING as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $variables) {
-                $stored = trim((string) ($tokens[$key] ?? ''));
+                $stored = $this->settingValue($tokens, $key);
                 if ('' === $stored) {
                     continue;
                 }
@@ -1496,7 +1647,7 @@ class ThemeCompiler
         foreach (self::COMPONENT_TEXT_SIZE as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $variables) {
-                $size = trim((string) ($tokens[$key] ?? ''));
+                $size = $this->settingValue($tokens, $key);
                 if ('' === $size) {
                     continue;
                 }

@@ -160,9 +160,14 @@ class ThemeFormMapper
         'components_paginationText', 'components_paginationAccent',
         'components_paginationBg', 'components_paginationBorder',
         'components_paginationOnAccent', 'components_paginationRadius',
-        // Badges worn by an article: categories and tags.
+        // Labels worn by an article: the pills of a tag list and the filled
+        // badge of a category. A badge key left empty follows the tag one,
+        // which the compiler resolves - see ThemeCompiler::SETTING_FALLBACKS.
         'components_tagBg', 'components_tagText', 'components_tagBorder',
-        'components_tagAccent', 'components_tagRadius',
+        'components_tagHoverBg', 'components_tagHoverText', 'components_tagHoverBorder',
+        'components_tagRadius',
+        'components_badgeBg', 'components_badgeText', 'components_badgeRadius',
+        'components_badgeFontSize', 'components_badgePadding', 'components_badgeGap',
         'components_sidebarRadius', 'components_sidebarShadow', 'components_backToTopShadow',
         'components_paginationShadow', 'components_tagShadow', 'components_controlsShadow',
         // Spacing and text size, per component.
@@ -325,6 +330,14 @@ class ThemeFormMapper
             if (isset($tokens[$key])) {
                 $data[$key] = $tokens[$key];
             }
+        }
+
+        // The tags "Accent" field (pre-3.0.0 release) drove the whole hover
+        // state without its name saying so, and became "Hover text". Its value
+        // pre-fills the new field so an existing theme keeps its look; the old
+        // key is dropped on the next save.
+        if (!isset($data['components_tagHoverText']) && isset($tokens['components_tagAccent'])) {
+            $data['components_tagHoverText'] = $tokens['components_tagAccent'];
         }
 
         // Project-defined fields, one namespace per JSON column
@@ -607,6 +620,11 @@ class ThemeFormMapper
             if (\array_key_exists($key, $data)) {
                 $tokens[$key] = $data[$key];
             }
+        }
+        // Data migration: the renamed tags accent is gone once its successor
+        // is stored, so the compiler stops reading it as a fallback.
+        if (\array_key_exists('components_tagHoverText', $tokens)) {
+            unset($tokens['components_tagAccent']);
         }
 
         // Project-defined token fields (custom_*). Collected last so a project

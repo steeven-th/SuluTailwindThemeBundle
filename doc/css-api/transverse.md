@@ -715,11 +715,17 @@ Generic bordered pills with a hover state. Rendered by `templates/components/_ta
 | `--iw-tag-border` | Border color | `var(--color-border)` |
 | `--iw-tag-radius` | Corner radius | `var(--border-radius)` |
 | `--iw-tag-text` | Text color | `var(--color-secondary-600)` |
-| `--iw-tag-hover-bg` | Hover background | `var(--color-primary-50)` |
-| `--iw-tag-hover-text` | Hover text color | `var(--color-primary-700)` |
-| `--iw-tag-hover-border` | Hover border color | `var(--color-primary-200)` |
+| `--iw-tag-bg` | Background color | `transparent` |
+| `--iw-tag-shadow` | Box shadow | `none` |
+| `--iw-tag-hover-text` | Hover text color | `var(--color-surface-accent)` |
+| `--iw-tag-hover-bg` | Hover background | a 12% tint of the hover text over `--iw-tag-bg` |
+| `--iw-tag-hover-border` | Hover border color | a 40% mix of the hover text into `--iw-tag-border` |
+
+The hover derives from `--iw-tag-hover-text`: the background is a tint of it laid over the resting background, and the border a stronger mix into the resting border. Setting that one variable restyles the whole hover state, and the other two are there to part with the calculation. Note that both mix *into* the resting values rather than replacing them, so a pill with a background keeps it on hover instead of turning paler than it was at rest.
 
 The variant modifiers simply re-point the `--iw-tag-*` variables to a different palette, so you can override a variant by setting those same variables.
+
+**Admin:** Default settings > Tags and badges. The theme writes these variables through `:where(.iw-tag)`, which carries no specificity: a class placed on the pill itself — a colour variant, your own — still wins, while a value inherited from a wrapper (the light tones a dark article hero sets on `.iw-tags`) does not.
 
 **Override example — pill-shaped accent tags:**
 ```css
@@ -747,8 +753,10 @@ Generic filled badge (primary palette by default). Rendered by `templates/compon
 | `--iw-category-badge-font-size` | Font size | `0.75rem` |
 | `--iw-category-badge-font-weight` | Font weight | `600` |
 | `--iw-category-badge-radius` | Corner radius | `var(--border-radius)` |
-| `--iw-category-badge-bg` | Background color | `var(--color-primary-100)` |
-| `--iw-category-badge-text` | Text color | `var(--color-primary-700)` |
+| `--iw-category-badge-bg` | Background color | the tag background, else `var(--color-primary-100)` |
+| `--iw-category-badge-text` | Text color | the tag text color, else `var(--color-primary-700)` |
+
+**Admin:** Default settings > Tags and badges, second group. Every badge field falls back to its tag counterpart — colors, radius, text size, padding and gap — so a theme styles its labels once and parts the two only where it wants them to differ. Inside a card the badge fields of Default settings > Cards take over, and they in turn fall back to these.
 
 **Override example — accent category badges:**
 ```css

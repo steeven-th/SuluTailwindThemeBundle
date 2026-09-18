@@ -4027,6 +4027,15 @@ section.block:has([data-slider-fullbleed-value]) {
     display: block;
 }
 
+/* Two-column body (the article "sidebar" style): content beside a column of
+   widgets. It carries the vertical rhythm of the whole body, the bottom half
+   included - the style empties the article footer, so nothing else stood
+   between the last widget and the site footer. */
+.iw-article-page__columns {
+    margin-top: var(--iw-article-page-columns-gap-top, 2rem);
+    margin-bottom: var(--iw-article-page-columns-gap-bottom, 4rem);
+}
+
 .iw-article-page__header {
     margin-bottom: var(--iw-article-page-header-margin-bottom, 1.5rem);
 }
@@ -4072,7 +4081,11 @@ section.block:has([data-slider-fullbleed-value]) {
     margin-top: var(--iw-article-page-header-tags-gap, 0.75rem);
 }
 
-/* On a dark hero (blog editorial) the pills switch to light tones. */
+/* On a dark hero (blog editorial) the pills switch to light tones. This sets
+   the variables on the wrapper, so a pill inherits them: a colour the theme
+   sets lands on the pill itself and wins, whatever its specificity. That is
+   why the compiler writes the tag colours on the element rather than on an
+   ancestor - see ThemeCompiler::COMPONENT_OWN_COLOR_VARIABLES. */
 .iw-article-hero .iw-tags {
     --iw-tag-text: rgba(255, 255, 255, 0.85);
     --iw-tag-border: rgba(255, 255, 255, 0.35);
@@ -4920,10 +4933,15 @@ span.iw-breadcrumbs__separator {
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
+/* The hover tints what the pill already wears instead of replacing it. Mixing
+   into `transparent` used to come out paler than the resting state, so a
+   background set in the admin only showed while the pointer was away.
+   --iw-tag-hover-text is the colour the whole state derives from: setting it
+   alone is enough, the other two only refine it. */
 .iw-tag:hover {
-    background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--color-surface-accent) 10%, transparent));
+    background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 12%, var(--iw-tag-bg, transparent)));
     color: var(--iw-tag-hover-text, var(--color-surface-accent));
-    border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--color-surface-accent) 30%, transparent));
+    border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 40%, var(--iw-tag-border, var(--color-surface-border))));
 }
 
 .iw-tag--variant-primary {
