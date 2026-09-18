@@ -33,7 +33,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | Class | Role |
 |-------|------|
 | `.iw-key-figure` | Single figure container. |
-| `.iw-key-figure--card` | Modifier — card variant used in `--grid-2x2`. |
+| `.iw-key-figure--card` | Modifier — card variant used in `--grid-2x2`. Framed by the paragraph surface of the variant, like every other card of the bundle. |
 | `.iw-key-figure--inline` | Modifier — vertical flex stack used in `--inline`. |
 | `.iw-key-figure--progress` | Modifier — progress-bar item used in `--progress`. |
 | `.iw-key-figure--timeline` | Modifier — timeline item used in `--timeline`. Even items alternate sides via `:nth-child(even)`. |
@@ -105,7 +105,9 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-gap` | `var(--iw-blocks-component-gap, 1.5rem)` | Gap between cards. |
 | `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Max-width of the grid (centered). |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |
-| `--iw-key-figure-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border. |
+| `--iw-key-figure-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent))` | Card background. The card declared none at all before 3.0.0, so no variant and no surface setting could fill it. |
+| `--iw-key-figure-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Text colour on that background. |
+| `--iw-key-figure-card-border` | `var(--iw-variant-paragraph-border, transparent)` | Card border colour. Its width comes from `--iw-variant-paragraph-border-width` and defaults to zero, so a variant asking for no border gets none. Replaces `--iw-key-figure-border`, which drew a hairline whatever the variant said. |
 
 ### Inline
 
@@ -168,6 +170,16 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
     --iw-key-figure-counter-size-xl: 3rem;
     --iw-key-figure-counter-size-xl-md: 4rem;
     --iw-key-figure-counter-size-xl-lg: 5rem;
+}
+```
+
+### Frame the grid cards without filling them
+
+```css
+.iw-block-key-figures--grid-2x2 .iw-key-figure--card {
+    --iw-key-figure-card-bg: transparent;
+    --iw-key-figure-card-border: var(--color-border);
+    border-width: 1px;
 }
 ```
 

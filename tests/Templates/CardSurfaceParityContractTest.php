@@ -105,6 +105,100 @@ final class CardSurfaceParityContractTest extends TestCase
     }
 
     /**
+     * Classes that are named a card and paint no background whatsoever.
+     *
+     * The two tests above only see a rule that already reaches for the
+     * variant, because that is the hook they recognise a card by. A card that
+     * paints nothing at all is invisible to them - and that is exactly what the
+     * key figures grid was: a padding, a hairline border and no background, so
+     * every surface setting an editor tried did nothing and the cards stayed
+     * bare on a variant that fills them.
+     *
+     * So the question here is the other one: is there, anywhere in the
+     * stylesheet, a rule painting this card? What it paints with is the two
+     * tests above.
+     */
+    #[Test]
+    public function everyCardPaintsABackgroundSomewhere(): void
+    {
+        $rules = self::allRules();
+
+        $names = [];
+        foreach ($rules as [$selector, $body]) {
+            preg_match_all('/\.([A-Za-z][\w-]*(?:--|__)card)(?![\w-])/', $selector, $matches);
+            foreach ($matches[1] as $name) {
+                $names[$name] = true;
+            }
+        }
+
+        self::assertNotEmpty($names, 'The card classes were not found.');
+
+        $bare = [];
+        foreach (array_keys($names) as $name) {
+            if (\in_array($name, self::PAINTED_BY_ITS_PARTS, true)) {
+                continue;
+            }
+
+            foreach ($rules as [$selector, $body]) {
+                if (1 === preg_match('/\.' . preg_quote($name, '/') . '(?![\w-])/', $selector)
+                    && 1 === preg_match('/(?<![-\w])background(?:-color)?:/', $body)
+                ) {
+                    continue 2;
+                }
+            }
+
+            $bare[] = $name;
+        }
+
+        self::assertSame(
+            [],
+            $bare,
+            "A card paints no background at all, so no variant and no surface setting can fill\n"
+            . "it: the editor turns the paragraph surface on and nothing happens. Give it the\n"
+            . "same cascade as the others:\n  "
+            . implode("\n  ", $bare),
+        );
+    }
+
+    /**
+     * Cards whose background is painted by their parts rather than by
+     * themselves.
+     *
+     * The location card is translucent over a map and holds a header and a
+     * body, each with its own fill - one opaque, one scrolling under it. The
+     * outer element carries the shadow and the blur and deliberately paints
+     * nothing.
+     *
+     * @var list<string>
+     */
+    private const PAINTED_BY_ITS_PARTS = ['iw-block-location__card'];
+
+    /**
+     * Every rule of the stylesheet, as selector and declarations.
+     *
+     * @return list<array{0: string, 1: string}>
+     */
+    private static function allRules(): array
+    {
+        $css = (string) file_get_contents(\dirname(__DIR__, 2) . '/assets/styles/app.css');
+
+        $rules = [];
+        foreach (preg_split('/(?<=\})/', $css) ?: [] as $chunk) {
+            if (1 !== preg_match('/([^{}]+)\{([^{}]*)\}\s*$/', $chunk, $matches)) {
+                continue;
+            }
+
+            $selector = trim((string) preg_replace('/\s+/', ' ', (string) preg_replace('~/\*.*?\*/~s', '', $matches[1])));
+
+            if ('' !== $selector) {
+                $rules[] = [$selector, $matches[2]];
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
      * Rules that expose a card-shaped hook without being a card.
      *
      * Each is excluded for a reason that would still hold if the surfaces were

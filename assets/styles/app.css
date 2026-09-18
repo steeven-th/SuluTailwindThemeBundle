@@ -1985,9 +1985,20 @@ img.object-cover {
     }
 }
 
+/* A figure of the grid is an enclosed unit, so it is framed like every other
+   card of the bundle: the paragraph surface of the variant, falling back to the
+   subtle one and then to nothing at all. It used to declare a padding and a
+   border and no background whatsoever, which no variant could fix - the surface
+   settings had nothing to paint. */
 .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
     padding: var(--iw-key-figure-card-padding, 1.5rem);
-    border: 1px solid var(--iw-key-figure-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-key-figure-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+    color: var(--iw-key-figure-card-color, var(--iw-variant-paragraph-color, inherit));
+    /* The width comes from the surface and defaults to zero, so a variant
+       asking for no border gets none. The hairline that used to be written
+       here framed a card the editor never asked to frame. */
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-key-figure-card-border, var(--iw-variant-paragraph-border, transparent));
     text-align: center;
 }
 

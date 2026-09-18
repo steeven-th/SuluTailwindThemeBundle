@@ -1442,3 +1442,27 @@ you want them larger.
 `.iw-key-figure__icon--lg`, `--iw-block-key-figures-with-icons-gap`,
 `--iw-key-figure-with-icon-padding`, `--iw-key-figure-icon-size-lg`,
 `--iw-key-figure-icon-margin-bottom-lg`.
+
+### The grid cards take the variant surface (breaking, visual)
+
+`.iw-key-figure--card`, the card of the grid style, declared a padding and a
+hairline border and **no background at all**, so no variant and no surface setting
+could fill it - turning the paragraph surface on did nothing. It now uses the
+enclosed-unit cascade every other card of the bundle uses, and its border comes
+from the variant instead of being drawn unconditionally.
+
+**What changes visually:** grid cards are filled on any variant that sets a
+paragraph background, and lose their hairline on a variant that asks for no border.
+To keep the old look:
+
+```css
+.iw-block-key-figures--grid-2x2 .iw-key-figure--card {
+    --iw-key-figure-card-bg: transparent;
+    --iw-key-figure-card-border: var(--color-border);
+    border-width: 1px;
+}
+```
+
+**CSS hook renamed:** `--iw-key-figure-border` → `--iw-key-figure-card-border`. The
+name changed because its meaning did: it used to decide the colour of a border that
+was always drawn, it now decides the colour of one the variant decides to draw.
