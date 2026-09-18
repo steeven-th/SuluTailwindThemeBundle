@@ -33,7 +33,7 @@ While a secondary site is selected:
 - picking one records a choice for that site alone, and leaves every other site on the shared value,
 - each field says whether the block **follows the main site** or is **set for this site**, with one click to give the choice back.
 
-An article published on a single site shows no switch at all, and neither does any page.
+On a project running several sites the switch is always there, because what it reads is worth as much as what it does: it names the sites this content reaches. A content reaching a single site shows it greyed out, and a snippet no site has picked up reads **Appearance: no site**, which is the one place that says so. A single-site project never shows it, and neither does any page.
 
 The preview has a webspace selector of its own, shipped by Sulu, sitting in the preview toolbar. The two are independent: ours picks the site you are setting, Sulu's picks the site you are looking at. Set them to the same site to see what you are editing.
 

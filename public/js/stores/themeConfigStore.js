@@ -304,6 +304,18 @@ class ThemeConfigStore {
     }
 
     /**
+     * Whether the project runs more than one site.
+     *
+     * What decides whether the appearance switch is worth any room at all. On
+     * a single-site project it answers a question nobody has.
+     *
+     * @returns {boolean} True when there are several sites
+     */
+    isMultiSite(): boolean {
+        return Object.keys(this._webspaceNames).length > 1;
+    }
+
+    /**
      * The readable name of a site, falling back to its key.
      *
      * @param {string} webspaceKey The site
@@ -441,8 +453,9 @@ class ThemeConfigStore {
      * which is what they showed all the time before this existed.
      *
      * @param {?Object} formInspector The form being edited, when there is one
+     * @param {boolean} refresh Ask again even if the answer is already known
      */
-    ensureSnippetWebspaces(formInspector: ?Object) {
+    ensureSnippetWebspaces(formInspector: ?Object, refresh: boolean = false) {
         if (!formInspector || SNIPPET_RESOURCE_KEY !== formInspector.resourceKey) {
             return;
         }
@@ -451,7 +464,15 @@ class ThemeConfigStore {
 
         // A snippet being created is not assigned anywhere yet, and asking
         // about it would answer nothing.
-        if (!id || this._snippetsAsked[String(id)]) {
+        if (!id) {
+            return;
+        }
+
+        // Asked once per form, not once per session: the assignment is edited
+        // in another view entirely, so a snippet reopened after a change there
+        // must be asked about again. The fields call this on every update, and
+        // they take the cached answer.
+        if (this._snippetsAsked[String(id)] && !refresh) {
             return;
         }
 
@@ -528,9 +549,6 @@ class ThemeConfigStore {
         window.addEventListener('hashchange', () => {
             this._formWebspace = null;
             this._editingWebspace = null;
-            // Area assignments are edited elsewhere in the admin, so where a
-            // snippet is shown is asked again each time one is opened.
-            this._snippetsAsked = {};
             this.ensureCurrentWebspace();
         });
         this.ensureCurrentWebspace();

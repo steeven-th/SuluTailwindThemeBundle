@@ -395,6 +395,7 @@
     "iw_sulu_tailwind_theme.content": "Inhalt",
     "iw_sulu_tailwind_theme.appearance": "Darstellung",
     "iw_sulu_tailwind_theme.appearance_of_site": "Darstellung: {webspace}",
+    "iw_sulu_tailwind_theme.appearance_no_site": "Darstellung: keine Website",
     "iw_sulu_tailwind_theme.appearance_set_for_site": "Nur für {webspace} gesetzt.",
     "iw_sulu_tailwind_theme.appearance_follows_main_site": "Folgt der Hauptwebsite.",
     "iw_sulu_tailwind_theme.appearance_follow_main_site": "Wieder der Hauptwebsite folgen",
