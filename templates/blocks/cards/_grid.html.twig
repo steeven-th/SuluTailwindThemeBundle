@@ -10,12 +10,14 @@
      - itemsView : the matching view data, carrying resolved link targets
      - columns : 2 | 3 | 4
      - align     : left | center - the text inside each card
+     - titleScale : normal | large | xlarge - how much the title of a card
+                    leads over its text, on top of the theme's own size
      - width     : fill | compact | medium | large - how wide a card may be
      - gridAlign : left | center | right - where a row sits once it no
                    longer fills the block
    ───────────────────────────────────────────────────────────────────────── #}
 
-<div class="iw-block-cards__grid iw-block-cards__grid--cols-{{ columns|default('3') }} iw-block-cards__grid--width-{{ width|default('fill') }} iw-block-cards__grid--place-{{ gridAlign|default('left') }} iw-block-cards__grid--align-{{ align|default('left') }}">
+<div class="iw-block-cards__grid iw-block-cards__grid--cols-{{ columns|default('3') }} iw-block-cards__grid--width-{{ width|default('fill') }} iw-block-cards__grid--place-{{ gridAlign|default('left') }} iw-block-cards__grid--align-{{ align|default('left') }} iw-block-cards__grid--title-{{ titleScale|default('normal') }}">
     {% for card in items|default([]) %}
         {% include '@ItechWorldSuluTailwindTheme/blocks/cards/_card.html.twig' with {
             card: card,

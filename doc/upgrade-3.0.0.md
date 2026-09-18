@@ -1392,3 +1392,127 @@ now `ItechWorld\SuluTailwindThemeBundle\Validator\Turnstile` instead of
 
 Verification needs a HTTP client: `composer require symfony/http-client` if your project
 has none.
+
+## Key figures: pictograms, surfaces, columns and progress bars
+
+### The pictogram now renders on every style (fixed)
+
+`inline`, `progress`, `timeline` and `split` offered the picker in the form and
+rendered nothing. An editor picking a pictogram on any of them saw nothing happen
+and had no way to tell why. `KeyFigureIconContractTest` holds the rule.
+
+**What changes visually:** a figure that carried an unused pictogram now shows it.
+Blocks published on those four styles may therefore gain a pictogram you had picked
+and given up on.
+
+A sizing bug came out with it: `.iw-key-figure__icon-img` stretched the pictogram to
+fill its slot, which only ever worked on the one style giving that slot a fixed
+square. Everywhere else the slot sizes itself to its content, so the rule had nothing
+to resolve against and an SVG with no intrinsic size rendered at 300px. The slot now
+hands its size down like the card slot does, so `--iw-key-figure-icon-size` and the
+per-figure size field both work on every style.
+
+### The "with icons" style is gone (breaking, migration provided)
+
+Six layout styles shipped, and two of them were the same one. `with_icons` was the
+inline row with the pictogram rendered, and `inline` did not render it - not by
+design, but because four of the six templates never included the icon partial.
+They all render it now, so a figure with no pictogram draws no slot for one, which
+is the whole of what the second style offered.
+
+**Run the migration once, on every environment holding content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-block-styles --dry-run
+php bin/console iw-sulu:theme:migrate-block-styles
+php bin/console cache:pool:clear cache.app
+```
+
+It moves the blocks published on `with_icons` to `inline`, on pages, snippets and
+articles alike, and drops the entry from the block styles of every theme stored in
+the database. Both halves matter: a theme still naming `_style_with_icons.html.twig`
+points the renderer at a file the bundle no longer holds.
+
+**What changes visually:** the figures wrap in a centred row instead of sitting in a
+grid of equal columns, and the pictograms come out at the default `3rem` rather than
+the `4rem` / `5rem` that style forced. Each figure picks its own size in the form if
+you want them larger.
+
+**CSS hooks removed:** `.iw-block-key-figures--with-icons`, `.iw-key-figure--with-icon`,
+`.iw-key-figure__icon--lg`, `--iw-block-key-figures-with-icons-gap`,
+`--iw-key-figure-with-icon-padding`, `--iw-key-figure-icon-size-lg`,
+`--iw-key-figure-icon-margin-bottom-lg`.
+
+### The grid cards take the variant surface (breaking, visual)
+
+`.iw-key-figure--card`, the card of the grid style, declared a padding and a
+hairline border and **no background at all**, so no variant and no surface setting
+could fill it - turning the paragraph surface on did nothing. It now uses the
+enclosed-unit cascade every other card of the bundle uses, and its border comes
+from the variant instead of being drawn unconditionally.
+
+**What changes visually:** grid cards are filled on any variant that sets a
+paragraph background, and lose their hairline on a variant that asks for no border.
+To keep the old look:
+
+```css
+.iw-block-key-figures--grid-2x2 .iw-key-figure--card {
+    --iw-key-figure-card-bg: transparent;
+    --iw-key-figure-card-border: var(--color-border);
+    border-width: 1px;
+}
+```
+
+**CSS hook renamed:** `--iw-key-figure-border` → `--iw-key-figure-card-border`. The
+name changed because its meaning did: it used to decide the colour of a border that
+was always drawn, it now decides the colour of one the variant decides to draw.
+
+### The grid holds 2 to 4 columns (new)
+
+**Settings > Columns** says how many figures share a row, `auto` giving each one a
+column of its own up to four. It was two and only two, so three figures left one of
+them alone on a row. Past two columns the reading-width cap steps aside, through the
+new `--grid-wide` modifier.
+
+Published blocks keep two columns, which is the default of the field.
+
+### Progress bars take a percentage of their own (new)
+
+A figure on the progress style says two things - what is printed beside the label,
+and how long the bar is - and one field answered both. So a figure reading
+`Sulu 3.0` was cast to zero and drew an empty bar under a value that was never a
+percentage.
+
+**Settings > Bar percentage**, offered on that style alone, drives the bar. The
+`Number` field is free text again: `Sulu 3.0`, `12/20`, `99%`, whatever the figure
+actually says.
+
+Published figures need no migration: an empty percentage reads the number when it is
+one, which is what they all are. A figure carrying neither now draws **no bar**
+rather than a bar at zero, which read as a measurement someone had taken.
+
+**What changes visually:** the displayed value is printed as written, where the style
+used to append a `%` to it. A figure published as `75` now reads `75` and not `75%`.
+Write the sign in the field - it is what makes `12/20` and `Sulu 3.0` possible in the
+same place, and a value that silently gains a unit cannot say anything else.
+
+## Cards: title size and a centred pictogram
+
+### The card title scales per block (new)
+
+`--iw-cards-title-size`, under **Defaults > Cards**, sets the card title size for the
+whole site, and two pixels separated it from the card text - a hierarchy nobody could
+read. Raising it grew every card of every page.
+
+**Settings > Title size** on the cards block scales the title for that block alone
+(Normal, Large, Extra large), as a multiplier on the theme value rather than a size
+of its own, so a site that already raised its titles keeps the proportion it chose.
+It makes the cards block usable as a key figures block, which is what it was being
+bent into.
+
+### A centred card centres its pictogram too (fixed)
+
+With **Content alignment** on centre and the pictogram above the title, the title and
+the number centred and the pictogram stayed against the left edge. The head is a flex
+column in that position, where the placement runs along `align-items` and not along
+`justify-content`, and only the second was named.

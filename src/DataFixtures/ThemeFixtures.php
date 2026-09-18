@@ -1553,7 +1553,6 @@ class ThemeFixtures
                 'enabled' => true,
                 'styles' => [
                     ['key' => 'inline', 'label' => 'En ligne', 'twig' => '_style_inline.html.twig', 'default' => true],
-                    ['key' => 'with_icons', 'label' => 'Avec icones', 'twig' => '_style_with_icons.html.twig'],
                     ['key' => 'grid_2x2', 'label' => 'Grille 2x2', 'twig' => '_style_grid_2x2.html.twig'],
                 ],
             ],

@@ -1804,13 +1804,17 @@ img.object-cover {
 }
 
 /* ─── Block: key_figures ──────────────────────────────────────────────── */
-/* Six layout modifiers:
-   - --grid-2x2   : 2-column card grid (max-width centered)
+/* Five layout modifiers:
+   - --grid-2x2   : card grid, 2 to 4 columns (the name is the stored style key)
    - --inline     : centered flex row with large counters
    - --progress   : list of horizontal progress bars
    - --timeline   : vertical timeline with dots + cards (alternating sides on desktop)
-   - --with-icons : grid of figures with large icons (1..4 columns on desktop)
    - --split      : text on one side, figures stacked on the other
+
+   A sixth one, --with-icons, was dropped in 3.0.0: it was --inline with the
+   pictogram rendered, and --inline renders it now, so the two layouts differed
+   by whether the editor had filled a field. Leaving that field empty is the
+   whole of what the second one offered.
 
    .iw-key-figure is the shared subcomponent for a single figure. Counter
    animation is driven by the `key-figures` Stimulus controller via
@@ -1928,33 +1932,41 @@ img.object-cover {
     opacity: var(--iw-key-figure-subtitle-opacity, 0.75);
 }
 
-/* Shared icon wrapper */
+/* Shared icon wrapper. Every style renders the pictogram, which four of them
+   used to drop on the floor: the field was offered in the form and shown
+   nowhere, so an editor picking one saw nothing happen. */
 .iw-block-key-figures .iw-key-figure__icon {
     --iw-icon-color: var(--iw-key-figure-icon-color, var(--iw-variant-highlight, var(--color-accent)));
     /* Same rule as the card slot: the icon carries the size, the slot follows,
        so a larger one takes the room it needs. */
     --iw-icon-size: var(--iw-key-figure-icon-size, 3rem);
     width: fit-content;
-    margin-inline: auto;
     margin-bottom: var(--iw-key-figure-icon-margin-bottom, 0.75rem);
 }
 
-.iw-block-key-figures .iw-key-figure__icon--lg {
-    width: var(--iw-key-figure-icon-size-lg, 4rem);
-    height: var(--iw-key-figure-icon-size-lg, 4rem);
-    margin-bottom: var(--iw-key-figure-icon-margin-bottom-lg, 1rem);
+/* The pictogram sits where the text under it sits, and only the two styles
+   that centre their figures centre it. `margin-inline: auto` used to be
+   unconditional, which was invisible while only those two rendered an icon and
+   would have centred the timeline and split pictograms over left-aligned text. */
+.iw-block-key-figures--grid-2x2 .iw-key-figure__icon,
+.iw-block-key-figures--inline .iw-key-figure__icon {
+    margin-inline: auto;
 }
 
-@media (min-width: 768px) {
-    .iw-block-key-figures .iw-key-figure__icon--lg {
-        width: var(--iw-key-figure-icon-size-lg-md, 5rem);
-        height: var(--iw-key-figure-icon-size-lg-md, 5rem);
-    }
+/* Beside a label rather than above a figure: the progress style has no room
+   over its bar, so its pictogram joins the label on the same line. */
+.iw-block-key-figures .iw-key-figure__icon--beside {
+    margin-bottom: 0;
+    --iw-icon-size: var(--iw-key-figure-icon-size-beside, 1.5rem);
 }
 
+/* The size lands on the icon and the slot follows, which is what the card slot
+   does. Stretching the icon to fill the slot instead was the rule here, and it
+   only ever worked because one style gave the slot a fixed square: everywhere
+   else the slot sizes itself to its content, so `width: 100%` had nothing to
+   resolve against and an SVG with no intrinsic size came out at 300px. Reading
+   the shared component's own size rule is enough. */
 .iw-block-key-figures .iw-key-figure__icon-img {
-    width: 100%;
-    height: 100%;
     object-fit: contain;
 }
 
@@ -1967,15 +1979,44 @@ img.object-cover {
     margin-inline: auto;
 }
 
+/* Two columns from the first breakpoint whatever the count asked for: three or
+   four of them only fit once there is desktop width, and the rule below takes
+   over there. */
 @media (min-width: 640px) {
     .iw-block-key-figures--grid-2x2 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
+/* How many columns the grid holds, from the `figureColumns` setting. It used to
+   be two, full stop, so three figures left one of them alone on a row. */
+@media (min-width: 1024px) {
+    .iw-block-key-figures--cols-1 { grid-template-columns: 1fr; }
+    .iw-block-key-figures--cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .iw-block-key-figures--cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .iw-block-key-figures--cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Past two columns the reading width the grid keeps by default is what makes
+   the cards cramped, so it steps aside. */
+.iw-block-key-figures--grid-wide {
+    max-width: var(--iw-block-key-figures-grid-wide-max-width, none);
+}
+
+/* A figure of the grid is an enclosed unit, so it is framed like every other
+   card of the bundle: the paragraph surface of the variant, falling back to the
+   subtle one and then to nothing at all. It used to declare a padding and a
+   border and no background whatsoever, which no variant could fix - the surface
+   settings had nothing to paint. */
 .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
     padding: var(--iw-key-figure-card-padding, 1.5rem);
-    border: 1px solid var(--iw-key-figure-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
+    background-color: var(--iw-key-figure-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+    color: var(--iw-key-figure-card-color, var(--iw-variant-paragraph-color, inherit));
+    /* The width comes from the surface and defaults to zero, so a variant
+       asking for no border gets none. The hairline that used to be written
+       here framed a card the editor never asked to frame. */
+    border: var(--iw-variant-paragraph-border-width, 0) solid
+        var(--iw-key-figure-card-border, var(--iw-variant-paragraph-border, transparent));
     text-align: center;
 }
 
@@ -2045,6 +2086,9 @@ img.object-cover {
 }
 
 .iw-block-key-figures--progress .iw-key-figure__progress-label {
+    display: flex;
+    align-items: center;
+    gap: var(--iw-key-figure-progress-label-gap, 0.5rem);
     font-weight: var(--iw-key-figure-progress-label-weight, 600);
 }
 
@@ -2164,34 +2208,6 @@ img.object-cover {
         margin-right: auto;
         padding-right: 2rem;
     }
-}
-
-/* Mode: --with-icons ──────────────────────────────────────────────────── */
-.iw-block-key-figures--with-icons {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--iw-block-key-figures-with-icons-gap, 2rem);
-}
-
-@media (min-width: 640px) {
-    .iw-block-key-figures--with-icons {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .iw-block-key-figures--cols-1 { grid-template-columns: 1fr; }
-    .iw-block-key-figures--cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .iw-block-key-figures--cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .iw-block-key-figures--cols-4 { grid-template-columns: repeat(4, 1fr); }
-}
-
-.iw-block-key-figures--with-icons .iw-key-figure--with-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: var(--iw-key-figure-with-icon-padding, 1.5rem);
 }
 
 /* ─── Block: timeline ─────────────────────────────────────────────────── */
@@ -6090,14 +6106,24 @@ aside .iw-toc {
     gap: 0.6rem;
 }
 
+/* `stretch` rather than the `inherit` written here before, which resolved to
+   the same thing by way of the body and only made it harder to read. */
 .iw-card__head--stacked {
     flex-direction: column;
-    align-items: inherit;
+    align-items: stretch;
     gap: 0.4rem;
 }
 
+/* Centring a head has to name both axes, because the two icon positions turn
+   the flow the other way: `inline` is a row, where the placement runs along
+   `justify-content`, and `above` is a column, where it runs along
+   `align-items`. Naming only the first left the pictogram of a stacked head
+   pinned to the left while the title and the number beside it centred - those
+   two are text, so they follow `text-align` and never needed the flex rules at
+   all. */
 .iw-block-cards__grid--align-center .iw-card__head {
     justify-content: center;
+    align-items: center;
 }
 
 /* The slot the pictogram sits in. It hands its size down through
@@ -6125,6 +6151,29 @@ aside .iw-toc {
     font-size: var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem));
     font-weight: 600;
     color: var(--iw-variant-title-color, inherit);
+}
+
+/* How much the title leads over the text, for this block alone.
+
+   It is a multiplier and not a size, so it rides on top of whatever the theme
+   set under Defaults > Cards rather than replacing it: a site that raised its
+   card titles keeps the proportion it chose. The default size leads the text by
+   two pixels, which reads as an accident rather than as a hierarchy, and the
+   theme value could not be raised for one block without growing every card of
+   every page with it.
+
+   The line height tightens as the size grows: a title standing in for a figure
+   is short, and the ratio a paragraph needs leaves a hole above and below it. */
+.iw-block-cards__grid--title-large .iw-card__title {
+    font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
+        * var(--iw-cards-title-scale-large, 1.5));
+    line-height: 1.25;
+}
+
+.iw-block-cards__grid--title-xlarge .iw-card__title {
+    font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
+        * var(--iw-cards-title-scale-xlarge, 2.25));
+    line-height: 1.1;
 }
 
 .iw-card__text {

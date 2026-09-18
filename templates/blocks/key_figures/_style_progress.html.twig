@@ -1,4 +1,14 @@
-{# Key figures block — horizontal progress bars #}
+{# Key figures block - horizontal progress bars.
+
+   A figure here says two separate things, and they used to share one field:
+   what is printed beside the label, and how long the bar is. So a figure
+   reading "Sulu 3.0" cast down to zero and drew an empty bar under a value
+   that was never a percentage. The dedicated percentage field answers the
+   second question now, and the displayed value is free text again.
+
+   A figure with no percentage at all - neither the field, nor a plain number
+   to read one from - prints its value and no bar, rather than a bar at zero
+   that reads as a measurement nobody took. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -20,19 +30,51 @@
         <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--progress">
             {% for item in figures %}
                 {% if item.type|default('figure') == 'figure' %}
-                    {% set percentage = item.number|default('0')|replace({',': '', '%': ''})|number_format(0) %}
+                    {% set percent = iw_sulu_tailwind_theme_progress_percent(
+                        item.progressValue|default(null),
+                        item.number|default('')
+                    ) %}
+                    {#- What is printed on the right. The editor's own value when
+                        there is one, and the percentage spelled out when the
+                        figure only carries a bar. -#}
+                    {% set displayValue = item.number|default('') is not empty
+                        ? item.number
+                        : (percent is not null ? percent ~ '%' : '') %}
+
                     <div class="iw-key-figure iw-key-figure--progress">
                         <div class="iw-key-figure__progress-header">
-                            <span class="iw-key-figure__progress-label">{{ item.title|default('') }}</span>
-                            <span class="iw-key-figure__progress-value" data-key-figures-target="counter" data-key-figures-end-value="{{ percentage }}%">0%</span>
+                            <span class="iw-key-figure__progress-label">
+                                {#- The pictogram sits beside the label, this
+                                    style having no room above it. -#}
+                                {% set figureIcon %}
+                                    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                                        item: item,
+                                        class: 'iw-key-figure__icon-img'
+                                    } only -%}
+                                {% endset %}
+                                {% if figureIcon|trim is not empty %}
+                                    <span class="iw-key-figure__icon iw-key-figure__icon--beside">{{ figureIcon }}</span>
+                                {% endif %}
+                                {{ item.title|default('') }}
+                            </span>
+                            {% if displayValue is not empty %}
+                                {#- The real value is in the markup, not a zero
+                                    the script is expected to replace: without
+                                    JavaScript the figure still reads. -#}
+                                <span class="iw-key-figure__progress-value"
+                                      data-key-figures-target="counter"
+                                      data-key-figures-end-value="{{ displayValue }}">{{ displayValue }}</span>
+                            {% endif %}
                         </div>
-                        <div class="iw-key-figure__progress-track">
-                            <div
-                                data-key-figures-target="progressBar"
-                                data-value="{{ percentage }}"
-                                class="iw-key-figure__progress-bar"
-                            ></div>
-                        </div>
+                        {% if percent is not null %}
+                            <div class="iw-key-figure__progress-track">
+                                <div
+                                    data-key-figures-target="progressBar"
+                                    data-value="{{ percent }}"
+                                    class="iw-key-figure__progress-bar"
+                                ></div>
+                            </div>
+                        {% endif %}
                         {% if item.subTitle is defined and item.subTitle is not empty %}
                             <p class="iw-key-figure__subtitle iw-block__subtitle">{{ item.subTitle }}</p>
                         {% endif %}

@@ -281,6 +281,29 @@
                     </params>
                 </property>
 
+                <!--
+                    How much the title of a card leads over its text. The theme
+                    sets the size every card of the site starts from, under
+                    Defaults > Cards, and this scales it for this block alone:
+                    a grid standing in for key figures needs a title that reads
+                    as the figure, and raising the theme value would have grown
+                    every card of every page along with it.
+                -->
+                <property name="cardTitleScale" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.cards_title_scale</title>
+                        <info_text>iw_sulu_tailwind_theme.cards_title_scale_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="normal"/>
+                        <param name="values" type="collection">
+                            <param name="normal"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_normal</title></meta></param>
+                            <param name="large"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_large</title></meta></param>
+                            <param name="xlarge"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_xlarge</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
                 <!-- The horizontal layout puts the visual beside the text, so it
                      owns that placement and the setting would do nothing. -->
                 <property name="iconPosition" type="single_select" colspan="6"

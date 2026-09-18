@@ -32,6 +32,19 @@
                         <div class="iw-key-figure iw-key-figure--timeline">
                             <div class="iw-key-figure__timeline-dot"></div>
                             <div class="iw-key-figure__timeline-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                                {#- The pictogram opens the card, above the
+                                    figure, and follows the text alignment of
+                                    the card rather than centring on its own. -#}
+                                {% set figureIcon %}
+                                    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                                        item: item,
+                                        class: 'iw-key-figure__icon-img'
+                                    } only -%}
+                                {% endset %}
+                                {% if figureIcon|trim is not empty %}
+                                    <div class="iw-key-figure__icon">{{ figureIcon }}</div>
+                                {% endif %}
+
                                 {% if item.number is defined and item.number is not empty %}
                                     <span
                                         data-key-figures-target="counter"

@@ -1,4 +1,13 @@
-{# Key figures block — 2x2 grid layout #}
+{# Key figures block - a grid of framed figures.
+
+   The file keeps its `grid_2x2` name, which is the key stored on every block
+   already published and in the block styles of every theme in the database.
+   The layout itself is no longer two columns: how many there are is a setting,
+   because three figures in a two-column grid left one of them alone on a row.
+
+   A figure is an enclosed unit here, so it is framed like every other card of
+   the bundle - by the paragraph surface of the variant, not by a rule of its
+   own. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -22,7 +31,19 @@
     {% endif %}
 
     {% if figures is defined and figures is iterable %}
-        <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--grid-2x2{{ highlightClass }}">
+        {#- `auto` gives every figure a column of its own, up to four. Past that
+            the row would be too narrow to read, and the extras wrap. An
+            explicit count wins over it, which is what the setting is for. -#}
+        {% set columns = figureColumns|default('2') %}
+        {% if columns not in ['2', '3', '4'] %}
+            {% set columns = figures|length > 4 ? 4 : (figures|length ?: 1) %}
+        {% endif %}
+        {#- Two columns keep the reading width they always had. More of them
+            need the whole block, or the cards come out too cramped to hold a
+            counter. -#}
+        {% set widthClass = columns > 2 ? ' iw-block-key-figures--grid-wide' : '' %}
+
+        <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--grid-2x2 iw-block-key-figures--cols-{{ columns }}{{ widthClass }}{{ highlightClass }}">
             {% for figure in figures %}
                 <div class="iw-key-figure iw-key-figure--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {# Icon / Image #}
