@@ -332,9 +332,37 @@ the button unstyled everywhere else.
 ```
 
 **Parameters:**
-- `stored` (`string|null`) — The style stored on the block or the variant
+- `stored` (`mixed`) — The style stored on the block or the variant, plain or naming a choice per site
 
 **Returns:** `string` — A slug the theme defines, or an empty string when it defines no button.
+
+---
+
+### `iw_sulu_tailwind_theme_site_value(stored)`
+
+Reduces a stored appearance value to what applies on the site being rendered.
+
+An article can be published on several sites, each running a different theme,
+and the editor can then pick a colour variant or a button style per site. The
+stored value is a plain string until that happens, and a map afterwards. The
+resolver functions above already do this reduction, so this one is for the
+templates that put a stored value straight into a class name of their own,
+where no resolver stands in the way.
+
+A plain value comes back untouched, so a template calling this keeps working on
+every page and every single-site article.
+
+```twig
+{% set style = iw_sulu_tailwind_theme_site_value(cta.style|default('')) %}
+<a class="{{ style ? 'iw-button--' ~ style : 'iw-button--variant' }}">
+```
+
+See [Articles on several sites](multi-site-articles.md).
+
+**Parameters:**
+- `stored` (`mixed`) — The stored value, plain or naming a choice per site
+
+**Returns:** `mixed` — The value that applies on the site being rendered.
 
 ---
 

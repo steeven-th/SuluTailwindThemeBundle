@@ -33,6 +33,7 @@ import TextColorPlugin from './ckeditor/TextColorPlugin';
 import UppercasePlugin from './ckeditor/UppercasePlugin';
 import collapsibleSections from './components/CollapsibleSections/CollapsibleSections';
 import SaveWithConfigReloadAction from './components/SaveWithConfigReloadAction/SaveWithConfigReloadAction';
+import AppearanceWebspaceAction from './components/AppearanceWebspaceAction/AppearanceWebspaceAction';
 import ExportToolbarAction from './components/ThemeTransfer/ExportToolbarAction';
 import ImportFormToolbarAction from './components/ThemeTransfer/ImportFormToolbarAction';
 import ImportListToolbarAction from './components/ThemeTransfer/ImportListToolbarAction';
@@ -46,16 +47,24 @@ import ImportListToolbarAction from './components/ThemeTransfer/ImportListToolba
  */
 initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initialized: boolean) => {
     if (config) {
-        // Apply initial theme data to the observable store
-        themeConfigStore.update(config);
+        // Which site a new article lands in, so its very first form shows the
+        // theme it will be saved with.
+        themeConfigStore.setArticleDefaultWebspaces(config.articleDefaultWebspaces || {});
+        themeConfigStore.setWebspaceNames(config.webspaceNames || {});
 
         // What just landed is the project-wide config, so it carries the theme
         // of the default webspace. On a multi-site project that is the wrong
-        // site the moment another one is being edited - and this hook runs
-        // again after every theme save. Mark the store stale and let the
-        // edited site's theme be fetched over it.
-        themeConfigStore.invalidate();
-        themeConfigStore.ensureCurrentWebspace();
+        // site the moment another one is being edited, and this hook runs again
+        // after every theme save. It may therefore only fill the store while no
+        // site is known: writing it over a known one is what made the colors of
+        // the first site appear on an article and stay there.
+        if (themeConfigStore.currentWebspace()) {
+            themeConfigStore.invalidate();
+            themeConfigStore.ensureCurrentWebspace();
+        } else {
+            themeConfigStore.update(config);
+            themeConfigStore.invalidate();
+        }
 
         StylePicker.blockStyles = config.blockStyles || {};
         ArticleStylePicker.articleStyles = config.articleStyles || {};
@@ -81,6 +90,11 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     // component for why.
     viewRegistry.add('iw_sulu_tailwind_theme.nested_tabs', NestedTabs);
     formToolbarActionRegistry.add('iw_sulu_tailwind_theme.save', SaveWithConfigReloadAction);
+
+    // Which site an appearance applies to, on an article published on several.
+    // Added to every article content form by ArticleAppearanceAdmin, and it
+    // shows nothing at all unless the article really is on several sites.
+    formToolbarActionRegistry.add('iw_sulu_tailwind_theme.appearance_webspace', AppearanceWebspaceAction);
 
     // Theme transfer. The same key names a form action and a list action: the
     // two registries are separate, and a theme is imported from either place -

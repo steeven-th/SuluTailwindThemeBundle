@@ -59,7 +59,7 @@ class VariantColorSchemeResolver
 
         $rawVariants = $tokens['blockVariants'] ?? [];
         $variantConfig = \is_array($rawVariants)
-            ? VariantResolver::resolveConfig($variant, $rawVariants)
+            ? VariantResolver::resolveConfig($variant, $rawVariants, $this->themeProvider->getCurrentWebspaceKey())
             : [];
 
         $colorSet = ColorSet::fromTokens($tokens);

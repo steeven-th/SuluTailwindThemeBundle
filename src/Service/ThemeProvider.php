@@ -65,6 +65,20 @@ class ThemeProvider
     }
 
     /**
+     * The site being rendered, when there is a request to read it from.
+     *
+     * What tells a value naming a choice per site which one applies here. Null
+     * on the command line, where WebspaceScopedValue falls back to the value
+     * every site follows.
+     *
+     * @return string|null The webspace key, or null outside a website request
+     */
+    public function getCurrentWebspaceKey(): ?string
+    {
+        return $this->requestAnalyzer?->getWebspace()?->getKey();
+    }
+
+    /**
      * Get the currently active theme for the current webspace.
      *
      * Wrapper around getThemeForWebspace() for backward compatibility.

@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Admin;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\ArticleWebspaceDefaults;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
@@ -238,6 +239,7 @@ class ThemeAdmin extends Admin
         private WebspaceThemeRepository $webspaceThemeRepository,
         private WebspaceManagerInterface $webspaceManager,
         private ThemeConfigResolver $themeConfigResolver,
+        private ArticleWebspaceDefaults $articleWebspaceDefaults,
         private bool $articleTemplatesEnabled = false,
         /** @var array<string, array<string, bool>> Buttons the title editor offers, per context */
         private array $titleEditorConfig = [],
@@ -701,6 +703,22 @@ class ThemeAdmin extends Admin
      *
      * @return string The config key
      */
+    /**
+     * The readable name of every webspace, keyed by webspace key.
+     *
+     * @return array<string, string> Webspace key to name
+     */
+    private function webspaceNames(): array
+    {
+        $names = [];
+
+        foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
+            $names[$webspace->getKey()] = $webspace->getName();
+        }
+
+        return $names;
+    }
+
     public function getConfigKey(): ?string
     {
         return 'iw_sulu_tailwind_theme';
@@ -716,7 +734,10 @@ class ThemeAdmin extends Admin
      */
     public function getConfig(): ?array
     {
-        // Pick the first webspace-assigned theme as default for initial load
+        // A starting point only, and a deliberately arbitrary one: the admin
+        // replaces it with the theme of the site actually being edited as soon
+        // as a view names one. Which is why the store must never write this
+        // over a site it already knows, see stores/themeConfigStore.
         $activeTheme = null;
         foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
             $activeTheme = $this->webspaceThemeRepository->findThemeForWebspace($webspace->getKey());
@@ -735,6 +756,13 @@ class ThemeAdmin extends Admin
             'articleStyles' => self::ARTICLE_STYLE_OPTIONS,
             'collapsibleSections' => self::COLLAPSIBLE_SECTIONS,
             'hasApiKey' => $this->googleFontsCatalog->hasApiKey(),
+            // An article names its site in its own data, and carries none
+            // before its first save. This is what the admin falls back to so
+            // that a brand new article already shows the theme it will run.
+            'articleDefaultWebspaces' => $this->articleWebspaceDefaults->byLocale(),
+            // Site names, so the appearance switch of an article names sites
+            // the way the editor knows them rather than by their key.
+            'webspaceNames' => $this->webspaceNames(),
             // Which buttons the title editor offers, per context. The field type
             // reads this as its DEFAULT: an explicit param in a template's XML
             // still wins, so a project can override one field without giving up

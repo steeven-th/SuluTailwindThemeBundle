@@ -94,13 +94,15 @@ final class ButtonResolver
      * button (best-effort, preserving legacy role references when a button
      * keeps that name as its slug).
      *
-     * @param mixed $stored  The stored reference (slug or legacy role name)
-     * @param mixed $buttons The raw or normalized buttons value
+     * @param mixed       $stored      The stored reference (slug, scoped map or legacy role name)
+     * @param mixed       $buttons     The raw or normalized buttons value
+     * @param string|null $webspaceKey The site being rendered, null off-request
      *
      * @return string The effective slug, or '' when there is no button
      */
-    public static function resolveSlug(mixed $stored, mixed $buttons): string
+    public static function resolveSlug(mixed $stored, mixed $buttons, ?string $webspaceKey = null): string
     {
+        $stored = WebspaceScopedValue::forWebspace($stored, $webspaceKey);
         $slugs = array_column(self::normalizeButtons($buttons), 'slug');
         if ([] === $slugs) {
             return '';

@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Admin\WebspaceThemeAdmin;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\SnippetWebspaceLocator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
@@ -34,6 +35,20 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class WebspaceThemeController extends AbstractController implements SecuredControllerInterface
 {
+    /**
+     * Who may ask where a snippet is used.
+     *
+     * The answer describes snippets, not themes, so it is guarded by the
+     * permission on snippets rather than by the one on this controller.
+     *
+     * Spelled out rather than read from SnippetAdmin::SECURITY_CONTEXT, which
+     * Sulu marks internal, and which only exists where SuluSnippetBundle is
+     * installed. A wrong value here denies the request and the admin silently
+     * stops offering the themes of the sites showing a snippet, so it is
+     * pinned by SnippetSecurityContextTest.
+     */
+    private const SNIPPET_SECURITY_CONTEXT = 'sulu.snippet.snippets';
+
     public function __construct(
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly ThemeConfigRepository $themeConfigRepository,
@@ -42,6 +57,7 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
         private readonly SecurityCheckerInterface $securityChecker,
         private readonly ThemeConfigResolver $themeConfigResolver,
         private readonly WebspaceSettings $webspaceSettings,
+        private readonly SnippetWebspaceLocator $snippetWebspaceLocator,
     ) {
     }
 
@@ -184,21 +200,81 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
     )]
     public function getThemeConfigAction(Request $request): JsonResponse
     {
+        // An article published on several sites needs all their themes at once
+        // to let the editor pick an appearance per site. Asking for them one
+        // request at a time would show the form filling in piece by piece.
+        $keys = array_values(array_filter(array_map(
+            trim(...),
+            explode(',', $request->query->getString('webspaces')),
+        )));
+
+        if ([] !== $keys) {
+            $configs = [];
+
+            foreach ($keys as $key) {
+                $configs[$key] = $this->resolveForWebspace($key);
+            }
+
+            return new JsonResponse($configs);
+        }
+
         $webspaceKey = $request->query->getString('webspace');
 
         if ('' === $webspaceKey) {
             return new JsonResponse($this->themeConfigResolver->resolve(null));
         }
 
+        return new JsonResponse($this->resolveForWebspace($webspaceKey));
+    }
+
+    /**
+     * The theme of one site, plus the per-site settings its fields need.
+     *
+     * Those settings are not part of the theme but still differ per site, and
+     * the fields asking for them are the very fields already waiting for this
+     * response, so they ride along rather than costing a second request.
+     *
+     * @param string $webspaceKey The site to resolve
+     *
+     * @return array<string, mixed> The resolved theme config of that site
+     */
+    private function resolveForWebspace(string $webspaceKey): array
+    {
         $theme = $this->webspaceThemeRepository->findThemeForWebspace($webspaceKey);
 
-        // Settings that are not part of the theme but still differ per site
-        // ride along: the fields asking for them are the very fields already
-        // waiting for this response, and one request beats two.
-        return new JsonResponse(\array_merge(
+        return \array_merge(
             $this->themeConfigResolver->resolve($theme),
             ['titleEditor' => $this->webspaceSettings->get('title_editor', $webspaceKey)],
-        ));
+        );
+    }
+
+    /**
+     * The sites a snippet is shown on, for the admin to pick a theme.
+     *
+     * A snippet names no site of its own, so its form had no way of knowing
+     * which theme to offer and fell back to the project-wide one. That is the
+     * theme of whichever site happens to be first, which is right by accident
+     * at best.
+     *
+     * @param Request $request The HTTP request (expects ?id=<uuid>)
+     *
+     * @return JsonResponse The webspace keys assigning this snippet
+     */
+    #[Route(
+        '/admin/api/iw-snippet-webspaces',
+        name: 'iw_sulu_tailwind_theme.get_snippet_webspaces',
+        methods: ['GET'],
+    )]
+    public function getSnippetWebspacesAction(Request $request): JsonResponse
+    {
+        $this->securityChecker->checkPermission(
+            self::SNIPPET_SECURITY_CONTEXT,
+            PermissionTypes::VIEW,
+        );
+
+        return new JsonResponse([
+            'webspaces' => $this->snippetWebspaceLocator->webspacesOf($request->query->getString('id')),
+        ]);
     }
 
     /**

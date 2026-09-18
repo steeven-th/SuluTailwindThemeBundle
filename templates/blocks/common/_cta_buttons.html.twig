@@ -88,9 +88,11 @@
                     {% set ctaIconLeft = (cta.iconPosition|default('right')) == 'left' %}
                     {% set ctaIconGap = iw_sulu_tailwind_theme_spacing_length(cta.iconGap|default('')) %}
                     {% set ctaIconVars = ctaIconGap ? '--iw-button-icon-gap: ' ~ ctaIconGap ~ ';' : '' %}
+                    {# A button style may name a choice per site, see iw_sulu_tailwind_theme_site_value. #}
+                    {% set ctaStyle = iw_sulu_tailwind_theme_site_value(cta.style|default('')) %}
 
                     <a href="{{ ctaUrl }}"
-                       class="{{ cta.style|default('') ? 'iw-button--' ~ cta.style : 'iw-button--variant' }} iw-block__action{{ ctaHasIcon ? ' iw-button--with-icon' : '' }}"
+                       class="{{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} iw-block__action{{ ctaHasIcon ? ' iw-button--with-icon' : '' }}"
                        {% if ctaHasIcon and ctaIconVars %}style="{{ ctaIconVars }}"{% endif %}
                        {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
                        {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}

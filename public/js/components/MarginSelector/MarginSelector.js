@@ -81,7 +81,7 @@ export default class MarginSelector extends React.Component {
     componentDidMount() {
         // The spacing shown as "the theme's" is the edited site's, not the
         // first site's.
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
         // A field that follows the theme must be ALLOWED to stay empty, so no
         // default is forced onto it: writing one in would silently opt every
@@ -102,7 +102,7 @@ export default class MarginSelector extends React.Component {
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**

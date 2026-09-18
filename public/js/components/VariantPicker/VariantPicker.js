@@ -4,6 +4,8 @@ import {observer} from 'mobx-react';
 import themeConfigStore from '../../stores/themeConfigStore';
 import loadFormPalette from '../../utils/formPalette';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
+import {valueFor, withValue} from '../../utils/scopedValue';
+import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 import {getSuluPrimaryColor, getSuluPrimaryAlpha} from '../../utils/suluColors';
 
 /**
@@ -73,7 +75,7 @@ export default class VariantPicker extends React.Component {
     state = {palette: null};
 
     componentDidMount() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
         // Colors edited in the palette tab of the same form are not saved yet,
         // and the variants reference them, so the wireframes need the form
@@ -85,17 +87,18 @@ export default class VariantPicker extends React.Component {
         });
 
         const {value, onChange} = this.props;
-        if ((value === null || value === undefined || value === '') && onChange) {
+        const applied = valueFor(value, themeConfigStore.editingWebspace);
+        if ((applied === null || applied === undefined || applied === '') && onChange) {
             const variants = this._getVariants();
             if (variants.length > 0) {
                 const firstSlug = variants[0].slug;
-                setTimeout(() => onChange(firstSlug), 0);
+                setTimeout(() => this.handleSelect(firstSlug), 0);
             }
         }
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**
@@ -135,9 +138,19 @@ export default class VariantPicker extends React.Component {
      * @param {string} variantSlug - The slug of the selected variant
      */
     handleSelect = (variantSlug) => {
-        const {onChange} = this.props;
+        const {onChange, value} = this.props;
         if (onChange) {
-            onChange(variantSlug);
+            onChange(withValue(value, themeConfigStore.editingWebspace, variantSlug));
+        }
+    };
+
+    /**
+     * Drop the choice made for this site, so it follows the main one again.
+     */
+    handleFollowMain = () => {
+        const {onChange, value} = this.props;
+        if (onChange) {
+            onChange(withValue(value, themeConfigStore.editingWebspace, valueFor(value, null)));
         }
     };
 
@@ -263,10 +276,12 @@ export default class VariantPicker extends React.Component {
         );
     }
 
+
     render() {
         const {value} = this.props;
+        const editingWebspace = themeConfigStore.editingWebspace;
         const variants = this._getVariants();
-        const selectedSlug = selectedVariantSlug(value, variants);
+        const selectedSlug = selectedVariantSlug(valueFor(value, editingWebspace), variants);
 
         if (variants.length === 0) {
             return (
@@ -277,18 +292,25 @@ export default class VariantPicker extends React.Component {
         }
 
         return (
-            <div style={{
-                display: 'grid',
-                // Same track as the style pickers, which sit in the same panel:
-                // at 150px the variants dropped to one column while the styles
-                // beside them still fitted two.
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                gap: '12px',
-                padding: '8px',
-            }}>
-                {variants.map((variant) =>
-                    this.renderWireframe(variant, variant.slug === selectedSlug)
-                )}
+            <div>
+                <AppearanceSiteNotice
+                    formInspector={this.props.formInspector}
+                    onFollowMain={this.handleFollowMain}
+                    value={value}
+                />
+                <div style={{
+                    display: 'grid',
+                    // Same track as the style pickers, which sit in the same panel:
+                    // at 150px the variants dropped to one column while the styles
+                    // beside them still fitted two.
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                    gap: '12px',
+                    padding: '8px',
+                }}>
+                    {variants.map((variant) =>
+                        this.renderWireframe(variant, variant.slug === selectedSlug)
+                    )}
+                </div>
             </div>
         );
     }

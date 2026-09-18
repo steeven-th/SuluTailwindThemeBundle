@@ -394,6 +394,13 @@
 
     "iw_sulu_tailwind_theme.content": "Inhalt",
     "iw_sulu_tailwind_theme.appearance": "Darstellung",
+    "iw_sulu_tailwind_theme.appearance_of_site": "Darstellung: {webspace}",
+    "iw_sulu_tailwind_theme.appearance_no_site": "Darstellung: keine Website",
+    "iw_sulu_tailwind_theme.appearance_set_for_site": "Nur für {webspace} gesetzt.",
+    "iw_sulu_tailwind_theme.appearance_follows_main_site": "Folgt der Hauptwebsite.",
+    "iw_sulu_tailwind_theme.appearance_follow_main_site": "Wieder der Hauptwebsite folgen",
+    "iw_sulu_tailwind_theme.appearance_shared_by_all_sites": "Diese Einstellung gilt für alle Websites, auf denen der Artikel veröffentlicht ist.",
+    "iw_sulu_tailwind_theme.appearance_shared_except": "Diese Einstellung gilt für alle Websites außer {webspaces}, dort wurde eine andere gewählt.",
     "iw_sulu_tailwind_theme.settings": "Einstellungen",
     "iw_sulu_tailwind_theme.settings_group_spacing": "Abstände",
     "iw_sulu_tailwind_theme.settings_group_radius": "Eckenradius",
@@ -1038,6 +1045,8 @@
     "iw_sulu_tailwind_theme.social_media_name": "Name",
     "iw_sulu_tailwind_theme.icon": "Symbol",
     "iw_sulu_tailwind_theme.snippet_title": "Snippet-Titel",
+    "iw_sulu_tailwind_theme.snippet_area_notice": "Farben und Schaltflächen dieses Snippets",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Die hier angebotenen Farbvarianten und Schaltflächenstile stammen aus dem Theme der Website, die dieses Snippet anzeigt. Um das Theme einer anderen Website zu sehen, muss diese das Snippet zuerst ausgewählt haben, unter Webspaces > Standard Schnipsel.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega-Menü",
     "iw_sulu_tailwind_theme.mega_source": "Datenquelle",

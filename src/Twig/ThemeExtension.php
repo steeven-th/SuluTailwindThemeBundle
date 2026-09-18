@@ -21,6 +21,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
 use ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantColorSchemeResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceScopedValue;
 use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
 use Psr\Log\LoggerInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
@@ -157,6 +158,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_variant_slug', $this->getVariantSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_site_value', $this->getSiteValue(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
@@ -508,9 +510,30 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @return string The effective `.iw-variant--<slug>` slug, or '' if there is none
      */
+    /**
+     * Reduce a stored appearance value to what applies on the site rendering it.
+     *
+     * For the templates that put a stored value straight into a class name of
+     * their own, where no resolver stands in the way. A plain value comes back
+     * untouched, so a template calling this keeps working on every page and
+     * every single-site article.
+     *
+     * A project rendering `variant` or a button style in its own template
+     * should call this rather than read the raw value, which may name a choice
+     * per site once an article is published on several of them.
+     *
+     * @param mixed $stored The stored value, plain or naming a choice per site
+     *
+     * @return mixed The value that applies here
+     */
+    public function getSiteValue(mixed $stored): mixed
+    {
+        return WebspaceScopedValue::forWebspace($stored, $this->themeProvider->getCurrentWebspaceKey());
+    }
+
     public function getVariantSlug(mixed $variant, array $variants): string
     {
-        return VariantResolver::resolveSlug($variant, $variants);
+        return VariantResolver::resolveSlug($variant, $variants, $this->themeProvider->getCurrentWebspaceKey());
     }
 
     /**
@@ -537,14 +560,18 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      *
      * @return string A slug the theme defines, or empty when it defines none
      */
-    public function getButtonSlug(?string $stored = null): string
+    public function getButtonSlug(mixed $stored = null): string
     {
-        return ButtonResolver::resolveSlug($stored, $this->themeProvider->getTokens()['buttons'] ?? []);
+        return ButtonResolver::resolveSlug(
+            $stored,
+            $this->themeProvider->getTokens()['buttons'] ?? [],
+            $this->themeProvider->getCurrentWebspaceKey(),
+        );
     }
 
     public function getVariantConfig(mixed $variant, array $variants): array
     {
-        return VariantResolver::resolveConfig($variant, $variants);
+        return VariantResolver::resolveConfig($variant, $variants, $this->themeProvider->getCurrentWebspaceKey());
     }
 
     /**

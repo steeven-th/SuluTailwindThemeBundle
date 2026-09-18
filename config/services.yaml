@@ -14,8 +14,17 @@ services:
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.config_resolver'
+            - '@itech_world.sulu_tailwind_theme.article_webspace_defaults'
             - '%itech_world_sulu_tailwind_theme.article_templates_enabled%'
             - '%itech_world_sulu_tailwind_theme.title_editor%'
+        tags:
+            - { name: 'sulu.admin' }
+            - { name: 'sulu.context', context: 'admin' }
+
+    # Amends views built by SuluArticleBundle and SuluSnippetBundle, hence the
+    # late priority declared by the class itself.
+    itech_world.sulu_tailwind_theme.appearance_webspace_admin:
+        class: ItechWorld\SuluTailwindThemeBundle\Admin\AppearanceWebspaceAdmin
         tags:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
@@ -58,6 +67,10 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+        arguments:
+            # Named explicitly: the locator takes an optional Sulu repository,
+            # so it is declared rather than autowired from its class.
+            $snippetWebspaceLocator: '@itech_world.sulu_tailwind_theme.snippet_webspace_locator'
         tags:
             - { name: 'controller.service_arguments' }
 
@@ -99,6 +112,29 @@ services:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver
         arguments:
             - '@itech_world.sulu_tailwind_theme.palette_generator'
+
+    # Where a new article lands, so its first form shows the right theme. The
+    # Sulu service is optional on purpose: a project may run this bundle
+    # without SuluArticleBundle, and the admin has to boot either way.
+    itech_world.sulu_tailwind_theme.article_webspace_defaults:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ArticleWebspaceDefaults
+        arguments:
+            - '@sulu.core.localization_manager'
+            - '@?sulu_article.webspace_settings_configuration_resolver'
+
+    # Reports per-site appearance choices naming a site the article left. See
+    # the class for why they are reported rather than deleted.
+    itech_world.sulu_tailwind_theme.appearance_override_audit:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    # Which sites show a given snippet, so its form can offer their theme. The
+    # Sulu repository is optional: the bundle runs without SuluSnippetBundle.
+    itech_world.sulu_tailwind_theme.snippet_webspace_locator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\SnippetWebspaceLocator
+        arguments:
+            - '@?sulu_snippet.snippet_area_repository'
 
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator
@@ -375,6 +411,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.compiler'
+            - '@itech_world.sulu_tailwind_theme.appearance_override_audit'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
         tags:

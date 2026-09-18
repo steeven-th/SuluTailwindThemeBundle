@@ -62,18 +62,27 @@ final class VariantResolver
     /**
      * Resolve a stored variant value to its effective slug (best-effort).
      *
+     * - a value naming a choice per site is reduced to that site's choice
+     *   first, see WebspaceScopedValue;
      * - a known slug string is returned as-is;
      * - a numeric value (legacy positional index) is mapped to the variant at
      *   that position;
      * - anything else falls back to the first variant.
      *
-     * @param mixed             $stored   The stored variant value (slug or legacy index)
-     * @param array<int, mixed> $variants The variant list (raw or normalized)
+     * That last fallback is what an article published on two sites relies on
+     * when it names no choice for the second one: the slugs of one theme mean
+     * nothing in another, so rather than render unstyled the block takes the
+     * first variant of the theme it is being shown in.
+     *
+     * @param mixed             $stored      The stored variant value (slug, scoped map or legacy index)
+     * @param array<int, mixed> $variants    The variant list (raw or normalized)
+     * @param string|null       $webspaceKey The site being rendered, null off-request
      *
      * @return string The effective slug, or '' if there is no variant
      */
-    public static function resolveSlug(mixed $stored, array $variants): string
+    public static function resolveSlug(mixed $stored, array $variants, ?string $webspaceKey = null): string
     {
+        $stored = WebspaceScopedValue::forWebspace($stored, $webspaceKey);
         $normalized = self::normalizeVariants($variants);
         $slugs = array_column($normalized, 'slug');
 
@@ -98,15 +107,16 @@ final class VariantResolver
     /**
      * Resolve a stored variant value to its full config array (best-effort).
      *
-     * @param mixed             $stored   The stored variant value (slug or legacy index)
-     * @param array<int, mixed> $variants The variant list (raw or normalized)
+     * @param mixed             $stored      The stored variant value (slug, scoped map or legacy index)
+     * @param array<int, mixed> $variants    The variant list (raw or normalized)
+     * @param string|null       $webspaceKey The site being rendered, null off-request
      *
      * @return array<string, mixed> The matched variant, or [] if none
      */
-    public static function resolveConfig(mixed $stored, array $variants): array
+    public static function resolveConfig(mixed $stored, array $variants, ?string $webspaceKey = null): array
     {
         $normalized = self::normalizeVariants($variants);
-        $slug = self::resolveSlug($stored, $normalized);
+        $slug = self::resolveSlug($stored, $normalized, $webspaceKey);
 
         foreach ($normalized as $variant) {
             if (($variant['slug'] ?? null) === $slug) {

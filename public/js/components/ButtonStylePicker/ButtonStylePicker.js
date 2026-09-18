@@ -6,6 +6,8 @@ import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
 import buttonBorder from '../../utils/buttonBorder';
+import {valueFor, withValue} from '../../utils/scopedValue';
+import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 
 /**
  * ButtonStylePicker field component for the Sulu admin.
@@ -29,12 +31,12 @@ export default class ButtonStylePicker extends React.Component {
 
     componentDidMount() {
         // The button previews are the edited site's, not the first site's.
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
         this._loadPalette();
     }
 
     componentDidUpdate() {
-        themeConfigStore.ensureCurrentWebspace();
+        themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
     }
 
     /**
@@ -75,11 +77,26 @@ export default class ButtonStylePicker extends React.Component {
     }
 
     handleSelect = (key) => {
-        const {onChange, disabled} = this.props;
+        const {onChange, disabled, value} = this.props;
         if (!onChange || disabled) {
             return;
         }
-        onChange(key);
+
+        // On an article published on several sites the choice belongs to the
+        // site being set, see utils/scopedValue.
+        onChange(withValue(value, themeConfigStore.editingWebspace, key));
+    };
+
+    /**
+     * Drop the choice made for this site, so it follows the main one again.
+     */
+    handleFollowMain = () => {
+        const {onChange, disabled, value} = this.props;
+        if (!onChange || disabled) {
+            return;
+        }
+
+        onChange(withValue(value, themeConfigStore.editingWebspace, valueFor(value, null)));
     };
 
     /**
@@ -111,6 +128,8 @@ export default class ButtonStylePicker extends React.Component {
 
     render() {
         const {value, disabled} = this.props;
+        const editingWebspace = themeConfigStore.editingWebspace;
+        const selected = valueFor(value, editingWebspace);
         const buttons = this._getButtons();
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
@@ -131,11 +150,17 @@ export default class ButtonStylePicker extends React.Component {
         }
 
         return (
-            <div style={containerStyle}>
+            <div>
+                <AppearanceSiteNotice
+                    formInspector={this.props.formInspector}
+                    onFollowMain={this.handleFollowMain}
+                    value={value}
+                />
+                <div style={containerStyle}>
                 {buttons.map((btnData) => {
                     const slug = btnData.slug;
                     const label = btnData.label || slug;
-                    const isSelected = value === slug;
+                    const isSelected = selected === slug;
                     const hasData = btnData && typeof btnData === 'object';
 
                     const cardStyle = {
@@ -208,7 +233,9 @@ export default class ButtonStylePicker extends React.Component {
                         </button>
                     );
                 })}
+                </div>
             </div>
         );
     }
+
 }
