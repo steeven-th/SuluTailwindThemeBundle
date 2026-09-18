@@ -1495,3 +1495,17 @@ rather than a bar at zero, which read as a measurement someone had taken.
 used to append a `%` to it. A figure published as `75` now reads `75` and not `75%`.
 Write the sign in the field - it is what makes `12/20` and `Sulu 3.0` possible in the
 same place, and a value that silently gains a unit cannot say anything else.
+
+## Cards: title size and a centred pictogram
+
+### The card title scales per block (new)
+
+`--iw-cards-title-size`, under **Defaults > Cards**, sets the card title size for the
+whole site, and two pixels separated it from the card text - a hierarchy nobody could
+read. Raising it grew every card of every page.
+
+**Settings > Title size** on the cards block scales the title for that block alone
+(Normal, Large, Extra large), as a multiplier on the theme value rather than a size
+of its own, so a site that already raised its titles keeps the proportion it chose.
+It makes the cards block usable as a key figures block, which is what it was being
+bent into.

@@ -6143,6 +6143,29 @@ aside .iw-toc {
     color: var(--iw-variant-title-color, inherit);
 }
 
+/* How much the title leads over the text, for this block alone.
+
+   It is a multiplier and not a size, so it rides on top of whatever the theme
+   set under Defaults > Cards rather than replacing it: a site that raised its
+   card titles keeps the proportion it chose. The default size leads the text by
+   two pixels, which reads as an accident rather than as a hierarchy, and the
+   theme value could not be raised for one block without growing every card of
+   every page with it.
+
+   The line height tightens as the size grows: a title standing in for a figure
+   is short, and the ratio a paragraph needs leaves a hole above and below it. */
+.iw-block-cards__grid--title-large .iw-card__title {
+    font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
+        * var(--iw-cards-title-scale-large, 1.5));
+    line-height: 1.25;
+}
+
+.iw-block-cards__grid--title-xlarge .iw-card__title {
+    font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
+        * var(--iw-cards-title-scale-xlarge, 2.25));
+    line-height: 1.1;
+}
+
 .iw-card__text {
     flex: 1 1 auto;
     font-size: var(--iw-card-text-size, var(--iw-cards-text-size, 0.9375rem));
