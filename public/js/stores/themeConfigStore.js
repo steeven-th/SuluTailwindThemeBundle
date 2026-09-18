@@ -19,6 +19,14 @@ const WEBSPACE_PATTERN = /\/webspaces\/([^/]+)/;
 const ARTICLE_RESOURCE_KEY = 'articles';
 
 /**
+ * Resource key of the Sulu snippet, which carries no site of its own at all.
+ *
+ * It reaches a site by being assigned to one of its areas, which is a per-site
+ * decision, so the sites are asked for rather than read off the form.
+ */
+const SNIPPET_RESOURCE_KEY = 'snippets';
+
+/**
  * The theme config the admin fields read, one entry per site.
  *
  * A page belongs to a single site and only ever needs one theme. An article
@@ -81,6 +89,17 @@ class ThemeConfigStore {
      * between views, so it never outlives the form that declared it.
      */
     _formWebspace: ?string = null;
+
+    /**
+     * Sites each snippet is shown on, keyed by snippet id.
+     *
+     * Observable because it arrives from a request: the fields showing a
+     * theme have already rendered by then and have to render again.
+     */
+    @observable _snippetWebspaces: Object = {};
+
+    /** Snippets already asked about, so a form asks once */
+    _snippetsAsked: Object = {};
 
     /**
      * Readable name of each site, keyed by webspace key.
@@ -321,6 +340,14 @@ class ThemeConfigStore {
             return mainWebspace;
         }
 
+        // A snippet names no site of its own. The sites showing it are the
+        // ones that assigned it to an area, fetched by ensureSnippetWebspaces.
+        if (SNIPPET_RESOURCE_KEY === formInspector.resourceKey) {
+            const assigned = this._snippetWebspaces[String(formInspector.id)];
+
+            return (assigned && assigned[0]) || null;
+        }
+
         // An article being created has no main webspace yet, and the site it
         // will land in is the configured default for its locale.
         if (ARTICLE_RESOURCE_KEY !== formInspector.resourceKey) {
@@ -346,6 +373,10 @@ class ThemeConfigStore {
      * @returns {Array<string>} The webspace keys, without duplicates
      */
     webspacesOfForm(formInspector: ?Object): Array<string> {
+        if (formInspector && SNIPPET_RESOURCE_KEY === formInspector.resourceKey) {
+            return Array.from(this._snippetWebspaces[String(formInspector.id)] || []);
+        }
+
         const main = this.webspaceFromForm(formInspector);
 
         if (!main) {
@@ -402,7 +433,49 @@ class ThemeConfigStore {
      *
      * @param {?Object} formInspector The form being edited, when there is one
      */
+    /**
+     * Learn which sites show the snippet on screen, and load their themes.
+     *
+     * The answer comes from a request, so the fields render once without it
+     * and again when it lands. Until then they show the project-wide theme,
+     * which is what they showed all the time before this existed.
+     *
+     * @param {?Object} formInspector The form being edited, when there is one
+     */
+    ensureSnippetWebspaces(formInspector: ?Object) {
+        if (!formInspector || SNIPPET_RESOURCE_KEY !== formInspector.resourceKey) {
+            return;
+        }
+
+        const id = formInspector.id;
+
+        // A snippet being created is not assigned anywhere yet, and asking
+        // about it would answer nothing.
+        if (!id || this._snippetsAsked[String(id)]) {
+            return;
+        }
+
+        this._snippetsAsked[String(id)] = true;
+
+        Requester.get('/admin/api/iw-snippet-webspaces?id=' + String(id))
+            .then(action((data) => {
+                const webspaces = (data && data.webspaces) || [];
+
+                this._snippetWebspaces = {...this._snippetWebspaces, [String(id)]: webspaces};
+                this.ensureWebspaces(webspaces);
+
+                if (webspaces.length > 0) {
+                    this._formWebspace = webspaces[0];
+                }
+            }))
+            .catch(() => {
+                delete this._snippetsAsked[String(id)];
+            });
+    }
+
     ensureCurrentWebspace(formInspector: ?Object) {
+        this.ensureSnippetWebspaces(formInspector);
+
         const declared = this.webspaceFromForm(formInspector);
 
         if (declared) {
@@ -444,6 +517,9 @@ class ThemeConfigStore {
         window.addEventListener('hashchange', () => {
             this._formWebspace = null;
             this._editingWebspace = null;
+            // Area assignments are edited elsewhere in the admin, so where a
+            // snippet is shown is asked again each time one is opened.
+            this._snippetsAsked = {};
             this.ensureCurrentWebspace();
         });
         this.ensureCurrentWebspace();

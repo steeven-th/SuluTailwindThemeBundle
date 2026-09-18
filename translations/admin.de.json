@@ -1044,8 +1044,8 @@
     "iw_sulu_tailwind_theme.social_media_name": "Name",
     "iw_sulu_tailwind_theme.icon": "Symbol",
     "iw_sulu_tailwind_theme.snippet_title": "Snippet-Titel",
-    "iw_sulu_tailwind_theme.snippet_area_notice": "Wo dieses Snippet erscheint",
-    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Dieses Snippet erscheint auf einer Website nur, wenn diese es ausgewählt hat, unter Webspaces > Standard Schnipsel. Jede Website trifft diese Wahl für sich, zwei Websites können also unterschiedliche Snippets anzeigen oder sich dieses teilen.",
+    "iw_sulu_tailwind_theme.snippet_area_notice": "Farben und Schaltflächen dieses Snippets",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Die hier angebotenen Farbvarianten und Schaltflächenstile stammen aus dem Theme der Website, die dieses Snippet anzeigt. Ein Snippet, das noch keine Website anzeigt, greift auf das Standard-Theme zurück, bis eine Website es unter Webspaces > Standard Schnipsel auswählt.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega-Menü",
     "iw_sulu_tailwind_theme.mega_source": "Datenquelle",

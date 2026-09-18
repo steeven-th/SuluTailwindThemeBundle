@@ -106,8 +106,13 @@ The diagnostic reports each one with the article, the locale, the site named and
 
 ## Snippets
 
-A snippet carries no site of its own, and it does not need one: **which snippet fills an area is already decided per site**. Sulu looks the area up by webspace key, so `iw_theme_mega_menu` on one site and on another are two separate assignments, made in **Webspaces > (site) > Default snippets**.
+A snippet carries no site of its own. It reaches one by being assigned to that site's area, in **Webspaces > (site) > Default snippets**, and Sulu looks an area up by webspace key, so `iw_theme_mega_menu` on one site and on another are two separate assignments.
 
-So a mega menu whose call-to-action button must differ between two sites does not need a per-site value at all. Give each site its own snippet, and each one carries its own `cta_style`, resolved against the theme that site runs. Nothing is shared, and the two menus can differ in their links and their wording too, not only in a button style.
+**The admin reads those assignments back.** Open a snippet and its colour variants and button styles are those of the theme of the site showing it, not of whichever site happens to be first. A snippet no site shows yet, which is every snippet being created, falls back to the default theme until a site picks it up.
 
-Pointing two sites at the **same** snippet is the other option, and then its `cta_style` really is one value for both. That is the point of sharing a snippet, and the usual fallback applies: a button slug the other theme does not define resolves to that theme's first button.
+So a mega menu whose button must differ between two sites has two answers, and the first one is usually better:
+
+- **Give each site its own snippet.** Each one is then authored against the theme of its site, and the two menus can differ in their links and their wording too, not only in a button style.
+- **Share one snippet between the sites.** The appearance switch then appears on its form exactly as it does on an article, and a variant or a button style can be set per site on shared content.
+
+A snippet shared between sites and never differentiated resolves its stored slug against each site's own theme, with the usual fallback to that theme's first button or first variant.

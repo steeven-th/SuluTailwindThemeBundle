@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Admin\WebspaceThemeAdmin;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\SnippetWebspaceLocator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings;
@@ -34,6 +35,14 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class WebspaceThemeController extends AbstractController implements SecuredControllerInterface
 {
+    /**
+     * Who may ask where a snippet is used.
+     *
+     * The answer describes snippets, not themes, so it is guarded by the
+     * permission on snippets rather than by the one on this controller.
+     */
+    private const SNIPPET_SECURITY_CONTEXT = 'sulu.global.snippets';
+
     public function __construct(
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
         private readonly ThemeConfigRepository $themeConfigRepository,
@@ -42,6 +51,7 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
         private readonly SecurityCheckerInterface $securityChecker,
         private readonly ThemeConfigResolver $themeConfigResolver,
         private readonly WebspaceSettings $webspaceSettings,
+        private readonly SnippetWebspaceLocator $snippetWebspaceLocator,
     ) {
     }
 
@@ -230,6 +240,35 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
             $this->themeConfigResolver->resolve($theme),
             ['titleEditor' => $this->webspaceSettings->get('title_editor', $webspaceKey)],
         );
+    }
+
+    /**
+     * The sites a snippet is shown on, for the admin to pick a theme.
+     *
+     * A snippet names no site of its own, so its form had no way of knowing
+     * which theme to offer and fell back to the project-wide one. That is the
+     * theme of whichever site happens to be first, which is right by accident
+     * at best.
+     *
+     * @param Request $request The HTTP request (expects ?id=<uuid>)
+     *
+     * @return JsonResponse The webspace keys assigning this snippet
+     */
+    #[Route(
+        '/admin/api/iw-snippet-webspaces',
+        name: 'iw_sulu_tailwind_theme.get_snippet_webspaces',
+        methods: ['GET'],
+    )]
+    public function getSnippetWebspacesAction(Request $request): JsonResponse
+    {
+        $this->securityChecker->checkPermission(
+            self::SNIPPET_SECURITY_CONTEXT,
+            PermissionTypes::VIEW,
+        );
+
+        return new JsonResponse([
+            'webspaces' => $this->snippetWebspaceLocator->webspacesOf($request->query->getString('id')),
+        ]);
     }
 
     /**

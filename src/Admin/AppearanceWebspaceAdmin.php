@@ -11,32 +11,42 @@ use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 
 /**
- * Adds the appearance site switch to every article content form.
+ * Adds the appearance site switch to the forms that can reach several sites.
  *
- * An article can be published on several sites at once, each running its own
- * theme, so the editor has to be able to say which site an appearance applies
- * to. The switch is what says it, and it belongs to the form rather than to
- * any one field: one control drives the variant picker, the button style
- * picker and anything added later, instead of each field growing a site
- * selector of its own.
+ * Two kinds of content are not tied to one site. An article declares a main
+ * webspace and may be published in others. A snippet names no site at all and
+ * reaches one by being assigned to its areas, which several sites can do at
+ * once. Both can therefore run under two different themes, and the editor has
+ * to be able to say which site an appearance applies to.
  *
- * The toolbar action hides itself on an article published on a single site, so
- * the overwhelming majority of forms look exactly as they did.
+ * The switch is what says it, and it belongs to the form rather than to any
+ * one field: one control drives the variant picker, the button style picker
+ * and anything added later, instead of each field growing a site selector of
+ * its own.
+ *
+ * It renders nothing at all where there is a single site to show, so the
+ * overwhelming majority of forms look exactly as they did. Pages are never
+ * matched: a page belongs to one webspace and has nothing to switch between.
  *
  * Article views are named after their template group, which a project defines,
- * so they cannot be listed here. Every content form of every group is matched
+ * so they cannot be listed here. Every content form is matched by name
  * instead, and a view that is not a form is skipped rather than assumed.
  */
-class ArticleAppearanceAdmin extends Admin
+class AppearanceWebspaceAdmin extends Admin
 {
     /**
-     * Name prefix of the article views, as SuluArticleBundle builds them.
+     * Name prefixes of the views this admin amends.
      *
-     * Both tab views are covered: an article gets its main webspace the moment
-     * it is created, so its appearance is already scoped while it is being
-     * added.
+     * Both tab views of each are covered: an article gets its main webspace
+     * the moment it is created, so its appearance is already scoped while it
+     * is being added.
+     *
+     * @var list<string>
      */
-    private const ARTICLE_VIEW_PREFIX = 'sulu_article.article.';
+    private const VIEW_PREFIXES = [
+        'sulu_article.article.',
+        'sulu_snippet.snippet.',
+    ];
 
     /**
      * Name suffix of the form holding the blocks.
@@ -67,16 +77,14 @@ class ArticleAppearanceAdmin extends Admin
     }
 
     /**
-     * Attach the switch to the content form of every article group.
+     * Attach the switch to every content form that can reach several sites.
      *
      * @param ViewCollection $viewCollection The views configured so far
      */
     public function configureViews(ViewCollection $viewCollection): void
     {
         foreach ($viewCollection->all() as $name => $viewBuilder) {
-            if (!str_starts_with($name, self::ARTICLE_VIEW_PREFIX)
-                || !str_ends_with($name, self::CONTENT_VIEW_SUFFIX)
-            ) {
+            if (!str_ends_with($name, self::CONTENT_VIEW_SUFFIX) || !$this->isCovered($name)) {
                 continue;
             }
 
@@ -88,5 +96,23 @@ class ArticleAppearanceAdmin extends Admin
 
             $viewBuilder->addToolbarActions([new ToolbarAction(self::TOOLBAR_ACTION)]);
         }
+    }
+
+    /**
+     * Whether a view belongs to a content type that can reach several sites.
+     *
+     * @param string $name The view name
+     *
+     * @return bool True when the switch belongs on it
+     */
+    private function isCovered(string $name): bool
+    {
+        foreach (self::VIEW_PREFIXES as $prefix) {
+            if (str_starts_with($name, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

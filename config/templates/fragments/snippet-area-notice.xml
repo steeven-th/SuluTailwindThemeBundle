@@ -1,16 +1,16 @@
 <?xml version="1.0" ?>
 <!--
-    Fragment: where a snippet assigned to an area actually appears.
+    Fragment: which theme the colours and buttons of this snippet come from.
 
-    Editing one of these snippets has no visible effect until a site points an
-    area at it, and that assignment lives in another part of the admin
-    entirely. An editor who has not been told goes looking for a bug.
+    A snippet carries no site, so the swatches and button previews in its form
+    belong to the theme of whichever site shows it. An editor looking at a
+    palette has no way of knowing whose it is, and on a multi-site project the
+    answer decides whether what they are picking is the right thing at all.
 
-    It matters twice over on a multi-site project, where each site makes that
-    choice for itself: two sites can run two different menus, or share one.
-    That is the answer to "how do I get a different menu per site", and it is
-    worth saying here rather than only in the documentation, which the person
-    filling in this form is not reading.
+    The notice says that, rather than explaining how areas work. Where a
+    snippet appears is a question the editor asks once, which the documentation
+    answers. Whose colours these are is a question the form itself raises every
+    time it is opened.
 
     Included as the first property of every area-assigned snippet:
 

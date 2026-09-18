@@ -1044,8 +1044,8 @@
     "iw_sulu_tailwind_theme.social_media_name": "Nom",
     "iw_sulu_tailwind_theme.icon": "Icône",
     "iw_sulu_tailwind_theme.snippet_title": "Titre du fragment",
-    "iw_sulu_tailwind_theme.snippet_area_notice": "Où ce fragment s'affiche",
-    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Ce fragment ne s'affiche sur un site que si ce site l'a choisi, dans Espaces web > Fragments par défaut. Chaque site fait ce choix de son côté, donc deux sites peuvent afficher deux fragments différents, ou partager celui-ci.",
+    "iw_sulu_tailwind_theme.snippet_area_notice": "Couleurs et boutons de ce fragment",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Les variantes de couleur et les styles de bouton proposés ici viennent du thème du site qui affiche ce fragment. Un fragment que personne n'affiche encore montre le thème par défaut, le temps qu'un site le choisisse dans Espaces web > Fragments par défaut.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega menu",
     "iw_sulu_tailwind_theme.mega_source": "Source des données",

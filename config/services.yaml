@@ -21,10 +21,10 @@ services:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
 
-    # Amends the article views built by SuluArticleBundle, hence the late
-    # priority declared by the class itself.
-    itech_world.sulu_tailwind_theme.article_appearance_admin:
-        class: ItechWorld\SuluTailwindThemeBundle\Admin\ArticleAppearanceAdmin
+    # Amends views built by SuluArticleBundle and SuluSnippetBundle, hence the
+    # late priority declared by the class itself.
+    itech_world.sulu_tailwind_theme.appearance_webspace_admin:
+        class: ItechWorld\SuluTailwindThemeBundle\Admin\AppearanceWebspaceAdmin
         tags:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
@@ -67,6 +67,10 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+        arguments:
+            # Named explicitly: the locator takes an optional Sulu repository,
+            # so it is declared rather than autowired from its class.
+            $snippetWebspaceLocator: '@itech_world.sulu_tailwind_theme.snippet_webspace_locator'
         tags:
             - { name: 'controller.service_arguments' }
 
@@ -124,6 +128,13 @@ services:
         class: ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit
         arguments:
             - '@doctrine.orm.entity_manager'
+
+    # Which sites show a given snippet, so its form can offer their theme. The
+    # Sulu repository is optional: the bundle runs without SuluSnippetBundle.
+    itech_world.sulu_tailwind_theme.snippet_webspace_locator:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\SnippetWebspaceLocator
+        arguments:
+            - '@?sulu_snippet.snippet_area_repository'
 
     itech_world.sulu_tailwind_theme.slug_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Admin;
 
-use ItechWorld\SuluTailwindThemeBundle\Admin\ArticleAppearanceAdmin;
+use ItechWorld\SuluTailwindThemeBundle\Admin\AppearanceWebspaceAdmin;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
@@ -14,13 +14,13 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 /**
  * Where the appearance switch is grafted, and where it must not be.
  *
- * The article views are named after their template group, which a project
- * defines, so the admin matches names rather than listing them. That matching
- * is the whole behaviour of the class, and it fails silently in both
- * directions: too narrow and the switch never appears, too wide and it shows
- * up on forms holding no appearance field at all.
+ * The views are named after a template group a project defines, so the admin
+ * matches names rather than listing them. That matching is the whole behaviour
+ * of the class, and it fails silently in both directions: too narrow and the
+ * switch never appears, too wide and it shows up on forms holding no
+ * appearance field at all.
  */
-final class ArticleAppearanceAdminTest extends TestCase
+final class AppearanceWebspaceAdminTest extends TestCase
 {
     private const SWITCH_ACTION = 'iw_sulu_tailwind_theme.appearance_webspace';
 
@@ -33,6 +33,19 @@ final class ArticleAppearanceAdminTest extends TestCase
         self::assertContains(self::SWITCH_ACTION, $views['sulu_article.article.add_tabs_default.content']);
         // A project naming its own template groups gets the same treatment.
         self::assertContains(self::SWITCH_ACTION, $views['sulu_article.article.edit_tabs_news.content']);
+    }
+
+    /**
+     * A snippet reaches a site by being assigned to its areas, and several
+     * sites can assign the same one.
+     */
+    #[Test]
+    public function itAddsTheSwitchToTheSnippetContentForm(): void
+    {
+        $views = $this->configuredViews();
+
+        self::assertContains(self::SWITCH_ACTION, $views['sulu_snippet.snippet.edit_tabs.content']);
+        self::assertNotContains(self::SWITCH_ACTION, $views['sulu_snippet.snippet.edit_tabs.settings']);
     }
 
     #[Test]
@@ -75,7 +88,7 @@ final class ArticleAppearanceAdminTest extends TestCase
     #[Test]
     public function itRunsAfterTheBundleBuildingTheArticleViews(): void
     {
-        self::assertLessThan(0, ArticleAppearanceAdmin::getPriority());
+        self::assertLessThan(0, AppearanceWebspaceAdmin::getPriority());
     }
 
     /**
@@ -94,6 +107,8 @@ final class ArticleAppearanceAdminTest extends TestCase
             'sulu_article.article.edit_tabs_news.content',
             'sulu_article.article.edit_tabs_default.seo',
             'sulu_article.article.edit_tabs_default.settings',
+            'sulu_snippet.snippet.edit_tabs.content',
+            'sulu_snippet.snippet.edit_tabs.settings',
             'sulu_page.page_edit_form.content',
         ];
 
@@ -114,7 +129,7 @@ final class ArticleAppearanceAdminTest extends TestCase
             '/articles/:id',
         )->setResourceKey('articles'));
 
-        (new ArticleAppearanceAdmin())->configureViews($collection);
+        (new AppearanceWebspaceAdmin())->configureViews($collection);
 
         $views = [];
 
