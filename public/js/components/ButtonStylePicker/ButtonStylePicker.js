@@ -6,8 +6,8 @@ import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
 import buttonBorder from '../../utils/buttonBorder';
-import {isOverridden, valueFor, withValue} from '../../utils/scopedValue';
-import {translate} from 'sulu-admin-bundle/utils';
+import {valueFor, withValue} from '../../utils/scopedValue';
+import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 
 /**
  * ButtonStylePicker field component for the Sulu admin.
@@ -151,7 +151,11 @@ export default class ButtonStylePicker extends React.Component {
 
         return (
             <div>
-                {this.renderSiteNotice(editingWebspace, value)}
+                <AppearanceSiteNotice
+                    formInspector={this.props.formInspector}
+                    onFollowMain={this.handleFollowMain}
+                    value={value}
+                />
                 <div style={containerStyle}>
                 {buttons.map((btnData) => {
                     const slug = btnData.slug;
@@ -234,62 +238,4 @@ export default class ButtonStylePicker extends React.Component {
         );
     }
 
-    /**
-     * Say which site is being set, and whether it differs from the main one.
-     *
-     * Mirrors the notice of the variant picker on purpose: the two fields sit
-     * in the same panel and answer the same question.
-     *
-     * @param {?string} editingWebspace The site being set, null for the main one
-     * @param {*} value The stored value
-     *
-     * @returns {?React.Element} The notice, or nothing on the main site
-     */
-    renderSiteNotice(editingWebspace: ?string, value: mixed) {
-        if (!editingWebspace) {
-            return null;
-        }
-
-        const overridden = isOverridden(value, editingWebspace);
-
-        return (
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                flexWrap: 'wrap',
-                padding: '4px 4px 8px',
-                fontSize: '12px',
-                color: '#666',
-            }}>
-                <span>
-                    {translate(
-                        overridden
-                            ? 'iw_sulu_tailwind_theme.appearance_set_for_site'
-                            : 'iw_sulu_tailwind_theme.appearance_follows_main_site',
-                        {webspace: themeConfigStore.webspaceName(editingWebspace)}
-                    )}
-                </span>
-                {overridden
-                    ? (
-                        <button
-                            onClick={this.handleFollowMain}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
-                                color: getSuluPrimaryColor(),
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                font: 'inherit',
-                            }}
-                            type="button"
-                        >
-                            {translate('iw_sulu_tailwind_theme.appearance_follow_main_site')}
-                        </button>
-                    )
-                    : null}
-            </div>
-        );
-    }
 }

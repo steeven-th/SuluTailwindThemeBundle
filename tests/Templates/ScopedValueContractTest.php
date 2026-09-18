@@ -35,6 +35,32 @@ final class ScopedValueContractTest extends TestCase
     }
 
     /**
+     * Both sides list the sites that hold a choice of their own: the renderer
+     * to report the ones pointing nowhere, the admin to tell an editor where
+     * the shared value will have no effect.
+     */
+    #[Test]
+    public function bothSidesCanListTheOverriddenSites(): void
+    {
+        $js = (string) file_get_contents(
+            \dirname(__DIR__, 2) . '/public/js/utils/scopedValue.js',
+        );
+
+        self::assertStringContainsString(
+            'export function overriddenWebspaces(',
+            $js,
+            'The admin needs the same list the renderer builds, or the notice on the main '
+            . 'site cannot name the sites that stopped following it.',
+        );
+
+        self::assertTrue(
+            method_exists(WebspaceScopedValue::class, 'overriddenWebspaces'),
+            'Kept as an explicit assertion so removing it on the PHP side fails here rather '
+            . 'than only where it is called.',
+        );
+    }
+
+    /**
      * The renderer only treats a map as per-site when it carries the default
      * key. The admin must therefore always write that key, never a map of
      * overrides alone.

@@ -91,6 +91,24 @@ export function isOverridden(stored: mixed, webspaceKey: ?string): boolean {
 }
 
 /**
+ * The sites that were given a choice of their own.
+ *
+ * What lets the main site say which sites are not following it, so an editor
+ * changing the shared value knows in advance where it will have no effect.
+ *
+ * @param {*} stored The stored value
+ *
+ * @returns {Array<string>} The webspace keys, without the default entry
+ */
+export function overriddenWebspaces(stored: mixed): Array<string> {
+    if (!isScoped(stored)) {
+        return [];
+    }
+
+    return Object.keys(toJS(stored)).filter((key) => DEFAULT_KEY !== key);
+}
+
+/**
  * The stored value after setting a choice for one site.
  *
  * Writing the default value on a site removes its override rather than

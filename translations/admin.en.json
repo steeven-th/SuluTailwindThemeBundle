@@ -398,6 +398,8 @@
     "iw_sulu_tailwind_theme.appearance_set_for_site": "Set for {webspace} only.",
     "iw_sulu_tailwind_theme.appearance_follows_main_site": "Follows the main site.",
     "iw_sulu_tailwind_theme.appearance_follow_main_site": "Follow the main site again",
+    "iw_sulu_tailwind_theme.appearance_shared_by_all_sites": "This setting applies to every site the article is published on.",
+    "iw_sulu_tailwind_theme.appearance_shared_except": "This setting applies to every site except {webspaces}, where a different one was chosen.",
     "iw_sulu_tailwind_theme.settings": "Settings",
     "iw_sulu_tailwind_theme.settings_group_spacing": "Spacing",
     "iw_sulu_tailwind_theme.settings_group_radius": "Corner radius",

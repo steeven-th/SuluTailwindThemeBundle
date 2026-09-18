@@ -21,10 +21,16 @@ On an article published on more than one site, the content form gains a switch i
 
 It names the site whose appearance you are setting. Everything else on the form stays what it is - the switch changes no text, and switching does not create a second version of the article.
 
+The main site holds the value **every other site follows**. A secondary site keeps following it until you give that site a choice of its own, which is why the order matters: switch first, then pick.
+
+While the main site is selected, each appearance field says so, and names the sites that stopped following it:
+
+> This setting applies to every site except Site B, where a different one was chosen.
+
 While a secondary site is selected:
 
 - the variant picker and the button style picker show **that site's theme**, with its own variants and its own button styles,
-- picking one records a choice for that site alone,
+- picking one records a choice for that site alone, and leaves every other site on the shared value,
 - each field says whether the block **follows the main site** or is **set for this site**, with one click to give the choice back.
 
 An article published on a single site shows no switch at all, and neither does any page.

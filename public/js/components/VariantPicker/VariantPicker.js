@@ -4,8 +4,8 @@ import {observer} from 'mobx-react';
 import themeConfigStore from '../../stores/themeConfigStore';
 import loadFormPalette from '../../utils/formPalette';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
-import {isOverridden, valueFor, withValue} from '../../utils/scopedValue';
-import {translate} from 'sulu-admin-bundle/utils';
+import {valueFor, withValue} from '../../utils/scopedValue';
+import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 import {getSuluPrimaryColor, getSuluPrimaryAlpha} from '../../utils/suluColors';
 
 /**
@@ -276,65 +276,6 @@ export default class VariantPicker extends React.Component {
         );
     }
 
-    /**
-     * Say which site is being set, and whether it differs from the main one.
-     *
-     * Without it an editor switching sites has no way of telling that the
-     * wireframes just changed because another theme is in play, nor that this
-     * block already looks different somewhere else.
-     *
-     * @param {?string} editingWebspace The site being set, null for the main one
-     * @param {*} value The stored value
-     *
-     * @returns {?React.Element} The notice, or nothing on the main site
-     */
-    renderSiteNotice(editingWebspace: ?string, value: mixed) {
-        if (!editingWebspace) {
-            return null;
-        }
-
-        const overridden = isOverridden(value, editingWebspace);
-
-        return (
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                flexWrap: 'wrap',
-                padding: '8px',
-                fontSize: '12px',
-                color: '#666',
-            }}>
-                <span>
-                    {translate(
-                        overridden
-                            ? 'iw_sulu_tailwind_theme.appearance_set_for_site'
-                            : 'iw_sulu_tailwind_theme.appearance_follows_main_site',
-                        {webspace: themeConfigStore.webspaceName(editingWebspace)}
-                    )}
-                </span>
-                {overridden
-                    ? (
-                        <button
-                            onClick={this.handleFollowMain}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
-                                color: getSuluPrimaryColor(),
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                font: 'inherit',
-                            }}
-                            type="button"
-                        >
-                            {translate('iw_sulu_tailwind_theme.appearance_follow_main_site')}
-                        </button>
-                    )
-                    : null}
-            </div>
-        );
-    }
 
     render() {
         const {value} = this.props;
@@ -352,7 +293,11 @@ export default class VariantPicker extends React.Component {
 
         return (
             <div>
-                {this.renderSiteNotice(editingWebspace, value)}
+                <AppearanceSiteNotice
+                    formInspector={this.props.formInspector}
+                    onFollowMain={this.handleFollowMain}
+                    value={value}
+                />
                 <div style={{
                     display: 'grid',
                     // Same track as the style pickers, which sit in the same panel:
