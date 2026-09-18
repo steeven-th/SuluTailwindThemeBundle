@@ -40,8 +40,14 @@ class WebspaceThemeController extends AbstractController implements SecuredContr
      *
      * The answer describes snippets, not themes, so it is guarded by the
      * permission on snippets rather than by the one on this controller.
+     *
+     * Spelled out rather than read from SnippetAdmin::SECURITY_CONTEXT, which
+     * Sulu marks internal, and which only exists where SuluSnippetBundle is
+     * installed. A wrong value here denies the request and the admin silently
+     * stops offering the themes of the sites showing a snippet, so it is
+     * pinned by SnippetSecurityContextTest.
      */
-    private const SNIPPET_SECURITY_CONTEXT = 'sulu.global.snippets';
+    private const SNIPPET_SECURITY_CONTEXT = 'sulu.snippet.snippets';
 
     public function __construct(
         private readonly WebspaceThemeRepository $webspaceThemeRepository,

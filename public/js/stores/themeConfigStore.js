@@ -468,8 +468,19 @@ class ThemeConfigStore {
                     this._formWebspace = webspaces[0];
                 }
             }))
-            .catch(() => {
+            .catch((error) => {
                 delete this._snippetsAsked[String(id)];
+
+                // Said out loud on purpose. A snippet form whose sites cannot
+                // be fetched silently shows the wrong theme and hides the
+                // appearance switch, which looks exactly like the feature not
+                // being there at all.
+                // eslint-disable-next-line no-console
+                console.warn(
+                    '[iw_sulu_tailwind_theme] Could not read which sites show this snippet, '
+                    + 'so its form falls back to the project-wide theme.',
+                    error
+                );
             });
     }
 
