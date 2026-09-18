@@ -2,6 +2,8 @@
 
 Statistics / KPI block with five layout styles: a 2-column card grid, an inline row, horizontal progress bars, a vertical timeline, and a grid with large icons.
 
+Every style renders the pictogram the block form offers. Four of them dropped it before 3.0.0, and `KeyFigureIconContractTest` holds the rule.
+
 Counter animation is driven by the `key-figures` Stimulus controller via `data-key-figures-target` attributes — these are preserved verbatim in every template.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
@@ -42,7 +44,8 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `.iw-key-figure__counter--md` / `--lg` / `--xl` | Counter size modifiers. |
 | `.iw-key-figure__title` | Figure title (text below the counter). Also carries `.iw-block__title`. |
 | `.iw-key-figure__subtitle` | Optional caption under the title. Also carries `.iw-block__subtitle`. |
-| `.iw-key-figure__icon` | Image wrapper (square). |
+| `.iw-key-figure__icon` | Pictogram wrapper. Centred in `--grid-2x2` and `--inline`, aligned with the text in the three others. Each figure picks its own size in the form, the CSS only sets the default. |
+| `.iw-key-figure__icon--beside` | The pictogram of `--progress`, which joins the label on one line rather than standing above the figure. |
 | `.iw-key-figure__icon--lg` | Larger icon used in `--with-icons`. |
 | `.iw-key-figure__icon-img` | The `<img>` itself (`object-fit: contain`). |
 
@@ -51,7 +54,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | Class | Role |
 |-------|------|
 | `.iw-key-figure__progress-header` | Flex row with label + value. |
-| `.iw-key-figure__progress-label` | Figure label (left). |
+| `.iw-key-figure__progress-label` | Figure label (left), a flex row so it can carry the pictogram. |
 | `.iw-key-figure__progress-value` | Animated percentage (right, Stimulus counter). |
 | `.iw-key-figure__progress-track` | Track of the bar (tinted background). |
 | `.iw-key-figure__progress-bar` | Animated fill (`data-key-figures-target="progressBar"`, width starts at `0%`). |
@@ -93,7 +96,9 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-key-figure-subtitle-margin-top` | `0.25rem` | Top margin of the subtitle. |
 | `--iw-key-figure-subtitle-size` | `0.875rem` | Subtitle font-size. |
 | `--iw-key-figure-subtitle-opacity` | `0.75` | Subtitle opacity. |
-| `--iw-key-figure-icon-size` | `3rem` | Default icon square size. |
+| `--iw-key-figure-icon-size` | `3rem` | Default pictogram size, when the figure picks none of its own. |
+| `--iw-key-figure-icon-size-beside` | `1.5rem` | Pictogram size in `--progress`, where it shares a line with the label. |
+| `--iw-key-figure-icon-color` | `var(--iw-variant-highlight, var(--color-accent))` | Pictogram colour. Library icons follow it, an editor's own media keeps its colours. |
 | `--iw-key-figure-icon-size-lg` | `4rem` (mobile) / `5rem` (`>=768px`) | Larger icon for `--with-icons`. |
 | `--iw-key-figure-icon-margin-bottom` | `0.75rem` | Space below the default icon. |
 | `--iw-key-figure-icon-margin-bottom-lg` | `1rem` | Space below `--lg` icon. |
@@ -123,6 +128,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-progress-gap` | `1.5rem` | Gap between rows. |
 | `--iw-block-key-figures-progress-max-width` | `48rem` | Max-width of the progress block. |
 | `--iw-key-figure-progress-height` | `0.75rem` | Bar height. |
+| `--iw-key-figure-progress-label-gap` | `0.5rem` | Space between the pictogram and the label. |
 
 ### Timeline
 

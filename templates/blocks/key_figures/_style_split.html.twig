@@ -45,6 +45,20 @@
             <div data-controller="key-figures" class="iw-block-key-figures__figures{{ figuresRight ? '' : ' iw-block-key-figures__figures--first' }}">
                 {% for figure in figures %}
                     <div class="iw-key-figure iw-key-figure--split">
+                        {#- The pictogram leads the figure, aligned with the
+                            text under it rather than centred: this column
+                            reads as a list beside a paragraph, not as a row of
+                            tiles. -#}
+                        {% set figureIcon %}
+                            {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                                item: figure,
+                                class: 'iw-key-figure__icon-img'
+                            } only -%}
+                        {% endset %}
+                        {% if figureIcon|trim is not empty %}
+                            <div class="iw-key-figure__icon">{{ figureIcon }}</div>
+                        {% endif %}
+
                         {% if figure.number is defined and figure.number is not empty %}
                             <span
                                 data-key-figures-target="counter"

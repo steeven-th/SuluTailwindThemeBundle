@@ -23,7 +23,20 @@
                     {% set percentage = item.number|default('0')|replace({',': '', '%': ''})|number_format(0) %}
                     <div class="iw-key-figure iw-key-figure--progress">
                         <div class="iw-key-figure__progress-header">
-                            <span class="iw-key-figure__progress-label">{{ item.title|default('') }}</span>
+                            <span class="iw-key-figure__progress-label">
+                                {#- The pictogram sits beside the label, this
+                                    style having no room above it. -#}
+                                {% set figureIcon %}
+                                    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                                        item: item,
+                                        class: 'iw-key-figure__icon-img'
+                                    } only -%}
+                                {% endset %}
+                                {% if figureIcon|trim is not empty %}
+                                    <span class="iw-key-figure__icon iw-key-figure__icon--beside">{{ figureIcon }}</span>
+                                {% endif %}
+                                {{ item.title|default('') }}
+                            </span>
                             <span class="iw-key-figure__progress-value" data-key-figures-target="counter" data-key-figures-end-value="{{ percentage }}%">0%</span>
                         </div>
                         <div class="iw-key-figure__progress-track">

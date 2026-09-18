@@ -1392,3 +1392,22 @@ now `ItechWorld\SuluTailwindThemeBundle\Validator\Turnstile` instead of
 
 Verification needs a HTTP client: `composer require symfony/http-client` if your project
 has none.
+
+## Key figures: pictograms, surfaces, columns and progress bars
+
+### The pictogram now renders on every style (fixed)
+
+`inline`, `progress`, `timeline` and `split` offered the picker in the form and
+rendered nothing. An editor picking a pictogram on any of them saw nothing happen
+and had no way to tell why. `KeyFigureIconContractTest` holds the rule.
+
+**What changes visually:** a figure that carried an unused pictogram now shows it.
+Blocks published on those four styles may therefore gain a pictogram you had picked
+and given up on.
+
+A sizing bug came out with it: `.iw-key-figure__icon-img` stretched the pictogram to
+fill its slot, which only ever worked on the one style giving that slot a fixed
+square. Everywhere else the slot sizes itself to its content, so the rule had nothing
+to resolve against and an SVG with no intrinsic size rendered at 300px. The slot now
+hands its size down like the card slot does, so `--iw-key-figure-icon-size` and the
+per-figure size field both work on every style.

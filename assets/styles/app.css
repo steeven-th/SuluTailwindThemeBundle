@@ -1928,15 +1928,32 @@ img.object-cover {
     opacity: var(--iw-key-figure-subtitle-opacity, 0.75);
 }
 
-/* Shared icon wrapper */
+/* Shared icon wrapper. Every style renders the pictogram, which four of them
+   used to drop on the floor: the field was offered in the form and shown
+   nowhere, so an editor picking one saw nothing happen. */
 .iw-block-key-figures .iw-key-figure__icon {
     --iw-icon-color: var(--iw-key-figure-icon-color, var(--iw-variant-highlight, var(--color-accent)));
     /* Same rule as the card slot: the icon carries the size, the slot follows,
        so a larger one takes the room it needs. */
     --iw-icon-size: var(--iw-key-figure-icon-size, 3rem);
     width: fit-content;
-    margin-inline: auto;
     margin-bottom: var(--iw-key-figure-icon-margin-bottom, 0.75rem);
+}
+
+/* The pictogram sits where the text under it sits, and only the two styles
+   that centre their figures centre it. `margin-inline: auto` used to be
+   unconditional, which was invisible while only those two rendered an icon and
+   would have centred the timeline and split pictograms over left-aligned text. */
+.iw-block-key-figures--grid-2x2 .iw-key-figure__icon,
+.iw-block-key-figures--inline .iw-key-figure__icon {
+    margin-inline: auto;
+}
+
+/* Beside a label rather than above a figure: the progress style has no room
+   over its bar, so its pictogram joins the label on the same line. */
+.iw-block-key-figures .iw-key-figure__icon--beside {
+    margin-bottom: 0;
+    --iw-icon-size: var(--iw-key-figure-icon-size-beside, 1.5rem);
 }
 
 .iw-block-key-figures .iw-key-figure__icon--lg {
@@ -1952,9 +1969,13 @@ img.object-cover {
     }
 }
 
+/* The size lands on the icon and the slot follows, which is what the card slot
+   does. Stretching the icon to fill the slot instead was the rule here, and it
+   only ever worked because one style gave the slot a fixed square: everywhere
+   else the slot sizes itself to its content, so `width: 100%` had nothing to
+   resolve against and an SVG with no intrinsic size came out at 300px. Reading
+   the shared component's own size rule is enough. */
 .iw-block-key-figures .iw-key-figure__icon-img {
-    width: 100%;
-    height: 100%;
     object-fit: contain;
 }
 
@@ -2045,6 +2066,9 @@ img.object-cover {
 }
 
 .iw-block-key-figures--progress .iw-key-figure__progress-label {
+    display: flex;
+    align-items: center;
+    gap: var(--iw-key-figure-progress-label-gap, 0.5rem);
     font-weight: var(--iw-key-figure-progress-label-weight, 600);
 }
 

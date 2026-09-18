@@ -1,4 +1,10 @@
-{# Key figures block — inline row of figures #}
+{# Key figures block - inline row of figures.
+
+   It absorbed the "with icons" style, which differed from this one by nothing
+   an editor could name: both drew a row of figures, and the only real
+   difference was that one rendered the pictogram and the other did not. A
+   figure without a pictogram already draws no slot, so leaving the field empty
+   is the whole of what the second style offered. #}
 {% extends '@ItechWorldSuluTailwindTheme/blocks/common/_block_wrapper.html.twig' %}
 
 {% block block_content %}
@@ -25,6 +31,18 @@
         <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--inline{{ highlightClass }}">
             {% for figure in figures %}
                 <div class="iw-key-figure iw-key-figure--inline">
+                    {#- Captured first so the slot only opens when a pictogram
+                        was actually picked. -#}
+                    {% set figureIcon %}
+                        {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+                            item: figure,
+                            class: 'iw-key-figure__icon-img'
+                        } only -%}
+                    {% endset %}
+                    {% if figureIcon|trim is not empty %}
+                        <div class="iw-key-figure__icon">{{ figureIcon }}</div>
+                    {% endif %}
+
                     {% if figure.number is defined and figure.number is not empty %}
                         <span
                             data-key-figures-target="counter"
