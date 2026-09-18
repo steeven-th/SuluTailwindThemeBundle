@@ -1045,7 +1045,7 @@
     "iw_sulu_tailwind_theme.icon": "Symbol",
     "iw_sulu_tailwind_theme.snippet_title": "Snippet-Titel",
     "iw_sulu_tailwind_theme.snippet_area_notice": "Farben und Schaltflächen dieses Snippets",
-    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Die hier angebotenen Farbvarianten und Schaltflächenstile stammen aus dem Theme der Website, die dieses Snippet anzeigt. Ein Snippet, das noch keine Website anzeigt, greift auf das Standard-Theme zurück, bis eine Website es unter Webspaces > Standard Schnipsel auswählt.",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Die hier angebotenen Farbvarianten und Schaltflächenstile stammen aus dem Theme der Website, die dieses Snippet anzeigt. Um das Theme einer anderen Website zu sehen, muss diese das Snippet zuerst ausgewählt haben, unter Webspaces > Standard Schnipsel.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega-Menü",
     "iw_sulu_tailwind_theme.mega_source": "Datenquelle",

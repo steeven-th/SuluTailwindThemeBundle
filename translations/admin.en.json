@@ -1045,7 +1045,7 @@
     "iw_sulu_tailwind_theme.icon": "Icon",
     "iw_sulu_tailwind_theme.snippet_title": "Snippet title",
     "iw_sulu_tailwind_theme.snippet_area_notice": "Colours and buttons of this snippet",
-    "iw_sulu_tailwind_theme.snippet_area_notice_info": "The colour variants and button styles offered here come from the theme of the site showing this snippet. A snippet no site shows yet falls back to the default theme, until a site picks it under Webspaces > Default snippets.",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "The colour variants and button styles offered here come from the theme of the site showing this snippet. To see another site's theme, that site must first have picked this snippet, under Webspaces > Default snippets.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega menu",
     "iw_sulu_tailwind_theme.mega_source": "Data source",

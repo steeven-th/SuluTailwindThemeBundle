@@ -1045,7 +1045,7 @@
     "iw_sulu_tailwind_theme.icon": "Icône",
     "iw_sulu_tailwind_theme.snippet_title": "Titre du fragment",
     "iw_sulu_tailwind_theme.snippet_area_notice": "Couleurs et boutons de ce fragment",
-    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Les variantes de couleur et les styles de bouton proposés ici viennent du thème du site qui affiche ce fragment. Un fragment que personne n'affiche encore montre le thème par défaut, le temps qu'un site le choisisse dans Espaces web > Fragments par défaut.",
+    "iw_sulu_tailwind_theme.snippet_area_notice_info": "Les variantes de couleur et les styles de bouton proposés ici viennent du thème du site qui affiche ce fragment. Pour voir le thème d'un autre site, il faut d'abord que ce site ait choisi ce fragment, dans Espaces web > Fragments par défaut.",
 
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega menu",
     "iw_sulu_tailwind_theme.mega_source": "Source des données",
