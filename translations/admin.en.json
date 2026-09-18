@@ -891,6 +891,8 @@
     "iw_sulu_tailwind_theme.figure": "Figure",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icon",
     "iw_sulu_tailwind_theme.number": "Number",
+    "iw_sulu_tailwind_theme.progress_value": "Bar percentage",
+    "iw_sulu_tailwind_theme.progress_value_info": "From 0 to 100, how long the bar is drawn. The Number field above stays free text, so it can show something other than a percentage. Left empty, the bar reads the number when it is one, and is dropped otherwise.",
     "iw_sulu_tailwind_theme.figure_columns": "Columns",
     "iw_sulu_tailwind_theme.figure_columns_info": "How many figures share a row on desktop. Below that width the grid folds to two columns, then to one.",
     "iw_sulu_tailwind_theme.figure_columns_auto": "Automatic",

@@ -59,6 +59,11 @@ export default class extends Controller {
      *
      * Handles numeric values with optional prefix/suffix (e.g., "+500", "99%", "1.5M").
      *
+     * A value whose prefix holds letters is printed rather than counted: a
+     * figure reading "Sulu 3.0" is a version and not a quantity, and counting
+     * up to it walks the reader through "Sulu 0.0" on the way. A suffix is left
+     * alone, "1.5M" being a number with a unit on it.
+     *
      * @param {HTMLElement} el - The counter DOM element
      * @param {string} rawValue - The target value string
      * @private
@@ -66,7 +71,7 @@ export default class extends Controller {
     _animateCounter(el, rawValue) {
         // Extract numeric part and prefix/suffix
         const match = rawValue.match(/^([^\d]*)([\d.,]+)([^\d]*)$/);
-        if (!match) {
+        if (!match || /\p{L}/u.test(match[1])) {
             el.textContent = rawValue;
             return;
         }

@@ -1475,3 +1475,23 @@ them alone on a row. Past two columns the reading-width cap steps aside, through
 new `--grid-wide` modifier.
 
 Published blocks keep two columns, which is the default of the field.
+
+### Progress bars take a percentage of their own (new)
+
+A figure on the progress style says two things - what is printed beside the label,
+and how long the bar is - and one field answered both. So a figure reading
+`Sulu 3.0` was cast to zero and drew an empty bar under a value that was never a
+percentage.
+
+**Settings > Bar percentage**, offered on that style alone, drives the bar. The
+`Number` field is free text again: `Sulu 3.0`, `12/20`, `99%`, whatever the figure
+actually says.
+
+Published figures need no migration: an empty percentage reads the number when it is
+one, which is what they all are. A figure carrying neither now draws **no bar**
+rather than a bar at zero, which read as a measurement someone had taken.
+
+**What changes visually:** the displayed value is printed as written, where the style
+used to append a `%` to it. A figure published as `75` now reads `75` and not `75%`.
+Write the sign in the field - it is what makes `12/20` and `Sulu 3.0` possible in the
+same place, and a value that silently gains a unit cannot say anything else.

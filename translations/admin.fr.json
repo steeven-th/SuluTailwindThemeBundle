@@ -891,6 +891,8 @@
     "iw_sulu_tailwind_theme.figure": "Chiffre",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icône",
     "iw_sulu_tailwind_theme.number": "Nombre",
+    "iw_sulu_tailwind_theme.progress_value": "Pourcentage de la barre",
+    "iw_sulu_tailwind_theme.progress_value_info": "De 0 à 100, la longueur de la barre. Le champ Nombre au-dessus reste libre, il peut donc afficher autre chose qu'un pourcentage. Laissé vide, la barre lit le nombre quand c'en est un, et disparaît sinon.",
     "iw_sulu_tailwind_theme.figure_columns": "Colonnes",
     "iw_sulu_tailwind_theme.figure_columns_info": "Combien de chiffres tiennent sur une ligne au format bureau. En dessous, la grille se replie sur deux colonnes puis sur une.",
     "iw_sulu_tailwind_theme.figure_columns_auto": "Automatique",

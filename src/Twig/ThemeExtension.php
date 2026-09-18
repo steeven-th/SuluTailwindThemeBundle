@@ -140,6 +140,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_media_ratio_class', $this->getMediaRatioClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_progress_percent', $this->getProgressPercent(...)),
             new TwigFunction('iw_sulu_tailwind_theme_zones_align_class', $this->getZonesAlignClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_heading_tag', $this->getHeadingTag(...)),
@@ -1019,6 +1020,50 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         return \in_array($value, self::IMAGE_MAX_WIDTH_STEPS, true)
             ? 'iw-imgw--' . $value
             : '';
+    }
+
+    /**
+     * How full the bar of a progress figure is drawn, from 0 to 100.
+     *
+     * The figure carries two separate things: what is printed beside the label,
+     * and how long the bar is. They used to be the same field, so a figure
+     * reading "Sulu 3.0" or "12/20" cast down to zero and drew an empty bar
+     * under a value that was never a percentage to begin with.
+     *
+     * The dedicated field answers it now. The displayed value is only read when
+     * that field is empty, which is what every figure published before it
+     * existed looks like: a bare number there still means what it used to, and
+     * anything else gives up rather than guessing - "3.0" out of "Sulu 3.0" is
+     * a number, but it is a version, and a bar at 3% is a worse answer than no
+     * bar at all.
+     *
+     * @param int|string|null $percent the dedicated percentage, 0-100
+     * @param string|null     $number  the value printed beside the label
+     *
+     * @return int|null the width to draw, or null when nothing says one
+     */
+    public function getProgressPercent(int|string|null $percent = null, ?string $number = null): ?int
+    {
+        $percent = trim((string) $percent);
+
+        if ('' === $percent) {
+            // A displayed value that is a plain number, with the separators and
+            // the percent sign an editor writes. Anything else - a version, a
+            // ratio, a word - is not a percentage and gets no bar.
+            $candidate = str_replace([' ', "\u{a0}", ',', '%'], ['', '', '.', ''], trim((string) $number));
+
+            if (!is_numeric($candidate)) {
+                return null;
+            }
+
+            $percent = $candidate;
+        }
+
+        if (!is_numeric($percent)) {
+            return null;
+        }
+
+        return max(0, min(100, (int) round((float) $percent)));
     }
 
     /**

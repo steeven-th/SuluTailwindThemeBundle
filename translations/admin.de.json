@@ -891,6 +891,8 @@
     "iw_sulu_tailwind_theme.figure": "Kennzahl",
     "iw_sulu_tailwind_theme.image_icon": "Bild / Symbol",
     "iw_sulu_tailwind_theme.number": "Zahl",
+    "iw_sulu_tailwind_theme.progress_value": "Prozentsatz des Balkens",
+    "iw_sulu_tailwind_theme.progress_value_info": "Von 0 bis 100, die Länge des Balkens. Das Feld Zahl darüber bleibt freier Text und kann also etwas anderes als einen Prozentsatz anzeigen. Bleibt es leer, liest der Balken die Zahl, sofern es eine ist, und entfällt andernfalls.",
     "iw_sulu_tailwind_theme.figure_columns": "Spalten",
     "iw_sulu_tailwind_theme.figure_columns_info": "Wie viele Kennzahlen sich auf dem Desktop eine Zeile teilen. Darunter faltet sich das Raster auf zwei Spalten und dann auf eine.",
     "iw_sulu_tailwind_theme.figure_columns_auto": "Automatisch",

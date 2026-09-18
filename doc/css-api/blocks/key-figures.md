@@ -53,7 +53,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 |-------|------|
 | `.iw-key-figure__progress-header` | Flex row with label + value. |
 | `.iw-key-figure__progress-label` | Figure label (left), a flex row so it can carry the pictogram. |
-| `.iw-key-figure__progress-value` | Animated percentage (right, Stimulus counter). |
+| `.iw-key-figure__progress-value` | The displayed value (right, Stimulus counter). Free text: the bar reads its own field, so this can say `Sulu 3.0` or `12/20`. Rendered with its real value rather than a zero the script replaces, so it reads without JavaScript. |
 | `.iw-key-figure__progress-track` | Track of the bar (tinted background). |
 | `.iw-key-figure__progress-bar` | Animated fill (`data-key-figures-target="progressBar"`, width starts at `0%`). |
 
