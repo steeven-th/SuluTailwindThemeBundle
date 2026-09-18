@@ -128,7 +128,6 @@ class ThemeAdmin extends Admin
         ],
         'key_figures' => [
             ['key' => 'inline', 'label' => 'iw_sulu_tailwind_theme.style.inline'],
-            ['key' => 'with_icons', 'label' => 'iw_sulu_tailwind_theme.style.with_icons'],
             ['key' => 'grid_2x2', 'label' => 'iw_sulu_tailwind_theme.style.grid_2x2'],
             ['key' => 'progress', 'label' => 'iw_sulu_tailwind_theme.style.progress'],
             ['key' => 'timeline', 'label' => 'iw_sulu_tailwind_theme.style.timeline'],

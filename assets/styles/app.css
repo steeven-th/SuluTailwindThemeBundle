@@ -1804,13 +1804,17 @@ img.object-cover {
 }
 
 /* ─── Block: key_figures ──────────────────────────────────────────────── */
-/* Six layout modifiers:
+/* Five layout modifiers:
    - --grid-2x2   : 2-column card grid (max-width centered)
    - --inline     : centered flex row with large counters
    - --progress   : list of horizontal progress bars
    - --timeline   : vertical timeline with dots + cards (alternating sides on desktop)
-   - --with-icons : grid of figures with large icons (1..4 columns on desktop)
    - --split      : text on one side, figures stacked on the other
+
+   A sixth one, --with-icons, was dropped in 3.0.0: it was --inline with the
+   pictogram rendered, and --inline renders it now, so the two layouts differed
+   by whether the editor had filled a field. Leaving that field empty is the
+   whole of what the second one offered.
 
    .iw-key-figure is the shared subcomponent for a single figure. Counter
    animation is driven by the `key-figures` Stimulus controller via
@@ -1954,19 +1958,6 @@ img.object-cover {
 .iw-block-key-figures .iw-key-figure__icon--beside {
     margin-bottom: 0;
     --iw-icon-size: var(--iw-key-figure-icon-size-beside, 1.5rem);
-}
-
-.iw-block-key-figures .iw-key-figure__icon--lg {
-    width: var(--iw-key-figure-icon-size-lg, 4rem);
-    height: var(--iw-key-figure-icon-size-lg, 4rem);
-    margin-bottom: var(--iw-key-figure-icon-margin-bottom-lg, 1rem);
-}
-
-@media (min-width: 768px) {
-    .iw-block-key-figures .iw-key-figure__icon--lg {
-        width: var(--iw-key-figure-icon-size-lg-md, 5rem);
-        height: var(--iw-key-figure-icon-size-lg-md, 5rem);
-    }
 }
 
 /* The size lands on the icon and the slot follows, which is what the card slot
@@ -2188,34 +2179,6 @@ img.object-cover {
         margin-right: auto;
         padding-right: 2rem;
     }
-}
-
-/* Mode: --with-icons ──────────────────────────────────────────────────── */
-.iw-block-key-figures--with-icons {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--iw-block-key-figures-with-icons-gap, 2rem);
-}
-
-@media (min-width: 640px) {
-    .iw-block-key-figures--with-icons {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .iw-block-key-figures--cols-1 { grid-template-columns: 1fr; }
-    .iw-block-key-figures--cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .iw-block-key-figures--cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .iw-block-key-figures--cols-4 { grid-template-columns: repeat(4, 1fr); }
-}
-
-.iw-block-key-figures--with-icons .iw-key-figure--with-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: var(--iw-key-figure-with-icon-padding, 1.5rem);
 }
 
 /* ─── Block: timeline ─────────────────────────────────────────────────── */

@@ -1411,3 +1411,34 @@ square. Everywhere else the slot sizes itself to its content, so the rule had no
 to resolve against and an SVG with no intrinsic size rendered at 300px. The slot now
 hands its size down like the card slot does, so `--iw-key-figure-icon-size` and the
 per-figure size field both work on every style.
+
+### The "with icons" style is gone (breaking, migration provided)
+
+Six layout styles shipped, and two of them were the same one. `with_icons` was the
+inline row with the pictogram rendered, and `inline` did not render it - not by
+design, but because four of the six templates never included the icon partial.
+They all render it now, so a figure with no pictogram draws no slot for one, which
+is the whole of what the second style offered.
+
+**Run the migration once, on every environment holding content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-block-styles --dry-run
+php bin/console iw-sulu:theme:migrate-block-styles
+php bin/console cache:pool:clear cache.app
+```
+
+It moves the blocks published on `with_icons` to `inline`, on pages, snippets and
+articles alike, and drops the entry from the block styles of every theme stored in
+the database. Both halves matter: a theme still naming `_style_with_icons.html.twig`
+points the renderer at a file the bundle no longer holds.
+
+**What changes visually:** the figures wrap in a centred row instead of sitting in a
+grid of equal columns, and the pictograms come out at the default `3rem` rather than
+the `4rem` / `5rem` that style forced. Each figure picks its own size in the form if
+you want them larger.
+
+**CSS hooks removed:** `.iw-block-key-figures--with-icons`, `.iw-key-figure--with-icon`,
+`.iw-key-figure__icon--lg`, `--iw-block-key-figures-with-icons-gap`,
+`--iw-key-figure-with-icon-padding`, `--iw-key-figure-icon-size-lg`,
+`--iw-key-figure-icon-margin-bottom-lg`.

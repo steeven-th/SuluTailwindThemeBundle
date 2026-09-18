@@ -1,8 +1,8 @@
 # Block: key_figures — CSS API
 
-Statistics / KPI block with five layout styles: a 2-column card grid, an inline row, horizontal progress bars, a vertical timeline, and a grid with large icons.
+Statistics / KPI block with five layout styles: a card grid, an inline row, horizontal progress bars, a vertical timeline, and a split layout with text beside the figures.
 
-Every style renders the pictogram the block form offers. Four of them dropped it before 3.0.0, and `KeyFigureIconContractTest` holds the rule.
+Every style renders the pictogram the block form offers. Four of them dropped it before 3.0.0, which is what made a sixth style, `with_icons`, look like a layout of its own: it was the inline row with the pictogram rendered. It was removed, and `KeyFigureIconContractTest` holds the rule that made it redundant.
 
 Counter animation is driven by the `key-figures` Stimulus controller via `data-key-figures-target` attributes — these are preserved verbatim in every template.
 
@@ -21,10 +21,8 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `.iw-block-key-figures--inline` | Centered flex row with large counters. |
 | `.iw-block-key-figures--progress` | Stack of horizontal progress bars. |
 | `.iw-block-key-figures--timeline` | Vertical timeline with dots and alternating cards. |
-| `.iw-block-key-figures--with-icons` | Grid with large icons (1–4 columns on desktop). |
 | `.iw-block-key-figures--split` | Text (titles, rich text, action buttons) on one side, figures stacked on the other from `lg`. Replaces the CTA block's counter accessory, removed in 3.0.0. |
 | `.iw-block-key-figures--highlight` | Present unless the editor unticks **Settings > Highlight the figures**. Paints the counters with the variant's highlight colour, the one already colouring the `[[marked]]` words of a title. Not offered on `--progress`, whose percentage accompanies its bar. |
-| `.iw-block-key-figures--cols-1` to `--cols-4` | Column-count modifier used together with `--with-icons` to select the desktop layout. |
 | `.iw-block-key-figures__content` | Text zone of `--split`; `--last` moves it after the figures on desktop. |
 | `.iw-block-key-figures__figures` | Figures zone of `--split`; `--first` moves it before the text on desktop. |
 | `.iw-block-key-figures__timeline-line` | Vertical line in the `--timeline` mode. |
@@ -39,14 +37,12 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `.iw-key-figure--inline` | Modifier — vertical flex stack used in `--inline`. |
 | `.iw-key-figure--progress` | Modifier — progress-bar item used in `--progress`. |
 | `.iw-key-figure--timeline` | Modifier — timeline item used in `--timeline`. Even items alternate sides via `:nth-child(even)`. |
-| `.iw-key-figure--with-icon` | Modifier — centered icon item used in `--with-icons`. |
 | `.iw-key-figure__counter` | Animated numeric value (Stimulus `data-key-figures-target="counter"`). |
 | `.iw-key-figure__counter--md` / `--lg` / `--xl` | Counter size modifiers. |
 | `.iw-key-figure__title` | Figure title (text below the counter). Also carries `.iw-block__title`. |
 | `.iw-key-figure__subtitle` | Optional caption under the title. Also carries `.iw-block__subtitle`. |
 | `.iw-key-figure__icon` | Pictogram wrapper. Centred in `--grid-2x2` and `--inline`, aligned with the text in the three others. Each figure picks its own size in the form, the CSS only sets the default. |
 | `.iw-key-figure__icon--beside` | The pictogram of `--progress`, which joins the label on one line rather than standing above the figure. |
-| `.iw-key-figure__icon--lg` | Larger icon used in `--with-icons`. |
 | `.iw-key-figure__icon-img` | The `<img>` itself (`object-fit: contain`). |
 
 ### Elements of `--progress`
@@ -99,9 +95,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-key-figure-icon-size` | `3rem` | Default pictogram size, when the figure picks none of its own. |
 | `--iw-key-figure-icon-size-beside` | `1.5rem` | Pictogram size in `--progress`, where it shares a line with the label. |
 | `--iw-key-figure-icon-color` | `var(--iw-variant-highlight, var(--color-accent))` | Pictogram colour. Library icons follow it, an editor's own media keeps its colours. |
-| `--iw-key-figure-icon-size-lg` | `4rem` (mobile) / `5rem` (`>=768px`) | Larger icon for `--with-icons`. |
-| `--iw-key-figure-icon-margin-bottom` | `0.75rem` | Space below the default icon. |
-| `--iw-key-figure-icon-margin-bottom-lg` | `1rem` | Space below `--lg` icon. |
+| `--iw-key-figure-icon-margin-bottom` | `0.75rem` | Space below the pictogram. |
 
 ### Grid-2x2
 
@@ -145,13 +139,6 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-key-figure-timeline-card-padding` | `1.5rem` | Card padding. |
 | `--iw-block-key-figures-timeline-gap` | `2rem` / `3rem` (`>=768px`) | Vertical gap between timeline items. |
 
-### With-icons
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `--iw-block-key-figures-with-icons-gap` | `2rem` | Gap between items. |
-| `--iw-key-figure-with-icon-padding` | `1.5rem` | Item padding. |
-
 ---
 
 ## Override examples
@@ -184,10 +171,10 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 }
 ```
 
-### Force 3 columns on the with-icons mode even when 5+ figures exist
+### Bigger pictograms on the inline row
 
 ```css
-.iw-block-key-figures--with-icons.iw-block-key-figures--cols-4 {
-    grid-template-columns: repeat(3, 1fr);
+.iw-block-key-figures--inline {
+    --iw-key-figure-icon-size: 4rem;
 }
 ```

@@ -210,19 +210,6 @@ const WIREFRAME_RENDERERS = {
             <rect x="95" y="42" width="18" height="3" rx="2" fill={fill} />
         </svg>
     ),
-    with_icons: (fill, accent) => (
-        <svg viewBox="0 0 120 80" width="120" height="80">
-            <circle cx="20" cy="20" r="10" fill={accent} opacity="0.3" />
-            <rect x="10" y="35" width="20" height="8" rx="2" fill={accent} />
-            <rect x="8" y="48" width="24" height="3" rx="2" fill={fill} />
-            <circle cx="60" cy="20" r="10" fill={accent} opacity="0.3" />
-            <rect x="50" y="35" width="20" height="8" rx="2" fill={accent} />
-            <rect x="48" y="48" width="24" height="3" rx="2" fill={fill} />
-            <circle cx="100" cy="20" r="10" fill={accent} opacity="0.3" />
-            <rect x="90" y="35" width="20" height="8" rx="2" fill={accent} />
-            <rect x="88" y="48" width="24" height="3" rx="2" fill={fill} />
-        </svg>
-    ),
     grid_2x2: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
             <rect x="5" y="5" width="52" height="32" rx="3" fill={fill} opacity="0.15" />

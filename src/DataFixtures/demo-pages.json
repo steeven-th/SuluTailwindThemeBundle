@@ -2058,7 +2058,7 @@
      {
       "_id": "effa62ed",
       "type": "key_figures",
-      "style": "with_icons",
+      "style": "inline",
       "figures": [
        {
         "_id": "bb4518a0",

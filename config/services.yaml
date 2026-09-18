@@ -395,6 +395,12 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\BlockStylesMigrateCommand:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\IconsSyncCommand:
         tags:
             - { name: 'console.command' }
