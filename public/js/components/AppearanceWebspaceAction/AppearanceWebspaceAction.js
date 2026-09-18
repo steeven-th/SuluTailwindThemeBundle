@@ -66,7 +66,10 @@ export default class AppearanceWebspaceAction extends AbstractFormToolbarAction 
 
         return {
             type: 'select',
-            icon: 'su-brush',
+            // The icon Sulu puts on its own webspace selector, in the preview
+            // toolbar: the two controls pick a site, and an editor reads them
+            // as the same kind of control because they look alike.
+            icon: 'su-webspace',
             value: current,
             options: webspaces.map((webspace) => ({
                 value: webspace,
