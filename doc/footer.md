@@ -44,7 +44,11 @@ tree. They live in a dedicated **Footer snippet** (type _Footer_) assigned to th
 1. Create a snippet of type **Footer** (Snippets).
 2. Add one **Column** block per column — each has a **title** and a **Pages**
    `page_selection` (add pages one by one, reorderable).
-3. Assign that snippet to the **Footer columns** area (`iw_theme_footer`).
+3. Assign that snippet to the **Footer columns** area (`iw_theme_footer`), under
+   **Webspaces > (site) > Default snippets**.
+
+That assignment is made per site, so a multi-site project can give each of its
+sites a footer of its own, or point them all at the same snippet to share one.
 
 The number of columns is simply how many Column blocks the editor adds; the grid
 auto-fits. The `centered` and `minimal` layouts reuse the **first column** of the

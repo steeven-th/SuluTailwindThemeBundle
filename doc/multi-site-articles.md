@@ -106,4 +106,8 @@ The diagnostic reports each one with the article, the locale, the site named and
 
 ## Snippets
 
-A snippet belongs to no webspace at all, so it has no site to differentiate between. The `cta_style` of the mega menu snippet is therefore a single value, resolved against the theme of whichever site renders the menu.
+A snippet carries no site of its own, and it does not need one: **which snippet fills an area is already decided per site**. Sulu looks the area up by webspace key, so `iw_theme_mega_menu` on one site and on another are two separate assignments, made in **Webspaces > (site) > Default snippets**.
+
+So a mega menu whose call-to-action button must differ between two sites does not need a per-site value at all. Give each site its own snippet, and each one carries its own `cta_style`, resolved against the theme that site runs. Nothing is shared, and the two menus can differ in their links and their wording too, not only in a button style.
+
+Pointing two sites at the **same** snippet is the other option, and then its `cta_style` really is one value for both. That is the point of sharing a snippet, and the usual fallback applies: a button slug the other theme does not define resolves to that theme's first button.
