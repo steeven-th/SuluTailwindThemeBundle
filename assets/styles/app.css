@@ -6106,14 +6106,24 @@ aside .iw-toc {
     gap: 0.6rem;
 }
 
+/* `stretch` rather than the `inherit` written here before, which resolved to
+   the same thing by way of the body and only made it harder to read. */
 .iw-card__head--stacked {
     flex-direction: column;
-    align-items: inherit;
+    align-items: stretch;
     gap: 0.4rem;
 }
 
+/* Centring a head has to name both axes, because the two icon positions turn
+   the flow the other way: `inline` is a row, where the placement runs along
+   `justify-content`, and `above` is a column, where it runs along
+   `align-items`. Naming only the first left the pictogram of a stacked head
+   pinned to the left while the title and the number beside it centred - those
+   two are text, so they follow `text-align` and never needed the flex rules at
+   all. */
 .iw-block-cards__grid--align-center .iw-card__head {
     justify-content: center;
+    align-items: center;
 }
 
 /* The slot the pictogram sits in. It hands its size down through

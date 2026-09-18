@@ -1509,3 +1509,10 @@ read. Raising it grew every card of every page.
 of its own, so a site that already raised its titles keeps the proportion it chose.
 It makes the cards block usable as a key figures block, which is what it was being
 bent into.
+
+### A centred card centres its pictogram too (fixed)
+
+With **Content alignment** on centre and the pictogram above the title, the title and
+the number centred and the pictogram stayed against the left edge. The head is a flex
+column in that position, where the placement runs along `align-items` and not along
+`justify-content`, and only the second was named.
