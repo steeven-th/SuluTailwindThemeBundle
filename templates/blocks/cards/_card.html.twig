@@ -69,7 +69,7 @@
 {% set hasButtons = cardButtons is iterable and cardButtons|length > 0 %}
 
 <{{ wholeCardIsLink ? 'a' : 'div' }}
-    class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted iw-surface--accent' : '' }} {{ cardRadius|default('') }}"
+    class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted iw-surface--accent' : ' iw-surface--card' }} {{ cardRadius|default('') }}"
     {% if wholeCardIsLink %}
         href="{{ cardLink }}"
     {% endif %}

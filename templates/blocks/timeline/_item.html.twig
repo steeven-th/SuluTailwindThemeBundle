@@ -58,7 +58,7 @@
         {% endif %}
     </div>
 
-    <div class="iw-timeline-step__card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+    <div class="iw-timeline-step__card iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
         {# The state is a colour and a shape on the marker, so it says nothing to
            a screen reader without this. #}
         {% if state != 'done' %}

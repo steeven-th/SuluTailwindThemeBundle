@@ -1006,7 +1006,8 @@ iw_sulu_tailwind_theme
 │
 └── blockVariants[]
     ├── [0] → {label, title, subtitle, paragraph, link, linkHover, list, hr,
-    │          blockBg, paragraphBg, buttonStyle, separatorMode, separatorStyle, separatorImage}
+    │          blockBg, paragraphBg, cardBg, cardTitle, cardParagraph,
+    │          buttonStyle, separatorMode, separatorStyle, separatorImage}
     ├── [1] → { ... }
     └── [2] → { ... }
 ```

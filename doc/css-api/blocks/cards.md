@@ -10,9 +10,9 @@ The markup is identical for the three. Only a BEM modifier on the root changes, 
 
 ## What is a layout, and what is not
 
-A layout changes **where things sit**. What a card is framed with is not a layout: it comes from the variant, since a card is an enclosed unit and takes the paragraph surface like every other one in the bundle. Shadow and numbering are settings, so they work on all three layouts rather than occupying one each.
+A layout changes **where things sit**. What a card is framed with is not a layout: it comes from the variant, since a card is an enclosed unit and takes the card surface like every other one in the bundle. Shadow and numbering are settings, so they work on all three layouts rather than occupying one each.
 
-That is why there is no "bordered", "elevated" or "minimal" layout: the first two are the paragraph surface with and without a border, and the third is what a variant that sets neither gives you.
+That is why there is no "bordered", "elevated" or "minimal" layout: the first two are the card surface with and without a border, and the third is what a variant that fills neither gives you.
 
 ---
 
@@ -43,7 +43,7 @@ That is why there is no "bordered", "elevated" or "minimal" layout: the first tw
 
 | Class | Role |
 |-------|------|
-| `.iw-card` | One card. Full height, so a row of cards has a straight bottom edge. Background and border come from the paragraph surface of the variant. |
+| `.iw-card` | One card. Full height, so a row of cards has a straight bottom edge. Background and border come from the card surface of the variant, and it wears `.iw-surface--card` so the text on it follows too. A highlighted card wears `.iw-surface--accent` instead. |
 | `.iw-card--stacked` / `--image-top` / `--horizontal` | Layout modifier, mirroring the block. Only `--horizontal` carries rules, turning the body into a two-column grid; the other two are hooks for a project to style. |
 | `.iw-card--shadow` | Optional shadow, on any layout. |
 | `.iw-card--highlighted` | Takes the **accent surface** of the variant. That surface owns the colour of the text on it, so the card stays legible whatever the accent is, which a plain background could not promise. |
@@ -75,8 +75,9 @@ A clickable card draws its action as a `<span>` carrying the button style, since
 |----------|---------|------|
 | `--iw-block-cards-gap` | `--iw-blocks-component-gap`, then `1.5rem` | Gap between cards. Reads the component grid token, not `--iw-cards-gap`, which drives the article card grids from a setting that never names this block. |
 | `--iw-card-track` | `1fr` | Width a card may take. Set by the width modifiers. |
-| `--iw-card-bg` | `--iw-variant-paragraph-bg`, then `--iw-variant-subtle-bg` | Card background. The enclosed-unit cascade every card in the bundle uses. |
-| `--iw-card-border` | `--iw-variant-paragraph-border` | Card border colour. Draws only when the variant gives it one, so a bare variant gets no hairline nobody asked for. |
+| `--iw-card-bg` | `--iw-variant-card-bg`, then `transparent` | Card background. The enclosed-unit cascade every card in the bundle uses. Nothing is drawn until the variant fills the card surface. |
+| `--iw-card-border` | `--iw-variant-card-border` | Card border colour. Draws only when the variant gives it one, so a bare variant gets no hairline nobody asked for. |
+| Highlighted card frame | `--iw-variant-accent-border` / `-width`, then the card ones | A card put forward keeps the frame of its neighbours unless the accent surface names one of its own. |
 | `--iw-card-padding` | `1.25rem` | Padding of the body. |
 | `--iw-card-icon-size` / `--iw-card-icon-size-stacked` | `1.6rem` / `3rem` | Pictogram size. |
 | `--iw-card-title-size` / `--iw-card-text-size` | `1.0625rem` / `0.9375rem` | Type scale inside a card. Both read the theme values (`--iw-cards-title-size`, `--iw-cards-text-size`) first, set under **Defaults > Cards**. |
@@ -89,7 +90,7 @@ A clickable card draws its action as a `<span>` carrying the button style, since
 
 ## Restyling
 
-A project changes the frame of every card by setting the paragraph surface of its variant, not by overriding this block. To restyle only these cards, `--iw-card-bg` and `--iw-card-border` sit in front of the variant in the cascade:
+A project changes the frame of every card by setting the card surface of its variant, not by overriding this block. To restyle only these cards, `--iw-card-bg` and `--iw-card-border` sit in front of the variant in the cascade:
 
 ```css
 .iw-block-cards {

@@ -10,7 +10,10 @@ use PHPUnit\Framework\TestCase;
 /**
  * Guards that every card of the bundle frames itself the same way.
  *
- * A card is an enclosed unit, so it takes the paragraph surface of the variant.
+ * A card is an enclosed unit, so it takes the card surface of the variant. It
+ * took the paragraph one until 3.0.0, for want of a surface of its own, which
+ * made a paragraph fill and a card fill impossible to set apart.
+ *
  * Eight blocks draw one, and each wrote its own rule, so they drifted: the
  * cards block, written last and against the surface model, drew no border
  * unless the variant asked for one, while the seven older ones drew a hairline
@@ -32,12 +35,12 @@ final class CardSurfaceParityContractTest extends TestCase
      * asks for no border gets none. Reading `1px` here is the whole bug: it
      * frames a card the editor never asked to frame.
      */
-    private const WIDTH = 'var(--iw-variant-paragraph-border-width,';
+    private const WIDTH = 'var(--iw-variant-card-border-width,';
 
     /**
      * The colour, likewise, falls back to transparent and not to a grey.
      */
-    private const COLOUR = 'var(--iw-variant-paragraph-border, transparent)';
+    private const COLOUR = 'var(--iw-variant-card-border, transparent)';
 
     /**
      * No card draws a border of its own making.
@@ -90,7 +93,7 @@ final class CardSurfaceParityContractTest extends TestCase
                 continue;
             }
 
-            if (!str_contains($matches[1], 'var(--iw-variant-paragraph-bg')) {
+            if (!str_contains($matches[1], 'var(--iw-variant-card-bg')) {
                 $offenders[] = $selector;
             }
         }
@@ -174,6 +177,23 @@ final class CardSurfaceParityContractTest extends TestCase
     private const PAINTED_BY_ITS_PARTS = ['iw-block-location__card'];
 
     /**
+     * Panels that expose a card-shaped hook and are not cards.
+     *
+     * Both are a stretch of text given a tint inside its block - the column
+     * beside a split form, the address beside a map - so they take the
+     * paragraph surface, which is what tints running text. Naming them costs a
+     * line and keeps the rule above strict: a real card that reached for the
+     * paragraph surface would still fail, which is the drift this whole file
+     * exists to catch.
+     *
+     * @var list<string>
+     */
+    private const INFO_PANELS = [
+        '.iw-block-form--split .iw-block-form__info',
+        '.iw-block-location__address',
+    ];
+
+    /**
      * Every rule of the stylesheet, as selector and declarations.
      *
      * @return list<array{0: string, 1: string}>
@@ -204,11 +224,13 @@ final class CardSurfaceParityContractTest extends TestCase
      * Each is excluded for a reason that would still hold if the surfaces were
      * redesigned, never because it happens to fail:
      *
-     *   - the split form's info column paints the BLOCK surface, being a zone
-     *     of the block rather than a unit sitting on it
      *   - the event info card and the mobile location card are translucent over
      *     a photo or a map, where a solid light background is legibility and
      *     not styling, and following a dark variant would make them unreadable
+     *   - the info panels listed below are stretches of text inside a block,
+     *     not units sitting on it, so they stay on the paragraph surface
+     *   - a highlighted card is on the accent surface, and only reads the card
+     *     one as the fallback for its frame
      *
      * @param string $selector The rule's selector
      * @param string $body     Its declarations
@@ -216,6 +238,19 @@ final class CardSurfaceParityContractTest extends TestCase
     private static function isNotACard(string $selector, string $body): bool
     {
         if (str_contains($body, 'card-bg-mobile') || str_contains($body, '--iw-event-info-bg')) {
+            return true;
+        }
+
+        $normalised = trim((string) preg_replace('/\s+/', ' ', (string) preg_replace('~/\*.*?\*/~s', '', $selector)));
+        if (\in_array($normalised, self::INFO_PANELS, true)) {
+            return true;
+        }
+
+        // A card put forward is on the ACCENT surface, which is the one
+        // guaranteeing the text on it. It reads the card surface only as the
+        // fallback for its frame - a variant that frames its cards frames this
+        // one too - and that mention is what brings it here.
+        if (str_contains($normalised, '.iw-card--highlighted')) {
             return true;
         }
 
@@ -228,8 +263,7 @@ final class CardSurfaceParityContractTest extends TestCase
             return true;
         }
 
-        return str_contains($selector, '__info')
-            && str_contains($body, 'var(--iw-variant-block-bg');
+        return false;
     }
 
     /**

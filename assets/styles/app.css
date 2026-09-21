@@ -1056,9 +1056,9 @@ img.object-cover {
 
 .iw-block-accordion--cards .iw-accordion__item {
     padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
-    background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-variant-paragraph-border, transparent);
+    background-color: var(--iw-accordion-card-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-variant-card-border, transparent);
 }
 
 /* Question styling (the accordion's fill setting).
@@ -1235,10 +1235,10 @@ img.object-cover {
     align-items: center;
     gap: var(--iw-document-card-gap, 1rem);
     padding: var(--iw-document-card-padding, 1rem);
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-document-card-border, var(--iw-variant-paragraph-border, transparent));
-    background-color: var(--iw-document-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    color: var(--iw-document-card-color, var(--iw-variant-paragraph-color, inherit));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-document-card-border, var(--iw-variant-card-border, transparent));
+    background-color: var(--iw-document-card-bg, var(--iw-variant-card-bg, transparent));
+    color: var(--iw-document-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
     text-decoration: none;
     transition: box-shadow var(--iw-document-card-transition-duration, 0.2s) ease;
 }
@@ -1371,9 +1371,9 @@ img.object-cover {
     display: block;
     height: 100%;
     padding: var(--iw-linked-page-card-padding, 1.5rem);
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-linked-page-card-border, var(--iw-variant-paragraph-border, transparent));
-    background-color: var(--iw-linked-page-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-linked-page-card-border, var(--iw-variant-card-border, transparent));
+    background-color: var(--iw-linked-page-card-bg, var(--iw-variant-card-bg, transparent));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1612,14 +1612,43 @@ img.object-cover {
     }
 }
 
+/* The card of the `--cards` style. It is a card like the others, so it takes
+   the card surface of the variant: it used to paint no background at all and
+   draw a hairline of its own, which left it the one card in the bundle no
+   variant could fill and the one that framed itself whatever the editor asked
+   for.
+
+   The author rule below keeps the separator colour: a line INSIDE the card is
+   a separator, not its frame. */
 .iw-block-testimonial--cards .iw-testimonial {
     padding: var(--iw-testimonial-padding, 1.5rem);
-    border: 1px solid var(--iw-testimonial-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    transition: box-shadow var(--iw-testimonial-transition-duration, 0.2s) ease;
+    background-color: var(--iw-testimonial-card-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-testimonial-border, var(--iw-variant-card-border, transparent));
+    /* The hover comes from Components > Cards, like every other card family.
+       It was written here instead, so the one card of the bundle that lifts on
+       its own was also the one no admin setting could reach: the duration, the
+       easing and the movement all ignored the theme. The literals stay behind
+       the tokens for a page rendered without a compiled theme. */
+    transition: transform var(--iw-testimonial-transition-duration, var(--iw-cards-hover-duration, .15s))
+            var(--iw-cards-hover-easing, ease),
+        box-shadow var(--iw-testimonial-transition-duration, var(--iw-cards-hover-duration, .15s))
+            var(--iw-cards-hover-easing, ease);
 }
 
 .iw-block-testimonial--cards .iw-testimonial:hover {
-    box-shadow: var(--iw-testimonial-hover-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+    transform: var(--iw-cards-hover-transform, translateY(-2px));
+    box-shadow: var(--iw-testimonial-hover-shadow, var(--iw-card-shadow-hover, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-block-testimonial--cards .iw-testimonial {
+        transition: none;
+    }
+
+    .iw-block-testimonial--cards .iw-testimonial:hover {
+        transform: none;
+    }
 }
 
 .iw-block-testimonial--cards .iw-testimonial__author {
@@ -1773,11 +1802,11 @@ img.object-cover {
 .iw-block-testimonial .iw-testimonial__rating-star {
     width: var(--iw-testimonial-rating-star-size, 1rem);
     height: var(--iw-testimonial-rating-star-size, 1rem);
-    color: var(--iw-testimonial-rating-star-empty, #d1d5db);
+    color: var(--iw-testimonial-rating-star-empty, var(--color-border, #d1d5db));
 }
 
 .iw-block-testimonial .iw-testimonial__rating-star--filled {
-    color: var(--iw-testimonial-rating-star-filled, #facc15);
+    color: var(--iw-testimonial-rating-star-filled, var(--color-accent, #facc15));
 }
 
 /* Center the rating row when displayed inside a centered slide */
@@ -2010,13 +2039,13 @@ img.object-cover {
    settings had nothing to paint. */
 .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
     padding: var(--iw-key-figure-card-padding, 1.5rem);
-    background-color: var(--iw-key-figure-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
-    color: var(--iw-key-figure-card-color, var(--iw-variant-paragraph-color, inherit));
+    background-color: var(--iw-key-figure-card-bg, var(--iw-variant-card-bg, transparent));
+    color: var(--iw-key-figure-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
     /* The width comes from the surface and defaults to zero, so a variant
        asking for no border gets none. The hairline that used to be written
        here framed a card the editor never asked to frame. */
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-key-figure-card-border, var(--iw-variant-paragraph-border, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-key-figure-card-border, var(--iw-variant-card-border, transparent));
     text-align: center;
 }
 
@@ -2187,10 +2216,10 @@ img.object-cover {
 .iw-block-key-figures--timeline .iw-key-figure__timeline-card {
     margin-left: 3rem;
     padding: var(--iw-key-figure-timeline-card-padding, 1.5rem);
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-block-key-figures-timeline-card-border, var(--iw-variant-paragraph-border, transparent));
-    background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-block-key-figures-timeline-card-border, var(--iw-variant-card-border, transparent));
+    background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+    color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
 }
 
 @media (min-width: 768px) {
@@ -2318,10 +2347,10 @@ img.object-cover {
     flex: 1 1 auto;
     min-width: 0;
     padding: var(--iw-timeline-card-padding, 1.5rem);
-    border: var(--iw-timeline-card-border-width, var(--iw-variant-paragraph-border-width, 0)) solid
-        var(--iw-timeline-card-border, var(--iw-variant-paragraph-border, transparent));
-    background-color: var(--iw-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    color: var(--iw-timeline-card-color, var(--iw-variant-paragraph-color, inherit));
+    border: var(--iw-timeline-card-border-width, var(--iw-variant-card-border-width, 0)) solid
+        var(--iw-timeline-card-border, var(--iw-variant-card-border, transparent));
+    background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+    color: var(--iw-timeline-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
 }
 
 .iw-timeline-step__date {
@@ -2584,9 +2613,9 @@ img.object-cover {
 .iw-block-article-carousel .iw-block-article-carousel__item {
     height: 100%;
     overflow: hidden;
-    background-color: var(--iw-block-article-item-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    border: var(--iw-block-article-item-border, var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-variant-paragraph-border, transparent));
+    background-color: var(--iw-block-article-item-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-block-article-item-border, var(--iw-variant-card-border-width, 0) solid
+        var(--iw-variant-card-border, transparent));
 }
 
 /* The L4 article-card applies `border-radius: var(--border-radius)` at its
@@ -2778,9 +2807,9 @@ img.object-cover {
    setting really yields squared corners. */
 .iw-block-article-featured .iw-featured-article-card {
     display: block;
-    background-color: var(--iw-featured-article-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-    border: var(--iw-featured-article-card-border, var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-variant-paragraph-border, transparent));
+    background-color: var(--iw-featured-article-card-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-featured-article-card-border, var(--iw-variant-card-border-width, 0) solid
+        var(--iw-variant-card-border, transparent));
     box-shadow: var(--iw-featured-article-card-shadow, 0 1px 2px rgb(0 0 0 / 0.05));
     overflow: hidden;
     text-decoration: none;
@@ -3752,9 +3781,9 @@ section.block:has([data-slider-fullbleed-value]) {
    inlined via the Tailwind utility `rounded-[var(--border-radius,8px)]` so it
    follows the theme tokens automatically. */
 .iw-block-form--card {
-    background-color: var(--iw-block-form-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-block-form-card-border, var(--iw-variant-paragraph-border, transparent));
+    background-color: var(--iw-block-form-card-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-block-form-card-border, var(--iw-variant-card-border, transparent));
 }
 
 /* --split widget (text / image / location). The widget partial fills the info
@@ -6100,14 +6129,14 @@ aside .iw-toc {
     text-decoration: none;
     /* The frame comes from the variant. A variant that sets neither background
        nor border leaves the cards bare, held together by the grid alone. */
-    background-color: var(--iw-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent)));
+    background-color: var(--iw-card-bg, var(--iw-variant-card-bg, transparent));
 }
 
 /* The border only draws when the variant gives it a colour, so a bare variant
    does not get a hairline nobody asked for. */
 .iw-card {
-    border: var(--iw-variant-paragraph-border-width, 0) solid
-        var(--iw-card-border, var(--iw-variant-paragraph-border, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-card-border, var(--iw-variant-card-border, transparent));
 }
 
 .iw-card__body {
@@ -6299,11 +6328,19 @@ aside .iw-toc {
 /* The accent surface owns its text colour, which is the whole point: a plain
    accent background could not promise the text on it stays readable. The
    title, link and number follow it too, or they would keep the colours meant
-   for the normal card background. */
+   for the normal card background.
+
+   The border falls back to the CARD surface rather than to a value of its own.
+   A card put forward is still one of the cards in the grid: a variant that
+   frames its cards frames this one too, unless the accent surface names a
+   frame of its own. Writing `transparent` and `1px` here instead took the
+   frame away from a variant that had asked for one, and gave this card a pixel
+   of invisible border its neighbours did not have - enough to sit it off the
+   grid by one. */
 .iw-card--highlighted {
     background-color: var(--iw-variant-accent-bg, var(--color-accent));
-    border-color: var(--iw-variant-accent-border, transparent);
-    border-width: var(--iw-variant-accent-border-width, 1px);
+    border-color: var(--iw-variant-accent-border, var(--iw-variant-card-border, transparent));
+    border-width: var(--iw-variant-accent-border-width, var(--iw-variant-card-border-width, 0));
     color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
 }
 

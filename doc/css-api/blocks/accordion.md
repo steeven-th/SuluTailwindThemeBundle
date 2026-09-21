@@ -109,7 +109,7 @@ A variant that defines no accent surface falls back to the theme's
 ### Colors and rules
 
 > **Changed in 3.0.0** - `--iw-accordion-card-surface` is now `--iw-accordion-card-bg`, and the
-> `--cards` style takes the **paragraph surface of the variant** rather than the site-wide card
+> `--cards` style takes the **card surface of the variant** rather than the site-wide card
 > colour. Its border comes from that surface too, so a variant that asks for no border no longer
 > gets a hairline: this is the rule the eight other cards of the bundle already followed, and the
 > accordion was the one exception. Override `--iw-accordion-card-bg` to restore a colour of your
@@ -119,7 +119,7 @@ A variant that defines no accent surface falls back to the theme's
 |----------|---------|---------|
 | `--iw-accordion-rule-color` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Separator rules: between items in `--list`, inside the box in `--bordered`, and the box itself. Follows the active block variant. |
 | `--iw-accordion-rule-width` | `1px` | Rule width. |
-| `--iw-accordion-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background in `--cards`. Takes the paragraph surface of the variant, like every other card of the bundle. |
+| `--iw-accordion-card-bg` | `var(--iw-variant-card-bg, transparent)` | Card background in `--cards`. Takes the **card surface** of the variant, like every other card of the bundle. The box of `--list` and `--bordered` keeps the paragraph surface: it is one panel, not a row of cards. |
 | `--iw-accordion-summary-color-hover` | `var(--iw-variant-link-hover, var(--color-primary))` | Row color on hover. Follows the variant's link color, falling back to the theme primary. |
 | `--iw-accordion-icon-color` | `currentColor` | Icon color. |
 | `--iw-accordion-content-color` | `inherit` | Answer text color. |

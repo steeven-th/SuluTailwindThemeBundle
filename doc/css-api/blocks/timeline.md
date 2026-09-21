@@ -100,7 +100,7 @@ The markup is identical for the four layouts. Only a BEM modifier on the root ch
 
 | Variable | Default |
 |----------|---------|
-| `--iw-timeline-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` |
+| `--iw-timeline-card-bg` | `var(--iw-variant-card-bg, transparent)` |
 | `--iw-timeline-card-color` | `var(--iw-variant-paragraph-color, inherit)` |
 | `--iw-timeline-card-border` | `var(--iw-variant-hr-color, var(--color-primary))` |
 | `--iw-timeline-card-border-width` | `1px` |

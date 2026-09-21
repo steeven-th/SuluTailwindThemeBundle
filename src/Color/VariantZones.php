@@ -53,6 +53,16 @@ final class VariantZones
      *
      * @var array<string, array{label: string, fields: list<array{0: string, 1: string, 2: string}>}>
      */
+    /**
+     * The zones, in the order the editor lists them.
+     *
+     * A zone is a SURFACE shared by several blocks, never a component. Cards
+     * earned one because ten blocks draw a card and they all took the paragraph
+     * surface for want of one of their own, which made a paragraph fill and a
+     * card fill impossible to set apart. A component - an accordion, say - does
+     * not: it already composes the surfaces below, and one zone per component
+     * would rebuild the fifty-picker form these zones replaced.
+     */
     private const ZONES = [
         'text' => [
             'label' => 'iw_sulu_tailwind_theme.variant_zone_text',
@@ -91,10 +101,21 @@ final class VariantZones
                 ['paragraphBorderWidth', 'iw_sulu_tailwind_theme.variant_paragraph_border_width', 'width'],
             ],
         ],
+        'cards' => [
+            'label' => 'iw_sulu_tailwind_theme.variant_surface_cards',
+            'fields' => [
+                ['cardBg', 'iw_sulu_tailwind_theme.variant_card_bg', 'color'],
+                ['cardTitle', 'iw_sulu_tailwind_theme.variant_card_title', 'color'],
+                ['cardParagraph', 'iw_sulu_tailwind_theme.variant_card_paragraph', 'color'],
+                ['cardBorder', 'iw_sulu_tailwind_theme.variant_card_border', 'color'],
+                ['cardBorderWidth', 'iw_sulu_tailwind_theme.variant_card_border_width', 'width'],
+            ],
+        ],
         'accent' => [
             'label' => 'iw_sulu_tailwind_theme.variant_surface_accent',
             'fields' => [
                 ['accentBg', 'iw_sulu_tailwind_theme.variant_accent_bg', 'color'],
+                ['accentTitle', 'iw_sulu_tailwind_theme.variant_accent_title', 'color'],
                 ['accentText', 'iw_sulu_tailwind_theme.variant_accent_text', 'color'],
                 ['accentBorder', 'iw_sulu_tailwind_theme.variant_accent_border', 'color'],
                 ['accentBorderWidth', 'iw_sulu_tailwind_theme.variant_accent_border_width', 'width'],
