@@ -39,35 +39,17 @@ use PHPUnit\Framework\TestCase;
 final class CardShadowTest extends TestCase
 {
     /**
-     * Every family of card reads its own variable, so one setting has to feed
-     * them all. Feeding only the first would leave three blocks on the value
-     * written in the stylesheet, and the difference would show on a page where
-     * the two sit side by side.
-     *
-     * @return array<string, array{0: string}>
+     * The shape reaches the stylesheet from one setting.
      */
-    public static function hoverShadowVariables(): array
-    {
-        return [
-            'cards block' => ['--iw-card-shadow-hover'],
-            'document block' => ['--iw-document-card-hover-shadow'],
-            'linked pages block' => ['--iw-linked-page-card-hover-shadow'],
-            'testimonial block' => ['--iw-testimonial-hover-shadow'],
-        ];
-    }
-
     #[Test]
-    #[DataProvider('hoverShadowVariables')]
-    public function theHoverShadowReachesEveryFamilyOfCard(string $variable): void
+    public function theHoverShadowIsEmitted(): void
     {
-        $css = $this->compileCss(['cardShadow' => ['blur' => 30, 'hoverOpacity' => 0.4]]);
+        $css = $this->compileCss([
+            'cardShadowHoverColor' => '#000000',
+            'cardShadow' => ['blur' => 30, 'hoverOpacity' => 0.4],
+        ]);
 
-        self::assertStringContainsString(
-            $variable . ': 0px 6px 45px',
-            $css,
-            'The hover shadow setting must reach ' . $variable . '. A family left out keeps the '
-            . 'literal written in its own rule, and sits differently from its neighbours.',
-        );
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 6px 45px', $css);
     }
 
     /**
@@ -79,7 +61,7 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function aShadowCanAppearOnHoverAlone(): void
     {
-        $css = $this->compileCss(['cardShadow' => [
+        $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => [
             'opacity' => 0,
             'hoverOpacity' => 0.35,
             'offsetY' => 2,
@@ -88,8 +70,8 @@ final class CardShadowTest extends TestCase
             'hoverScale' => 1,
         ]]);
 
-        self::assertStringContainsString('--iw-card-shadow: none', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: 0px 2px 66px 15px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 2px 66px 15px', $css);
     }
 
     /**
@@ -99,7 +81,7 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function everySettingReachesTheStylesheet(): void
     {
-        $css = $this->compileCss(['cardShadow' => [
+        $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => [
             'offsetX' => 7,
             'offsetY' => 9,
             'blur' => 41,
@@ -107,7 +89,7 @@ final class CardShadowTest extends TestCase
             'opacity' => 0.5,
         ]]);
 
-        self::assertStringContainsString('--iw-card-shadow: 7px 9px 41px 13px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: 7px 9px 41px 13px', $css);
         self::assertStringContainsString('50%, transparent)', $css);
     }
 
@@ -117,10 +99,10 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function noneEmitsNoShadowRatherThanAnEmptyOne(): void
     {
-        $css = $this->compileCss(['cardShadow' => ['opacity' => 0, 'hoverOpacity' => 0]]);
+        $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => ['opacity' => 0, 'hoverOpacity' => 0]]);
 
-        self::assertStringContainsString('--iw-card-shadow: none', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: none', $css);
     }
 
     /**
@@ -132,9 +114,9 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function aThemeStillHoldingTheOldSizeIsUnderstood(): void
     {
-        $css = $this->compileCss(['cardShadow' => 'md']);
+        $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => 'md']);
 
-        self::assertStringContainsString('--iw-card-shadow: 0px 4px 12px -2px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: 0px 4px 12px -2px', $css);
     }
 
     /**
@@ -179,13 +161,18 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function theShadowFallsBackToBlackWhenNoVariantSaysOtherwise(): void
     {
-        $css = $this->compileCss([]);
+        $css = $this->compileCss(['cardShadowColor' => '#334155']);
 
         self::assertStringContainsString(
-            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, var(--iw-cards-shadow-color, #000)))',
+            'var(--iw-card-shadow-color, #334155)',
             $css,
-            'The chain must end on a colour of its own, or a theme that never set one loses '
-            . 'its shadows entirely.',
+            'A project override must still come first, with the theme colour behind it.',
+        );
+
+        self::assertStringContainsString(
+            '--iw-cards-shadow: none',
+            $this->compileCss([]),
+            'A theme naming no colour draws no shadow, rather than a black one nobody chose.',
         );
     }
 
@@ -203,67 +190,52 @@ final class CardShadowTest extends TestCase
     {
         $css = $this->compileCss(['cardShadowColor' => '#1e293b', 'cardShadowHoverColor' => '#0f172a']);
 
-        self::assertStringContainsString('--iw-cards-shadow-color: #1e293b', $css);
-        self::assertStringContainsString('--iw-cards-shadow-hover-color: #0f172a', $css);
+        self::assertStringContainsString('var(--iw-card-shadow-color, #1e293b)', $css);
+        self::assertStringContainsString('var(--iw-card-shadow-color, #0f172a)', $css);
     }
 
     /**
-     * The variant wins over the site-wide colour, never the other way round.
+     * A variant colours the shadow of the cards in its own block.
      *
-     * Reading them in the wrong order would make a variant unable to change
-     * anything as soon as the theme set a colour, which is the shape of the bug
-     * this whole rework came from.
+     * The variable cannot be inherited from `:root` with the variant behind it:
+     * the `var()` inside a custom property is substituted where the property is
+     * declared, so such a chain resolves against `:root` and the variant never
+     * wins - whatever an editor picks. Each variant redeclares it instead.
      */
     #[Test]
-    public function theVariantColourComesBeforeTheSiteWideOne(): void
+    public function aVariantRedeclaresTheShadowInItsOwnColour(): void
     {
-        $css = $this->compileCss([]);
-
-        $variant = strpos($css, '--iw-variant-card-shadow-color');
-        $siteWide = strpos($css, '--iw-cards-shadow-color, #000');
-
-        self::assertIsInt($variant);
-        self::assertIsInt($siteWide);
-        self::assertLessThan($siteWide, $variant, 'The variant must be read before the site-wide colour.');
-    }
-
-    /**
-     * The hover setting is read whatever the resting one says.
-     *
-     * The old form had two lists: the resting one defaulted to "Auto", stored
-     * as an empty string, and the hover one to `none`. So the commonest theme
-     * of all holds an empty resting size and an explicit `none` - and reading
-     * the hover value only alongside a named size skipped exactly that pair.
-     *
-     * The cost was not theoretical: the hover shadow also stopped depending on
-     * the block's Shadow checkbox in the same release, so such a theme would
-     * have gone from no shadow anywhere to one under the pointer on every card.
-     *
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
-     */
-    public static function legacyPairs(): array
-    {
-        return [
-            'auto + no hover' => [['cardShadow' => '', 'cardHoverShadow' => 'none'], 'none'],
-            'auto + a hover size' => [['cardShadow' => '', 'cardHoverShadow' => 'lg'], '0px 9.2px'],
-            'a size + no hover' => [['cardShadow' => 'md', 'cardHoverShadow' => 'none'], 'none'],
-            'nothing stored at all' => [[], '0px 6px 18px'],
-        ];
-    }
-
-    /**
-     * @param array<string, mixed> $tokens
-     */
-    #[Test]
-    #[DataProvider('legacyPairs')]
-    public function theHoverSettingSurvivesWhateverTheRestingOneHolds(array $tokens, string $expected): void
-    {
-        $css = $this->compileCss($tokens);
+        $css = $this->compileCss([
+            'cardShadowColor' => '#111111',
+            'blockVariants' => [['slug' => 'nuit', 'label' => 'Nuit', 'cardShadowColor' => '#7dd3fc']],
+        ]);
 
         self::assertStringContainsString(
-            '--iw-card-shadow-hover: ' . $expected,
-            $css,
-            'A theme keeps the hover shadow it asked for, including none of it.',
+            'var(--iw-card-shadow-color, #7dd3fc)',
+            $this->ruleFor($css, '.iw-variant--nuit'),
+            'A variant that names a shadow colour must use it on its own cards.',
+        );
+    }
+
+    /**
+     * A variant that names nothing draws no shadow.
+     *
+     * Inside a block the variant decides, and saying nothing is a decision -
+     * the same rule as the card fill. The site-wide colour answers for the
+     * cards no variant reaches, never for those it does.
+     */
+    #[Test]
+    public function aVariantWithoutAShadowColourDrawsNone(): void
+    {
+        $css = $this->compileCss([
+            'cardShadowColor' => '#111111',
+            'blockVariants' => [['slug' => 'clair', 'label' => 'Clair']],
+        ]);
+
+        self::assertStringContainsString(
+            '--iw-variant-card-shadow: none',
+            $this->ruleFor($css, '.iw-variant--clair'),
+            'The site-wide colour must not leak into a block whose variant said nothing.',
         );
     }
 
@@ -281,8 +253,8 @@ final class CardShadowTest extends TestCase
     {
         $css = $this->compileCss(['cardShadow' => 'md', 'cardHoverShadow' => 'glow-primary']);
 
-        self::assertStringContainsString('--iw-cards-shadow-hover-color: var(--color-primary)', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: 0px 5px 15px', $css);
+        self::assertStringContainsString('var(--iw-card-shadow-color, var(--color-primary))', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 5px 15px', $css);
     }
 
     /**
@@ -296,8 +268,10 @@ final class CardShadowTest extends TestCase
             'cardShadowHoverColor' => '#ff0000',
         ]);
 
-        self::assertStringContainsString('--iw-cards-shadow-hover-color: #ff0000', $css);
-        self::assertStringNotContainsString('--iw-cards-shadow-hover-color: var(--color-primary)', $css);
+        $hover = self::declaration($css, '--iw-cards-shadow-hover');
+
+        self::assertStringContainsString('#ff0000', $hover);
+        self::assertStringNotContainsString('--color-primary', $hover, 'The picked colour replaces the glow.');
     }
 
     /**
@@ -316,6 +290,22 @@ final class CardShadowTest extends TestCase
         }
 
         return (string) (new \ReflectionMethod(ThemeCompiler::class, 'generateCss'))->invoke($compiler, $theme);
+    }
+
+    /**
+     * One declaration of the compiled CSS, value included.
+     *
+     * Asserting on the whole stylesheet catches a colour used anywhere else -
+     * `--color-primary` drives the buttons too - which makes a negative
+     * assertion fail for the wrong reason.
+     */
+    private static function declaration(string $css, string $property): string
+    {
+        if (1 !== preg_match('/' . preg_quote($property, '/') . ':([^;]*);/', $css, $matches)) {
+            return '';
+        }
+
+        return $matches[1];
     }
 
     private function ruleFor(string $css, string $selector): string

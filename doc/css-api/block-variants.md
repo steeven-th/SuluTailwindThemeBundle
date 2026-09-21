@@ -49,8 +49,8 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
 | `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
-| `--iw-variant-card-shadow-color` | `cardShadowColor` | Colour the shadow of every card is drawn in. The shape stays site-wide, under **Components > Cards** |
-| `--iw-variant-card-shadow-hover-color` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
+| `--iw-variant-card-shadow` | `cardShadowColor` | The shadow the cards of this block cast, shape from **Components > Cards** and colour from here. `none` when the variant names no colour |
+| `--iw-variant-card-shadow-hover` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
@@ -157,10 +157,15 @@ about the site, taken once under **Components > Cards**, while what it lifts
 against depends on the surface underneath it. The chain ends on the original
 black, so a theme that sets no colour keeps the shadow it had.
 
-A variant only reaches the cards of its own block. Cards drawn outside any
-block - an article listing page, for one - read `--iw-cards-shadow-color` and
-its hover twin, set under **Components > Cards** beside the geometry, the same
-way their background is already set there.
+Inside a block the variant decides, saying nothing included: a variant that
+names no shadow colour emits `none`, and the site-wide setting does not leak
+into it. That setting - `--iw-cards-shadow` and its hover twin, under
+**Components > Cards** beside the geometry - answers for the cards no variant
+reaches, an article listing page carrying none.
+
+The colour is written into the value rather than left to a `var()` chain: the
+`var()` inside a custom property is substituted where the property is declared,
+so a chain written on `:root` resolves there and never sees a variant.
 
 The colour reaches cards alone. The shadow sizes are shared with the
 back-to-top button, the gallery navigation, the article filters, the table of
