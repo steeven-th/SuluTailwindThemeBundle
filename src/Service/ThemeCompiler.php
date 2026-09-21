@@ -308,7 +308,11 @@ class ThemeCompiler
         $css .= $this->generateArticleCardClasses();
 
         // Block variant classes
-        $css .= $this->generateBlockVariantClasses($tokens['blockVariants'] ?? [], $buttonList);
+        $css .= $this->generateBlockVariantClasses(
+            $tokens['blockVariants'] ?? [],
+            $buttonList,
+            CardShadow::fromTokens($tokens),
+        );
 
         // Text color utility classes. After the variant classes on purpose: a
         // color the editor picked explicitly must win over `.iw-highlight`,
@@ -737,40 +741,24 @@ class ThemeCompiler
         // One setting, four variables per state. Each family of card reads its
         // own, so feeding only the first would leave the document cards, the
         // linked pages and the testimonials on their hard-coded value.
+        // The colours a card outside any block casts its shadow in. An article
+        // listing page carries no variant, so these are all it has.
         $geometry = CardShadow::fromTokens($tokens);
+        $rest = trim((string) ($tokens['cardShadowColor'] ?? ''));
+        $hover = trim((string) ($tokens['cardShadowHoverColor'] ?? ''));
 
-        // The colour a card casts its shadow in when no variant says otherwise.
-        // An article listing page carries no variant, so without this its cards
-        // draw a black shadow whatever the page is made of.
-        foreach ([
-            'cardShadowColor' => '--iw-cards-shadow-color',
-            'cardShadowHoverColor' => '--iw-cards-shadow-hover-color',
-        ] as $token => $variable) {
-            $colour = trim((string) ($tokens[$token] ?? ''));
-            if ('' === $colour) {
-                continue;
-            }
-
-            $css .= '  ' . $variable . ': ' . $this->resolveColorValue($colour) . ";\n";
-        }
-
-        // A theme that chose a coloured glow keeps its halo. The geometry
-        // travels with the rest, the colour has to be named here, and only
-        // while nothing has been picked since.
+        // A theme that chose a coloured glow keeps its halo, until a colour is
+        // picked since.
         $glow = CardShadow::glowColour($tokens);
-        if (null !== $glow && '' === trim((string) ($tokens['cardShadowHoverColor'] ?? ''))) {
-            $css .= '  --iw-cards-shadow-hover-color: ' . $glow . ";\n";
+        if ('' === $hover && null !== $glow) {
+            $hover = $glow;
         }
 
-        foreach ([
-            ['--iw-card-shadow', $geometry->rest()],
-            ['--iw-card-shadow-hover', $geometry->hover()],
-            ['--iw-document-card-hover-shadow', $geometry->hover()],
-            ['--iw-linked-page-card-hover-shadow', $geometry->hover()],
-            ['--iw-testimonial-hover-shadow', $geometry->hover()],
-        ] as [$variable, $value]) {
-            $css .= '  ' . $variable . ': ' . $value . ";\n";
-        }
+        $css .= $this->cardShadowDeclarations(
+            $geometry,
+            '' === $rest ? null : $this->resolveColorValue($rest),
+            '' === $hover ? null : ($hover === $glow ? $hover : $this->resolveColorValue($hover)),
+        );
 
         // Global card grid gap — every card grid/list/carousel falls back to this
         // token so a single admin setting harmonizes spacing across blocks.
@@ -3727,6 +3715,36 @@ class ThemeCompiler
         return $css;
     }
 
+
+    /**
+     * The shadow variables every family of card reads, in one colour.
+     *
+     * Each family reads its own variable, so feeding only the first would leave
+     * the document cards, the linked pages and the testimonials on the value
+     * written in their own rule.
+     *
+     * @param CardShadow  $geometry The shape, shared by the whole site
+     * @param string|null $rest     Resting colour, null for no shadow
+     * @param string|null $hover    Hover colour, null for no shadow
+     *
+     * @return string The declarations, indented for a rule body
+     */
+    private function cardShadowDeclarations(CardShadow $geometry, ?string $rest, ?string $hover): string
+    {
+        $css = '  --iw-card-shadow: ' . $geometry->rest($rest) . ";\n";
+
+        foreach ([
+            '--iw-card-shadow-hover',
+            '--iw-document-card-hover-shadow',
+            '--iw-linked-page-card-hover-shadow',
+            '--iw-testimonial-hover-shadow',
+        ] as $variable) {
+            $css .= '  ' . $variable . ': ' . $geometry->hover($hover) . ";\n";
+        }
+
+        return $css;
+    }
+
     /**
      * Generate CSS classes for block variants.
      *
@@ -3741,10 +3759,15 @@ class ThemeCompiler
      *
      * @param array<int, array<string, mixed>> $blockVariants Block variant definitions (indexed)
      * @param array<string, mixed>             $buttons       Button variant definitions (for .iw-button--variant mapping)
+     * @param CardShadow|null                  $cardShadow    The site-wide shadow shape, recoloured per variant
      *
      * @return string CSS class declarations
      */
-    private function generateBlockVariantClasses(array $blockVariants, array $buttons = []): string
+    private function generateBlockVariantClasses(
+        array $blockVariants,
+        array $buttons = [],
+        ?CardShadow $cardShadow = null,
+    ): string
     {
         $css = "/* Block variant classes */\n";
 
@@ -3891,6 +3914,31 @@ class ThemeCompiler
             if (isset($props['title'])) {
                 $css .= "  color: {$this->resolveColorValue((string) $props['title'])};\n";
             }
+
+            // The shadow of the cards of this block, redeclared here with the
+            // colour of this variant already in it.
+            //
+            // It cannot be inherited from `:root`: the `var()` inside a custom
+            // property is substituted where the property is DECLARED, so a
+            // chain reaching for a variant variable from `:root` resolves
+            // against `:root`, where no variant exists. Every card would keep
+            // the site-wide colour whatever an editor picked - and nothing
+            // would look broken, since a shadow that is there looks like a
+            // shadow that was chosen.
+            //
+            // A variant that names no colour draws no shadow. Inside a block
+            // the variant decides, and saying nothing is a decision: the
+            // site-wide colour answers for the cards no variant reaches, not
+            // for those it does.
+            $shadowGeometry = $cardShadow ?? CardShadow::fromTokens([]);
+            $shadowRest = trim((string) ($props['cardShadowColor'] ?? ''));
+            $shadowHover = trim((string) ($props['cardShadowHoverColor'] ?? ''));
+
+            $css .= $this->cardShadowDeclarations(
+                $shadowGeometry,
+                '' === $shadowRest ? null : $this->resolveColorValue($shadowRest),
+                '' === $shadowHover ? null : $this->resolveColorValue($shadowHover),
+            );
 
             // Subtle background for code, table headers, blockquotes
             // Resolve ref BEFORE passing to isLightBackground()

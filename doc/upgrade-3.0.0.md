@@ -216,11 +216,18 @@ another. Unlike the sizes, the glows really applied - article cards wore them
 as a modifier class - so dropping them silently would have taken away an effect
 a site had asked for.
 
-The colour is read three levels deep: a CSS override, then the variant of the
-block the card sits in, then a site-wide colour under **Components > Cards**.
-The last level is what covers the cards no variant reaches - an article listing
-page carries none, so its cards would otherwise draw a black shadow whatever
-the page is made of.
+**Inside a block, the variant decides, and nothing else.** A variant that names
+no shadow colour draws no shadow - the site-wide colour never leaks into a block
+it did not ask for, the same rule the card fill follows. The colour under
+**Components > Cards** answers for the cards no variant reaches: an article
+listing page carries none.
+
+A CSS override (`--iw-card-shadow-color`) still comes first, for a project
+singling out one block.
+
+This is also why a theme that never named a colour now draws no card shadow at
+all. Set **Cards > Shadow colour** on the variants that should have one, and
+under **Components > Cards** for the cards outside any block.
 
 ### A shadow can now appear on hover alone (breaking, visual)
 

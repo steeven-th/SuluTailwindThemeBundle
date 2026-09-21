@@ -215,29 +215,31 @@ final class CardShadow
     }
 
     /**
-     * The shadow drawn at rest.
+     * The shadow drawn at rest, in a colour given here.
+     *
+     * The colour is passed in rather than read from a variable, because these
+     * values land in a custom property: the `var()` inside one is substituted
+     * where the property is DECLARED, not where it is used. Declared on
+     * `:root`, a chain reaching for a variant variable resolves against `:root`
+     * - where no variant exists - so the variant could never win, whatever an
+     * editor set. Each variant therefore gets its own declaration, with its own
+     * colour already in it.
+     *
+     * @param string|null $colour A CSS colour, or null for no shadow at all
      */
-    public function rest(): string
+    public function rest(?string $colour): string
     {
-        return $this->compose(
-            1.0,
-            (float) $this->values['opacity'],
-            '--iw-variant-card-shadow-color',
-            '--iw-cards-shadow-color',
-        );
+        return $this->compose(1.0, (float) $this->values['opacity'], $colour);
     }
 
     /**
-     * The shadow drawn on hover.
+     * The shadow drawn on hover, in a colour given here.
+     *
+     * @param string|null $colour A CSS colour, or null for no shadow at all
      */
-    public function hover(): string
+    public function hover(?string $colour): string
     {
-        return $this->compose(
-            (float) $this->values['hoverScale'],
-            (float) $this->values['hoverOpacity'],
-            '--iw-variant-card-shadow-hover-color',
-            '--iw-cards-shadow-hover-color',
-        );
+        return $this->compose((float) $this->values['hoverScale'], (float) $this->values['hoverOpacity'], $colour);
     }
 
     /**
@@ -247,14 +249,13 @@ final class CardShadow
      * render the same, but only the first says in the compiled CSS that the
      * theme asked for no shadow here.
      *
-     * @param float  $scale    How much bigger than the resting geometry
-     * @param float  $opacity  The alpha to draw the colour at
-     * @param string $variable The variant variable holding the colour
-     * @param string $siteWide The site-wide variable it falls back to
+     * @param float       $scale   How much bigger than the resting geometry
+     * @param float       $opacity The alpha to draw the colour at
+     * @param string|null $colour  The colour, or null for no shadow at all
      */
-    private function compose(float $scale, float $opacity, string $variable, string $siteWide): string
+    private function compose(float $scale, float $opacity, ?string $colour): string
     {
-        if ($opacity <= 0.0) {
+        if ($opacity <= 0.0 || null === $colour) {
             return 'none';
         }
 
@@ -274,18 +275,10 @@ final class CardShadow
             return 'none';
         }
 
-        // Three levels, narrowest first. A project override wins over
-        // everything, then the variant of the block the card sits in, then the
-        // site-wide colour.
-        //
-        // That last one is not a nicety: an article listing page carries no
-        // variant at all, so its cards would draw a black shadow on any dark
-        // page with nothing able to change it. Their background is already set
-        // site-wide, and their shadow now follows the same road.
-        $colour = \sprintf(
-            'color-mix(in srgb, var(--iw-card-shadow-color, var(%s, var(%s, #000))) %s%%, transparent)',
-            $variable,
-            $siteWide,
+        // A project override still comes first, the given colour behind it.
+        $tint = \sprintf(
+            'color-mix(in srgb, var(--iw-card-shadow-color, %s) %s%%, transparent)',
+            $colour,
             self::number($opacity * 100),
         );
 
@@ -295,7 +288,7 @@ final class CardShadow
             self::number((float) $this->values['offsetY'] * $scale),
             self::number((float) $this->values['blur'] * $scale),
             self::number((float) $this->values['spread'] * $scale),
-            $colour,
+            $tint,
         );
     }
 
