@@ -1,15 +1,4 @@
 <?xml version="1.0" ?>
-<!--
-    Admin form: Default settings tab, Cards sub-tab.
-
-    How a card looks everywhere it is drawn: the cards block, an article
-    listing, a related-articles row. A block may still override what it needs
-    on its own.
-
-    Twenty fields in one run read as a wall, so they are grouped by what they
-    change: the shape of the card, its text, its border, then what happens on
-    hover.
--->
 <form xmlns="http://schemas.sulu.io/template/template"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
@@ -35,9 +24,6 @@
                     </params>
                 </property>
 
-                <!-- Gap between article cards, in every card grid/list/carousel.
-                     Image grids and the other component grids have their own
-                     settings under Defaults > Blocks. -->
                 <property name="cardGap" type="single_select" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.card_gap</title>
@@ -57,28 +43,7 @@
                     </params>
                 </property>
 
-                <!-- The colour a card casts its shadow in, for every card the
-                     site draws. A variant overrides it for the cards of its own
-                     block, but an article listing page carries no variant at
-                     all: without this its cards would draw a black shadow
-                     whatever the page is made of, the way their background is
-                     already set here rather than per block.
-
-                     Quarter width to close the row opened above it: the shape
-                     of the shadow is set under Hover, where its hover colour
-                     sits beside it. -->
-                <property name="cardShadowColor" type="iw_theme_color_token_editor" colspan="4">
-                    <meta><title>iw_sulu_tailwind_theme.variant_card_shadow_color</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <!-- Surface -->
-                <property name="cardSurface" type="iw_theme_color_token_editor" colspan="6">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
-                </property>
-
-                <property name="cardPadding" type="single_select" colspan="3">
+                <property name="cardPadding" type="single_select" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_padding</title></meta>
                     <params>
                         <param name="default_value" value="1rem"/>
@@ -96,7 +61,17 @@
                     </params>
                 </property>
 
-                <property name="cardImagePadded" type="checkbox" colspan="3">
+                <property name="cardShadowColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.variant_card_shadow_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardSurface" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardImagePadded" type="checkbox" colspan="12">
                     <params>
                         <param name="type" value="toggler"/>
                         <param name="default_value" value="true"/>
@@ -113,15 +88,6 @@
                 <title>iw_sulu_tailwind_theme.cards_section_text</title>
             </meta>
             <properties>
-                <!-- Content colors (empty = theme defaults) -->
-                <!--
-                    Sizes of the card title and text, shared by every family of
-                    card. Left empty each family keeps the size it ships with,
-                    so a site upgrading sees nothing move. Filled, they all
-                    follow, which is the point: a card title is a component, not
-                    a step of the heading scale, and nothing else was lining
-                    them up.
-                -->
                 <property name="cardTitleSize" type="number" colspan="4">
                     <meta>
                         <title>iw_sulu_tailwind_theme.card_title_size</title>
@@ -156,12 +122,12 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="cardBadgeBg" type="iw_theme_color_token_editor" colspan="6">
+                <property name="cardBadgeBg" type="iw_theme_color_token_editor" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.card_badge_bg</title></meta>
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <property name="cardBadgeText" type="iw_theme_color_token_editor" colspan="6">
+                <property name="cardBadgeText" type="iw_theme_color_token_editor" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.card_badge_text</title></meta>
                     <params><param name="show_palette" value="true"/></params>
                 </property>
@@ -173,7 +139,6 @@
                 <title>iw_sulu_tailwind_theme.cards_section_border</title>
             </meta>
             <properties>
-                <!-- Border -->
                 <property name="cardBorder" type="iw_theme_color_token_editor" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_border</title></meta>
                     <params><param name="show_palette" value="true"/></params>
@@ -214,13 +179,6 @@
                 <title>iw_sulu_tailwind_theme.cards_section_hover</title>
             </meta>
             <properties>
-                <!-- Hover effects -->
-                <!--
-                    Defaults to the lift the Cards block has always drawn: this
-                    setting now drives every family of card, and a card you can
-                    click that answers nothing on hover reads as broken rather
-                    than as restraint.
-                -->
                 <property name="cardHoverTransform" type="single_select" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform</title></meta>
                     <params>
@@ -287,20 +245,6 @@
                     <params><param name="show_palette" value="true"/></params>
                 </property>
 
-                <!-- The shadow, as a geometry rather than as a named size. Four
-                     sizes could not say where a shadow falls nor how strong it
-                     is, so every theme drew the same one, and neither could
-                     they express the common case of no shadow at rest and one
-                     on hover.
-
-                     Seven settings, one stored value: a Sulu field type
-                     receives one value and returns one, so separate properties
-                     would mean seven fields with no shared preview - which is
-                     what made this hard to set to begin with.
-
-                     The two colours are not here. What a shadow is drawn
-                     against depends on the surface under the card, so they
-                     belong to the variant. -->
                 <property name="cardShadow" type="iw_theme_shadow_editor" colspan="12">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_label_shadow</title>
