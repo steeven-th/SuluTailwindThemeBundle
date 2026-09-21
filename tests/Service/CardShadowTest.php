@@ -228,6 +228,46 @@ final class CardShadowTest extends TestCase
     }
 
     /**
+     * The hover setting is read whatever the resting one says.
+     *
+     * The old form had two lists: the resting one defaulted to "Auto", stored
+     * as an empty string, and the hover one to `none`. So the commonest theme
+     * of all holds an empty resting size and an explicit `none` - and reading
+     * the hover value only alongside a named size skipped exactly that pair.
+     *
+     * The cost was not theoretical: the hover shadow also stopped depending on
+     * the block's Shadow checkbox in the same release, so such a theme would
+     * have gone from no shadow anywhere to one under the pointer on every card.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     */
+    public static function legacyPairs(): array
+    {
+        return [
+            'auto + no hover' => [['cardShadow' => '', 'cardHoverShadow' => 'none'], 'none'],
+            'auto + a hover size' => [['cardShadow' => '', 'cardHoverShadow' => 'lg'], '0px 9.2px'],
+            'a size + no hover' => [['cardShadow' => 'md', 'cardHoverShadow' => 'none'], 'none'],
+            'nothing stored at all' => [[], '0px 6px 18px'],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $tokens
+     */
+    #[Test]
+    #[DataProvider('legacyPairs')]
+    public function theHoverSettingSurvivesWhateverTheRestingOneHolds(array $tokens, string $expected): void
+    {
+        $css = $this->compileCss($tokens);
+
+        self::assertStringContainsString(
+            '--iw-card-shadow-hover: ' . $expected,
+            $css,
+            'A theme keeps the hover shadow it asked for, including none of it.',
+        );
+    }
+
+    /**
      * A theme that chose a coloured glow keeps its halo.
      *
      * The glows were the one part of the old hover setting that really
