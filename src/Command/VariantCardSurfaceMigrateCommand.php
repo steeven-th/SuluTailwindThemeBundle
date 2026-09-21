@@ -6,6 +6,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\VariantResolver;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,10 +22,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * about its cards draws none, which is what an editor who filled nothing
  * expects to see.
  *
- * That is the right default for a theme being built, and the wrong one for a
- * theme already built - its cards would empty out at the next compile without
- * anybody touching them. So the old value is copied across, once, and the two
- * settings part ways from there.
+ * A theme saved before the surface says nothing about its cards either, and
+ * meant the opposite. `VariantResolver` reads the paragraph value for it at
+ * runtime, so nothing breaks while it stays unmigrated - the compile, the site
+ * and the admin form all agree on the inherited value.
+ *
+ * This command writes those values down. It is not a rescue, it is what makes
+ * the two surfaces settable apart: as long as the card keys are missing, they
+ * track the paragraph ones, and clearing the paragraph fill takes the cards
+ * with it.
  *
  * Only variants that would change are written, so it can be run twice: a
  * variant that already names a card fill is left exactly as it is.
@@ -38,18 +44,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class VariantCardSurfaceMigrateCommand extends Command
 {
-    /**
-     * The settings carried over, old key => new key.
-     *
-     * The border travels with the fill. A card drew the paragraph border too,
-     * so leaving it behind would un-frame every card of a theme that had asked
-     * for one - the same regression as the fill, one line further down.
-     */
-    private const CARRIED = [
-        'paragraphBg' => 'cardBg',
-        'paragraphBorder' => 'cardBorder',
-        'paragraphBorderWidth' => 'cardBorderWidth',
-    ];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -204,8 +198,8 @@ class VariantCardSurfaceMigrateCommand extends Command
 
         $io->warning(\sprintf(
             "%d variant(s) name no paragraph fill. Their cards used to take the computed tint\n"
-            . "(--iw-variant-subtle-bg), which no longer applies, and nothing here can carry a\n"
-            . "value that was never stored. Set Cards > Background on them if that tint mattered:\n  %s",
+            . "(--iw-variant-subtle-bg), which no longer applies, and there is no stored value to\n"
+            . "inherit either. Set Cards > Background on them if that tint mattered:\n  %s",
             \count($variants),
             implode("\n  ", $variants),
         ));
@@ -241,7 +235,7 @@ class VariantCardSurfaceMigrateCommand extends Command
     {
         $carried = [];
 
-        foreach (self::CARRIED as $from => $to) {
+        foreach (VariantResolver::CARD_INHERITS as $from => $to) {
             if (\array_key_exists($to, $variant)) {
                 continue;
             }
