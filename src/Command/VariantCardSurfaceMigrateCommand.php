@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
-use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +53,7 @@ class VariantCardSurfaceMigrateCommand extends Command
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly ThemeConfigRepository $themeConfigRepository,
     ) {
         parent::__construct();
     }
@@ -83,7 +84,7 @@ class VariantCardSurfaceMigrateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
 
-        $themes = $this->entityManager->getRepository(ThemeConfig::class)->findAll();
+        $themes = $this->themeConfigRepository->findAll();
         if ([] === $themes) {
             $io->success('Nothing to migrate - no theme stored.');
 
@@ -92,6 +93,13 @@ class VariantCardSurfaceMigrateCommand extends Command
 
         $touched = 0;
         $variantsTouched = 0;
+
+        // Variants whose cards were filled by something the admin never showed:
+        // an empty paragraph fill used to send them to `--iw-variant-subtle-bg`,
+        // the tint computed from the block lightness. There is nothing to copy
+        // for those - the value never existed - yet their cards do change, so
+        // they are the ones worth naming.
+        $losingTheTint = [];
 
         foreach ($themes as $theme) {
             $tokens = $theme->getTokens();
@@ -106,6 +114,12 @@ class VariantCardSurfaceMigrateCommand extends Command
                     continue;
                 }
 
+                $label = (string) ($variant['label'] ?? $variant['slug'] ?? (string) $index);
+
+                if ($this->losesTheComputedTint($variant)) {
+                    $losingTheTint[] = \sprintf('%s / %s', $theme->getName(), $label);
+                }
+
                 $carried = $this->carry($variant);
                 if ([] === $carried) {
                     continue;
@@ -118,7 +132,7 @@ class VariantCardSurfaceMigrateCommand extends Command
                 $io->text(\sprintf(
                     '  %s / %s: %s',
                     $theme->getName(),
-                    (string) ($variant['label'] ?? $variant['slug'] ?? (string) $index),
+                    $label,
                     implode(', ', array_keys($carried)),
                 ));
             }
@@ -138,6 +152,7 @@ class VariantCardSurfaceMigrateCommand extends Command
 
         if (0 === $variantsTouched) {
             $io->success('Nothing to migrate - every variant already names its card surface.');
+            $this->warnAboutTheTint($io, $losingTheTint);
 
             return Command::SUCCESS;
         }
@@ -148,6 +163,7 @@ class VariantCardSurfaceMigrateCommand extends Command
                 $variantsTouched,
                 $touched,
             ));
+            $this->warnAboutTheTint($io, $losingTheTint);
 
             return Command::SUCCESS;
         }
@@ -159,8 +175,56 @@ class VariantCardSurfaceMigrateCommand extends Command
             $variantsTouched,
             $touched,
         ));
+        $this->warnAboutTheTint($io, $losingTheTint);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Name the variants whose cards change without anything being copied.
+     *
+     * Copying is only half the story. A variant with no paragraph fill had
+     * nothing to give its cards, yet they were not bare: they landed on
+     * `--iw-variant-subtle-bg`, a translucent black or white computed from the
+     * lightness of the block. That fallback is gone, so those cards lose a fill
+     * the admin never displayed and this command cannot restore - there is no
+     * stored value to carry.
+     *
+     * Silence here would be the worst outcome: the command reports success, the
+     * compile runs, and cards turn bare with nobody able to say why.
+     *
+     * @param SymfonyStyle $io       The console style
+     * @param list<string> $variants Theme and variant names, as reported
+     */
+    private function warnAboutTheTint(SymfonyStyle $io, array $variants): void
+    {
+        if ([] === $variants) {
+            return;
+        }
+
+        $io->warning(\sprintf(
+            "%d variant(s) name no paragraph fill. Their cards used to take the computed tint\n"
+            . "(--iw-variant-subtle-bg), which no longer applies, and nothing here can carry a\n"
+            . "value that was never stored. Set Cards > Background on them if that tint mattered:\n  %s",
+            \count($variants),
+            implode("\n  ", $variants),
+        ));
+    }
+
+    /**
+     * Whether a variant's cards lose the computed tint and gain nothing.
+     *
+     * Both halves matter. No paragraph fill means the cards were taking the
+     * computed tint, and no card fill means nothing replaces it.
+     *
+     * @param array<string, mixed> $variant
+     */
+    private function losesTheComputedTint(array $variant): bool
+    {
+        $paragraph = trim((string) ($variant['paragraphBg'] ?? ''));
+        $card = trim((string) ($variant['cardBg'] ?? ''));
+
+        return '' === $paragraph && '' === $card;
     }
 
     /**

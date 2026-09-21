@@ -146,6 +146,26 @@ card keys of every variant that has none, and leaves alone any variant already
 naming one. Safe to run twice. Skipping it empties the cards of every existing
 theme at the next compile.
 
+> **If your deployment compiles on start-up**, put the migration in front of it,
+> in the same script. An entrypoint running `iw-sulu:theme:compile` at boot
+> reaches the compile before anyone can migrate by hand, so the first container
+> to come up on the new version serves bare cards. The command is idempotent,
+> so leaving it there costs one no-op per boot:
+>
+> ```bash
+> php bin/adminconsole iw-sulu:theme:migrate-card-surface
+> php bin/adminconsole iw-sulu:theme:compile
+> ```
+>
+> Nothing is lost either way - the compile reads the stored theme without
+> writing to it, so migrating and recompiling restores the cards - but the site
+> stays degraded in between.
+
+The command also names the variants it cannot help: those with no paragraph
+fill at all. Their cards used to land on the computed `--iw-variant-subtle-bg`
+tint, and there is no stored value to carry onto the card surface. Set
+**Cards > Background** on them if that tint mattered.
+
 ### The accent surface gains a heading colour (new)
 
 A highlighted card, an accent FAQ header - anything on the accent surface - had

@@ -282,15 +282,24 @@ services:
             $cacheDir: '%itech_world_sulu_tailwind_theme.css_output_dir%'
 
     # ─── Repositories ─────────────────────────────────────────────────────
-    itech_world.sulu_tailwind_theme.repository:
-        class: ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository
+    # A Doctrine repository is looked up by the CLASS name: the factory holds a
+    # service locator keyed by it, and an alias does not enter a locator. These
+    # two are therefore declared under their own class, with the bundle's naming
+    # convention kept as the alias below, so `getRepository(ThemeConfig::class)`
+    # resolves as well as an explicit injection. Declared the other way round,
+    # it threw "its service could not be found" while `debug:container` happily
+    # showed the tag - on the wrong id.
+    ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository:
         arguments:
             - '@doctrine'
+        tags:
+            - { name: 'doctrine.repository_service' }
 
-    itech_world.sulu_tailwind_theme.webspace_theme_repository:
-        class: ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository
+    ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository:
         arguments:
             - '@doctrine'
+        tags:
+            - { name: 'doctrine.repository_service' }
 
     # ─── Twig Extension ──────────────────────────────────────────────────
     itech_world.sulu_tailwind_theme.twig_extension:
@@ -404,6 +413,7 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Command\VariantCardSurfaceMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.repository'
         tags:
             - { name: 'console.command' }
 
@@ -469,8 +479,8 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator: '@itech_world.sulu_tailwind_theme.embed_url_validator'
     ItechWorld\SuluTailwindThemeBundle\Service\WebspaceSettings: '@itech_world.sulu_tailwind_theme.webspace_settings'
     ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy: '@itech_world.sulu_tailwind_theme.code_block_policy'
-    ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository: '@itech_world.sulu_tailwind_theme.repository'
-    ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+    itech_world.sulu_tailwind_theme.repository: '@ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository'
+    itech_world.sulu_tailwind_theme.webspace_theme_repository: '@ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository'
     ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer: '@itech_world.sulu_tailwind_theme.icon_renderer'
     ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer: '@itech_world.sulu_tailwind_theme.title_markup_renderer'
     ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension: '@itech_world.sulu_tailwind_theme.twig_extension'
