@@ -196,7 +196,8 @@ class ThemeFormMapper
         // Site-wide card appearance (moved from the Articles tab in 3.0).
         'cardImageRatio', 'cardGap', 'cardSurface', 'cardPadding', 'cardImagePadded',
         'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
-        'cardShadow', 'cardHoverTransform', 'cardHoverImage', 'cardHoverBorder',
+        'cardShadow', 'cardShadowColor', 'cardShadowHoverColor',
+        'cardHoverTransform', 'cardHoverImage', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         'cardTitleSize', 'cardTextSize',

@@ -1345,7 +1345,7 @@
     "iw_sulu_tailwind_theme.components_shadow_sm": "Dezent",
     "iw_sulu_tailwind_theme.components_shadow_md": "Mittel",
     "iw_sulu_tailwind_theme.components_shadow_lg": "Stark",
-    "iw_sulu_tailwind_theme.card_shadow_info": "Eine Schattenform mit einer Deckkraft in Ruhe und einer beim Hover. Die Deckkraft in Ruhe auf null zu setzen ergibt einen Schatten, der nur beim Hover erscheint. Die Farbe wird je Variante eingestellt.",
+    "iw_sulu_tailwind_theme.card_shadow_info": "Eine Schattenform mit einer Deckkraft in Ruhe und einer beim Hover. Die Deckkraft in Ruhe auf null zu setzen ergibt einen Schatten, der nur beim Hover erscheint. Die Farben unten gelten site-weit, jede Variante kann sie in ihrem Block ersetzen.",
     "iw_sulu_tailwind_theme.components_section_tags": "Schlagworte und Badges",
     "iw_sulu_tailwind_theme.components_group_tags": "Schlagworte",
     "iw_sulu_tailwind_theme.components_group_tag_hover": "Beim Überfahren",

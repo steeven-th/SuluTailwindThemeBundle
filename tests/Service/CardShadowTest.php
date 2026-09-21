@@ -182,11 +182,49 @@ final class CardShadowTest extends TestCase
         $css = $this->compileCss([]);
 
         self::assertStringContainsString(
-            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, #000))',
+            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, var(--iw-cards-shadow-color, #000)))',
             $css,
             'The chain must end on a colour of its own, or a theme that never set one loses '
             . 'its shadows entirely.',
         );
+    }
+
+    /**
+     * A card outside any block reads a colour of its own.
+     *
+     * An article listing page carries no variant, so the variant level of the
+     * chain resolves to nothing there. Without a site-wide colour behind it,
+     * those cards draw a black shadow on any dark page and no setting can
+     * change it - their background is already set site-wide for that very
+     * reason.
+     */
+    #[Test]
+    public function aCardOutsideAnyBlockStillTakesAColour(): void
+    {
+        $css = $this->compileCss(['cardShadowColor' => '#1e293b', 'cardShadowHoverColor' => '#0f172a']);
+
+        self::assertStringContainsString('--iw-cards-shadow-color: #1e293b', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover-color: #0f172a', $css);
+    }
+
+    /**
+     * The variant wins over the site-wide colour, never the other way round.
+     *
+     * Reading them in the wrong order would make a variant unable to change
+     * anything as soon as the theme set a colour, which is the shape of the bug
+     * this whole rework came from.
+     */
+    #[Test]
+    public function theVariantColourComesBeforeTheSiteWideOne(): void
+    {
+        $css = $this->compileCss([]);
+
+        $variant = strpos($css, '--iw-variant-card-shadow-color');
+        $siteWide = strpos($css, '--iw-cards-shadow-color, #000');
+
+        self::assertIsInt($variant);
+        self::assertIsInt($siteWide);
+        self::assertLessThan($siteWide, $variant, 'The variant must be read before the site-wide colour.');
     }
 
     /**

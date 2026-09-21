@@ -162,7 +162,12 @@ final class CardShadow
      */
     public function rest(): string
     {
-        return $this->compose(1.0, (float) $this->values['opacity'], '--iw-variant-card-shadow-color');
+        return $this->compose(
+            1.0,
+            (float) $this->values['opacity'],
+            '--iw-variant-card-shadow-color',
+            '--iw-cards-shadow-color',
+        );
     }
 
     /**
@@ -174,6 +179,7 @@ final class CardShadow
             (float) $this->values['hoverScale'],
             (float) $this->values['hoverOpacity'],
             '--iw-variant-card-shadow-hover-color',
+            '--iw-cards-shadow-hover-color',
         );
     }
 
@@ -187,8 +193,9 @@ final class CardShadow
      * @param float  $scale    How much bigger than the resting geometry
      * @param float  $opacity  The alpha to draw the colour at
      * @param string $variable The variant variable holding the colour
+     * @param string $siteWide The site-wide variable it falls back to
      */
-    private function compose(float $scale, float $opacity, string $variable): string
+    private function compose(float $scale, float $opacity, string $variable, string $siteWide): string
     {
         if ($opacity <= 0.0) {
             return 'none';
@@ -210,9 +217,18 @@ final class CardShadow
             return 'none';
         }
 
+        // Three levels, narrowest first. A project override wins over
+        // everything, then the variant of the block the card sits in, then the
+        // site-wide colour.
+        //
+        // That last one is not a nicety: an article listing page carries no
+        // variant at all, so its cards would draw a black shadow on any dark
+        // page with nothing able to change it. Their background is already set
+        // site-wide, and their shadow now follows the same road.
         $colour = \sprintf(
-            'color-mix(in srgb, var(--iw-card-shadow-color, var(%s, #000)) %s%%, transparent)',
+            'color-mix(in srgb, var(--iw-card-shadow-color, var(%s, var(%s, #000))) %s%%, transparent)',
             $variable,
+            $siteWide,
             self::number($opacity * 100),
         );
 

@@ -1352,7 +1352,7 @@
     "iw_sulu_tailwind_theme.components_shadow_sm": "Subtle",
     "iw_sulu_tailwind_theme.components_shadow_md": "Medium",
     "iw_sulu_tailwind_theme.components_shadow_lg": "Strong",
-    "iw_sulu_tailwind_theme.card_shadow_info": "One shadow shape, with an opacity at rest and one on hover. Setting the resting opacity to zero gives a shadow that only appears under the pointer. The colour is set per variant.",
+    "iw_sulu_tailwind_theme.card_shadow_info": "One shadow shape, with an opacity at rest and one on hover. Setting the resting opacity to zero gives a shadow that only appears under the pointer. The colours below apply site-wide, and any variant can override them inside its own block.",
     "iw_sulu_tailwind_theme.components_section_tags": "Tags and badges",
     "iw_sulu_tailwind_theme.components_group_tags": "Tags",
     "iw_sulu_tailwind_theme.components_group_tag_hover": "On hover",

@@ -157,6 +157,11 @@ about the site, taken once under **Components > Cards**, while what it lifts
 against depends on the surface underneath it. The chain ends on the original
 black, so a theme that sets no colour keeps the shadow it had.
 
+A variant only reaches the cards of its own block. Cards drawn outside any
+block - an article listing page, for one - read `--iw-cards-shadow-color` and
+its hover twin, set under **Components > Cards** beside the geometry, the same
+way their background is already set there.
+
 The colour reaches cards alone. The shadow sizes are shared with the
 back-to-top button, the gallery navigation, the article filters, the table of
 contents, the pagination and the tags, and none of those takes a card setting.

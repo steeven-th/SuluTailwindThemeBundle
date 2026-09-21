@@ -287,6 +287,22 @@
                         <info_text>iw_sulu_tailwind_theme.card_shadow_info</info_text>
                     </meta>
                 </property>
+
+                <!-- The colour a card casts its shadow in, for every card the
+                     site draws. A variant overrides it for the cards inside its
+                     own block, but an article listing page carries no variant
+                     at all: without these two its cards would draw a black
+                     shadow whatever the page is made of, the way their
+                     background is already set here rather than per block. -->
+                <property name="cardShadowColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.variant_card_shadow_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <property name="cardShadowHoverColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.variant_card_shadow_hover_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
+                </property>
             </properties>
         </section>
     </properties>

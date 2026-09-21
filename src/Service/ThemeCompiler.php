@@ -739,6 +739,21 @@ class ThemeCompiler
         // linked pages and the testimonials on their hard-coded value.
         $geometry = CardShadow::fromTokens($tokens);
 
+        // The colour a card casts its shadow in when no variant says otherwise.
+        // An article listing page carries no variant, so without this its cards
+        // draw a black shadow whatever the page is made of.
+        foreach ([
+            'cardShadowColor' => '--iw-cards-shadow-color',
+            'cardShadowHoverColor' => '--iw-cards-shadow-hover-color',
+        ] as $token => $variable) {
+            $colour = trim((string) ($tokens[$token] ?? ''));
+            if ('' === $colour) {
+                continue;
+            }
+
+            $css .= '  ' . $variable . ': ' . $this->resolveColorValue($colour) . ";\n";
+        }
+
         foreach ([
             ['--iw-card-shadow', $geometry->rest()],
             ['--iw-card-shadow-hover', $geometry->hover()],

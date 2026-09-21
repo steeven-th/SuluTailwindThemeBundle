@@ -209,6 +209,12 @@ old hover size is carried over as a growth factor.
 emitted from this tab anyway, and an accent colour with some spread does the
 same thing with control over how much.
 
+The colour is read three levels deep: a CSS override, then the variant of the
+block the card sits in, then a site-wide colour under **Components > Cards**.
+The last level is what covers the cards no variant reaches - an article listing
+page carries none, so its cards would otherwise draw a black shadow whatever
+the page is made of.
+
 ### A shadow can now appear on hover alone (breaking, visual)
 
 The hover shadow hung off `.iw-card--shadow`, the class the block's **Shadow**
