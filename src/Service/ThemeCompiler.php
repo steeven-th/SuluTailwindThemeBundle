@@ -758,6 +758,7 @@ class ThemeCompiler
             $geometry,
             '' === $rest ? null : $this->resolveColorValue($rest),
             '' === $hover ? null : ($hover === $glow ? $hover : $this->resolveColorValue($hover)),
+            '--iw-cards-shadow',
         );
 
         // Global card grid gap — every card grid/list/carousel falls back to this
@@ -3717,32 +3718,23 @@ class ThemeCompiler
 
 
     /**
-     * The shadow variables every family of card reads, in one colour.
+     * The two shadow variables, in one colour.
      *
-     * Each family reads its own variable, so feeding only the first would leave
-     * the document cards, the linked pages and the testimonials on the value
-     * written in their own rule.
+     * Every family of card reads the same pair through one cascade in the
+     * stylesheet - its own override, then the variant, then the site - so one
+     * declaration here reaches them all.
      *
      * @param CardShadow  $geometry The shape, shared by the whole site
      * @param string|null $rest     Resting colour, null for no shadow
      * @param string|null $hover    Hover colour, null for no shadow
+     * @param string      $prefix   `--iw-cards-shadow` or `--iw-variant-card-shadow`
      *
      * @return string The declarations, indented for a rule body
      */
-    private function cardShadowDeclarations(CardShadow $geometry, ?string $rest, ?string $hover): string
+    private function cardShadowDeclarations(CardShadow $geometry, ?string $rest, ?string $hover, string $prefix): string
     {
-        $css = '  --iw-card-shadow: ' . $geometry->rest($rest) . ";\n";
-
-        foreach ([
-            '--iw-card-shadow-hover',
-            '--iw-document-card-hover-shadow',
-            '--iw-linked-page-card-hover-shadow',
-            '--iw-testimonial-hover-shadow',
-        ] as $variable) {
-            $css .= '  ' . $variable . ': ' . $geometry->hover($hover) . ";\n";
-        }
-
-        return $css;
+        return '  ' . $prefix . ': ' . $geometry->rest($rest) . ";\n"
+            . '  ' . $prefix . '-hover: ' . $geometry->hover($hover) . ";\n";
     }
 
     /**
@@ -3915,21 +3907,12 @@ class ThemeCompiler
                 $css .= "  color: {$this->resolveColorValue((string) $props['title'])};\n";
             }
 
-            // The shadow of the cards of this block, redeclared here with the
-            // colour of this variant already in it.
-            //
-            // It cannot be inherited from `:root`: the `var()` inside a custom
-            // property is substituted where the property is DECLARED, so a
-            // chain reaching for a variant variable from `:root` resolves
-            // against `:root`, where no variant exists. Every card would keep
-            // the site-wide colour whatever an editor picked - and nothing
-            // would look broken, since a shadow that is there looks like a
-            // shadow that was chosen.
-            //
-            // A variant that names no colour draws no shadow. Inside a block
-            // the variant decides, and saying nothing is a decision: the
-            // site-wide colour answers for the cards no variant reaches, not
-            // for those it does.
+            // A variant that names no colour draws no shadow: inside a block
+            // the variant decides, saying nothing included. The value carries
+            // the colour already resolved, because the `var()` inside a custom
+            // property is substituted where the property is declared - a chain
+            // written here reaching for a variant variable would resolve
+            // against this same rule and never see anything else.
             $shadowGeometry = $cardShadow ?? CardShadow::fromTokens([]);
             $shadowRest = trim((string) ($props['cardShadowColor'] ?? ''));
             $shadowHover = trim((string) ($props['cardShadowHoverColor'] ?? ''));
@@ -3938,6 +3921,7 @@ class ThemeCompiler
                 $shadowGeometry,
                 '' === $shadowRest ? null : $this->resolveColorValue($shadowRest),
                 '' === $shadowHover ? null : $this->resolveColorValue($shadowHover),
+                '--iw-variant-card-shadow',
             );
 
             // Subtle background for code, table headers, blockquotes

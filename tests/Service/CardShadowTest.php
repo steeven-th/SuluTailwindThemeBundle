@@ -39,35 +39,17 @@ use PHPUnit\Framework\TestCase;
 final class CardShadowTest extends TestCase
 {
     /**
-     * Every family of card reads its own variable, so one setting has to feed
-     * them all. Feeding only the first would leave three blocks on the value
-     * written in the stylesheet, and the difference would show on a page where
-     * the two sit side by side.
-     *
-     * @return array<string, array{0: string}>
+     * The shape reaches the stylesheet from one setting.
      */
-    public static function hoverShadowVariables(): array
-    {
-        return [
-            'cards block' => ['--iw-card-shadow-hover'],
-            'document block' => ['--iw-document-card-hover-shadow'],
-            'linked pages block' => ['--iw-linked-page-card-hover-shadow'],
-            'testimonial block' => ['--iw-testimonial-hover-shadow'],
-        ];
-    }
-
     #[Test]
-    #[DataProvider('hoverShadowVariables')]
-    public function theHoverShadowReachesEveryFamilyOfCard(string $variable): void
+    public function theHoverShadowIsEmitted(): void
     {
-        $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => ['blur' => 30, 'hoverOpacity' => 0.4]]);
+        $css = $this->compileCss([
+            'cardShadowHoverColor' => '#000000',
+            'cardShadow' => ['blur' => 30, 'hoverOpacity' => 0.4],
+        ]);
 
-        self::assertStringContainsString(
-            $variable . ': 0px 6px 45px',
-            $css,
-            'The hover shadow setting must reach ' . $variable . '. A family left out keeps the '
-            . 'literal written in its own rule, and sits differently from its neighbours.',
-        );
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 6px 45px', $css);
     }
 
     /**
@@ -88,8 +70,8 @@ final class CardShadowTest extends TestCase
             'hoverScale' => 1,
         ]]);
 
-        self::assertStringContainsString('--iw-card-shadow: none', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: 0px 2px 66px 15px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 2px 66px 15px', $css);
     }
 
     /**
@@ -107,7 +89,7 @@ final class CardShadowTest extends TestCase
             'opacity' => 0.5,
         ]]);
 
-        self::assertStringContainsString('--iw-card-shadow: 7px 9px 41px 13px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: 7px 9px 41px 13px', $css);
         self::assertStringContainsString('50%, transparent)', $css);
     }
 
@@ -119,8 +101,8 @@ final class CardShadowTest extends TestCase
     {
         $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => ['opacity' => 0, 'hoverOpacity' => 0]]);
 
-        self::assertStringContainsString('--iw-card-shadow: none', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow: none', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: none', $css);
     }
 
     /**
@@ -134,7 +116,7 @@ final class CardShadowTest extends TestCase
     {
         $css = $this->compileCss(['cardShadowColor' => '#000000', 'cardShadowHoverColor' => '#000000', 'cardShadow' => 'md']);
 
-        self::assertStringContainsString('--iw-card-shadow: 0px 4px 12px -2px', $css);
+        self::assertStringContainsString('--iw-cards-shadow: 0px 4px 12px -2px', $css);
     }
 
     /**
@@ -188,7 +170,7 @@ final class CardShadowTest extends TestCase
         );
 
         self::assertStringContainsString(
-            '--iw-card-shadow: none',
+            '--iw-cards-shadow: none',
             $this->compileCss([]),
             'A theme naming no colour draws no shadow, rather than a black one nobody chose.',
         );
@@ -251,7 +233,7 @@ final class CardShadowTest extends TestCase
         ]);
 
         self::assertStringContainsString(
-            '--iw-card-shadow: none',
+            '--iw-variant-card-shadow: none',
             $this->ruleFor($css, '.iw-variant--clair'),
             'The site-wide colour must not leak into a block whose variant said nothing.',
         );
@@ -272,7 +254,7 @@ final class CardShadowTest extends TestCase
         $css = $this->compileCss(['cardShadow' => 'md', 'cardHoverShadow' => 'glow-primary']);
 
         self::assertStringContainsString('var(--iw-card-shadow-color, var(--color-primary))', $css);
-        self::assertStringContainsString('--iw-card-shadow-hover: 0px 5px 15px', $css);
+        self::assertStringContainsString('--iw-cards-shadow-hover: 0px 5px 15px', $css);
     }
 
     /**
@@ -286,7 +268,7 @@ final class CardShadowTest extends TestCase
             'cardShadowHoverColor' => '#ff0000',
         ]);
 
-        $hover = self::declaration($css, '--iw-card-shadow-hover');
+        $hover = self::declaration($css, '--iw-cards-shadow-hover');
 
         self::assertStringContainsString('#ff0000', $hover);
         self::assertStringNotContainsString('--color-primary', $hover, 'The picked colour replaces the glow.');
