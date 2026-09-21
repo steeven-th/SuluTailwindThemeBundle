@@ -109,6 +109,17 @@ final class VariantZones
                 ['cardParagraph', 'iw_sulu_tailwind_theme.variant_card_paragraph', 'color'],
                 ['cardBorder', 'iw_sulu_tailwind_theme.variant_card_border', 'color'],
                 ['cardBorderWidth', 'iw_sulu_tailwind_theme.variant_card_border_width', 'width'],
+                // A shadow detaches a card from its background, exactly what a
+                // border does, and a border has always been settable here. The
+                // shadow was not: its colour was written black in the
+                // stylesheet, so a dark variant chose its own background and
+                // then lost the shadow in it, with no way to lighten it.
+                //
+                // Only the colour belongs to the variant. How far a card lifts
+                // is a decision about the site, taken once under Components >
+                // Cards; against what it lifts is a decision about this
+                // surface.
+                ['cardShadowColor', 'iw_sulu_tailwind_theme.variant_card_shadow_color', 'color'],
             ],
         ],
         'accent' => [

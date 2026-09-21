@@ -728,12 +728,31 @@ class ThemeCompiler
 
         $css = "  /* Card (site-wide) */\n";
 
-        // The hover shadow has always been settable while the resting one was
-        // not, so a theme could say how a card lifts but not whether it sits
-        // flat to begin with.
+        // Both shadows are written here. The resting one always was; the hover
+        // one never, though a field offered it since the beginning and the
+        // stylesheet read `--iw-card-shadow-hover` in four places. Picking a
+        // hover shadow therefore changed nothing, every card falling back to
+        // the literal written in its own rule.
         $cardShadow = trim((string) ($tokens['cardShadow'] ?? ''));
         if (isset(self::SHADOWS[$cardShadow])) {
             $css .= '  --iw-card-shadow: ' . self::SHADOWS[$cardShadow] . ";\n";
+        }
+
+        $cardHoverShadow = trim((string) ($tokens['cardHoverShadow'] ?? ''));
+        if (isset(self::SHADOWS[$cardHoverShadow])) {
+            $shadow = self::SHADOWS[$cardHoverShadow];
+
+            // One setting, four variables. Each family of card reads its own,
+            // so feeding only the first would have left the document cards,
+            // the linked pages and the testimonials on their hard-coded value.
+            foreach ([
+                '--iw-card-shadow-hover',
+                '--iw-document-card-hover-shadow',
+                '--iw-linked-page-card-hover-shadow',
+                '--iw-testimonial-hover-shadow',
+            ] as $variable) {
+                $css .= '  ' . $variable . ': ' . $shadow . ";\n";
+            }
         }
 
         // Global card grid gap — every card grid/list/carousel falls back to this
@@ -1317,9 +1336,15 @@ class ThemeCompiler
      */
     private const SHADOWS = [
         'none' => 'none',
-        'sm' => '0 1px 3px 0 rgb(0 0 0 / 0.08)',
-        'md' => '0 4px 12px -2px rgb(0 0 0 / 0.12)',
-        'lg' => '0 12px 28px -6px rgb(0 0 0 / 0.18)',
+        // The colour travels through the same fallback chain as every other
+        // card property: a project override, then the variant, then the black
+        // that used to be written here alone.
+        'sm' => '0 1px 3px 0 var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.08)))',
+        'md' => '0 4px 12px -2px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)))',
+        'lg' => '0 12px 28px -6px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.18)))',
+        // `xl` was offered by the hover field and defined nowhere, so picking it
+        // emitted no shadow at all.
+        'xl' => '0 20px 40px -8px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.22)))',
     ];
 
     /**
@@ -3721,6 +3746,10 @@ class ThemeCompiler
             'cardTitle' => '--iw-variant-card-title-color',
             'cardParagraph' => '--iw-variant-card-paragraph-color',
             'cardBorder' => '--iw-variant-card-border',
+            // Colours the shadow of every card of this variant. The shape of
+            // the shadow stays site-wide; only what it is drawn against is
+            // local, which is what a dark surface needs to be able to change.
+            'cardShadowColor' => '--iw-variant-card-shadow-color',
             'accentBg' => '--iw-variant-accent-bg',
             'accentTitle' => '--iw-variant-accent-title-color',
             'accentText' => '--iw-variant-accent-text',

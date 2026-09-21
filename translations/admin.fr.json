@@ -10,7 +10,6 @@
     "iw_sulu_tailwind_theme.webspaces": "Webspaces",
     "iw_sulu_tailwind_theme.webspace_theme_info": "Sélectionnez le thème à utiliser pour ce webspace",
     "iw_sulu_tailwind_theme.details": "Détails",
-
     "iw_sulu_tailwind_theme.export": "Exporter",
     "iw_sulu_tailwind_theme.import": "Importer",
     "iw_sulu_tailwind_theme.import_title": "Importer un thème",
@@ -27,7 +26,6 @@
     "iw_sulu_tailwind_theme.import_error_unknown_target": "Le thème à écraser est introuvable.",
     "iw_sulu_tailwind_theme.import_error_unreadable_file": "Le fichier n'a pas pu être lu.",
     "iw_sulu_tailwind_theme.import_error_generic": "L'import a échoué.",
-
     "iw_sulu_tailwind_theme.colors": "Couleurs",
     "iw_sulu_tailwind_theme.colors_section_main": "Palette",
     "iw_sulu_tailwind_theme.colors_section_text": "Texte et bordures",
@@ -57,7 +55,6 @@
     "iw_sulu_tailwind_theme.palette_slug_reserved": "Ce nom est réservé et ne peut pas être utilisé.",
     "iw_sulu_tailwind_theme.palette_add": "Ajouter une couleur",
     "iw_sulu_tailwind_theme.palette_remove": "Supprimer cette couleur",
-
     "iw_sulu_tailwind_theme.typography": "Typographie",
     "iw_sulu_tailwind_theme.typography_font_families": "Familles de polices",
     "iw_sulu_tailwind_theme.typography_font_heading": "Titres",
@@ -117,7 +114,6 @@
     "iw_sulu_tailwind_theme.typography_link_size": "Liens - Taille (rem)",
     "iw_sulu_tailwind_theme.typography_link_style": "Liens - Style",
     "iw_sulu_tailwind_theme.typography_link_lineHeight": "Liens - Interligne (×)",
-
     "iw_sulu_tailwind_theme.buttons": "Boutons",
     "iw_sulu_tailwind_theme.buttons_primary": "Bouton primaire",
     "iw_sulu_tailwind_theme.buttons_secondary": "Bouton secondaire",
@@ -175,14 +171,12 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out": "Sortie douce",
     "iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out": "Entrée et sortie douces",
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Rebond",
-
     "iw_sulu_tailwind_theme.defaults": "Réglages par défaut",
     "iw_sulu_tailwind_theme.defaults_general": "Espacements et rayons",
     "iw_sulu_tailwind_theme.borders_radii": "Rayons de bordure",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Rayon des cards",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Rayon des images",
     "iw_sulu_tailwind_theme.borders_paragraphRadius": "Rayon des paragraphes",
-
     "iw_sulu_tailwind_theme.defaults_section_block_padding": "Espacement intérieur des blocs par défaut",
     "iw_sulu_tailwind_theme.defaults_section_block_padding_info": "Espacement qu'un bloc prend quand aucun n'a été choisi sur le bloc lui-même. Un bloc qui a son propre réglage le garde, y compris un espacement nul.",
     "iw_sulu_tailwind_theme.defaults_blockPaddingTop": "Espacement intérieur haut",
@@ -192,7 +186,6 @@
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Espacement intérieur latéral",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Espace entre les bords gauche et droit du bloc et son contenu.",
     "iw_sulu_tailwind_theme.margin_theme_default": "Défaut",
-
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Espacement intérieur des surfaces",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Espace entre une surface et ce qui est posé dessus. Ne s'applique qu'aux surfaces qui ont un fond ou une bordure, un bloc sans fond de contenu garde donc sa mise en page.",
     "iw_sulu_tailwind_theme.defaults_contentPaddingX": "Contenu - espacement horizontal",
@@ -203,7 +196,6 @@
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info": "Espace à gauche et à droite, entre le bord du fond de paragraphe et son texte.",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraphe - espacement vertical",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Espace en haut et en bas, entre le bord du fond de paragraphe et son texte.",
-
     "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocs",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Espacement entre les zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "S'applique aux blocs à deux zones de contenu (texte + images, formulaire + widget, carte + informations, texte + chiffres clés). L'espacement est réduit de moitié sur mobile.",
@@ -276,7 +268,6 @@
     "iw_sulu_tailwind_theme.defaults_spacing_spacious": "Spacieux - 32 px (gap-8)",
     "iw_sulu_tailwind_theme.defaults_spacing_large": "Large - 40 px (gap-10)",
     "iw_sulu_tailwind_theme.defaults_spacing_xlarge": "Très large - 48 px (gap-12)",
-
     "iw_sulu_tailwind_theme.variants": "Variantes",
     "iw_sulu_tailwind_theme.variants_info": "Définissez des variantes de couleur pour les blocs de contenu",
     "iw_sulu_tailwind_theme.variant": "Variante",
@@ -334,7 +325,6 @@
     "iw_sulu_tailwind_theme.editor_text_color": "Couleur du texte",
     "iw_sulu_tailwind_theme.editor_uppercase": "Majuscules",
     "iw_sulu_tailwind_theme.editor_quote": "Citation",
-
     "iw_sulu_tailwind_theme.variant_zone_table": "Tableau",
     "iw_sulu_tailwind_theme.variant_table_head_bg": "Fond de l'en-tête",
     "iw_sulu_tailwind_theme.variant_table_head_text": "Texte de l'en-tête",
@@ -352,7 +342,6 @@
     "iw_sulu_tailwind_theme.variant_preview_table_head": "En-tête",
     "iw_sulu_tailwind_theme.variant_preview_table_cell": "Cellule",
     "iw_sulu_tailwind_theme.variant_preview_table_hover": "Survol",
-
     "iw_sulu_tailwind_theme.variant_zone_form": "Formulaire",
     "iw_sulu_tailwind_theme.variant_surfaces": "Surfaces",
     "iw_sulu_tailwind_theme.variant_border_none": "Aucune bordure",
@@ -378,6 +367,7 @@
     "iw_sulu_tailwind_theme.variant_card_paragraph": "Couleur du texte",
     "iw_sulu_tailwind_theme.variant_card_border": "Bordure",
     "iw_sulu_tailwind_theme.variant_card_border_width": "Épaisseur de la bordure",
+    "iw_sulu_tailwind_theme.variant_card_shadow_color": "Couleur de l'ombre",
     "iw_sulu_tailwind_theme.variant_button_style": "Style de bouton",
     "iw_sulu_tailwind_theme.variant_form_bg": "Formulaire - Fond des champs",
     "iw_sulu_tailwind_theme.variant_form_text": "Formulaire - Texte des champs",
@@ -401,7 +391,6 @@
     "iw_sulu_tailwind_theme.separator_zigzag": "Zigzag",
     "iw_sulu_tailwind_theme.separator_dots": "Points",
     "iw_sulu_tailwind_theme.separator_diamond": "Losange",
-
     "iw_sulu_tailwind_theme.content": "Contenu",
     "iw_sulu_tailwind_theme.appearance": "Apparence",
     "iw_sulu_tailwind_theme.appearance_of_site": "Apparence : {webspace}",
@@ -434,7 +423,6 @@
     "iw_sulu_tailwind_theme.content_group_code": "Code",
     "iw_sulu_tailwind_theme.content_group_form": "Formulaire",
     "iw_sulu_tailwind_theme.settings_group_layout": "Disposition",
-
     "iw_sulu_tailwind_theme.config_group_colors": "Couleurs",
     "iw_sulu_tailwind_theme.config_group_buttons": "Boutons",
     "iw_sulu_tailwind_theme.config_group_display": "Affichage",
@@ -447,11 +435,9 @@
     "iw_sulu_tailwind_theme.cards_section_text": "Texte et badge",
     "iw_sulu_tailwind_theme.cards_section_border": "Bordure",
     "iw_sulu_tailwind_theme.cards_section_hover": "Survol",
-
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Extérieur",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Intérieur",
     "iw_sulu_tailwind_theme.lateral_margins_none": "Aucune",
-
     "iw_sulu_tailwind_theme.menu": "Menu",
     "iw_sulu_tailwind_theme.menu_settings": "Configuration",
     "iw_sulu_tailwind_theme.menu_type": "Type de menu",
@@ -552,7 +538,6 @@
     "iw_sulu_tailwind_theme.menu_colors_burgerClose": "Icône burger (fermé)",
     "iw_sulu_tailwind_theme.menu_colors_socialMedia": "Réseaux sociaux",
     "iw_sulu_tailwind_theme.menu_colors_socialMediaHover": "Réseaux sociaux au survol",
-
     "iw_sulu_tailwind_theme.footer": "Pied de page",
     "iw_sulu_tailwind_theme.footer_settings": "Configuration du pied de page",
     "iw_sulu_tailwind_theme.footer_type": "Type de pied de page",
@@ -585,7 +570,6 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Charge les liens depuis le snippet « Réseaux sociaux (pied de page) »",
     "iw_sulu_tailwind_theme.footer_copyright": "Texte de copyright",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Utilisez {year} pour insérer l'année courante. Vide = généré depuis le nom du site",
-
     "iw_sulu_tailwind_theme.menu_fullscreenImage": "Image d'ambiance",
     "iw_sulu_tailwind_theme.menu_fullscreenImage_info": "Si définie, le menu s'ouvre en deux parties (image à gauche, navigation à droite) avec un effet rideau",
     "iw_sulu_tailwind_theme.menu_twoColumns": "Navigation sur 2 colonnes",
@@ -596,7 +580,6 @@
     "iw_sulu_tailwind_theme.menu_sidebarWidth_info": "Sur grand écran. La barre reste visible au-dessus du panneau : un panneau trop étroit laisse les icônes déborder sur la page",
     "iw_sulu_tailwind_theme.menu_position_left": "Gauche",
     "iw_sulu_tailwind_theme.menu_position_right": "Droite",
-
     "iw_sulu_tailwind_theme.style.one_column": "Une colonne",
     "iw_sulu_tailwind_theme.style.centered": "Centré",
     "iw_sulu_tailwind_theme.style.two_columns": "Deux colonnes",
@@ -615,7 +598,6 @@
     "iw_sulu_tailwind_theme.style.slider": "Défilement",
     "iw_sulu_tailwind_theme.style.carousel": "Carrousel",
     "iw_sulu_tailwind_theme.style.wide_carousel": "Carrousel large",
-
     "iw_sulu_tailwind_theme.style.filmstrip": "Pellicule",
     "iw_sulu_tailwind_theme.style.inline": "En ligne",
     "iw_sulu_tailwind_theme.style.grid_2x2": "Grille",
@@ -640,7 +622,6 @@
     "iw_sulu_tailwind_theme.style.divider": "Séparateur",
     "iw_sulu_tailwind_theme.style.side_by_side": "Côte à côte",
     "iw_sulu_tailwind_theme.style.spotlight": "Mise en lumière",
-
     "iw_sulu_tailwind_theme.page.default": "Page par défaut",
     "iw_sulu_tailwind_theme.content_blocks": "Blocs de contenu",
     "iw_sulu_tailwind_theme.page.section_hero": "Bandeau",
@@ -678,11 +659,11 @@
     "iw_sulu_tailwind_theme.page.hero_breadcrumb_hidden": "Masqué",
     "iw_sulu_tailwind_theme.page.hero_align_x": "Alignement horizontal des titres",
     "iw_sulu_tailwind_theme.page.hero_align_x_no_image": "Alignement horizontal des titres sans image",
-    "iw_sulu_tailwind_theme.page.hero_align_x_no_image_info": "Sur ce style, une page sans image affiche le texte sur toute la largeur au lieu d'une colonne. Cet alignement s'applique alors \u00e0 sa place.",
+    "iw_sulu_tailwind_theme.page.hero_align_x_no_image_info": "Sur ce style, une page sans image affiche le texte sur toute la largeur au lieu d'une colonne. Cet alignement s'applique alors à sa place.",
     "iw_sulu_tailwind_theme.page.hero_align_x_follow": "Suivre l'alignement horizontal des titres",
     "iw_sulu_tailwind_theme.page.hero_align_y": "Position verticale des titres",
     "iw_sulu_tailwind_theme.page.hero_align_y_with_image": "Alignement vertical des titres avec image",
-    "iw_sulu_tailwind_theme.page.hero_align_y_with_image_info": "Position du texte face \u00e0 l'image, sur la hauteur de celle-ci.",
+    "iw_sulu_tailwind_theme.page.hero_align_y_with_image_info": "Position du texte face à l'image, sur la hauteur de celle-ci.",
     "iw_sulu_tailwind_theme.page.hero_align_y_no_image": "Alignement vertical des titres sans image",
     "iw_sulu_tailwind_theme.page.hero_align_y_no_image_info": "Sans image, le bandeau reprend la hauteur définie plus haut. Le texte s'y place ici.",
     "iw_sulu_tailwind_theme.page.hero_align_top": "Haut",
@@ -694,13 +675,11 @@
     "iw_sulu_tailwind_theme.page.hero_shade_light": "Léger",
     "iw_sulu_tailwind_theme.page.hero_shade_medium": "Moyen",
     "iw_sulu_tailwind_theme.page.hero_shade_strong": "Fort",
-
     "iw_sulu_tailwind_theme.title": "Titre",
     "iw_sulu_tailwind_theme.title_info": "Titre de section du bloc, rendu par défaut en H2. Évitez de remettre un titre de même niveau dans l'éditeur de texte ci-dessous.",
     "iw_sulu_tailwind_theme.subtitle": "Sous-titre",
     "iw_sulu_tailwind_theme.url": "URL",
     "iw_sulu_tailwind_theme.text": "Texte",
-
     "iw_sulu_tailwind_theme.title_alignment": "Alignement du titre",
     "iw_sulu_tailwind_theme.cta_buttons": "Boutons d'action",
     "iw_sulu_tailwind_theme.cta_buttons_info": "Ajoutez autant de boutons que nécessaire. Ils s'affichent à la fin du bloc, ou sous le texte pour les blocs à deux zones.",
@@ -728,16 +707,13 @@
     "iw_sulu_tailwind_theme.align_left": "Gauche",
     "iw_sulu_tailwind_theme.align_center": "Centré",
     "iw_sulu_tailwind_theme.align_right": "Droite",
-
     "iw_sulu_tailwind_theme.title_level": "Niveau du titre",
     "iw_sulu_tailwind_theme.title_level_info": "Niveau sémantique HTML du titre. Laissez H2 sauf si un autre bloc porte déjà le titre principal de la section (SEO / accessibilité).",
     "iw_sulu_tailwind_theme.title_level_h2": "Titre H2 (par défaut)",
     "iw_sulu_tailwind_theme.title_level_h3": "Titre H3",
     "iw_sulu_tailwind_theme.title_level_h4": "Titre H4",
-
     "iw_sulu_tailwind_theme.color_variant": "Variante de couleur",
     "iw_sulu_tailwind_theme.layout_style": "Style d'agencement",
-
     "iw_sulu_tailwind_theme.margin_top": "Marge haute",
     "iw_sulu_tailwind_theme.margin_bottom": "Marge basse",
     "iw_sulu_tailwind_theme.lateral_margins": "Marges latérales",
@@ -753,7 +729,6 @@
     "iw_sulu_tailwind_theme.show_block_border": "Bordure du bloc",
     "iw_sulu_tailwind_theme.show_content_background": "Fond du contenu",
     "iw_sulu_tailwind_theme.show_content_border": "Bordure du contenu",
-
     "iw_sulu_tailwind_theme.block.text": "Texte",
     "iw_sulu_tailwind_theme.block.text_images": "Texte et médias",
     "iw_sulu_tailwind_theme.block.cards": "Cartes",
@@ -818,7 +793,6 @@
     "iw_sulu_tailwind_theme.block.article_list": "Liste d'articles",
     "iw_sulu_tailwind_theme.block.article_carousel": "Carrousel d'articles",
     "iw_sulu_tailwind_theme.block.article_featured": "Article à la une",
-
     "iw_sulu_tailwind_theme.block.article_list.source": "Source des articles",
     "iw_sulu_tailwind_theme.block.article_list.source_info": "Sélectionner les articles à afficher dans la liste",
     "iw_sulu_tailwind_theme.block.article_carousel.source": "Source des articles",
@@ -859,7 +833,6 @@
     "iw_sulu_tailwind_theme.timeline_state_upcoming": "À venir",
     "iw_sulu_tailwind_theme.timeline_icon": "Picto",
     "iw_sulu_tailwind_theme.timeline_icon_info": "Affiché dans la pastille ou dans la carte selon le réglage « Contenu de la pastille ». Sa taille est fixée par le thème.",
-
     "iw_sulu_tailwind_theme.media_type": "Type de média",
     "iw_sulu_tailwind_theme.media_type_images": "Images",
     "iw_sulu_tailwind_theme.media_type_video": "Vidéo",
@@ -901,7 +874,6 @@
     "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Le nom du média sert de légende dans la visionneuse, à l'ouverture de l'image au clic. Seul le style « Carrousel » l'affiche aussi sous l'image, directement dans le bloc.",
     "iw_sulu_tailwind_theme.content_position_right": "Contenu à droite",
     "iw_sulu_tailwind_theme.image_position_bottom": "Média en bas",
-
     "iw_sulu_tailwind_theme.figures": "Chiffres",
     "iw_sulu_tailwind_theme.figure": "Chiffre",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icône",
@@ -911,7 +883,6 @@
     "iw_sulu_tailwind_theme.figure_columns": "Colonnes",
     "iw_sulu_tailwind_theme.figure_columns_info": "Combien de chiffres tiennent sur une ligne au format bureau. En dessous, la grille se replie sur deux colonnes puis sur une.",
     "iw_sulu_tailwind_theme.figure_columns_auto": "Automatique",
-
     "iw_sulu_tailwind_theme.links": "Liens",
     "iw_sulu_tailwind_theme.internal_link": "Lien interne",
     "iw_sulu_tailwind_theme.external_link": "Lien externe",
@@ -920,11 +891,9 @@
     "iw_sulu_tailwind_theme.target": "Cible",
     "iw_sulu_tailwind_theme.target_self": "Même fenêtre",
     "iw_sulu_tailwind_theme.target_blank": "Nouvelle fenêtre",
-
     "iw_sulu_tailwind_theme.location": "Localisation",
     "iw_sulu_tailwind_theme.address": "Adresse",
     "iw_sulu_tailwind_theme.open_map": "Ouvrir dans Maps",
-
     "iw_sulu_tailwind_theme.form_use_bundle": "Source du formulaire",
     "iw_sulu_tailwind_theme.form_use_bundle_label": "Utiliser SuluFormBundle",
     "iw_sulu_tailwind_theme.form_id": "ID du formulaire",
@@ -933,11 +902,8 @@
     "iw_sulu_tailwind_theme.form_twig_template_info": "Chemin du template Twig à inclure (ex: forms/contact.html.twig)",
     "iw_sulu_tailwind_theme.form_bundle_not_installed": "SuluFormBundle n'est pas installé.",
     "iw_sulu_tailwind_theme.documents": "Documents",
-
-
     "iw_sulu_tailwind_theme.testimonials": "Témoignages",
     "iw_sulu_tailwind_theme.testimonial_item": "Témoignage",
-
     "iw_sulu_tailwind_theme.accordion_items": "Éléments",
     "iw_sulu_tailwind_theme.accordion_item": "Élément",
     "iw_sulu_tailwind_theme.accordion_item_title": "Titre / Question",
@@ -963,7 +929,6 @@
     "iw_sulu_tailwind_theme.accordion_header_surface_accent": "Question en surface accent",
     "iw_sulu_tailwind_theme.accordion_header_surface_paragraph": "Surface paragraphe",
     "iw_sulu_tailwind_theme.title_level_h5": "Titre 5 (h5)",
-
     "iw_sulu_tailwind_theme.iframe_url": "Adresse à intégrer",
     "iw_sulu_tailwind_theme.iframe_url_info": "Adresse complète en https. Les adresses en http ou d'un autre type ne sont pas intégrées (elles seraient de toute façon bloquées par le navigateur).",
     "iw_sulu_tailwind_theme.iframe_title": "Description du contenu intégré",
@@ -1002,7 +967,6 @@
     "iw_sulu_tailwind_theme.embed_allow_geolocation_info": "Nécessaire pour certaines cartes. À laisser décoché sinon.",
     "iw_sulu_tailwind_theme.embed_allow_top_navigation": "Autoriser la redirection de la page",
     "iw_sulu_tailwind_theme.embed_allow_top_navigation_info": "Nécessaire aux moteurs de réservation et formulaires de recherche, qui redirigent la page vers leurs résultats. La redirection reste impossible sans action du visiteur : le contenu intégré ne peut pas rediriger votre page tout seul.",
-
     "iw_sulu_tailwind_theme.consent_mode": "Consentement avant chargement",
     "iw_sulu_tailwind_theme.consent_mode_info": "Un contenu externe contacte un tiers dès l'affichage de la page et peut y déposer des traceurs. Ces modes empêchent tout appel tant que le visiteur n'a pas accepté.",
     "iw_sulu_tailwind_theme.consent_mode_none": "Aucun (chargement immédiat)",
@@ -1014,7 +978,6 @@
     "iw_sulu_tailwind_theme.consent_text_info": "Texte affiché à la place du contenu tant qu'il n'est pas accepté. Un message par défaut est utilisé si vide.",
     "iw_sulu_tailwind_theme.consent_image": "Image d'attente",
     "iw_sulu_tailwind_theme.consent_image_info": "Visuel affiché en fond du message d'attente (optionnel).",
-
     "iw_sulu_tailwind_theme.code_snippet": "Code HTML / JavaScript",
     "iw_sulu_tailwind_theme.code_snippet_info_sandboxed": "Collez ici le code fourni par le service tiers. Il s'exécute dans un cadre isolé : il ne peut pas accéder au reste de la page ni à votre session. Un widget qui doit agir sur la page entière (bulle de chat, script de mesure) ne fonctionnera pas ici.",
     "iw_sulu_tailwind_theme.code_snippet_info_open": "Collez ici le code fourni par le service tiers. Par défaut il s'exécute dans un cadre isolé. Sans isolation (case ci-dessous), il s'exécute directement dans la page : ne collez alors que du code dont vous connaissez l'origine.",
@@ -1029,7 +992,6 @@
     "iw_sulu_tailwind_theme.role": "Fonction",
     "iw_sulu_tailwind_theme.photo": "Photo",
     "iw_sulu_tailwind_theme.rating": "Note (1-5)",
-
     "iw_sulu_tailwind_theme.height": "Hauteur",
     "iw_sulu_tailwind_theme.height_xs": "Très petit",
     "iw_sulu_tailwind_theme.height_sm": "Petit",
@@ -1052,10 +1014,8 @@
     "iw_sulu_tailwind_theme.icon_size_md": "Moyenne",
     "iw_sulu_tailwind_theme.icon_size_lg": "Grande",
     "iw_sulu_tailwind_theme.icon_size_xl": "Très grande",
-
     "iw_sulu_tailwind_theme.palette_tab": "Palette",
     "iw_sulu_tailwind_theme.custom_tab": "Personnalisé",
-
     "iw_sulu_tailwind_theme.snippet.social_media": "Réseaux sociaux",
     "iw_sulu_tailwind_theme.snippet.social_media_menu_area": "Réseaux sociaux dans le menu",
     "iw_sulu_tailwind_theme.snippet.social_media_footer_area": "Réseaux sociaux dans le pied de page",
@@ -1066,7 +1026,6 @@
     "iw_sulu_tailwind_theme.snippet_title": "Titre du fragment",
     "iw_sulu_tailwind_theme.snippet_area_notice": "Couleurs et boutons de ce fragment",
     "iw_sulu_tailwind_theme.snippet_area_notice_info": "Les variantes de couleur et les styles de bouton proposés ici viennent du thème du site qui affiche ce fragment. Pour voir le thème d'un autre site, il faut d'abord que ce site ait choisi ce fragment, dans Espaces web > Fragments par défaut.",
-
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega menu",
     "iw_sulu_tailwind_theme.mega_source": "Source des données",
     "iw_sulu_tailwind_theme.mega_source_info": "Choisir entre navigation automatique ou structure manuelle via snippet",
@@ -1095,19 +1054,16 @@
     "iw_sulu_tailwind_theme.mega_cta_title": "Texte du bouton",
     "iw_sulu_tailwind_theme.mega_cta_link": "Lien du bouton",
     "iw_sulu_tailwind_theme.mega_cta_style": "Style du bouton",
-
     "iw_sulu_tailwind_theme.mega_layout": "Disposition",
     "iw_sulu_tailwind_theme.mega_layout_vertical": "Vertical",
     "iw_sulu_tailwind_theme.mega_layout_horizontal": "Horizontal",
     "iw_sulu_tailwind_theme.mega_image_position": "Position de l'image",
-
     "iw_sulu_tailwind_theme.mega_image_ratio": "Ratio de l'image",
     "iw_sulu_tailwind_theme.mega_ratio_auto": "Automatique",
     "iw_sulu_tailwind_theme.mega_ratio_square": "Carré (1:1)",
     "iw_sulu_tailwind_theme.mega_ratio_portrait": "Portrait (9:16)",
     "iw_sulu_tailwind_theme.mega_ratio_landscape": "Paysage (16:9)",
     "iw_sulu_tailwind_theme.mega_card_show_background": "Afficher un fond",
-
     "sulu_form.forms": "Formulaires",
     "sulu_form.id": "ID",
     "sulu_form.title": "Titre",
@@ -1205,7 +1161,6 @@
     "sulu_activity.description.forms.removed": "{userFullName} a supprimé le formulaire « {resourceTitle} »",
     "sulu_activity.description.forms.copied": "{userFullName} a copié le formulaire « {resourceTitle} »",
     "sulu_activity.description.forms.restored": "{userFullName} a restauré le formulaire « {resourceTitle} »",
-
     "iw_sulu_tailwind_theme.article.news": "Actualité",
     "iw_sulu_tailwind_theme.article.event": "Événement",
     "iw_sulu_tailwind_theme.article.blog_post": "Article de blog",
@@ -1241,11 +1196,9 @@
     "iw_sulu_tailwind_theme.article.organizer_organization_select": "Sélectionner une organisation",
     "iw_sulu_tailwind_theme.article.reading_time": "Temps de lecture",
     "iw_sulu_tailwind_theme.article.reading_time_info": "Temps de lecture estimé (ex : « 5 min »)",
-
     "iw_sulu_tailwind_theme.page.article_listing": "Liste d'articles",
     "iw_sulu_tailwind_theme.article.listing_source": "Source des articles",
     "iw_sulu_tailwind_theme.article.listing_articles": "Articles",
-
     "iw_sulu_tailwind_theme.articles": "Articles",
     "iw_sulu_tailwind_theme.articles_section_page_styles": "Styles des pages",
     "iw_sulu_tailwind_theme.articles_section_filters": "Filtres et sommaire",
@@ -1257,7 +1210,6 @@
     "iw_sulu_tailwind_theme.articles_event_style": "Style page Événement",
     "iw_sulu_tailwind_theme.articles_blog_style": "Style page Blog",
     "iw_sulu_tailwind_theme.articles_listing_style": "Style du listing",
-
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Ratio image des cartes",
     "iw_sulu_tailwind_theme.card_gap": "Espacement entre cartes",
     "iw_sulu_tailwind_theme.card_title_size": "Taille du titre",
@@ -1469,7 +1421,6 @@
     "iw_sulu_tailwind_theme.articles_visibility_listing": "Liste uniquement",
     "iw_sulu_tailwind_theme.articles_visibility_both": "Les deux",
     "iw_sulu_tailwind_theme.articles_no_styles": "Aucun style disponible.",
-
     "iw_sulu_tailwind_theme.style.article_news_classic": "Classique",
     "iw_sulu_tailwind_theme.style.article_news_magazine": "Magazine",
     "iw_sulu_tailwind_theme.style.article_news_minimal": "Minimal",
@@ -1531,10 +1482,8 @@
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Texte de l'infobulle",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Fond des contrôles",
     "iw_sulu_tailwind_theme.components_maps_controls_text": "Couleur des contrôles",
-
     "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
     "iw_sulu_tailwind_theme.turnstile_title_info": "Libellé facultatif affiché au-dessus du widget. Le widget affiche déjà son propre texte de vérification : laissez vide dans la plupart des cas.",
-
     "iw_sulu_tailwind_theme.articles_author_name_format": "Format du nom des auteurs",
     "iw_sulu_tailwind_theme.articles_author_name_format_info": "Comment le nom des auteurs s'affiche sur le site. Un auteur qui a besoin d'un pseudonyme s'ajoute en auteur « personnalisé », dont le nom est libre.",
     "iw_sulu_tailwind_theme.articles_author_name_full": "Nom complet (Marie Dupont)",
