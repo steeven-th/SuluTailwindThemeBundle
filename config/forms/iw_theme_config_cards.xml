@@ -266,7 +266,6 @@
                         </param>
                     </params>
                 </property>
-            </properties>
 
                 <!-- The shadow, as a geometry rather than as a named size. Four
                      sizes could not say where a shadow falls nor how strong it
@@ -288,6 +287,7 @@
                         <info_text>iw_sulu_tailwind_theme.card_shadow_info</info_text>
                     </meta>
                 </property>
+            </properties>
         </section>
     </properties>
 </form>
