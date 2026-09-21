@@ -378,6 +378,7 @@
     "iw_sulu_tailwind_theme.variant_card_paragraph": "Textfarbe",
     "iw_sulu_tailwind_theme.variant_card_border": "Rahmen",
     "iw_sulu_tailwind_theme.variant_card_border_width": "Rahmenstärke",
+    "iw_sulu_tailwind_theme.variant_card_shadow_color": "Schattenfarbe",
     "iw_sulu_tailwind_theme.variant_button_style": "Schaltflächen-Stil",
     "iw_sulu_tailwind_theme.variant_form_bg": "Formular - Feldhintergrund",
     "iw_sulu_tailwind_theme.variant_form_text": "Formular - Feldtext",

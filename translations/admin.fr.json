@@ -378,6 +378,7 @@
     "iw_sulu_tailwind_theme.variant_card_paragraph": "Couleur du texte",
     "iw_sulu_tailwind_theme.variant_card_border": "Bordure",
     "iw_sulu_tailwind_theme.variant_card_border_width": "Épaisseur de la bordure",
+    "iw_sulu_tailwind_theme.variant_card_shadow_color": "Couleur de l'ombre",
     "iw_sulu_tailwind_theme.variant_button_style": "Style de bouton",
     "iw_sulu_tailwind_theme.variant_form_bg": "Formulaire - Fond des champs",
     "iw_sulu_tailwind_theme.variant_form_text": "Formulaire - Texte des champs",

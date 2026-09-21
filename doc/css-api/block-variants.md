@@ -49,6 +49,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
 | `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
+| `--iw-variant-card-shadow-color` | `cardShadowColor` | Colour the shadow of every card is drawn in. The shape stays site-wide, under **Components > Cards** |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
@@ -144,6 +145,20 @@ embed all stay on the paragraph surface. Two further exceptions are
 deliberate: the event info card and the mobile location card are translucent
 over a photo or a map, where a solid light background is legibility rather than
 styling, and following a dark variant would make them unreadable.
+
+A shadow detaches a card from its background the way a border does, and a
+border has always been settable per variant. The shadow was not: its colour was
+black, written in the stylesheet, so a dark variant chose its own background
+and then lost its shadow in it. `cardShadowColor` fixes that.
+
+Only the **colour** belongs to the variant. How far a card lifts is a decision
+about the site, taken once under **Components > Cards**, while what it lifts
+against depends on the surface underneath it. The chain ends on the original
+black, so a theme that sets no colour keeps the shadow it had.
+
+The colour reaches cards alone. The shadow sizes are shared with the
+back-to-top button, the gallery navigation, the article filters, the table of
+contents, the pagination and the tags, and none of those takes a card setting.
 
 ### Reaching the card surface
 

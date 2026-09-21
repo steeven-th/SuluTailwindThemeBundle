@@ -1244,7 +1244,7 @@ img.object-cover {
 }
 
 .iw-block-document .iw-document-card:hover {
-    box-shadow: var(--iw-document-card-hover-shadow, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1));
+    box-shadow: var(--iw-document-card-hover-shadow, 0 4px 6px -1px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)));
 }
 
 /* Card variant — grid mode: stack vertically, center, more padding */
@@ -1256,7 +1256,7 @@ img.object-cover {
 }
 
 .iw-block-document--grid .iw-document-card:hover {
-    box-shadow: var(--iw-document-card-hover-shadow-grid, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+    box-shadow: var(--iw-document-card-hover-shadow-grid, 0 10px 15px -3px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)));
 }
 
 /* Icon wrap — colored square containing the doc icon */
@@ -1380,7 +1380,7 @@ img.object-cover {
 }
 
 .iw-block-linked-pages .iw-linked-page-card:hover {
-    box-shadow: var(--iw-linked-page-card-hover-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+    box-shadow: var(--iw-linked-page-card-hover-shadow, 0 10px 15px -3px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)));
 }
 
 .iw-block-linked-pages .iw-linked-page-card__title {
@@ -1638,7 +1638,7 @@ img.object-cover {
 
 .iw-block-testimonial--cards .iw-testimonial:hover {
     transform: var(--iw-cards-hover-transform, translateY(-2px));
-    box-shadow: var(--iw-testimonial-hover-shadow, var(--iw-card-shadow-hover, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)));
+    box-shadow: var(--iw-testimonial-hover-shadow, var(--iw-card-shadow-hover, 0 10px 15px -3px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1))));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6316,11 +6316,11 @@ aside .iw-toc {
 /* Options ──────────────────────────────────────────────────────────────── */
 
 .iw-card--shadow {
-    box-shadow: var(--iw-card-shadow, 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 16px -6px rgb(0 0 0 / 0.12));
+    box-shadow: var(--iw-card-shadow, 0 1px 3px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 6px 16px -6px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)));
 }
 
 .iw-card--shadow:hover {
-    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px rgb(0 0 0 / 0.12), 0 12px 24px -8px rgb(0 0 0 / 0.18));
+    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)), 0 12px 24px -8px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.18)));
 }
 
 /* Highlighted ──────────────────────────────────────────────────────────── */
@@ -6404,7 +6404,13 @@ aside .iw-toc {
    also the one nobody could tune: six settings drove the article cards and none
    of them reached this. The literals stay behind the tokens for a page rendered
    without a compiled theme. */
-a.iw-card {
+/* The transition is on every card, the lift only on the ones that are links.
+   `.iw-card--shadow:hover` changes the shadow of any card, link or not, but the
+   transition was declared on `a.iw-card` alone - so a card the editor left
+   unclickable saw its shadow snap on and off instead of fading. The lift stays
+   where it was: something that rises under the pointer says it can be clicked,
+   and saying so of a card that cannot would be a lie. */
+.iw-card {
     transition: transform var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease),
         box-shadow var(--iw-cards-hover-duration, .15s) var(--iw-cards-hover-easing, ease);
 }
@@ -6414,7 +6420,7 @@ a.iw-card:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    a.iw-card {
+    .iw-card {
         transition: none;
     }
 

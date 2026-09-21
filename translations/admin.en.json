@@ -378,6 +378,7 @@
     "iw_sulu_tailwind_theme.variant_card_paragraph": "Text color",
     "iw_sulu_tailwind_theme.variant_card_border": "Border",
     "iw_sulu_tailwind_theme.variant_card_border_width": "Border width",
+    "iw_sulu_tailwind_theme.variant_card_shadow_color": "Shadow color",
     "iw_sulu_tailwind_theme.variant_button_style": "Button style",
     "iw_sulu_tailwind_theme.variant_form_bg": "Form - Field background",
     "iw_sulu_tailwind_theme.variant_form_text": "Form - Field text",

@@ -61,6 +61,7 @@ const ZONES = [
             {key: 'cardParagraph', label: 'iw_sulu_tailwind_theme.variant_card_paragraph', kind: 'color'},
             {key: 'cardBorder', label: 'iw_sulu_tailwind_theme.variant_card_border', kind: 'color'},
             {key: 'cardBorderWidth', label: 'iw_sulu_tailwind_theme.variant_card_border_width', kind: 'width'},
+            {key: 'cardShadowColor', label: 'iw_sulu_tailwind_theme.variant_card_shadow_color', kind: 'color'},
         ],
     },
     {
@@ -154,7 +155,7 @@ const PREVIEW_GROUPS = [
     {id: 'hr', label: 'iw_sulu_tailwind_theme.variant_hr_color',
         fields: ['hr']},
     {id: 'cards', label: 'iw_sulu_tailwind_theme.variant_surface_cards',
-        fields: ['cardBg', 'cardBorder', 'cardTitle', 'cardParagraph', 'cardBorderWidth']},
+        fields: ['cardBg', 'cardBorder', 'cardTitle', 'cardParagraph', 'cardBorderWidth', 'cardShadowColor']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
         fields: ['accentBg', 'accentBorder', 'accentTitle', 'accentText', 'accentBorderWidth']},
     {id: 'table', label: 'iw_sulu_tailwind_theme.variant_zone_table',
