@@ -72,12 +72,19 @@ The `.iw-testimonial` subcomponent is shared by the three modes.
 
 ### Card surface (`--cards`)
 
+The card takes the **card surface of the variant**, like every other card of the
+bundle, and wears `iw-surface--card` so the text on it follows too. It painted
+no background at all before 3.0.0 and drew a hairline of its own, which made it
+the one card no variant could fill and the one that framed itself whether the
+editor asked for a frame or not.
+
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `--iw-testimonial-padding` | `1.5rem` | Card inner padding. |
-| `--iw-testimonial-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border + author-block separator. |
-| `--iw-testimonial-hover-shadow` | large shadow | Box-shadow on hover. |
-| `--iw-testimonial-transition-duration` | `0.2s` | Hover transition. |
+| `--iw-testimonial-card-bg` | `var(--iw-variant-card-bg, transparent)` | Card background. A variant that fills no card draws none. |
+| `--iw-testimonial-border` | `var(--iw-variant-card-border, transparent)`, width from `--iw-variant-card-border-width` (`0` when unset) | Card border. It also colours the author-block separator, which keeps the separator colour of the variant as its own fallback: a line inside a card is a separator, not its frame. |
+| `--iw-testimonial-hover-shadow` | `var(--iw-card-shadow-hover, …)` | Box-shadow on hover, from **Components > Cards**. |
+| `--iw-testimonial-transition-duration` | `var(--iw-cards-hover-duration, .15s)` | Hover transition. The easing and the movement come from the same place (`--iw-cards-hover-easing`, `--iw-cards-hover-transform`), so one admin setting drives every card family. Honours `prefers-reduced-motion`. |
 
 ### Quote icon + text
 
@@ -101,8 +108,8 @@ The `.iw-testimonial` subcomponent is shared by the three modes.
 | `--iw-testimonial-rating-gap` | `0.25rem` | Gap between stars. |
 | `--iw-testimonial-rating-margin-top` | `0.75rem` | Space above the rating row. |
 | `--iw-testimonial-rating-star-size` | `1rem` | Star SVG size. |
-| `--iw-testimonial-rating-star-filled` | `#facc15` | Filled-star color (yellow-400 equivalent). |
-| `--iw-testimonial-rating-star-empty` | `#d1d5db` | Empty-star color (gray-300 equivalent). |
+| `--iw-testimonial-rating-star-filled` | `var(--color-accent, #facc15)` | Filled-star colour. Follows the theme accent, so the stars belong to the palette rather than to a fixed yellow. Set this to pin a colour of your own. |
+| `--iw-testimonial-rating-star-empty` | `var(--color-border, #d1d5db)` | Empty-star colour, the theme border colour. |
 
 ### Author block
 

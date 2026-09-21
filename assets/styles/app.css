@@ -1612,14 +1612,43 @@ img.object-cover {
     }
 }
 
+/* The card of the `--cards` style. It is a card like the others, so it takes
+   the card surface of the variant: it used to paint no background at all and
+   draw a hairline of its own, which left it the one card in the bundle no
+   variant could fill and the one that framed itself whatever the editor asked
+   for.
+
+   The author rule below keeps the separator colour: a line INSIDE the card is
+   a separator, not its frame. */
 .iw-block-testimonial--cards .iw-testimonial {
     padding: var(--iw-testimonial-padding, 1.5rem);
-    border: 1px solid var(--iw-testimonial-border, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
-    transition: box-shadow var(--iw-testimonial-transition-duration, 0.2s) ease;
+    background-color: var(--iw-testimonial-card-bg, var(--iw-variant-card-bg, transparent));
+    border: var(--iw-variant-card-border-width, 0) solid
+        var(--iw-testimonial-border, var(--iw-variant-card-border, transparent));
+    /* The hover comes from Components > Cards, like every other card family.
+       It was written here instead, so the one card of the bundle that lifts on
+       its own was also the one no admin setting could reach: the duration, the
+       easing and the movement all ignored the theme. The literals stay behind
+       the tokens for a page rendered without a compiled theme. */
+    transition: transform var(--iw-testimonial-transition-duration, var(--iw-cards-hover-duration, .15s))
+            var(--iw-cards-hover-easing, ease),
+        box-shadow var(--iw-testimonial-transition-duration, var(--iw-cards-hover-duration, .15s))
+            var(--iw-cards-hover-easing, ease);
 }
 
 .iw-block-testimonial--cards .iw-testimonial:hover {
-    box-shadow: var(--iw-testimonial-hover-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
+    transform: var(--iw-cards-hover-transform, translateY(-2px));
+    box-shadow: var(--iw-testimonial-hover-shadow, var(--iw-card-shadow-hover, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-block-testimonial--cards .iw-testimonial {
+        transition: none;
+    }
+
+    .iw-block-testimonial--cards .iw-testimonial:hover {
+        transform: none;
+    }
 }
 
 .iw-block-testimonial--cards .iw-testimonial__author {
@@ -1773,11 +1802,11 @@ img.object-cover {
 .iw-block-testimonial .iw-testimonial__rating-star {
     width: var(--iw-testimonial-rating-star-size, 1rem);
     height: var(--iw-testimonial-rating-star-size, 1rem);
-    color: var(--iw-testimonial-rating-star-empty, #d1d5db);
+    color: var(--iw-testimonial-rating-star-empty, var(--color-border, #d1d5db));
 }
 
 .iw-block-testimonial .iw-testimonial__rating-star--filled {
-    color: var(--iw-testimonial-rating-star-filled, #facc15);
+    color: var(--iw-testimonial-rating-star-filled, var(--color-accent, #facc15));
 }
 
 /* Center the rating row when displayed inside a centered slide */
