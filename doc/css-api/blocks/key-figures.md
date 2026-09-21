@@ -35,7 +35,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | Class | Role |
 |-------|------|
 | `.iw-key-figure` | Single figure container. |
-| `.iw-key-figure--card` | Modifier — card variant used in `--grid-2x2`. Framed by the paragraph surface of the variant, like every other card of the bundle. |
+| `.iw-key-figure--card` | Modifier — card variant used in `--grid-2x2`. Framed by the card surface of the variant, like every other card of the bundle. |
 | `.iw-key-figure--inline` | Modifier — vertical flex stack used in `--inline`. |
 | `.iw-key-figure--progress` | Modifier — progress-bar item used in `--progress`. |
 | `.iw-key-figure--timeline` | Modifier — timeline item used in `--timeline`. Even items alternate sides via `:nth-child(even)`. |
@@ -108,7 +108,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-grid-2x2-max-width` | `48rem` | Reading-width cap, applied up to two columns. |
 | `--iw-block-key-figures-grid-wide-max-width` | `none` | What replaces it past two columns, under `--grid-wide`. |
 | `--iw-key-figure-card-padding` | `1.5rem` / `2rem` (`>=768px`) | Card padding. |
-| `--iw-key-figure-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, transparent))` | Card background. The card declared none at all before 3.0.0, so no variant and no surface setting could fill it. |
+| `--iw-key-figure-card-bg` | `var(--iw-variant-card-bg, transparent)` | Card background, from the variant's **card surface**. The card declared none at all before 3.0.0, so no variant and no surface setting could fill it. |
 | `--iw-key-figure-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Text colour on that background. |
 | `--iw-key-figure-card-border` | `var(--iw-variant-paragraph-border, transparent)` | Card border colour. Its width comes from `--iw-variant-paragraph-border-width` and defaults to zero, so a variant asking for no border gets none. Replaces `--iw-key-figure-border`, which drew a hairline whatever the variant said. |
 
@@ -137,7 +137,7 @@ Counter animation is driven by the `key-figures` Stimulus controller via `data-k
 | `--iw-block-key-figures-timeline-ring` | `var(--color-secondary, var(--color-primary))` | Dot outer ring color. |
 | `--iw-block-key-figures-timeline-line` | inherits `--accent` | Overrides the line color if you want it different from the accent. |
 | `--iw-block-key-figures-timeline-card-border` | inherits `--accent` | Card border color. |
-| `--iw-block-key-figures-timeline-card-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Card background. Uses the variant's `paragraphBg` token (admin-configurable), with the auto-computed `--iw-variant-subtle-bg` as fallback when `paragraphBg` is `transparent`. |
+| `--iw-block-key-figures-timeline-card-bg` | `var(--iw-variant-card-bg, transparent)` | Card background, from the variant's **card surface**. A variant that fills no card draws none. |
 | `--iw-block-key-figures-timeline-card-color` | `var(--iw-variant-paragraph-color, inherit)` | Default text color inside the timeline card. |
 | `--iw-key-figure-timeline-dot-size` | `1rem` | Dot diameter. |
 | `--iw-key-figure-timeline-dot-ring-width` | `4px` | Dot ring thickness. |

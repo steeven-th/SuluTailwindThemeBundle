@@ -99,6 +99,127 @@ The highlight is lost, the layout and the copy are not.
 If you rename a brand color slug that editors have used in titles, plan a
 migration pass over `templateData` alongside the theme config one.
 
+## Cards get a surface of their own (breaking, visual)
+
+Cards read the variant's **paragraph** surface until now, for want of one of
+their own. A single value painted two unrelated things - the running text of a
+block and the cards of nine others - so filling a card meant tinting every
+paragraph with it, and a theme could not have one without the other.
+
+A variant now carries five more settings, under **Cards**:
+
+| Setting | Token key | CSS variable |
+|---|---|---|
+| Background | `cardBg` | `--iw-variant-card-bg` |
+| Title color | `cardTitle` | `--iw-variant-card-title-color` |
+| Text color | `cardParagraph` | `--iw-variant-card-paragraph-color` |
+| Border | `cardBorder` | `--iw-variant-card-border` |
+| Border width | `cardBorderWidth` | `--iw-variant-card-border-width` |
+
+The zone the cards left is now called **Paragraphs**, and drives the running
+text alone.
+
+### Nothing falls back any more (breaking, visual)
+
+An unset card fill draws no fill. Not the paragraph one, and not the computed
+`--iw-variant-subtle-bg` - the translucent black or white a card used to land
+on when `paragraphBg` was empty. That cascade was invisible from the admin: an
+editor who configured nothing got a tint they had not asked for and could not
+find. What the variant says is now what the card gets.
+
+`--iw-variant-subtle-bg` keeps its original job - table headers, inline code,
+`<pre>` blocks - and is unchanged there.
+
+### Migrating a theme already built
+
+Themes in the database name a paragraph fill their cards depend on. Copy it
+across once, before recompiling:
+
+```bash
+php bin/adminconsole iw-sulu:theme:migrate-card-surface --dry-run
+php bin/adminconsole iw-sulu:theme:migrate-card-surface
+php bin/adminconsole iw-sulu:theme:compile
+```
+
+It copies `paragraphBg`, `paragraphBorder` and `paragraphBorderWidth` onto the
+card keys of every variant that has none, and leaves alone any variant already
+naming one. Safe to run twice. Skipping it empties the cards of every existing
+theme at the next compile.
+
+### The accent surface gains a heading colour (new)
+
+A highlighted card, an accent FAQ header - anything on the accent surface - had
+one colour for its heading and its text. An ordinary card now lets an editor
+set the two apart, so offering a single field here read as a missing setting.
+
+**Accent > Title color** (`accentTitle`, `--iw-variant-accent-title-color`)
+fills that gap. Left empty it falls back to **Text color**, which is what the
+whole surface used to take, so nothing moves in an existing theme.
+
+The labels of that zone lost their `accent` prefix while we were there -
+**Background**, **Title color**, **Text color**, **Border**, **Border width** -
+so the accent and card surfaces read the same way. The stored keys are
+unchanged.
+
+### Testimonial cards lose their hairline (breaking, visual)
+
+The `--cards` style of the testimonial block painted no background at all and
+drew a `1px` border of its own in the separator colour. It was the one card no
+variant could fill, and the one that framed itself whether the editor had asked
+for a frame or not.
+
+It takes the card surface now, like every other card. On a theme that set no
+card border, those cards lose their outline: set **Cards > Border** and
+**Border width** on the variant to get it back, and **Cards > Background** to
+fill them - which was never possible before.
+
+`--iw-testimonial-border` still exists and still colours both the card border
+and the author separator, so a project overriding it needs no change.
+
+The rest of the block follows the theme too, where it used to hold literals of
+its own:
+
+- the **hover** reads `--iw-cards-hover-duration`, `-easing` and `-transform`,
+  and the shadow `--iw-card-shadow-hover`, all four from **Components > Cards**.
+  These cards now lift like the others, and honour `prefers-reduced-motion`,
+  which they ignored
+- the **rating stars** take `--color-accent` when filled and `--color-border`
+  when empty, instead of a fixed yellow and grey. Set
+  `--iw-testimonial-rating-star-filled` to keep a colour of your own
+
+### Text colours need a class
+
+The fill and the border come from the block's own cascade and need nothing.
+The two text colours are emitted per variant against `.iw-surface--card`,
+because the variant colours headings and running text with rules that plain
+inheritance cannot beat.
+
+Every card of the bundle carries the class already. A **custom block** drawing
+its own card has to add it:
+
+```twig
+<div class="my-card iw-surface--card">
+```
+
+Without it the fill applies and the text on it silently keeps the colour picked
+against the block background. A card put forward carries `iw-surface--accent`
+instead, never both.
+
+### Overriding in CSS
+
+The per-block hooks are unchanged, only what sits behind them moved:
+
+```css
+/* before */
+background-color: var(--iw-document-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+/* after */
+background-color: var(--iw-document-card-bg, var(--iw-variant-card-bg, transparent));
+```
+
+A project setting `--iw-document-card-bg` or `--iw-card-bg` needs no change.
+
+---
+
 ## Radius split: `paragraphImageRadius` → `paragraphRadius` / `cardRadius` / `imageRadius`
 
 The single per-block "Paragraph / Image radius" field coupled three different
@@ -1119,8 +1240,8 @@ background-color: var(--iw-accordion-card-surface, var(--iw-article-card-surface
 border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, …);
 
 /* after */
-background-color: var(--iw-accordion-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
-border: var(--iw-variant-paragraph-border-width, 0) solid var(--iw-variant-paragraph-border, transparent);
+background-color: var(--iw-accordion-card-bg, var(--iw-variant-card-bg, transparent));
+border: var(--iw-variant-card-border-width, 0) solid var(--iw-variant-card-border, transparent);
 ```
 
 **What changes on a site:** accordion cards take the colour of the variant

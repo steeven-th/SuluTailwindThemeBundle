@@ -44,6 +44,11 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
+| `--iw-variant-card-bg` | `cardBg` | Background of every card. Nothing is drawn until it is set |
+| `--iw-variant-card-title-color` | `cardTitle` | Heading colour inside a card. Falls back to `--iw-variant-title-color` |
+| `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
+| `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
+| `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
@@ -53,6 +58,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
 | `--iw-variant-paragraph-border-width` | `paragraphBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-accent-bg` | `accentBg` | Background of an element put forward |
+| `--iw-variant-accent-title-color` | `accentTitle` | Heading colour on the accent surface. Falls back to `--iw-variant-accent-text` |
 | `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
@@ -103,26 +109,67 @@ weaker than it would be if the surface were taken into account.
 
 ### Cards
 
-Every card in the bundle is an enclosed unit, so it takes the **paragraph
-surface**: the background from `--iw-variant-paragraph-bg`, the border colour
-from `--iw-variant-paragraph-border` and its width from
-`--iw-variant-paragraph-border-width`, which defaults to zero.
+Every card in the bundle is an enclosed unit, so it takes the **card surface**:
+the background from `--iw-variant-card-bg`, the border colour from
+`--iw-variant-card-border` and its width from `--iw-variant-card-border-width`,
+which defaults to zero, plus the two text colours below.
 
-That default is the point. A variant that asks for no border gets none, on
-every block. Eight blocks draw cards - cards, documents, linked pages, both
-timelines, article list, carousel and featured, plus the form in card style -
-and each used to carry its own rule. The older ones drew a hairline of their
-own in the separator colour, so an article carousel and a cards block on the
-same variant looked like two different designs.
+Cards took the *paragraph* surface until 3.0.0, for want of one of their own.
+One value painted two unrelated things - the running text of a block and the
+cards of nine others - so filling a card meant tinting every paragraph with it,
+and the reverse was impossible. They are separate settings now.
+
+**Nothing falls back.** An unset card fill draws no fill: not the paragraph
+one, not the computed `--iw-variant-subtle-bg` a card used to land on. Reading
+a cascade nobody can see from the admin is how an editor who configured nothing
+ended up with a tint they had not asked for. What the variant says is what the
+card gets.
+
+That is also why the border width defaults to zero, on every block. Ten blocks
+draw cards - cards, documents, linked pages, both key-figure layouts, timeline,
+article list and carousel, featured article, testimonials in `--cards` style,
+the accordion in `--cards` style and the form in card style - and each used to
+carry its own rule. The older ones drew a hairline of their own in the
+separator colour, so an article carousel and a cards block on the same variant
+looked like two different designs.
 
 Each card keeps an override hook of its own as the first fallback
 (`--iw-document-card-border`, `--iw-block-article-item-bg`…), so a project can
 still single one out without touching the others.
 
-Two exceptions are deliberate and stay out: the event info card and the mobile
-location card are translucent over a photo or a map, where a solid light
-background is legibility rather than styling, and following a dark variant
-would make them unreadable.
+What is **not** a card: a stretch of text given a tint inside its block. The
+info column of a split form, the address panel beside a map, the box of an
+accordion in `--list` or `--bordered` and the consent placeholder of an
+embed all stay on the paragraph surface. Two further exceptions are
+deliberate: the event info card and the mobile location card are translucent
+over a photo or a map, where a solid light background is legibility rather than
+styling, and following a dark variant would make them unreadable.
+
+### Reaching the card surface
+
+The fill and the border are reached by consuming the custom properties above.
+The **text colours** are reached by carrying a class, `iw-surface--card`, for
+the same reason the accent surface needs one: the variant colours headings and
+running text with rules of real specificity, and inheriting from a surface has
+none.
+
+```twig
+<div class="iw-document-card iw-surface--card">
+```
+
+The compiler then emits, per variant, the colours for that class and everything
+inside it - headings and `.iw-card__title` from `cardTitle`, paragraphs, list
+items, definition lists, captions and table cells from `cardParagraph` - at a
+specificity that beats the variant's own rules. Both fall back to the colours
+the variant already chose, so filling a card without saying anything about its
+text renders exactly as it did before the surface existed.
+
+A card **put forward** carries `iw-surface--accent` instead, never both: only
+the accent surface guarantees the text on it, which is the whole reason an
+element is put on it.
+
+`CardSurfaceMarkerContractTest` fails when a block takes the fill without the
+marker, since the half that is missing fails silently.
 
 ### Reaching the accent surface
 
@@ -135,13 +182,23 @@ past them:
 <div class="iw-card iw-card--highlighted iw-surface--accent">
 ```
 
-The compiler then emits, per variant, the text colour for that class and
-everything inside it - **headings, the block subtitle**, paragraphs, list
-items, definition lists, captions, table cells and links in every state - at a
-specificity that beats the variant rules. Without
-it the element keeps the paragraph colour, which was chosen against a
-completely different background and has no reason to be readable on the accent
-one. That is the point of the surface owning a text colour at all.
+The compiler then emits, per variant, the colours for that class and everything
+inside it, at a specificity that beats the variant rules. Two colours, split the
+way the card surface splits them:
+
+- **headings, `.iw-block__subtitle` and `.iw-card__title`** take `accentTitle`
+- **paragraphs, list items, definition lists, captions, table cells and links
+  in every state** take `accentText`
+
+`accentTitle` falls back to `accentText`, so a variant that names only one
+colour behaves exactly as it did before the split. It exists because an
+ordinary card lets an editor set its titles apart from its text: a card put
+forward offering a single field for both reads as a missing setting rather than
+as a guarantee.
+
+Without the class the element keeps the paragraph colour, which was chosen
+against a completely different background and has no reason to be readable on
+the accent one. That is the point of the surface owning a text colour at all.
 
 Buttons are excluded: a call to action on an accent card keeps the colours of
 its button style.
@@ -312,39 +369,41 @@ does both at once.
 
 ## Which surface paints what
 
-Three of the four surfaces can be reached by a block, and they are easy to
+Four of the five surfaces can be reached by a block, and they are easy to
 confuse because any of them makes a panel look better. The rule:
 
 | You want to paint | Surface | Painted on |
 |---|---|---|
 | The whole section | Block | `.iw-variant--{slug}` |
 | Everything the block holds, title included | Content | `.iw-block__content` |
-| One enclosed unit: a rich text area, a card, an inset | Paragraph | that unit |
+| A stretch of text given a tint | Paragraph | that text area |
+| A repeated enclosed unit | Cards | that unit, plus `iw-surface--card` |
+| One unit put forward | Accent | that unit, plus `iw-surface--accent` |
 
 Before the content surface existed, the paragraph background was the only one
-available, so everything that needed a panel used it. That is why cards reach
-for it across the bundle - timeline steps, document cards, linked pages,
-article items, the consent banner, the location inset. They are enclosed units,
-so it stays the right one.
+available, so everything needing a panel used it - cards included. Cards moved
+off it in 3.0.0, since one value could not fill a card and leave the running
+text alone. What stays on the paragraph surface is text given a tint: the info
+column of a split form, the address panel beside a map, the box of an accordion
+in `--list` or `--bordered`, the consent placeholder of an embed.
 
-A component painting an enclosed unit uses the full three-level cascade:
+A component painting a card uses a two-level cascade:
 
 ```css
-background-color: var(--iw-timeline-card-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
 ```
 
 The first level is what a theme overrides for that component alone, the second
-is the variant, the third is the computed neutral. Dropping the first makes the
-component impossible to style on its own; dropping the third leaves it
-transparent on a variant that sets no paragraph background. `SurfaceUsageContractTest`
-checks both, and refuses a rule that paints `.iw-block__content` with the
-paragraph background.
+is the variant. There is deliberately no third: a card the variant does not
+fill is not filled. `SurfaceUsageContractTest` refuses a rule that paints
+`.iw-block__content` with the paragraph background, and
+`CardSurfaceParityContractTest` refuses a card framing itself differently from
+the others.
 
-**A card is a paragraph, and a highlighted card is an accent.** Cards share the
-paragraph background with rich text areas, deliberately: they are both enclosed
-units, and giving cards a surface of their own would mean giving highlighted
-cards one too, which is what the accent surface already is. Four surfaces cover
-it, six would say the same thing twice.
+**A card put forward is an accent.** The card surface describes the ordinary
+card, the accent surface the one singled out - and it is the only surface
+owning the colour of the text on it, which is what makes a highlighted element
+legible whatever the editor picked.
 
 ## Paragraph background (`.iw-block__text`)
 

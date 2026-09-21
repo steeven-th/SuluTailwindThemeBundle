@@ -38,7 +38,7 @@ The visual surface (background, border, `overflow: hidden`) is owned by `__item`
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-block-article-item-bg` | `var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg))` | Background of each item — derives from the block's **Color variant** (not the global `articles_card_*` theme tokens). |
+| `--iw-block-article-item-bg` | `var(--iw-variant-card-bg, transparent)` | Background of each item - comes from the **card surface** of the block's colour variant (not the global `articles_card_*` theme tokens). Unset means unfilled. |
 | `--iw-block-article-item-border` | `1px solid var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Border shorthand. Set to `none` to remove. |
 
 The inner L4 `.iw-article-card` is rendered as transparent inside an article block (its surface/border vars are overridden) so there is no double surface. The L4 card still drives its body padding and its `--image-bleed` behavior (toggled automatically when the effective `cardRadius` resolves to `rounded-none`).
