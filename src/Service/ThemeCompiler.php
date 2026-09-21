@@ -735,12 +735,12 @@ class ThemeCompiler
         // the literal written in its own rule.
         $cardShadow = trim((string) ($tokens['cardShadow'] ?? ''));
         if (isset(self::SHADOWS[$cardShadow])) {
-            $css .= '  --iw-card-shadow: ' . self::SHADOWS[$cardShadow] . ";\n";
+            $css .= '  --iw-card-shadow: ' . self::cardShadow($cardShadow) . ";\n";
         }
 
         $cardHoverShadow = trim((string) ($tokens['cardHoverShadow'] ?? ''));
         if (isset(self::SHADOWS[$cardHoverShadow])) {
-            $shadow = self::SHADOWS[$cardHoverShadow];
+            $shadow = self::cardShadow($cardHoverShadow);
 
             // One setting, four variables. Each family of card reads its own,
             // so feeding only the first would have left the document cards,
@@ -1336,16 +1336,46 @@ class ThemeCompiler
      */
     private const SHADOWS = [
         'none' => 'none',
-        // The colour travels through the same fallback chain as every other
-        // card property: a project override, then the variant, then the black
-        // that used to be written here alone.
-        'sm' => '0 1px 3px 0 var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.08)))',
-        'md' => '0 4px 12px -2px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)))',
-        'lg' => '0 12px 28px -6px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.18)))',
+        'sm' => '0 1px 3px 0 rgb(0 0 0 / 0.08)',
+        'md' => '0 4px 12px -2px rgb(0 0 0 / 0.12)',
+        'lg' => '0 12px 28px -6px rgb(0 0 0 / 0.18)',
         // `xl` was offered by the hover field and defined nowhere, so picking it
         // emitted no shadow at all.
-        'xl' => '0 20px 40px -8px var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.22)))',
+        'xl' => '0 20px 40px -8px rgb(0 0 0 / 0.22)',
     ];
+
+    /**
+     * One of those shadows, drawn in the card shadow colour.
+     *
+     * The colour belongs to cards alone, so it is added here rather than in the
+     * table: that table also answers to the back-to-top button, the gallery
+     * navigation, the article filters, the table of contents, the pagination
+     * and the tags. Colouring it at the source tinted all of them from a card
+     * setting - and the pagination of an article list, or a tag inside an
+     * article card, sits inside a block, so the variant value really did reach
+     * them.
+     *
+     * The chain ends on the black that used to be written alone, so a theme
+     * setting no colour keeps exactly the shadow it had.
+     *
+     * @param string $key A key of SHADOWS
+     *
+     * @return string The shadow, with its colour behind the card variables
+     */
+    private static function cardShadow(string $key): string
+    {
+        $shadow = self::SHADOWS[$key] ?? 'none';
+
+        if ('none' === $shadow) {
+            return $shadow;
+        }
+
+        return (string) preg_replace(
+            '/rgb\(0 0 0 \/ ([\d.]+)\)/',
+            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / $1)))',
+            $shadow,
+        );
+    }
 
     /**
      * Per-component shadow: selector => [config key => variables].

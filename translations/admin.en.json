@@ -10,6 +10,7 @@
     "iw_sulu_tailwind_theme.webspaces": "Webspaces",
     "iw_sulu_tailwind_theme.webspace_theme_info": "Select the theme to use for this webspace",
     "iw_sulu_tailwind_theme.details": "Details",
+
     "iw_sulu_tailwind_theme.export": "Export",
     "iw_sulu_tailwind_theme.import": "Import",
     "iw_sulu_tailwind_theme.import_title": "Import a theme",
@@ -26,6 +27,7 @@
     "iw_sulu_tailwind_theme.import_error_unknown_target": "The theme to overwrite could not be found.",
     "iw_sulu_tailwind_theme.import_error_unreadable_file": "The file could not be read.",
     "iw_sulu_tailwind_theme.import_error_generic": "The import failed.",
+
     "iw_sulu_tailwind_theme.colors": "Colors",
     "iw_sulu_tailwind_theme.colors_section_main": "Palette",
     "iw_sulu_tailwind_theme.colors_section_text": "Text and borders",
@@ -55,6 +57,7 @@
     "iw_sulu_tailwind_theme.palette_slug_reserved": "This name is reserved and cannot be used.",
     "iw_sulu_tailwind_theme.palette_add": "Add a color",
     "iw_sulu_tailwind_theme.palette_remove": "Remove this color",
+
     "iw_sulu_tailwind_theme.typography": "Typography",
     "iw_sulu_tailwind_theme.typography_font_families": "Font families",
     "iw_sulu_tailwind_theme.typography_font_heading": "Heading",
@@ -114,6 +117,7 @@
     "iw_sulu_tailwind_theme.typography_link_size": "Link - Size (rem)",
     "iw_sulu_tailwind_theme.typography_link_style": "Link - Style",
     "iw_sulu_tailwind_theme.typography_link_lineHeight": "Link - Line height (×)",
+
     "iw_sulu_tailwind_theme.buttons": "Buttons",
     "iw_sulu_tailwind_theme.buttons_primary": "Primary button",
     "iw_sulu_tailwind_theme.buttons_secondary": "Secondary button",
@@ -171,12 +175,14 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_ease_out": "Ease out",
     "iw_sulu_tailwind_theme.buttons_hoverEasing_ease_in_out": "Ease in & out",
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Bounce",
+
     "iw_sulu_tailwind_theme.defaults": "Defaults",
     "iw_sulu_tailwind_theme.defaults_general": "Spacing and radius",
     "iw_sulu_tailwind_theme.borders_radii": "Border radii",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Card radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Image radius",
     "iw_sulu_tailwind_theme.borders_paragraphRadius": "Paragraph radius",
+
     "iw_sulu_tailwind_theme.defaults_section_block_padding": "Default block padding",
     "iw_sulu_tailwind_theme.defaults_section_block_padding_info": "The padding a block takes when none was chosen on the block itself. A block with its own setting keeps it, a zero padding included.",
     "iw_sulu_tailwind_theme.defaults_blockPaddingTop": "Top padding",
@@ -186,6 +192,7 @@
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral": "Lateral padding",
     "iw_sulu_tailwind_theme.defaults_blockPaddingLateral_info": "Space between the left and right edges of the block and its content.",
     "iw_sulu_tailwind_theme.margin_theme_default": "Default",
+
     "iw_sulu_tailwind_theme.defaults_section_surface_padding": "Surface padding",
     "iw_sulu_tailwind_theme.defaults_section_surface_padding_info": "Space between a surface and what sits on it. It only applies to surfaces that have a background or a border, so a block with no content surface keeps its layout.",
     "iw_sulu_tailwind_theme.defaults_contentPaddingX": "Content - horizontal padding",
@@ -196,6 +203,7 @@
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingX_info": "Space on the left and right, between the edge of the paragraph surface and its text.",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraph - vertical padding",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Space at the top and bottom, between the edge of the paragraph surface and its text.",
+
     "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocks",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Gap between zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "Applies to blocks with two content zones (text + images, form + widget, map + info, text + key figures). The gap is halved on mobile.",
@@ -268,6 +276,7 @@
     "iw_sulu_tailwind_theme.defaults_spacing_spacious": "Spacious - 32 px (gap-8)",
     "iw_sulu_tailwind_theme.defaults_spacing_large": "Large - 40 px (gap-10)",
     "iw_sulu_tailwind_theme.defaults_spacing_xlarge": "Extra large - 48 px (gap-12)",
+
     "iw_sulu_tailwind_theme.variants": "Variants",
     "iw_sulu_tailwind_theme.variants_info": "Define color variants for content blocks",
     "iw_sulu_tailwind_theme.variant": "Variant",
@@ -325,6 +334,7 @@
     "iw_sulu_tailwind_theme.editor_text_color": "Text colour",
     "iw_sulu_tailwind_theme.editor_uppercase": "Uppercase",
     "iw_sulu_tailwind_theme.editor_quote": "Quote",
+
     "iw_sulu_tailwind_theme.variant_zone_table": "Table",
     "iw_sulu_tailwind_theme.variant_table_head_bg": "Header background",
     "iw_sulu_tailwind_theme.variant_table_head_text": "Header text",
@@ -342,6 +352,7 @@
     "iw_sulu_tailwind_theme.variant_preview_table_head": "Header",
     "iw_sulu_tailwind_theme.variant_preview_table_cell": "Cell",
     "iw_sulu_tailwind_theme.variant_preview_table_hover": "Hover",
+
     "iw_sulu_tailwind_theme.variant_zone_form": "Form",
     "iw_sulu_tailwind_theme.variant_surfaces": "Surfaces",
     "iw_sulu_tailwind_theme.variant_border_none": "No border",
@@ -391,6 +402,7 @@
     "iw_sulu_tailwind_theme.separator_zigzag": "Zigzag",
     "iw_sulu_tailwind_theme.separator_dots": "Dots",
     "iw_sulu_tailwind_theme.separator_diamond": "Diamond",
+
     "iw_sulu_tailwind_theme.content": "Content",
     "iw_sulu_tailwind_theme.appearance": "Appearance",
     "iw_sulu_tailwind_theme.appearance_of_site": "Appearance: {webspace}",
@@ -423,6 +435,7 @@
     "iw_sulu_tailwind_theme.content_group_code": "Code",
     "iw_sulu_tailwind_theme.content_group_form": "Form",
     "iw_sulu_tailwind_theme.settings_group_layout": "Layout",
+
     "iw_sulu_tailwind_theme.config_group_colors": "Colors",
     "iw_sulu_tailwind_theme.config_group_buttons": "Buttons",
     "iw_sulu_tailwind_theme.config_group_display": "Display",
@@ -435,9 +448,11 @@
     "iw_sulu_tailwind_theme.cards_section_text": "Text and badge",
     "iw_sulu_tailwind_theme.cards_section_border": "Border",
     "iw_sulu_tailwind_theme.cards_section_hover": "Hover",
+
     "iw_sulu_tailwind_theme.lateral_margins_exterior": "Exterior",
     "iw_sulu_tailwind_theme.lateral_margins_interior": "Interior",
     "iw_sulu_tailwind_theme.lateral_margins_none": "None",
+
     "iw_sulu_tailwind_theme.menu": "Menu",
     "iw_sulu_tailwind_theme.menu_settings": "Configuration",
     "iw_sulu_tailwind_theme.menu_type": "Menu type",
@@ -538,6 +553,7 @@
     "iw_sulu_tailwind_theme.menu_colors_burgerClose": "Burger icon (close)",
     "iw_sulu_tailwind_theme.menu_colors_socialMedia": "Social media",
     "iw_sulu_tailwind_theme.menu_colors_socialMediaHover": "Social media hover",
+
     "iw_sulu_tailwind_theme.footer": "Footer",
     "iw_sulu_tailwind_theme.footer_settings": "Footer configuration",
     "iw_sulu_tailwind_theme.footer_type": "Footer type",
@@ -570,6 +586,7 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Loads links from the \"Social media (footer)\" snippet",
     "iw_sulu_tailwind_theme.footer_copyright": "Copyright text",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Use {year} to insert the current year. Empty = generated from the site name",
+
     "iw_sulu_tailwind_theme.menu_fullscreenImage": "Ambiance image",
     "iw_sulu_tailwind_theme.menu_fullscreenImage_info": "When set, the menu opens in two parts (image left, navigation right) with a curtain effect",
     "iw_sulu_tailwind_theme.menu_twoColumns": "Two-column navigation",
@@ -580,6 +597,7 @@
     "iw_sulu_tailwind_theme.menu_sidebarWidth_info": "On large screens. The bar stays visible above the panel: too narrow and its icons hang over the page",
     "iw_sulu_tailwind_theme.menu_position_left": "Left",
     "iw_sulu_tailwind_theme.menu_position_right": "Right",
+
     "iw_sulu_tailwind_theme.style.one_column": "One column",
     "iw_sulu_tailwind_theme.style.centered": "Centered",
     "iw_sulu_tailwind_theme.style.two_columns": "Two columns",
@@ -598,6 +616,7 @@
     "iw_sulu_tailwind_theme.style.slider": "Slider",
     "iw_sulu_tailwind_theme.style.carousel": "Carousel",
     "iw_sulu_tailwind_theme.style.wide_carousel": "Wide carousel",
+
     "iw_sulu_tailwind_theme.style.filmstrip": "Filmstrip",
     "iw_sulu_tailwind_theme.style.inline": "Inline",
     "iw_sulu_tailwind_theme.style.grid_2x2": "Grid",
@@ -622,6 +641,7 @@
     "iw_sulu_tailwind_theme.style.divider": "Divider",
     "iw_sulu_tailwind_theme.style.side_by_side": "Side by side",
     "iw_sulu_tailwind_theme.style.spotlight": "Spotlight",
+
     "iw_sulu_tailwind_theme.page.default": "Default page",
     "iw_sulu_tailwind_theme.content_blocks": "Content blocks",
     "iw_sulu_tailwind_theme.page.section_hero": "Hero",
@@ -675,11 +695,13 @@
     "iw_sulu_tailwind_theme.page.hero_shade_light": "Light",
     "iw_sulu_tailwind_theme.page.hero_shade_medium": "Medium",
     "iw_sulu_tailwind_theme.page.hero_shade_strong": "Strong",
+
     "iw_sulu_tailwind_theme.title": "Title",
     "iw_sulu_tailwind_theme.title_info": "Section title of the block, rendered as an H2 by default. Avoid adding another heading of the same level in the text editor below.",
     "iw_sulu_tailwind_theme.subtitle": "Subtitle",
     "iw_sulu_tailwind_theme.url": "URL",
     "iw_sulu_tailwind_theme.text": "Text",
+
     "iw_sulu_tailwind_theme.title_alignment": "Title alignment",
     "iw_sulu_tailwind_theme.cta_buttons": "Action buttons",
     "iw_sulu_tailwind_theme.cta_buttons_info": "Add as many buttons as needed. They render at the end of the block, or under the text in two-zone layouts.",
@@ -707,13 +729,16 @@
     "iw_sulu_tailwind_theme.align_left": "Left",
     "iw_sulu_tailwind_theme.align_center": "Center",
     "iw_sulu_tailwind_theme.align_right": "Right",
+
     "iw_sulu_tailwind_theme.title_level": "Title level",
     "iw_sulu_tailwind_theme.title_level_info": "HTML semantic level of the title. Keep H2 unless another block already carries the section's main title (SEO / accessibility).",
     "iw_sulu_tailwind_theme.title_level_h2": "Heading H2 (default)",
     "iw_sulu_tailwind_theme.title_level_h3": "Heading H3",
     "iw_sulu_tailwind_theme.title_level_h4": "Heading H4",
+
     "iw_sulu_tailwind_theme.color_variant": "Color variant",
     "iw_sulu_tailwind_theme.layout_style": "Layout style",
+
     "iw_sulu_tailwind_theme.margin_top": "Top margin",
     "iw_sulu_tailwind_theme.margin_bottom": "Bottom margin",
     "iw_sulu_tailwind_theme.lateral_margins": "Lateral margins",
@@ -729,6 +754,7 @@
     "iw_sulu_tailwind_theme.show_block_border": "Block border",
     "iw_sulu_tailwind_theme.show_content_background": "Content background",
     "iw_sulu_tailwind_theme.show_content_border": "Content border",
+
     "iw_sulu_tailwind_theme.block.text": "Text",
     "iw_sulu_tailwind_theme.block.text_images": "Text and media",
     "iw_sulu_tailwind_theme.block.cards": "Cards",
@@ -793,6 +819,7 @@
     "iw_sulu_tailwind_theme.block.article_list": "Article list",
     "iw_sulu_tailwind_theme.block.article_carousel": "Article carousel",
     "iw_sulu_tailwind_theme.block.article_featured": "Featured article",
+
     "iw_sulu_tailwind_theme.block.article_list.source": "Article source",
     "iw_sulu_tailwind_theme.block.article_list.source_info": "Select the articles to display in the list",
     "iw_sulu_tailwind_theme.block.article_carousel.source": "Article source",
@@ -833,6 +860,7 @@
     "iw_sulu_tailwind_theme.timeline_state_upcoming": "Upcoming",
     "iw_sulu_tailwind_theme.timeline_icon": "Icon",
     "iw_sulu_tailwind_theme.timeline_icon_info": "Shown in the marker or in the card, depending on the \"Marker content\" setting. The theme fixes its size.",
+
     "iw_sulu_tailwind_theme.media_type": "Media type",
     "iw_sulu_tailwind_theme.media_type_images": "Images",
     "iw_sulu_tailwind_theme.media_type_video": "Video",
@@ -874,6 +902,7 @@
     "iw_sulu_tailwind_theme.show_images_name_gallery_info": "The media title is used as the caption in the lightbox, when the image is opened by clicking it. Only the \"Carousel\" style also shows it under the image, on the block itself.",
     "iw_sulu_tailwind_theme.content_position_right": "Content on the right",
     "iw_sulu_tailwind_theme.image_position_bottom": "Media at bottom",
+
     "iw_sulu_tailwind_theme.figures": "Figures",
     "iw_sulu_tailwind_theme.figure": "Figure",
     "iw_sulu_tailwind_theme.image_icon": "Image / Icon",
@@ -883,6 +912,7 @@
     "iw_sulu_tailwind_theme.figure_columns": "Columns",
     "iw_sulu_tailwind_theme.figure_columns_info": "How many figures share a row on desktop. Below that width the grid folds to two columns, then to one.",
     "iw_sulu_tailwind_theme.figure_columns_auto": "Automatic",
+
     "iw_sulu_tailwind_theme.links": "Links",
     "iw_sulu_tailwind_theme.internal_link": "Internal link",
     "iw_sulu_tailwind_theme.external_link": "External link",
@@ -891,9 +921,11 @@
     "iw_sulu_tailwind_theme.target": "Target",
     "iw_sulu_tailwind_theme.target_self": "Same window",
     "iw_sulu_tailwind_theme.target_blank": "New window",
+
     "iw_sulu_tailwind_theme.location": "Location",
     "iw_sulu_tailwind_theme.address": "Address",
     "iw_sulu_tailwind_theme.open_map": "Open in maps",
+
     "iw_sulu_tailwind_theme.form_use_bundle": "Form source",
     "iw_sulu_tailwind_theme.form_use_bundle_label": "Use SuluFormBundle",
     "iw_sulu_tailwind_theme.form_id": "Form ID",
@@ -902,8 +934,11 @@
     "iw_sulu_tailwind_theme.form_twig_template_info": "Path to the Twig template to include (e.g. forms/contact.html.twig)",
     "iw_sulu_tailwind_theme.form_bundle_not_installed": "SuluFormBundle is not installed.",
     "iw_sulu_tailwind_theme.documents": "Documents",
+
+
     "iw_sulu_tailwind_theme.testimonials": "Testimonials",
     "iw_sulu_tailwind_theme.testimonial_item": "Testimonial",
+
     "iw_sulu_tailwind_theme.accordion_items": "Items",
     "iw_sulu_tailwind_theme.accordion_item": "Item",
     "iw_sulu_tailwind_theme.accordion_item_title": "Title / Question",
@@ -929,6 +964,7 @@
     "iw_sulu_tailwind_theme.accordion_header_surface_accent": "Question on the accent surface",
     "iw_sulu_tailwind_theme.accordion_header_surface_paragraph": "Paragraph surface",
     "iw_sulu_tailwind_theme.title_level_h5": "Heading 5 (h5)",
+
     "iw_sulu_tailwind_theme.iframe_url": "Address to embed",
     "iw_sulu_tailwind_theme.iframe_url_info": "Full https address. Other schemes are not embedded (browsers would block them anyway).",
     "iw_sulu_tailwind_theme.iframe_title": "Description of the embedded content",
@@ -967,6 +1003,7 @@
     "iw_sulu_tailwind_theme.embed_allow_geolocation_info": "Needed by some maps. Leave unchecked otherwise.",
     "iw_sulu_tailwind_theme.embed_allow_top_navigation": "Allow the page to be redirected",
     "iw_sulu_tailwind_theme.embed_allow_top_navigation_info": "Needed by booking engines and search forms, which redirect the page to their results. Redirection stays impossible without a visitor action: the embedded content cannot redirect your page on its own.",
+
     "iw_sulu_tailwind_theme.consent_mode": "Consent before loading",
     "iw_sulu_tailwind_theme.consent_mode_info": "External content contacts a third party as soon as the page is displayed and may set trackers there. These modes prevent any call until the visitor agrees.",
     "iw_sulu_tailwind_theme.consent_mode_none": "None (load immediately)",
@@ -978,6 +1015,7 @@
     "iw_sulu_tailwind_theme.consent_text_info": "Shown in place of the content until it is accepted. A default message is used when empty.",
     "iw_sulu_tailwind_theme.consent_image": "Waiting image",
     "iw_sulu_tailwind_theme.consent_image_info": "Visual displayed behind the waiting message (optional).",
+
     "iw_sulu_tailwind_theme.code_snippet": "HTML / JavaScript code",
     "iw_sulu_tailwind_theme.code_snippet_info_sandboxed": "Paste the code provided by the third-party service. It runs in an isolated frame: it cannot reach the rest of the page or your session. A widget that must act on the whole page (chat bubble, analytics tag) will not work here.",
     "iw_sulu_tailwind_theme.code_snippet_info_open": "Paste the code provided by the third-party service. By default it runs in an isolated frame. Without isolation (checkbox below) it runs directly in the page: only paste code whose origin you know.",
@@ -992,6 +1030,7 @@
     "iw_sulu_tailwind_theme.role": "Role",
     "iw_sulu_tailwind_theme.photo": "Photo",
     "iw_sulu_tailwind_theme.rating": "Rating (1-5)",
+
     "iw_sulu_tailwind_theme.height": "Height",
     "iw_sulu_tailwind_theme.height_xs": "Extra small",
     "iw_sulu_tailwind_theme.height_sm": "Small",
@@ -1014,8 +1053,10 @@
     "iw_sulu_tailwind_theme.icon_size_md": "Medium",
     "iw_sulu_tailwind_theme.icon_size_lg": "Large",
     "iw_sulu_tailwind_theme.icon_size_xl": "Extra large",
+
     "iw_sulu_tailwind_theme.palette_tab": "Palette",
     "iw_sulu_tailwind_theme.custom_tab": "Custom",
+
     "iw_sulu_tailwind_theme.snippet.social_media": "Social Media",
     "iw_sulu_tailwind_theme.snippet.social_media_menu_area": "Social media in the menu",
     "iw_sulu_tailwind_theme.snippet.social_media_footer_area": "Social media in the footer",
@@ -1026,6 +1067,7 @@
     "iw_sulu_tailwind_theme.snippet_title": "Snippet title",
     "iw_sulu_tailwind_theme.snippet_area_notice": "Colours and buttons of this snippet",
     "iw_sulu_tailwind_theme.snippet_area_notice_info": "The colour variants and button styles offered here come from the theme of the site showing this snippet. To see another site's theme, that site must first have picked this snippet, under Webspaces > Default snippets.",
+
     "iw_sulu_tailwind_theme.menu_type_megamenu": "Mega menu",
     "iw_sulu_tailwind_theme.mega_source": "Data source",
     "iw_sulu_tailwind_theme.mega_source_info": "Choose between automatic navigation or manual structure via snippet",
@@ -1054,27 +1096,33 @@
     "iw_sulu_tailwind_theme.mega_cta_title": "Button text",
     "iw_sulu_tailwind_theme.mega_cta_link": "Button link",
     "iw_sulu_tailwind_theme.mega_cta_style": "Button style",
+
     "iw_sulu_tailwind_theme.mega_layout": "Layout",
     "iw_sulu_tailwind_theme.mega_layout_vertical": "Vertical",
     "iw_sulu_tailwind_theme.mega_layout_horizontal": "Horizontal",
     "iw_sulu_tailwind_theme.mega_image_position": "Image position",
+
     "iw_sulu_tailwind_theme.mega_image_ratio": "Image ratio",
     "iw_sulu_tailwind_theme.mega_ratio_auto": "Auto",
     "iw_sulu_tailwind_theme.mega_ratio_square": "Square (1:1)",
     "iw_sulu_tailwind_theme.mega_ratio_portrait": "Portrait (9:16)",
     "iw_sulu_tailwind_theme.mega_ratio_landscape": "Landscape (16:9)",
     "iw_sulu_tailwind_theme.mega_card_show_background": "Show background",
+
     "iw_sulu_tailwind_theme.article.news": "News",
     "iw_sulu_tailwind_theme.article.event": "Event",
     "iw_sulu_tailwind_theme.article.blog_post": "Blog Post",
+
     "iw_sulu_tailwind_theme.article.section_hero": "Hero",
     "iw_sulu_tailwind_theme.article.section_meta": "Meta",
     "iw_sulu_tailwind_theme.article.section_content": "Content",
     "iw_sulu_tailwind_theme.article.section_event_details": "Event details",
     "iw_sulu_tailwind_theme.article.section_organizer": "Organizer",
+
     "iw_sulu_tailwind_theme.article.hero_image": "Hero image",
     "iw_sulu_tailwind_theme.article.hero_image_info": "Main image displayed at the top of the article",
     "iw_sulu_tailwind_theme.article.subtitle": "Subtitle",
+
     "iw_sulu_tailwind_theme.article.additional_authors": "Additional authors",
     "iw_sulu_tailwind_theme.article.additional_authors_info": "The primary author is set in the article settings. Add co-authors or contributors here.",
     "iw_sulu_tailwind_theme.article.author_custom": "Custom author",
@@ -1085,6 +1133,8 @@
     "iw_sulu_tailwind_theme.article.author_avatar": "Avatar",
     "iw_sulu_tailwind_theme.article.author_contact_select": "Select a contact",
     "iw_sulu_tailwind_theme.article.author_organization_select": "Select an organization",
+
+
     "iw_sulu_tailwind_theme.article.event_start_date": "Start date",
     "iw_sulu_tailwind_theme.article.event_end_date": "End date",
     "iw_sulu_tailwind_theme.article.event_is_online": "Online event",
@@ -1092,16 +1142,20 @@
     "iw_sulu_tailwind_theme.article.event_location": "Location",
     "iw_sulu_tailwind_theme.article.event_location_url": "Event URL",
     "iw_sulu_tailwind_theme.article.event_location_url_info": "Link to the online event platform (Zoom, Teams, etc.)",
+
     "iw_sulu_tailwind_theme.article.organizer": "Organizer",
     "iw_sulu_tailwind_theme.article.organizer_name": "Organizer name",
     "iw_sulu_tailwind_theme.article.organizer_url": "Organizer website",
     "iw_sulu_tailwind_theme.article.organizer_contact_select": "Select a contact",
     "iw_sulu_tailwind_theme.article.organizer_organization_select": "Select an organization",
+
     "iw_sulu_tailwind_theme.article.reading_time": "Reading time",
     "iw_sulu_tailwind_theme.article.reading_time_info": "Estimated reading time (e.g. \"5 min\")",
+
     "iw_sulu_tailwind_theme.page.article_listing": "Article listing",
     "iw_sulu_tailwind_theme.article.listing_source": "Article source",
     "iw_sulu_tailwind_theme.article.listing_articles": "Articles",
+
     "iw_sulu_tailwind_theme.articles": "Articles",
     "iw_sulu_tailwind_theme.articles_section_page_styles": "Page styles",
     "iw_sulu_tailwind_theme.articles_section_filters": "Filters and contents",
@@ -1113,6 +1167,7 @@
     "iw_sulu_tailwind_theme.articles_event_style": "Event page style",
     "iw_sulu_tailwind_theme.articles_blog_style": "Blog post page style",
     "iw_sulu_tailwind_theme.articles_listing_style": "Listing style",
+
     "iw_sulu_tailwind_theme.articles_card_image_ratio": "Card image ratio",
     "iw_sulu_tailwind_theme.card_gap": "Card spacing",
     "iw_sulu_tailwind_theme.card_title_size": "Title size",
@@ -1324,6 +1379,7 @@
     "iw_sulu_tailwind_theme.articles_visibility_listing": "Listing only",
     "iw_sulu_tailwind_theme.articles_visibility_both": "Both",
     "iw_sulu_tailwind_theme.articles_no_styles": "No styles available.",
+
     "iw_sulu_tailwind_theme.style.article_news_classic": "Classic",
     "iw_sulu_tailwind_theme.style.article_news_magazine": "Magazine",
     "iw_sulu_tailwind_theme.style.article_news_minimal": "Minimal",
@@ -1385,8 +1441,10 @@
     "iw_sulu_tailwind_theme.components_maps_popup_text": "Popup text",
     "iw_sulu_tailwind_theme.components_maps_controls_bg": "Controls background",
     "iw_sulu_tailwind_theme.components_maps_controls_text": "Controls color",
+
     "iw_sulu_tailwind_theme.form_field.turnstile": "Cloudflare Turnstile",
     "iw_sulu_tailwind_theme.turnstile_title_info": "Optional label shown above the widget. The widget already displays its own verification wording, so leaving this empty is usually the right call.",
+
     "iw_sulu_tailwind_theme.articles_author_name_format": "Author name format",
     "iw_sulu_tailwind_theme.articles_author_name_format_info": "How author names are written on the site. An author who needs a pen name is added as a \"custom\" author, whose name is free text.",
     "iw_sulu_tailwind_theme.articles_author_name_full": "Full name (Marie Dupont)",

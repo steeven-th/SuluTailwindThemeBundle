@@ -188,6 +188,25 @@ The labels of that zone lost their `accent` prefix while we were there -
 so the accent and card surfaces read the same way. The stored keys are
 unchanged.
 
+### Card shadows reach the stylesheet, and take a colour (fixed)
+
+Two settings did nothing until now. **Components > Cards > Hover shadow** was
+offered by the form since the beginning and emitted nowhere, so picking one
+changed no card on any page. And its strongest step, `xl`, was defined in no
+table, so choosing it emitted nothing at all - the two bugs hid one another.
+
+Both are fixed, and one setting now feeds the four variables the card families
+read (`--iw-card-shadow-hover`, plus the document, linked-page and testimonial
+ones), so two families side by side lift the same way.
+
+A variant also carries **Cards > Shadow colour** (`cardShadowColor`,
+`--iw-variant-card-shadow-color`). A shadow detaches a card from its background
+the way a border does, and a border was already settable there - a dark variant
+used to lose its black shadow in its own background with no way to lighten it.
+
+Only the colour is local. The chain ends on the original black, so a theme that
+sets nothing keeps exactly the shadows it had.
+
 ### Testimonial cards lose their hairline (breaking, visual)
 
 The `--cards` style of the testimonial block painted no background at all and
