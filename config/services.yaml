@@ -401,6 +401,12 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\VariantCardSurfaceMigrateCommand:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\IconsSyncCommand:
         tags:
             - { name: 'console.command' }
