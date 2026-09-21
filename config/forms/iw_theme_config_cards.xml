@@ -235,27 +235,6 @@
                     </params>
                 </property>
 
-                <!-- The shadow, as a geometry rather than as a named size. Four
-                     sizes could not say where a shadow falls nor how strong it
-                     is, so every theme drew the same one, and neither could
-                     they express the common case of no shadow at rest and one
-                     on hover.
-
-                     Seven settings, one stored value: a Sulu field type
-                     receives one value and returns one, so separate properties
-                     would mean seven fields with no shared preview - which is
-                     what made this hard to set to begin with.
-
-                     The two colours are not here. What a shadow is drawn
-                     against depends on the surface under the card, so they
-                     belong to the variant. -->
-                <property name="cardShadow" type="iw_theme_shadow_editor" colspan="12">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.components_label_shadow</title>
-                        <info_text>iw_sulu_tailwind_theme.card_shadow_info</info_text>
-                    </meta>
-                </property>
-
                 <property name="cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
                           visibleCondition="cardBorder != 'none'">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
@@ -288,6 +267,27 @@
                     </params>
                 </property>
             </properties>
+
+                <!-- The shadow, as a geometry rather than as a named size. Four
+                     sizes could not say where a shadow falls nor how strong it
+                     is, so every theme drew the same one, and neither could
+                     they express the common case of no shadow at rest and one
+                     on hover.
+
+                     Seven settings, one stored value: a Sulu field type
+                     receives one value and returns one, so separate properties
+                     would mean seven fields with no shared preview - which is
+                     what made this hard to set to begin with.
+
+                     The two colours are not here. What a shadow is drawn
+                     against depends on the surface under the card, so they
+                     belong to the variant. -->
+                <property name="cardShadow" type="iw_theme_shadow_editor" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_label_shadow</title>
+                        <info_text>iw_sulu_tailwind_theme.card_shadow_info</info_text>
+                    </meta>
+                </property>
         </section>
     </properties>
 </form>

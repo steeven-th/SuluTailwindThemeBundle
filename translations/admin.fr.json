@@ -1443,7 +1443,7 @@
     "iw_sulu_tailwind_theme.components_shadow_sm": "Légère",
     "iw_sulu_tailwind_theme.components_shadow_md": "Moyenne",
     "iw_sulu_tailwind_theme.components_shadow_lg": "Prononcée",
-    "iw_sulu_tailwind_theme.card_shadow_info": "Ombre portée d'une carte au repos. L'ombre au survol se règle juste à côté.",
+    "iw_sulu_tailwind_theme.card_shadow_info": "Une seule forme d'ombre, avec son opacité au repos et au survol. Mettre l'opacité au repos à zéro donne une ombre qui n'apparaît qu'au survol. La couleur se règle par variante.",
     "iw_sulu_tailwind_theme.components_section_tags": "Étiquettes et badges",
     "iw_sulu_tailwind_theme.components_group_tags": "Étiquettes",
     "iw_sulu_tailwind_theme.components_group_tag_hover": "Au survol",
