@@ -50,6 +50,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-card-shadow-color` | `cardShadowColor` | Colour the shadow of every card is drawn in. The shape stays site-wide, under **Components > Cards** |
+| `--iw-variant-card-shadow-hover-color` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
@@ -156,9 +157,20 @@ about the site, taken once under **Components > Cards**, while what it lifts
 against depends on the surface underneath it. The chain ends on the original
 black, so a theme that sets no colour keeps the shadow it had.
 
+A variant only reaches the cards of its own block. Cards drawn outside any
+block - an article listing page, for one - read `--iw-cards-shadow-color` and
+its hover twin, set under **Components > Cards** beside the geometry, the same
+way their background is already set there.
+
 The colour reaches cards alone. The shadow sizes are shared with the
 back-to-top button, the gallery navigation, the article filters, the table of
 contents, the pagination and the tags, and none of those takes a card setting.
+
+The **shape** is a geometry set once under **Components > Cards**: horizontal
+and vertical offset, blur, spread, an opacity at rest and one on hover, and how
+much the shadow grows under the pointer. Two opacities rather than one
+multiplier, because that is what makes the commonest arrangement of all
+reachable: nothing at rest, a shadow on hover.
 
 ### Reaching the card surface
 

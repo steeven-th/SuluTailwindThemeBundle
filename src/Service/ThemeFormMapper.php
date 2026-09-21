@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
@@ -195,7 +196,8 @@ class ThemeFormMapper
         // Site-wide card appearance (moved from the Articles tab in 3.0).
         'cardImageRatio', 'cardGap', 'cardSurface', 'cardPadding', 'cardImagePadded',
         'cardBorder', 'cardBorderWidth', 'cardBorderStyle',
-        'cardShadow', 'cardHoverTransform', 'cardHoverImage', 'cardHoverShadow', 'cardHoverBorder',
+        'cardShadow', 'cardShadowColor', 'cardShadowHoverColor',
+        'cardHoverTransform', 'cardHoverImage', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         'cardTitleSize', 'cardTextSize',
@@ -308,6 +310,13 @@ class ThemeFormMapper
 
         // Typography assignments (depth 2): tokens.typography.assignments.h1.family → typography_assignments_h1_family
         $this->flattenDepth2($data, self::PREFIX_TYPO_ASSIGNMENTS, $tokens['typography']['assignments'] ?? []);
+
+        // The card shadow reaches the form as sliders, whatever is stored. A
+        // theme saved before the editor holds a named size, and showing the
+        // defaults for it would put the admin and the site out of step - the
+        // first save would then write what the form displayed rather than what
+        // the theme meant.
+        $data['cardShadow'] = CardShadow::fromTokens($tokens)->toArray();
 
         // BlockVariants as Sulu block array (indexed array with 'type' field)
         $data['blockVariants'] = $this->serializeBlockVariants($tokens['blockVariants'] ?? []);

@@ -21,6 +21,7 @@ import ColorTokenEditor from './components/ColorTokenEditor/ColorTokenEditor';
 import PaletteEditor from './components/PaletteEditor/PaletteEditor';
 import FontPicker from './components/FontPicker/FontPicker';
 import RadiusSelector from './components/RadiusSelector/RadiusSelector';
+import ShadowEditor from './components/ShadowEditor/ShadowEditor';
 import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker';
 import WeightPicker from './components/WeightPicker/WeightPicker';
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
@@ -110,6 +111,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_palette_editor', PaletteEditor);
     fieldRegistry.add('iw_theme_font_picker', FontPicker);
     fieldRegistry.add('iw_theme_radius_selector', RadiusSelector);
+    fieldRegistry.add('iw_theme_shadow_editor', ShadowEditor);
     fieldRegistry.add('iw_theme_button_style_picker', ButtonStylePicker);
     fieldRegistry.add('iw_theme_weight_picker', WeightPicker);
     fieldRegistry.add('iw_theme_article_style_picker', ArticleStylePicker);

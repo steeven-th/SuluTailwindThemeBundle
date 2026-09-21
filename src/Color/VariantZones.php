@@ -120,6 +120,7 @@ final class VariantZones
                 // Cards; against what it lifts is a decision about this
                 // surface.
                 ['cardShadowColor', 'iw_sulu_tailwind_theme.variant_card_shadow_color', 'color'],
+                ['cardShadowHoverColor', 'iw_sulu_tailwind_theme.variant_card_shadow_hover_color', 'color'],
             ],
         ],
         'accent' => [
