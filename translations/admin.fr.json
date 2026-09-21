@@ -1443,7 +1443,7 @@
     "iw_sulu_tailwind_theme.components_shadow_sm": "Légère",
     "iw_sulu_tailwind_theme.components_shadow_md": "Moyenne",
     "iw_sulu_tailwind_theme.components_shadow_lg": "Prononcée",
-    "iw_sulu_tailwind_theme.card_shadow_info": "Une seule forme d'ombre, avec son opacité au repos et au survol. Mettre l'opacité au repos à zéro donne une ombre qui n'apparaît qu'au survol. Les couleurs ci-dessous valent pour tout le site, chaque variante pouvant les remplacer dans son bloc.",
+    "iw_sulu_tailwind_theme.card_shadow_info": "Une seule forme d'ombre, avec son opacité au repos et au survol. Mettre l'opacité au repos à zéro donne une ombre qui n'apparaît qu'au survol. La couleur au repos se règle dans Apparence, celle du survol juste au-dessus, et chaque variante peut les remplacer dans son bloc.",
     "iw_sulu_tailwind_theme.components_section_tags": "Étiquettes et badges",
     "iw_sulu_tailwind_theme.components_group_tags": "Étiquettes",
     "iw_sulu_tailwind_theme.components_group_tag_hover": "Au survol",
