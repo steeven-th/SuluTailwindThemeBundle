@@ -115,6 +115,7 @@ final class VariantZones
             'label' => 'iw_sulu_tailwind_theme.variant_surface_accent',
             'fields' => [
                 ['accentBg', 'iw_sulu_tailwind_theme.variant_accent_bg', 'color'],
+                ['accentTitle', 'iw_sulu_tailwind_theme.variant_accent_title', 'color'],
                 ['accentText', 'iw_sulu_tailwind_theme.variant_accent_text', 'color'],
                 ['accentBorder', 'iw_sulu_tailwind_theme.variant_accent_border', 'color'],
                 ['accentBorderWidth', 'iw_sulu_tailwind_theme.variant_accent_border_width', 'width'],

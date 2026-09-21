@@ -3722,6 +3722,7 @@ class ThemeCompiler
             'cardParagraph' => '--iw-variant-card-paragraph-color',
             'cardBorder' => '--iw-variant-card-border',
             'accentBg' => '--iw-variant-accent-bg',
+            'accentTitle' => '--iw-variant-accent-title-color',
             'accentText' => '--iw-variant-accent-text',
             'accentBorder' => '--iw-variant-accent-border',
             // Tables. Every one of these is empty by default and falls back, in
@@ -3960,6 +3961,29 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit));\n";
             $css .= "}\n";
 
+            // Headings on the accent surface. They have a colour of their own
+            // since 3.0.0: an ordinary card lets an editor set its titles apart
+            // from its text, so a card put forward offering a single colour for
+            // both read as a missing field rather than as a guarantee.
+            //
+            // Empty falls back to the surface text colour, which is what the
+            // whole surface used to do, so nothing moves in a theme that says
+            // nothing - and the readable-by-construction promise holds either
+            // way.
+            //
+            // `.iw-card__title` is listed because a card title is not always a
+            // heading, and the block's own rule forces it to `inherit`.
+            $css .= ".iw-variant--{$index} .iw-surface--accent h1,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h2,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h3,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h4,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h5,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent h6,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent .iw-block__subtitle,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--accent .iw-card__title {\n";
+            $css .= "  color: var(--iw-variant-accent-title-color, var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff)));\n";
+            $css .= "}\n";
+
             // Text sitting ON the accent surface takes the colour that surface
             // guarantees readable on itself, which is the whole reason the
             // surface owns a text colour at all. The rule above is one class
@@ -3971,21 +3995,6 @@ class ThemeCompiler
             // so anything that paints the accent surface later - a badge, a
             // callout - is covered without a rule of its own.
             $css .= ".iw-variant--{$index} .iw-surface--accent,\n";
-            // Headings and the subtitle, which the list below used to leave out.
-            // Both are coloured by a rule of their own further up - the heading
-            // one is a class and a type, the subtitle two classes - and plain
-            // inheritance carries no specificity at all, so a title on the
-            // accent surface kept the colour picked against the ordinary
-            // background while the paragraph beside it followed the surface.
-            // That is what an accordion question is: a heading, so a coloured
-            // FAQ bar showed its question in the title colour of the variant.
-            $css .= ".iw-variant--{$index} .iw-surface--accent h1,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent h2,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent h3,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent h4,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent h5,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent h6,\n";
-            $css .= ".iw-variant--{$index} .iw-surface--accent .iw-block__subtitle,\n";
             // Headings and the subtitle, which the list below used to leave out.
             // Both are coloured by a rule of their own further up - the heading
             // one is a class and a type, the subtitle two classes - and plain

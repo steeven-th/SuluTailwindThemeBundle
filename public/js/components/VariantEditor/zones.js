@@ -68,6 +68,7 @@ const ZONES = [
         label: 'iw_sulu_tailwind_theme.variant_surface_accent',
         fields: [
             {key: 'accentBg', label: 'iw_sulu_tailwind_theme.variant_accent_bg', kind: 'color'},
+            {key: 'accentTitle', label: 'iw_sulu_tailwind_theme.variant_accent_title', kind: 'color'},
             {key: 'accentText', label: 'iw_sulu_tailwind_theme.variant_accent_text', kind: 'color'},
             {key: 'accentBorder', label: 'iw_sulu_tailwind_theme.variant_accent_border', kind: 'color'},
             {key: 'accentBorderWidth', label: 'iw_sulu_tailwind_theme.variant_accent_border_width', kind: 'width'},
@@ -155,7 +156,7 @@ const PREVIEW_GROUPS = [
     {id: 'cards', label: 'iw_sulu_tailwind_theme.variant_surface_cards',
         fields: ['cardBg', 'cardBorder', 'cardTitle', 'cardParagraph', 'cardBorderWidth']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
-        fields: ['accentBg', 'accentBorder', 'accentText', 'accentBorderWidth']},
+        fields: ['accentBg', 'accentBorder', 'accentTitle', 'accentText', 'accentBorderWidth']},
     {id: 'table', label: 'iw_sulu_tailwind_theme.variant_zone_table',
         fields: ['tableHeadBg', 'tableHeadText', 'tableCellBg', 'tableCellText',
             'tableStripeBg', 'tableHoverBg', 'tableBorder', 'tableBorderStyle',

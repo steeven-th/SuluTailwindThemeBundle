@@ -91,6 +91,13 @@ function ensureVariantEditorStyles() {
         '  color: var(--ve-accentText, #111827);',
         '  padding: 10px 12px; border-radius: 3px; font-size: 13px; margin: 0 0 10px;',
         '}',
+        /* The heading of a highlighted element, which has a colour of its own
+           so it can be set apart from the text the way a card title is. */
+        '.iw-ve__accent-title {',
+        '  color: var(--ve-accentTitle, var(--ve-accentText, #111827));',
+        '  font-size: 14px; font-weight: 600; margin: 0 0 3px;',
+        '}',
+        '.iw-ve__accent-text { margin: 0; }',
         '.iw-ve__table-wrap { margin: 0 0 10px; }',
         '.iw-ve__table {',
         '  width: 100%; border-collapse: collapse; font-size: 12px;',
@@ -485,8 +492,16 @@ export default class VariantEditor extends React.Component {
                                 </p>
                             </div>
                         ))}
-                        {this.renderRegion('accent', 'iw-ve__accent',
-                            translate('iw_sulu_tailwind_theme.variant_preview_accent'))}
+                        {this.renderRegion('accent', 'iw-ve__accent', (
+                            <div>
+                                <p className="iw-ve__accent-title">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_accent')}
+                                </p>
+                                <p className="iw-ve__accent-text">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_accent_text')}
+                                </p>
+                            </div>
+                        ))}
                         {this.renderRegion('table', 'iw-ve__table-wrap', (
                             <table className="iw-ve__table">
                                 <thead>
