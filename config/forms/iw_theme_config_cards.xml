@@ -281,7 +281,7 @@
                      The two colours are not here. What a shadow is drawn
                      against depends on the surface under the card, so they
                      belong to the variant. -->
-                <property name="cardShadow" type="iw_theme_shadow_editor" colspan="6">
+                <property name="cardShadow" type="iw_theme_shadow_editor" colspan="12">
                     <meta>
                         <title>iw_sulu_tailwind_theme.components_label_shadow</title>
                         <info_text>iw_sulu_tailwind_theme.card_shadow_info</info_text>

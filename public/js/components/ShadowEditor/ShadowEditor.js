@@ -28,6 +28,12 @@ const FIELDS = [
     {key: 'hoverScale', label: 'iw_sulu_tailwind_theme.shadow_hover_scale', min: 1, max: 3, step: 0.1, unit: '×'},
 ];
 
+/** Where the shadow falls and how far it reaches. */
+const DIMENSIONS = FIELDS.slice(0, 4);
+
+/** How strongly it is drawn, at rest and under the pointer. */
+const STRENGTHS = FIELDS.slice(4);
+
 /**
  * What an unset editor shows and stores.
  *
@@ -63,7 +69,21 @@ function ensureShadowEditorStyles() {
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-        '.iw-se { max-width: 520px; }',
+        '.iw-se { width: 100%; }',
+        /* Two columns: the four dimensions on one side, the three strengths
+           and the reset on the other. In one column the seven sliders ran far
+           below the preview, and the geometry and its intensity read as one
+           long list rather than as two kinds of setting. */
+        '.iw-se__columns {',
+        '  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px;',
+        '}',
+        '@media (max-width: 720px) {',
+        '  .iw-se__columns { grid-template-columns: minmax(0, 1fr); }',
+        '}',
+        '.iw-se__column { display: flex; flex-direction: column; }',
+        /* The reset sits at the bottom of its column rather than after the
+           last slider, so both columns end on the same line. */
+        '.iw-se__column--trailing { justify-content: space-between; }',
         '.iw-se__row { margin-bottom: 14px; }',
         '.iw-se__head {',
         '  display: flex; align-items: center; justify-content: space-between;',
@@ -107,7 +127,7 @@ function ensureShadowEditorStyles() {
         '  font-size: 10px; color: #999;',
         '}',
         '.iw-se__reset {',
-        '  border: 0; background: none; padding: 0; cursor: pointer;',
+        '  align-self: flex-start; border: 0; background: none; padding: 0; cursor: pointer;',
         '  color: #888; font-size: 11px; text-decoration: underline;',
         '}',
     ].join('\n');
@@ -261,11 +281,19 @@ export default class ShadowEditor extends React.Component {
                     </div>
                 </div>
 
-                {FIELDS.map((field) => this.renderSlider(field))}
-
-                <button className="iw-se__reset" onClick={this.handleReset} type="button">
-                    {translate('iw_sulu_tailwind_theme.shadow_reset')}
-                </button>
+                <div className="iw-se__columns">
+                    <div className="iw-se__column">
+                        {DIMENSIONS.map((field) => this.renderSlider(field))}
+                    </div>
+                    <div className="iw-se__column iw-se__column--trailing">
+                        <div>
+                            {STRENGTHS.map((field) => this.renderSlider(field))}
+                        </div>
+                        <button className="iw-se__reset" onClick={this.handleReset} type="button">
+                            {translate('iw_sulu_tailwind_theme.shadow_reset')}
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
