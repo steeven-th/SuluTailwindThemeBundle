@@ -91,12 +91,13 @@ final class CardShadow
     {
         $stored = $tokens['cardShadow'] ?? null;
 
-        if (\is_string($stored) && '' !== $stored) {
-            return self::fromLegacySize($stored, $tokens);
-        }
-
         if (!\is_array($stored)) {
-            return new self(self::DEFAULTS);
+            // Everything else is a theme from before the editor: a named size,
+            // the empty string the old list stored for "Auto", or nothing at
+            // all. All three have to read the hover setting, which lived in a
+            // field of its own - reading it only alongside a size left a theme
+            // that had asked for no hover shadow with the default one.
+            return self::fromLegacySize(\is_string($stored) ? trim($stored) : '', $tokens);
         }
 
         $values = self::DEFAULTS;
@@ -134,12 +135,23 @@ final class CardShadow
             'xl' => ['offsetY' => 20, 'blur' => 40, 'spread' => -8, 'opacity' => 0.22],
         ];
 
-        $values = array_merge(self::DEFAULTS, $sizes[$size] ?? $sizes['md']);
+        // An unknown size and the empty string both mean "whatever the theme
+        // draws by default", which is what DEFAULTS holds.
+        $values = array_merge(self::DEFAULTS, $sizes[$size] ?? []);
 
         // The old hover setting was a size of its own. Expressed here as how
         // much bigger it was than the resting one, which is what the geometry
         // now carries, with its opacity kept as the hover opacity.
-        $hover = (string) ($tokens['cardHoverShadow'] ?? '');
+        $hover = trim((string) ($tokens['cardHoverShadow'] ?? ''));
+
+        // Asking for no hover shadow has to silence it, whatever the resting
+        // side says. This is the setting most themes touched, since the hover
+        // list defaulted to `none` while the resting one defaulted to Auto.
+        if ('none' === $hover) {
+            $values['hoverOpacity'] = 0.0;
+
+            return new self($values);
+        }
 
         // A glow was a coloured halo, and unlike the sizes it really applied -
         // article cards carried it as a modifier class. Its geometry is the
@@ -152,7 +164,7 @@ final class CardShadow
             return new self($values);
         }
 
-        if (isset($sizes[$hover]) && 'none' !== $hover) {
+        if (isset($sizes[$hover])) {
             $restBlur = (float) $values['blur'];
             $hoverBlur = (float) $sizes[$hover]['blur'];
 
