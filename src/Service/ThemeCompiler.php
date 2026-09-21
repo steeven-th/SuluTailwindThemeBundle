@@ -3707,14 +3707,20 @@ class ThemeCompiler
             // surface has no rule of its own here on purpose: it belongs to
             // whatever puts an element forward, not to every block.
             //
-            // There is deliberately no card surface either. A card is an
-            // enclosed unit, so it takes the paragraph surface, and a card put
-            // forward takes this one. Adding one would mean adding a
-            // highlighted-card surface beside it, to say what these two say.
+            // Cards have a surface of their own since 3.0.0. They used to take
+            // the paragraph one, which made a single value paint two unrelated
+            // things - the running text of a block and the cards of ten others -
+            // so an editor could not fill a card without also filling every
+            // paragraph. A card put forward still takes the accent surface, and
+            // that is why this one does not need a highlighted twin.
             'contentBg' => '--iw-variant-content-bg',
             'contentBorder' => '--iw-variant-content-border',
             'blockBorder' => '--iw-variant-block-border',
             'paragraphBorder' => '--iw-variant-paragraph-border',
+            'cardBg' => '--iw-variant-card-bg',
+            'cardTitle' => '--iw-variant-card-title-color',
+            'cardParagraph' => '--iw-variant-card-paragraph-color',
+            'cardBorder' => '--iw-variant-card-border',
             'accentBg' => '--iw-variant-accent-bg',
             'accentText' => '--iw-variant-accent-text',
             'accentBorder' => '--iw-variant-accent-border',
@@ -3738,6 +3744,7 @@ class ThemeCompiler
             'blockBorderWidth' => '--iw-variant-block-border-width',
             'contentBorderWidth' => '--iw-variant-content-border-width',
             'paragraphBorderWidth' => '--iw-variant-paragraph-border-width',
+            'cardBorderWidth' => '--iw-variant-card-border-width',
             'accentBorderWidth' => '--iw-variant-accent-border-width',
             'tableBorderWidth' => '--iw-variant-table-border-width',
         ];
@@ -3908,6 +3915,51 @@ class ThemeCompiler
             $css .= "  color: var(--iw-variant-paragraph-color, inherit);\n";
             $css .= "}\n";
 
+            // Text sitting ON the card surface. A card that fills itself owns
+            // the text on it, the same contract the accent surface carries, and
+            // it needs a rule of its own for the same reason: the variant names
+            // headings and running text with one class and a type, which plain
+            // inheritance cannot beat. Without this, a card filled dark on a
+            // light variant kept the colours picked against the block and read
+            // as a mistake.
+            //
+            // Both fall back to the colours the variant already chose, so a
+            // variant that fills a card without saying anything about its text
+            // renders exactly as it did before the surface existed.
+            //
+            // Written BEFORE the accent rules on purpose. A card put forward
+            // carries both classes, both rules weigh the same, and the later
+            // one wins - which has to be the accent, since that surface is the
+            // one guaranteeing its own text.
+            $css .= ".iw-variant--{$index} .iw-surface--card,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h1,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h2,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h3,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h4,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h5,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card h6,\n";
+            // A card title is not always a heading: some blocks draw one in a
+            // span or a div, and those would keep the block colour.
+            $css .= ".iw-variant--{$index} .iw-surface--card .iw-card__title {\n";
+            $css .= "  color: var(--iw-variant-card-title-color, var(--iw-variant-title-color, inherit));\n";
+            $css .= "}\n";
+
+            // Same list as the variant colours with the paragraph colour, for
+            // the same reason: anything left out here falls through to the rule
+            // above, which is the TITLE colour.
+            $css .= ".iw-variant--{$index} .iw-surface--card p,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card li,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card dt,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card dd,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card figcaption,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card caption,\n";
+            // A rich-text table inside a card, whose cells would otherwise keep
+            // the colours the variant picked against the block background.
+            $css .= ".iw-variant--{$index} .iw-surface--card th,\n";
+            $css .= ".iw-variant--{$index} .iw-surface--card td {\n";
+            $css .= "  color: var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit));\n";
+            $css .= "}\n";
+
             // Text sitting ON the accent surface takes the colour that surface
             // guarantees readable on itself, which is the whole reason the
             // surface owns a text colour at all. The rule above is one class
@@ -3934,6 +3986,14 @@ class ThemeCompiler
             $css .= ".iw-variant--{$index} .iw-surface--accent h5,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent h6,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent .iw-block__subtitle,\n";
+            // Headings and the subtitle, which the list below used to leave out.
+            // Both are coloured by a rule of their own further up - the heading
+            // one is a class and a type, the subtitle two classes - and plain
+            // inheritance carries no specificity at all, so a title on the
+            // accent surface kept the colour picked against the ordinary
+            // background while the paragraph beside it followed the surface.
+            // That is what an accordion question is: a heading, so a coloured
+            // FAQ bar showed its question in the title colour of the variant.
             $css .= ".iw-variant--{$index} .iw-surface--accent p,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent li,\n";
             $css .= ".iw-variant--{$index} .iw-surface--accent dt,\n";

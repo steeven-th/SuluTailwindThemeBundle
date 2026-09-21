@@ -68,6 +68,23 @@ function ensureVariantEditorStyles() {
         '.iw-ve__list li::marker { color: var(--ve-list, #d97706); }',
         '.iw-ve__hr-wrap { margin: 0 0 10px; }',
         '.iw-ve__hr { border: 0; border-top: 2px solid var(--ve-hr, #e5e7eb); margin: 0; }',
+        /* The card. Its own title and text colours, because a card that fills
+           itself owns the text on it - which is the whole point of the
+           surface. Both fall back to the block colours when unset, the way
+           the compiled CSS does. */
+        '.iw-ve__card {',
+        '  background: var(--ve-cardBg, transparent);',
+        '  border: var(--ve-cardBorderWidth, 0px) solid var(--ve-cardBorder, transparent);',
+        '  padding: 10px 12px; border-radius: 3px; margin: 0 0 10px;',
+        '}',
+        '.iw-ve__card-title {',
+        '  color: var(--ve-cardTitle, var(--ve-title, #1a1a1a));',
+        '  font-size: 14px; font-weight: 600; margin: 0 0 3px;',
+        '}',
+        '.iw-ve__card-text {',
+        '  color: var(--ve-cardParagraph, var(--ve-paragraph, #374151));',
+        '  font-size: 13px; line-height: 1.5; margin: 0;',
+        '}',
         '.iw-ve__accent {',
         '  background: var(--ve-accentBg, #f3f4f6);',
         '  border: var(--ve-accentBorderWidth, 0px) solid var(--ve-accentBorder, transparent);',
@@ -452,6 +469,20 @@ export default class VariantEditor extends React.Component {
                                         <li>{translate('iw_sulu_tailwind_theme.variant_preview_list_item')}</li>
                                     </ul>
                                 ))}
+                            </div>
+                        ))}
+                        {/* A card sits on the content, not inside the running
+                            text: it is an enclosed unit, and drawing it inside
+                            the paragraph background would show it taking a fill
+                            it does not take. */}
+                        {this.renderRegion('cards', 'iw-ve__card', (
+                            <div>
+                                <p className="iw-ve__card-title">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_card_title')}
+                                </p>
+                                <p className="iw-ve__card-text">
+                                    {translate('iw_sulu_tailwind_theme.variant_preview_card_text')}
+                                </p>
                             </div>
                         ))}
                         {this.renderRegion('accent', 'iw-ve__accent',

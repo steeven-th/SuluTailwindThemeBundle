@@ -53,6 +53,17 @@ const ZONES = [
         ],
     },
     {
+        id: 'cards',
+        label: 'iw_sulu_tailwind_theme.variant_surface_cards',
+        fields: [
+            {key: 'cardBg', label: 'iw_sulu_tailwind_theme.variant_card_bg', kind: 'color'},
+            {key: 'cardTitle', label: 'iw_sulu_tailwind_theme.variant_card_title', kind: 'color'},
+            {key: 'cardParagraph', label: 'iw_sulu_tailwind_theme.variant_card_paragraph', kind: 'color'},
+            {key: 'cardBorder', label: 'iw_sulu_tailwind_theme.variant_card_border', kind: 'color'},
+            {key: 'cardBorderWidth', label: 'iw_sulu_tailwind_theme.variant_card_border_width', kind: 'width'},
+        ],
+    },
+    {
         id: 'accent',
         label: 'iw_sulu_tailwind_theme.variant_surface_accent',
         fields: [
@@ -141,6 +152,8 @@ const PREVIEW_GROUPS = [
         fields: ['list']},
     {id: 'hr', label: 'iw_sulu_tailwind_theme.variant_hr_color',
         fields: ['hr']},
+    {id: 'cards', label: 'iw_sulu_tailwind_theme.variant_surface_cards',
+        fields: ['cardBg', 'cardBorder', 'cardTitle', 'cardParagraph', 'cardBorderWidth']},
     {id: 'accent', label: 'iw_sulu_tailwind_theme.variant_surface_accent',
         fields: ['accentBg', 'accentBorder', 'accentText', 'accentBorderWidth']},
     {id: 'table', label: 'iw_sulu_tailwind_theme.variant_zone_table',
