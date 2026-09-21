@@ -188,6 +188,41 @@ The labels of that zone lost their `accent` prefix while we were there -
 so the accent and card surfaces read the same way. The stored keys are
 unchanged.
 
+### The card shadow becomes a geometry (breaking, admin)
+
+**Components > Cards > Shadow** was a list of four named sizes, plus a second
+list for the hover state. A size says neither where a shadow falls, how far it
+spreads, nor how strong it is, so every theme drew the same one.
+
+Both lists are replaced by a single editor with sliders: horizontal and
+vertical offset, blur, spread, opacity at rest, opacity on hover, and how much
+the shadow grows under the pointer. The seven values travel as one stored
+object, since a Sulu field type returns one value and cannot write into its
+neighbours.
+
+**Nothing to run.** A theme still holding `md` is understood and keeps drawing
+what `md` drew, in the admin as on the site - the form shows it as sliders
+rather than as its defaults, so the first save writes what the theme meant. The
+old hover size is carried over as a growth factor.
+
+`glow-primary` and `glow-accent` disappear with the lists. They were never
+emitted from this tab anyway, and an accent colour with some spread does the
+same thing with control over how much.
+
+### A shadow can now appear on hover alone (breaking, visual)
+
+The hover shadow hung off `.iw-card--shadow`, the class the block's **Shadow**
+checkbox puts on a card. Ticking the box gave a permanent shadow *and* a hover
+one, leaving it unticked gave neither - the arrangement most sites want was out
+of reach.
+
+The hover shadow now applies to every card. A theme that wants none sets the
+hover opacity to zero.
+
+Article cards join the rest here too: their hover shadow came from a modifier
+class driven by a setting of its own, so an article card and a cards block on
+the same page could cast different shadows from one intent.
+
 ### Card shadows reach the stylesheet, and take a colour (fixed)
 
 Two settings did nothing until now. **Components > Cards > Hover shadow** was

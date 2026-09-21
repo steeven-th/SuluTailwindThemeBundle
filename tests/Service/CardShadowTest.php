@@ -27,6 +27,11 @@ use PHPUnit\Framework\TestCase;
  * lighten it - the one card property that stayed out of the variant while the
  * background, the border and the text colours moved in.
  *
+ * And it was a named size, which can say neither where a shadow falls nor how
+ * strong it is. The commonest arrangement of all - nothing at rest, a shadow on
+ * hover - was unreachable: the hover rule hung off the block's own "Shadow"
+ * checkbox, so ticking it gave both states and leaving it gave neither.
+ *
  * These tests compile the CSS rather than read the source, so a setting that
  * stops reaching the stylesheet fails here rather than on a page.
  */
@@ -55,10 +60,10 @@ final class CardShadowTest extends TestCase
     #[DataProvider('hoverShadowVariables')]
     public function theHoverShadowReachesEveryFamilyOfCard(string $variable): void
     {
-        $css = $this->compileCss(['cardHoverShadow' => 'lg']);
+        $css = $this->compileCss(['cardShadow' => ['blur' => 30, 'hoverOpacity' => 0.4]]);
 
         self::assertStringContainsString(
-            $variable . ': 0 12px 28px',
+            $variable . ': 0px 6px 45px',
             $css,
             'The hover shadow setting must reach ' . $variable . '. A family left out keeps the '
             . 'literal written in its own rule, and sits differently from its neighbours.',
@@ -66,30 +71,70 @@ final class CardShadowTest extends TestCase
     }
 
     /**
-     * `xl` was offered by the form and defined in no table, so choosing the
-     * strongest shadow produced none at all.
+     * The whole point of the geometry: no shadow at rest, one on hover.
+     *
+     * A named size could not express it, and the stylesheet made it worse by
+     * hanging the hover rule off the block's "Shadow" checkbox.
      */
     #[Test]
-    public function everyValueTheFormOffersProducesAShadow(): void
+    public function aShadowCanAppearOnHoverAlone(): void
     {
-        foreach (['sm', 'md', 'lg', 'xl'] as $size) {
-            $css = $this->compileCss(['cardHoverShadow' => $size]);
+        $css = $this->compileCss(['cardShadow' => [
+            'opacity' => 0,
+            'hoverOpacity' => 0.35,
+            'offsetY' => 2,
+            'blur' => 66,
+            'spread' => 15,
+            'hoverScale' => 1,
+        ]]);
 
-            self::assertMatchesRegularExpression(
-                '/--iw-card-shadow-hover: 0 \d/',
-                $css,
-                'Choosing "' . $size . '" must emit a shadow. A value the form offers and the '
-                . 'compiler ignores looks like a setting that does nothing.',
-            );
-        }
+        self::assertStringContainsString('--iw-card-shadow: none', $css);
+        self::assertStringContainsString('--iw-card-shadow-hover: 0px 2px 66px 15px', $css);
     }
 
+    /**
+     * Every slider reaches the stylesheet, which is the failure this file
+     * exists for: a field nothing reads looks exactly like a field that works.
+     */
+    #[Test]
+    public function everySettingReachesTheStylesheet(): void
+    {
+        $css = $this->compileCss(['cardShadow' => [
+            'offsetX' => 7,
+            'offsetY' => 9,
+            'blur' => 41,
+            'spread' => 13,
+            'opacity' => 0.5,
+        ]]);
+
+        self::assertStringContainsString('--iw-card-shadow: 7px 9px 41px 13px', $css);
+        self::assertStringContainsString('50%, transparent)', $css);
+    }
+
+    /**
+     * A shadow of no dimension is no shadow, not a faint one.
+     */
     #[Test]
     public function noneEmitsNoShadowRatherThanAnEmptyOne(): void
     {
-        $css = $this->compileCss(['cardHoverShadow' => 'none']);
+        $css = $this->compileCss(['cardShadow' => ['opacity' => 0, 'hoverOpacity' => 0]]);
 
+        self::assertStringContainsString('--iw-card-shadow: none', $css);
         self::assertStringContainsString('--iw-card-shadow-hover: none', $css);
+    }
+
+    /**
+     * A theme still holding a named size keeps drawing what that size drew.
+     *
+     * It renders correctly before anyone migrates it, and whether or not anyone
+     * ever does - the same contract as the card surface itself.
+     */
+    #[Test]
+    public function aThemeStillHoldingTheOldSizeIsUnderstood(): void
+    {
+        $css = $this->compileCss(['cardShadow' => 'md']);
+
+        self::assertStringContainsString('--iw-card-shadow: 0px 4px 12px -2px', $css);
     }
 
     /**
@@ -134,13 +179,13 @@ final class CardShadowTest extends TestCase
     #[Test]
     public function theShadowFallsBackToBlackWhenNoVariantSaysOtherwise(): void
     {
-        $css = $this->compileCss(['cardHoverShadow' => 'md']);
+        $css = $this->compileCss([]);
 
         self::assertStringContainsString(
-            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)))',
+            'var(--iw-card-shadow-color, var(--iw-variant-card-shadow-color, #000))',
             $css,
-            'The chain must end on the literal it replaced, or every theme that never set a '
-            . 'shadow colour loses its shadows.',
+            'The chain must end on a colour of its own, or a theme that never set one loses '
+            . 'its shadows entirely.',
         );
     }
 

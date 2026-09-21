@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
@@ -728,31 +729,24 @@ class ThemeCompiler
 
         $css = "  /* Card (site-wide) */\n";
 
-        // Both shadows are written here. The resting one always was; the hover
-        // one never, though a field offered it since the beginning and the
-        // stylesheet read `--iw-card-shadow-hover` in four places. Picking a
-        // hover shadow therefore changed nothing, every card falling back to
-        // the literal written in its own rule.
-        $cardShadow = trim((string) ($tokens['cardShadow'] ?? ''));
-        if (isset(self::SHADOWS[$cardShadow])) {
-            $css .= '  --iw-card-shadow: ' . self::cardShadow($cardShadow) . ";\n";
-        }
+        // The two shadows, composed from one geometry. A named size could say
+        // neither where a shadow falls nor how strong it is, so every theme
+        // drew the same one - and the commonest case of all, nothing at rest
+        // and a shadow on hover, could not be expressed at all.
+        //
+        // One setting, four variables per state. Each family of card reads its
+        // own, so feeding only the first would leave the document cards, the
+        // linked pages and the testimonials on their hard-coded value.
+        $geometry = CardShadow::fromTokens($tokens);
 
-        $cardHoverShadow = trim((string) ($tokens['cardHoverShadow'] ?? ''));
-        if (isset(self::SHADOWS[$cardHoverShadow])) {
-            $shadow = self::cardShadow($cardHoverShadow);
-
-            // One setting, four variables. Each family of card reads its own,
-            // so feeding only the first would have left the document cards,
-            // the linked pages and the testimonials on their hard-coded value.
-            foreach ([
-                '--iw-card-shadow-hover',
-                '--iw-document-card-hover-shadow',
-                '--iw-linked-page-card-hover-shadow',
-                '--iw-testimonial-hover-shadow',
-            ] as $variable) {
-                $css .= '  ' . $variable . ': ' . $shadow . ";\n";
-            }
+        foreach ([
+            ['--iw-card-shadow', $geometry->rest()],
+            ['--iw-card-shadow-hover', $geometry->hover()],
+            ['--iw-document-card-hover-shadow', $geometry->hover()],
+            ['--iw-linked-page-card-hover-shadow', $geometry->hover()],
+            ['--iw-testimonial-hover-shadow', $geometry->hover()],
+        ] as [$variable, $value]) {
+            $css .= '  ' . $variable . ': ' . $value . ";\n";
         }
 
         // Global card grid gap — every card grid/list/carousel falls back to this
@@ -859,6 +853,11 @@ class ThemeCompiler
         $css .= "  border: var(--iw-article-card-border, none);\n";
         $css .= "  border-radius: var(--border-radius);\n";
         $css .= "  padding: var(--iw-article-card-padding, 0);\n";
+        // The same two shadows as every other card family. These used to come
+        // from a modifier class picked per theme, which is why an article card
+        // and a cards block on the same page could cast different shadows from
+        // one setting.
+        $css .= "  box-shadow: var(--iw-card-shadow, none);\n";
         $css .= "  transition: background-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
         $css .= "    border-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
         $css .= "    box-shadow var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
@@ -957,14 +956,12 @@ class ThemeCompiler
         }
         $css .= "\n";
 
-        // Hover shadow modifiers (reuse button shadow catalog for consistency)
-        $css .= "/* Article card — hover shadow modifiers */\n";
-        $cardShadows = ['sm', 'md', 'lg', 'xl', 'glow-primary', 'glow-accent'];
-        foreach ($cardShadows as $key) {
-            $value = ButtonEffectCatalog::resolveShadow($key);
-            $css .= ".iw-article-card--shadow-{$key}:hover { box-shadow: {$value}; }\n";
-        }
-        $css .= "\n";
+        // The hover shadow, from the same setting as every other card. It was a
+        // modifier class per named size, chosen by the template from a second
+        // setting, so article cards answered to one control and the rest of the
+        // bundle to another - two shadows on one page from one intent.
+        $css .= "/* Article card — hover shadow */\n";
+        $css .= ".iw-article-card:hover { box-shadow: var(--iw-card-shadow-hover, none); }\n\n";
 
         // Hover border color modifier (only meaningful when border is configured)
         $css .= "/* Article card — hover border color modifier */\n";
@@ -3780,6 +3777,7 @@ class ThemeCompiler
             // the shadow stays site-wide; only what it is drawn against is
             // local, which is what a dark surface needs to be able to change.
             'cardShadowColor' => '--iw-variant-card-shadow-color',
+            'cardShadowHoverColor' => '--iw-variant-card-shadow-hover-color',
             'accentBg' => '--iw-variant-accent-bg',
             'accentTitle' => '--iw-variant-accent-title-color',
             'accentText' => '--iw-variant-accent-text',

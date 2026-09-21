@@ -6319,8 +6319,14 @@ aside .iw-toc {
     box-shadow: var(--iw-card-shadow, 0 1px 3px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.1)), 0 6px 16px -6px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)));
 }
 
-.iw-card--shadow:hover {
-    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12)), 0 12px 24px -8px var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.18)));
+/* The hover shadow belongs to every card, not only to the ones carrying a
+   resting one. It used to hang off `--shadow`, the class the block's "Shadow"
+   checkbox puts there, so the commonest arrangement of all - nothing at rest, a
+   shadow on hover - could not be reached: ticking the box gave both, leaving it
+   unticked gave neither. The theme decides whether there is one by giving the
+   hover state an opacity. */
+.iw-card:hover {
+    box-shadow: var(--iw-card-shadow-hover, 0 2px 6px var(--iw-variant-card-shadow-hover-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.12))), 0 12px 24px -8px var(--iw-variant-card-shadow-hover-color, var(--iw-variant-card-shadow-color, rgb(0 0 0 / 0.18))));
 }
 
 /* Highlighted ──────────────────────────────────────────────────────────── */
@@ -6405,7 +6411,7 @@ aside .iw-toc {
    of them reached this. The literals stay behind the tokens for a page rendered
    without a compiled theme. */
 /* The transition is on every card, the lift only on the ones that are links.
-   `.iw-card--shadow:hover` changes the shadow of any card, link or not, but the
+   `.iw-card:hover` changes the shadow of any card, link or not, but the
    transition was declared on `a.iw-card` alone - so a card the editor left
    unclickable saw its shadow snap on and off instead of fading. The lift stays
    where it was: something that rises under the pointer says it can be clicked,

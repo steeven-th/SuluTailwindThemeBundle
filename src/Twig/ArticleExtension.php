@@ -300,7 +300,6 @@ class ArticleExtension extends AbstractExtension
             'cardBorderStyle' => $tokens['cardBorderStyle'] ?? 'solid',
             'cardHoverTransform' => $tokens['cardHoverTransform'] ?? 'none',
             'cardHoverImage' => $tokens['cardHoverImage'] ?? 'zoom',
-            'cardHoverShadow' => $tokens['cardHoverShadow'] ?? 'none',
             'cardHoverBorder' => $tokens['cardHoverBorder'] ?? 'none',
             'cardHoverDuration' => $tokens['cardHoverDuration'] ?? '300ms',
             'cardHoverEasing' => $tokens['cardHoverEasing'] ?? 'ease-out',

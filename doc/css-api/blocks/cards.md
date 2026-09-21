@@ -83,8 +83,8 @@ A clickable card draws its action as a `<span>` carrying the button style, since
 | `--iw-card-title-size` / `--iw-card-text-size` | `1.0625rem` / `0.9375rem` | Type scale inside a card. Both read the theme values (`--iw-cards-title-size`, `--iw-cards-text-size`) first, set under **Defaults > Cards**. |
 | `--iw-cards-title-scale-large` / `--iw-cards-title-scale-xlarge` | `1.5` / `2.25` | What the two title-size modifiers multiply the title by. Two pixels separated a default title from its text, which reads as an accident rather than as a hierarchy, and raising the theme value grew every card of the site. |
 | `--iw-card-number-size` | `1.75rem` | Size of the position number. |
-| `--iw-card-shadow` / `--iw-card-shadow-hover` | **Components > Cards**, resting and hover | Shadow, when the setting is on. Both come from the theme: the hover one was offered by the form since the beginning and emitted nowhere, so picking it changed nothing. |
-| `--iw-card-shadow-color` | `--iw-variant-card-shadow-color`, then `rgb(0 0 0 / …)` | Colour the shadow is drawn in. Set it per variant under **Cards > Shadow colour**, or here to single out this block. |
+| `--iw-card-shadow` / `--iw-card-shadow-hover` | **Components > Cards** | Both shadows, composed from one geometry: offsets, blur, spread, an opacity at rest and one on hover. The resting one applies to cards carrying the block's **Shadow** setting, the hover one to every card - which is what allows no shadow at rest and one under the pointer. |
+| `--iw-card-shadow-color` | `--iw-variant-card-shadow-color` (and its hover twin), then `#000` | Colour the shadow is drawn in. Set it per variant under **Cards > Shadow colour** and **Shadow colour on hover**, or here to single out this block. The opacity is applied to it with `color-mix()`, the colour arriving as a hex or a palette reference and carrying no alpha of its own. |
 | `--iw-card-horizontal-visual` | `6rem` | Width of the visual column in the horizontal layout. |
 
 ---
