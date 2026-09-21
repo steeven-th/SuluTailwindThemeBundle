@@ -44,7 +44,7 @@
         {% endif %}
 
         <div class="iw-block-article-featured iw-block-article-featured--hero">
-            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--hero {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--hero {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                 {# Image with aspect-ratio — gives height to the card #}
                 {% if imgMedia %}
                     {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {

@@ -31,7 +31,7 @@
                     {% if item.type|default('figure') == 'figure' %}
                         <div class="iw-key-figure iw-key-figure--timeline">
                             <div class="iw-key-figure__timeline-dot"></div>
-                            <div class="iw-key-figure__timeline-card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                            <div class="iw-key-figure__timeline-card iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                                 {#- The pictogram opens the card, above the
                                     figure, and follows the text alignment of
                                     the card rather than centring on its own. -#}

@@ -28,7 +28,7 @@
             {% set articleImage = mainArticle.excerptImages|default(mainArticle.excerpt.images|default(mainArticle.heroImage|default(null))) %}
             {% set articleCategories = mainArticle.excerptCategories|default(mainArticle.excerpt.categories|default([])) %}
 
-            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-featured-article-card--main iw-featured-article-card--lg {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+            <a href="{{ articleUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--main iw-featured-article-card--lg {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                 {% if articleImage is not empty %}
                     {% set imgMedia = null %}
                     {% set imgId = null %}
@@ -98,7 +98,7 @@
                         {% set secImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
                         {% set secCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
-                        <a href="{{ secUrl }}" class="iw-featured-article-card iw-featured-article-card--horizontal {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                        <a href="{{ secUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--horizontal {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                             {# Image left — fills card height #}
                             {% if secImage is not empty %}
                                 {% set secImgMedia = null %}

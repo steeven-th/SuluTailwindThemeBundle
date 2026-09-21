@@ -20,7 +20,7 @@
     {% if articleItems is iterable and articleItems|length > 0 %}
         <div class="iw-block-article-list iw-block-article-list--grid">
             {% for article in articleItems %}
-                <div class="iw-block-article-list__item {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                <div class="iw-block-article-list__item iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
                         imageRatio: '16/9',

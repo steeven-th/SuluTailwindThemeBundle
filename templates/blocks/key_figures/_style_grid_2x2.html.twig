@@ -45,7 +45,7 @@
 
         <div data-controller="key-figures" class="iw-block-key-figures iw-block-key-figures--grid-2x2 iw-block-key-figures--cols-{{ columns }}{{ widthClass }}{{ highlightClass }}">
             {% for figure in figures %}
-                <div class="iw-key-figure iw-key-figure--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                <div class="iw-key-figure iw-key-figure--card iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {# Icon / Image #}
                     {% set figureIcon %}
                         {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
