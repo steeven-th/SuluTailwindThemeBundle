@@ -18,7 +18,40 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 final class VariantResolver
 {
     /**
+     * Card settings a theme stored before the card surface existed, and where
+     * they used to be read from.
+     *
+     * Cards took the paragraph surface until 3.0.0, so a theme saved before it
+     * holds no card key at all while its cards visibly depend on one. Reading
+     * the paragraph value for them keeps such a theme rendering as it did,
+     * which matters more than it sounds: a deployment that compiles on
+     * start-up reaches the compile before anyone can migrate, and bare cards
+     * would be the first thing the site serves.
+     *
+     * The absence of the KEY is what triggers it, never an empty value. An
+     * editor who clears the card fill writes an empty string, so their choice
+     * survives, and the first save through the admin makes every key explicit -
+     * after which nothing here applies again.
+     *
+     * `iw-sulu:theme:migrate-card-surface` writes the same values down, which
+     * is what lets the two surfaces be set apart afterwards.
+     *
+     * @var array<string, string> Stored paragraph key => card key it feeds
+     */
+    public const CARD_INHERITS = [
+        'paragraphBg' => 'cardBg',
+        'paragraphBorder' => 'cardBorder',
+        'paragraphBorderWidth' => 'cardBorderWidth',
+    ];
+
+    /**
      * Normalize a variant list so every entry has a unique, non-empty slug.
+     *
+     * Also fills in the card surface of a theme that predates it. This is the
+     * one path the compiler, the website resolver and the admin form all go
+     * through, so the three agree on what a variant holds - the form showing
+     * the inherited value is what keeps a plain save from silently emptying
+     * the cards.
      *
      * @param array<int, mixed> $variants The raw block variants
      *
@@ -53,10 +86,35 @@ final class VariantResolver
             $seen[$slug] = true;
 
             $variant['slug'] = $slug;
-            $result[] = $variant;
+            $result[] = self::withInheritedCardSurface($variant);
         }
 
         return $result;
+    }
+
+    /**
+     * Give a variant the card settings it never stored.
+     *
+     * @param array<string, mixed> $variant
+     *
+     * @return array<string, mixed>
+     */
+    private static function withInheritedCardSurface(array $variant): array
+    {
+        foreach (self::CARD_INHERITS as $from => $to) {
+            if (\array_key_exists($to, $variant)) {
+                continue;
+            }
+
+            $value = $variant[$from] ?? null;
+            if (null === $value || '' === $value) {
+                continue;
+            }
+
+            $variant[$to] = $value;
+        }
+
+        return $variant;
     }
 
     /**

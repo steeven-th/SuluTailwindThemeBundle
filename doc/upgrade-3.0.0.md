@@ -103,7 +103,7 @@ migration pass over `templateData` alongside the theme config one.
 
 Cards read the variant's **paragraph** surface until now, for want of one of
 their own. A single value painted two unrelated things - the running text of a
-block and the cards of nine others - so filling a card meant tinting every
+block and the cards of ten others - so filling a card meant tinting every
 paragraph with it, and a theme could not have one without the other.
 
 A variant now carries five more settings, under **Cards**:
@@ -127,13 +127,33 @@ on when `paragraphBg` was empty. That cascade was invisible from the admin: an
 editor who configured nothing got a tint they had not asked for and could not
 find. What the variant says is now what the card gets.
 
+This is about an *empty* setting. A theme saved before the surface holds no
+card setting at all, which is a different thing and reads as such: see below.
+
 `--iw-variant-subtle-bg` keeps its original job - table headers, inline code,
 `<pre>` blocks - and is unchanged there.
 
-### Migrating a theme already built
+### A theme already built keeps its cards, upgrade or not
 
-Themes in the database name a paragraph fill their cards depend on. Copy it
-across once, before recompiling:
+A theme saved before the surface holds no card key at all, and meant the
+opposite of what an empty key means now. So the runtime reads the paragraph
+value for it: as long as a variant names no card fill, its cards take the
+paragraph one, exactly as they did before.
+
+This happens in `VariantResolver`, the single path the compiler, the website
+and the admin form all go through, so the three agree. **Nothing has to be run
+before deploying**, including where an entrypoint compiles the theme on
+start-up.
+
+The distinction is the KEY, never the value. A card fill *cleared* by an editor
+is an empty string and stays empty - tinted paragraphs with bare cards is the
+whole point of the split, and inheriting over it would put that out of reach.
+
+### Writing the values down
+
+Inheritance keeps a site rendering, it does not let the two surfaces be set
+apart: while the card keys are missing they track the paragraph ones, so
+clearing the paragraph fill takes the cards with it.
 
 ```bash
 php bin/adminconsole iw-sulu:theme:migrate-card-surface --dry-run
@@ -143,8 +163,15 @@ php bin/adminconsole iw-sulu:theme:compile
 
 It copies `paragraphBg`, `paragraphBorder` and `paragraphBorderWidth` onto the
 card keys of every variant that has none, and leaves alone any variant already
-naming one. Safe to run twice. Skipping it empties the cards of every existing
-theme at the next compile.
+naming one. Safe to run twice.
+
+Saving a theme through the admin does the same thing for that theme: the form
+shows the inherited value, and writing it makes every key explicit.
+
+The command also names the variants it cannot help: those with no paragraph
+fill at all. Their cards used to land on the computed `--iw-variant-subtle-bg`
+tint, which is not a stored value and cannot be inherited. Set
+**Cards > Background** on them if that tint mattered.
 
 ### The accent surface gains a heading colour (new)
 
