@@ -229,6 +229,8 @@ final class CardSurfaceParityContractTest extends TestCase
      *     not styling, and following a dark variant would make them unreadable
      *   - the info panels listed below are stretches of text inside a block,
      *     not units sitting on it, so they stay on the paragraph surface
+     *   - a highlighted card is on the accent surface, and only reads the card
+     *     one as the fallback for its frame
      *
      * @param string $selector The rule's selector
      * @param string $body     Its declarations
@@ -241,6 +243,14 @@ final class CardSurfaceParityContractTest extends TestCase
 
         $normalised = trim((string) preg_replace('/\s+/', ' ', (string) preg_replace('~/\*.*?\*/~s', '', $selector)));
         if (\in_array($normalised, self::INFO_PANELS, true)) {
+            return true;
+        }
+
+        // A card put forward is on the ACCENT surface, which is the one
+        // guaranteeing the text on it. It reads the card surface only as the
+        // fallback for its frame - a variant that frames its cards frames this
+        // one too - and that mention is what brings it here.
+        if (str_contains($normalised, '.iw-card--highlighted')) {
             return true;
         }
 

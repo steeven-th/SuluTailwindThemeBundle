@@ -6328,11 +6328,19 @@ aside .iw-toc {
 /* The accent surface owns its text colour, which is the whole point: a plain
    accent background could not promise the text on it stays readable. The
    title, link and number follow it too, or they would keep the colours meant
-   for the normal card background. */
+   for the normal card background.
+
+   The border falls back to the CARD surface rather than to a value of its own.
+   A card put forward is still one of the cards in the grid: a variant that
+   frames its cards frames this one too, unless the accent surface names a
+   frame of its own. Writing `transparent` and `1px` here instead took the
+   frame away from a variant that had asked for one, and gave this card a pixel
+   of invisible border its neighbours did not have - enough to sit it off the
+   grid by one. */
 .iw-card--highlighted {
     background-color: var(--iw-variant-accent-bg, var(--color-accent));
-    border-color: var(--iw-variant-accent-border, transparent);
-    border-width: var(--iw-variant-accent-border-width, 1px);
+    border-color: var(--iw-variant-accent-border, var(--iw-variant-card-border, transparent));
+    border-width: var(--iw-variant-accent-border-width, var(--iw-variant-card-border-width, 0));
     color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));
 }
 
