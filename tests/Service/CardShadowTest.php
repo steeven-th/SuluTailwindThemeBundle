@@ -228,6 +228,39 @@ final class CardShadowTest extends TestCase
     }
 
     /**
+     * A theme that chose a coloured glow keeps its halo.
+     *
+     * The glows were the one part of the old hover setting that really
+     * applied - article cards carried them as a modifier class - so dropping
+     * them silently would take a visible effect away from a site that had
+     * asked for it. They are not offered any more, since any palette colour
+     * now does the same with control over how much.
+     */
+    #[Test]
+    public function aStoredGlowKeepsItsColour(): void
+    {
+        $css = $this->compileCss(['cardShadow' => 'md', 'cardHoverShadow' => 'glow-primary']);
+
+        self::assertStringContainsString('--iw-cards-shadow-hover-color: var(--color-primary)', $css);
+        self::assertStringContainsString('--iw-card-shadow-hover: 0px 5px 15px', $css);
+    }
+
+    /**
+     * A colour picked since wins over the glow it replaced.
+     */
+    #[Test]
+    public function aChosenColourOutranksAnOldGlow(): void
+    {
+        $css = $this->compileCss([
+            'cardHoverShadow' => 'glow-primary',
+            'cardShadowHoverColor' => '#ff0000',
+        ]);
+
+        self::assertStringContainsString('--iw-cards-shadow-hover-color: #ff0000', $css);
+        self::assertStringNotContainsString('--iw-cards-shadow-hover-color: var(--color-primary)', $css);
+    }
+
+    /**
      * @param array<string, mixed> $tokens
      */
     private function compileCss(array $tokens): string

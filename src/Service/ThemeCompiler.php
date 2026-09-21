@@ -754,6 +754,14 @@ class ThemeCompiler
             $css .= '  ' . $variable . ': ' . $this->resolveColorValue($colour) . ";\n";
         }
 
+        // A theme that chose a coloured glow keeps its halo. The geometry
+        // travels with the rest, the colour has to be named here, and only
+        // while nothing has been picked since.
+        $glow = CardShadow::glowColour($tokens);
+        if (null !== $glow && '' === trim((string) ($tokens['cardShadowHoverColor'] ?? ''))) {
+            $css .= '  --iw-cards-shadow-hover-color: ' . $glow . ";\n";
+        }
+
         foreach ([
             ['--iw-card-shadow', $geometry->rest()],
             ['--iw-card-shadow-hover', $geometry->hover()],

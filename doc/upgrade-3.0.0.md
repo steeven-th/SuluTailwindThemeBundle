@@ -205,9 +205,16 @@ what `md` drew, in the admin as on the site - the form shows it as sliders
 rather than as its defaults, so the first save writes what the theme meant. The
 old hover size is carried over as a growth factor.
 
-`glow-primary` and `glow-accent` disappear with the lists. They were never
-emitted from this tab anyway, and an accent colour with some spread does the
-same thing with control over how much.
+`glow-primary`, `glow-secondary` and `glow-accent` are no longer offered. A
+glow was `0 4px 15px` at 40% in one of three theme colours, which the sliders
+reproduce exactly - with any palette colour rather than three, and a blur and a
+spread of your choosing.
+
+A theme that had chosen one keeps its halo: the geometry travels with the rest
+and the colour is carried onto the site-wide hover colour, until someone picks
+another. Unlike the sizes, the glows really applied - article cards wore them
+as a modifier class - so dropping them silently would have taken away an effect
+a site had asked for.
 
 The colour is read three levels deep: a CSS override, then the variant of the
 block the card sits in, then a site-wide colour under **Components > Cards**.

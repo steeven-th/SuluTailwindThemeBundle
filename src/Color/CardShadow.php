@@ -51,6 +51,16 @@ final class CardShadow
      *
      * @var array<string, array{0: float|int, 1: float|int}>
      */
+    /**
+     * The geometry of the glow steps this field replaced.
+     *
+     * `0 4px 15px` at 40%, whatever the colour. Only three colours were on
+     * offer, where the editor now takes any of the palette.
+     *
+     * @var array<string, float>
+     */
+    private const GLOW = ['blur' => 15.0, 'opacity' => 0.4];
+
     private const BOUNDS = [
         'offsetX' => [-50, 50],
         'offsetY' => [-50, 50],
@@ -130,6 +140,18 @@ final class CardShadow
         // much bigger it was than the resting one, which is what the geometry
         // now carries, with its opacity kept as the hover opacity.
         $hover = (string) ($tokens['cardHoverShadow'] ?? '');
+
+        // A glow was a coloured halo, and unlike the sizes it really applied -
+        // article cards carried it as a modifier class. Its geometry is the
+        // same for the three of them, so only its colour has to follow, which
+        // `glowColour()` hands to the compiler.
+        if (str_starts_with($hover, 'glow-')) {
+            $values['hoverScale'] = self::GLOW['blur'] / max(1.0, (float) $values['blur']);
+            $values['hoverOpacity'] = self::GLOW['opacity'];
+
+            return new self($values);
+        }
+
         if (isset($sizes[$hover]) && 'none' !== $hover) {
             $restBlur = (float) $values['blur'];
             $hoverBlur = (float) $sizes[$hover]['blur'];
@@ -141,6 +163,29 @@ final class CardShadow
         }
 
         return new self($values);
+    }
+
+    /**
+     * The palette colour a stored glow was drawn in, if it was one.
+     *
+     * The geometry travels with the rest, the colour cannot: it belongs to the
+     * theme rather than to the shadow. A theme that chose a glow keeps its
+     * halo until someone picks a colour of their own.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string|null A CSS colour, or null when no glow was stored
+     */
+    public static function glowColour(array $tokens): ?string
+    {
+        $hover = (string) ($tokens['cardHoverShadow'] ?? '');
+
+        return match ($hover) {
+            'glow-primary' => 'var(--color-primary)',
+            'glow-secondary' => 'var(--color-secondary)',
+            'glow-accent' => 'var(--color-accent)',
+            default => null,
+        };
     }
 
     /**
