@@ -430,4 +430,93 @@ final class ThemeCompilerTest extends TestCase
             $css,
         );
     }
+
+    /**
+     * A colour named in the admin gets the utility classes Tailwind never
+     * built for it, base name and shades alike.
+     */
+    #[Test]
+    public function itEmitsUtilityClassesForAColorTailwindNeverSaw(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => null, 'slug' => 'gray-blue', 'value' => '#f8fafc'],
+        ]]);
+
+        self::assertStringContainsString(".bg-gray-blue {\n  background-color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString(".text-gray-blue {\n  color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString(".border-gray-blue {\n  border-color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString('.bg-gray-blue-600 {', $css);
+    }
+
+    /**
+     * The classes read the variable, so a repainted theme travels through them
+     * without the stylesheet being rebuilt.
+     */
+    #[Test]
+    public function itsUtilityClassesReadTheVariableRatherThanTheHex(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => null, 'slug' => 'gray-blue', 'value' => '#f8fafc'],
+        ]]);
+
+        preg_match('/\.bg-gray-blue \{\n  background-color: ([^;]+);/', $css, $matches);
+
+        self::assertSame('var(--color-gray-blue)', $matches[1] ?? null);
+    }
+
+    /**
+     * A role wearing its own name already has its utilities from the bridge.
+     */
+    #[Test]
+    public function itLeavesTheBaseRolesToTailwind(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringNotContainsString('.bg-primary {', $css);
+        self::assertStringNotContainsString('.bg-primary-500 {', $css);
+    }
+
+    /**
+     * A renamed role is as unknown to Tailwind as a brand colour, and gets the
+     * classes under its new name only.
+     */
+    #[Test]
+    public function itCoversARenamedRoleUnderItsNewNameOnly(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'marine', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringContainsString('.bg-marine {', $css);
+        self::assertStringNotContainsString('.bg-primary {', $css);
+    }
+
+    /**
+     * A forged slug writes no CSS of its own, wherever it is stored.
+     *
+     * The three lists that carry a slug are compiled at once, since they all
+     * end up in the same stylesheet and one unescaped brace is enough to hand
+     * whoever wrote it a rule that runs on every page of the site.
+     */
+    #[Test]
+    public function aForgedSlugCannotOpenARuleOfItsOwn(): void
+    {
+        $forged = 'oops } body { background-image: url(https://example.com/x';
+
+        $css = $this->compileCss([
+            'colors' => [['role' => null, 'slug' => $forged, 'value' => '#f8fafc']],
+            'blockVariants' => [['slug' => $forged, 'label' => 'Forged', 'title' => '#ffffff']],
+            'buttons' => [['slug' => $forged, 'label' => 'Forged', 'bg' => '#1a3a6b']],
+        ]);
+
+        self::assertStringNotContainsString('oops } body', $css);
+        self::assertStringNotContainsString('url(https://example.com/x', $css);
+        self::assertSame(
+            substr_count($css, '{'),
+            substr_count($css, '}'),
+            'The generated stylesheet has unbalanced braces, so a rule was closed early.',
+        );
+    }
 }

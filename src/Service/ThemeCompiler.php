@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
@@ -71,6 +72,21 @@ class ThemeCompiler
      * existed, or by hand, would otherwise emit any width it likes.
      */
     public const MAX_BORDER_WIDTH = 3;
+
+    /**
+     * The properties a colour is asked for often enough to deserve a class.
+     *
+     * Keyed by the Tailwind prefix they mirror, so `bg-marine` means the same
+     * thing whether the colour is a base role or one named in the admin. The
+     * list stops there on purpose: every further property multiplies the
+     * stylesheet by the number of colours and shades, and anything outside it
+     * is written `fill-(--color-marine)`, which needs no class at all.
+     */
+    private const COLOR_UTILITY_PROPERTIES = [
+        'bg' => 'background-color',
+        'text' => 'color',
+        'border' => 'border-color',
+    ];
 
     private const RADIUS_MAP = [
         'rounded-none' => '0',
@@ -318,6 +334,12 @@ class ThemeCompiler
         // color the editor picked explicitly must win over `.iw-highlight`,
         // and both sit at the same specificity.
         $css .= $this->generateTextColorClasses();
+
+        // Utility classes for the colours Tailwind never saw. After the
+        // variant classes for the same reason as the text colours: a class
+        // written by hand in a template says more than the variant painting
+        // the zone around it, and both sit at the same specificity.
+        $css .= $this->generateCustomColorUtilities();
 
         // Project-contributed rules, last so they win over a built-in rule of
         // equal specificity — which is the whole point of contributing one.
@@ -1876,6 +1898,68 @@ class ThemeCompiler
                 foreach ($shades as $shade) {
                     $css .= ".iw-text--{$name}-{$shade} {\n";
                     $css .= "  color: var(--color-{$name}-{$shade});\n";
+                    $css .= "}\n";
+                }
+            }
+        }
+
+        return [] === $emitted ? '' : $css . "\n";
+    }
+
+    /**
+     * Generate utility classes for the colours Tailwind cannot know about.
+     *
+     * Tailwind reads its palette when the assets are built, from the `@theme`
+     * block of `tailwind-theme-bridge.css`, which names the ten base roles and
+     * nothing else. A colour added in the admin only exists in the stylesheet
+     * compiled here, served long after the utilities were generated, so
+     * `bg-<slug>` was never produced - and failed silently, since an unknown
+     * utility class is not an error anywhere.
+     *
+     * The classes are emitted here instead, for the colours the bridge cannot
+     * cover: the brand colours, and the roles renamed in the admin, whose slug
+     * is just as unknown to Tailwind as a brand colour's. A role still wearing
+     * its own name is skipped, the bridge already declares it.
+     *
+     * They read the variable rather than the hex, so what they paint follows
+     * the theme through the same cascade as everything else. What they cannot
+     * offer is what Tailwind builds around a utility: `hover:`, breakpoints,
+     * the `/50` opacity modifier. Those are written `hover:bg-(--color-marine)`
+     * instead, which needs no class and no build.
+     *
+     * @return string CSS class declarations (e.g. `.bg-marine { ... }`)
+     */
+    private function generateCustomColorUtilities(): string
+    {
+        if (null === $this->colorSet) {
+            return '';
+        }
+
+        $css = "/* Utility classes for colors named outside the base roles */\n";
+        $emitted = [];
+
+        foreach ($this->colorSet->getColors() as $color) {
+            $slug = $color['slug'];
+
+            if (ColorRoles::isRole($slug) || isset($emitted[$slug])) {
+                continue;
+            }
+            $emitted[$slug] = true;
+
+            $names = [$slug];
+
+            // A `ref:` colour borrows another one's value and carries no shades
+            // of its own, so it gets the plain class and nothing more.
+            if ($this->isHexColor($color['value'])) {
+                foreach (array_keys($this->paletteFor($color['value'])) as $shade) {
+                    $names[] = $slug . '-' . $shade;
+                }
+            }
+
+            foreach ($names as $name) {
+                foreach (self::COLOR_UTILITY_PROPERTIES as $prefix => $property) {
+                    $css .= ".{$prefix}-{$name} {\n";
+                    $css .= "  {$property}: var(--color-{$name});\n";
                     $css .= "}\n";
                 }
             }

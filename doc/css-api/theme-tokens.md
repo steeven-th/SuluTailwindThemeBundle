@@ -45,6 +45,14 @@ by slug only (`--color-<slug>`, `role: null`).
 > Always reference `--color-<role>` in theme CSS (stable). The `--color-<slug>`
 > alias is for readable custom CSS and changes if the slug is renamed.
 
+**Utility classes.** Tailwind builds its utilities from the ten role names and
+knows nothing of a slug entered afterwards, so the theme stylesheet emits
+`bg-<slug>`, `text-<slug>` and `border-<slug>` itself, base name and shades
+alike, for every brand color and every renamed role. Any other property goes
+through the variable, which Tailwind turns into a utility on its own:
+`fill-(--color-<slug>)`, `hover:bg-(--color-<slug>-100)`. See
+[Tailwind integration](../tailwind-integration.md#colors-named-in-the-admin).
+
 **Semantic text colors** (from `tokens.textColors`, resolved from the palette):
 
 | Variable | Description |

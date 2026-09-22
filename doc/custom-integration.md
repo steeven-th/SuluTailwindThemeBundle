@@ -9,6 +9,7 @@ This guide explains how to use the SuluTailwindThemeBundle in your own custom co
 - [3. Custom block templates](#3-custom-block-templates)
 - [4. Accessing theme data in PHP](#4-accessing-theme-data-in-php)
 - [5. Tailwind CSS integration](#5-tailwind-css-integration)
+- [6. Reusing the bundle's Stimulus controllers](#6-reusing-the-bundles-stimulus-controllers)
 
 ---
 
@@ -745,7 +746,7 @@ The bundle provides a **theme bridge** that registers all CSS custom properties 
 </div>
 ```
 
-The bridge also provides semantic color palettes (error, warning, success) with hardcoded defaults:
+The bridge covers the ten base roles, the semantic ones included:
 
 ```twig
 <div class="bg-error-50 text-error-700 border border-error rounded p-4">
@@ -753,4 +754,71 @@ The bridge also provides semantic color palettes (error, warning, success) with 
 </div>
 ```
 
-> See **[Tailwind Integration](tailwind-integration.md)** for the full reference: all available tokens, adding custom colors, manual setup without bridge, and Tailwind 4.x compatibility.
+A color added in the admin outside those roles carries a name the bridge never saw. The theme stylesheet emits `bg-<name>`, `text-<name>` and `border-<name>` for it, and every other property is reached with `fill-(--color-<name>)`, which needs no build:
+
+```twig
+<div class="bg-gray-blue text-gray-blue-700 hover:bg-(--color-gray-blue-100)">
+    Color named "gray blue" in the admin
+</div>
+```
+
+> See **[Tailwind Integration](tailwind-integration.md)** for the full reference: all available tokens, colors named in the admin, adding custom colors, manual setup without bridge, and Tailwind 4.x compatibility.
+
+---
+
+## 6. Reusing the bundle's Stimulus controllers
+
+The controllers shipped with the bundle are registered by `@itech-world/sulu-tailwind-theme-bundle` and available to your own templates, not only to the bundle's blocks. They are part of the public API: a custom block or a page template can wire one up with plain data attributes.
+
+### The slider controller
+
+`data-controller="slider"` drives both a scrollable track and a one-slide-at-a-time carousel.
+
+```twig
+<div
+    data-controller="slider"
+    data-slider-mode-value="carousel"
+    data-slider-autoplay-value="true"
+    data-slider-interval-value="6000"
+    class="relative overflow-hidden"
+>
+    {% for slide in slides %}
+        <div
+            data-slider-target="slide"
+            class="absolute inset-0 w-full h-full {{ loop.first ? '' : 'hidden' }}"
+        >
+            {# ... #}
+        </div>
+    {% endfor %}
+
+    <button type="button" data-action="slider#prev">{{ 'previous'|trans }}</button>
+    <button type="button" data-action="slider#next">{{ 'next'|trans }}</button>
+</div>
+```
+
+| Value | Type | Default | Purpose |
+|-------|------|---------|---------|
+| `mode` | String | `scroll` | `scroll` for a snap track, `carousel` for one slide at a time |
+| `autoplay` | Boolean | `false` | Advance on a timer (carousel only) |
+| `interval` | Number | `5000` | Milliseconds between two advances |
+| `equalHeight` | Boolean | `false` | Hold inactive slides back with `visibility` instead of `display`, so a stacked grid keeps the height of the tallest slide |
+| `fullbleed` | Boolean | `false` | Let the slides fill the parent `section.block` rather than the controller element |
+| `parallax` | Boolean | `false` | Translate the visible slide's image on scroll |
+
+Targets: `slide` (carousel), `track` (scroll mode), `dots`, `thumbnail`, `thumbnailTrack`. Actions: `slider#prev`, `slider#next`, `slider#goTo` (with `data-slider-index-param`), `slider#selectThumbnail`, `slider#scrollThumbnailsBy`.
+
+### Marking the starting state
+
+The controller paints the slides as soon as it connects, so a carousel works with no marking at all in the template. Marking it anyway spares a flash of stacked slides during the moment before the JavaScript runs, which is why every block of the bundle does it.
+
+Mark with the family the mode uses:
+
+```twig
+{# Default carousel: display #}
+class="... {{ loop.first ? '' : 'hidden' }}"
+
+{# equalHeight carousel: visibility #}
+class="... {{ loop.first ? '' : 'invisible pointer-events-none' }}"
+```
+
+Getting it wrong is harmless since 3.0.0 - the controller clears both families on every pass - but the flash then shows the wrong slides.

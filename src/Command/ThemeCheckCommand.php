@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
@@ -28,6 +29,21 @@ use Symfony\Component\HttpKernel\KernelInterface;
 )]
 class ThemeCheckCommand extends Command
 {
+    /**
+     * The palette names Tailwind ships with.
+     *
+     * A colour named after one of them takes its utilities over: the theme
+     * stylesheet is plain CSS while Tailwind's utilities sit in a layer, and
+     * unlayered rules win whatever the order. `text-rose-500` would then paint
+     * the theme colour everywhere the project already used it, silently, which
+     * is worth a word even though the name is the user's to choose.
+     */
+    private const TAILWIND_PALETTES = [
+        'slate', 'gray', 'zinc', 'stone', 'red', 'orange', 'amber', 'yellow',
+        'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo',
+        'violet', 'purple', 'fuchsia', 'pink', 'rose',
+    ];
+
     public function __construct(
         private readonly ThemeConfigRepository $themeRepository,
         private readonly WebspaceThemeRepository $webspaceThemeRepository,
@@ -161,6 +177,30 @@ class ThemeCheckCommand extends Command
                     \count($orphans) . ' override(s) name a site the article is not published on',
                 ];
             }
+        }
+
+        // ── Check: colour names shadowing a Tailwind palette ──
+        // The compiler emits `bg-<slug>` for every colour named outside the
+        // base roles, which is what makes an admin colour usable as a utility
+        // class at all. When the name is one Tailwind already uses, the two
+        // classes collide and the theme wins.
+        $shadowing = [];
+        foreach ($themes as $theme) {
+            foreach (ColorSet::fromTokens($theme->getTokens())->getColors() as $color) {
+                if (\in_array($color['slug'], self::TAILWIND_PALETTES, true)) {
+                    $shadowing[] = $theme->getLabel() . ' → ' . $color['slug'];
+                }
+            }
+        }
+
+        if ([] === $shadowing) {
+            $checks[] = ['<fg=green>✓</>', 'Color names', 'No colour takes a Tailwind palette name over'];
+        } else {
+            $checks[] = [
+                '<fg=yellow>!</>',
+                'Color names',
+                implode(', ', $shadowing) . ' - these override Tailwind\'s palette of the same name site-wide',
+            ];
         }
 
         // ── Output table ──

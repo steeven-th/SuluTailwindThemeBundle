@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\Slug;
+
 /**
  * Resolves block variants by stable slug (replacing the legacy positional index).
  *
@@ -67,7 +69,9 @@ final class VariantResolver
                 continue;
             }
 
-            $slug = (isset($variant['slug']) && \is_string($variant['slug'])) ? trim($variant['slug']) : '';
+            // Normalized rather than trimmed: the slug ends up in a selector,
+            // and a stored one never passed through the save-time validator.
+            $slug = (isset($variant['slug']) && \is_string($variant['slug'])) ? Slug::normalize($variant['slug']) : '';
             if ('' === $slug) {
                 $label = (isset($variant['label']) && \is_string($variant['label'])) ? $variant['label'] : '';
                 $slug = self::slugify($label);
@@ -194,17 +198,6 @@ final class VariantResolver
      */
     public static function slugify(string $text): string
     {
-        $text = (string) preg_replace('/[^\p{L}\p{N}]+/u', '-', $text);
-        // Best-effort accent transliteration when the intl extension is present.
-        if (function_exists('transliterator_transliterate')) {
-            $ascii = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $text);
-            if (\is_string($ascii)) {
-                $text = $ascii;
-            }
-        }
-        $text = strtolower($text);
-        $text = (string) preg_replace('/[^a-z0-9]+/', '-', $text);
-
-        return trim($text, '-');
+        return Slug::slugify($text);
     }
 }
