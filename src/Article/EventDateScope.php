@@ -113,12 +113,31 @@ final class EventDateScope
     }
 
     /**
-     * Add the date clause and the agenda order to a query.
+     * Add the date clause and the agenda order to a query that returns rows.
+     *
+     * A query that counts takes the clause alone: see {@see applyFilterTo()}.
      *
      * @param QueryBuilder $queryBuilder    The query being built
      * @param string       $dimensionAlias  Alias of the joined dimension content
      */
     public function applyTo(QueryBuilder $queryBuilder, string $dimensionAlias): void
+    {
+        $this->applyFilterTo($queryBuilder, $dimensionAlias);
+        $this->applyOrderTo($queryBuilder, $dimensionAlias);
+    }
+
+    /**
+     * Keep only the events of this half of the calendar.
+     *
+     * Told apart from the order because a counting query needs one and not the
+     * other: PostgreSQL refuses to order an aggregate on a column it does not
+     * group by, and MySQL runs the same query without complaining, which is
+     * what makes the mistake easy to ship.
+     *
+     * @param QueryBuilder $queryBuilder    The query being built
+     * @param string       $dimensionAlias  Alias of the joined dimension content
+     */
+    public function applyFilterTo(QueryBuilder $queryBuilder, string $dimensionAlias): void
     {
         $queryBuilder
             ->andWhere(\sprintf(
@@ -128,7 +147,18 @@ final class EventDateScope
                 self::NOW_PARAMETER,
             ))
             ->setParameter(self::NOW_PARAMETER, $this->now->format(self::STORED_FORMAT));
+    }
 
+    /**
+     * Order the events the way an agenda reads, soonest first.
+     *
+     * Only for a query that returns rows.
+     *
+     * @param QueryBuilder $queryBuilder    The query being built
+     * @param string       $dimensionAlias  Alias of the joined dimension content
+     */
+    public function applyOrderTo(QueryBuilder $queryBuilder, string $dimensionAlias): void
+    {
         // The agenda order has to come first, whatever the caller had asked
         // for: a listing page arrives here with the sort an editor chose, and a
         // date order appended behind it would never decide anything. The
