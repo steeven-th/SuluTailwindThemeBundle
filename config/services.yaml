@@ -445,8 +445,22 @@ services:
         arguments:
             - '@itech_world.sulu_tailwind_theme.twig_extension'
             - '@?sulu.repository.user'
+            - '@ItechWorld\SuluTailwindThemeBundle\Service\EventFinder'
         tags:
             - { name: 'twig.extension' }
+
+    # Events as smart content: the same admin interface as any article
+    # selection, ordered and filtered on the date an editor typed into the
+    # event, which the native provider has no way to reach.
+    itech_world.sulu_tailwind_theme.event_smart_content_provider:
+        class: ItechWorld\SuluTailwindThemeBundle\Article\EventSmartContentProvider
+        arguments:
+            - '@sulu_content.dimension_content_query_enhancer'
+            - '@sulu_admin.smart_content_query_enhancer'
+            - '@doctrine.orm.entity_manager'
+            - '@sulu_admin.metadata_group_provider'
+        tags:
+            - { name: 'sulu_content.smart_content_provider', type: 'iw_events' }
 
     # ─── Article discovery services (F2) ─────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService: ~
@@ -454,6 +468,15 @@ services:
     # Restricts a listing to the site being visited, which the Sulu article
     # repository cannot express on its own.
     ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository: ~
+
+    ItechWorld\SuluTailwindThemeBundle\Service\ArticleItemResolver: ~
+
+    # Events for a template that asks for them directly, rather than through a
+    # smart content property an editor fills.
+    ItechWorld\SuluTailwindThemeBundle\Service\EventFinder:
+        arguments:
+            $requestAnalyzer: '@?sulu_core.webspace.request_analyzer'
+
 
     ItechWorld\SuluTailwindThemeBundle\Service\ArticleListingResolver: ~
 

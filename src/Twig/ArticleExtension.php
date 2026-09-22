@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
+use ItechWorld\SuluTailwindThemeBundle\Service\EventFinder;
 use Sulu\Component\Security\Authentication\UserRepositoryInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -91,6 +92,7 @@ class ArticleExtension extends AbstractExtension
     public function __construct(
         private readonly ThemeExtension $themeExtension,
         private readonly ?UserRepositoryInterface $userRepository = null,
+        private readonly ?EventFinder $eventFinder = null,
     ) {
     }
 
@@ -117,7 +119,45 @@ class ArticleExtension extends AbstractExtension
             new TwigFunction('iw_sulu_tailwind_theme_listing_style', $this->listingStyle(...)),
             new TwigFunction('iw_sulu_tailwind_theme_article_config', $this->articleConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_article_authors', $this->articleAuthors(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_upcoming_events', $this->upcomingEvents(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_past_events', $this->pastEvents(...)),
         ];
+    }
+
+    /**
+     * The next events of the site, soonest first.
+     *
+     * For a template that shows an agenda without offering a setting for it -
+     * a home page carrying the three next events, typically. An editor who
+     * should pick them gets a smart content property instead, on the
+     * `iw_events` provider, which reads the same dates.
+     *
+     *     {% for event in iw_sulu_tailwind_theme_upcoming_events(3) %}
+     *     {% for event in iw_sulu_tailwind_theme_upcoming_events(4, {categories: ['agenda']}) %}
+     *
+     * An event stays listed until it is over, not until it has begun.
+     *
+     * @param int                  $limit   How many at most
+     * @param array<string, mixed> $options categories, tags, templates, webspace, locale
+     *
+     * @return array<int, array<string, mixed>> Card items, in display order
+     */
+    public function upcomingEvents(int $limit = EventFinder::DEFAULT_LIMIT, array $options = []): array
+    {
+        return $this->eventFinder?->upcoming($limit, $options) ?? [];
+    }
+
+    /**
+     * The events that are over, most recent first, for an archive page.
+     *
+     * @param int                  $limit   How many at most
+     * @param array<string, mixed> $options Same as {@see upcomingEvents()}
+     *
+     * @return array<int, array<string, mixed>> Card items, in display order
+     */
+    public function pastEvents(int $limit = EventFinder::DEFAULT_LIMIT, array $options = []): array
+    {
+        return $this->eventFinder?->past($limit, $options) ?? [];
     }
 
     /**

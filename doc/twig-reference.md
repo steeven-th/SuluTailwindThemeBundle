@@ -410,6 +410,32 @@ there treats "follow the theme" as "no padding".
 
 ---
 
+### `iw_sulu_tailwind_theme_upcoming_events(limit, options)`
+
+The next events of the site, soonest first, for a template that shows an agenda without offering a setting for it.
+
+```twig
+{% for event in iw_sulu_tailwind_theme_upcoming_events(3) %}
+    <a href="{{ event.url }}">{{ event.title }}</a>
+{% endfor %}
+
+{# Narrowed #}
+{{ iw_sulu_tailwind_theme_upcoming_events(4, {categories: ['agenda'], tags: ['festival']}) }}
+```
+
+| Argument | Type | Default | Description |
+|---|---|---|---|
+| `limit` | int | 3 | How many at most |
+| `options` | map | `{}` | `categories`, `tags`, `templates`, `webspace`, `locale` |
+
+Returns the same item shape a smart content property hands you, so the card partials read it as it is. An event stays listed until it is over, not until it has begun. Returns an empty list rather than raising when there is no locale to resolve.
+
+An editor who should pick the events gets a smart content property instead, on the `iw_events` provider, which reads the same dates. See [Events and agendas](events.md).
+
+### `iw_sulu_tailwind_theme_past_events(limit, options)`
+
+The other half of the calendar, most recent first, for an archive page. Same arguments and same return as above.
+
 ### `iw_sulu_tailwind_theme_color_scheme(variant, hasBackground)`
 
 Tells whether a block variant renders on a **light** or a **dark** surface. Meant
