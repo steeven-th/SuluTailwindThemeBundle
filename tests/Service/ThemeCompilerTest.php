@@ -492,4 +492,31 @@ final class ThemeCompilerTest extends TestCase
         self::assertStringContainsString('.bg-marine {', $css);
         self::assertStringNotContainsString('.bg-primary {', $css);
     }
+
+    /**
+     * A forged slug writes no CSS of its own, wherever it is stored.
+     *
+     * The three lists that carry a slug are compiled at once, since they all
+     * end up in the same stylesheet and one unescaped brace is enough to hand
+     * whoever wrote it a rule that runs on every page of the site.
+     */
+    #[Test]
+    public function aForgedSlugCannotOpenARuleOfItsOwn(): void
+    {
+        $forged = 'oops } body { background-image: url(https://example.com/x';
+
+        $css = $this->compileCss([
+            'colors' => [['role' => null, 'slug' => $forged, 'value' => '#f8fafc']],
+            'blockVariants' => [['slug' => $forged, 'label' => 'Forged', 'title' => '#ffffff']],
+            'buttons' => [['slug' => $forged, 'label' => 'Forged', 'bg' => '#1a3a6b']],
+        ]);
+
+        self::assertStringNotContainsString('oops } body', $css);
+        self::assertStringNotContainsString('url(https://example.com/x', $css);
+        self::assertSame(
+            substr_count($css, '{'),
+            substr_count($css, '}'),
+            'The generated stylesheet has unbalanced braces, so a rule was closed early.',
+        );
+    }
 }

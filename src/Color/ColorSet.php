@@ -72,10 +72,14 @@ final class ColorSet
                     continue;
                 }
                 $role = (isset($item['role']) && \is_string($item['role'])) ? $item['role'] : null;
-                $slug = (isset($item['slug']) && \is_string($item['slug']) && '' !== $item['slug'])
-                    ? $item['slug']
-                    : $role;
-                if (null === $slug) {
+                // A slug names a custom property and a class, so a stored one
+                // is normalized before anything downstream writes it. What
+                // normalizing cannot salvage falls back to the role, and a
+                // brand colour left with nothing to be called is dropped: there
+                // is no variable to emit it under.
+                $stored = (isset($item['slug']) && \is_string($item['slug'])) ? Slug::normalize($item['slug']) : '';
+                $slug = '' !== $stored ? $stored : ($role ?? '');
+                if ('' === $slug) {
                     continue;
                 }
                 $value = $item['value'];

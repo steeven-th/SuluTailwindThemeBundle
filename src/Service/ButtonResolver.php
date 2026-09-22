@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Color\Slug;
+
 /**
  * Resolves button styles by stable slug (replacing the 3 fixed roles
  * primary/secondary/accent).
@@ -46,7 +48,9 @@ final class ButtonResolver
                 continue;
             }
 
-            $slug = (isset($button['slug']) && \is_string($button['slug'])) ? trim($button['slug']) : '';
+            // Normalized rather than trimmed, for the same reason as a variant:
+            // the slug is written into `.iw-button--<slug>`.
+            $slug = (isset($button['slug']) && \is_string($button['slug'])) ? Slug::normalize($button['slug']) : '';
             if ('' === $slug) {
                 $label = (isset($button['label']) && \is_string($button['label'])) ? $button['label'] : '';
                 $slug = self::slugify($label);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
+use ItechWorld\SuluTailwindThemeBundle\Color\Slug;
 use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 
 /**
@@ -17,11 +18,6 @@ use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
  */
 class SlugValidator
 {
-    /**
-     * Slug format: kebab-case (lowercase letters/digits, single dashes).
-     */
-    private const SLUG_PATTERN = '/^[a-z0-9]+(-[a-z0-9]+)*$/';
-
     /**
      * Validate the slugs of a normalized palette color list.
      *
@@ -96,7 +92,7 @@ class SlugValidator
      */
     private function assertFormat(string $slug): void
     {
-        if (1 !== preg_match(self::SLUG_PATTERN, $slug)) {
+        if (!Slug::isWellFormed($slug)) {
             throw new SlugValidationException(
                 'iw_sulu_tailwind_theme.error_slug_format',
                 $slug,

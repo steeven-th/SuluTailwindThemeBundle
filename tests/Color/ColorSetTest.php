@@ -72,4 +72,61 @@ final class ColorSetTest extends TestCase
         self::assertSame(['name' => 'accent', 'shade' => null], ColorSet::parseRef('ref:accent'));
         self::assertNull(ColorSet::parseRef('#ffffff'));
     }
+
+    /**
+     * A stored slug is made safe before anything writes it into the CSS.
+     */
+    #[Test]
+    public function itNeutralizesASlugThatWouldBreakOutOfADeclaration(): void
+    {
+        $set = ColorSet::fromTokens(['colors' => [
+            ['role' => null, 'slug' => 'oops } body { display: none', 'value' => '#f8fafc'],
+        ]]);
+
+        $brand = $set->getColors()[10];
+
+        self::assertSame('oops-body-display-none', $brand['slug']);
+    }
+
+    /**
+     * Salvaged rather than dropped: a slug typed before the validator existed
+     * keeps its colour, under the name it was going to have anyway.
+     */
+    #[Test]
+    public function itSalvagesASlugTypedTheHumanWay(): void
+    {
+        $set = ColorSet::fromTokens(['colors' => [
+            ['role' => null, 'slug' => 'Rose Employeur', 'value' => '#e86ca0'],
+        ]]);
+
+        self::assertSame('#e86ca0', $set->baseHexFor('rose-employeur'));
+    }
+
+    /**
+     * A role keeps its colour even when its slug holds nothing usable, since
+     * the role name is a name of its own.
+     */
+    #[Test]
+    public function itFallsBackToTheRoleWhenNothingIsSalvageable(): void
+    {
+        $set = ColorSet::fromTokens(['colors' => [
+            ['role' => 'primary', 'slug' => '///', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertSame('#1a3a6b', $set->baseHexFor('primary'));
+    }
+
+    /**
+     * A brand colour with no name left to be called by is dropped: there is no
+     * custom property to emit it under.
+     */
+    #[Test]
+    public function itDropsABrandColorLeftWithoutAName(): void
+    {
+        $set = ColorSet::fromTokens(['colors' => [
+            ['role' => null, 'slug' => '///', 'value' => '#e86ca0'],
+        ]]);
+
+        self::assertCount(10, $set->getColors());
+    }
 }
