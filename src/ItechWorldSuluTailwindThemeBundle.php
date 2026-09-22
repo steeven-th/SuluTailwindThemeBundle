@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle;
 
+use ItechWorld\SuluTailwindThemeBundle\Doctrine\JsonTextFunction;
 use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -417,10 +418,18 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         // its presence alone cannot stop the container from compiling.
         $this->prependTurnstileConfig($builder);
 
-        // Register Doctrine ORM mapping for this bundle's entities
+        // Register Doctrine ORM mapping for this bundle's entities, and the
+        // one DQL function it needs: Sulu keeps the fields of a template in a
+        // JSON column, so ordering an agenda on the date an editor typed means
+        // reading inside that column, which DQL cannot do on its own.
         if ($builder->hasExtension('doctrine')) {
             $builder->prependExtensionConfig('doctrine', [
                 'orm' => [
+                    'dql' => [
+                        'string_functions' => [
+                            'IW_JSON_TEXT' => JsonTextFunction::class,
+                        ],
+                    ],
                     'mappings' => [
                         'ItechWorldSuluTailwindThemeBundle' => [
                             'type' => 'attribute',
