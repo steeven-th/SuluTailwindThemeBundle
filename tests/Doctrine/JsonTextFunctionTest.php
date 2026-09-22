@@ -139,9 +139,13 @@ final class JsonTextFunctionTest extends TestCase
     {
         $config = ORMSetup::createAttributeMetadataConfiguration([__DIR__], true);
         $config->addCustomStringFunction('IW_JSON_TEXT', JsonTextFunction::class);
-        // PHP 8.4 lazy objects, so the manager builds without the proxy
-        // generator asking for a package the bundle does not depend on.
-        $config->enableNativeLazyObjects(true);
+        // Doctrine builds its proxies with symfony/var-exporter up to PHP 8.3
+        // and with the language's own lazy objects from 8.4 on, where the
+        // first way is gone. Asking for the native ones below 8.4 throws, so
+        // the version decides and the test runs on every supported PHP.
+        if (\PHP_VERSION_ID >= 80400) {
+            $config->enableNativeLazyObjects(true);
+        }
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
 
