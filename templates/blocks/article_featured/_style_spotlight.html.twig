@@ -30,21 +30,12 @@
             {% endif %}
             {% set articleExcerpt = mainArticle.excerptDescription|default(mainArticle.excerpt.description|default('')) %}
             {% set articleDate = mainArticle.authored|default(null) %}
-            {% set articleImage = mainArticle.excerptImages|default(mainArticle.excerpt.images|default(mainArticle.heroImage|default(null))) %}
+            {% set articleImage = mainArticle.excerptImage|default(mainArticle.heroImage|default(null)) %}
             {% set articleCategories = mainArticle.excerptCategories|default(mainArticle.excerpt.categories|default([])) %}
 
             <a href="{{ articleUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--main iw-featured-article-card--lg {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                 {% if articleImage is not empty %}
-                    {% set imgMedia = null %}
-                    {% set imgId = null %}
-                    {% if articleImage is iterable and articleImage|length > 0 %}
-                        {% set imgId = articleImage.ids|default(articleImage)|first %}
-                    {% else %}
-                        {% set imgId = articleImage %}
-                    {% endif %}
-                    {% if imgId %}
-                        {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-                    {% endif %}
+                    {% set imgMedia = sulu_resolve_media(articleImage, app.request.locale) %}
 
                     {% if imgMedia %}
                         <div class="iw-featured-article-card__image-wrap">
@@ -100,22 +91,13 @@
                         {% endif %}
                         {% set secExcerpt = article.excerptDescription|default(article.excerpt.description|default('')) %}
                         {% set secDate = article.authored|default(null) %}
-                        {% set secImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
+                        {% set secImage = article.excerptImage|default(article.heroImage|default(null)) %}
                         {% set secCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
                         <a href="{{ secUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--horizontal {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                             {# Image left — fills card height #}
                             {% if secImage is not empty %}
-                                {% set secImgMedia = null %}
-                                {% set secImgId = null %}
-                                {% if secImage is iterable and secImage|length > 0 %}
-                                    {% set secImgId = secImage.ids|default(secImage)|first %}
-                                {% else %}
-                                    {% set secImgId = secImage %}
-                                {% endif %}
-                                {% if secImgId %}
-                                    {% set secImgMedia = sulu_resolve_media(secImgId, app.request.locale) %}
-                                {% endif %}
+                                {% set secImgMedia = sulu_resolve_media(secImage, app.request.locale) %}
 
                                 {% if secImgMedia %}
                                     <div class="iw-featured-article-card__image-wrap iw-featured-article-card__image-wrap--horizontal">

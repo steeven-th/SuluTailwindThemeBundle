@@ -30,21 +30,11 @@
         {% endif %}
         {% set articleExcerpt = article.excerptDescription|default(article.excerpt.description|default('')) %}
         {% set articleDate = article.authored|default(null) %}
-        {% set articleImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
+        {% set articleImage = article.excerptImage|default(article.heroImage|default(null)) %}
         {% set articleCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
         {# Resolve image #}
-        {% set imgMedia = null %}
-        {% set imgId = null %}
-        {% if articleImage is iterable and articleImage|length > 0 %}
-            {% set imgId = articleImage.ids|default(articleImage)|first %}
-        {% elseif articleImage is not empty %}
-            {# single_media_selection scalar (heroImage fallback) #}
-            {% set imgId = articleImage %}
-        {% endif %}
-        {% if imgId %}
-            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-        {% endif %}
+        {% set imgMedia = articleImage is not empty ? sulu_resolve_media(articleImage, app.request.locale) : null %}
 
         <div class="iw-block-article-featured iw-block-article-featured--hero">
             <a href="{{ articleUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--hero {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">

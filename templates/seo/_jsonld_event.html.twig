@@ -7,8 +7,8 @@
 {% set imageUrl = null %}
 {# A media deleted from the library resolves to null: skip the image rather than
    taking down the whole page from inside the <head>. #}
-{% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
-    {% set imgMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
+{% if extension.excerpt.image is defined and extension.excerpt.image is not empty %}
+    {% set imgMedia = sulu_resolve_media(extension.excerpt.image, app.request.locale) %}
     {% if imgMedia is not null %}
         {% set imageUrl = absolute_url(imgMedia.thumbnails['iw_og_image']|default(imgMedia.url)) %}
     {% endif %}
