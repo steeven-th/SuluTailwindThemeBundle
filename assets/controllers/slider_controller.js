@@ -7,6 +7,11 @@ import { Controller } from '@hotwired/stimulus';
  *   - "scroll" (default): Scrollable track with snap points
  *   - "carousel": Single-slide display with fade/show transitions
  *
+ * In carousel mode the controller lays down the starting state when it
+ * connects, so a template does not have to mark it. Marking it anyway is
+ * still worth it: it spares a flash of stacked slides before the JavaScript
+ * runs, whichever class family the mode uses.
+ *
  * Values:
  *   - autoplay (Boolean): Whether to auto-advance slides
  *   - interval (Number): Milliseconds between auto-advances (default: 5000)
@@ -57,8 +62,15 @@ export default class extends Controller {
             this._setupFullbleed();
         }
 
-        if (this.modeValue === 'carousel' && this.autoplayValue) {
-            this._startAutoplay();
+        if (this.modeValue === 'carousel') {
+            // Which slide shows is the controller's call, so it has to make it
+            // at mount. Left to the first prev()/next(), a carousel nobody
+            // touches stays stacked.
+            this._renderSlides();
+
+            if (this.autoplayValue) {
+                this._startAutoplay();
+            }
         }
 
         // Parallax scroll effect
@@ -122,25 +134,43 @@ export default class extends Controller {
 
     /**
      * Show the current slide and hide all others (carousel mode).
-     * When equalHeight is enabled, uses visibility instead of display
-     * so the container keeps the height of the tallest slide.
      *
      * @private
      */
     _showSlide() {
+        this._renderSlides();
+        this._resetAutoplay();
+    }
+
+    /**
+     * Paint the current slide state, leaving the autoplay timer alone.
+     *
+     * Split out of _showSlide() so connect() can lay down the starting state:
+     * _resetAutoplay() starts a timer, and at mount it would run before
+     * _startAutoplay() does, leaving a second one behind.
+     *
+     * When equalHeight is enabled, inactive slides are held back with
+     * visibility rather than display, so the container keeps the height of the
+     * tallest one. Both families are cleared on every pass: a template marks
+     * the starting state itself to avoid a flash before the JavaScript runs,
+     * and one marked with the other mode's family would otherwise keep the
+     * active slide out for good.
+     *
+     * @private
+     */
+    _renderSlides() {
         const useVisibility = this.equalHeightValue;
+
         this.slideTargets.forEach((slide, idx) => {
-            if (useVisibility) {
-                slide.classList.toggle('invisible', idx !== this.currentSlide);
-                slide.classList.toggle('pointer-events-none', idx !== this.currentSlide);
-            } else {
-                slide.classList.toggle('hidden', idx !== this.currentSlide);
-            }
+            const inactive = idx !== this.currentSlide;
+
+            slide.classList.toggle('hidden', inactive && !useVisibility);
+            slide.classList.toggle('invisible', inactive && useVisibility);
+            slide.classList.toggle('pointer-events-none', inactive && useVisibility);
         });
 
         this._updateDots();
         this._updateThumbnails();
-        this._resetAutoplay();
     }
 
     /**
@@ -346,7 +376,9 @@ export default class extends Controller {
         const translateY = clamped * maxShift;
 
         this.slideTargets.forEach((slide) => {
-            if (slide.classList.contains('hidden')) return;
+            // Both families, since equalHeight holds slides back with one and
+            // every other mode with the other.
+            if (slide.classList.contains('hidden') || slide.classList.contains('invisible')) return;
 
             const img = slide.querySelector('img');
             if (img) {
