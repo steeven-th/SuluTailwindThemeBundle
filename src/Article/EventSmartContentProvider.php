@@ -53,6 +53,15 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
     private const FILTER_DIRECTION = 'iwEventDirection';
 
     /**
+     * Marks the query that counts rather than lists.
+     *
+     * Both go through the same hook, and only one may be ordered: PostgreSQL
+     * refuses to order a count by a column it does not group by. Nothing in
+     * the hook says which query it is building, so countBy() says it.
+     */
+    private const FILTER_COUNTING = 'iwEventCounting';
+
+    /**
      * Alias Sulu gives the dimension content it filters on.
      *
      * @see \Sulu\Content\Infrastructure\Doctrine\DimensionContentQueryEnhancer::addFilters()
@@ -73,6 +82,19 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
     }
 
     /**
+     * Count the events of the agenda, without ordering them.
+     *
+     * @param array<string, mixed> $filters
+     * @param array<string, mixed> $params
+     */
+    public function countBy(array $filters, array $params = []): int
+    {
+        $params[self::FILTER_COUNTING] = true;
+
+        return parent::countBy($filters, $params);
+    }
+
+    /**
      * Carry the direction from the template parameters into the filters.
      *
      * @param array<string, mixed> $filters
@@ -86,12 +108,14 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
 
         $direction = $params[self::PARAM_DIRECTION] ?? EventDateScope::DIRECTION_UPCOMING;
         $filters[self::FILTER_DIRECTION] = \is_string($direction) ? $direction : EventDateScope::DIRECTION_UPCOMING;
+        $filters[self::FILTER_COUNTING] = true === ($params[self::FILTER_COUNTING] ?? false);
 
         return $filters;
     }
 
     /**
-     * Add the date clause, on the count as on the list.
+     * Add the date clause, on the count as on the list, and the order on the
+     * list alone.
      *
      * @param array<string, mixed> $filters
      */
@@ -99,8 +123,16 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
     {
         parent::addInternalFilters($queryBuilder, $filters, $alias);
 
-        EventDateScope::fromDirection($filters[self::FILTER_DIRECTION] ?? null)
-            ?->applyTo($queryBuilder, self::DIMENSION_CONTENT_ALIAS);
+        $scope = EventDateScope::fromDirection($filters[self::FILTER_DIRECTION] ?? null);
+        if (null === $scope) {
+            return;
+        }
+
+        $scope->applyFilterTo($queryBuilder, self::DIMENSION_CONTENT_ALIAS);
+
+        if (true !== ($filters[self::FILTER_COUNTING] ?? false)) {
+            $scope->applyOrderTo($queryBuilder, self::DIMENSION_CONTENT_ALIAS);
+        }
     }
 
     public function getType(): string

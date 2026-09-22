@@ -87,6 +87,66 @@ final class EventSmartContentProviderTest extends TestCase
     }
 
     /**
+     * Counting is not ordering.
+     *
+     * The provider enables pagination, so the smart content asks for a total
+     * even on a short list with no pager in sight. That query aggregates, and
+     * PostgreSQL refuses to order an aggregate by a column it does not group
+     * by - while MySQL runs it without a word, which is how this shipped.
+     *
+     * Both queries are walked for real, and stopped once the clause is on
+     * them: what is asserted is the query, not a result a database would owe.
+     */
+    #[Test]
+    public function theQueryThatCountsIsNarrowedButNotOrdered(): void
+    {
+        $queryBuilder = $this->queryBuiltBy('countBy');
+
+        self::assertStringContainsString(
+            'startDate',
+            (string) $queryBuilder->getDQLPart('where'),
+            'A count still has to be narrowed to the half of the calendar it counts.',
+        );
+        self::assertSame([], $queryBuilder->getDQLPart('orderBy'));
+    }
+
+    /**
+     * The query that lists is ordered, since an agenda is an order.
+     */
+    #[Test]
+    public function theQueryThatListsIsOrdered(): void
+    {
+        $queryBuilder = $this->queryBuiltBy('findFlatBy');
+
+        self::assertStringContainsString('startDate', (string) $queryBuilder->getDQLPart('where'));
+        self::assertNotSame([], $queryBuilder->getDQLPart('orderBy'));
+    }
+
+    /**
+     * Walk one of the provider's two public methods and catch its query.
+     *
+     * @param 'countBy'|'findFlatBy' $method
+     */
+    private function queryBuiltBy(string $method): QueryBuilder
+    {
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+
+        $repository = $this->createStub(EntityRepository::class);
+        $repository->method('createQueryBuilder')->willReturn(new QueryBuilder($entityManager));
+        $entityManager->method('getRepository')->willReturn($repository);
+
+        $provider = new QuerySpyEventProvider(
+            $this->createStub(DimensionContentQueryEnhancer::class),
+            new SmartContentQueryEnhancer(),
+            $entityManager,
+            $this->groupProvider(),
+            new \ArrayObject(),
+        );
+
+        return QuerySpyEventProvider::queryBuiltBy($method, [], $provider);
+    }
+
+    /**
      * Run mapFilters() then addInternalFilters(), the way findFlatBy() does.
      *
      * @param array<string, mixed> $params The template parameters
@@ -121,14 +181,22 @@ final class EventSmartContentProviderTest extends TestCase
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($this->createStub(EntityRepository::class));
 
-        $groupProvider = $this->createStub(GroupProviderInterface::class);
-        $groupProvider->method('getGroups')->willReturn([]);
-
         return new EventSmartContentProvider(
             $this->createStub(DimensionContentQueryEnhancer::class),
             new SmartContentQueryEnhancer(),
             $entityManager,
-            $groupProvider,
+            $this->groupProvider(),
         );
+    }
+
+    /**
+     * A group provider with no article group, which is all these tests need.
+     */
+    private function groupProvider(): GroupProviderInterface
+    {
+        $groupProvider = $this->createStub(GroupProviderInterface::class);
+        $groupProvider->method('getGroups')->willReturn([]);
+
+        return $groupProvider;
     }
 }
