@@ -430,4 +430,66 @@ final class ThemeCompilerTest extends TestCase
             $css,
         );
     }
+
+    /**
+     * A colour named in the admin gets the utility classes Tailwind never
+     * built for it, base name and shades alike.
+     */
+    #[Test]
+    public function itEmitsUtilityClassesForAColorTailwindNeverSaw(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => null, 'slug' => 'gray-blue', 'value' => '#f8fafc'],
+        ]]);
+
+        self::assertStringContainsString(".bg-gray-blue {\n  background-color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString(".text-gray-blue {\n  color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString(".border-gray-blue {\n  border-color: var(--color-gray-blue);\n}", $css);
+        self::assertStringContainsString('.bg-gray-blue-600 {', $css);
+    }
+
+    /**
+     * The classes read the variable, so a repainted theme travels through them
+     * without the stylesheet being rebuilt.
+     */
+    #[Test]
+    public function itsUtilityClassesReadTheVariableRatherThanTheHex(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => null, 'slug' => 'gray-blue', 'value' => '#f8fafc'],
+        ]]);
+
+        preg_match('/\.bg-gray-blue \{\n  background-color: ([^;]+);/', $css, $matches);
+
+        self::assertSame('var(--color-gray-blue)', $matches[1] ?? null);
+    }
+
+    /**
+     * A role wearing its own name already has its utilities from the bridge.
+     */
+    #[Test]
+    public function itLeavesTheBaseRolesToTailwind(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'primary', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringNotContainsString('.bg-primary {', $css);
+        self::assertStringNotContainsString('.bg-primary-500 {', $css);
+    }
+
+    /**
+     * A renamed role is as unknown to Tailwind as a brand colour, and gets the
+     * classes under its new name only.
+     */
+    #[Test]
+    public function itCoversARenamedRoleUnderItsNewNameOnly(): void
+    {
+        $css = $this->compileCss(['colors' => [
+            ['role' => 'primary', 'slug' => 'marine', 'value' => '#1a3a6b'],
+        ]]);
+
+        self::assertStringContainsString('.bg-marine {', $css);
+        self::assertStringNotContainsString('.bg-primary {', $css);
+    }
 }

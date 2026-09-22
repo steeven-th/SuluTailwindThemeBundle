@@ -746,7 +746,7 @@ The bundle provides a **theme bridge** that registers all CSS custom properties 
 </div>
 ```
 
-The bridge also provides semantic color palettes (error, warning, success) with hardcoded defaults:
+The bridge covers the ten base roles, the semantic ones included:
 
 ```twig
 <div class="bg-error-50 text-error-700 border border-error rounded p-4">
@@ -754,7 +754,15 @@ The bridge also provides semantic color palettes (error, warning, success) with 
 </div>
 ```
 
-> See **[Tailwind Integration](tailwind-integration.md)** for the full reference: all available tokens, adding custom colors, manual setup without bridge, and Tailwind 4.x compatibility.
+A color added in the admin outside those roles carries a name the bridge never saw. The theme stylesheet emits `bg-<name>`, `text-<name>` and `border-<name>` for it, and every other property is reached with `fill-(--color-<name>)`, which needs no build:
+
+```twig
+<div class="bg-gray-blue text-gray-blue-700 hover:bg-(--color-gray-blue-100)">
+    Color named "gray blue" in the admin
+</div>
+```
+
+> See **[Tailwind Integration](tailwind-integration.md)** for the full reference: all available tokens, colors named in the admin, adding custom colors, manual setup without bridge, and Tailwind 4.x compatibility.
 
 ---
 
