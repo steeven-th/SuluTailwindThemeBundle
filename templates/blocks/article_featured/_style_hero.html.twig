@@ -10,12 +10,15 @@
         variant: variant|default(0)
     } only %}
 
-    {# Hero style: 1 article. Use the style-specific smart_content property,
-       fall back to the legacy `articles` (max 3) for blocks created before
-       the multi-property XML was introduced. #}
-    {% set articleItems = articles_hero is defined and articles_hero is not empty
-        ? articles_hero
-        : articles|default([]) %}
+    {# Hero style: 1 article. Each source keeps the selection made for this
+       style, so the block reads the one it is set to. The article selection
+       falls back to the legacy `articles` for blocks created before the
+       per-style properties existed. #}
+    {% set articleItems = {
+        'articles': (articles_hero is defined and articles_hero is not empty ? articles_hero : articles|default([])),
+        'upcoming': upcomingEvents_hero|default([]),
+        'past': pastEvents_hero|default([]),
+    }[source|default('articles')]|default([]) %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         {% set article = articleItems|first %}

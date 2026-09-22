@@ -10,11 +10,14 @@
         variant: variant|default(0)
     } only %}
 
-    {# Side-by-side style: 2 articles. Use the style-specific smart_content
-       property, fall back to the legacy `articles` (max 3). #}
-    {% set articleItems = articles_side_by_side is defined and articles_side_by_side is not empty
-        ? articles_side_by_side
-        : articles|default([]) %}
+    {# Side-by-side style: 2 articles. Each source keeps the selection made
+       for this style, and the article one falls back to the legacy
+       `articles` for blocks that predate the per-style properties. #}
+    {% set articleItems = {
+        'articles': (articles_side_by_side is defined and articles_side_by_side is not empty ? articles_side_by_side : articles|default([])),
+        'upcoming': upcomingEvents_side_by_side|default([]),
+        'past': pastEvents_side_by_side|default([]),
+    }[source|default('articles')]|default([]) %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         <div class="iw-block-article-featured iw-block-article-featured--side-by-side">
