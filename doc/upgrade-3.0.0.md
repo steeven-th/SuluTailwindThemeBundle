@@ -439,9 +439,10 @@ directly:
 {% set media = sulu_resolve_media(content.heroImage, app.request.locale) %}
 ```
 
-Article listings (cards, featured) still accept both shapes for their image
-fallback chain (`excerptImages` stays a `media_selection`), so no change is
-needed there beyond re-selecting the hero where it is the only source.
+Article listings (cards, featured) resolve their image the same way, from an
+already-resolved media object. Their excerpt image follows the same single
+selection as the rest of Sulu 3, see [The excerpt image is read at
+all](#the-excerpt-image-is-read-at-all-fixed-breaking-for-overrides).
 
 ## Unified image pipeline (`<picture>` avif/webp + focus point)
 
@@ -1792,3 +1793,66 @@ The *sidebar* blog style empties the article footer, and nothing stood between i
 widget and the site footer. Its two-column body is now a `.iw-article-page__columns`,
 with `--iw-article-page-columns-gap-top` and `--iw-article-page-columns-gap-bottom`
 (`2rem` / `4rem`).
+
+## The excerpt image is read at all (fixed, breaking for overrides)
+
+Every article listing served the hero image, whatever the excerpt image said. No
+error, no warning: the page stayed correct, with the wrong picture. The share
+thumbnails had it too, so a post carefully given its own excerpt image was shared
+under its banner.
+
+The templates asked for the excerpt image in the plural, at a path Sulu 3 does not
+have:
+
+```xml
+<!-- before -->
+<param name="excerptImages" value="excerpt.images"/>
+<!-- after -->
+<param name="excerptImage" value="excerpt.image"/>
+```
+
+Sulu 2 carried a `media_selection` there. Sulu 3 declares a single
+`single_media_selection` in `content_excerpt_metadata.xml`, stored under the
+`image` key and read by `ExcerptInterface::getExcerptImage()`. There is no
+collection any more, and no `images` at all. Asked for a field the excerpt form
+does not declare, `ExcerptTaxonomyResolver` returns `null` by construction, so the
+fallback chain of the templates always went one step further, to `heroImage`.
+
+### What you get back
+
+The parameter is renamed along with its value, because a plural name for a single
+image is what put the wrong path there in the first place. The dead
+`article.excerpt.images` fallback is gone from the chain.
+
+### Overriding templates (breaking)
+
+A template of yours reading `article.excerptImages` now reads `null`. Rename it:
+
+```twig
+{# before #}
+{% set articleImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
+{# after #}
+{% set articleImage = article.excerptImage|default(article.heroImage|default(null)) %}
+```
+
+The value is a resolved `Sulu\Bundle\MediaBundle\Api\Media`, not an id and not a
+collection, exactly like `heroImage` since the single selection. Pass it straight to
+`sulu_resolve_media()`, which takes an object as readily as an id, and drop any
+`is iterable` / `|first` handling around it:
+
+```twig
+{# before #}
+{% if articleImage is iterable and articleImage|length > 0 %}
+    {% set imgId = articleImage.ids|default(articleImage)|first %}
+{% else %}
+    {% set imgId = articleImage %}
+{% endif %}
+{% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
+{# after #}
+{% set imgMedia = sulu_resolve_media(articleImage, app.request.locale) %}
+```
+
+The SEO partials moved the same way, from `extension.excerpt.images.ids|first` to
+`extension.excerpt.image`. Published content is untouched: the parameter name lives
+in the template, never in the database, so nothing needs migrating and no image has
+to be re-selected.

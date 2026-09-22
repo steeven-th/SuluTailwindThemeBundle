@@ -59,7 +59,7 @@
                             <param name="authored" value="authored"/>
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>
@@ -83,7 +83,7 @@
                             <param name="endDate" value="endDate"/>
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>
@@ -107,7 +107,7 @@
                             <param name="endDate" value="endDate"/>
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>

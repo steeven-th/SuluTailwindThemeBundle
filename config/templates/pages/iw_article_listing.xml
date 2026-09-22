@@ -75,7 +75,7 @@
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
                             <param name="excerptMore" value="excerpt.more"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>
@@ -101,7 +101,7 @@
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
                             <param name="excerptMore" value="excerpt.more"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>
@@ -127,7 +127,7 @@
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
                             <param name="excerptMore" value="excerpt.more"/>
-                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptImage" value="excerpt.image"/>
                             <param name="excerptCategories" value="excerpt.categories"/>
                             <param name="excerptTags" value="excerpt.tags"/>
                         </param>

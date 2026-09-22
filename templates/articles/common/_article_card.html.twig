@@ -42,7 +42,7 @@
 {% endif %}
 {% set articleExcerpt = article.excerptDescription|default(article.excerpt.description|default('')) %}
 {% set articleDate = article.authored|default(null) %}
-{% set articleImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
+{% set articleImage = article.excerptImage|default(article.heroImage|default(null)) %}
 {% set articleCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
 {% set cardClasses = ['iw-article-card'] %}
@@ -54,17 +54,7 @@
 
 <article class="{{ cardClasses|join(' ') }}">
     {% if showImage and articleImage is not empty %}
-        {% set imgMedia = null %}
-        {% set imgId = null %}
-        {% if articleImage is iterable and articleImage|length > 0 %}
-            {% set imgId = articleImage.ids|default(articleImage)|first %}
-        {% else %}
-            {# single_media_selection scalar (heroImage fallback) #}
-            {% set imgId = articleImage %}
-        {% endif %}
-        {% if imgId %}
-            {% set imgMedia = sulu_resolve_media(imgId, app.request.locale) %}
-        {% endif %}
+        {% set imgMedia = sulu_resolve_media(articleImage, app.request.locale) %}
 
         {% if imgMedia %}
             <a href="{{ articleUrl }}" class="iw-article-card__image">

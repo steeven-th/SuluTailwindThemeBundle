@@ -15,8 +15,8 @@
 {% set twitterDefaultShareImage = iw_sulu_tailwind_theme.components_shareDefaultImage|default(null) %}
 {# A media deleted from the library resolves to null: skip the image rather than
    taking down the whole page from inside the <head>. #}
-{% if extension.excerpt.images is defined and extension.excerpt.images.ids is defined and extension.excerpt.images.ids|length > 0 %}
-    {% set twitterMedia = sulu_resolve_media(extension.excerpt.images.ids|first, app.request.locale) %}
+{% if extension.excerpt.image is defined and extension.excerpt.image is not empty %}
+    {% set twitterMedia = sulu_resolve_media(extension.excerpt.image, app.request.locale) %}
     {% if twitterMedia is not null %}
         {% set twitterImageUrl = twitterMedia.thumbnails['iw_og_image']|default(twitterMedia.thumbnails['sulu-400x400']|default(twitterMedia.url)) %}
     {% endif %}
