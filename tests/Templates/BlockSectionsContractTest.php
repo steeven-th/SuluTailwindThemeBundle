@@ -130,6 +130,7 @@ final class BlockSectionsContractTest extends TestCase
      */
     private const SWITCHES = [
         'mediaType', 'widgetType', 'videoProvider', 'dateMode', 'useSuluFormBundle', 'singleImage',
+        'source',
     ];
 
     /**

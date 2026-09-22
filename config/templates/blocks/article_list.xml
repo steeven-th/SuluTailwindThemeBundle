@@ -26,7 +26,25 @@
                     </params>
                 </property>
 
-                <property name="articles" type="smart_content">
+                <!-- What the block lists. Each choice shows the selection built
+                     on the provider that answers it, so the preview in the admin
+                     lists what the page will list. -->
+                <property name="source" type="single_select" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.article_list.source_type</title>
+                        <info_text>iw_sulu_tailwind_theme.block.article_list.source_type_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="articles"/>
+                        <param name="values" type="collection">
+                            <param name="articles"><meta><title>iw_sulu_tailwind_theme.article.source_articles</title></meta></param>
+                            <param name="upcoming"><meta><title>iw_sulu_tailwind_theme.article.source_upcoming</title></meta></param>
+                            <param name="past"><meta><title>iw_sulu_tailwind_theme.article.source_past</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="articles" type="smart_content" visibleCondition="__parent.source == 'articles'">
                     <meta>
                         <title>iw_sulu_tailwind_theme.block.article_list.source</title>
                         <info_text>iw_sulu_tailwind_theme.block.article_list.source_info</info_text>
@@ -39,6 +57,54 @@
                             <param name="heroImage" value="heroImage"/>
                             <param name="subtitle" value="subtitle"/>
                             <param name="authored" value="authored"/>
+                            <param name="excerptTitle" value="excerpt.title"/>
+                            <param name="excerptDescription" value="excerpt.description"/>
+                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptCategories" value="excerpt.categories"/>
+                            <param name="excerptTags" value="excerpt.tags"/>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="upcomingEvents" type="smart_content" visibleCondition="__parent.source == 'upcoming'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.upcoming_events</title>
+                                            </meta>
+                    <params>
+                        <param name="provider" value="iw_events"/>
+                        <param name="direction" value="upcoming"/>
+                        <param name="properties" type="collection">
+                            <param name="title" value="title"/>
+                            <param name="url" value="url"/>
+                            <param name="heroImage" value="heroImage"/>
+                            <param name="subtitle" value="subtitle"/>
+                            <param name="authored" value="authored"/>
+                            <param name="startDate" value="startDate"/>
+                            <param name="endDate" value="endDate"/>
+                            <param name="excerptTitle" value="excerpt.title"/>
+                            <param name="excerptDescription" value="excerpt.description"/>
+                            <param name="excerptImages" value="excerpt.images"/>
+                            <param name="excerptCategories" value="excerpt.categories"/>
+                            <param name="excerptTags" value="excerpt.tags"/>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="pastEvents" type="smart_content" visibleCondition="__parent.source == 'past'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.past_events</title>
+                                            </meta>
+                    <params>
+                        <param name="provider" value="iw_events"/>
+                        <param name="direction" value="past"/>
+                        <param name="properties" type="collection">
+                            <param name="title" value="title"/>
+                            <param name="url" value="url"/>
+                            <param name="heroImage" value="heroImage"/>
+                            <param name="subtitle" value="subtitle"/>
+                            <param name="authored" value="authored"/>
+                            <param name="startDate" value="startDate"/>
+                            <param name="endDate" value="endDate"/>
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
                             <param name="excerptImages" value="excerpt.images"/>

@@ -41,6 +41,24 @@ final class ArticleListingController extends ContentController
      */
     private const SCOPE_PROPERTY = 'articles';
 
+    /**
+     * Name of the property saying what the page lists.
+     */
+    private const SOURCE_PROPERTY = 'source';
+
+    /**
+     * The selection each source reads from.
+     *
+     * One property per source rather than one shared: a smart content is bound
+     * to its provider in the template, and that binding is what makes the
+     * preview in the admin list what the site will list.
+     */
+    private const SOURCE_PROPERTIES = [
+        'articles' => self::SCOPE_PROPERTY,
+        'upcoming' => 'upcomingEvents',
+        'past' => 'pastEvents',
+    ];
+
     public function __construct(
         private readonly ArticleListingResolver $listingResolver,
         private readonly ArticleFacetsService $facetsService,
@@ -119,6 +137,7 @@ final class ArticleListingController extends ContentController
      * Extract the admin editorial scope from the page's smart_content property.
      *
      * @return array{
+     *     eventMode: string|null,
      *     templateKeys: string[],
      *     baseCategoryIds: int[],
      *     baseCategoryOperator: 'AND'|'OR',
@@ -131,15 +150,25 @@ final class ArticleListingController extends ContentController
     private function resolveScope(DimensionContentInterface $object): array
     {
         $filter = [];
+        $source = 'articles';
         if ($object instanceof TemplateInterface) {
             $templateData = $object->getTemplateData();
-            $candidate = $templateData[self::SCOPE_PROPERTY] ?? null;
+
+            $stored = $templateData[self::SOURCE_PROPERTY] ?? null;
+            if (\is_string($stored) && isset(self::SOURCE_PROPERTIES[$stored])) {
+                $source = $stored;
+            }
+
+            $candidate = $templateData[self::SOURCE_PROPERTIES[$source]] ?? null;
             if (\is_array($candidate)) {
                 $filter = $candidate;
             }
         }
 
         return [
+            // The two event sources are named after the direction they read,
+            // so the source is the agenda mode.
+            'eventMode' => 'articles' !== $source ? $source : null,
             'templateKeys' => $this->resolveTemplateKeys($this->asList($filter['types'] ?? null)),
             'baseCategoryIds' => $this->asIntList($filter['categories'] ?? null),
             'baseCategoryOperator' => $this->asOperator($filter['categoryOperator'] ?? null),

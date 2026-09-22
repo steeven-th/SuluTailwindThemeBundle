@@ -533,6 +533,8 @@ The `iw_article_listing` page template renders a filtered, paginated article lis
 
 Filters combine (`/news?category=news&q=release&sort=title&page=2`) and pagination links preserve the active filters. URLs are shareable and SEO-friendly; filtering works without JavaScript.
 
+**What the page lists.** The page asks whether it lists *articles*, *upcoming events* or *past events*, and shows the selection that answers it — each one bound to the provider that can answer it, so the preview in the admin lists what the site will list. On an agenda the articles are ordered by the date an editor typed into the event, an event stays listed until it is over, and the sort dropdown disappears since the order is the calendar's. See **[Events and agendas](doc/events.md)**.
+
 **Editorial scope vs visitor filters.** The page's smart_content defines the **editorial scope** — the admin picks the article types (news/event/blog), optional base categories/tags, default sort and a result cap. The visitor filters **refine within that scope**: the chosen type is always enforced, and the sidebar/URL filters narrow the list further (a search for "blog" on a News page returns nothing — it never escapes the news scope). The visitor sort overrides the admin default.
 
 **Filter sidebar.** A left sidebar exposes a search box, a sort dropdown (most recent / oldest / title) and category/tag checkboxes. The checkboxes are **contextual**: only the categories and tags actually used by the articles in the page's editorial scope are listed (a category with no article on this page is not shown), so visitors never land on an empty filter. The list reflects the scope, not the visitor's active selection, so options stay stable while filtering. It is a plain GET form — filtering works without JavaScript. Restyle it with the `--iw-article-filters-*` and `--iw-article-layout-*` custom properties; no Twig override needed.
@@ -786,6 +788,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 |----------|-------------|
 | [Screenshots](doc/screenshots.md) | Visual overview of the admin interface (colors, typography, buttons, blocks, menu) |
 | [Page Templates](doc/page-templates.md) | Modular architecture, creating custom templates, block types, XInclude fragments |
+| [Events and agendas](doc/events.md) | The `iw_events` smart content provider, the Twig functions, and the listing page in agenda mode |
 | [CSS Variables Reference](doc/css-variables.md) | All CSS custom properties: colors, palettes, typography, borders, buttons, menu |
 | [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
 | [Button Hover Effects](doc/button-effects.md) | Catalog of composable hover effects (shadow, transform, opacity, duration, easing) |

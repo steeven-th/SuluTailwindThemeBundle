@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Article\EventDateScope;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository;
 use Sulu\Article\Domain\Repository\ArticleRepositoryInterface;
 use Sulu\Content\Application\ContentManager\ContentManagerInterface;
-use Sulu\Content\Application\ContentResolver\ContentResolverInterface;
 use Sulu\Content\Domain\Model\DimensionContentInterface;
 
 /**
@@ -50,9 +50,9 @@ final class ArticleListingResolver
     public function __construct(
         private readonly ArticleRepositoryInterface $articleRepository,
         private readonly ContentManagerInterface $contentManager,
-        private readonly ContentResolverInterface $contentResolver,
         private readonly ArticleSearchService $articleSearchService,
         private readonly WebspaceArticleRepository $webspaceArticleRepository,
+        private readonly ArticleItemResolver $itemResolver,
     ) {
     }
 
@@ -73,6 +73,7 @@ final class ArticleListingResolver
      *     tagNames?: string[],
      *     query?: string,
      *     sort?: string,
+     *     eventMode?: string|null,
      *     page?: int,
      *     limit?: int,
      * } $request
@@ -91,6 +92,10 @@ final class ArticleListingResolver
         $page = max(1, (int) ($request['page'] ?? 1));
         $limit = max(1, (int) ($request['limit'] ?? self::DEFAULT_LIMIT));
         $query = trim((string) ($request['query'] ?? ''));
+
+        // An agenda is a listing whose order is the calendar's rather than the
+        // editor's, so the scope carries the clause and the order together.
+        $dateScope = EventDateScope::fromDirection($request['eventMode'] ?? null);
 
         // Stage 1 — materialise the admin editorial scope as ordered UUIDs.
         $scopeUuids = $this->resolveScopeUuids($request, $locale);
@@ -136,17 +141,33 @@ final class ArticleListingResolver
             return $this->buildResult([], 0, $page, $limit);
         }
 
-        // The visitor sort overrides the admin default sort when provided.
-        $sortBy = $this->resolveSortBy($request['sort'] ?? null, $request['baseSort'] ?? null);
+        if (null !== $dateScope) {
+            // The calendar order was decided in stage 1 and cannot be asked of
+            // the repository here, which knows nothing of a date living in the
+            // template data. The refinement therefore only says which articles
+            // remain, and the page is cut out of the scope order itself.
+            $orderedUuids = $this->paginateWithinScope(
+                $scopeUuids,
+                array_values(iterator_to_array(
+                    $this->articleRepository->findIdentifiersBy($refineFilters),
+                    false,
+                )),
+                $page,
+                $limit,
+            );
+        } else {
+            // The visitor sort overrides the admin default sort when provided.
+            $sortBy = $this->resolveSortBy($request['sort'] ?? null, $request['baseSort'] ?? null);
 
-        $pageFilters = $refineFilters;
-        $pageFilters['page'] = $page;
-        $pageFilters['limit'] = $limit;
+            $pageFilters = $refineFilters;
+            $pageFilters['page'] = $page;
+            $pageFilters['limit'] = $limit;
 
-        $orderedUuids = array_values(iterator_to_array(
-            $this->articleRepository->findIdentifiersBy($pageFilters, $sortBy),
-            false,
-        ));
+            $orderedUuids = array_values(iterator_to_array(
+                $this->articleRepository->findIdentifiersBy($pageFilters, $sortBy),
+                false,
+            ));
+        }
 
         $items = $this->resolveItems($orderedUuids, $locale);
 
@@ -215,7 +236,35 @@ final class ArticleListingResolver
             $filters,
             $baseSort,
             \is_string($webspaceKey) ? $webspaceKey : null,
+            EventDateScope::fromDirection($request['eventMode'] ?? null),
         );
+    }
+
+    /**
+     * Cut one page out of the scope, keeping the scope's own order.
+     *
+     * The refinement answers which articles remain, in no particular order,
+     * while the order that matters was settled when the scope was built. The
+     * page is therefore taken from the scope, keeping only what survived the
+     * refinement.
+     *
+     * @param string[] $scopeUuids  The scope, in display order
+     * @param string[] $matching    The uuids the visitor filters left, unordered
+     * @param int      $page        The page being shown, from 1
+     * @param int      $limit       Articles per page
+     *
+     * @return string[] The uuids of the page, in display order
+     */
+    private function paginateWithinScope(array $scopeUuids, array $matching, int $page, int $limit): array
+    {
+        $kept = array_flip($matching);
+
+        $ordered = array_values(array_filter(
+            $scopeUuids,
+            static fn (string $uuid): bool => isset($kept[$uuid]),
+        ));
+
+        return array_slice($ordered, ($page - 1) * $limit, $limit);
     }
 
     /**
@@ -284,14 +333,7 @@ final class ArticleListingResolver
     }
 
     /**
-     * Resolve the given article UUIDs into renderable card items, preserving the
-     * requested order.
-     *
-     * The UUIDs are loaded without page/limit so the dimension contents collection
-     * is fully and reliably hydrated (applying a SQL LIMIT on a query that
-     * fetch-joins the to-many dimension collection truncates the joined rowset and
-     * yields incomplete, unresolvable dimensions), then resolved through Sulu's
-     * content pipeline for card parity.
+     * Resolve the given article UUIDs into renderable card items.
      *
      * @param string[] $orderedUuids Article UUIDs in the desired display order
      * @param string   $locale       Current request locale
@@ -300,57 +342,7 @@ final class ArticleListingResolver
      */
     private function resolveItems(array $orderedUuids, string $locale): array
     {
-        if ([] === $orderedUuids) {
-            return [];
-        }
-
-        // Eager-load dimension contents (required by ContentAggregator) via the
-        // same select group the native article ResourceLoader uses.
-        $selects = [ArticleRepositoryInterface::GROUP_SELECT_ARTICLE_WEBSITE => true];
-        $loadFilters = [
-            'locale' => $locale,
-            'stage' => DimensionContentInterface::STAGE_LIVE,
-            'uuids' => $orderedUuids,
-        ];
-
-        $itemsByUuid = [];
-        foreach ($this->articleRepository->findBy($loadFilters, [], $selects) as $article) {
-            $dimensionContent = $this->contentManager->resolve($article, [
-                'locale' => $locale,
-                'stage' => DimensionContentInterface::STAGE_LIVE,
-            ]);
-
-            // Safety guard: an article without a published dimension in the current
-            // locale resolves to its unlocalized base dimension and cannot be
-            // rendered. With UUID-based pagination this should no longer happen.
-            if (!\is_string($dimensionContent->getLocale())) {
-                continue;
-            }
-
-            $resolved = $this->contentResolver->resolve($dimensionContent);
-
-            // The card consumes the template fields (title, url, heroImage…) plus
-            // the excerpt (categories, tags, description, image) and the authored
-            // date — which live outside `content`. Rebuild the same item shape the
-            // native smart_content exposes.
-            $item = $resolved['content'];
-            $item['excerpt'] = $resolved['extension']['excerpt'] ?? [];
-            $item['authored'] = method_exists($dimensionContent, 'getAuthored')
-                ? $dimensionContent->getAuthored()
-                : null;
-
-            $itemsByUuid[$article->getUuid()] = $item;
-        }
-
-        // The `uuids` filter does not preserve order — restore the paginated order.
-        $items = [];
-        foreach ($orderedUuids as $uuid) {
-            if (isset($itemsByUuid[$uuid])) {
-                $items[] = $itemsByUuid[$uuid];
-            }
-        }
-
-        return $items;
+        return $this->itemResolver->resolve($orderedUuids, $locale);
     }
 
     /**

@@ -203,9 +203,11 @@ Since blocks are registered globally, creating a custom page template with a sub
 | `iframe` | External embed (widget, video, map) | Content (title group + URL + accessible description), Appearance (+ sizing), Settings (+ sandbox, permissions, consent) |
 | `code` | Pasted HTML/JS widget | Content (title group + code), Appearance, Settings (+ sizing, theme styles, consent) — see [code-block-security.md](./code-block-security.md) |
 | `separator` | Visual separator | Content (height + line style), Appearance, Settings |
-| `article_list` | Article list (grid/list/cards) | Content (title group + smart_content articles + count + pagination), Appearance, Settings |
-| `article_carousel` | Article carousel | Content (title group + smart_content articles + count + autoplay + interval), Appearance, Settings |
-| `article_featured` | Featured article (hero/side-by-side/spotlight) | Content (title group + smart_content articles), Appearance, Settings |
+| `article_list` | Article list (grid/list/cards) | Content (title group + source switch + smart_content per source + count + pagination), Appearance, Settings |
+| `article_carousel` | Article carousel | Content (title group + source switch + smart_content per source + count + autoplay + interval), Appearance, Settings |
+| `article_featured` | Featured article (hero/side-by-side/spotlight) | Content (title group + source switch + smart_content per style and source), Appearance, Settings |
+
+The three article blocks ask what they list: articles, upcoming events or past events. Each choice has its own selection, built on the provider that answers it, so the preview in the admin lists what the page will list. See [Events and agendas](events.md).
 
 > The 3 article blocks use `smart_content` with `provider: articles` to fetch articles. Articles ship with the Sulu 3 core (`Sulu\Article`), so there is nothing extra to install.
 

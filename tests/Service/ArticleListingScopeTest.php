@@ -6,6 +6,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 
 use CmsIg\Seal\EngineInterface;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\ArticleItemResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ArticleListingResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ArticleSearchService;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -76,9 +77,13 @@ final class ArticleListingScopeTest extends TestCase
         return new ArticleListingResolver(
             $this->createStub(ArticleRepositoryInterface::class),
             $this->createStub(ContentManagerInterface::class),
-            $this->createStub(ContentResolverInterface::class),
             new ArticleSearchService($this->createStub(EngineInterface::class)),
             $webspaceArticleRepository,
+            new ArticleItemResolver(
+                $this->createStub(ArticleRepositoryInterface::class),
+                $this->createStub(ContentManagerInterface::class),
+                $this->createStub(ContentResolverInterface::class),
+            ),
         );
     }
 }

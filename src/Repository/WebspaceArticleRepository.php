@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Repository;
 
 use Doctrine\ORM\Query\Expr\OrderBy;
+use ItechWorld\SuluTailwindThemeBundle\Article\EventDateScope;
 use Sulu\Article\Infrastructure\Doctrine\Repository\ArticleRepository;
 
 /**
@@ -61,14 +62,25 @@ class WebspaceArticleRepository
      * @param string|null                   $webspaceKey The site to restrict to, or null to
      *                                                   keep every site (single-site projects,
      *                                                   and any caller without a request)
+     * @param EventDateScope|null           $dateScope   Restrict to the events still ahead or
+     *                                                   already over, in agenda order, or null
+     *                                                   for a plain article query
      *
      * @return string[] The article uuids, in the requested order
      *
      * @throws \LogicException When the filters cannot produce the dimension content join
      */
-    public function findIdentifiersBy(array $filters, array $sortBy = [], ?string $webspaceKey = null): array
-    {
-        if (null === $webspaceKey || '' === $webspaceKey) {
+    public function findIdentifiersBy(
+        array $filters,
+        array $sortBy = [],
+        ?string $webspaceKey = null,
+        ?EventDateScope $dateScope = null,
+    ): array {
+        if ('' === $webspaceKey) {
+            $webspaceKey = null;
+        }
+
+        if (null === $webspaceKey && null === $dateScope) {
             return \array_values(\iterator_to_array(
                 $this->articleRepository->findIdentifiersBy($filters, $sortBy),
                 false,
@@ -79,10 +91,15 @@ class WebspaceArticleRepository
 
         if (!\in_array(self::DIMENSION_CONTENT_ALIAS, $queryBuilder->getAllAliases(), true)) {
             throw new \LogicException(
-                'Filtering articles by webspace requires both a "locale" and a "stage" filter, '
-                . 'which are what make Sulu join the dimension content carrying the webspace.',
+                'Filtering articles by webspace or by event date requires both a "locale" and a '
+                . '"stage" filter, which are what make Sulu join the dimension content carrying '
+                . 'the webspace and the template data.',
             );
         }
+
+        // Before the selects below: the agenda order is an expression, and an
+        // expression has to be selected for the DISTINCT to accept it.
+        $dateScope?->applyTo($queryBuilder, self::DIMENSION_CONTENT_ALIAS);
 
         $queryBuilder->select('DISTINCT article.uuid');
 
@@ -97,13 +114,15 @@ class WebspaceArticleRepository
         // An article is on a site as its main one, or as an additional one. The
         // left join keeps the articles that have no additional site at all,
         // which is the common case.
-        $queryBuilder
-            ->leftJoin(self::DIMENSION_CONTENT_ALIAS . '.additionalWebspaces', 'additionalWebspace')
-            ->andWhere(
-                self::DIMENSION_CONTENT_ALIAS . '.mainWebspace = :webspaceKey'
-                . ' OR additionalWebspace.additionalWebspace = :webspaceKey',
-            )
-            ->setParameter('webspaceKey', $webspaceKey);
+        if (null !== $webspaceKey) {
+            $queryBuilder
+                ->leftJoin(self::DIMENSION_CONTENT_ALIAS . '.additionalWebspaces', 'additionalWebspace')
+                ->andWhere(
+                    self::DIMENSION_CONTENT_ALIAS . '.mainWebspace = :webspaceKey'
+                    . ' OR additionalWebspace.additionalWebspace = :webspaceKey',
+                )
+                ->setParameter('webspaceKey', $webspaceKey);
+        }
 
         /** @var array<array{uuid: string}> $result */
         $result = $queryBuilder->getQuery()->getResult();

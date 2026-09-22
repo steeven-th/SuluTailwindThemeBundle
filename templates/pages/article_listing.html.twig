@@ -80,7 +80,18 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {# Prefer the server-side filtered list; fall back to native smart_content. #}
         {% set isFiltered = filteredArticles is defined %}
-        {% set listingArticles = isFiltered ? filteredArticles : (content.articles|default([])) %}
+        {# What the page lists: articles, or one side of the agenda. An agenda
+           is ordered by date rather than by whatever a visitor picks. #}
+        {% set listingSource = content.source|default('articles') %}
+        {% set isAgenda = listingSource in ['upcoming', 'past'] %}
+        {# Each source keeps its own selection, so the fallback reads the one
+           the page is set to rather than the articles of another mode. #}
+        {% set sourceSelection = {
+            'articles': content.articles|default([]),
+            'upcoming': content.upcomingEvents|default([]),
+            'past': content.pastEvents|default([]),
+        } %}
+        {% set listingArticles = isFiltered ? filteredArticles : sourceSelection[listingSource]|default([]) %}
 
         {% if isFiltered %}
             {% set listingCurrentPage = articlePagination.page %}
@@ -190,6 +201,7 @@
                     active: activeFilters|default({}),
                     baseUrl: baseUrl,
                     resultCount: articlePagination.total|default(0),
+                    sortable: not isAgenda,
                 } only %}
                 <div class="iw-article-layout__results" data-article-filters-target="results">
                     {{ resultsColumn }}

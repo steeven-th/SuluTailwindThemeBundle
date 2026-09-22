@@ -10,7 +10,13 @@
         variant: variant|default(0)
     } only %}
 
-    {% set articleItems = articles|default([]) %}
+    {# Each source keeps its own selection, so the block reads the one it is
+       set to rather than the articles of another mode. #}
+    {% set articleItems = {
+        'articles': articles|default([]),
+        'upcoming': upcomingEvents|default([]),
+        'past': pastEvents|default([]),
+    }[source|default('articles')]|default([]) %}
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}

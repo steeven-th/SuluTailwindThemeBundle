@@ -10,7 +10,12 @@
         variant: variant|default(0)
     } only %}
 
-    {% set articleItems = articles|default([]) %}
+    {# Spotlight style: 3 articles, one per source. #}
+    {% set articleItems = {
+        'articles': articles|default([]),
+        'upcoming': upcomingEvents|default([]),
+        'past': pastEvents|default([]),
+    }[source|default('articles')]|default([]) %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         {% set mainArticle = articleItems|first %}

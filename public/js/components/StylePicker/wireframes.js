@@ -483,12 +483,15 @@ const WIREFRAME_RENDERERS = {
     // ── article_featured styles ──────────────────────────────────
     // All three prefixed: `hero` and `side_by_side` already mean something
     // else elsewhere in the bundle.
+    // One article, filling the block, its text over the image. The two cards
+    // this used to draw underneath belonged to no style and read as "three
+    // articles", which is what the editor then expected to see.
     article_featured_hero: (fill, accent) => (
         <svg viewBox="0 0 120 80" width="120" height="80">
-            <rect x="8" y="8" width="104" height="34" rx="3" fill={fill} />
-            <rect x="16" y="30" width="50" height="5" rx="2" fill={accent} />
-            <rect x="8" y="48" width="50" height="24" rx="3" fill={fill} opacity="0.6" />
-            <rect x="62" y="48" width="50" height="24" rx="3" fill={fill} opacity="0.6" />
+            <rect x="8" y="10" width="104" height="60" rx="3" fill={fill} opacity="0.5" />
+            <rect x="18" y="36" width="58" height="6" rx="2" fill={accent} />
+            <rect x="18" y="48" width="48" height="3" rx="2" fill="#fff" />
+            <rect x="18" y="55" width="40" height="3" rx="2" fill="#fff" />
         </svg>
     ),
     article_featured_side_by_side: (fill, accent) => (
