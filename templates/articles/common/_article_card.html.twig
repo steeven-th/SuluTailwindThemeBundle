@@ -10,8 +10,10 @@
     - imageRatio: aspect ratio string (default '16/9')
     - showImage / showDate / showExcerpt / showCategory: bool toggles
     - cardSurface, cardBorder, cardHoverTransform, cardHoverImage,
-      cardHoverShadow, cardHoverBorder: tokens from the theme config; used
-      to build BEM modifier classes on the root element.
+      cardHoverBorder: tokens from the theme config; used to build BEM
+      modifier classes on the root element. The shadow is not among them:
+      it is drawn entirely by the compiled stylesheet, from the geometry
+      set under Components > Cards.
     - cardImagePadded (bool): when false, the image touches the card edges
       (image-bleed mode); when true (default), the image keeps its own
       padding/radius inside the card.
