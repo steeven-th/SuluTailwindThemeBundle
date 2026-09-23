@@ -134,7 +134,7 @@ Returns the menu configuration for the active theme.
 | `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger`, `fullscreen` and `sidebar` |
 | `sidebarWidth` | `int` | Sidebar panel width in pixels on large screens (default: `288`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
-| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
+| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
 | `logo` | `string\|null` | Path to logo image |
 | `siteName` | `string\|null` | Site name for display |
 

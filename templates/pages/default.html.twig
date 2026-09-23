@@ -55,6 +55,7 @@
         imageFormat: iw_sulu_tailwind_theme.pageHero_imageFormat|default('original'),
         breadcrumbPageUuid: resource.uuid|default(null),
         breadcrumbCurrentTitle: content.title|default(''),
+        menuOverlay: not (effectiveBreadcrumb == 'top_bar' and pageBreadcrumbsOn),
     } only %}
 
     {# A bar under the banner, the mirror of the one above it. #}

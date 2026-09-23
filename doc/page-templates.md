@@ -56,6 +56,8 @@ The banner image is a **property** of the hero, not a condition for it: the comp
 - **`pageHero_breadcrumbPosition`** applies to all three visible display modes. Each used to place the breadcrumb its own way - below the titles on `overlay`, above them on `below` - which the setting replaces.
 - **`pageHero_shade` and `pageHero_parallax`** are ignored without an image — there is nothing to veil, and nothing to scroll.
 
+With the menu set to **Transparent navbar**, a banner with an image that opens the page carries `data-iw-menu-overlay`: the bar slides over the picture, and the banner grows by the part the bar covers. Not in `side_by_side`, nor under a breadcrumb bar. See [Transparent bar over a hero](menus.md#transparent-bar-over-a-hero).
+
 A `heroImage` pointing at a deleted media resolves to nothing and falls back to the image-less banner, rather than dropping the header (and the H1) entirely.
 
 The breadcrumb also honors the global breadcrumbs setting (Components → Breadcrumb): if breadcrumbs are disabled for pages, none is shown regardless of `pageHero_breadcrumb`.

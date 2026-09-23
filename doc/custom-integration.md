@@ -11,6 +11,7 @@ This guide explains how to use the SuluTailwindThemeBundle in your own custom co
 - [5. Tailwind CSS integration](#5-tailwind-css-integration)
 - [6. Reusing the bundle's Stimulus controllers](#6-reusing-the-bundles-stimulus-controllers)
 - [7. Skip link and main landmark](#7-skip-link-and-main-landmark)
+- [8. A hero of your own under a transparent menu bar](#8-a-hero-of-your-own-under-a-transparent-menu-bar)
 
 ---
 
@@ -845,4 +846,24 @@ A keyboard user should not have to tab through the whole menu on every page (WCA
 - The link must be the **first focusable element** of the page. It stays off screen until it takes the focus, then shows over the bar in the menu colors swapped (`.iw-skip-link`).
 - `tabindex="-1"` on `<main>` lets the browser move the focus there, not only scroll: without it, the next Tab starts again from the top of the page. `#main-content:focus` draws no outline, the ring around the whole page would say nothing.
 - Another target id is passed with `{% include '...' with {target: 'content'} %}`.
+
+---
+
+## 8. A hero of your own under a transparent menu bar
+
+With **Transparent navbar** on, the bar only turns transparent over a hero that says it may sit under it. The bundle heroes do it for you. A hero of your own, on a homepage template or any page that does not go through the bundle page hero, needs two things:
+
+```twig
+<section class="my-hero" data-iw-menu-overlay>
+```
+
+```css
+.my-hero { box-sizing: content-box; padding-top: var(--iw-menu-overlap, 0px); }
+```
+
+- Put the attribute only on a hero that **opens the page with a picture or a dark background**. Anywhere else the bar would turn transparent over a light page.
+- `--iw-menu-overlap` is the bar height while the bar sits over the hero, `0` otherwise, so the padding keeps your content out from under the bar and costs nothing on other pages.
+- Without the attribute, nothing changes: the bar stays opaque and the page starts below it.
+
+See [Transparent bar over a hero](menus.md#transparent-bar-over-a-hero) for the states and the colors.
 

@@ -476,6 +476,14 @@ class ThemeFormMapper
      */
     private function flattenMenuConfig(array &$data, array $menuConfig): void
     {
+        // A transparent bar left transparent while the page scrolls is only
+        // readable over dark sections, so the background comes back by
+        // default. Mirrors the `?? true` of the menu templates, so the admin
+        // shows what the site does for a theme saved before the setting.
+        if (null === ($menuConfig['scrollBg'] ?? null)) {
+            $menuConfig = $this->withMenuScalar($menuConfig, 'scrollBg', true);
+        }
+
         foreach ($menuConfig as $key => $value) {
             if ('colors' === $key && is_array($value)) {
                 foreach ($value as $colorKey => $colorValue) {
@@ -488,6 +496,39 @@ class ThemeFormMapper
                 $data[self::PREFIX_MENU . $key] = $value;
             }
         }
+    }
+
+    /**
+     * Set a scalar of the menu config at the place a mapped-back config gives
+     * it (the order of MENU_SCALAR_KEYS), so serializing, mapping back and
+     * serializing again yields the same keys in the same order.
+     *
+     * @param array<string, mixed> $menuConfig The menu config
+     * @param string               $key        One of MENU_SCALAR_KEYS
+     * @param mixed                $value      The value to set
+     *
+     * @return array<string, mixed> The menu config with the key set
+     */
+    private function withMenuScalar(array $menuConfig, string $key, mixed $value): array
+    {
+        unset($menuConfig[$key]);
+        $rank = array_search($key, self::MENU_SCALAR_KEYS, true);
+
+        $result = [];
+        $inserted = false;
+        foreach ($menuConfig as $existingKey => $existingValue) {
+            $existingRank = array_search($existingKey, self::MENU_SCALAR_KEYS, true);
+            if (!$inserted && (false === $existingRank || $existingRank > $rank)) {
+                $result[$key] = $value;
+                $inserted = true;
+            }
+            $result[$existingKey] = $existingValue;
+        }
+        if (!$inserted) {
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     /**

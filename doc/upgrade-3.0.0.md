@@ -835,6 +835,41 @@ rules.
 
 ---
 
+## Transparent menu bar: only over a hero (breaking, visual)
+
+The **Transparent navbar** setting made the bar transparent on every page,
+while nothing slid under it: the content started below the bar, which then
+showed the page background. With the usual white text, the links, the logo
+and the burger vanished on a white page. See
+[Transparent bar over a hero](menus.md#transparent-bar-over-a-hero). What
+changes on screen:
+
+- **The bar is transparent only over a hero image that opens the page**, and
+  the hero now slides under it, up to the top of the window. On any other
+  page the bar stays opaque.
+- **The hero grows by the height of the bar**, so its picture and text keep
+  the room they had. A full-screen hero stays one screen tall.
+- **Background on scroll is on by default.** A theme saved without the
+  setting now gets its background back on scroll. Uncheck it to keep the old
+  behavior.
+- **The blur is dropped too** while the bar is transparent, and the regular
+  bar comes back while a panel is open.
+- **New colors** for the bar over a hero, in the *Transparent bar, over a
+  hero* group of the menu colors. Empty, the regular colors apply.
+- **All five types** follow the setting. The documentation used to say
+  navbar and mega menu only, while the burger, fullscreen and sidebar already
+  applied it.
+- **The sidebar** now honours *Background on scroll*: its bar never took the
+  background back.
+
+**If you override a hero template**, add `data-iw-menu-overlay` to its outer
+element when it opens the page with an image, and pad its content with
+`--iw-menu-overlap`. The bundle heroes take a `menuOverlay` parameter for it.
+`HeroMenuOverlayRenderTest` and `MenuTransparentBarTest` in the bundle guard
+these rules.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

@@ -16,6 +16,9 @@ The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
 | `--menu-bg` | Main menu background | `#ffffff` |
 | `--menu-text` | Primary text color | `#202124` |
 | `--menu-textHover` | Text color on hover | `#1a73e8` |
+| `--iw-menu-transparent-text` | Text over a hero while the bar is transparent (falls back to the regular text color) | `#ffffff` |
+| `--iw-menu-transparent-burger` | Burger icon over a hero (falls back to the transparent text color) | `#ffffff` |
+| `--iw-menu-overlap` | Height of the bar sitting over the hero, `0` otherwise, for a hero to keep its content out from under it | `80px` |
 | `--iw-menu-text-active` | Link of the current page and the entries leading to it (falls back to each level's hover color) | `#facc15` |
 | `--menu-secondBg` | Dropdown background (level 2) | `#f8f9fa` |
 | `--menu-secondText` | Dropdown text color | `#202124` |

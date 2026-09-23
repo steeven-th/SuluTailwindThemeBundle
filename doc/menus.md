@@ -32,8 +32,8 @@ These options are available regardless of the menu type:
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
 | **Switcher placement** | (`burger`, `fullscreen`, `sidebar` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
 | **Label format** | (Language switcher only) How each language is named: short code (`FR`), native name (`Français`), or the name written in the language currently being browsed. |
-| **Transparent navbar** | Makes the navbar background transparent (useful for hero sections). Only applies to `navbar` and `megamenu` types. |
-| **Background on scroll** | (Transparent navbar only) The navbar takes its configured background color once the page is scrolled past ~50px, and turns transparent again at the top. Adds `.iw-menu--scrolled`. |
+| **Transparent navbar** | The bar drops its background and slides over the hero image at the top of a page. All five menu types. On a page that does not open with a hero image, the bar stays opaque. See [Transparent bar over a hero](#transparent-bar-over-a-hero). |
+| **Background on scroll** | (Transparent navbar only, on by default) The bar takes its background back once the page is scrolled past ~50px, and turns transparent again at the top. Adds `.iw-menu--scrolled`. Unchecked, the bar stays transparent over the whole page, readable only if every section behind it is dark. |
 | **Hide on scroll** | Smart hide — the navbar slides out of view on scroll down and reappears on scroll up (with its background if *Background on scroll* is on). Works on any background. Adds `.iw-menu--hidden`. Never hides near the top of the page or while the mobile menu is open; respects `prefers-reduced-motion`. |
 
 ## Bar chrome
@@ -51,7 +51,8 @@ What detaches the bar from the content scrolling underneath. All four settings l
 Two things worth knowing:
 
 - **Blur needs opacity.** A fully opaque bar has nothing to blur behind it, so *Backdrop blur* alone changes nothing on screen. Lower *Background opacity* first.
-- **Transparent mode drops the whole chrome.** While `.iw-menu--transparent` is on and the bar has not scrolled yet, background, rule and shadow are all neutralized — a rule floating over a hero reads as a glitch. They come back together with the background, in the same transition, when `.iw-menu--scrolled` applies.
+- **Transparent mode drops the whole chrome.** While the bar sits transparent over a hero, background, rule, shadow and blur are all neutralized: a rule floating over a hero reads as a glitch, a blur smears the picture. They come back together with the background, in the same transition, once the page scrolls or a panel opens.
+- **Below 100% opacity, the text sits on whatever scrolls under the bar.** Keep enough opacity, or a blur, for it to stay readable over light content.
 
 Only the bar is translucent: dropdowns, overlays and side panels stay on the opaque `--iw-menu-bg`, since a see-through dropdown is unreadable.
 
@@ -76,6 +77,47 @@ With the defaults (80, 40 and 12 on desktop), nothing changes: `max(80, 64) = 80
 | `--iw-menu-panels-offset` | Top offset of the drill-down panels. Follows `--iw-menu-bar-height` unless a project overrides it. |
 
 `html` gets `scroll-padding-top: var(--iw-menu-bar-height)`, so the target of an in-page link does not land under the sticky bar.
+
+## Transparent bar over a hero
+
+A transparent bar only works over a picture. On a white page it leaves white text on white. So the bar turns transparent only when the page **opens with a hero image** that says the bar may sit over it, with the `data-iw-menu-overlay` attribute.
+
+**Where the bundle sets it**
+
+- Page hero: with an image, displayed `overlay`, `below` or `hidden`. Not `side_by_side` (the image sits beside the text, not under the bar), not without an image, and not when a breadcrumb bar sits above the banner.
+- Article hero: `fullwidth` and `parallax` styles of the news and blog post *Classic* styles, whose hero opens the page. Not `contained`, which is framed by the page margins, nor the styles that print a breadcrumb above the article.
+
+**What happens then**
+
+| State | Bar |
+|-------|-----|
+| Top of the page, over the hero | Transparent, no rule, shadow or blur. Text, icons and burger in the *Transparent bar* colors. Transparent-mode logos. |
+| Scrolled past ~50px (*Background on scroll*) | Regular bar, in the same transition. |
+| A panel open (burger, sidebar, fullscreen) | Regular bar: the panel paints its own background under it. |
+| Page without a marked hero | Regular bar, the content starts below it. |
+
+The header stays sticky and is pulled up by the bar height, so the hero starts at the top of the window. The hero grows by the part the bar covers, so the picture and the text keep the room they have under an opaque bar. A full-screen hero stays one screen tall.
+
+The state is read in CSS with `:has()`, so it applies before the first paint and the page never jumps. A browser without `:has()` keeps the bar opaque.
+
+**Colors.** The *Transparent bar, over a hero* group of **Menu > Colors** sets the text (links, site name, social icons, language switcher) and the burger icon. Pick colors that read on the picture. Left empty, the regular colors apply.
+
+**A hero of your own.** Put the attribute on its outer element, only when it opens the page, and keep its content out from under the bar with `--iw-menu-overlap` (the bar height while the bar sits over it, `0` otherwise):
+
+```twig
+<section class="my-hero"{% if heroImage %} data-iw-menu-overlay{% endif %}>
+```
+
+```css
+.my-hero { box-sizing: content-box; padding-top: var(--iw-menu-overlap, 0px); }
+```
+
+| CSS variable | Description |
+|--------------|-------------|
+| `--iw-menu-overlap` | Height of the bar sitting over the hero, `0` when it does not. |
+| `--iw-menu-transparent-text` | Text over the hero. Defaults to `--iw-menu-text`. |
+| `--iw-menu-transparent-social` | Social icons over the hero. Defaults to the transparent text color, then `--iw-menu-social-media`. |
+| `--iw-menu-transparent-burger` | Burger icon over the hero. Defaults to the transparent text color, then the regular burger color. |
 
 ## Menu buttons
 
@@ -299,6 +341,8 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Burger close | `--iw-menu-burger-close` | Burger icon color (open state / X). |
 | Social media | `--iw-menu-social-media` | Social media icon color. |
 | Social media hover | `--iw-menu-social-media-hover` | Social media icon hover color. |
+| Transparent bar text | `--iw-menu-transparent-text` | Text, social icons and language switcher while the bar sits transparent over a hero. Falls back to the regular colors. |
+| Transparent bar burger | `--iw-menu-transparent-burger` | Burger icon over a hero. Falls back to the transparent bar text color. |
 
 ## Language switcher
 
@@ -461,7 +505,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 |-------|-------------|
 | `.iw-menu` | Base menu container: text color plus the whole bar chrome (background `--iw-menu-surface`, bottom rule, shadow, backdrop blur). |
 | `.iw-menu--sidebar` | Sidebar menu type. There the sticky element is the `.iw-menu__frame`, not the header (which also wraps the sliding panel), so the chrome moves onto that frame. |
-| `.iw-menu--transparent` | Transparent navbar modifier — drops background, rule and shadow at once. |
+| `.iw-menu--transparent` | Transparent navbar setting. Drops background, rule, shadow and blur only over a hero marked `data-iw-menu-overlay`, see [Transparent bar over a hero](#transparent-bar-over-a-hero). |
 | `.iw-menu--scrolled` | Set by JS past the scroll threshold; a transparent navbar takes its chrome back. Override the scroll transition via `--iw-menu-scroll-duration` (default `300ms`). |
 | `.iw-menu--hidden` | Set by JS on scroll down (smart hide) — translates the navbar out of view (`translateY(-100%)`). |
 | `.iw-menu__frame` | Wrapper of the bar, a plain `<div>` (the bar is not a navigation landmark). Stays usable while a panel is open. |

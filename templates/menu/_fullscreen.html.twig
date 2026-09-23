@@ -30,7 +30,7 @@
     data-controller="menu"
     data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
     data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
-    data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
+    data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >

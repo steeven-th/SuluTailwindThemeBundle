@@ -2629,6 +2629,22 @@ class ThemeCompiler
      * admin tokens stable (camelCase) while emitting variables that follow
      * the 3.0.0 kebab-case convention.
      */
+    /**
+     * The page starts with a hero that may sit under the bar (it carries
+     * `data-iw-menu-overlay`) and the theme asks for a transparent bar. Read
+     * with :has(), so the bar knows it before the first paint: a class set by
+     * a script would arrive after it and make the page jump. A browser without
+     * :has() keeps the bar opaque, which is always readable.
+     */
+    private const MENU_OVER_HERO_PAGE = ':root:has(.iw-menu--transparent):has(main [data-iw-menu-overlay])';
+
+    /**
+     * The bar is actually drawn transparent: over a hero, not scrolled past
+     * it, and no panel open (a panel paints its own background under the bar,
+     * the regular colors are the ones chosen against it).
+     */
+    private const MENU_OVER_HERO = self::MENU_OVER_HERO_PAGE . ':not(.iw-scroll-locked) .iw-menu--transparent:not(.iw-menu--scrolled)';
+
     private const MENU_COLOR_VAR_SUFFIX = [
         'bg' => 'bg',
         'text' => 'text',
@@ -2741,6 +2757,15 @@ class ThemeCompiler
             $css .= "  --iw-menu-{$suffix}: {$resolved};\n";
         }
 
+        // Colors of the bar while it sits transparent over a hero. Always
+        // emitted, falling back to the regular ones, so the rule applying them
+        // needs no knowledge of the config.
+        $transparentText = $this->menuColorOrNull($colors['transparentText'] ?? null);
+        $transparentBurger = $this->menuColorOrNull($colors['transparentBurger'] ?? null);
+        $css .= '  --iw-menu-transparent-text: ' . ($transparentText ?? 'var(--iw-menu-text)') . ";\n";
+        $css .= '  --iw-menu-transparent-social: ' . ($transparentText ?? 'var(--iw-menu-social-media)') . ";\n";
+        $css .= '  --iw-menu-transparent-burger: ' . ($transparentBurger ?? $transparentText ?? 'var(--iw-menu-burger-open, var(--iw-menu-text))') . ";\n";
+
         $css .= "\n  /* Menu bar chrome */\n";
 
         // Painted surface of the bar: the configured background, thinned by the
@@ -2793,6 +2818,22 @@ class ThemeCompiler
         $css .= "  --iw-menu-bar-height-mobile: {$barMobile}px;\n";
 
         return $css . "\n";
+    }
+
+    /**
+     * Resolve a menu color setting, or null when it is left empty.
+     *
+     * @param mixed $value The stored color (hex, ref:..., or empty)
+     *
+     * @return string|null The CSS color, or null to let the caller fall back
+     */
+    private function menuColorOrNull(mixed $value): ?string
+    {
+        if (!\is_string($value) || '' === trim($value)) {
+            return null;
+        }
+
+        return $this->resolveColorValue($value);
     }
 
     /**
@@ -2945,19 +2986,31 @@ class ThemeCompiler
         $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
         $css .= "  backdrop-filter: var(--iw-menu-backdrop, none); }\n";
 
-        // Transparent navbar modifier: no background, and no chrome either, so
-        // the bar truly disappears over the hero.
-        $css .= ".iw-menu.iw-menu--transparent, .iw-menu--sidebar.iw-menu--transparent > .iw-menu__frame {\n";
-        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none; }\n";
-
-        // Scroll behavior (L16): a transparent navbar takes its background once
-        // scrolled; the smart-hide modifier slides it out of view. The chrome
-        // comes back with the background, in the same transition.
-        $css .= ".iw-menu.iw-menu--transparent.iw-menu--scrolled,\n";
-        $css .= ".iw-menu--sidebar.iw-menu--transparent.iw-menu--scrolled > .iw-menu__frame {\n";
-        $css .= "  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
-        $css .= "  border-bottom-color: var(--iw-menu-border-color, transparent);\n";
-        $css .= "  box-shadow: var(--iw-menu-shadow, none); }\n";
+        // Transparent bar. Only over a hero that says it can sit under the bar
+        // (see MENU_OVER_HERO_PAGE): on any other page the bar stays opaque,
+        // never white text on a white page. The header is pulled up by the
+        // bar height, sticky still, so the hero starts at the top of the
+        // window, and --iw-menu-overlap tells the hero how much of it the bar
+        // covers.
+        $overHeroPage = self::MENU_OVER_HERO_PAGE;
+        $overHero = self::MENU_OVER_HERO;
+        $css .= "{$overHeroPage} { --iw-menu-overlap: var(--iw-menu-bar-height); }\n";
+        $css .= "{$overHeroPage} .iw-menu--transparent { margin-bottom: calc(-1 * var(--iw-menu-overlap)); }\n";
+        // No background and no chrome either, so the bar truly disappears over
+        // the hero. The blur goes too: it would smear the top of the picture.
+        // Scrolled past the threshold (.iw-menu--scrolled) or with a panel
+        // open, the selector stops matching and the regular bar comes back, in
+        // the transition of .iw-menu.
+        $css .= "{$overHero}, {$overHero}.iw-menu--sidebar > .iw-menu__frame {\n";
+        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none;\n";
+        $css .= "  -webkit-backdrop-filter: none; backdrop-filter: none; }\n";
+        // Colors chosen for the picture under the bar, the regular ones when
+        // unset (see generateMenuVariables()). Scoped to the frame: the panel
+        // the burger opens lies outside it and keeps its own colors.
+        $css .= "{$overHero} .iw-menu__frame {\n";
+        $css .= "  --iw-menu-text: var(--iw-menu-transparent-text);\n";
+        $css .= "  --iw-menu-social-media: var(--iw-menu-transparent-social);\n";
+        $css .= "  --iw-menu-burger-open: var(--iw-menu-transparent-burger); }\n";
         $css .= ".iw-menu.iw-menu--hidden { transform: translateY(-100%); }\n";
         // Respect reduced-motion: no slide/fade animation, instant state change
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu { transition: none; } }\n";
@@ -3071,8 +3124,9 @@ class ThemeCompiler
         // Default state: the regular logo is shown, the transparent one waits.
         $css .= ".iw-menu__logo-state--transparent { opacity: 0; pointer-events: none; }\n";
         // Over the hero (transparent, not yet scrolled) the variants swap.
-        $css .= ".iw-menu--transparent:not(.iw-menu--scrolled) .iw-menu__logo-state--transparent { opacity: 1; pointer-events: auto; }\n";
-        $css .= ".iw-menu--transparent:not(.iw-menu--scrolled) .iw-menu__logo-state--default { opacity: 0; pointer-events: none; }\n";
+        $overHero = self::MENU_OVER_HERO;
+        $css .= "{$overHero} .iw-menu__logo-state--transparent { opacity: 1; pointer-events: auto; }\n";
+        $css .= "{$overHero} .iw-menu__logo-state--default { opacity: 0; pointer-events: none; }\n";
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__logo-state { transition: none; } }\n";
 
         // Background of the panel the burger opens (burger, navbar and mega menu

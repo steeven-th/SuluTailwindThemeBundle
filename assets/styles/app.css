@@ -4365,6 +4365,20 @@ section.block:has([data-slider-fullbleed-value]) {
     max-height: none;
 }
 
+/* Under a transparent menu bar: same treatment as the page hero, the banner
+   grows by the part of it the bar covers (see .iw-page-hero[data-iw-menu-overlay]). */
+.iw-article-hero[data-iw-menu-overlay] {
+    box-sizing: content-box;
+    padding-top: var(--iw-menu-overlap, 0px);
+}
+.iw-article-hero[data-iw-menu-overlay] .iw-article-hero__image:not(.parallax-slide-img) {
+    position: absolute;
+    inset: 0;
+}
+.iw-article-hero--h-full[data-iw-menu-overlay] {
+    height: calc(100svh - var(--iw-menu-overlap, 0px));
+}
+
 /* A viewport-tall banner makes no sense once the hero sits inside the page
    container with rounded corners, so "full" falls back to the large preset. */
 .iw-article-hero--h-full.iw-article-hero--contained {
@@ -4394,6 +4408,24 @@ section.block:has([data-slider-fullbleed-value]) {
 .iw-page-hero--h-md { --iw-page-hero-ratio: 16 / 9; --iw-page-hero-max-height: 560px; }
 .iw-page-hero--h-lg { --iw-page-hero-ratio: 16 / 11; --iw-page-hero-max-height: 720px; }
 .iw-page-hero--h-full { --iw-page-hero-ratio: auto; --iw-page-hero-height: 100svh; --iw-page-hero-max-height: none; }
+
+/* Under a transparent menu bar (data-iw-menu-overlay, --iw-menu-overlap set by
+   the theme stylesheet), the banner grows by the part the bar covers: the
+   height and the ratio apply below the bar, so the picture and the text keep
+   the room they have on a page with an opaque bar. The padding holds that
+   part, the image fills it, and a full-screen banner stays one screen tall.
+   Without a transparent bar the overlap is 0 and nothing moves. */
+.iw-page-hero[data-iw-menu-overlay] {
+    box-sizing: content-box;
+    padding-top: var(--iw-menu-overlap, 0px);
+}
+.iw-page-hero[data-iw-menu-overlay] .iw-page-hero__image:not(.iw-page-hero__image--parallax) {
+    position: absolute;
+    inset: 0;
+}
+.iw-page-hero--h-full[data-iw-menu-overlay] {
+    --iw-page-hero-height: calc(100svh - var(--iw-menu-overlap, 0px));
+}
 
 /* No banner image: the header sits on the page background instead of a photo,
    so it drops the light-on-dark treatment and takes the theme text colors.
@@ -4440,6 +4472,9 @@ section.block:has([data-slider-fullbleed-value]) {
     display: flex;
     flex-direction: column;
     padding-block: var(--iw-page-hero-overlay-padding-block, 2rem);
+    /* Under a transparent menu bar, the top of the banner is covered by the
+       bar: --iw-menu-overlap (0 otherwise) keeps the title out from under it. */
+    padding-top: calc(var(--iw-page-hero-overlay-padding-block, 2rem) + var(--iw-menu-overlap, 0px));
     pointer-events: none; /* let clicks reach the page; links re-enable below */
 }
 .iw-page-hero__overlay > * { pointer-events: auto; }

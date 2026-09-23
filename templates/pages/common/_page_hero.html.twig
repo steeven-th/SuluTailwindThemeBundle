@@ -39,6 +39,10 @@
     - breadcrumbPosition: above | below — where the breadcrumb sits relative to
                   the titles, when it sits with them
     - breadcrumbPageUuid / breadcrumbCurrentTitle: breadcrumb context
+    - menuOverlay: bool - the hero opens the page, nothing above it, so a
+             transparent menu bar may sit over its image. Marks the banner
+             with data-iw-menu-overlay, never on side_by_side (the image is
+             beside the text, not under the bar) nor without an image.
 
     Public CSS API:
     - .iw-page-hero (block) + .iw-page-hero--h-{sm|md|lg|full} + .iw-page-hero--parallax
@@ -169,7 +173,8 @@
     {% set imgClasses = 'iw-page-hero__image' ~ (parallax ? ' iw-page-hero__image--parallax' : '') %}
 
     <section class="iw-page-hero iw-page-hero--h-{{ height }}{{ hasImage ? '' : ' iw-page-hero--no-image' }}{{ parallax ? ' iw-page-hero--parallax' : '' }}"
-             {%- if parallax %} data-controller="hero-parallax"{% endif %}>
+             {%- if parallax %} data-controller="hero-parallax"{% endif %}
+             {%- if hasImage and menuOverlay|default(false) %} data-iw-menu-overlay{% endif %}>
         {# "hidden" hides the title visually, not semantically: the page
            would otherwise ship without any <h1>. #}
         {% if display == 'hidden' and heroTitle is not empty %}
