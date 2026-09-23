@@ -2717,6 +2717,12 @@ class ThemeCompiler
      * bar shipped with, so an untouched theme keeps its bar.
      */
     private const MENU_BAR_HEIGHT_DESKTOP = 80;
+
+    /**
+     * Widths under which navbar and mega menu switch to the burger, keyed by
+     * the `collapseAt` menu setting. `auto` measures the bar instead.
+     */
+    private const MENU_COLLAPSE_WIDTHS = ['md' => 768, 'lg' => 1024, 'xl' => 1280];
     private const MENU_BAR_HEIGHT_MOBILE = 64;
     private const MENU_LOGO_SPACING = 12;
 
@@ -3281,6 +3287,36 @@ class ThemeCompiler
         $css .= ".iw-social-text { color: var(--iw-menu-social-media); transition: color 0.2s ease; }\n";
         $css .= "a:hover > .iw-social-text { color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n\n";
 
+        // ─── Links or burger ─────────────────────────────────────────────────
+        // Navbar and mega menu switch from their links to the burger under the
+        // width set by `collapseAt` (.iw-menu--collapse-*). Written here rather
+        // than as Tailwind breakpoints in the templates: a class built from a
+        // setting would never reach the Tailwind build.
+        foreach (self::MENU_COLLAPSE_WIDTHS as $name => $width) {
+            $below = $width - 0.02;
+            $css .= "@media (max-width: {$below}px) { .iw-menu--collapse-{$name} .iw-menu__desktop-only { display: none; } }\n";
+            $css .= "@media (min-width: {$width}px) { .iw-menu--collapse-{$name} .iw-menu__mobile-only { display: none; } }\n";
+        }
+        // Automatic: the controller measures the bar and sets --collapsed when
+        // the links do not fit. Below 768px the burger always wins. Until the
+        // controller has measured (--measured), or without JavaScript, the
+        // bar behaves as with 1024px.
+        $css .= "@media (max-width: 767.98px) { .iw-menu--collapse-auto .iw-menu__desktop-only { display: none; } }\n";
+        $css .= "@media (min-width: 768px) and (max-width: 1023.98px) { .iw-menu--collapse-auto:not(.iw-menu--measured) .iw-menu__desktop-only { display: none; } }\n";
+        $css .= "@media (min-width: 1024px) { .iw-menu--collapse-auto:not(.iw-menu--measured) .iw-menu__mobile-only { display: none; } }\n";
+        $css .= "@media (min-width: 768px) {\n";
+        $css .= "  .iw-menu--collapse-auto.iw-menu--measured:not(.iw-menu--collapsed) .iw-menu__mobile-only { display: none; }\n";
+        $css .= "  .iw-menu--collapse-auto.iw-menu--collapsed .iw-menu__desktop-only { display: none; }\n";
+        $css .= "}\n";
+        // A first-level entry stays on one line: a label wrapped on three
+        // lines squashed its chevron and hid the overflow instead of showing it.
+        $css .= ".iw-menu__desktop-nav > ul > li > .iw-menu__text { white-space: nowrap; }\n";
+        // A long dropdown scrolls instead of running off a short screen. Not a
+        // level 2 opening a level 3 beside it: the scroll box would clip it.
+        $css .= ".iw-menu__dropdown--scroll, .iw-mega-menu__dropdown {\n";
+        $css .= "  max-height: calc(100dvh - var(--iw-menu-bar-height, 4rem) - 1rem);\n";
+        $css .= "  overflow-y: auto; overscroll-behavior: contain; }\n\n";
+
         // ─── Bar height ───────────────────────────────────────────────────────
         // One height for the whole menu, resolved from the theme (see
         // generateMenuVariables()). Everything that sits against the bar reads
@@ -3342,10 +3378,12 @@ class ThemeCompiler
         $css .= "@media (max-width: 900px) {\n";
         $css .= "  .iw-mega-menu__grid--cols-3 { grid-template-columns: repeat(2, 1fr); }\n";
         $css .= "}\n";
-        // Responsive: 4-5 columns → 2 under 1024px, then 1 under 768px
+        // Responsive: 4-5 columns → 3 under 1024px, then 1 under 768px. Two
+        // columns made each image card half the panel wide, and a portrait
+        // card then ran taller than the screen.
         $css .= "@media (max-width: 1024px) {\n";
-        $css .= "  .iw-mega-menu__grid--cols-4 { grid-template-columns: repeat(2, 1fr); }\n";
-        $css .= "  .iw-mega-menu__grid--cols-5 { grid-template-columns: repeat(2, 1fr); }\n";
+        $css .= "  .iw-mega-menu__grid--cols-4 { grid-template-columns: repeat(3, 1fr); }\n";
+        $css .= "  .iw-mega-menu__grid--cols-5 { grid-template-columns: repeat(3, 1fr); }\n";
         $css .= "}\n";
         $css .= "@media (max-width: 768px) {\n";
         $css .= "  .iw-mega-menu__grid--cols-3,\n";

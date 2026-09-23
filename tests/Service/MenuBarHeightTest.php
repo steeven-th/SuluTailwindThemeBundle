@@ -62,6 +62,22 @@ final class MenuBarHeightTest extends TestCase
         self::assertStringContainsString('var(--iw-menu-panels-offset, var(--iw-menu-bar-height', $css);
     }
 
+    #[Test]
+    public function eachCollapseWidthHasItsRules(): void
+    {
+        $css = $this->compile([]);
+
+        foreach (['md' => 768, 'lg' => 1024, 'xl' => 1280] as $name => $width) {
+            $below = $width - 0.02;
+            self::assertStringContainsString("@media (max-width: {$below}px) { .iw-menu--collapse-{$name} .iw-menu__desktop-only { display: none; } }", $css);
+            self::assertStringContainsString("@media (min-width: {$width}px) { .iw-menu--collapse-{$name} .iw-menu__mobile-only { display: none; } }", $css);
+        }
+        // Automatic, before the controller measured or without JavaScript: as 1024px.
+        self::assertStringContainsString('.iw-menu--collapse-auto:not(.iw-menu--measured) .iw-menu__mobile-only { display: none; }', $css);
+        self::assertStringContainsString('.iw-menu--collapse-auto.iw-menu--collapsed .iw-menu__desktop-only { display: none; }', $css);
+        self::assertStringContainsString('max-height: calc(100dvh - var(--iw-menu-bar-height, 4rem) - 1rem);', $css);
+    }
+
     /**
      * The heights written in the templates are what the setting replaced: one
      * left behind is a bar, a panel or a spacer that ignores it.

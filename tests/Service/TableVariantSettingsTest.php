@@ -129,8 +129,10 @@ final class TableVariantSettingsTest extends TestCase
             'tableBorderStyle' => 'red; display: none',
         ]);
 
+        // The injected value itself: the stylesheet has display: none rules
+        // of its own (the menu switching to the burger, for one).
         self::assertStringNotContainsString(
-            'display: none',
+            'red; display: none',
             $css,
             'The line style lands inside a border shorthand, so it must be whitelisted. Passed '
             . 'through, an unexpected value takes the whole declaration down with it.',

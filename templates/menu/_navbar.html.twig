@@ -21,6 +21,9 @@
 
 {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
 
+{# Width under which the links give way to the burger (see ThemeCompiler). #}
+{% set collapseAt = config.collapseAt|default('auto') in ['md', 'lg', 'xl', 'auto'] ? config.collapseAt|default('auto') : 'auto' %}
+
 {# Ids tie each trigger to what it opens (aria-controls). #}
 {% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
 
@@ -30,7 +33,7 @@
     data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
+    class="iw-menu iw-menu--collapse-{{ collapseAt }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     <div class="iw-menu__frame relative z-50 md:container md:mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
@@ -48,7 +51,7 @@
                 'center': 'md:mx-auto',
                 'right': 'md:ml-auto md:mr-6'
             } %}
-            <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="hidden md:block {{ navPositionClass[navPosition]|default('md:mx-auto') }}">
+            <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__desktop-nav iw-menu__desktop-only {{ navPositionClass[navPosition]|default('md:mx-auto') }}">
                 <ul class="iw-menu__list flex items-center gap-1">
                 {% for item in navItems %}
                     {% set itemHref = sulu_content_path(item.url) %}
@@ -56,6 +59,9 @@
                     {% if item.children is defined and item.children|length > 0 %}
                         {# Dropdown parent: the item is the hover and focus zone #}
                         {% set dropdownId = iw_sulu_tailwind_theme_unique_id('menu-dropdown') %}
+                        {# A long list scrolls, unless a level 3 opens beside it:
+                           the scroll box would clip that flyout. #}
+                        {% set hasLevel3 = item.children|filter(child => child.children is defined and child.children|length > 0)|length > 0 %}
                         <li class="relative">
                             <button
                                 type="button"
@@ -70,7 +76,7 @@
                             </button>
                             <ul
                                 id="{{ dropdownId }}"
-                                class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__bar-dropdown hidden absolute w-48 shadow-lg py-1 z-50"
+                                class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__bar-dropdown{{ hasLevel3 ? '' : ' iw-menu__dropdown--scroll' }} hidden absolute w-48 shadow-lg py-1 z-50"
                             >
                                 {% if clickNavbar %}
                                     <li>
@@ -103,7 +109,7 @@
                                             <ul
                                                 id="{{ subdropdownId }}"
                                                 data-menu-placement="side"
-                                                class="iw-menu__list iw-menu__dropdown--level-3 hidden absolute left-full top-0 ml-0.5 w-48 shadow-lg py-1 z-50"
+                                                class="iw-menu__list iw-menu__dropdown--level-3 iw-menu__dropdown--scroll hidden absolute left-full top-0 ml-0.5 w-48 shadow-lg py-1 z-50"
                                             >
                                                 {% if clickNavbar %}
                                                     <li>
@@ -160,7 +166,7 @@
             <div class="flex items-center gap-3">
                 {# Language switcher — desktop. Anchored right: it sits at the
                    end of the bar, so a left-anchored panel would overflow. #}
-                <div class="hidden md:block">
+                <div class="iw-menu__desktop-only">
                     {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                         with {config: config, align: 'right'} %}
                 </div>
@@ -168,7 +174,7 @@
                 {# Social media icons — desktop #}
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
-                    class: 'hidden md:flex items-center gap-2',
+                    class: 'flex items-center gap-2 iw-menu__desktop-only',
                     iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
@@ -181,7 +187,7 @@
                     aria-expanded="false"
                     aria-controls="{{ panelId }}"
                     aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
-                    class="iw-menu__burger md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+                    class="iw-menu__burger iw-menu__mobile-only w-10 h-10 flex flex-col items-center justify-center gap-1.5"
                 >
                     <span class="iw-menu__burger-line"></span>
                     <span class="iw-menu__burger-line"></span>
@@ -198,7 +204,7 @@
         data-menu-target="panel"
         role="dialog"
         aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
-        class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} iw-menu__below-bar fixed left-0 right-0 bottom-0 z-30 md:hidden"
+        class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} iw-menu__below-bar fixed left-0 right-0 bottom-0 z-30 iw-menu__mobile-only"
     >
         {# Navigation links #}
         <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav px-6 sm:px-8 overflow-y-auto h-full">

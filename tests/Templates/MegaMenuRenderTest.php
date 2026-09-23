@@ -83,7 +83,7 @@ final class MegaMenuRenderTest extends TestCase
         self::assertSame(3, substr_count($html, 'class="iw-menu__button '));
         // A button style sets its own display, so the bar CTA is hidden on
         // mobile through a wrapper rather than on the anchor itself.
-        self::assertMatchesRegularExpression('#<div class="hidden md:block">\s*<a\s+href="/en/contact"#', $html);
+        self::assertMatchesRegularExpression('#<div class="iw-menu__desktop-only">\s*<a\s+href="/en/contact"#', $html);
     }
 
     /**

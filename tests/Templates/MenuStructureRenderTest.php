@@ -167,6 +167,58 @@ final class MenuStructureRenderTest extends TestCase
         self::assertStringNotContainsString('style="', self::render($config));
     }
 
+    /**
+     * The switch from links to burger follows the collapseAt setting through
+     * bundle classes. A Tailwind breakpoint built from the setting would never
+     * reach the Tailwind build, and a fixed md one let the bar overflow.
+     */
+    #[Test]
+    public function linksGiveWayToTheBurgerAtTheWidthSet(): void
+    {
+        foreach (['navbar', 'megamenu'] as $type) {
+            $source = (string) file_get_contents(\dirname(__DIR__, 2) . "/templates/menu/_{$type}.html.twig");
+            self::assertDoesNotMatchRegularExpression('/(?<![\w-])(?:md:hidden|hidden md:(?:block|flex|grid))(?![\w-])/', $source, "{$type} switches at a fixed Tailwind breakpoint.");
+
+            $default = self::render(['type' => $type, 'megamenuSource' => 'native']);
+            self::assertStringContainsString('iw-menu iw-menu--collapse-auto ', $default);
+            self::assertStringContainsString('iw-menu--collapse-lg ', self::render(['type' => $type, 'megamenuSource' => 'native', 'collapseAt' => 'lg']));
+            self::assertStringContainsString('iw-menu--collapse-auto ', self::render(['type' => $type, 'megamenuSource' => 'native', 'collapseAt' => '2xl']));
+
+            $xpath = self::xpath($default);
+            self::assertGreaterThan(0, \count($xpath->query('//*[contains(@class, "iw-menu__desktop-only")]') ?: []));
+            self::assertCount(1, $xpath->query('//*[@data-menu-target="burger"][contains(@class, "iw-menu__mobile-only")]') ?: []);
+            self::assertCount(1, $xpath->query('//*[@role="dialog"][contains(@class, "iw-menu__mobile-only")]') ?: []);
+        }
+    }
+
+    /**
+     * A long dropdown scrolls, except a level 2 opening a level 3 beside it:
+     * its scroll box would clip the flyout.
+     */
+    #[Test]
+    public function aLongDropdownScrollsUnlessALevelOpensBesideIt(): void
+    {
+        $xpath = self::xpath(self::render(['type' => 'navbar']));
+
+        $withLevel3 = $xpath->query('//nav[contains(@class, "iw-menu__desktop-nav")]//ul[contains(@class, "iw-menu__dropdown--level-2")]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $withLevel3);
+        self::assertStringNotContainsString('iw-menu__dropdown--scroll', $withLevel3->getAttribute('class'));
+
+        $level3 = $xpath->query('//nav[contains(@class, "iw-menu__desktop-nav")]//ul[contains(@class, "iw-menu__dropdown--level-3")]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $level3);
+        self::assertStringContainsString('iw-menu__dropdown--scroll', $level3->getAttribute('class'));
+    }
+
+    #[Test]
+    public function theControllerMeasuresAnAutomaticBar(): void
+    {
+        $controller = (string) file_get_contents(\dirname(__DIR__, 2) . '/assets/controllers/menu_controller.js');
+
+        self::assertStringContainsString("const AUTO_COLLAPSE_CLASS = 'iw-menu--collapse-auto';", $controller);
+        self::assertStringContainsString("classList.add('iw-menu--measured')", $controller);
+        self::assertStringContainsString("classList.toggle('iw-menu--collapsed', bar.scrollWidth > bar.clientWidth + 1)", $controller);
+    }
+
     #[Test]
     public function theFooterSharesTheSocialList(): void
     {

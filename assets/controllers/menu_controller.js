@@ -15,6 +15,12 @@ const HOVER_CLOSE_DELAY = 150;
 /** Elements that can take the focus when a panel opens. */
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** A navbar or mega menu that switches to the burger when its links no longer fit. */
+const AUTO_COLLAPSE_CLASS = 'iw-menu--collapse-auto';
+
+/** Under this width the burger always wins, whatever fits (the md breakpoint of the stylesheet). */
+const AUTO_COLLAPSE_MIN_WIDTH = 768;
+
 /** Class put on <html> while a panel is open: no page scroll, no layout shift. */
 const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
 
@@ -47,6 +53,10 @@ const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
  *
  * Motion lives in the stylesheet (state classes, `prefers-reduced-motion`
  * honoured there): this controller only switches classes.
+ *
+ * A navbar or mega menu set to switch to the burger automatically
+ * (`.iw-menu--collapse-auto`) is measured on load and on resize: it gets
+ * `.iw-menu--collapsed` when its links do not fit on one line.
  *
  * Values:
  *   - scrollBg: Transparent navbar takes its background once scrolled (boolean)
@@ -111,6 +121,7 @@ export default class extends Controller {
         window.addEventListener('resize', this._onResize, { passive: true });
 
         this._setupHover();
+        this._setupAutoCollapse();
     }
 
     disconnect() {
@@ -303,9 +314,47 @@ export default class extends Controller {
      * @private
      */
     _handleResize() {
+        if (this._autoCollapse) {
+            this._measureBar();
+        }
         if (this._dialog && this._dialog.panel.getClientRects().length === 0) {
             this._closeDialog({ restoreFocus: false });
         }
+    }
+
+    /**
+     * Automatic switch to the burger: measure the bar now, and again once the
+     * web fonts and the logo, which change its width, have loaded.
+     *
+     * @private
+     */
+    _setupAutoCollapse() {
+        this._autoCollapse = this.element.classList.contains(AUTO_COLLAPSE_CLASS);
+        if (!this._autoCollapse) return;
+
+        this._measureBar();
+        document.fonts?.ready.then(() => this._measureBar());
+        this.element.querySelectorAll('.iw-menu__frame img').forEach((img) => {
+            if (!img.complete) img.addEventListener('load', () => this._measureBar(), { once: true });
+        });
+    }
+
+    /**
+     * Lay the links out, measure whether the bar holds them, and fall back to
+     * the burger when it does not. Class changes and measure run in the same
+     * task, so the browser never paints the links it then hides.
+     *
+     * @private
+     */
+    _measureBar() {
+        const bar = this.element.querySelector('.iw-menu__bar');
+        if (!bar) return;
+
+        this.element.classList.add('iw-menu--measured');
+        this.element.classList.remove('iw-menu--collapsed');
+        if (window.innerWidth < AUTO_COLLAPSE_MIN_WIDTH) return;
+
+        this.element.classList.toggle('iw-menu--collapsed', bar.scrollWidth > bar.clientWidth + 1);
     }
 
     /**

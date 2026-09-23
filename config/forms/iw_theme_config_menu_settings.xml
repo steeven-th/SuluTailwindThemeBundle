@@ -77,6 +77,34 @@
                 </params>
             </property>
 
+            <!-- Width under which the bar gives way to the burger. The labels,
+                 the logo and the icons decide what fits, hence the automatic
+                 value, which measures the bar instead of guessing a width. -->
+            <property name="menuConfig_collapseAt" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'navbar' OR menuConfig_type == 'megamenu'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_collapseAt</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_collapseAt_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="auto"/>
+                    <param name="values" type="collection">
+                        <param name="md">
+                            <meta><title>iw_sulu_tailwind_theme.menu_collapseAt_md</title></meta>
+                        </param>
+                        <param name="lg">
+                            <meta><title>iw_sulu_tailwind_theme.menu_collapseAt_lg</title></meta>
+                        </param>
+                        <param name="xl">
+                            <meta><title>iw_sulu_tailwind_theme.menu_collapseAt_xl</title></meta>
+                        </param>
+                        <param name="auto">
+                            <meta><title>iw_sulu_tailwind_theme.menu_collapseAt_auto</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
             <property name="menuConfig_animation" type="single_select" colspan="6"
                       visibleCondition="menuConfig_type != 'fullscreen' AND menuConfig_type != 'sidebar' AND menuConfig_type != 'megamenu'">
                 <meta>

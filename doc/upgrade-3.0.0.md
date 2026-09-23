@@ -870,6 +870,32 @@ these rules.
 
 ---
 
+## Navbar and mega menu: the burger width becomes a setting (breaking, visual)
+
+The links gave way to the burger at 768px, written in the templates. With five
+or six entries, a long label or social icons, the bar overflowed the screen
+between 768 and 1100px. **Switch to the mobile menu** in the Menu tab now sets
+that width: automatic, 768px, 1024px or 1280px. See
+[Links or burger](menus.md#links-or-burger). What changes on screen:
+
+- **The default is Automatic.** The links show from 768px wherever they fit
+  on one line, the burger takes over where they do not. A site whose links
+  overflowed between 768 and 1100px now shows the burger there. Pick 768px to
+  keep the old behavior.
+- **First-level labels stay on one line.** They wrapped on up to three lines.
+- **Long dropdowns scroll** instead of running off a short screen, except a
+  level 2 that opens a level 3 beside it.
+- **Mega menu grids of 4 and 5 columns keep 3 columns** between 768 and
+  1024px, instead of 2.
+
+**If you override `_navbar.html.twig` or `_megamenu.html.twig`**, replace the
+`hidden md:block`, `hidden md:flex` and `md:hidden` of the bar with
+`iw-menu__desktop-only` and `iw-menu__mobile-only`, and put
+`iw-menu--collapse-{{ collapseAt }}` on the header. Otherwise the template keeps
+switching at 768px whatever the setting says.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

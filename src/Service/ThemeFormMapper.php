@@ -222,7 +222,7 @@ class ThemeFormMapper
      * Scalar menuConfig keys (non-color).
      */
     public const MENU_SCALAR_KEYS = [
-        'type', 'animation', 'slideDirection', 'navPosition', 'clickParentPage', 'childLevels',
+        'type', 'animation', 'slideDirection', 'navPosition', 'collapseAt', 'clickParentPage', 'childLevels',
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
         'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition',
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
