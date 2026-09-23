@@ -3145,6 +3145,38 @@ class ThemeCompiler
 
         // Fullscreen split layout (curtain effect)
         $css .= ".iw-menu__fullscreen-nav { background-color: var(--iw-menu-bg); }\n";
+        // Fullscreen panel: one scroll box under the bar, holding the links and
+        // the foot together, so its scrollbar never runs along the close
+        // button. The content sits in the middle when it fits: the auto
+        // margins, unlike justify-content, never push it out of reach above.
+        $css .= ".iw-menu__fullscreen-scroll { position: absolute; inset: var(--iw-menu-bar-height, 4rem) 0 0 0; overflow-y: auto; overscroll-behavior: contain; }\n";
+        $css .= ".iw-menu__fullscreen-body { display: flex; flex-direction: column; min-height: 100%; padding-block: 2rem; }\n";
+        $css .= ".iw-menu__fullscreen-body > :first-child { margin-top: auto; }\n";
+        $css .= ".iw-menu__fullscreen-body > :last-child { margin-bottom: auto; }\n";
+        $css .= ".iw-menu__fullscreen-body--left { text-align: left; }\n";
+        $css .= ".iw-menu__fullscreen-body--center { text-align: center; }\n";
+        $css .= ".iw-menu__fullscreen-body--right { text-align: right; }\n";
+        // Aligned on a side, every level starts on the same edge: an indent
+        // and a thin rule on that side tie the children to their parent.
+        // Centered, the symmetry already shows the nesting.
+        $css .= ".iw-menu__fullscreen-body--left .iw-menu__fullscreen-sublist { margin-left: 0.25rem; padding-left: var(--iw-menu-fullscreen-indent, 1rem); border-left: 1px solid var(--iw-menu-fullscreen-rule, color-mix(in srgb, currentColor 25%, transparent)); }\n";
+        $css .= ".iw-menu__fullscreen-body--right .iw-menu__fullscreen-sublist { margin-right: 0.25rem; padding-right: var(--iw-menu-fullscreen-indent, 1rem); border-right: 1px solid var(--iw-menu-fullscreen-rule, color-mix(in srgb, currentColor 25%, transparent)); }\n";
+        $css .= ".iw-menu__fullscreen-footer { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding-top: 2rem; }\n";
+        $css .= ".iw-menu__fullscreen-body--left .iw-menu__fullscreen-footer { align-items: flex-start; }\n";
+        $css .= ".iw-menu__fullscreen-body--right .iw-menu__fullscreen-footer { align-items: flex-end; }\n";
+        // First-level titles: one size for the whole panel, smaller where
+        // the room is shared (two columns, half of the screen next to the
+        // image), so a long label takes two lines, not six.
+        $css .= ".iw-menu__fullscreen-l1 { font-size: var(--iw-menu-fullscreen-l1-size, clamp(1.5rem, 4vw, 3rem)); line-height: 1.15; }\n";
+        $css .= ".iw-menu__fullscreen-list--two, .iw-menu__fullscreen-nav { --iw-menu-fullscreen-l1-size: clamp(1.5rem, 2.4vw, 2.25rem); }\n";
+        $css .= ".iw-menu__fullscreen-list > li { padding-bottom: 1.25rem; }\n";
+        $css .= "@media (min-width: 768px) { .iw-menu__fullscreen-list > li { padding-bottom: 1.75rem; } }\n";
+        // Two columns balanced by height, each entry kept whole: a grid lined
+        // every entry up with the tallest of its row. Next to the image, only
+        // once the half screen holds two columns of 320px.
+        $css .= ".iw-menu__fullscreen-list--two > li, .iw-menu__fullscreen-list--split > li { break-inside: avoid; }\n";
+        $css .= "@media (min-width: 768px) { .iw-menu__fullscreen-list--two { columns: 2; column-gap: 3rem; } }\n";
+        $css .= "@media (min-width: 1280px) { .iw-menu__fullscreen-list--split { columns: 2; column-gap: 3rem; } }\n";
 
         // Sidebar panel
         $css .= ".iw-menu__sidebar { background-color: var(--iw-menu-bg); }\n";

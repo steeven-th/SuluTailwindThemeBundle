@@ -896,6 +896,34 @@ switching at 768px whatever the setting says.
 
 ---
 
+## Fullscreen menu: layout of the panel (breaking, visual)
+
+The fullscreen panel is laid out again. See the Fullscreen settings in
+[menus.md](menus.md#fullscreen). What changes on screen:
+
+- **One scroll box under the bar** holds the links and the foot, instead of
+  the links alone scrolling next to the close button.
+- **Two columns are balanced by height.** They were a grid whose rows took
+  the height of their tallest entry, leaving large gaps. Next to the
+  background image, the two columns only start at 1280px.
+- **Smaller first-level titles** in two columns and next to the image
+  (`--iw-menu-fullscreen-l1-size`), so a long label no longer runs on six lines.
+- **The logo is no longer repeated** at the foot of the panel, and the social
+  icons only appear there on mobile.
+- **New Text alignment setting** for one column: left, centered (the previous
+  rendering, default) or right.
+- **New Folding sub-menus setting**: the third level only (the previous
+  rendering, default), the second and third levels, or none.
+- **The background image** is served in the new `iw_theme_menu_curtain` format
+  and only fetched when the panel opens, never on mobile. Clear the format
+  cache after the update: `bin/adminconsole sulu:media:format:cache:clear`.
+
+**If you override `_fullscreen.html.twig`**, the macros `render_overlay_logo`
+and `render_social_links` are gone, replaced by `render_panel_footer`, and
+`render_nav_items` takes the column mode and the alignment.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

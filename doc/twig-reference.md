@@ -971,6 +971,7 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
+| `iw_theme_menu_curtain` | 1200×1400 | outbound | Background image of the fullscreen menu (half screen, portrait) |
 | `iw_theme_avatar` | 200×200 | outbound | Author avatars |
 | `iw_theme_logo_desktop` | 1200×400 | inset | Header logo (covers the 200px height setting on a high-density screen) |
 | `iw_theme_logo_mobile` | 800×400 | inset | Mobile header logo |

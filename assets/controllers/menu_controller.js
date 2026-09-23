@@ -323,6 +323,22 @@ export default class extends Controller {
     }
 
     /**
+     * Unpack the content a panel keeps in a <template data-menu-deferred>,
+     * such as the fullscreen background image: nothing is fetched until the
+     * panel opens, and nothing at all where its container is not displayed.
+     *
+     * @param {HTMLElement} panel
+     * @private
+     */
+    _loadDeferred(panel) {
+        panel.querySelectorAll('template[data-menu-deferred]').forEach((template) => {
+            const container = template.parentElement;
+            if (!container || container.getClientRects().length === 0) return;
+            template.replaceWith(template.content.cloneNode(true));
+        });
+    }
+
+    /**
      * Automatic switch to the burger: measure the bar now, and again once the
      * web fonts and the logo, which change its width, have loaded.
      *
@@ -411,6 +427,7 @@ export default class extends Controller {
         this._dialog = { panel, burger, openClass };
 
         panel.classList.add(openClass);
+        this._loadDeferred(panel);
         if (isSidebar && this.hasBackdropTarget) {
             this.backdropTarget.classList.add('iw-menu__backdrop--visible');
         }

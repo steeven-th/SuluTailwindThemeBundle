@@ -110,6 +110,15 @@
         <scale x="1920" y="800" mode="outbound"/>
     </format>
 
+    <!-- Background of the fullscreen menu, next to the links (half a screen, portrait) -->
+    <format key="iw_theme_menu_curtain">
+        <meta>
+            <title lang="en">Theme Menu Curtain</title>
+            <title lang="fr">Thème Rideau du menu</title>
+        </meta>
+        <scale x="1200" y="1400" mode="outbound"/>
+    </format>
+
     <!-- Open Graph / social share format (1.91:1 ratio, used by og:image, twitter:image and JSON-LD) -->
     <format key="iw_og_image">
         <meta>

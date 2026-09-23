@@ -1,13 +1,9 @@
 {# Menu — fullscreen overlay menu #}
 
-{# Resolve fullscreen image media URL #}
-{% set fullscreenImageUrl = null %}
-{% if config.fullscreenImage is defined and config.fullscreenImage.id|default(null) is not null %}
-    {% set fsMedia = sulu_resolve_media(config.fullscreenImage.id, app.request.locale) %}
-    {% if fsMedia is not null %}
-        {% set fullscreenImageUrl = fsMedia.url|default(null) %}
-    {% endif %}
-{% endif %}
+{# Background image of the curtain split, resolved once. #}
+{% set fullscreenMedia = config.fullscreenImage.id|default(null)
+    ? sulu_resolve_media(config.fullscreenImage.id, app.request.locale)
+    : null %}
 {% set twoColumns = config.twoColumns|default(false) %}
 
 {# Parent page click mode: none, split, or selflink (backward compat: boolean → string) #}
@@ -84,30 +80,80 @@
        close). #}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
 
-    {# Macro: navigation items (L1 / L2 / L3) #}
-    {% macro render_nav_items(navItems, twoColumns, clickMode) %}
+    {# Macro: navigation items (L1 / L2 / L3).
+       collapse: which sub-levels fold behind a chevron. 'level3' (default):
+       the third level only, 'levels23': the second as well, 'none': every
+       level stays open. #}
+    {% macro render_nav_items(navItems, columns, clickMode, align, collapse) %}
         {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
-        {% set navClasses = twoColumns
-            ? 'grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-left'
-            : 'space-y-4 md:space-y-6 text-center'
-        %}
-        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="overflow-y-auto max-h-full px-6 sm:px-8 py-8">
-            <ul class="iw-menu__list {{ navClasses }}">
+        {# Rows holding a link and its chevron follow the text alignment. #}
+        {% set justifyClass = {'left': 'justify-start', 'center': 'justify-center', 'right': 'justify-end'}[align]|default('justify-center') %}
+        {% set l2Folds = collapse == 'levels23' %}
+        {% set l3Folds = collapse != 'none' %}
+        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}">
+            <ul class="iw-menu__list iw-menu__fullscreen-list{{ columns ? ' iw-menu__fullscreen-list--' ~ columns : '' }}">
                 {% for item in navItems %}
                     {% set itemHref = sulu_content_path(item.url) %}
                     {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
-                    <li>
-                        {# L1 link - always a direct link in fullscreen #}
-                        <a
-                            href="{{ itemHref }}"{{ nav.current(itemState) }}
-                            class="iw-menu__text{{ nav.state_class(itemState) }} text-2xl md:text-4xl lg:text-5xl font-bold hover:opacity-80 transition-opacity no-underline"
-                        >
-                            {{ item.title }}
-                        </a>
+                    {% set hasChildren = item.children is defined and item.children|length > 0 %}
+                    {% set level2Id = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
+                    <li class="iw-menu__parent-item">
+                        {% if hasChildren and l2Folds and clickMode != 'split' %}
+                            {# L1 folding its children: the whole row is the toggle #}
+                            <button
+                                type="button"
+                                data-action="menu#toggleDisclosure"
+                                aria-expanded="false"
+                                aria-controls="{{ level2Id }}"
+                                class="iw-menu__text{{ nav.branch_class(itemState) }} iw-menu__fullscreen-l1 font-bold inline-flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                            >
+                                <span>{{ item.title }}</span>
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
+                            </button>
+                        {% elseif hasChildren and l2Folds %}
+                            {# Split: the title is a link, a separate chevron folds #}
+                            <div class="flex items-center gap-3 w-full {{ justifyClass }}">
+                                <a
+                                    href="{{ itemHref }}"{{ nav.current(itemState) }}
+                                    class="iw-menu__text{{ nav.state_class(itemState) }} iw-menu__fullscreen-l1 font-bold hover:opacity-80 transition-opacity no-underline"
+                                >
+                                    {{ item.title }}
+                                </a>
+                                <button
+                                    type="button"
+                                    data-action="menu#toggleDisclosure"
+                                    aria-expanded="false"
+                                    aria-controls="{{ level2Id }}"
+                                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': item.title}, 'messages') }}"
+                                    class="iw-menu__text hover:opacity-80 cursor-pointer"
+                                >
+                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
+                                </button>
+                            </div>
+                        {% else %}
+                            {# L1 link, its children listed open below #}
+                            <a
+                                href="{{ itemHref }}"{{ nav.current(itemState) }}
+                                class="iw-menu__text{{ nav.state_class(itemState) }} iw-menu__fullscreen-l1 font-bold hover:opacity-80 transition-opacity no-underline"
+                            >
+                                {{ item.title }}
+                            </a>
+                        {% endif %}
 
                         {# L2 children #}
-                        {% if item.children is defined and item.children|length > 0 %}
-                            <ul class="iw-menu__list mt-2 space-y-1">
+                        {% if hasChildren %}
+                            <ul id="{{ level2Id }}" class="iw-menu__list iw-menu__fullscreen-sublist mt-2 space-y-1{{ l2Folds ? ' hidden' : '' }}">
+                                {% if l2Folds and clickMode == 'selflink' %}
+                                    {# The folded L1 page itself, first of its list #}
+                                    <li>
+                                        <a
+                                            href="{{ itemHref }}"{{ nav.current(itemState) }}
+                                            class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline italic"
+                                        >
+                                            {{ item.title }}
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 {% for child in item.children %}
                                     {% set childHref = sulu_content_path(child.url) %}
                                     {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
@@ -115,9 +161,9 @@
                                         {# L2 with L3 children #}
                                         {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
                                         <li class="iw-menu__parent-item">
-                                            {% if clickMode == 'split' %}
+                                            {% if l3Folds and clickMode == 'split' %}
                                                 {# Split button: L2 is a link + separate chevron #}
-                                                <div class="flex items-center gap-2 w-full {{ twoColumns ? 'justify-start' : 'justify-center' }}">
+                                                <div class="flex items-center gap-2 w-full {{ justifyClass }}">
                                                     <a
                                                         href="{{ childHref }}"{{ nav.current(childState) }}
                                                         class="iw-menu__text--level-2{{ nav.state_class(childState) }} text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
@@ -135,21 +181,29 @@
                                                         {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                     </button>
                                                 </div>
-                                            {% else %}
+                                            {% elseif l3Folds %}
                                                 {# Default button (none + selflink) #}
                                                 <button
                                                     type="button"
                                                     data-action="menu#toggleDisclosure"
                                                     aria-expanded="false"
                                                     aria-controls="{{ submenuId }}"
-                                                    class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
+                                                    class="iw-menu__text--level-2{{ nav.branch_class(childState) }} inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
                                                 >
                                                     <span>{{ child.title }}</span>
                                                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                 </button>
+                                            {% else %}
+                                                {# Nothing folds: L2 is a link, its children listed open #}
+                                                <a
+                                                    href="{{ childHref }}"{{ nav.current(childState) }}
+                                                    class="iw-menu__text--level-2{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                >
+                                                    {{ child.title }}
+                                                </a>
                                             {% endif %}
-                                            <ul id="{{ submenuId }}" class="iw-menu__list hidden mt-1 space-y-1 {{ twoColumns ? '' : 'text-center' }}">
-                                                {% if clickMode == 'selflink' %}
+                                            <ul id="{{ submenuId }}" class="iw-menu__list iw-menu__fullscreen-sublist mt-1 space-y-1{{ l3Folds ? ' hidden' : '' }}">
+                                                {% if l3Folds and clickMode == 'selflink' %}
                                                     {# Self-link to the L2 page itself #}
                                                     <li>
                                                         <a
@@ -195,36 +249,40 @@
         </nav>
     {% endmacro %}
 
-    {# Macro: logo in overlay — respects admin display toggles.
-       transparentSwap is off here: the overlay paints its own opaque background,
-       so the transparent-mode variant would be shown over the wrong surface. #}
-    {% macro render_overlay_logo(config) %}
-        {# Capture first: the wrapper carries padding, so it must not be rendered
-           when the toggles are on but no media is actually set. #}
-        {% set logoMarkup %}
-            {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
-                with { config: config, transparentSwap: false } only %}
+    {# Macro: foot of the panel. The logo stays in the bar, never repeated
+       here. The social icons are shown here on mobile only, where the bar
+       hides them. #}
+    {% macro render_panel_footer(config, socialLinks, localizations) %}
+        {% set languageMarkup %}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                with {config: config, localizations: localizations, display: 'inline', slot: 'panel'} only %}
         {% endset %}
-        {% if logoMarkup|trim is not empty %}
-            <div class="flex items-center justify-center pt-4 pb-2">
-                {{ logoMarkup }}
+        {% set socialMarkup %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                links: socialLinks,
+                class: 'flex md:hidden items-center gap-3',
+                iconClass: 'w-6 h-6',
+                textClass: '',
+            } only %}
+        {% endset %}
+        {% if languageMarkup|trim is not empty or socialMarkup|trim is not empty %}
+            <div class="iw-menu__fullscreen-footer">
+                {{ languageMarkup }}
+                {{ socialMarkup }}
             </div>
         {% endif %}
     {% endmacro %}
 
-    {# Macro: social media icons #}
-    {% macro render_social_links(socialLinks) %}
-        {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
-            links: socialLinks,
-            class: 'flex items-center justify-center gap-3 py-6',
-            iconClass: 'w-6 h-6',
-            textClass: '',
-        } only %}
-    {% endmacro %}
+    {# Which sub-levels fold behind a chevron: the third (default), the second
+       as well, or none. #}
+    {% set collapse = config.fullscreenCollapse|default('level3') in ['level3', 'levels23', 'none'] ? config.fullscreenCollapse|default('level3') : 'level3' %}
 
-    {% if fullscreenImageUrl %}
-        {# ═══ WITH IMAGE — curtain split: image left, nav+bg right ═══ #}
-        {# Panel is transparent (no bg), each volet carries its own content #}
+    {# Text alignment of a single column, the columns always start on the left. #}
+    {% set align = twoColumns ? 'left' : (config.fullscreenAlign|default('center') in ['left', 'center', 'right'] ? config.fullscreenAlign|default('center') : 'center') %}
+
+    {% if fullscreenMedia %}
+        {# ═══ WITH IMAGE - curtain split: image left, nav + background right ═══ #}
+        {# The panel is transparent, each curtain carries its own content. #}
         <div
             id="{{ panelId }}"
             data-menu-target="panel"
@@ -233,39 +291,52 @@
             class="iw-menu__dialog iw-menu__dialog--curtain fixed inset-0 z-30"
         >
             <div class="flex h-full">
-                {# Left volet — image, slides from the left, full height #}
+                {# Left curtain, image only, from md up. The picture waits in a
+                   <template> the controller unpacks when the panel opens and
+                   this curtain is shown: no request before, none on mobile. #}
                 <div class="iw-menu__curtain iw-menu__curtain--left w-1/2 h-full overflow-hidden hidden md:block">
-                    <img src="{{ fullscreenImageUrl }}" alt="" class="w-full h-full object-cover">
+                    <template data-menu-deferred>
+                        {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                            media: fullscreenMedia,
+                            format: 'iw_theme_menu_curtain',
+                            alt: '',
+                            raw: true,
+                            loading: 'eager',
+                            classes: 'w-full h-full object-cover',
+                        }) }}
+                    </template>
                 </div>
-                {# Right volet — nav + background, slides from the right #}
-                <div class="iw-menu__curtain iw-menu__curtain--right iw-menu__fullscreen-nav iw-menu__overlay-nav--below-bar relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
-                    {% if navItems is not empty %}
-                        {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
-                    {% endif %}
-                    {{ _self.render_overlay_logo(config) }}
-                    {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
-                        with {config: config, display: 'inline', slot: 'panel'} %}
-                    {{ _self.render_social_links(socialLinks) }}
+                {# Right curtain: nav + background, one scroll box under the bar. #}
+                <div class="iw-menu__curtain iw-menu__curtain--right iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full">
+                    <div class="iw-menu__fullscreen-scroll">
+                        <div class="iw-menu__fullscreen-body iw-menu__fullscreen-body--{{ align }} px-6 sm:px-8 lg:px-12">
+                            {% if navItems is not empty %}
+                                {{ _self.render_nav_items(navItems, twoColumns ? 'split' : null, clickMode, align, collapse) }}
+                            {% endif %}
+                            {{ _self.render_panel_footer(config, socialLinks, localizations|default([])) }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     {% else %}
-        {# ═══ WITHOUT IMAGE — full panel slides from right ═══ #}
-        {# Panel has iw-menu__overlay background, slides as one block #}
+        {# ═══ WITHOUT IMAGE - full panel slides from the right ═══ #}
         <div
             id="{{ panelId }}"
             data-menu-target="panel"
             role="dialog"
             aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
-            class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right iw-menu__overlay-nav--below-bar fixed inset-0 z-30 flex flex-col items-center justify-center"
+            class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right fixed inset-0 z-30"
         >
-            {% if navItems is not empty %}
-                {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
-            {% endif %}
-            {{ _self.render_overlay_logo(config) }}
-            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
-                with {config: config, display: 'inline', slot: 'panel'} %}
-            {{ _self.render_social_links(socialLinks) }}
+            <div class="iw-menu__fullscreen-scroll">
+                {# Same container as the bar, so the columns line up with the logo. #}
+                <div class="iw-menu__fullscreen-body iw-menu__fullscreen-body--{{ align }} container mx-auto px-4 sm:px-6 lg:px-8">
+                    {% if navItems is not empty %}
+                        {{ _self.render_nav_items(navItems, twoColumns ? 'two' : null, clickMode, align, collapse) }}
+                    {% endif %}
+                    {{ _self.render_panel_footer(config, socialLinks, localizations|default([])) }}
+                </div>
+            </div>
         </div>
     {% endif %}
 </header>

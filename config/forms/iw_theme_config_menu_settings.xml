@@ -243,6 +243,50 @@
                 </meta>
             </property>
 
+            <!-- Two columns always start on the left, so only one column offers it. -->
+            <property name="menuConfig_fullscreenAlign" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'fullscreen' AND menuConfig_twoColumns != true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_fullscreenAlign</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="center"/>
+                    <param name="values" type="collection">
+                        <param name="left">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_left</title></meta>
+                        </param>
+                        <param name="center">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_center</title></meta>
+                        </param>
+                        <param name="right">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_right</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_fullscreenCollapse" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'fullscreen'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_fullscreenCollapse</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_fullscreenCollapse_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="level3"/>
+                    <param name="values" type="collection">
+                        <param name="level3">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_level3</title></meta>
+                        </param>
+                        <param name="levels23">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_levels23</title></meta>
+                        </param>
+                        <param name="none">
+                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_none</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
             <property name="menuConfig_sidebarPosition" type="single_select" colspan="6"
                       visibleCondition="menuConfig_type == 'sidebar'">
                 <meta>
