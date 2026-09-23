@@ -21,10 +21,12 @@ These options are available regardless of the menu type:
 | Setting | Description |
 |---------|-------------|
 | **Child levels** | Number of sub-menu levels to render (1, 2, or 3). |
-| **Logo desktop / mobile** | Media selection for logo images. Separate logos for each breakpoint. |
-| **Logo desktop / mobile in transparent mode** | (Transparent navbar only) Alternate logos shown while the bar is transparent — typically light ones over a dark hero. Both variants are rendered and cross-faded on the same state as the background, so the logo never sits on the wrong surface mid-transition. Left empty, the regular logo is kept. Never applied inside overlays and side panels, which paint their own opaque background. |
+| **Logo desktop / mobile** | Media selection for logo images. Separate logos for each breakpoint. With *Display logo mobile* on and no mobile image, the desktop logo is shown on mobile, at the mobile height. |
+| **Logo desktop / mobile in transparent mode** | (Transparent navbar only) Alternate logos shown while the bar is transparent, typically light ones over a dark hero. Both variants are rendered and cross-faded on the same state as the background, so the logo never sits on the wrong surface mid-transition. Both take exactly the configured height, so two files of different sizes do not make the logo jump during the fade. Left empty, the regular logo is kept. Never applied inside overlays and side panels, which paint their own opaque background. |
 | **Display logo desktop / mobile** | Toggle logo visibility per breakpoint. |
-| **Logo height desktop / mobile** | (Shown when the matching logo is displayed) Logo height in pixels, 12 to 200, defaulting to 40 desktop / 32 mobile. Raster logos are capped at that height and never upscaled; SVG logos are rendered at exactly that height. Compiled to `--iw-menu-logo-height-desktop` / `--iw-menu-logo-height-mobile`. |
+| **Logo height desktop / mobile** | (Shown when the matching logo is displayed) Logo height in pixels, 12 to 200, defaulting to 40 desktop / 32 mobile. Raster logos are capped at that height and never upscaled, SVG logos are rendered at exactly that height. The logo image formats go up to 400px high, so a raster logo reaches the height set even on a high-density screen. Compiled to `--iw-menu-logo-height-desktop` / `--iw-menu-logo-height-mobile`. |
+| **Bar height desktop / mobile** | Minimum bar height in pixels, 40 to 240, defaulting to 80 desktop / 64 mobile. The bar grows to hold a displayed logo plus the space around it. See [Bar height](#bar-height). |
+| **Space around the logo** | Pixels kept above and below the logo, 0 to 48, default 12. |
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
@@ -52,6 +54,28 @@ Two things worth knowing:
 - **Transparent mode drops the whole chrome.** While `.iw-menu--transparent` is on and the bar has not scrolled yet, background, rule and shadow are all neutralized — a rule floating over a hero reads as a glitch. They come back together with the background, in the same transition, when `.iw-menu--scrolled` applies.
 
 Only the bar is translucent: dropdowns, overlays and side panels stay on the opaque `--iw-menu-bg`, since a see-through dropdown is unreadable.
+
+## Bar height
+
+The height of the bar is one value for the whole menu. The bar itself, the panels opened below it, the spacer of the sidebar, the dropdowns hanging from it and the in-page anchors all read it.
+
+The two settings are minimums. When a logo is displayed, the bar is at least as tall as the logo plus twice the space around it, so a logo never overflows the bar or covers the first link of a panel:
+
+```
+desktop bar = max(Bar height desktop, Logo height desktop + 2 × Space around the logo)
+mobile bar  = max(Bar height mobile,  Logo height mobile  + 2 × Space around the logo)
+```
+
+With the defaults (80, 40 and 12 on desktop), nothing changes: `max(80, 64) = 80`.
+
+| Variable | Role |
+|----------|------|
+| `--iw-menu-bar-height-desktop` / `--iw-menu-bar-height-mobile` | Effective heights, compiled from the settings above. |
+| `--iw-menu-bar-height` | The current one: mobile below `md` (768px), desktop above. Use it to offset anything against the sticky bar. |
+| `--iw-menu-logo-spacing` | The space kept around the logo. |
+| `--iw-menu-panels-offset` | Top offset of the drill-down panels. Follows `--iw-menu-bar-height` unless a project overrides it. |
+
+`html` gets `scroll-padding-top: var(--iw-menu-bar-height)`, so the target of an in-page link does not land under the sticky bar.
 
 ## Menu buttons
 
@@ -417,6 +441,11 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu--transparent` | Transparent navbar modifier — drops background, rule and shadow at once. |
 | `.iw-menu--scrolled` | Set by JS past the scroll threshold; a transparent navbar takes its chrome back. Override the scroll transition via `--iw-menu-scroll-duration` (default `300ms`). |
 | `.iw-menu--hidden` | Set by JS on scroll down (smart hide) — translates the navbar out of view (`translateY(-100%)`). |
+| `.iw-menu__bar` | The bar row. Its height is `--iw-menu-bar-height`. See [Bar height](#bar-height). |
+| `.iw-menu__bar-spacer` | Empty block as tall as the bar (sidebar panel, below the sticky bar). |
+| `.iw-menu__below-bar` | Places a fixed panel right under the bar (mobile panel of the navbar and mega menu). |
+| `.iw-menu__overlay-nav--below-bar` | Pushes the content of a full-screen panel below the bar. |
+| `.iw-menu__bar-dropdown` | A dropdown hanging from the bottom edge of the bar, not from its button. |
 | `.iw-menu__text` | Level 1 text color with hover transition. |
 | `.iw-menu__text--level-2` | Level 2 text color. |
 | `.iw-menu__text--level-3` | Level 3 text color. |

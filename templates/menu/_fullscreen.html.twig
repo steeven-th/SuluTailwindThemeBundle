@@ -38,7 +38,7 @@
        burger button stays visible and animates into the X (like the burger menu),
        instead of being covered by the panel and needing a separate close button. #}
     <nav class="relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 md:h-20">
+        <div class="iw-menu__bar flex items-center justify-between">
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
@@ -264,7 +264,7 @@
                     <img src="{{ fullscreenImageUrl }}" alt="" class="w-full h-full object-cover">
                 </div>
                 {# Right volet — nav + background, slides from the right #}
-                <div class="iw-menu__curtain iw-menu__curtain--right iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
+                <div class="iw-menu__curtain iw-menu__curtain--right iw-menu__fullscreen-nav iw-menu__overlay-nav--below-bar relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
                     {% if navItems is not empty %}
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
@@ -283,7 +283,7 @@
             data-menu-target="panel"
             role="dialog"
             aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
-            class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right fixed inset-0 z-30 flex flex-col items-center justify-center"
+            class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right iw-menu__overlay-nav--below-bar fixed inset-0 z-30 flex flex-col items-center justify-center"
         >
             {% if navItems is not empty %}
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}

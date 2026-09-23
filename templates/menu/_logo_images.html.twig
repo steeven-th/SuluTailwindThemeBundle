@@ -59,8 +59,13 @@
     {% endif %}
 {% endif %}
 
-{% if showMobile and config.logoMobile.id|default(null) is not null %}
-    {% set media = sulu_resolve_media(config.logoMobile.id, app.request.locale) %}
+{# Mobile display on without a mobile image: the desktop logo stands in, at
+   the mobile height. The toggle exists to hide the logo on purpose, so "on"
+   with nothing to show can only mean "use the one I have". #}
+{% set mobileFallsBack = config.logoMobile.id|default(null) is null %}
+{% set logoMobileId = mobileFallsBack ? config.logoDesktop.id|default(null) : config.logoMobile.id %}
+{% if showMobile and logoMobileId is not null %}
+    {% set media = sulu_resolve_media(logoMobileId, app.request.locale) %}
     {% if media is not null %}
         {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
         {% set logoMobileUrl = thumbnail|default(media.url)|default(null) %}
@@ -78,8 +83,9 @@
             {% set logoDesktopTransparentVector = 'image/svg+xml' == media.mimeType|default('') %}
         {% endif %}
     {% endif %}
-    {% if showMobile and config.logoTransparentMobile.id|default(null) is not null %}
-        {% set media = sulu_resolve_media(config.logoTransparentMobile.id, app.request.locale) %}
+    {% set logoTransparentMobileId = config.logoTransparentMobile.id|default(mobileFallsBack ? config.logoTransparentDesktop.id|default(null) : null) %}
+    {% if showMobile and logoTransparentMobileId is not null %}
+        {% set media = sulu_resolve_media(logoTransparentMobileId, app.request.locale) %}
         {% if media is not null %}
             {% set thumbnail = media.thumbnails['iw_theme_logo_mobile']|default(null) %}
             {% set logoMobileTransparentUrl = thumbnail|default(media.url)|default(null) %}

@@ -2696,6 +2696,14 @@ class ThemeCompiler
     private const MENU_LOGO_HEIGHT_MOBILE = 32;
 
     /**
+     * Default bar heights and logo spacing, in pixels: the h-16 / md:h-20 the
+     * bar shipped with, so an untouched theme keeps its bar.
+     */
+    private const MENU_BAR_HEIGHT_DESKTOP = 80;
+    private const MENU_BAR_HEIGHT_MOBILE = 64;
+    private const MENU_LOGO_SPACING = 12;
+
+    /**
      * Generate CSS custom properties for menu colors and bar chrome.
      *
      * Two families are emitted:
@@ -2766,7 +2774,49 @@ class ThemeCompiler
         $css .= "  --iw-menu-logo-height-desktop: {$logoHeightDesktop}px;\n";
         $css .= "  --iw-menu-logo-height-mobile: {$logoHeightMobile}px;\n";
 
+        // Bar height: the configured value is a minimum. A displayed logo
+        // plus the space kept around it may need more, and the bar grows
+        // rather than let the logo overflow. Resolved here, where both the
+        // heights and the display toggles are known.
+        $logoSpacing = $this->normalizeBarLength($menuConfig['logoSpacing'] ?? null, self::MENU_LOGO_SPACING, 0, 48);
+        $barDesktop = $this->normalizeBarLength($menuConfig['barHeightDesktop'] ?? null, self::MENU_BAR_HEIGHT_DESKTOP, 40, 240);
+        $barMobile = $this->normalizeBarLength($menuConfig['barHeightMobile'] ?? null, self::MENU_BAR_HEIGHT_MOBILE, 40, 240);
+        if (!empty($menuConfig['displayLogoDesktop'])) {
+            $barDesktop = max($barDesktop, $logoHeightDesktop + 2 * $logoSpacing);
+        }
+        if (!empty($menuConfig['displayLogoMobile'])) {
+            $barMobile = max($barMobile, $logoHeightMobile + 2 * $logoSpacing);
+        }
+        $css .= "  --iw-menu-logo-spacing: {$logoSpacing}px;\n";
+        $css .= "  --iw-menu-bar-height-desktop: {$barDesktop}px;\n";
+        $css .= "  --iw-menu-bar-height-mobile: {$barMobile}px;\n";
+
         return $css . "\n";
+    }
+
+    /**
+     * Read a bar length setting (height or spacing) in pixels.
+     *
+     * Mirrors the bounds of the admin number field. Anything outside them, or
+     * not a number, falls back to the default, which is what the bar looked
+     * like before the setting existed.
+     *
+     * @param mixed $value    The stored setting
+     * @param int   $fallback The default, in pixels
+     * @param int   $min      The lowest accepted value
+     * @param int   $max      The highest accepted value
+     *
+     * @return int The length in pixels
+     */
+    private function normalizeBarLength(mixed $value, int $fallback, int $min, int $max): int
+    {
+        if (!is_numeric($value)) {
+            return $fallback;
+        }
+
+        $length = (int) $value;
+
+        return $length < $min || $length > $max ? $fallback : $length;
     }
 
     /**
@@ -2996,6 +3046,11 @@ class ThemeCompiler
         // The wrapper's own `display` stays on the responsive utilities
         // (hidden md:grid / grid md:hidden), so it is never forced here.
         $css .= ".iw-menu__logo-swap > * { grid-area: 1 / 1; }\n";
+        // Both variants take exactly the configured height, like a vector
+        // logo: two raster files of different sizes would otherwise make the
+        // logo jump during the cross-fade.
+        $css .= ".iw-menu__logo-swap .iw-menu__logo--desktop { height: var(--iw-menu-logo-height-desktop, 40px); width: auto; object-fit: contain; }\n";
+        $css .= ".iw-menu__logo-swap .iw-menu__logo--mobile { height: var(--iw-menu-logo-height-mobile, 32px); width: auto; object-fit: contain; }\n";
         $css .= ".iw-menu__logo-state {\n";
         $css .= "  transition: opacity var(--iw-menu-scroll-duration, 300ms) ease;\n";
         $css .= "}\n";
@@ -3085,20 +3140,16 @@ class ThemeCompiler
         // The root panel scrolls in place; each sub-panel is an absolute overlay
         // that slides in from the menu's own direction over the current one.
         $css .= ".iw-menu__panels { position: relative; height: 100%; overflow: hidden; }\n";
-        // Sidebar: its navbar is taller on desktop (h-16 md:h-20) than the burger's
-        // (h-16), so the panels clear a responsive offset.
-        $css .= ".iw-menu__panels--sidebar { --iw-menu-panels-offset: 4rem; }\n";
-        $css .= "@media (min-width: 768px) { .iw-menu__panels--sidebar { --iw-menu-panels-offset: 5rem; } }\n";
         $css .= ".iw-menu__panel { height: 100%; overflow-y: auto; }\n";
         $css .= ".iw-menu__panel-body { display: flex; flex-direction: column; }\n";
         // Root panel body clears the navbar with the same offset the sub-panels use.
-        $css .= ".iw-menu__panel-body--root { padding-top: var(--iw-menu-panels-offset, 4rem); }\n";
+        $css .= ".iw-menu__panel-body--root { padding-top: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem)); }\n";
         // Sub-panel: top padding clears the navbar (which stays above the overlay),
         // header stays put, body scrolls.
         $css .= ".iw-menu__subpanel {\n";
         $css .= "  position: absolute; inset: 0;\n";
         $css .= "  display: flex; flex-direction: column;\n";
-        $css .= "  padding-top: var(--iw-menu-panels-offset, 4rem);\n";
+        $css .= "  padding-top: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem));\n";
         $css .= "  background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));\n";
         $css .= "  transition: transform 0.3s ease, opacity 0.3s ease;\n";
         $css .= "}\n";
@@ -3144,6 +3195,24 @@ class ThemeCompiler
         $css .= "a:hover > .iw-social-icon { background-color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n";
         $css .= ".iw-social-text { color: var(--iw-menu-social-media); transition: color 0.2s ease; }\n";
         $css .= "a:hover > .iw-social-text { color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n\n";
+
+        // ─── Bar height ───────────────────────────────────────────────────────
+        // One height for the whole menu, resolved from the theme (see
+        // generateMenuVariables()). Everything that sits against the bar reads
+        // it: the bar itself, the panels opened below it, the spacer of the
+        // sidebar, the dropdowns hanging from it and the page anchors.
+        $css .= ":root { --iw-menu-bar-height: var(--iw-menu-bar-height-mobile, 64px); }\n";
+        $css .= "@media (min-width: 768px) { :root { --iw-menu-bar-height: var(--iw-menu-bar-height-desktop, 80px); } }\n";
+        // A sticky bar would cover the target of an in-page link.
+        $css .= "html { scroll-padding-top: var(--iw-menu-bar-height); }\n";
+        $css .= ".iw-menu__bar { height: var(--iw-menu-bar-height); }\n";
+        $css .= ".iw-menu__bar-spacer { height: var(--iw-menu-bar-height); flex-shrink: 0; }\n";
+        $css .= ".iw-menu__below-bar { top: var(--iw-menu-bar-height); }\n";
+        $css .= ".iw-menu__overlay-nav--below-bar { padding-top: var(--iw-menu-bar-height); }\n";
+        // A dropdown hangs from the bottom of the bar, not from its button:
+        // the button is centred in the bar, so the bottom edge is half the
+        // bar below the middle of the button's wrapper.
+        $css .= ".iw-menu__bar-dropdown { top: calc(50% + var(--iw-menu-bar-height) / 2); }\n\n";
 
         // ─── Menu buttons ─────────────────────────────────────────────────────
         // A page button is sized for a page: at the theme padding it can be

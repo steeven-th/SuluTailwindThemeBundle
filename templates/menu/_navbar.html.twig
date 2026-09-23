@@ -31,7 +31,7 @@
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     <nav class="relative z-50 md:container md:mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 md:h-20">
+        <div class="iw-menu__bar flex items-center justify-between">
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center {{ navPosition == 'left' ? 'mr-0' : '' }}">
@@ -75,7 +75,7 @@
                                 </button>
                                 <div
                                     id="{{ dropdownId }}"
-                                    class="iw-menu__dropdown--level-2 hidden absolute top-full mt-1 w-48 shadow-lg py-1 z-50"
+                                    class="iw-menu__dropdown--level-2 iw-menu__bar-dropdown hidden absolute w-48 shadow-lg py-1 z-50"
                                 >
                                     {% if clickNavbar %}
                                         <a
@@ -205,7 +205,7 @@
         data-menu-target="panel"
         role="dialog"
         aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
-        class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed left-0 right-0 bottom-0 top-16 z-30 md:hidden"
+        class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} iw-menu__below-bar fixed left-0 right-0 bottom-0 z-30 md:hidden"
     >
         {# Navigation links #}
         <nav class="iw-menu__overlay-nav px-6 sm:px-8 overflow-y-auto h-full">

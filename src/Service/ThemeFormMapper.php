@@ -226,6 +226,8 @@ class ThemeFormMapper
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
         'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition',
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
+        // Bar size, read by ThemeCompiler: the effective height also depends on the logo.
+        'barHeightDesktop', 'barHeightMobile', 'logoSpacing',
         'logoTransparentDesktop', 'logoTransparentMobile',
         'fullscreenImage', 'twoColumns',
         'sidebarPosition', 'sidebarWidth', 'transparentNavbar', 'scrollBg', 'scrollHide',

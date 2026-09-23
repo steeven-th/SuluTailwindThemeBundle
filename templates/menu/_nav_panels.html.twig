@@ -23,8 +23,8 @@
     - localizations: Sulu's localizations map, forwarded explicitly because this
       partial is included with `only` (optional)
     - context: 'burger' (default) | 'sidebar'. Both fill their container and push
-      the panels below the navbar via --iw-menu-panels-offset; 'sidebar' uses a
-      responsive offset (the sidebar navbar is taller on desktop, h-16 md:h-20).
+      the panels below the bar via --iw-menu-panels-offset, which follows the
+      bar height (--iw-menu-bar-height) unless a project overrides it.
 
     Public CSS API:
     - .iw-menu__panels (+ --from-{dir} / --fade / --none) — the stack + its motion

@@ -767,6 +767,30 @@ The chevrons of the menus now go through `components/_nav_arrow.html.twig`:
 they follow the theme's chevron setting like every other chevron of the site.
 With no chevron set, they look as before.
 
+
+## Menu bar height becomes a setting (breaking, visual)
+
+The bar height was written in the templates (`h-16 md:h-20`, `h-16` for the
+burger) while the logo height was a setting going up to 200px, so a tall logo
+stuck out of the bar and covered the first link of the panels. The **Bar**
+group of the Menu tab now sets it, and the bar grows to hold the logo. See
+[Bar height](menus.md#bar-height). What changes on screen:
+
+- **The burger bar is 80px on desktop**, like the other types. It used to stay
+  at 64px.
+- **Dropdowns hang from the bar**, not from their button: the navbar level 2
+  and the language dropdown now start at the bottom edge of the bar.
+- **A tall logo grows the bar** instead of overflowing it.
+- **Logos reach the height set.** The `iw_theme_logo_desktop` and
+  `iw_theme_logo_mobile` image formats capped a raster logo at 80 and 64px
+  whatever the setting. They now go up to 400px. Clear the format cache so
+  existing logos are regenerated:
+  `bin/adminconsole sulu:media:format:cache:clear`.
+
+If you override a menu template, replace `h-16`, `md:h-20`, `top-16` and
+`pt-16` with the classes of the [reference](menus.md#css-classes-reference):
+`.iw-menu__bar`, `.iw-menu__below-bar`, `.iw-menu__bar-spacer`,
+`.iw-menu__overlay-nav--below-bar`, `.iw-menu__bar-dropdown`.
 ---
 
 ## CTA banner: the title alignment setting now applies (breaking, visual)

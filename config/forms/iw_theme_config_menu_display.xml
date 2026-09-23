@@ -21,6 +21,7 @@
             <property name="menuConfig_logoMobile" type="single_media_selection" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoMobile</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_logoMobile_info</info_text>
                 </meta>
             </property>
 
@@ -59,6 +60,52 @@
                     <param name="default_value" value="32"/>
                     <param name="min" value="12"/>
                     <param name="max" value="200"/>
+                </params>
+            </property>
+
+            <!-- Bar size. The heights are minimums: the bar grows to hold the
+                 logo plus the space around it, so a logo never overflows it. -->
+            <property name="menuConfig_barHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_barHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_barHeightDesktop" type="number" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barHeightDesktop</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barHeight_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="80"/>
+                    <param name="min" value="40"/>
+                    <param name="max" value="240"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_barHeightMobile" type="number" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barHeightMobile</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barHeight_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="64"/>
+                    <param name="min" value="40"/>
+                    <param name="max" value="240"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_logoSpacing" type="number" colspan="12">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_logoSpacing</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_logoSpacing_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="12"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="48"/>
                 </params>
             </property>
 

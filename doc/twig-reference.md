@@ -939,8 +939,8 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
 | `iw_theme_avatar` | 200×200 | outbound | Author avatars |
-| `iw_theme_logo_desktop` | 400×80 | inset | Header logo |
-| `iw_theme_logo_mobile` | 200×64 | inset | Mobile header logo |
+| `iw_theme_logo_desktop` | 1200×400 | inset | Header logo (covers the 200px height setting on a high-density screen) |
+| `iw_theme_logo_mobile` | 800×400 | inset | Mobile header logo |
 | `iw_og_image` | 1200×630 | outbound | `og:image`, `twitter:image`, JSON-LD |
 
 > `iw_og_image` also serves the theme-wide fallback thumbnail set in **Components > Sharing > Default share image** (`iw_sulu_tailwind_theme.components_shareDefaultImage`), used when a page carries neither an excerpt image nor a hero image.

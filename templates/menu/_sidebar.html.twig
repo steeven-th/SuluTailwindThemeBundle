@@ -180,7 +180,7 @@
        the <header> (which also wraps the sliding panel). The bar chrome
        therefore lives on the <nav>, driven by .iw-menu--sidebar. #}
     <nav class="sticky top-0 z-50 w-full">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 md:h-20">
+        <div class="iw-menu__bar container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
                 {{ _self.render_logo(config) }}
@@ -270,7 +270,7 @@
             {% endif %}
         {% else %}
             {# Accordion mode: a spacer clears the navbar, then the nav. #}
-            <div class="h-16 md:h-20 flex-shrink-0"></div>
+            <div class="iw-menu__bar-spacer"></div>
             {% if navItems is not empty %}
                 <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
                     {{ _self.render_nav_items(navItems, clickMode) }}
