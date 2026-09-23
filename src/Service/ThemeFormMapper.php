@@ -224,7 +224,7 @@ class ThemeFormMapper
     public const MENU_SCALAR_KEYS = [
         'type', 'animation', 'slideDirection', 'navPosition', 'collapseAt', 'clickParentPage', 'childLevels',
         'displayLogoDesktop', 'displayLogoMobile', 'displaySiteName', 'displaySocialMedia',
-        'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition',
+        'displayLanguageSwitcher', 'languageSwitcherLabel', 'languageSwitcherPosition', 'languageSwitcherBarOrder',
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
         // Bar size, read by ThemeCompiler: the effective height also depends on the logo.
         'barHeightDesktop', 'barHeightMobile', 'logoSpacing',
@@ -233,6 +233,10 @@ class ThemeFormMapper
         'sidebarPosition', 'sidebarWidth', 'transparentNavbar', 'scrollBg', 'scrollHide',
         // Bar chrome, read by ThemeCompiler::compileMenu().
         'borderWidth', 'shadow', 'bgOpacity', 'blur',
+        // Dropdowns of the bar, read by ThemeCompiler.
+        'dropdownRadius', 'dropdownRadiusTop',
+        // Chevron of the menus, read by components/_nav_arrow.html.twig.
+        'chevronOwn', 'chevronIconCustom', 'chevronIcon', 'chevronIconMedia', 'chevronIconSize', 'chevronIconDirection', 'chevronRotate',
         'clickParentPageNavbar',
         'megamenuSource',
         'subMenuPanels', 'clickParentPagePanels',

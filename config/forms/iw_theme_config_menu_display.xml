@@ -163,6 +163,20 @@
                 </params>
             </property>
 
+            <property name="menuConfig_languageSwitcherBarOrder" type="single_select" colspan="12"
+                      visibleCondition="menuConfig_displayLanguageSwitcher == true AND menuConfig_displaySocialMedia == true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="before"/>
+                    <param name="values" type="collection">
+                        <param name="before"><meta><title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder_before</title></meta></param>
+                        <param name="after"><meta><title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder_after</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
             <property name="menuConfig_languageSwitcherLabel" type="single_select" colspan="6"
                       visibleCondition="menuConfig_displayLanguageSwitcher == true">
                 <meta>

@@ -75,7 +75,7 @@
                                         {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
                                         <li>
                                             <a {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
-                                               class="iw-menu__text--level-3{{ nav.state_class(itemState) }} block no-underline hover:opacity-80 transition-opacity">
+                                               class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block no-underline hover:opacity-80 transition-opacity">
                                                 <span class="text-sm">{{ linkItem.title }}</span>{{ links.new_tab_hint(itemLink) }}
                                                 {% if linkItem.description|default(null) %}
                                                     <span class="block text-xs opacity-60 mt-0.5">{{ linkItem.description }}</span>
@@ -125,9 +125,9 @@
                                                 {% endif %}
                                             {% endif %}
                                             <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
-                                                <span class="iw-menu__text--level-3 text-sm font-medium">{{ card.title }}</span>{% if cardLink %}{{ links.new_tab_hint(cardLink) }}{% endif %}
+                                                <span class="{{ cardHasBg ? 'iw-menu__text--level-3' : 'iw-menu__text--level-2' }} text-sm font-medium">{{ card.title }}</span>{% if cardLink %}{{ links.new_tab_hint(cardLink) }}{% endif %}
                                                 {% if card.description|default(null) %}
-                                                    <span class="iw-menu__text--level-3 block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
+                                                    <span class="{{ cardHasBg ? 'iw-menu__text--level-3' : 'iw-menu__text--level-2' }} block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
                                                 {% endif %}
                                             </div>
                                         </{{ cardTag }}>
@@ -160,7 +160,7 @@
                                 {% endif %}
                             {% endif %}
                             <div class="{{ featLayout == 'horizontal' ? 'iw-mega-menu__featured-body' : '' }}">
-                                <span class="iw-menu__text--level-2 font-semibold text-sm block mb-2">{{ column.title }}</span>
+                                <span class="iw-menu__text--level-3 font-semibold text-sm block mb-2">{{ column.title }}</span>
                                 {% if column.description|default(null) %}
                                     <p class="iw-menu__text--level-3 text-xs opacity-70 mb-3">{{ column.description }}</p>
                                 {% endif %}
@@ -208,7 +208,7 @@
                                     {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
                                     <li>
                                         <a href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
-                                           class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} text-sm no-underline hover:opacity-80 transition-opacity">
+                                           class="iw-menu__text--level-2{{ nav.state_class(grandchildState) }} text-sm no-underline hover:opacity-80 transition-opacity">
                                             {{ grandchild.title }}
                                         </a>
                                     </li>
@@ -286,7 +286,7 @@
                                     class="iw-menu__text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
                                 >
                                     {{ item.title }}
-                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                 </button>
                                 {{ _self.snippet_panel(item, menuItemsView[loop.index0]|default({}), megaId) }}
                             </li>
@@ -309,7 +309,7 @@
                                     class="iw-menu__text{{ nav.branch_class(itemState) }} flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
                                 >
                                     {{ item.title }}
-                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                 </button>
                                 {{ _self.native_panel(item, megaId, parentLinkable) }}
                             </li>
@@ -340,7 +340,6 @@
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'flex items-center gap-2 iw-menu__desktop-only',
-                    iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
 
@@ -396,10 +395,10 @@
                         {% set itemLink = iw_sulu_tailwind_theme_link(item.link|default(null), itemView.link|default(null), item.open_in_new_tab|default(false)) %}
                         {% if itemLink %}
                             {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
-                            <li>
+                            <li class="iw-menu__divider border-b">
                                 <a
                                     {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
-                                    class="iw-menu__text{{ nav.state_class(itemState) }} iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
+                                    class="iw-menu__text{{ nav.state_class(itemState) }} block py-4 text-lg font-medium no-underline"
                                 >
                                     {{ item.title }}{{ links.new_tab_hint(itemLink) }}
                                 </a>
@@ -418,9 +417,9 @@
                                 class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
                             >
                                 <span class="text-lg font-medium">{{ item.title }}</span>
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-5 h-5 flex-shrink-0'} only %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-5 h-5 flex-shrink-0'} only %}
                             </button>
-                            <div id="{{ submenuId }}" class="hidden pb-3 mt-1 px-4">
+                            <div id="{{ submenuId }}" class="iw-menu__dropdown--level-2 hidden pb-3 mt-1 px-4">
                                 {# The dropdown's own page, when the editor linked one #}
                                 {% if parentLink %}
                                     <a
@@ -445,7 +444,7 @@
                                                     {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
                                                     <li>
                                                         <a {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
-                                                           class="iw-menu__text--level-3{{ nav.state_class(itemState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                                           class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                             {{ linkItem.title }}{{ links.new_tab_hint(itemLink) }}
                                                         </a>
                                                     </li>
@@ -465,7 +464,7 @@
                                                     {% set cardState = iw_sulu_tailwind_theme_nav_state(cardLink.url) %}
                                                     <li>
                                                         <a {{ links.attrs(cardLink) }}{{ nav.current(cardState) }}
-                                                           class="iw-menu__text--level-3{{ nav.state_class(cardState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                                           class="iw-menu__text--level-2{{ nav.state_class(cardState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                             {{ card.title }}{{ links.new_tab_hint(cardLink) }}
                                                         </a>
                                                     </li>
@@ -477,7 +476,7 @@
                                         {% set featLink = column.cta_title|default(null) ? iw_sulu_tailwind_theme_link(column.cta_link|default(null), columnView.cta_link|default(null)) : null %}
                                         {% if featLink %}
                                             <a {{ links.attrs(featLink) }}
-                                               class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                               class="iw-menu__text--level-2 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
                                                 {{ column.cta_title }}{{ links.new_tab_hint(featLink) }}
                                             </a>
                                         {% endif %}
@@ -514,7 +513,7 @@
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex items-center gap-3 pt-6 pb-4',
-                iconClass: 'w-6 h-6',
+                size: 'md',
                 textClass: '',
             } only %}
         </nav>

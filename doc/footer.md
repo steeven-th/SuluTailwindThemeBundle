@@ -61,6 +61,9 @@ Social links are managed in a **snippet** assigned to the
 `iw_theme_footer_social_media_links` area (Settings > Snippet areas). This is separate
 from the menu's `iw_theme_menu_social_media_links` area, so the header and footer can
 show different sets of links. Icons are recolored from the footer variant's link color.
+They share the social links component of the menu: one height for all
+(`--iw-social-icon-size`), the width following the ratio of each file, and a link
+of at least 24×24. See [menus.md](menus.md#css-classes-reference).
 
 ## Rendering & overriding
 

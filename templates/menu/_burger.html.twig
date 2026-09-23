@@ -48,7 +48,6 @@
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'hidden md:flex items-center gap-2',
-                    iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
 
@@ -107,7 +106,7 @@
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex items-center gap-3 pt-6 pb-4',
-                iconClass: 'w-6 h-6',
+                size: 'md',
                 textClass: '',
             } only %}
         </nav>

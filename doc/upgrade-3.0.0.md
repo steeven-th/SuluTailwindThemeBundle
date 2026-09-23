@@ -924,6 +924,50 @@ and `render_social_links` are gone, replaced by `render_panel_footer`, and
 
 ---
 
+## Menus: finishing (visual)
+
+- **Social icons share one height** and keep the ratio of their file, in the
+  menu and the footer. A raster icon is served through the `iw_theme_icon`
+  format instead of the square `50x50` thumbnail, which cropped a wide logo.
+  An icon with no color set now takes the text color: it vanished.
+- **An empty menu color is no longer written** to the stylesheet. It was
+  written as an empty variable, which beat every fallback.
+- **Dropdown radius** and **Round the top corners too** settings. A dropdown
+  hanging from the bar now has square top corners by default.
+- **A chevron of its own for the menu**, with one color per level and an
+  optional rotation. The menu templates draw `_nav_arrow.html.twig` with the
+  new `role: 'menu'`.
+- **Dividers of the mobile accordion and the drill-down panels** moved from the
+  entries to their `<li>`, and the entries got some inner room (given back by a
+  negative margin): the focus ring is drawn inside the entry, off the text,
+  without running into the divider above. If you override those templates,
+  keep `iw-menu__divider border-b` on the `<li>`.
+- **The inline language switcher** lines up with the links above it, and the
+  current language is written with the second-level text color on its
+  second-level background (it took the panel text color, white on white with
+  a light second level).
+- **Sidebar sub-lists** take the level backgrounds like the other accordions:
+  their text already took the level colors, and could vanish on the sidebar
+  background.
+- **Language switcher before or after the social icons** in the bar, a new
+  setting.
+- **The pictogram points** setting turns a menu chevron drawn facing another
+  way than right back before use.
+- **Third level text hover** is now offered in Menu > Colors (the variable
+  existed, the field did not). A level with no hover color of its own takes
+  the one of the level above: the second and third levels used to fall back
+  to their own text color, so hovering them changed nothing.
+- **Colors per level, everywhere**: a text takes the colors of the level whose
+  background it sits on. Drill-down sub-panels of level 3 take the level 3
+  background and text (they took level 2), and their header takes the colors of
+  its sub-panel (it took level 1). The fullscreen panel writes all its levels in
+  the level 1 text, since they all sit on its background. In the mega menu, the
+  links of the panel take the level 2 text, the featured column the level 3
+  text, and the mobile accordion of the snippet mode paints its level 2
+  background. See [Menu Colors](menus.md#menu-colors).
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

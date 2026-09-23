@@ -53,7 +53,6 @@
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'hidden md:flex items-center gap-2',
-                    iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
 
@@ -108,7 +107,7 @@
                                 class="iw-menu__text{{ nav.branch_class(itemState) }} iw-menu__fullscreen-l1 font-bold inline-flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
                             >
                                 <span>{{ item.title }}</span>
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
                             </button>
                         {% elseif hasChildren and l2Folds %}
                             {# Split: the title is a link, a separate chevron folds #}
@@ -127,7 +126,7 @@
                                     aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': item.title}, 'messages') }}"
                                     class="iw-menu__text hover:opacity-80 cursor-pointer"
                                 >
-                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
+                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-6 h-6 flex-shrink-0'} only %}
                                 </button>
                             </div>
                         {% else %}
@@ -148,7 +147,7 @@
                                     <li>
                                         <a
                                             href="{{ itemHref }}"{{ nav.current(itemState) }}
-                                            class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline italic"
+                                            class="iw-menu__text{{ nav.state_class(itemState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline italic"
                                         >
                                             {{ item.title }}
                                         </a>
@@ -166,7 +165,7 @@
                                                 <div class="flex items-center gap-2 w-full {{ justifyClass }}">
                                                     <a
                                                         href="{{ childHref }}"{{ nav.current(childState) }}
-                                                        class="iw-menu__text--level-2{{ nav.state_class(childState) }} text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                        class="iw-menu__text{{ nav.state_class(childState) }} text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
                                                     >
                                                         {{ child.title }}
                                                     </a>
@@ -176,9 +175,9 @@
                                                         aria-expanded="false"
                                                         aria-controls="{{ submenuId }}"
                                                         aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
-                                                        class="iw-menu__text--level-2 opacity-60 hover:opacity-100 cursor-pointer"
+                                                        class="iw-menu__text opacity-60 hover:opacity-100 cursor-pointer"
                                                     >
-                                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                     </button>
                                                 </div>
                                             {% elseif l3Folds %}
@@ -188,16 +187,16 @@
                                                     data-action="menu#toggleDisclosure"
                                                     aria-expanded="false"
                                                     aria-controls="{{ submenuId }}"
-                                                    class="iw-menu__text--level-2{{ nav.branch_class(childState) }} inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+                                                    class="iw-menu__text{{ nav.branch_class(childState) }} inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
                                                 >
                                                     <span>{{ child.title }}</span>
-                                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                 </button>
                                             {% else %}
                                                 {# Nothing folds: L2 is a link, its children listed open #}
                                                 <a
                                                     href="{{ childHref }}"{{ nav.current(childState) }}
-                                                    class="iw-menu__text--level-2{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                    class="iw-menu__text{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
                                                 >
                                                     {{ child.title }}
                                                 </a>
@@ -208,7 +207,7 @@
                                                     <li>
                                                         <a
                                                             href="{{ childHref }}"{{ nav.current(childState) }}
-                                                            class="iw-menu__text--level-3{{ nav.state_class(childState) }} block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
+                                                            class="iw-menu__text{{ nav.state_class(childState) }} block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
                                                         >
                                                             {{ child.title }}
                                                         </a>
@@ -221,7 +220,7 @@
                                                     <li>
                                                         <a
                                                             href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
-                                                            class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                            class="iw-menu__text{{ nav.state_class(grandchildState) }} block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
                                                         >
                                                             {{ grandchild.title }}
                                                         </a>
@@ -234,7 +233,7 @@
                                         <li>
                                             <a
                                                 href="{{ childHref }}"{{ nav.current(childState) }}
-                                                class="iw-menu__text--level-2{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                class="iw-menu__text{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
                                             >
                                                 {{ child.title }}
                                             </a>
@@ -261,7 +260,7 @@
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex md:hidden items-center gap-3',
-                iconClass: 'w-6 h-6',
+                size: 'md',
                 textClass: '',
             } only %}
         {% endset %}

@@ -288,6 +288,53 @@ final class MenuStructureRenderTest extends TestCase
     }
 
     /**
+     * Every trigger opens something that exists: a broken id left a whole
+     * drill-down level unreachable, with no error anywhere.
+     *
+     * @param array<string, mixed> $config
+     */
+    #[Test]
+    #[DataProvider('menus')]
+    public function everyTriggerPointsToWhatItOpens(array $config): void
+    {
+        $document = new \DOMDocument();
+        @$document->loadHTML('<?xml encoding="utf-8"?>' . self::render($config));
+        $xpath = new \DOMXPath($document);
+
+        $ids = [];
+        foreach ($xpath->query('//*[@id]') ?: [] as $element) {
+            self::assertInstanceOf(\DOMElement::class, $element);
+            self::assertMatchesRegularExpression('/^[A-Za-z][\w-]*$/', $element->getAttribute('id'));
+            $ids[] = $element->getAttribute('id');
+        }
+        self::assertSame($ids, array_unique($ids), 'Two elements share an id.');
+
+        foreach ($xpath->query('//*[@aria-controls]') ?: [] as $control) {
+            self::assertInstanceOf(\DOMElement::class, $control);
+            self::assertContains($control->getAttribute('aria-controls'), $ids, 'aria-controls points to nothing.');
+        }
+    }
+
+    /**
+     * A drill-down sub-panel paints its own level and writes everything on it,
+     * header included, in the text of that level.
+     */
+    #[Test]
+    public function subPanelsTakeTheColorsOfTheirLevel(): void
+    {
+        $xpath = self::xpath(self::render(['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true]));
+
+        foreach (['2' => 'Employers', '3' => 'Recruiting'] as $level => $title) {
+            $panel = $xpath->query("//section[contains(@class, 'iw-menu__subpanel--level-{$level}')][.//*[contains(@class, 'iw-menu__panel-title')][normalize-space() = '{$title}']]")?->item(0);
+            self::assertInstanceOf(\DOMElement::class, $panel, "No level {$level} sub-panel for {$title}.");
+            foreach ($xpath->query('.//*[contains(@class, "iw-menu__panel-back") or contains(@class, "iw-menu__panel-title") or contains(@class, "iw-menu__panel-item")]', $panel) ?: [] as $element) {
+                self::assertInstanceOf(\DOMElement::class, $element);
+                self::assertStringContainsString("iw-menu__text--level-{$level}", $element->getAttribute('class'));
+            }
+        }
+    }
+
+    /**
      * @return array<string, array{0: string, 1: int, 2: int}>
      */
     public static function fullscreenFolds(): array

@@ -72,7 +72,7 @@
                                 class="iw-menu__text{{ nav.branch_class(itemState) }} flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity"
                             >
                                 {{ item.title }}
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                             </button>
                             <ul
                                 id="{{ dropdownId }}"
@@ -104,7 +104,7 @@
                                                 class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center justify-between w-full px-4 py-2 text-sm transition-opacity hover:opacity-80 text-left cursor-pointer"
                                             >
                                                 {{ child.title }}
-                                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-3 h-3 ml-2'} only %}
+                                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'next', 'class': 'w-3 h-3 ml-2'} only %}
                                             </button>
                                             <ul
                                                 id="{{ subdropdownId }}"
@@ -175,7 +175,6 @@
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'flex items-center gap-2 iw-menu__desktop-only',
-                    iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
 
@@ -220,7 +219,7 @@
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex items-center gap-3 pt-6 pb-4',
-                iconClass: 'w-6 h-6',
+                size: 'md',
                 textClass: '',
             } only %}
         </nav>

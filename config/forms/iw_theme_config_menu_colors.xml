@@ -60,6 +60,7 @@
             <property name="menuConfig_colors_secondTextHover" type="iw_theme_color_token_editor" colspan="4">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_secondTextHover</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_textHover_fallback_info</info_text>
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>
@@ -84,7 +85,17 @@
                 </params>
             </property>
 
-            <property name="menuConfig_colors_divider" type="iw_theme_color_token_editor" colspan="4">
+            <property name="menuConfig_colors_thirdTextHover" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_thirdTextHover</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_textHover_fallback_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_divider" type="iw_theme_color_token_editor" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_divider</title>
                 </meta>
@@ -93,7 +104,7 @@
                 </params>
             </property>
 
-            <property name="menuConfig_colors_textActive" type="iw_theme_color_token_editor" colspan="4">
+            <property name="menuConfig_colors_textActive" type="iw_theme_color_token_editor" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_textActive</title>
                     <info_text>iw_sulu_tailwind_theme.menu_colors_textActive_info</info_text>
@@ -103,7 +114,7 @@
                 </params>
             </property>
 
-            <property name="menuConfig_colors_burgerOpen" type="iw_theme_color_token_editor" colspan="4">
+            <property name="menuConfig_colors_burgerOpen" type="iw_theme_color_token_editor" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_burgerOpen</title>
                 </meta>
@@ -112,7 +123,7 @@
                 </params>
             </property>
 
-            <property name="menuConfig_colors_burgerClose" type="iw_theme_color_token_editor" colspan="4">
+            <property name="menuConfig_colors_burgerClose" type="iw_theme_color_token_editor" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_burgerClose</title>
                 </meta>
@@ -133,6 +144,46 @@
             <property name="menuConfig_colors_socialMediaHover" type="iw_theme_color_token_editor" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_socialMediaHover</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <!-- One chevron color per level, each level having its own
+                 background. Empty, the text color of the level. -->
+            <property name="menuConfig_chevronColorsHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_chevronColorsHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_chevron" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_chevron</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_chevron_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_secondChevron" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_secondChevron</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_chevron_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_thirdChevron" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_thirdChevron</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_chevron_info</info_text>
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>

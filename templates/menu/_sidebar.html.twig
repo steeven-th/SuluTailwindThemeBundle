@@ -46,7 +46,7 @@
                             aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': item.title}, 'messages') }}"
                             class="iw-menu__text p-2 rounded-md hover:opacity-80 transition-opacity cursor-pointer"
                         >
-                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                         </button>
                     </div>
                 {% else %}
@@ -59,10 +59,10 @@
                         class="iw-menu__text{{ nav.branch_class(itemState) }} flex items-center justify-between w-full py-2.5 px-3 text-sm font-semibold rounded-md hover:opacity-80 transition-opacity text-left cursor-pointer"
                     >
                         {{ item.title }}
-                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                     </button>
                 {% endif %}
-                <ul id="{{ submenuId }}" class="iw-menu__list hidden pl-3 space-y-0.5">
+                <ul id="{{ submenuId }}" class="iw-menu__list iw-menu__dropdown--level-2 hidden pl-3 space-y-0.5">
                     {% if clickMode == 'selflink' %}
                         {# Self-link to parent page as first item #}
                         <li>
@@ -97,7 +97,7 @@
                                             aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
                                             class="iw-menu__text--level-2 p-1 opacity-70 hover:opacity-100 cursor-pointer"
                                         >
-                                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
+                                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
                                         </button>
                                     </div>
                                 {% else %}
@@ -109,10 +109,10 @@
                                         class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center justify-between w-full py-2 px-3 text-sm rounded-md opacity-70 hover:opacity-100 transition-opacity text-left cursor-pointer"
                                     >
                                         <span>{{ child.title }}</span>
-                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
+                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
                                     </button>
                                 {% endif %}
-                                <ul id="{{ subSubmenuId }}" class="iw-menu__list hidden pl-3 space-y-0.5">
+                                <ul id="{{ subSubmenuId }}" class="iw-menu__list iw-menu__dropdown--level-3 hidden pl-3 space-y-0.5">
                                     {% if clickMode == 'selflink' %}
                                         {# Self-link to L2 page itself #}
                                         <li>
@@ -204,7 +204,6 @@
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'flex items-center gap-2',
-                    iconClass: 'w-5 h-5',
                     textClass: 'text-sm',
                 } only %}
 
@@ -268,8 +267,9 @@
                 </nav>
             {% endif %}
             {# Also inline at the foot of the panel: once the sidebar is open it
-               covers the bar on mobile. #}
-            <div class="px-4 py-3">
+               covers the bar on mobile. Inset like the text of the links
+               (panel px-4 plus entry px-3). #}
+            <div class="px-7 py-3">
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {config: config, display: 'inline', slot: 'panel'} %}
             </div>

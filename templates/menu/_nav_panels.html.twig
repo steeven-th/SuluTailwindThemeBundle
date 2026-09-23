@@ -40,21 +40,25 @@
 
 {# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
    shares the same absolute positioning context. #}
-{% macro render_subpanel(item, panelId, parentLinkable) %}
+{% macro render_subpanel(item, panelId, parentLinkable, depth) %}
     {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
-    <section class="iw-menu__subpanel" id="iw-menu-subpanel-{{ panelId }}" data-menu-target="subPanel" inert>
+    {# A sub-panel paints the background of its level, second or third, and
+       everything on it, header included, takes the text of that level. #}
+    {% set depth = depth|default(2) >= 3 ? 3 : 2 %}
+    {% set levelText = 'iw-menu__text--level-' ~ depth %}
+    <section class="iw-menu__subpanel iw-menu__subpanel--level-{{ depth }}" id="iw-menu-subpanel-{{ panelId }}" data-menu-target="subPanel" inert>
         <div class="iw-menu__panel-header">
             <button type="button"
                     data-action="menu#closePanel"
-                    class="iw-menu__panel-back iw-menu__text"
+                    class="iw-menu__panel-back {{ levelText }}"
                     aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}">
-                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'prev', 'class': 'w-5 h-5'} only %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'prev', 'class': 'w-5 h-5'} only %}
             </button>
             {% if parentLinkable %}
-                {# Linkable → iw-menu__text carries the hover feedback of a link. #}
+                {# Linkable: the level text class carries the hover feedback of a link. #}
                 {% set itemHref = sulu_content_path(item.url) %}
                 {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
-                <a href="{{ itemHref }}"{{ nav.current(itemState) }} class="iw-menu__panel-title iw-menu__text{{ nav.state_class(itemState) }} no-underline">{{ item.title }}</a>
+                <a href="{{ itemHref }}"{{ nav.current(itemState) }} class="iw-menu__panel-title {{ levelText }}{{ nav.state_class(itemState) }} no-underline">{{ item.title }}</a>
             {% else %}
                 {# Not a link → plain title, no hover effect. #}
                 <span class="iw-menu__panel-title">{{ item.title }}</span>
@@ -71,12 +75,12 @@
                                     data-action="menu#openPanel"
                                     aria-expanded="false"
                                     aria-controls="iw-menu-subpanel-{{ panelId }}-{{ loop.index }}"
-                                    class="iw-menu__panel-item iw-menu__text--level-2{{ nav.branch_class(childState) }}">
+                                    class="iw-menu__panel-item {{ levelText }}{{ nav.branch_class(childState) }}">
                                 <span>{{ child.title }}</span>
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
                             </button>
                         {% else %}
-                            <a href="{{ childHref }}"{{ nav.current(childState) }} class="iw-menu__panel-item iw-menu__text--level-2{{ nav.state_class(childState) }} no-underline">
+                            <a href="{{ childHref }}"{{ nav.current(childState) }} class="iw-menu__panel-item {{ levelText }}{{ nav.state_class(childState) }} no-underline">
                                 <span>{{ child.title }}</span>
                             </a>
                         {% endif %}
@@ -88,7 +92,7 @@
     {# Deeper panels, emitted as siblings (flattened). #}
     {% for child in item.children %}
         {% if child.children is defined and child.children|length > 0 %}
-            {{ _self.render_subpanel(child, panelId ~ '-' ~ loop.index, parentLinkable) }}
+            {{ _self.render_subpanel(child, panelId ~ '-' ~ loop.index, parentLinkable, depth + 1) }}
         {% endif %}
     {% endfor %}
 {% endmacro %}
@@ -105,19 +109,19 @@
                 {% for item in navItems %}
                     {% set itemHref = sulu_content_path(item.url) %}
                     {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
-                    <li>
+                    <li class="iw-menu__divider border-b">
                         {% if item.children is defined and item.children|length > 0 %}
                             <button type="button"
                                     data-action="menu#openPanel"
                                     aria-expanded="false"
                                     aria-controls="iw-menu-subpanel-p-{{ loop.index }}"
-                                    class="iw-menu__panel-item iw-menu__text{{ nav.branch_class(itemState) }} iw-menu__divider border-b">
+                                    class="iw-menu__panel-item iw-menu__text{{ nav.branch_class(itemState) }}">
                                 <span class="text-lg font-medium">{{ item.title }}</span>
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
                             </button>
                         {% else %}
                             <a href="{{ itemHref }}"{{ nav.current(itemState) }}
-                               class="iw-menu__panel-item iw-menu__text{{ nav.state_class(itemState) }} iw-menu__divider border-b no-underline">
+                               class="iw-menu__panel-item iw-menu__text{{ nav.state_class(itemState) }} no-underline">
                                 <span class="text-lg font-medium">{{ item.title }}</span>
                             </a>
                         {% endif %}
@@ -126,20 +130,23 @@
             </ul>
 
             {# Language switcher, above the social icons. Inline: the panels
-               already fill the screen. #}
-            {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
-                with {
-                    config: config|default({}),
-                    localizations: localizations|default([]),
-                    display: 'inline',
-                    slot: 'panel',
-                } %}
+               already fill the screen. The padding keeps its current-language
+               pill off the divider of the last row, as in the accordion. #}
+            <div class="pt-6 pb-2">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
+                    with {
+                        config: config|default({}),
+                        localizations: localizations|default([]),
+                        display: 'inline',
+                        slot: 'panel',
+                    } %}
+            </div>
 
             {# Social media icons, at the bottom of the root panel. #}
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex items-center gap-3 pt-6 pb-4',
-                iconClass: 'w-6 h-6',
+                size: 'md',
                 textClass: '',
             } only %}
         </div>
@@ -148,7 +155,7 @@
     {# Sub-panels for every branch, flattened as siblings. #}
     {% for item in navItems %}
         {% if item.children is defined and item.children|length > 0 %}
-            {{ _self.render_subpanel(item, 'p-' ~ loop.index, parentLinkable) }}
+            {{ _self.render_subpanel(item, 'p-' ~ loop.index, parentLinkable, 2) }}
         {% endif %}
     {% endfor %}
 </nav>

@@ -31,6 +31,7 @@ These options are available regardless of the menu type:
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
 | **Switcher placement** | (`burger`, `fullscreen`, `sidebar` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
+| **Language switcher in the bar** | (Language switcher and social media both shown) Before (default) or after the social icons. |
 | **Label format** | (Language switcher only) How each language is named: short code (`FR`), native name (`Français`), or the name written in the language currently being browsed. |
 | **Transparent navbar** | The bar drops its background and slides over the hero image at the top of a page. All five menu types. On a page that does not open with a hero image, the bar stays opaque. See [Transparent bar over a hero](#transparent-bar-over-a-hero). |
 | **Background on scroll** | (Transparent navbar only, on by default) The bar takes its background back once the page is scrolled past ~50px, and turns transparent again at the top. Adds `.iw-menu--scrolled`. Unchecked, the bar stays transparent over the whole page, readable only if every section behind it is dark. |
@@ -118,6 +119,27 @@ The state is read in CSS with `:has()`, so it applies before the first paint and
 | `--iw-menu-transparent-text` | Text over the hero. Defaults to `--iw-menu-text`. |
 | `--iw-menu-transparent-social` | Social icons over the hero. Defaults to the transparent text color, then `--iw-menu-social-media`. |
 | `--iw-menu-transparent-burger` | Burger icon over the hero. Defaults to the transparent text color, then the regular burger color. |
+
+## Dropdowns and chevron
+
+Two groups of **Menu > Appearance** finish the dropdowns of the bar.
+
+**Dropdowns**
+
+| Setting | Description |
+|---------|-------------|
+| **Dropdown radius** | Corners of the dropdowns of the bar, their levels and the language dropdown (`--iw-menu-dropdown-radius`). Empty, the radius of the theme. The sub-lists of the panels (burger, sidebar, mobile) are part of the panel and stay square. |
+| **Round the top corners too** | Off by default: a dropdown hanging from the bar keeps square top corners against it. On, it takes the radius on its four corners, for a dropdown that stands out from the bar on a different background (`--iw-menu-dropdown-top-radius`). A level 3, opening beside its parent, always has four round corners. |
+
+**Chevron**
+
+| Setting | Description |
+|---------|-------------|
+| **A chevron of its own for the menu** | Off, the menus use the chevron of the theme (Navigation tab). On, a pictogram of the library or a media of the project, and its size, for the menus only. |
+| **The pictogram points** | (Own chevron) Right (default), down, left or up. The menus turn the chevron to the way it has to point starting from a pictogram facing right: tell which way yours faces and it is turned back first (`--iw-menu-chevron-offset`). An `arrow-down` picked without it points left. |
+| **Turn the chevron when a sub-menu opens** | On by default: a chevron pointing down flips. Off for a pictogram with no direction, such as a plus sign (`--iw-menu-chevron-open-rotate: 0deg`). |
+
+The chevron colors are set per level in **Menu > Colors**, since each level has its own background. Empty, the text color of the level. A library pictogram or an SVG takes the color, a PNG or a JPG keeps its own.
 
 ## Menu buttons
 
@@ -361,9 +383,10 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Current page text | `--iw-menu-text-active` | The link of the page being displayed and the entries leading to it, at every level. Unset, each level falls back to its own hover color. See [Structure and current page](#structure-and-current-page). |
 | 2nd level BG | `--iw-menu-second-bg` | Dropdown background (level 2). Also used for mega menu dropdown panels. |
 | 2nd level text | `--iw-menu-second-text` | Dropdown text color. |
-| 2nd level text hover | `--iw-menu-second-text-hover` | Dropdown text hover color. |
+| 2nd level text hover | `--iw-menu-second-text-hover` | Dropdown text hover color. Empty, the hover color of the first level. |
 | 3rd level BG | `--iw-menu-third-bg` | Sub-dropdown / featured column background. Also used for image cards with `show_background`. |
 | 3rd level text | `--iw-menu-third-text` | Sub-dropdown text color. |
+| 3rd level text hover | `--iw-menu-third-text-hover` | Sub-dropdown text hover color. Empty, the hover color of the second level, then of the first. |
 | Divider | `--iw-menu-divider` | Border/separator color between menu items. Not the bottom rule of the bar — that one is **Rule color** / `--iw-menu-border-color`, see [Bar chrome](#bar-chrome). |
 | Rule | `--iw-menu-border-color` | Bottom rule of the bar itself. |
 | Burger open | `--iw-menu-burger-open` | Burger icon color (closed state). |
@@ -372,6 +395,18 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Social media hover | `--iw-menu-social-media-hover` | Social media icon hover color. |
 | Transparent bar text | `--iw-menu-transparent-text` | Text, social icons and language switcher while the bar sits transparent over a hero. Falls back to the regular colors. |
 | Transparent bar burger | `--iw-menu-transparent-burger` | Burger icon over a hero. Falls back to the transparent bar text color. |
+| Chevrons, first / second / third level | `--iw-menu-chevron-color` / `--iw-menu-second-chevron-color` / `--iw-menu-third-chevron-color` | Chevron of each level. Falls back to the text color of the level. |
+
+**One rule for every menu: a text takes the colors of the level whose background it sits on**, and a chevron with no color of its own takes the color of that text.
+
+| Where | Background | Text |
+|-------|------------|------|
+| Bar, first-level entries, panels opened by the burger | Level 1 | Level 1 |
+| Dropdowns of the bar, accordion sub-lists, drill-down sub-panels of level 2 (header included), mega menu panel | Level 2 | Level 2 |
+| Level 3 flyouts and sub-lists, drill-down sub-panels of level 3, mega menu featured column and image cards with a background | Level 3 | Level 3 |
+| Fullscreen panel, all levels | Level 1 | Level 1, the hierarchy made by size and opacity |
+
+A color left empty is not written to the stylesheet at all, so every fallback above applies. Written empty, the variable would win over its fallback and paint nothing: a social icon with no color set used to vanish.
 
 ## Language switcher
 
@@ -594,7 +629,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__panel-body` | Scrollable level inside a panel, holding its `<ul>` of rows. |
 | `.iw-menu__panel-item` | A single row (link, or button opening the next panel). |
 | `.iw-social-links` | The list of social links (`components/_social_links.html.twig`), in the menu and the footer. |
-| `.iw-social-icon` | Social media icon (mask-image technique for SVG coloring). Hover color follows `--iw-menu-social-media-hover`. |
+| `.iw-social-icon` | Social media icon (mask-image technique for SVG coloring). Hover color follows `--iw-menu-social-media-hover`, the text color when no social color is set. All icons share one height, `--iw-social-icon-size` (1.25rem, 1.5rem with `.iw-social-icon--md`), and each keeps the ratio of its file (`--iw-social-icon-ratio`, read from the media), so a tall and a wide logo line up. The link around it is at least 24×24 (WCAG 2.5.8). |
 | `.iw-social-text` | Social media link with text label (color + hover). |
 
 ### Mega menu (sub-namespace `iw-mega-menu`)
