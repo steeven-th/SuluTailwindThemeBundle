@@ -86,6 +86,39 @@ final class MegaMenuRenderTest extends TestCase
         self::assertMatchesRegularExpression('#<div class="hidden md:block">\s*<a\s+href="/en/contact"#', $html);
     }
 
+    /**
+     * Rendered after the whole bar, a panel was out of reach of the keyboard:
+     * Tab went from its button to the next bar item. Each panel now follows
+     * its button, which also makes them one hover and focus zone.
+     */
+    #[Test]
+    public function eachPanelFollowsItsButton(): void
+    {
+        foreach (['snippet' => self::snippet(), 'native' => null] as $source => $snippet) {
+            $html = $this->render(['type' => 'megamenu', 'megamenuSource' => $source, 'clickParentPageNavbar' => true], $snippet);
+
+            $document = new \DOMDocument();
+            @$document->loadHTML('<?xml encoding="utf-8"?>' . $html);
+            $xpath = new \DOMXPath($document);
+
+            $triggers = $xpath->query('//button[@data-menu-target="popupTrigger"]') ?: [];
+            self::assertGreaterThan(0, \count($triggers), "No mega trigger in {$source} mode.");
+
+            foreach ($triggers as $trigger) {
+                self::assertInstanceOf(\DOMElement::class, $trigger);
+                $panel = $trigger->nextElementSibling;
+                self::assertNotNull($panel, "A {$source} trigger has no panel after it.");
+                self::assertSame($trigger->getAttribute('aria-controls'), $panel->getAttribute('id'));
+                self::assertSame('false', $trigger->getAttribute('aria-expanded'));
+            }
+
+            foreach ($xpath->query('//*[@aria-controls]') ?: [] as $control) {
+                self::assertInstanceOf(\DOMElement::class, $control);
+                self::assertNotNull($document->getElementById($control->getAttribute('aria-controls')), "{$source}: aria-controls points to nothing.");
+            }
+        }
+    }
+
     #[Test]
     public function nativeModeLinksTheParentPageWhenAsked(): void
     {
@@ -126,6 +159,10 @@ final class MegaMenuRenderTest extends TestCase
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_link', LinkResolver::resolve(...)));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_site_value', static fn (mixed $value): mixed => \is_array($value) ? ($value['_default'] ?? '') : $value));
         $twig->addFilter(new TwigFilter('trans', static fn (string $key): string => $key));
+        $ids = 0;
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static function (string $prefix = 'iw') use (&$ids): string {
+            return 'iw-' . $prefix . '-' . ++$ids;
+        }));
 
         $twig->registerUndefinedFunctionCallback(static fn (string $name): TwigFunction => new TwigFunction($name, static fn (): null => null));
 

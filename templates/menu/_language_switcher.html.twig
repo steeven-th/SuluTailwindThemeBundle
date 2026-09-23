@@ -64,14 +64,17 @@
                 {% endfor %}
             </div>
         {% else %}
-            {# Reuses the menu controller's dropdown machinery: same toggle, same
-               mutual closing as the navigation dropdowns, no extra JS. #}
-            <div class="iw-menu__lang iw-menu__lang--dropdown relative" data-menu-target="dropdownParent">
+            {# A disclosure like the navigation dropdowns: same toggle, same
+               mutual closing, Escape and focus handling, no extra JS. #}
+            {% set langPanelId = iw_sulu_tailwind_theme_unique_id('menu-lang') %}
+            <div class="iw-menu__lang iw-menu__lang--dropdown relative">
                 <button
                     type="button"
-                    data-action="menu#toggleDropdown"
+                    data-action="menu#toggleDisclosure"
+                    data-menu-target="popupTrigger"
+                    aria-expanded="false"
+                    aria-controls="{{ langPanelId }}"
                     class="iw-menu__text iw-menu__lang-toggle flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-opacity"
-                    aria-haspopup="true"
                     aria-label="{{ 'iw_sulu_tailwind_theme.menu_languageSwitcher'|trans({}, 'messages') }}"
                 >
                     <svg class="iw-menu__lang-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -79,12 +82,10 @@
                               d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
                     </svg>
                     <span class="iw-menu__lang-current">{{ currentLabel }}</span>
-                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                 </button>
                 <div
-                    data-menu-target="dropdown"
+                    id="{{ langPanelId }}"
                     class="iw-menu__dropdown--level-2 iw-menu__lang-panel hidden absolute top-full mt-1 min-w-[8rem] shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
                 >
                     {% for entry in entries %}

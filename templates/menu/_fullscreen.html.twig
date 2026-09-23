@@ -15,9 +15,6 @@
 {% if clickMode is same as(true) %}{% set clickMode = 'selflink' %}{% endif %}
 {% if clickMode is same as(false) %}{% set clickMode = 'none' %}{% endif %}
 
-{# Animation: curtain (split) when image present, slide from right otherwise #}
-{% set animation = fullscreenImageUrl ? 'curtain' : 'slide' %}
-
 {# Load social media links from snippet area #}
 {% set socialLinks = [] %}
 {% if config.displaySocialMedia|default(false) %}
@@ -27,10 +24,12 @@
     {% endif %}
 {% endif %}
 
+{% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
+
 <header
     data-controller="menu"
-    data-menu-animation-value="{{ animation }}"
-    data-menu-slide-direction-value="right"
+    data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+    data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
     class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
@@ -92,8 +91,10 @@
                     type="button"
                     data-action="menu#toggle"
                     data-menu-target="burger"
+                    aria-expanded="false"
+                    aria-controls="{{ panelId }}"
+                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
                     class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                    aria-label="Menu"
                 >
                     <span class="iw-menu__burger-line"></span>
                     <span class="iw-menu__burger-line"></span>
@@ -131,6 +132,7 @@
                             {% for child in item.children %}
                                 {% if child.children is defined and child.children|length > 0 %}
                                     {# L2 with L3 children #}
+                                    {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
                                     <div class="iw-menu__parent-item">
                                         {% if clickMode == 'split' %}
                                             {# Split button: L2 is a link + separate chevron #}
@@ -143,28 +145,29 @@
                                                 </a>
                                                 <button
                                                     type="button"
-                                                    data-action="menu#toggleMobileSubmenu"
+                                                    data-action="menu#toggleDisclosure"
+                                                    aria-expanded="false"
+                                                    aria-controls="{{ submenuId }}"
+                                                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
                                                     class="iw-menu__text--level-2 opacity-60 hover:opacity-100 cursor-pointer"
                                                 >
-                                                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                                    </svg>
+                                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                 </button>
                                             </div>
                                         {% else %}
                                             {# Default button (none + selflink) #}
                                             <button
                                                 type="button"
-                                                data-action="menu#toggleMobileSubmenu"
+                                                data-action="menu#toggleDisclosure"
+                                                aria-expanded="false"
+                                                aria-controls="{{ submenuId }}"
                                                 class="iw-menu__text--level-2 flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
                                             >
                                                 <span>{{ child.title }}</span>
-                                                <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                                </svg>
+                                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                             </button>
                                         {% endif %}
-                                        <div data-menu-target="submenu" class="hidden mt-1 space-y-1 {{ twoColumns ? '' : 'text-center' }}">
+                                        <div id="{{ submenuId }}" class="hidden mt-1 space-y-1 {{ twoColumns ? '' : 'text-center' }}">
                                             {% if clickMode == 'selflink' %}
                                                 {# Self-link to the L2 page itself #}
                                                 <a
@@ -249,16 +252,19 @@
         {# ═══ WITH IMAGE — curtain split: image left, nav+bg right ═══ #}
         {# Panel is transparent (no bg), each volet carries its own content #}
         <div
+            id="{{ panelId }}"
             data-menu-target="panel"
-            class="fixed inset-0 z-30 invisible opacity-0"
+            role="dialog"
+            aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
+            class="iw-menu__dialog iw-menu__dialog--curtain fixed inset-0 z-30"
         >
             <div class="flex h-full">
                 {# Left volet — image, slides from the left, full height #}
-                <div data-menu-target="curtainLeft" class="w-1/2 h-full overflow-hidden hidden md:block">
+                <div class="iw-menu__curtain iw-menu__curtain--left w-1/2 h-full overflow-hidden hidden md:block">
                     <img src="{{ fullscreenImageUrl }}" alt="" class="w-full h-full object-cover">
                 </div>
                 {# Right volet — nav + background, slides from the right #}
-                <div data-menu-target="curtainRight" class="iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
+                <div class="iw-menu__curtain iw-menu__curtain--right iw-menu__fullscreen-nav relative w-full md:w-1/2 h-full overflow-y-auto flex flex-col items-center justify-center">
                     {% if navItems is not empty %}
                         {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}
                     {% endif %}
@@ -273,8 +279,11 @@
         {# ═══ WITHOUT IMAGE — full panel slides from right ═══ #}
         {# Panel has iw-menu__overlay background, slides as one block #}
         <div
+            id="{{ panelId }}"
             data-menu-target="panel"
-            class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0 flex flex-col items-center justify-center"
+            role="dialog"
+            aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
+            class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right fixed inset-0 z-30 flex flex-col items-center justify-center"
         >
             {% if navItems is not empty %}
                 {{ _self.render_nav_items(navItems, twoColumns, clickMode) }}

@@ -736,6 +736,39 @@ function: `link.url` is always null under Sulu 3.
 
 ---
 
+## Menus: keyboard, focus and ARIA (breaking for template overrides)
+
+The `menu` Stimulus controller was rewritten around two ARIA patterns,
+disclosure for what drops down and dialog for the panels the burger opens. See
+[Accessibility](menus.md#accessibility). On screen, the menus look the same.
+What changes for the visitor: Escape closes, the focus is managed, level 3 of
+the navbar opens without a mouse, a click no longer closes a dropdown hover
+just opened, and opening a panel no longer shifts the page.
+
+**If you override a menu template**, the old controller API is gone:
+
+| Removed | Now |
+|---------|-----|
+| `menu#toggleDropdown`, `menu#toggleMobileSubmenu`, `menu#toggleMegaDropdown` | `menu#toggleDisclosure` on a button with `aria-expanded="false"` and `aria-controls="<id>"` |
+| targets `dropdown`, `dropdownParent`, `subdropdown`, `subdropdownParent`, `submenu`, `megaParent`, `megaDropdown` | `popupTrigger` on the button of a floating dropdown; the content is found by its id |
+| targets `curtainLeft`, `curtainRight` | classes `iw-menu__curtain iw-menu__curtain--left` / `--right` |
+| values `animation`, `slideDirection` | classes on the panel: `iw-menu__dialog iw-menu__dialog--{none\|fade\|slide\|curtain}` and `--from-{top\|right\|bottom\|left}` |
+| `invisible opacity-0` on the panel, translate utilities on the sidebar | `iw-menu__dialog`, `iw-menu__sidebar--{left\|right}`, opened by `--open` |
+| `data-menu-panel-id-param` on a drill-down row | `aria-controls` pointing to the sub-panel id |
+
+The panels also need `role="dialog"` and an `aria-label`, and the burger
+`aria-controls`. The sidebar panel is now a `<div>`, not an `<aside>`: it is
+not complementary content, and `dialog` is not an allowed role on `<aside>`. In the mega menu, each panel now sits right after its button,
+inside a `.iw-mega-menu__item` wrapper, and the `<nav>` became full width with
+the container inside it. A `MenuAccessibilityContractTest` in the bundle lists
+every rule a template must follow.
+
+The chevrons of the menus now go through `components/_nav_arrow.html.twig`:
+they follow the theme's chevron setting like every other chevron of the site.
+With no chevron set, they look as before.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

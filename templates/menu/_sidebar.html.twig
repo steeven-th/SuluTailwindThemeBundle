@@ -22,6 +22,7 @@
 {% macro render_nav_items(navItems, clickMode) %}
     {% for item in navItems %}
         {% if item.children is defined and item.children|length > 0 %}
+            {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
             <div class="iw-menu__parent-item">
                 {# L1 with children — depends on clickMode #}
                 {% if clickMode == 'split' %}
@@ -35,28 +36,29 @@
                         </a>
                         <button
                             type="button"
-                            data-action="menu#toggleMobileSubmenu"
+                            data-action="menu#toggleDisclosure"
+                            aria-expanded="false"
+                            aria-controls="{{ submenuId }}"
+                            aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': item.title}, 'messages') }}"
                             class="iw-menu__text p-2 rounded-md hover:opacity-80 transition-opacity cursor-pointer"
                         >
-                            <svg class="w-4 h-4 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
+                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                         </button>
                     </div>
                 {% else %}
                     {# Default accordion button (none + selflink) #}
                     <button
                         type="button"
-                        data-action="menu#toggleMobileSubmenu"
+                        data-action="menu#toggleDisclosure"
+                        aria-expanded="false"
+                        aria-controls="{{ submenuId }}"
                         class="iw-menu__text flex items-center justify-between w-full py-2.5 px-3 text-sm font-semibold rounded-md hover:opacity-80 transition-opacity text-left cursor-pointer"
                     >
                         {{ item.title }}
-                        <svg class="w-4 h-4 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                     </button>
                 {% endif %}
-                <div data-menu-target="submenu" class="hidden pl-3 space-y-0.5">
+                <div id="{{ submenuId }}" class="hidden pl-3 space-y-0.5">
                     {% if clickMode == 'selflink' %}
                         {# Self-link to parent page as first item #}
                         <a
@@ -69,6 +71,7 @@
                     {% for child in item.children %}
                         {% if child.children is defined and child.children|length > 0 %}
                             {# L2 with L3 children — nested accordion #}
+                            {% set subSubmenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
                             <div class="iw-menu__parent-item">
                                 {% if clickMode == 'split' %}
                                     <div class="flex items-center justify-between w-full">
@@ -80,27 +83,28 @@
                                         </a>
                                         <button
                                             type="button"
-                                            data-action="menu#toggleMobileSubmenu"
+                                            data-action="menu#toggleDisclosure"
+                                            aria-expanded="false"
+                                            aria-controls="{{ subSubmenuId }}"
+                                            aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
                                             class="iw-menu__text--level-2 p-1 opacity-70 hover:opacity-100 cursor-pointer"
                                         >
-                                            <svg class="w-3.5 h-3.5 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                            </svg>
+                                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
                                         </button>
                                     </div>
                                 {% else %}
                                     <button
                                         type="button"
-                                        data-action="menu#toggleMobileSubmenu"
+                                        data-action="menu#toggleDisclosure"
+                                        aria-expanded="false"
+                                        aria-controls="{{ subSubmenuId }}"
                                         class="iw-menu__text--level-2 flex items-center justify-between w-full py-2 px-3 text-sm rounded-md opacity-70 hover:opacity-100 transition-opacity text-left cursor-pointer"
                                     >
                                         <span>{{ child.title }}</span>
-                                        <svg class="w-3.5 h-3.5 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                        </svg>
+                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-3.5 h-3.5 flex-shrink-0'} only %}
                                     </button>
                                 {% endif %}
-                                <div data-menu-target="submenu" class="hidden pl-3 space-y-0.5">
+                                <div id="{{ subSubmenuId }}" class="hidden pl-3 space-y-0.5">
                                     {% if clickMode == 'selflink' %}
                                         {# Self-link to L2 page itself #}
                                         <a
@@ -164,9 +168,11 @@
     </a>
 {% endmacro %}
 
+{% set sidebarId = iw_sulu_tailwind_theme_unique_id('menu-sidebar') %}
+
 <header data-controller="menu"
-        data-menu-animation-value="slide"
-        data-menu-slide-direction-value="{{ position }}"
+        data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+        data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
         class="iw-menu iw-menu--sidebar {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }}">
 
     {# ═══ NAVBAR: always visible (mobile + desktop) ═══
@@ -215,8 +221,10 @@
                 <button type="button"
                         data-action="menu#toggleSidebar"
                         data-menu-target="sidebarBurger"
-                        class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                        aria-label="Menu">
+                        aria-expanded="false"
+                        aria-controls="{{ sidebarId }}"
+                        aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+                        class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5">
                     <span class="iw-menu__burger-line"></span>
                     <span class="iw-menu__burger-line"></span>
                     <span class="iw-menu__burger-line"></span>
@@ -234,13 +242,19 @@
     {# ═══ Sidebar — slides in from the configured side on every breakpoint ═══ #}
     {# Full width on mobile, 288px on desktop (where the backdrop dims the rest of
        the page). Stack: navbar (z-50) > sidebar (z-40) > backdrop (z-30) > page. #}
-    <aside data-menu-target="sidebar"
+    {# A dialog: the controller makes the page it hides inert while it is
+       open. A <div>, not an <aside>: it is not complementary content, and
+       `dialog` is not an allowed role on <aside>. The slide and the hidden
+       state come from .iw-menu__sidebar--{side} and --open. #}
+    <div id="{{ sidebarId }}"
+           data-menu-target="sidebar"
+           role="dialog"
+           aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
            class="fixed top-0 {{ isLeft ? 'left-0' : 'right-0' }} h-screen z-40
-                  iw-menu__sidebar w-full flex flex-col transition-transform duration-300
-                  {{ isLeft ? '-translate-x-full' : 'translate-x-full' }}">
+                  iw-menu__sidebar iw-menu__sidebar--{{ isLeft ? 'left' : 'right' }} w-full flex flex-col">
 
         {% if config.subMenuPanels|default(false) %}
-            {# Drill-down panels mode — the partial fills the aside and clears the
+            {# Drill-down panels mode: the partial fills the panel and clears the
                navbar itself (like the burger), so no spacer here. #}
             {% if navItems is not empty %}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
@@ -269,5 +283,5 @@
                     with {config: config, display: 'inline', slot: 'panel'} %}
             </div>
         {% endif %}
-    </aside>
+    </div>
 </header>

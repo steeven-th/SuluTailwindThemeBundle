@@ -3006,7 +3006,8 @@ class ThemeCompiler
         $css .= ".iw-menu--transparent:not(.iw-menu--scrolled) .iw-menu__logo-state--default { opacity: 0; pointer-events: none; }\n";
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__logo-state { transition: none; } }\n";
 
-        // Fullscreen overlay (transition is handled by JS, not CSS, to avoid conflicts)
+        // Background of the panel the burger opens (burger, navbar and mega menu
+        // on mobile, fullscreen without image). Its motion is below.
         $css .= ".iw-menu__overlay {\n";
         $css .= "  background-color: var(--iw-menu-bg);\n";
         $css .= "  color: var(--iw-menu-text);\n";
@@ -3029,6 +3030,56 @@ class ThemeCompiler
         // Backdrop overlay — hidden by default, faded in via --visible (sidebar).
         $css .= ".iw-menu__backdrop { background-color: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }\n";
         $css .= ".iw-menu__backdrop--visible { opacity: 1; pointer-events: auto; }\n";
+
+        // ─── Dialog states (burger, fullscreen, mobile panels, sidebar) ───────
+        // The menu controller only switches classes: every motion lives here, so
+        // a project can restyle it and reduced motion can switch it off. A closed
+        // panel is `visibility: hidden`, which also takes it out of the focus
+        // order. On close, visibility waits for the end of the motion (delayed
+        // transition), so no script has to listen for `transitionend`.
+        $css .= ".iw-menu__dialog { visibility: hidden; }\n";
+        $css .= ".iw-menu__dialog--open { visibility: visible; }\n";
+        $css .= ".iw-menu__dialog--fade { opacity: 0; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }\n";
+        $css .= ".iw-menu__dialog--fade.iw-menu__dialog--open { opacity: 1; transition: opacity 0.3s ease, visibility 0s; }\n";
+        $css .= ".iw-menu__dialog--slide { transition: transform 0.3s ease, visibility 0s linear 0.3s; }\n";
+        $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-top { transform: translateY(-100%); }\n";
+        $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-bottom { transform: translateY(100%); }\n";
+        $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-left { transform: translateX(-100%); }\n";
+        $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-right { transform: translateX(100%); }\n";
+        $css .= ".iw-menu__dialog--slide.iw-menu__dialog--open { transform: none; transition: transform 0.3s ease, visibility 0s; }\n";
+        // Curtain (fullscreen with image): the two halves slide, the panel waits.
+        $css .= ".iw-menu__dialog--curtain { transition: visibility 0s linear 0.5s; }\n";
+        $css .= ".iw-menu__dialog--curtain.iw-menu__dialog--open { transition: visibility 0s; }\n";
+        $css .= ".iw-menu__curtain { transition: transform 0.5s ease; }\n";
+        $css .= ".iw-menu__curtain--left { transform: translateX(-100%); }\n";
+        $css .= ".iw-menu__curtain--right { transform: translateX(100%); }\n";
+        $css .= ".iw-menu__dialog--open .iw-menu__curtain { transform: none; }\n";
+        // Sidebar: slides in from its side.
+        $css .= ".iw-menu__sidebar { visibility: hidden; transition: transform 0.3s ease, visibility 0s linear 0.3s; }\n";
+        $css .= ".iw-menu__sidebar--left { transform: translateX(-100%); }\n";
+        $css .= ".iw-menu__sidebar--right { transform: translateX(100%); }\n";
+        $css .= ".iw-menu__sidebar--open { visibility: visible; transform: none; transition: transform 0.3s ease, visibility 0s; }\n";
+        // The page under an open panel does not scroll. The room its scrollbar
+        // took is given back as padding (width measured by the controller), so
+        // the bar does not shift sideways. A reserved gutter would do the same
+        // but leave a strip of page background beside a full-screen panel.
+        // On <body> rather than <html>: the stylesheet clips body horizontally,
+        // and the bar below must be able to reach into that padding.
+        $css .= "html.iw-scroll-locked { overflow: hidden; }\n";
+        $css .= "html.iw-scroll-locked body { padding-right: var(--iw-scrollbar-compensation, 0px); }\n";
+        // The bar keeps the full width, with the same room given back inside
+        // it: its content does not move and no strip of page shows beside it.
+        // On the sidebar type the sticky bar is the <nav>, not the header.
+        $css .= "html.iw-scroll-locked .iw-menu:not(.iw-menu--sidebar), html.iw-scroll-locked .iw-menu--sidebar > nav {\n";
+        $css .= "  width: calc(100% + var(--iw-scrollbar-compensation, 0px)); padding-right: var(--iw-scrollbar-compensation, 0px); }\n";
+        // A chevron that shows an expandable part turns once it is expanded.
+        // `rotate` stacks on the `transform` that points the arrow down.
+        $css .= ".iw-menu .iw-nav-arrow--down { transition: rotate 0.2s ease; }\n";
+        $css .= ".iw-menu [aria-expanded=\"true\"] .iw-nav-arrow--down { rotate: 180deg; }\n";
+        $css .= "@media (prefers-reduced-motion: reduce) {\n";
+        $css .= "  .iw-menu__dialog, .iw-menu__curtain, .iw-menu__sidebar, .iw-menu__backdrop, .iw-menu__subpanel,\n";
+        $css .= "  .iw-menu__burger-line, .iw-menu .iw-nav-arrow--down { transition-duration: 0s !important; transition-delay: 0s !important; }\n";
+        $css .= "}\n";
 
         // ─── Drill-down panels (burger "panels" mode) ────────────────────────
         // The root panel scrolls in place; each sub-panel is an absolute overlay

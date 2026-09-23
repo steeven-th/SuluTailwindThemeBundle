@@ -7,7 +7,10 @@
     parent page when parentLinkable is true.
 
     Included by _burger.html.twig and _sidebar.html.twig when config.subMenuPanels
-    is on. Requires the menu Stimulus controller (openPanel / closePanel).
+    is on. Requires the menu Stimulus controller (openPanel / closePanel): a row
+    opening a sub-panel carries aria-expanded and aria-controls, the sub-panel
+    stays inert until it is shown, and the level underneath goes inert while a
+    sub-panel covers it.
 
     Params:
     - navItems:  the resolved navigation tree (L1 → L3)
@@ -38,7 +41,7 @@
 {# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
    shares the same absolute positioning context. #}
 {% macro render_subpanel(item, panelId, parentLinkable) %}
-    <section class="iw-menu__subpanel" data-panel-id="{{ panelId }}" data-menu-target="subPanel" inert>
+    <section class="iw-menu__subpanel" id="iw-menu-subpanel-{{ panelId }}" data-menu-target="subPanel" inert>
         <div class="iw-menu__panel-header">
             <button type="button"
                     data-action="menu#closePanel"
@@ -59,7 +62,8 @@
                 {% if child.children is defined and child.children|length > 0 %}
                     <button type="button"
                             data-action="menu#openPanel"
-                            data-menu-panel-id-param="{{ panelId }}-{{ loop.index }}"
+                            aria-expanded="false"
+                            aria-controls="iw-menu-subpanel-{{ panelId }}-{{ loop.index }}"
                             class="iw-menu__panel-item iw-menu__text--level-2">
                         <span>{{ child.title }}</span>
                         {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
@@ -88,7 +92,8 @@
                 {% if item.children is defined and item.children|length > 0 %}
                     <button type="button"
                             data-action="menu#openPanel"
-                            data-menu-panel-id-param="p-{{ loop.index }}"
+                            aria-expanded="false"
+                            aria-controls="iw-menu-subpanel-p-{{ loop.index }}"
                             class="iw-menu__panel-item iw-menu__text iw-menu__divider border-b">
                         <span class="text-lg font-medium">{{ item.title }}</span>
                         {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'next', 'class': 'w-5 h-5 flex-shrink-0'} only %}
