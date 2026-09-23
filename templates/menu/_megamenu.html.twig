@@ -16,6 +16,7 @@
 {% endif %}
 
 {% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
 
 {# Load menu data based on source mode #}
 {% if megaSource == 'snippet' %}
@@ -38,9 +39,10 @@
 {% endif %}
 
 {# A mega panel sits right after its button in the markup, so the keyboard
-   reaches it in reading order. It is positioned against the full-width <nav>. #}
+   reaches it in reading order. It is positioned against the full-width frame. #}
 {% macro snippet_panel(item, itemView, panelId) %}
     {% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+    {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
     {% set columnsView = itemView.columns|default([]) %}
     {% set parentLink = iw_sulu_tailwind_theme_link(item.link|default(null), itemView.link|default(null)) %}
     <div id="{{ panelId }}" class="iw-mega-menu__dropdown hidden absolute left-0 right-0 top-full z-40 shadow-lg">
@@ -65,14 +67,15 @@
                                     {{ column.column_title }}
                                 </span>
                             {% endif %}
-                            <ul class="space-y-2 mt-2 list-none p-0">
+                            <ul class="iw-menu__list space-y-2 mt-2">
                                 {% for linkItem in column.links|default([]) %}
                                     {# An unresolved link - deleted or unpublished target - is left out #}
                                     {% set itemLink = iw_sulu_tailwind_theme_link(linkItem.link|default(null), linksView[loop.index0].link|default(null)) %}
                                     {% if itemLink %}
+                                        {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
                                         <li>
-                                            <a {{ links.attrs(itemLink) }}
-                                               class="iw-menu__text--level-3 block no-underline hover:opacity-80 transition-opacity">
+                                            <a {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
+                                               class="iw-menu__text--level-3{{ nav.state_class(itemState) }} block no-underline hover:opacity-80 transition-opacity">
                                                 <span class="text-sm">{{ linkItem.title }}</span>{{ links.new_tab_hint(itemLink) }}
                                                 {% if linkItem.description|default(null) %}
                                                     <span class="block text-xs opacity-60 mt-0.5">{{ linkItem.description }}</span>
@@ -94,7 +97,7 @@
                                     {{ column.column_title }}
                                 </span>
                             {% endif %}
-                            <div class="grid gap-3 mt-2">
+                            <ul class="iw-menu__list grid gap-3 mt-2">
                                 {% set ratioClasses = {'1-1': 'aspect-square', '9-16': 'aspect-[9/16]', '16-9': 'aspect-video'} %}
                                 {% for card in column.cards|default([]) %}
                                     {% set cardRatioClass = ratioClasses[card.image_ratio|default('auto')]|default('') %}
@@ -103,32 +106,34 @@
                                        target is gone, stays visible but is not clickable. #}
                                     {% set cardLink = iw_sulu_tailwind_theme_link(card.link|default(null), cardsView[loop.index0].link|default(null)) %}
                                     {% set cardTag = cardLink ? 'a' : 'div' %}
-                                    <{{ cardTag }} {% if cardLink %}{{ links.attrs(cardLink) }}{% endif %}
-                                       class="iw-mega-menu__card block no-underline group {{ cardHasBg ? 'iw-mega-menu__card--bg' : '' }} {{ cardLayout == 'horizontal' ? 'iw-mega-menu__card--horizontal' : '' }} {{ cardLayout == 'horizontal' and imgPos == 'right' ? 'iw-mega-menu__card--img-right' : '' }}">
-                                        {% if card.image is defined and card.image.id|default(null) is not null %}
-                                            {% set cardMedia = sulu_resolve_media(card.image.id, app.request.locale) %}
-                                            {% if cardMedia is not null %}
-                                                {# Decorative: the card title right beside it already
-                                                   names the link, an alt would be read twice. #}
-                                                {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
-                                                    media: cardMedia,
-                                                    format: 'iw_theme_mega_card',
-                                                    alt: '',
-                                                    raw: true,
-                                                    loading: 'lazy',
-                                                    classes: cardRatioClass,
-                                                }) }}
+                                    <li>
+                                        <{{ cardTag }} {% if cardLink %}{{ links.attrs(cardLink) }}{{ nav.current(iw_sulu_tailwind_theme_nav_state(cardLink.url)) }}{% endif %}
+                                           class="iw-mega-menu__card block no-underline group {{ cardHasBg ? 'iw-mega-menu__card--bg' : '' }} {{ cardLayout == 'horizontal' ? 'iw-mega-menu__card--horizontal' : '' }} {{ cardLayout == 'horizontal' and imgPos == 'right' ? 'iw-mega-menu__card--img-right' : '' }}">
+                                            {% if card.image is defined and card.image.id|default(null) is not null %}
+                                                {% set cardMedia = sulu_resolve_media(card.image.id, app.request.locale) %}
+                                                {% if cardMedia is not null %}
+                                                    {# Decorative: the card title right beside it already
+                                                       names the link, an alt would be read twice. #}
+                                                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                                        media: cardMedia,
+                                                        format: 'iw_theme_mega_card',
+                                                        alt: '',
+                                                        raw: true,
+                                                        loading: 'lazy',
+                                                        classes: cardRatioClass,
+                                                    }) }}
+                                                {% endif %}
                                             {% endif %}
-                                        {% endif %}
-                                        <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
-                                            <span class="iw-menu__text--level-3 text-sm font-medium">{{ card.title }}</span>{% if cardLink %}{{ links.new_tab_hint(cardLink) }}{% endif %}
-                                            {% if card.description|default(null) %}
-                                                <span class="iw-menu__text--level-3 block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
-                                            {% endif %}
-                                        </div>
-                                    </{{ cardTag }}>
+                                            <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
+                                                <span class="iw-menu__text--level-3 text-sm font-medium">{{ card.title }}</span>{% if cardLink %}{{ links.new_tab_hint(cardLink) }}{% endif %}
+                                                {% if card.description|default(null) %}
+                                                    <span class="iw-menu__text--level-3 block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </{{ cardTag }}>
+                                    </li>
                                 {% endfor %}
-                            </div>
+                            </ul>
                         </div>
                     {% elseif column.type == 'featured_column' %}
                         {# Featured column: highlight with image, description, CTA (vertical or horizontal layout) #}
@@ -175,37 +180,44 @@
 {% endmacro %}
 
 {% macro native_panel(item, panelId, parentLinkable) %}
+    {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
     <div id="{{ panelId }}" class="iw-mega-menu__dropdown hidden absolute left-0 right-0 top-full z-40 shadow-lg">
         <div class="md:container md:mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {% if parentLinkable %}
-                <a href="{{ sulu_content_path(item.url) }}"
-                   class="iw-mega-menu__parent-link iw-menu__text--level-2 inline-flex items-center gap-2 mb-6 font-semibold no-underline hover:opacity-80 transition-opacity">
+                {% set itemHref = sulu_content_path(item.url) %}
+                {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
+                <a href="{{ itemHref }}"{{ nav.current(itemState) }}
+                   class="iw-mega-menu__parent-link iw-menu__text--level-2{{ nav.state_class(itemState) }} inline-flex items-center gap-2 mb-6 font-semibold no-underline hover:opacity-80 transition-opacity">
                     {{ item.title }}
                     <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 12h12"/></svg>
                 </a>
             {% endif %}
-            <div class="iw-mega-menu__grid--cols-{{ min(item.children|length, 5) }}">
+            <ul class="iw-menu__list iw-mega-menu__grid--cols-{{ min(item.children|length, 5) }}">
                 {% for child in item.children %}
-                    <div>
-                        <a href="{{ sulu_content_path(child.url) }}"
-                           class="iw-menu__text--level-2 font-semibold mb-3 block text-sm no-underline hover:opacity-80 transition-opacity">
+                    {% set childHref = sulu_content_path(child.url) %}
+                    {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
+                    <li>
+                        <a href="{{ childHref }}"{{ nav.current(childState) }}
+                           class="iw-menu__text--level-2{{ nav.state_class(childState) }} font-semibold mb-3 block text-sm no-underline hover:opacity-80 transition-opacity">
                             {{ child.title }}
                         </a>
                         {% if child.children is defined and child.children|length > 0 %}
-                            <ul class="space-y-2 mt-2 list-none p-0">
+                            <ul class="iw-menu__list space-y-2 mt-2">
                                 {% for grandchild in child.children %}
+                                    {% set grandchildHref = sulu_content_path(grandchild.url) %}
+                                    {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
                                     <li>
-                                        <a href="{{ sulu_content_path(grandchild.url) }}"
-                                           class="iw-menu__text--level-3 text-sm no-underline hover:opacity-80 transition-opacity">
+                                        <a href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
+                                           class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} text-sm no-underline hover:opacity-80 transition-opacity">
                                             {{ grandchild.title }}
                                         </a>
                                     </li>
                                 {% endfor %}
                             </ul>
                         {% endif %}
-                    </div>
+                    </li>
                 {% endfor %}
-            </div>
+            </ul>
         </div>
     </div>
 {% endmacro %}
@@ -223,23 +235,14 @@
     {# ─── Desktop navbar ───
        Full width and positioned: the mega panels inside it span the whole
        viewport, while the bar content keeps the container width. #}
-    <nav class="relative z-50">
+    <div class="iw-menu__frame relative z-50">
         <div class="md:container md:mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center {{ navPosition == 'left' ? 'mr-0' : '' }}">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
-                    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
-                        with { config: config } only %}
-                    {% if config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
-                    {% endif %}
-                    {# Fallback: show site name if no logo and no siteName option checked #}
-                    {% if not config.displayLogoDesktop|default(false) and not config.displayLogoMobile|default(false) and not config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('Site') }}</span>
-                    {% endif %}
-                </a>
+                {% include '@ItechWorldSuluTailwindTheme/menu/_logo_link.html.twig'
+                    with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
             {# CENTER — Desktop L1 navigation items #}
@@ -248,25 +251,29 @@
                 'center': 'md:mx-auto',
                 'right': 'md:ml-auto md:mr-6'
             } %}
-            <div class="hidden md:flex items-center gap-1 {{ navPositionClass[navPosition]|default('md:mx-auto') }}">
+            <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="hidden md:block {{ navPositionClass[navPosition]|default('md:mx-auto') }}">
+                <ul class="iw-menu__list flex items-center gap-1">
                 {% if megaSource == 'snippet' %}
                     {# ─── Snippet mode: render from snippet data ─── #}
                     {% for item in menuItems %}
                         {% if item.type == 'simple_link' %}
                             {% set itemLink = iw_sulu_tailwind_theme_link(item.link|default(null), menuItemsView[loop.index0].link|default(null), item.open_in_new_tab|default(false)) %}
                             {% if itemLink %}
-                                <a
-                                    {{ links.attrs(itemLink) }}
-                                    class="iw-menu__text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
-                                >
-                                    {{ item.title }}{{ links.new_tab_hint(itemLink) }}
-                                </a>
+                                {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
+                                <li>
+                                    <a
+                                        {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
+                                        class="iw-menu__text{{ nav.state_class(itemState) }} block px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
+                                    >
+                                        {{ item.title }}{{ links.new_tab_hint(itemLink) }}
+                                    </a>
+                                </li>
                             {% endif %}
                         {% elseif item.type == 'mega_dropdown' %}
                             {# Static wrapper: the hover and focus zone of the button and
-                               its panel, which positions itself against the <nav>. #}
+                               its panel, which positions itself against the frame. #}
                             {% set megaId = iw_sulu_tailwind_theme_unique_id('menu-mega') %}
-                            <div class="iw-mega-menu__item">
+                            <li class="iw-mega-menu__item">
                                 <button
                                     type="button"
                                     data-action="menu#toggleDisclosure"
@@ -279,39 +286,44 @@
                                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                 </button>
                                 {{ _self.snippet_panel(item, menuItemsView[loop.index0]|default({}), megaId) }}
-                            </div>
+                            </li>
                         {% endif %}
                     {% endfor %}
                 {% else %}
                     {# ─── Native mode: render from page tree ─── #}
                     {% for item in navItems %}
+                        {% set itemHref = sulu_content_path(item.url) %}
+                        {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
                         {% if item.children is defined and item.children|length > 0 %}
                             {% set megaId = iw_sulu_tailwind_theme_unique_id('menu-mega') %}
-                            <div class="iw-mega-menu__item">
+                            <li class="iw-mega-menu__item">
                                 <button
                                     type="button"
                                     data-action="menu#toggleDisclosure"
                                     data-menu-target="popupTrigger"
                                     aria-expanded="false"
                                     aria-controls="{{ megaId }}"
-                                    class="iw-menu__text flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
+                                    class="iw-menu__text{{ nav.branch_class(itemState) }} flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-md transition-opacity cursor-pointer"
                                 >
                                     {{ item.title }}
                                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                 </button>
                                 {{ _self.native_panel(item, megaId, parentLinkable) }}
-                            </div>
+                            </li>
                         {% else %}
-                            <a
-                                href="{{ sulu_content_path(item.url) }}"
-                                class="iw-menu__text px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
-                            >
-                                {{ item.title }}
-                            </a>
+                            <li>
+                                <a
+                                    href="{{ itemHref }}"{{ nav.current(itemState) }}
+                                    class="iw-menu__text{{ nav.state_class(itemState) }} block px-4 py-2 text-sm font-medium rounded-md transition-opacity no-underline hover:opacity-80"
+                                >
+                                    {{ item.title }}
+                                </a>
+                            </li>
                         {% endif %}
                     {% endfor %}
                 {% endif %}
-            </div>
+                </ul>
+            </nav>
 
             {# RIGHT — Language switcher + Social media + CTA (snippet) + Burger (mobile) #}
             <div class="flex items-center gap-3">
@@ -322,28 +334,12 @@
                 </div>
 
                 {# Social media icons — desktop #}
-                {% if socialLinks|length > 0 %}
-                    <div class="hidden md:flex items-center gap-2">
-                        {% for link in socialLinks %}
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center">
-                                {% if link.icon is defined and link.icon.id is defined %}
-                                    {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                                    {% if iconMedia is not null and iconMedia.url is defined %}
-                                        {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                        <span class="iw-social-icon w-5 h-5"
-                                              style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                              aria-label="{{ link.name|default('') }}"></span>
-                                    {% else %}
-                                        <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                {% endif %}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                    links: socialLinks,
+                    class: 'hidden md:flex items-center gap-2',
+                    iconClass: 'w-5 h-5',
+                    textClass: 'text-sm',
+                } only %}
 
                 {# CTA button — snippet mode only, desktop #}
                 {% if megaSource == 'snippet' and ctaLink %}
@@ -377,36 +373,40 @@
             </div>
         </div>
         </div>
-    </nav>
+    </div>
 
     {# ─── Mobile overlay panel ─── #}
     <div
         id="{{ panelId }}"
         data-menu-target="panel"
         role="dialog"
-        aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
+        aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
         class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--none iw-menu__below-bar fixed left-0 right-0 bottom-0 z-30 md:hidden"
     >
-        <nav class="iw-menu__overlay-nav px-6 sm:px-8 overflow-y-auto h-full">
+        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav px-6 sm:px-8 overflow-y-auto h-full">
             {% if megaSource == 'snippet' %}
                 {# ─── Snippet mode: mobile accordion ─── #}
+                <ul class="iw-menu__list">
                 {% for item in menuItems %}
                     {% set itemView = menuItemsView[loop.index0]|default({}) %}
                     {% if item.type == 'simple_link' %}
                         {% set itemLink = iw_sulu_tailwind_theme_link(item.link|default(null), itemView.link|default(null), item.open_in_new_tab|default(false)) %}
                         {% if itemLink %}
-                            <a
-                                {{ links.attrs(itemLink) }}
-                                class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
-                            >
-                                {{ item.title }}{{ links.new_tab_hint(itemLink) }}
-                            </a>
+                            {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
+                            <li>
+                                <a
+                                    {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
+                                    class="iw-menu__text{{ nav.state_class(itemState) }} iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
+                                >
+                                    {{ item.title }}{{ links.new_tab_hint(itemLink) }}
+                                </a>
+                            </li>
                         {% endif %}
                     {% elseif item.type == 'mega_dropdown' %}
                         {% set columnsView = itemView.columns|default([]) %}
                         {% set parentLink = iw_sulu_tailwind_theme_link(item.link|default(null), itemView.link|default(null)) %}
                         {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
-                        <div class="iw-menu__divider border-b">
+                        <li class="iw-menu__divider border-b">
                             <button
                                 type="button"
                                 data-action="menu#toggleDisclosure"
@@ -421,7 +421,7 @@
                                 {# The dropdown's own page, when the editor linked one #}
                                 {% if parentLink %}
                                     <a
-                                        {{ links.attrs(parentLink) }}
+                                        {{ links.attrs(parentLink) }}{{ nav.current(iw_sulu_tailwind_theme_nav_state(parentLink.url)) }}
                                         class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
                                     >
                                         {{ item.title }}{{ links.new_tab_hint(parentLink) }}
@@ -435,30 +435,40 @@
                                             <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
                                         {% endif %}
                                         {% set linksView = columnView.links|default([]) %}
-                                        {% for linkItem in column.links|default([]) %}
-                                            {% set itemLink = iw_sulu_tailwind_theme_link(linkItem.link|default(null), linksView[loop.index0].link|default(null)) %}
-                                            {% if itemLink %}
-                                                <a {{ links.attrs(itemLink) }}
-                                                   class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
-                                                    {{ linkItem.title }}{{ links.new_tab_hint(itemLink) }}
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
+                                        <ul class="iw-menu__list">
+                                            {% for linkItem in column.links|default([]) %}
+                                                {% set itemLink = iw_sulu_tailwind_theme_link(linkItem.link|default(null), linksView[loop.index0].link|default(null)) %}
+                                                {% if itemLink %}
+                                                    {% set itemState = iw_sulu_tailwind_theme_nav_state(itemLink.url) %}
+                                                    <li>
+                                                        <a {{ links.attrs(itemLink) }}{{ nav.current(itemState) }}
+                                                           class="iw-menu__text--level-3{{ nav.state_class(itemState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                                            {{ linkItem.title }}{{ links.new_tab_hint(itemLink) }}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
                                     {% elseif column.type == 'image_column' %}
                                         {% if column.column_title|default(null) %}
                                             <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.column_title }}</span>
                                         {% endif %}
                                         {# Only the cards that lead somewhere: the images stay on desktop #}
                                         {% set cardsView = columnView.cards|default([]) %}
-                                        {% for card in column.cards|default([]) %}
-                                            {% set cardLink = iw_sulu_tailwind_theme_link(card.link|default(null), cardsView[loop.index0].link|default(null)) %}
-                                            {% if cardLink %}
-                                                <a {{ links.attrs(cardLink) }}
-                                                   class="iw-menu__text--level-3 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
-                                                    {{ card.title }}{{ links.new_tab_hint(cardLink) }}
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
+                                        <ul class="iw-menu__list">
+                                            {% for card in column.cards|default([]) %}
+                                                {% set cardLink = iw_sulu_tailwind_theme_link(card.link|default(null), cardsView[loop.index0].link|default(null)) %}
+                                                {% if cardLink %}
+                                                    {% set cardState = iw_sulu_tailwind_theme_nav_state(cardLink.url) %}
+                                                    <li>
+                                                        <a {{ links.attrs(cardLink) }}{{ nav.current(cardState) }}
+                                                           class="iw-menu__text--level-3{{ nav.state_class(cardState) }} block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
+                                                            {{ card.title }}{{ links.new_tab_hint(cardLink) }}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
                                     {% elseif column.type == 'featured_column' %}
                                         <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.title }}</span>
                                         {% set featLink = column.cta_title|default(null) ? iw_sulu_tailwind_theme_link(column.cta_link|default(null), columnView.cta_link|default(null)) : null %}
@@ -471,9 +481,10 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                        </div>
+                        </li>
                     {% endif %}
                 {% endfor %}
+                </ul>
 
                 {# CTA button — mobile #}
                 {% if ctaLink %}
@@ -488,79 +499,8 @@
                 {% endif %}
             {% else %}
                 {# ─── Native mode: mobile accordion from page tree ─── #}
-                {% for item in navItems %}
-                    {% if item.children is defined and item.children|length > 0 %}
-                        {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
-                        <div class="iw-menu__divider border-b">
-                            <button
-                                type="button"
-                                data-action="menu#toggleDisclosure"
-                                aria-expanded="false"
-                                aria-controls="{{ submenuId }}"
-                                class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
-                            >
-                                <span class="text-lg font-medium">{{ item.title }}</span>
-                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-5 h-5 flex-shrink-0'} only %}
-                            </button>
-                            <div id="{{ submenuId }}" class="hidden pb-3 mt-1 px-4">
-                                {% if parentLinkable %}
-                                    <a
-                                        href="{{ sulu_content_path(item.url) }}"
-                                        class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
-                                    >
-                                        {{ item.title }}
-                                    </a>
-                                {% endif %}
-                                {% for child in item.children %}
-                                    {% if child.children is defined and child.children|length > 0 %}
-                                        {# Level 2 with L3 sub-accordion #}
-                                        {% set subSubmenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
-                                        <button
-                                            type="button"
-                                            data-action="menu#toggleDisclosure"
-                                            aria-expanded="false"
-                                            aria-controls="{{ subSubmenuId }}"
-                                            class="iw-menu__text--level-2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
-                                        >
-                                            <span>{{ child.title }}</span>
-                                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
-                                        </button>
-                                        <div id="{{ subSubmenuId }}" class="hidden pb-2 mt-1 px-4">
-                                            <a
-                                                href="{{ sulu_content_path(child.url) }}"
-                                                class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
-                                            >
-                                                {{ child.title }}
-                                            </a>
-                                            {% for grandchild in child.children %}
-                                                <a
-                                                    href="{{ sulu_content_path(grandchild.url) }}"
-                                                    class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
-                                                >
-                                                    {{ grandchild.title }}
-                                                </a>
-                                            {% endfor %}
-                                        </div>
-                                    {% else %}
-                                        <a
-                                            href="{{ sulu_content_path(child.url) }}"
-                                            class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
-                                        >
-                                            {{ child.title }}
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <a
-                            href="{{ sulu_content_path(item.url) }}"
-                            class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
-                        >
-                            {{ item.title }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
+                    with {navItems: navItems, clickMode: parentLinkable ? 'selflink' : 'none'} only %}
             {% endif %}
 
             {# Language switcher — mobile overlay, inline #}
@@ -568,28 +508,12 @@
                 with {config: config, display: 'inline'} %}
 
             {# Social media icons in mobile overlay #}
-            {% if socialLinks|length > 0 %}
-                <div class="flex items-center gap-3 pt-6 pb-4">
-                    {% for link in socialLinks %}
-                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center">
-                            {% if link.icon is defined and link.icon.id is defined %}
-                                {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                                {% if iconMedia is not null and iconMedia.url is defined %}
-                                    {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                    <span class="iw-social-icon w-6 h-6"
-                                          style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                          aria-label="{{ link.name|default('') }}"></span>
-                                {% else %}
-                                    <span class="iw-social-text">{{ link.name|default('') }}</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="iw-social-text">{{ link.name|default('') }}</span>
-                            {% endif %}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                links: socialLinks,
+                class: 'flex items-center gap-3 pt-6 pb-4',
+                iconClass: 'w-6 h-6',
+                textClass: '',
+            } only %}
         </nav>
     </div>
 </header>

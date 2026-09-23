@@ -561,6 +561,8 @@
     "iw_sulu_tailwind_theme.menu_colors_bg": "Fond",
     "iw_sulu_tailwind_theme.menu_colors_text": "Texte",
     "iw_sulu_tailwind_theme.menu_colors_textHover": "Texte au survol",
+    "iw_sulu_tailwind_theme.menu_colors_textActive": "Texte de la page courante",
+    "iw_sulu_tailwind_theme.menu_colors_textActive_info": "Le lien de la page affichée et les entrées qui y mènent. À défaut, la couleur de survol s'applique.",
     "iw_sulu_tailwind_theme.menu_colors_secondBg": "Fond niveau 2",
     "iw_sulu_tailwind_theme.menu_colors_secondText": "Texte niveau 2",
     "iw_sulu_tailwind_theme.menu_colors_secondTextHover": "Texte niveau 2 au survol",

@@ -16,6 +16,7 @@ The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
 | `--menu-bg` | Main menu background | `#ffffff` |
 | `--menu-text` | Primary text color | `#202124` |
 | `--menu-textHover` | Text color on hover | `#1a73e8` |
+| `--iw-menu-text-active` | Link of the current page and the entries leading to it (falls back to each level's hover color) | `#facc15` |
 | `--menu-secondBg` | Dropdown background (level 2) | `#f8f9fa` |
 | `--menu-secondText` | Dropdown text color | `#202124` |
 | `--menu-secondTextHover` | Dropdown text hover color | `#1a73e8` |

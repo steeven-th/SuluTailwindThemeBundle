@@ -561,6 +561,8 @@
     "iw_sulu_tailwind_theme.menu_colors_bg": "Hintergrund",
     "iw_sulu_tailwind_theme.menu_colors_text": "Text",
     "iw_sulu_tailwind_theme.menu_colors_textHover": "Text bei Hover",
+    "iw_sulu_tailwind_theme.menu_colors_textActive": "Text der aktuellen Seite",
+    "iw_sulu_tailwind_theme.menu_colors_textActive_info": "Der Link der angezeigten Seite und die Einträge, die zu ihr führen. Ohne Angabe gilt die Hover-Farbe.",
     "iw_sulu_tailwind_theme.menu_colors_secondBg": "Ebene-2-Hintergrund",
     "iw_sulu_tailwind_theme.menu_colors_secondText": "Ebene-2-Text",
     "iw_sulu_tailwind_theme.menu_colors_secondTextHover": "Ebene-2-Text bei Hover",

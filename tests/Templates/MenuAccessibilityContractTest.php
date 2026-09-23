@@ -28,6 +28,7 @@ final class MenuAccessibilityContractTest extends TestCase
         '_sidebar.html.twig',
         '_megamenu.html.twig',
         '_nav_panels.html.twig',
+        '_nav_accordion.html.twig',
         '_language_switcher.html.twig',
     ];
 

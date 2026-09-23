@@ -561,6 +561,8 @@
     "iw_sulu_tailwind_theme.menu_colors_bg": "Background",
     "iw_sulu_tailwind_theme.menu_colors_text": "Text",
     "iw_sulu_tailwind_theme.menu_colors_textHover": "Text hover",
+    "iw_sulu_tailwind_theme.menu_colors_textActive": "Current page text",
+    "iw_sulu_tailwind_theme.menu_colors_textActive_info": "The link of the page being displayed, and the entries leading to it. Falls back to the hover color.",
     "iw_sulu_tailwind_theme.menu_colors_secondBg": "Level 2 background",
     "iw_sulu_tailwind_theme.menu_colors_secondText": "Level 2 text",
     "iw_sulu_tailwind_theme.menu_colors_secondTextHover": "Level 2 text hover",

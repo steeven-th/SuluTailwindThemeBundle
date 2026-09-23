@@ -16,6 +16,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -162,6 +163,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_site_value', $this->getSiteValue(...)),
             new TwigFunction('iw_sulu_tailwind_theme_link', $this->getLink(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_nav_state', $this->getNavState(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
@@ -550,6 +552,27 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getLink(mixed $content, mixed $view = null, bool $forceNewTab = false): ?array
     {
         return LinkResolver::resolve($content, $view, $forceNewTab);
+    }
+
+    /**
+     * Tell whether a menu link leads to the page being displayed or to one of
+     * its ancestors.
+     *
+     * @param string|null $url The link URL, as the anchor prints it
+     *
+     * @return string|null 'current', 'ancestor', or null (also outside a request)
+     */
+    public function getNavState(?string $url): ?string
+    {
+        $request = $this->requestStack?->getMainRequest();
+        if (null === $request || null === $url || '' === $url) {
+            return null;
+        }
+
+        $base = $request->getBaseUrl();
+        $prefix = $this->requestAnalyzer?->getResourceLocatorPrefix() ?? '';
+
+        return NavigationState::of($url, $base . $request->getPathInfo(), $base . $prefix, $request->getHost());
     }
 
     public function getVariantSlug(mixed $variant, array $variants): string

@@ -2633,6 +2633,7 @@ class ThemeCompiler
         'bg' => 'bg',
         'text' => 'text',
         'textHover' => 'text-hover',
+        'textActive' => 'text-active',
         'secondBg' => 'second-bg',
         'secondText' => 'second-text',
         'secondTextHover' => 'second-text-hover',
@@ -2928,17 +2929,17 @@ class ThemeCompiler
         $css .= "    transform var(--iw-menu-scroll-duration, 300ms) ease,\n";
         $css .= "    border-color var(--iw-menu-scroll-duration, 300ms) ease,\n";
         $css .= "    box-shadow 0.2s ease; }\n";
-        // The inner <nav> deliberately paints nothing: the header already spans
-        // the full width, and a second background layer would double a
-        // translucent bar's opacity. The sidebar is the exception below — there
-        // the sticky element is the <nav>, not the header.
-        $css .= ".iw-menu > nav { background-color: transparent; }\n";
+        // The frame around the bar deliberately paints nothing: the header
+        // already spans the full width, and a second background layer would
+        // double a translucent bar's opacity. The sidebar is the exception
+        // below - there the sticky element is the frame, not the header.
+        $css .= ".iw-menu > .iw-menu__frame { background-color: transparent; }\n";
 
         // Sidebar menu: the header wraps both the bar and the sliding panel and
-        // does not stick, so the bar chrome belongs to its sticky <nav>.
+        // does not stick, so the bar chrome belongs to its sticky frame.
         $css .= ".iw-menu--sidebar { background-color: transparent; border-bottom: 0; box-shadow: none;\n";
         $css .= "  -webkit-backdrop-filter: none; backdrop-filter: none; }\n";
-        $css .= ".iw-menu--sidebar > nav { background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
+        $css .= ".iw-menu--sidebar > .iw-menu__frame { background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
         $css .= "  border-bottom: var(--iw-menu-border-width, 0) solid var(--iw-menu-border-color, transparent);\n";
         $css .= "  box-shadow: var(--iw-menu-shadow, none);\n";
         $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
@@ -2946,14 +2947,14 @@ class ThemeCompiler
 
         // Transparent navbar modifier: no background, and no chrome either, so
         // the bar truly disappears over the hero.
-        $css .= ".iw-menu.iw-menu--transparent, .iw-menu--sidebar.iw-menu--transparent > nav {\n";
+        $css .= ".iw-menu.iw-menu--transparent, .iw-menu--sidebar.iw-menu--transparent > .iw-menu__frame {\n";
         $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none; }\n";
 
         // Scroll behavior (L16): a transparent navbar takes its background once
         // scrolled; the smart-hide modifier slides it out of view. The chrome
         // comes back with the background, in the same transition.
         $css .= ".iw-menu.iw-menu--transparent.iw-menu--scrolled,\n";
-        $css .= ".iw-menu--sidebar.iw-menu--transparent.iw-menu--scrolled > nav {\n";
+        $css .= ".iw-menu--sidebar.iw-menu--transparent.iw-menu--scrolled > .iw-menu__frame {\n";
         $css .= "  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
         $css .= "  border-bottom-color: var(--iw-menu-border-color, transparent);\n";
         $css .= "  box-shadow: var(--iw-menu-shadow, none); }\n";
@@ -2968,6 +2969,19 @@ class ThemeCompiler
         $css .= ".iw-menu__text--level-2:hover { color: var(--iw-menu-second-text-hover, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
         $css .= ".iw-menu__text--level-3 { color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); transition: color 0.2s ease; }\n";
         $css .= ".iw-menu__text--level-3:hover { color: var(--iw-menu-third-text-hover, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
+
+        // The page being displayed and the entries leading to it (see
+        // menu/_nav_macros.html.twig). Each level falls back to its own hover
+        // color, which is known to read on that level's background. The
+        // underline on the page itself is the cue that does not rely on color
+        // alone. Two classes beat a level color and its :hover.
+        // In the base layer, like Tailwind's preflight: an unlayered reset
+        // would beat the spacing utilities the templates put on the lists.
+        $css .= "@layer base { .iw-menu__list { list-style: none; margin: 0; padding: 0; } }\n";
+        $css .= ".iw-menu__text.iw-menu__item--current, .iw-menu__text.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-text-hover, var(--iw-menu-text))); opacity: 1; }\n";
+        $css .= ".iw-menu__text--level-2.iw-menu__item--current, .iw-menu__text--level-2.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-second-text-hover, var(--iw-menu-second-text, var(--iw-menu-text)))); opacity: 1; }\n";
+        $css .= ".iw-menu__text--level-3.iw-menu__item--current, .iw-menu__text--level-3.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-third-text-hover, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))))); opacity: 1; }\n";
+        $css .= ".iw-menu__item--current { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }\n";
 
         // Dropdown backgrounds per level
         $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); border-radius: var(--border-radius); }\n";
@@ -3125,7 +3139,7 @@ class ThemeCompiler
         // The bar keeps the full width, with the same room given back inside
         // it: its content does not move and no strip of page shows beside it.
         // On the sidebar type the sticky bar is the <nav>, not the header.
-        $css .= "html.iw-scroll-locked .iw-menu:not(.iw-menu--sidebar), html.iw-scroll-locked .iw-menu--sidebar > nav {\n";
+        $css .= "html.iw-scroll-locked .iw-menu:not(.iw-menu--sidebar), html.iw-scroll-locked .iw-menu--sidebar > .iw-menu__frame {\n";
         $css .= "  width: calc(100% + var(--iw-scrollbar-compensation, 0px)); padding-right: var(--iw-scrollbar-compensation, 0px); }\n";
         // A chevron that shows an expandable part turns once it is expanded.
         // `rotate` stacks on the `transform` that points the arrow down.
@@ -3180,7 +3194,24 @@ class ThemeCompiler
         // Rows: title on the left, chevron pushed to the right.
         $css .= ".iw-menu__panel-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0.75rem 0; text-align: left; cursor: pointer; }\n";
 
-        // Social media icons — mask-image technique for SVG coloring
+        // Skip link (components/_skip_link.html.twig): off screen until it
+        // takes the focus, then drawn over the bar in the menu colors swapped,
+        // so it stands out from the bar it covers.
+        $css .= ".iw-skip-link { position: fixed; top: 0.5rem; left: 1rem; z-index: 100; padding: 0.75rem 1.25rem;\n";
+        $css .= "  background-color: var(--iw-menu-text, var(--color-text, #000)); color: var(--iw-menu-bg, var(--color-background, #fff));\n";
+        $css .= "  border-radius: var(--border-radius, 0.375rem); font-weight: 600; text-decoration: none;\n";
+        $css .= "  box-shadow: 0 4px 16px -2px rgb(0 0 0 / 0.18); transform: translateY(calc(-100% - 1rem)); transition: transform 0.15s ease; }\n";
+        $css .= ".iw-skip-link:focus { transform: none; }\n";
+        $css .= "@media (prefers-reduced-motion: reduce) { .iw-skip-link { transition: none; } }\n";
+        // The target only takes the focus to move the reading position: a ring
+        // around the whole page would say nothing more.
+        $css .= "#main-content:focus { outline: none; }\n";
+        // Social media links: a list whose items stay flex boxes, so the
+        // anchors sit exactly where they did before the markup became a list.
+        // The reset sits in the base layer so the spacing utilities still apply.
+        $css .= "@layer base { .iw-social-links { list-style: none; margin: 0; padding: 0; } }\n";
+        $css .= ".iw-social-links > li { display: flex; }\n";
+        // Social media icons - mask-image technique for SVG coloring
         $css .= ".iw-social-icon {\n";
         $css .= "  display: inline-block;\n";
         $css .= "  background-color: var(--iw-menu-social-media);\n";

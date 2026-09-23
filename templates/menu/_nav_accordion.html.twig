@@ -1,0 +1,158 @@
+{#
+    Mobile and burger navigation: the page tree as nested accordions.
+
+    Params:
+    - navItems: the resolved navigation tree (L1 to L3)
+    - clickMode: what a parent page does
+        'none'     the row only opens its branch
+        'selflink' the branch starts with a link to the parent page
+        'split'    the title is a link, a separate chevron opens the branch
+
+    Every level is a list, so a screen reader announces how many entries it
+    holds. The link of the page being displayed carries aria-current, the
+    branches leading to it only a class (see _nav_macros.html.twig).
+#}
+
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+{% set clickMode = clickMode|default('none') %}
+
+{% if navItems is not empty %}
+<ul class="iw-menu__list">
+    {% for item in navItems %}
+        {% set itemHref = sulu_content_path(item.url) %}
+        {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
+        {% if item.children is defined and item.children|length > 0 %}
+            {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
+            <li class="iw-menu__divider border-b iw-menu__parent-item">
+                {% if clickMode == 'split' %}
+                    {# Split button: link + separate chevron toggle #}
+                    <div class="flex items-center justify-between w-full">
+                        <a
+                            href="{{ itemHref }}"{{ nav.current(itemState) }}
+                            class="iw-menu__text{{ nav.state_class(itemState) }} flex-1 py-4 text-lg font-medium no-underline"
+                        >
+                            {{ item.title }}
+                        </a>
+                        <button
+                            type="button"
+                            data-action="menu#toggleDisclosure"
+                            aria-expanded="false"
+                            aria-controls="{{ submenuId }}"
+                            aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': item.title}, 'messages') }}"
+                            class="iw-menu__text p-2 cursor-pointer"
+                        >
+                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-5 h-5 flex-shrink-0'} only %}
+                        </button>
+                    </div>
+                {% else %}
+                    <button
+                        type="button"
+                        data-action="menu#toggleDisclosure"
+                        aria-expanded="false"
+                        aria-controls="{{ submenuId }}"
+                        class="iw-menu__text{{ nav.branch_class(itemState) }} flex items-center justify-between w-full py-4 text-left cursor-pointer"
+                    >
+                        <span class="text-lg font-medium">{{ item.title }}</span>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-5 h-5 flex-shrink-0'} only %}
+                    </button>
+                {% endif %}
+                <ul id="{{ submenuId }}" class="iw-menu__list iw-menu__dropdown--level-2 hidden pb-3 mt-1 px-4">
+                    {% if clickMode == 'selflink' %}
+                        <li>
+                            <a
+                                href="{{ itemHref }}"{{ nav.current(itemState) }}
+                                class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
+                            >
+                                {{ item.title }}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for child in item.children %}
+                        {% set childHref = sulu_content_path(child.url) %}
+                        {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
+                        {% if child.children is defined and child.children|length > 0 %}
+                            {# Level 2 with a level 3 sub-accordion #}
+                            {% set subSubmenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
+                            <li class="iw-menu__parent-item">
+                                {% if clickMode == 'split' %}
+                                    <div class="flex items-center justify-between w-full">
+                                        <a
+                                            href="{{ childHref }}"{{ nav.current(childState) }}
+                                            class="iw-menu__text--level-2{{ nav.state_class(childState) }} flex-1 py-2.5 no-underline"
+                                        >
+                                            {{ child.title }}
+                                        </a>
+                                        <button
+                                            type="button"
+                                            data-action="menu#toggleDisclosure"
+                                            aria-expanded="false"
+                                            aria-controls="{{ subSubmenuId }}"
+                                            aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
+                                            class="iw-menu__text--level-2 p-1 cursor-pointer"
+                                        >
+                                            {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <button
+                                        type="button"
+                                        data-action="menu#toggleDisclosure"
+                                        aria-expanded="false"
+                                        aria-controls="{{ subSubmenuId }}"
+                                        class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
+                                    >
+                                        <span>{{ child.title }}</span>
+                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                    </button>
+                                {% endif %}
+                                <ul id="{{ subSubmenuId }}" class="iw-menu__list iw-menu__dropdown--level-3 hidden pb-2 mt-1 px-4">
+                                    {% if clickMode == 'selflink' %}
+                                        <li>
+                                            <a
+                                                href="{{ childHref }}"{{ nav.current(childState) }}
+                                                class="iw-menu__text--level-3{{ nav.state_class(childState) }} block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
+                                            >
+                                                {{ child.title }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% for grandchild in child.children %}
+                                        {% set grandchildHref = sulu_content_path(grandchild.url) %}
+                                        {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
+                                        <li>
+                                            <a
+                                                href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
+                                                class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
+                                            >
+                                                {{ grandchild.title }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a
+                                    href="{{ childHref }}"{{ nav.current(childState) }}
+                                    class="iw-menu__text--level-2{{ nav.state_class(childState) }} block py-2.5 opacity-80 hover:opacity-100 no-underline"
+                                >
+                                    {{ child.title }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li>
+                <a
+                    href="{{ itemHref }}"{{ nav.current(itemState) }}
+                    class="iw-menu__text{{ nav.state_class(itemState) }} iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
+                >
+                    {{ item.title }}
+                </a>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endif %}

@@ -37,22 +37,13 @@
     {# Navbar — z-50 so it stays ABOVE the fullscreen panel (z-30): the single
        burger button stays visible and animates into the X (like the burger menu),
        instead of being covered by the panel and needing a separate close button. #}
-    <nav class="relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
 
             {# LEFT — Logo + Site Name #}
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
-                    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
-                        with { config: config } only %}
-                    {% if config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
-                    {% endif %}
-                    {# Fallback: show site name if no logo and no siteName option checked #}
-                    {% if not config.displayLogoDesktop|default(false) and not config.displayLogoMobile|default(false) and not config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('Site') }}</span>
-                    {% endif %}
-                </a>
+                {% include '@ItechWorldSuluTailwindTheme/menu/_logo_link.html.twig'
+                    with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
             {# RIGHT — Language switcher + Social media + Burger #}
@@ -63,28 +54,12 @@
                     with {config: config, align: 'right', slot: 'bar'} %}
 
                 {# Social media icons #}
-                {% if socialLinks|length > 0 %}
-                    <div class="hidden md:flex items-center gap-2">
-                        {% for link in socialLinks %}
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center">
-                                {% if link.icon is defined and link.icon.id is defined %}
-                                    {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                                    {% if iconMedia is not null and iconMedia.url is defined %}
-                                        {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                        <span class="iw-social-icon w-5 h-5"
-                                              style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                              aria-label="{{ link.name|default('') }}"></span>
-                                    {% else %}
-                                        <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                {% endif %}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                    links: socialLinks,
+                    class: 'hidden md:flex items-center gap-2',
+                    iconClass: 'w-5 h-5',
+                    textClass: 'text-sm',
+                } only %}
 
                 {# Animated burger button — always visible #}
                 <button
@@ -102,7 +77,7 @@
                 </button>
             </div>
         </div>
-    </nav>
+    </div>
 
     {# Fullscreen overlay — sits BELOW the navbar (z-30 < z-50) so the navbar's
        burger stays visible and animates into the X (single button, no separate
@@ -111,97 +86,112 @@
 
     {# Macro: navigation items (L1 / L2 / L3) #}
     {% macro render_nav_items(navItems, twoColumns, clickMode) %}
+        {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
         {% set navClasses = twoColumns
             ? 'grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-left'
             : 'space-y-4 md:space-y-6 text-center'
         %}
-        <nav class="{{ navClasses }} overflow-y-auto max-h-full px-6 sm:px-8 py-8">
-            {% for item in navItems %}
-                <div>
-                    {# L1 link — always a direct link in fullscreen #}
-                    <a
-                        href="{{ sulu_content_path(item.url) }}"
-                        class="iw-menu__text text-2xl md:text-4xl lg:text-5xl font-bold hover:opacity-80 transition-opacity no-underline"
-                    >
-                        {{ item.title }}
-                    </a>
+        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="overflow-y-auto max-h-full px-6 sm:px-8 py-8">
+            <ul class="iw-menu__list {{ navClasses }}">
+                {% for item in navItems %}
+                    {% set itemHref = sulu_content_path(item.url) %}
+                    {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
+                    <li>
+                        {# L1 link - always a direct link in fullscreen #}
+                        <a
+                            href="{{ itemHref }}"{{ nav.current(itemState) }}
+                            class="iw-menu__text{{ nav.state_class(itemState) }} text-2xl md:text-4xl lg:text-5xl font-bold hover:opacity-80 transition-opacity no-underline"
+                        >
+                            {{ item.title }}
+                        </a>
 
-                    {# L2 children #}
-                    {% if item.children is defined and item.children|length > 0 %}
-                        <div class="mt-2 space-y-1">
-                            {% for child in item.children %}
-                                {% if child.children is defined and child.children|length > 0 %}
-                                    {# L2 with L3 children #}
-                                    {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
-                                    <div class="iw-menu__parent-item">
-                                        {% if clickMode == 'split' %}
-                                            {# Split button: L2 is a link + separate chevron #}
-                                            <div class="flex items-center gap-2 w-full {{ twoColumns ? 'justify-start' : 'justify-center' }}">
-                                                <a
-                                                    href="{{ sulu_content_path(child.url) }}"
-                                                    class="iw-menu__text--level-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                                >
-                                                    {{ child.title }}
-                                                </a>
+                        {# L2 children #}
+                        {% if item.children is defined and item.children|length > 0 %}
+                            <ul class="iw-menu__list mt-2 space-y-1">
+                                {% for child in item.children %}
+                                    {% set childHref = sulu_content_path(child.url) %}
+                                    {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
+                                    {% if child.children is defined and child.children|length > 0 %}
+                                        {# L2 with L3 children #}
+                                        {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
+                                        <li class="iw-menu__parent-item">
+                                            {% if clickMode == 'split' %}
+                                                {# Split button: L2 is a link + separate chevron #}
+                                                <div class="flex items-center gap-2 w-full {{ twoColumns ? 'justify-start' : 'justify-center' }}">
+                                                    <a
+                                                        href="{{ childHref }}"{{ nav.current(childState) }}
+                                                        class="iw-menu__text--level-2{{ nav.state_class(childState) }} text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                    >
+                                                        {{ child.title }}
+                                                    </a>
+                                                    <button
+                                                        type="button"
+                                                        data-action="menu#toggleDisclosure"
+                                                        aria-expanded="false"
+                                                        aria-controls="{{ submenuId }}"
+                                                        aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
+                                                        class="iw-menu__text--level-2 opacity-60 hover:opacity-100 cursor-pointer"
+                                                    >
+                                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
+                                                    </button>
+                                                </div>
+                                            {% else %}
+                                                {# Default button (none + selflink) #}
                                                 <button
                                                     type="button"
                                                     data-action="menu#toggleDisclosure"
                                                     aria-expanded="false"
                                                     aria-controls="{{ submenuId }}"
-                                                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
-                                                    class="iw-menu__text--level-2 opacity-60 hover:opacity-100 cursor-pointer"
+                                                    class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
                                                 >
+                                                    <span>{{ child.title }}</span>
                                                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                                                 </button>
-                                            </div>
-                                        {% else %}
-                                            {# Default button (none + selflink) #}
-                                            <button
-                                                type="button"
-                                                data-action="menu#toggleDisclosure"
-                                                aria-expanded="false"
-                                                aria-controls="{{ submenuId }}"
-                                                class="iw-menu__text--level-2 flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity w-full cursor-pointer {{ twoColumns ? 'justify-start' : 'justify-center' }}"
-                                            >
-                                                <span>{{ child.title }}</span>
-                                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
-                                            </button>
-                                        {% endif %}
-                                        <div id="{{ submenuId }}" class="hidden mt-1 space-y-1 {{ twoColumns ? '' : 'text-center' }}">
-                                            {% if clickMode == 'selflink' %}
-                                                {# Self-link to the L2 page itself #}
-                                                <a
-                                                    href="{{ sulu_content_path(child.url) }}"
-                                                    class="iw-menu__text--level-3 block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
-                                                >
-                                                    {{ child.title }}
-                                                </a>
                                             {% endif %}
-                                            {# L3 grandchildren #}
-                                            {% for grandchild in child.children %}
-                                                <a
-                                                    href="{{ sulu_content_path(grandchild.url) }}"
-                                                    class="iw-menu__text--level-3 block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                                >
-                                                    {{ grandchild.title }}
-                                                </a>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% else %}
-                                    {# L2 without children — simple link #}
-                                    <a
-                                        href="{{ sulu_content_path(child.url) }}"
-                                        class="iw-menu__text--level-2 block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                    >
-                                        {{ child.title }}
-                                    </a>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                                            <ul id="{{ submenuId }}" class="iw-menu__list hidden mt-1 space-y-1 {{ twoColumns ? '' : 'text-center' }}">
+                                                {% if clickMode == 'selflink' %}
+                                                    {# Self-link to the L2 page itself #}
+                                                    <li>
+                                                        <a
+                                                            href="{{ childHref }}"{{ nav.current(childState) }}
+                                                            class="iw-menu__text--level-3{{ nav.state_class(childState) }} block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
+                                                        >
+                                                            {{ child.title }}
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                                {# L3 grandchildren #}
+                                                {% for grandchild in child.children %}
+                                                    {% set grandchildHref = sulu_content_path(grandchild.url) %}
+                                                    {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
+                                                    <li>
+                                                        <a
+                                                            href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
+                                                            class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                                        >
+                                                            {{ grandchild.title }}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% else %}
+                                        {# L2 without children - simple link #}
+                                        <li>
+                                            <a
+                                                href="{{ childHref }}"{{ nav.current(childState) }}
+                                                class="iw-menu__text--level-2{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
+                                            >
+                                                {{ child.title }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
         </nav>
     {% endmacro %}
 
@@ -224,28 +214,12 @@
 
     {# Macro: social media icons #}
     {% macro render_social_links(socialLinks) %}
-        {% if socialLinks|length > 0 %}
-            <div class="flex items-center justify-center gap-3 py-6">
-                {% for link in socialLinks %}
-                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center">
-                        {% if link.icon is defined and link.icon.id is defined %}
-                            {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                            {% if iconMedia is not null and iconMedia.url is defined %}
-                                {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                <span class="iw-social-icon w-6 h-6"
-                                      style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                      aria-label="{{ link.name|default('') }}"></span>
-                            {% else %}
-                                <span class="iw-social-text">{{ link.name|default('') }}</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="iw-social-text">{{ link.name|default('') }}</span>
-                        {% endif %}
-                    </a>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+            links: socialLinks,
+            class: 'flex items-center justify-center gap-3 py-6',
+            iconClass: 'w-6 h-6',
+            textClass: '',
+        } only %}
     {% endmacro %}
 
     {% if fullscreenImageUrl %}
@@ -255,7 +229,7 @@
             id="{{ panelId }}"
             data-menu-target="panel"
             role="dialog"
-            aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
+            aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
             class="iw-menu__dialog iw-menu__dialog--curtain fixed inset-0 z-30"
         >
             <div class="flex h-full">
@@ -282,7 +256,7 @@
             id="{{ panelId }}"
             data-menu-target="panel"
             role="dialog"
-            aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}"
+            aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
             class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right iw-menu__overlay-nav--below-bar fixed inset-0 z-30 flex flex-col items-center justify-center"
         >
             {% if navItems is not empty %}

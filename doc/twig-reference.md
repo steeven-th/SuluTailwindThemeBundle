@@ -134,7 +134,7 @@ Returns the menu configuration for the active theme.
 | `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger`, `fullscreen` and `sidebar` |
 | `sidebarWidth` | `int` | Sidebar panel width in pixels on large screens (default: `288`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
-| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
+| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
 | `logo` | `string\|null` | Path to logo image |
 | `siteName` | `string\|null` | Site name for display |
 
@@ -398,6 +398,39 @@ screen reader hint for a new tab:
 - `forceNewTab` (`bool`) - Open in a new tab whatever the link says, for a field with its own "new tab" checkbox. Default `false`
 
 **Returns:** `array|null` - `{url, target, rel, title, provider, newTab}`, or `null` when there is nothing to link to.
+
+---
+
+### `iw_sulu_tailwind_theme_nav_state(url)`
+
+Tells whether a menu link leads to the page being displayed or to one of its
+ancestors. Pass the URL the anchor prints (`sulu_content_path(item.url)`, or
+`link.url` for a resolved `link` field).
+
+The comparison works on whole path segments and ignores a trailing slash and a
+`.html` suffix. The home page is never an ancestor, `/news` never matches
+`/newsletter`, and an absolute URL to another host never matches. Sulu's own
+`sulu_page_navigation_is_active()` does none of that: it matches the item path
+anywhere in the request path.
+
+The macros of `menu/_nav_macros.html.twig` turn the answer into markup:
+
+```twig
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+{% set href = sulu_content_path(item.url) %}
+{% set state = iw_sulu_tailwind_theme_nav_state(href) %}
+<a href="{{ href }}"{{ nav.current(state) }} class="iw-menu__text{{ nav.state_class(state) }}">{{ item.title }}</a>
+```
+
+`nav.current()` prints `aria-current="page"` on the page itself only,
+`nav.state_class()` adds `iw-menu__item--current` or `iw-menu__item--ancestor`,
+and `nav.branch_class()` marks the button opening a branch that leads to the
+page.
+
+**Parameters:**
+- `url` (`string|null`) - The link URL, relative or absolute
+
+**Returns:** `string|null` - `'current'`, `'ancestor'`, or `null` (also outside a request).
 
 ---
 

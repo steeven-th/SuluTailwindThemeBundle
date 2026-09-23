@@ -287,6 +287,7 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Background | `--iw-menu-bg` | Main menu background. |
 | Text | `--iw-menu-text` | Primary text color. |
 | Text hover | `--iw-menu-text-hover` | Text color on hover. |
+| Current page text | `--iw-menu-text-active` | The link of the page being displayed and the entries leading to it, at every level. Unset, each level falls back to its own hover color. See [Structure and current page](#structure-and-current-page). |
 | 2nd level BG | `--iw-menu-second-bg` | Dropdown background (level 2). Also used for mega menu dropdown panels. |
 | 2nd level text | `--iw-menu-second-text` | Dropdown text color. |
 | 2nd level text hover | `--iw-menu-second-text-hover` | Dropdown text hover color. |
@@ -406,11 +407,20 @@ Navbar dropdowns (levels 2 and 3), mega menu panels, mobile accordions and the l
 
 Burger, fullscreen, the mobile panel of the navbar and of the mega menu, and the sidebar.
 
-- The panel carries `role="dialog"` and an accessible name ("Main menu", translated). The burger carries `aria-expanded`, `aria-controls` and a label that switches between "Open menu" and "Close menu".
+- The panel carries `role="dialog"` and an accessible name ("Menu", translated). The links inside it sit in a `<nav>` named "Main menu". The burger carries `aria-expanded`, `aria-controls` and a label that switches between "Open menu" and "Close menu".
 - On open, the page the panel hides is made `inert`, so Tab never reaches it, and the focus moves to the first link of the panel. The bar, drawn above the panel, stays usable: burger, logo, language switcher.
 - Escape, the burger or the backdrop close it, and the focus goes back to the burger.
 - In *Sub-menus as panels* mode, a row opening a sub-panel carries `aria-expanded`. The focus moves to the Back button of the sub-panel, the level underneath goes inert, and Escape or Back returns one level with the focus on the row.
 - The panel has no `aria-modal`. The burger that closes it sits in the bar, outside the panel. `aria-modal` would hide the bar from screen readers, and a phone has no Escape key. `inert` already makes the hidden page unreachable.
+
+### Structure and current page
+
+- **Landmarks.** The bar is a plain `<div class="iw-menu__frame">`: it holds the logo, the language switcher and the burger, which are not navigation. Only the lists of links are a `<nav>`, named "Main menu". The desktop list and the mobile panel both carry that name but are never displayed together, so a screen reader always finds one. The drill-down panels share a single `<nav>` around every level.
+- **Lists.** Every level of every menu is a `<ul>`, each entry an `<li>`, so a screen reader announces how many entries a level holds. The same goes for the language switcher and the social links. `.iw-menu__list` only resets the list style, in the base layer, so a spacing utility on the list still applies.
+- **Current page.** The link of the page being displayed carries `aria-current="page"` and `.iw-menu__item--current` (text color plus an underline, the cue that does not rely on color alone). The entries leading to it, including the button opening its branch and a parent's own link, carry `.iw-menu__item--ancestor`, a visual state only: announcing "current" on a parent would tell a screen reader user they are on a page they are not. The comparison is done on whole path segments, so the home page is never the ancestor of every page and `/news` never matches `/newsletter`. See [`iw_sulu_tailwind_theme_nav_state()`](twig-reference.md#iw_sulu_tailwind_theme_nav_stateurl).
+- **Logo.** With the site name hidden, the logo link gets an `aria-label` ("Home page of {site name}"), otherwise a screen reader announces its URL. The logo images keep an empty `alt`, the link is named once.
+- **Social links.** Rendered by `components/_social_links.html.twig`, in the menu and in the footer. The network name is the text of the link (visually hidden next to an icon), the icon is `aria-hidden`, and the link says it opens a new tab. The icon URLs go through a `<style>` block, never an inline `style` attribute.
+- **Skip link.** The bundle `base.html.twig` starts with a "Skip to content" link to `<main id="main-content" tabindex="-1">`. A project with its own base template adds it the same way, see [Custom integration](custom-integration.md#7-skip-link-and-main-landmark).
 
 ### Motion and scrolling
 
@@ -426,7 +436,20 @@ Every open and close animation lives in the compiled stylesheet as state classes
 
 ### Overriding a menu template
 
-A project template must keep the contract: every opening button carries `aria-expanded="false"` and `aria-controls` pointing to the id of what it opens, a dropdown button carries `data-menu-target="popupTrigger"` and shares a wrapper with its content, a panel carries `role="dialog"`, an `aria-label` and an id. Generate ids with `iw_sulu_tailwind_theme_unique_id()`.
+A project template must keep the contract: every opening button carries `aria-expanded="false"` and `aria-controls` pointing to the id of what it opens, a dropdown button carries `data-menu-target="popupTrigger"` and shares a wrapper with its content (its `<li>`), a panel carries `role="dialog"`, an `aria-label` and an id. Generate ids with `iw_sulu_tailwind_theme_unique_id()`.
+
+The bar is wrapped in `.iw-menu__frame`, which the controller keeps usable while a panel is open, and the links sit in named `<nav>` and `<ul>` elements. Mark the current page with the macros of `menu/_nav_macros.html.twig`:
+
+```twig
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+{% set href = sulu_content_path(item.url) %}
+{% set state = iw_sulu_tailwind_theme_nav_state(href) %}
+<li>
+    <a href="{{ href }}"{{ nav.current(state) }} class="iw-menu__text{{ nav.state_class(state) }}">{{ item.title }}</a>
+</li>
+```
+
+The mobile accordion shared by the navbar, the burger and the mega menu lives in `menu/_nav_accordion.html.twig`, the logo link in `menu/_logo_link.html.twig`. Overriding one of them changes every menu type that includes it.
 
 ## CSS Classes Reference
 
@@ -437,10 +460,11 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | Class | Description |
 |-------|-------------|
 | `.iw-menu` | Base menu container: text color plus the whole bar chrome (background `--iw-menu-surface`, bottom rule, shadow, backdrop blur). |
-| `.iw-menu--sidebar` | Sidebar menu type. There the sticky element is the inner `<nav>`, not the header (which also wraps the sliding panel), so the chrome moves onto that `<nav>`. |
+| `.iw-menu--sidebar` | Sidebar menu type. There the sticky element is the `.iw-menu__frame`, not the header (which also wraps the sliding panel), so the chrome moves onto that frame. |
 | `.iw-menu--transparent` | Transparent navbar modifier — drops background, rule and shadow at once. |
 | `.iw-menu--scrolled` | Set by JS past the scroll threshold; a transparent navbar takes its chrome back. Override the scroll transition via `--iw-menu-scroll-duration` (default `300ms`). |
 | `.iw-menu--hidden` | Set by JS on scroll down (smart hide) — translates the navbar out of view (`translateY(-100%)`). |
+| `.iw-menu__frame` | Wrapper of the bar, a plain `<div>` (the bar is not a navigation landmark). Stays usable while a panel is open. |
 | `.iw-menu__bar` | The bar row. Its height is `--iw-menu-bar-height`. See [Bar height](#bar-height). |
 | `.iw-menu__bar-spacer` | Empty block as tall as the bar (sidebar panel, below the sticky bar). |
 | `.iw-menu__below-bar` | Places a fixed panel right under the bar (mobile panel of the navbar and mega menu). |
@@ -449,6 +473,9 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__text` | Level 1 text color with hover transition. |
 | `.iw-menu__text--level-2` | Level 2 text color. |
 | `.iw-menu__text--level-3` | Level 3 text color. |
+| `.iw-menu__list` | A list of menu entries. Resets the list style in the base layer, so spacing utilities still apply. |
+| `.iw-menu__item--current` | The link of the page being displayed, with `aria-current="page"`. Color `--iw-menu-text-active`, underlined. |
+| `.iw-menu__item--ancestor` | An entry leading to the page being displayed (a parent link or the button of its branch). Color only. |
 | `.iw-menu__button` | A button inside the menu: menu size, button style kept. See [Menu buttons](#menu-buttons). |
 | `.iw-menu__button--block` | Full-width menu button, used in the mobile panel. |
 | `.iw-menu__dropdown--level-2` | Level 2 dropdown background. |
@@ -480,8 +507,9 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__panel-header` | Sub-panel header row: back button + section title. |
 | `.iw-menu__panel-back` | The back button (chevron), returns one level. |
 | `.iw-menu__panel-title` | Section title in the header (one size up); a link when parent-page access is on. |
-| `.iw-menu__panel-body` | Scrollable list of rows inside a panel. |
+| `.iw-menu__panel-body` | Scrollable level inside a panel, holding its `<ul>` of rows. |
 | `.iw-menu__panel-item` | A single row (link, or button opening the next panel). |
+| `.iw-social-links` | The list of social links (`components/_social_links.html.twig`), in the menu and the footer. |
 | `.iw-social-icon` | Social media icon (mask-image technique for SVG coloring). Hover color follows `--iw-menu-social-media-hover`. |
 | `.iw-social-text` | Social media link with text label (color + hover). |
 
@@ -490,7 +518,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | Class | Description |
 |-------|-------------|
 | `.iw-mega-menu__item` | Wrapper of a top-level button and its panel, right after it in the markup. The hover and focus zone of the panel. |
-| `.iw-mega-menu__dropdown` | Mega menu full-width dropdown panel, positioned against the full-width `<nav>`. |
+| `.iw-mega-menu__dropdown` | Mega menu full-width dropdown panel, positioned against the full-width `.iw-menu__frame`. |
 | `.iw-mega-menu__grid--cols-{1..5}` | Column grid layout (with responsive breakpoints). |
 | `.iw-mega-menu__card` | Image card container (border-radius, overflow hidden, hover effect). |
 | `.iw-mega-menu__card--bg` | Card with background (uses `--iw-menu-third-bg`). Removes image radius — card clips corners. |
@@ -508,6 +536,9 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 Add the following to your `base.html.twig` layout. The menu type is resolved dynamically from the theme configuration — the correct template is included automatically:
 
 ```twig
+{# First thing in <body>: lets a keyboard user jump over the menu #}
+{% include '@ItechWorldSuluTailwindTheme/components/_skip_link.html.twig' %}
+
 {# Theme: dynamic menu #}
 {% set menuConfig = iw_sulu_tailwind_theme_menu_config() %}
 {% block header %}
@@ -529,6 +560,10 @@ Add the following to your `base.html.twig` layout. The menu type is resolved dyn
         </header>
     {% endif %}
 {% endblock %}
+
+<main id="main-content" tabindex="-1">
+    {% block content %}{% endblock %}
+</main>
 ```
 
 The `iw_sulu_tailwind_theme_menu_config()` Twig function returns the full menu configuration object. When a menu type is configured, the matching template (`_navbar.html.twig`, `_burger.html.twig`, `_fullscreen.html.twig`, `_sidebar.html.twig`, or `_megamenu.html.twig`) is included automatically. The `else` block provides a basic fallback navigation if no theme is configured.

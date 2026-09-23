@@ -1,0 +1,26 @@
+{# State of a menu entry against the page being displayed.
+
+   {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+   {% set href = sulu_content_path(item.url) %}
+   {% set state = iw_sulu_tailwind_theme_nav_state(href) %}
+   <a href="{{ href }}"{{ nav.current(state) }} class="...{{ nav.state_class(state) }}">
+
+   Only the link of the page itself says so to assistive technologies
+   (aria-current). An entry leading to it, or the button opening its branch,
+   carries a class and nothing else: announcing "current" on a parent tells a
+   screen reader user they are on a page they are not. #}
+
+{# aria-current on the link of the page being displayed. #}
+{% macro current(state) -%}
+    {%- if state == 'current' %} aria-current="page"{% endif -%}
+{%- endmacro %}
+
+{# Class of a link: iw-menu__item--current or iw-menu__item--ancestor. #}
+{% macro state_class(state) -%}
+    {%- if state %} iw-menu__item--{{ state }}{% endif -%}
+{%- endmacro %}
+
+{# Class of the button opening a branch: the page is in it, or is its parent. #}
+{% macro branch_class(state) -%}
+    {%- if state %} iw-menu__item--ancestor{% endif -%}
+{%- endmacro %}

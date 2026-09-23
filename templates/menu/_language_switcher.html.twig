@@ -48,21 +48,24 @@
         {% set currentLabel = iw_sulu_tailwind_theme_language_label(currentEntry.locale|default(currentLocale), labelFormat) %}
 
         {% if switcherDisplay == 'inline' %}
-            <div class="iw-menu__lang iw-menu__lang--inline flex items-center gap-1 flex-wrap">
+            <ul class="iw-menu__list iw-menu__lang iw-menu__lang--inline flex items-center gap-1 flex-wrap"
+                aria-label="{{ 'iw_sulu_tailwind_theme.menu_languageSwitcher'|trans({}, 'messages') }}">
                 {% for entry in entries %}
                     {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}
-                    <a
-                        href="{{ entry.url }}"
-                        hreflang="{{ entry.locale|replace({'_': '-'}) }}"
-                        lang="{{ entry.locale|replace({'_': '-'}) }}"
-                        class="iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} px-2 py-1 text-sm font-medium no-underline transition-opacity"
-                        {% if isCurrent %}aria-current="true"{% endif %}
-                        {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
-                    >
-                        {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
-                    </a>
+                    <li>
+                        <a
+                            href="{{ entry.url }}"
+                            hreflang="{{ entry.locale|replace({'_': '-'}) }}"
+                            lang="{{ entry.locale|replace({'_': '-'}) }}"
+                            class="iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} block px-2 py-1 text-sm font-medium no-underline transition-opacity"
+                            {% if isCurrent %}aria-current="true"{% endif %}
+                            {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
+                        >
+                            {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
+                        </a>
+                    </li>
                 {% endfor %}
-            </div>
+            </ul>
         {% else %}
             {# A disclosure like the navigation dropdowns: same toggle, same
                mutual closing, Escape and focus handling, no extra JS. #}
@@ -84,24 +87,26 @@
                     <span class="iw-menu__lang-current">{{ currentLabel }}</span>
                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'chevron', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                 </button>
-                <div
+                <ul
                     id="{{ langPanelId }}"
-                    class="iw-menu__dropdown--level-2 iw-menu__lang-panel iw-menu__bar-dropdown hidden absolute min-w-[8rem] shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
+                    class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__lang-panel iw-menu__bar-dropdown hidden absolute min-w-[8rem] shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
                 >
                     {% for entry in entries %}
                         {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}
-                        <a
-                            href="{{ entry.url }}"
-                            hreflang="{{ entry.locale|replace({'_': '-'}) }}"
-                            lang="{{ entry.locale|replace({'_': '-'}) }}"
-                            class="iw-menu__text--level-2 iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} block px-4 py-2 text-sm font-medium no-underline transition-opacity hover:opacity-80"
-                            {% if isCurrent %}aria-current="true"{% endif %}
-                            {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
-                        >
-                            {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
-                        </a>
+                        <li>
+                            <a
+                                href="{{ entry.url }}"
+                                hreflang="{{ entry.locale|replace({'_': '-'}) }}"
+                                lang="{{ entry.locale|replace({'_': '-'}) }}"
+                                class="iw-menu__text--level-2 iw-menu__lang-item{{ isCurrent ? ' iw-menu__lang-item--current' }} block px-4 py-2 text-sm font-medium no-underline transition-opacity hover:opacity-80"
+                                {% if isCurrent %}aria-current="true"{% endif %}
+                                {% if not entry.alternate|default(true) %}title="{{ 'iw_sulu_tailwind_theme.menu_languageNotTranslated'|trans({}, 'messages') }}"{% endif %}
+                            >
+                                {{ iw_sulu_tailwind_theme_language_label(entry.locale, labelFormat) }}
+                            </a>
+                        </li>
                     {% endfor %}
-                </div>
+                </ul>
             </div>
         {% endif %}
     {% endif %}

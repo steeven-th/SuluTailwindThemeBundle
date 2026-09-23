@@ -685,16 +685,17 @@ of the page too, which is the intended behavior. `transition-shadow` was dropped
 from the menu templates at the same time; the transition lives in the compiled
 CSS.
 
-### `.iw-menu > nav` no longer inherits the background
+### The frame of the bar no longer inherits the background
 
 It used to repaint the bar background, which was invisible with an opaque color
-but would double a translucent one. The inner `<nav>` is now transparent — the
-header spans the full width and already paints it.
+but would double a translucent one. The frame around the bar (`<nav>` then,
+`.iw-menu__frame` since the menu structure change below) is now transparent,
+the header spans the full width and already paints it.
 
-The **sidebar** menu is the exception: there the sticky element *is* the `<nav>`,
+The **sidebar** menu is the exception: there the sticky element *is* the frame,
 so its header carries a new `.iw-menu--sidebar` class that moves the chrome onto
-that `<nav>`. If you override a sidebar menu template, keep the class on the
-`<header>`.
+`.iw-menu--sidebar > .iw-menu__frame`. If you override a sidebar menu template,
+keep the class on the `<header>`.
 
 ### Logo markup moved to a partial
 
@@ -791,6 +792,47 @@ If you override a menu template, replace `h-16`, `md:h-20`, `top-16` and
 `pt-16` with the classes of the [reference](menus.md#css-classes-reference):
 `.iw-menu__bar`, `.iw-menu__below-bar`, `.iw-menu__bar-spacer`,
 `.iw-menu__overlay-nav--below-bar`, `.iw-menu__bar-dropdown`.
+
+---
+
+## Menus: lists, landmarks and current page (breaking for template overrides)
+
+A screen reader user now gets the structure a sighted visitor sees. See
+[Structure and current page](menus.md#structure-and-current-page). On screen,
+the menus look the same, except for the page being displayed:
+
+- **The current page is marked.** Its link is underlined and colored, the
+  entries leading to it are colored. The color is the new **Current page text**
+  setting of the menu colors (`--iw-menu-text-active`). Unset, each level uses
+  its hover color.
+- **Skip link.** The bundle `base.html.twig` starts with a "Skip to content"
+  link, and `<main>` became `<main id="main-content" tabindex="-1">`. A project
+  base template adds both, see
+  [Custom integration](custom-integration.md#7-skip-link-and-main-landmark).
+
+**If you override a menu template or target its markup in CSS:**
+
+| Before | Now |
+|--------|-----|
+| The bar wrapped in a `<nav>` (`.iw-menu > nav`, `.iw-menu--sidebar > nav`) | A `<div class="iw-menu__frame">`. Only the lists of links are a `<nav aria-label="Main menu">` |
+| Menu entries as sibling `<a>`, `<button>` and `<div>` | `<ul class="iw-menu__list">` and `<li>` at every level, language switcher and social links included |
+| The panel named "Main menu" | The panel is named "Menu", the `<nav>` inside it "Main menu" |
+| A `<nav>` per drill-down level | One `<nav>` around every level (`.iw-menu__panels`), a `<div class="iw-menu__panel-body">` per level |
+| Social links inlined in each template, the name as an `aria-label` on the icon `<span>`, the icon as an inline `style` | `components/_social_links.html.twig`: the name inside the link, the icon `aria-hidden`, the icon URLs in a `<style>` block |
+| The logo link built in each template, unnamed with the logo alone | `menu/_logo_link.html.twig`, named "Home page of {site name}" when the name is hidden |
+| Mobile accordions copied in the navbar, burger and mega menu | `menu/_nav_accordion.html.twig` |
+
+The mobile accordion of the **native mega menu** used to differ from the navbar
+one: its level 2 had no `iw-menu__dropdown--level-2` background and its level 3
+always repeated the parent link. It now shares the accordion of the other
+types, so it takes the level 2 background and repeats the parent link only
+when **Parent page access** is checked.
+
+The controller keeps the bar usable through `.iw-menu__frame`, so a template
+without it leaves the logo and the burger inert while the panel is open.
+`MenuStructureRenderTest` in the bundle renders every type and checks these
+rules.
+
 ---
 
 ## CTA banner: the title alignment setting now applies (breaking, visual)

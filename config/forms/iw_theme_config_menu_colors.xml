@@ -93,6 +93,16 @@
                 </params>
             </property>
 
+            <property name="menuConfig_colors_textActive" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_textActive</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_textActive_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
             <property name="menuConfig_colors_burgerOpen" type="iw_theme_color_token_editor" colspan="4">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_burgerOpen</title>

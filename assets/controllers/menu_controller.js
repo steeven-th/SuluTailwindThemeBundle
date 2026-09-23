@@ -372,7 +372,7 @@ export default class extends Controller {
         // Only what the panel hides goes inert. The bar stays drawn above the
         // panel, so it stays usable: the burger to close, the logo and the
         // language switcher as they are. The backdrop must take the click.
-        const bar = burger ? burger.closest('nav') : null;
+        const bar = burger ? burger.closest('.iw-menu__frame') : null;
         this._inertOutside([panel, bar ?? burger, isSidebar && this.hasBackdropTarget ? this.backdropTarget : null]);
 
         this._focusFirst(panel);

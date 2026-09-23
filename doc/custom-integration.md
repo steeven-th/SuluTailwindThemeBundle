@@ -10,6 +10,7 @@ This guide explains how to use the SuluTailwindThemeBundle in your own custom co
 - [4. Accessing theme data in PHP](#4-accessing-theme-data-in-php)
 - [5. Tailwind CSS integration](#5-tailwind-css-integration)
 - [6. Reusing the bundle's Stimulus controllers](#6-reusing-the-bundles-stimulus-controllers)
+- [7. Skip link and main landmark](#7-skip-link-and-main-landmark)
 
 ---
 
@@ -822,3 +823,26 @@ class="... {{ loop.first ? '' : 'invisible pointer-events-none' }}"
 ```
 
 Getting it wrong is harmless since 3.0.0 - the controller clears both families on every pass - but the flash then shows the wrong slides.
+
+---
+
+## 7. Skip link and main landmark
+
+A keyboard user should not have to tab through the whole menu on every page (WCAG 2.4.1). The bundle `base.html.twig` does it for you. A project with its own base template adds two things:
+
+```twig
+<body>
+    {% include '@ItechWorldSuluTailwindTheme/components/_skip_link.html.twig' %}
+
+    {# the menu #}
+
+    <main id="main-content" tabindex="-1">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+```
+
+- The link must be the **first focusable element** of the page. It stays off screen until it takes the focus, then shows over the bar in the menu colors swapped (`.iw-skip-link`).
+- `tabindex="-1"` on `<main>` lets the browser move the focus there, not only scroll: without it, the next Tab starts again from the top of the page. `#main-content:focus` draws no outline, the ring around the whole page would say nothing.
+- Another target id is passed with `{% include '...' with {target: 'content'} %}`.
+
