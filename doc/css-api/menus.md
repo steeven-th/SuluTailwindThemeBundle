@@ -5,6 +5,9 @@ chrome variables — `--iw-menu-surface`, `--iw-menu-border-width`,
 `--iw-menu-border-color`, `--iw-menu-shadow`, `--iw-menu-backdrop` — come from
 the Bar chrome section and are documented in
 [`menus.md`](../menus.md#bar-chrome).
+The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
+`--iw-menu-button-padding-x`, `--iw-menu-button-font-size`) is documented in
+[`menus.md`](../menus.md#menu-buttons).
 
 > For the full reference on menu CSS classes (navbar, burger, fullscreen, sidebar, megamenu), see [`menus.md`](../menus.md).
 

@@ -366,6 +366,41 @@ See [Articles on several sites](multi-site-articles.md).
 
 ---
 
+### `iw_sulu_tailwind_theme_link(content, view, forceNewTab)`
+
+Reads a Sulu 3 `link` field into the parts of an anchor.
+
+Sulu 3 resolves a link in two halves. The content holds the final URL as a
+string, already localized, so it goes into `href` as it is (no
+`sulu_content_path`). The view holds the stored data at the same path:
+`provider`, `href`, `target`, `title`, `rel`. Reading `link.url` as under
+Sulu 2 always yields null.
+
+A link Sulu could not resolve (deleted or unpublished page, removed media)
+comes back as its raw structure, and the function returns `null`: render
+nothing rather than a link to `#`. A new tab always gets `noopener noreferrer`,
+added to any `rel` the editor set.
+
+The macros of `components/_link_macros.html.twig` print the attributes and the
+screen reader hint for a new tab:
+
+```twig
+{% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+{% set link = iw_sulu_tailwind_theme_link(item.link, itemView.link|default(null)) %}
+{% if link %}
+    <a {{ links.attrs(link) }}>{{ item.title }}{{ links.new_tab_hint(link) }}</a>
+{% endif %}
+```
+
+**Parameters:**
+- `content` (`mixed`) - The field's content value
+- `view` (`mixed`) - The field's view value, optional
+- `forceNewTab` (`bool`) - Open in a new tab whatever the link says, for a field with its own "new tab" checkbox. Default `false`
+
+**Returns:** `array|null` - `{url, target, rel, title, provider, newTab}`, or `null` when there is nothing to link to.
+
+---
+
 ### `iw_sulu_tailwind_theme_padding_class(context, blockValue)`
 
 Resolves the padding class a block puts on one of its edges: the block value

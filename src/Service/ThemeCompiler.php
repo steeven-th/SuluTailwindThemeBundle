@@ -3094,6 +3094,19 @@ class ThemeCompiler
         $css .= ".iw-social-text { color: var(--iw-menu-social-media); transition: color 0.2s ease; }\n";
         $css .= "a:hover > .iw-social-text { color: var(--iw-menu-social-media-hover, var(--iw-menu-social-media)); }\n\n";
 
+        // ─── Menu buttons ─────────────────────────────────────────────────────
+        // A page button is sized for a page: at the theme padding it can be
+        // taller than the bar itself. Inside the menu, the button keeps its
+        // style (colors, border, radius) but takes the menu's own size, by
+        // redefining the variables the button rule reads. Utilities cannot do
+        // it: the button rules are unlayered and beat any Tailwind class.
+        $css .= ".iw-menu .iw-menu__button { ";
+        $css .= "--iw-button-padding-y: var(--iw-menu-button-padding-y, 0.625rem); ";
+        $css .= "--iw-button-padding-x: var(--iw-menu-button-padding-x, 1.25rem); ";
+        $css .= "font-size: var(--iw-menu-button-font-size, 0.875rem); line-height: 1.25rem; white-space: nowrap; }\n";
+        // Full-width variant, for the mobile panel
+        $css .= ".iw-menu .iw-menu__button--block { display: block; text-align: center; white-space: normal; }\n\n";
+
         // ─── Mega menu (sub-namespace iw-mega-menu) ──────────────────────────
         // Dropdown panel
         $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); ";

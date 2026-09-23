@@ -171,7 +171,7 @@
             </property>
 
             <property name="menuConfig_clickParentPageNavbar" type="checkbox" colspan="6"
-                      visibleCondition="menuConfig_type == 'navbar'">
+                      visibleCondition="menuConfig_type == 'navbar' OR (menuConfig_type == 'megamenu' AND menuConfig_megamenuSource != 'snippet')">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_clickParentPageNavbar</title>
                     <info_text>iw_sulu_tailwind_theme.menu_clickParentPageNavbar_info</info_text>

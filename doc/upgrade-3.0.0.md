@@ -708,6 +708,34 @@ surface.
 
 ---
 
+## Mega menu: snippet links fixed, parent pages reachable (fixed, visual)
+
+In snippet mode, every link of the mega menu pointed to `#` under Sulu 3: the
+template read `link.url`, a Sulu 2 shape. Links are now read with
+[`iw_sulu_tailwind_theme_link()`](twig-reference.md#iw_sulu_tailwind_theme_linkcontent-view-forcenewtab),
+which takes the URL from the snippet content and the target from its view.
+What changes on screen:
+
+- **Unresolved links disappear.** An item whose page was deleted or
+  unpublished is no longer rendered, instead of pointing to `#`. An image
+  card stays, without its link.
+- **The dropdown's own link is rendered.** A Mega Dropdown with its `link`
+  filled now shows it, with its title, at the top of the panel and of the
+  mobile accordion.
+- **Native mode can reach parent pages.** The **Parent page access** checkbox
+  of the navbar now also applies to the native mega menu. A theme where it was
+  already checked shows the link at once.
+- **Menu buttons get the menu size.** The global CTA and the featured column
+  CTA use `.iw-menu__button`: their style is kept, their size no longer
+  follows the page buttons. See [Menu buttons](menus.md#menu-buttons).
+- **Card and featured images are decorative** (`alt=""`), their title is
+  right beside them.
+
+If you override `_megamenu.html.twig`, read every `link` field through the
+function: `link.url` is always null under Sulu 3.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

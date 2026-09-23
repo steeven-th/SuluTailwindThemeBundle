@@ -519,4 +519,20 @@ final class ThemeCompilerTest extends TestCase
             'The generated stylesheet has unbalanced braces, so a rule was closed early.',
         );
     }
+
+    /**
+     * A button in the menu keeps its style but not the size of a page button,
+     * which can be taller than the bar. The size goes through the variables
+     * the button rules read: a Tailwind utility on the button never wins.
+     */
+    #[Test]
+    public function itSizesMenuButtonsThroughTheButtonVariables(): void
+    {
+        $css = $this->compileCss([]);
+
+        self::assertMatchesRegularExpression(
+            '/\.iw-menu \.iw-menu__button \{[^}]*--iw-button-padding-y: var\(--iw-menu-button-padding-y, [^)]+\);[^}]*--iw-button-padding-x: var\(--iw-menu-button-padding-x, [^)]+\);[^}]*font-size: var\(--iw-menu-button-font-size, [^)]+\)/',
+            $css,
+        );
+    }
 }
