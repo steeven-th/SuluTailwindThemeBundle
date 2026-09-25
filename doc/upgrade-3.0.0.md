@@ -1025,6 +1025,30 @@ templates.
 
 ---
 
+## Menus: a fourth level (new, breaking for template overrides)
+
+**Child levels** goes up to 4, with its own colors (background, text, hover,
+chevron: `--iw-menu-fourth-*`, each falling back on level 3), always offered in
+Menu > Colors. See [Four levels](menus.md#four-levels).
+
+The accordion, the navbar dropdowns and the fullscreen sub-levels are now
+rendered by recursive macros instead of one block per level. Their markup for
+levels 1 to 3 is unchanged (pinned by `MenuLevelsSnapshotTest`), except:
+
+- **Fullscreen**: the links of levels 2 and below are inline blocks, no longer
+  blocks, so the focus ring hugs the text instead of running across the panel.
+- **Folding sub-menus** (fullscreen): `level3` now reads "the third level and
+  below", `levels23` "the second level and below". The stored values are
+  unchanged.
+- **Navbar**: a level 3 dropdown that opens a level 4 beside it no longer
+  scrolls, like a level 2 opening a level 3.
+
+If you override `_nav_accordion.html.twig`, `_navbar.html.twig` or
+`_fullscreen.html.twig`, port your changes to the level macros: a block copied
+per level will not render the fourth one.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

@@ -79,16 +79,16 @@
        close). #}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
 
-    {# Macro: navigation items (L1 / L2 / L3).
+    {# Macro: navigation items, the first level here, the deeper ones in
+       render_sublevel.
        collapse: which sub-levels fold behind a chevron. 'level3' (default):
-       the third level only, 'levels23': the second as well, 'none': every
-       level stays open. #}
+       the third level and below, 'levels23': the second as well, 'none':
+       every level stays open. #}
     {% macro render_nav_items(navItems, columns, clickMode, align, collapse) %}
         {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
         {# Rows holding a link and its chevron follow the text alignment. #}
         {% set justifyClass = {'left': 'justify-start', 'center': 'justify-center', 'right': 'justify-end'}[align]|default('justify-center') %}
         {% set l2Folds = collapse == 'levels23' %}
-        {% set l3Folds = collapse != 'none' %}
         <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}">
             <ul class="iw-menu__list iw-menu__fullscreen-list{{ columns ? ' iw-menu__fullscreen-list--' ~ columns : '' }}">
                 {% for item in navItems %}
@@ -139,113 +139,103 @@
                             </a>
                         {% endif %}
 
-                        {# L2 children #}
                         {% if hasChildren %}
-                            <ul id="{{ level2Id }}" class="iw-menu__list iw-menu__fullscreen-sublist mt-2 space-y-1{{ l2Folds ? ' hidden' : '' }}">
-                                {% if l2Folds and clickMode == 'selflink' %}
-                                    {# The folded L1 page itself, first of its list #}
-                                    <li>
-                                        <a
-                                            href="{{ itemHref }}"{{ nav.current(itemState) }}
-                                            class="iw-menu__text{{ nav.state_class(itemState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline italic"
-                                        >
-                                            {{ item.title }}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                                {% for child in item.children %}
-                                    {% set childHref = sulu_content_path(child.url) %}
-                                    {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
-                                    {% if child.children is defined and child.children|length > 0 %}
-                                        {# L2 with L3 children #}
-                                        {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
-                                        <li class="iw-menu__parent-item">
-                                            {% if l3Folds and clickMode == 'split' %}
-                                                {# Split button: L2 is a link + separate chevron #}
-                                                <div class="flex items-center gap-2 w-full {{ justifyClass }}">
-                                                    <a
-                                                        href="{{ childHref }}"{{ nav.current(childState) }}
-                                                        class="iw-menu__text{{ nav.state_class(childState) }} text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                                    >
-                                                        {{ child.title }}
-                                                    </a>
-                                                    <button
-                                                        type="button"
-                                                        data-action="menu#toggleDisclosure"
-                                                        aria-expanded="false"
-                                                        aria-controls="{{ submenuId }}"
-                                                        aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
-                                                        class="iw-menu__text opacity-60 hover:opacity-100 cursor-pointer"
-                                                    >
-                                                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
-                                                    </button>
-                                                </div>
-                                            {% elseif l3Folds %}
-                                                {# Default button (none + selflink) #}
-                                                <button
-                                                    type="button"
-                                                    data-action="menu#toggleDisclosure"
-                                                    aria-expanded="false"
-                                                    aria-controls="{{ submenuId }}"
-                                                    class="iw-menu__text{{ nav.branch_class(childState) }} inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-                                                >
-                                                    <span>{{ child.title }}</span>
-                                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
-                                                </button>
-                                            {% else %}
-                                                {# Nothing folds: L2 is a link, its children listed open #}
-                                                <a
-                                                    href="{{ childHref }}"{{ nav.current(childState) }}
-                                                    class="iw-menu__text{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                                >
-                                                    {{ child.title }}
-                                                </a>
-                                            {% endif %}
-                                            <ul id="{{ submenuId }}" class="iw-menu__list iw-menu__fullscreen-sublist mt-1 space-y-1{{ l3Folds ? ' hidden' : '' }}">
-                                                {% if l3Folds and clickMode == 'selflink' %}
-                                                    {# Self-link to the L2 page itself #}
-                                                    <li>
-                                                        <a
-                                                            href="{{ childHref }}"{{ nav.current(childState) }}
-                                                            class="iw-menu__text{{ nav.state_class(childState) }} block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"
-                                                        >
-                                                            {{ child.title }}
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-                                                {# L3 grandchildren #}
-                                                {% for grandchild in child.children %}
-                                                    {% set grandchildHref = sulu_content_path(grandchild.url) %}
-                                                    {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
-                                                    <li>
-                                                        <a
-                                                            href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
-                                                            class="iw-menu__text{{ nav.state_class(grandchildState) }} block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                                        >
-                                                            {{ grandchild.title }}
-                                                        </a>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </li>
-                                    {% else %}
-                                        {# L2 without children - simple link #}
-                                        <li>
-                                            <a
-                                                href="{{ childHref }}"{{ nav.current(childState) }}
-                                                class="iw-menu__text{{ nav.state_class(childState) }} block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"
-                                            >
-                                                {{ child.title }}
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
+                            {{ _self.render_sublevel(item, itemHref, itemState, level2Id, 2, clickMode, collapse, justifyClass) }}
                         {% endif %}
                     </li>
                 {% endfor %}
             </ul>
         </nav>
+    {% endmacro %}
+
+    {# Macro: the list of a level (2 to 4) under its parent, each entry with
+       its own branch. Every level writes in the level 1 text: they all sit
+       on the background of the panel. The links are inline blocks, so the
+       focus ring hugs the text instead of running across the panel. #}
+    {% macro render_sublevel(parent, parentHref, parentState, id, depth, clickMode, collapse, justifyClass) %}
+        {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+        {% set styles = {
+            2: {leaf: 'inline-block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline', self: 'inline-block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline italic', split: 'text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline', button: 'inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer', arrow: 'w-4 h-4 flex-shrink-0', list: 'mt-2'},
+            3: {leaf: 'inline-block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline', self: 'inline-block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic', split: 'text-sm opacity-60 hover:opacity-100 transition-opacity no-underline', button: 'inline-flex items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity cursor-pointer', arrow: 'w-3.5 h-3.5 flex-shrink-0', list: 'mt-1'},
+        } %}
+        {% set style = styles[min(depth, 3)] %}
+        {# This list folds: the second level with 'levels23' only, the third
+           and below unless nothing folds. #}
+        {% set folds = depth == 2 ? collapse == 'levels23' : collapse != 'none' %}
+        {% set childrenFold = collapse != 'none' %}
+        <ul id="{{ id }}" class="iw-menu__list iw-menu__fullscreen-sublist {{ style.list }} space-y-1{{ folds ? ' hidden' : '' }}">
+            {% if folds and clickMode == 'selflink' %}
+                {# The folded parent page itself, first of its list #}
+                <li>
+                    <a
+                        href="{{ parentHref }}"{{ nav.current(parentState) }}
+                        class="iw-menu__text{{ nav.state_class(parentState) }} {{ style.self }}"
+                    >
+                        {{ parent.title }}
+                    </a>
+                </li>
+            {% endif %}
+            {% for child in parent.children %}
+                {% set childHref = sulu_content_path(child.url) %}
+                {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
+                {% if child.children is defined and child.children|length > 0 %}
+                    {% set submenuId = iw_sulu_tailwind_theme_unique_id('menu-submenu') %}
+                    <li class="iw-menu__parent-item">
+                        {% if childrenFold and clickMode == 'split' %}
+                            {# Split: the entry is a link, a separate chevron folds #}
+                            <div class="flex items-center gap-2 w-full {{ justifyClass }}">
+                                <a
+                                    href="{{ childHref }}"{{ nav.current(childState) }}
+                                    class="iw-menu__text{{ nav.state_class(childState) }} {{ style.split }}"
+                                >
+                                    {{ child.title }}
+                                </a>
+                                <button
+                                    type="button"
+                                    data-action="menu#toggleDisclosure"
+                                    aria-expanded="false"
+                                    aria-controls="{{ submenuId }}"
+                                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_submenu_toggle'|trans({'%title%': child.title}, 'messages') }}"
+                                    class="iw-menu__text opacity-60 hover:opacity-100 cursor-pointer"
+                                >
+                                    {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': style.arrow} only %}
+                                </button>
+                            </div>
+                        {% elseif childrenFold %}
+                            {# Default button (none + selflink) #}
+                            <button
+                                type="button"
+                                data-action="menu#toggleDisclosure"
+                                aria-expanded="false"
+                                aria-controls="{{ submenuId }}"
+                                class="iw-menu__text{{ nav.branch_class(childState) }} {{ style.button }}"
+                            >
+                                <span>{{ child.title }}</span>
+                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': style.arrow} only %}
+                            </button>
+                        {% else %}
+                            {# Nothing folds: the entry is a link, its children listed open #}
+                            <a
+                                href="{{ childHref }}"{{ nav.current(childState) }}
+                                class="iw-menu__text{{ nav.state_class(childState) }} {{ style.leaf }}"
+                            >
+                                {{ child.title }}
+                            </a>
+                        {% endif %}
+                        {{ _self.render_sublevel(child, childHref, childState, submenuId, depth + 1, clickMode, collapse, justifyClass) }}
+                    </li>
+                {% else %}
+                    <li>
+                        <a
+                            href="{{ childHref }}"{{ nav.current(childState) }}
+                            class="iw-menu__text{{ nav.state_class(childState) }} {{ style.leaf }}"
+                        >
+                            {{ child.title }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     {% endmacro %}
 
     {# Macro: foot of the panel. The logo stays in the bar, never repeated

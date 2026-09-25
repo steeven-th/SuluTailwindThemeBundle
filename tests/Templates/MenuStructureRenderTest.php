@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
-use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
-use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 
 /**
  * Renders every menu type and checks the structure a screen reader relies on.
@@ -437,27 +431,7 @@ final class MenuStructureRenderTest extends TestCase
      */
     private static function render(array $config, ?string $template = null): string
     {
-        $loader = new FilesystemLoader();
-        $loader->addPath(\dirname(__DIR__, 2) . '/templates', 'ItechWorldSuluTailwindTheme');
-
-        $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
-        $twig->addGlobal('app', ['request' => ['locale' => 'en']]);
-
-        $twig->addFunction(new TwigFunction('sulu_snippet_load_by_area', static fn (string $area): ?array => \in_array($area, ['iw_theme_menu_social_media_links', 'iw_theme_footer_social_media_links'], true) ? self::socialSnippet() : null));
-        $twig->addFunction(new TwigFunction('sulu_page_navigation_root_tree', static fn (): array => self::pageTree()));
-        $twig->addFunction(new TwigFunction('sulu_content_path', static fn (string $path): string => '/en' . ('/' === $path ? '' : $path)));
-        $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (int $id): array => 10 === $id ? ['url' => '/media/curtain.jpg', 'thumbnails' => []] : ['url' => '/media/icon.svg', 'thumbnails' => []]));
-        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_link', LinkResolver::resolve(...)));
-        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_nav_state', static fn (?string $url): ?string => null === $url ? null : NavigationState::of($url, self::CURRENT_PATH, '/en')));
-        $twig->addFilter(new TwigFilter('trans', static fn (string $key): string => $key));
-        $ids = 0;
-        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static function (string $prefix = 'iw') use (&$ids): string {
-            return 'iw-' . $prefix . '-' . ++$ids;
-        }));
-
-        $twig->registerUndefinedFunctionCallback(static fn (string $name): TwigFunction => new TwigFunction($name, static fn (): null => null));
-
-        return $twig->render($template ?? '@ItechWorldSuluTailwindTheme/menu/_' . $config['type'] . '.html.twig', ['config' => $config]);
+        return MenuTemplateRenderer::render($config, self::pageTree(), self::CURRENT_PATH, $template);
     }
 
     private static function xpath(string $html): \DOMXPath
@@ -498,15 +472,5 @@ final class MenuStructureRenderTest extends TestCase
             ],
             ['title' => 'News', 'url' => '/news', 'children' => []],
         ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private static function socialSnippet(): array
-    {
-        return ['content' => ['blocks_social_medias' => [
-            ['name' => 'Mastodon', 'url' => 'https://mastodon.social/@acme', 'icon' => ['id' => 5]],
-        ]]];
     }
 }

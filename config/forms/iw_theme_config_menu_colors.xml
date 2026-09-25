@@ -2,7 +2,7 @@
 <!--
     Admin form: Menu tab, Colors sub-tab.
 
-    Every colour of the menu, from the bar itself down to the third level and
+    Every colour of the menu, from the bar itself down to the fourth level and
     the burger icon.
 -->
 <form xmlns="http://schemas.sulu.io/template/template"
@@ -88,6 +88,37 @@
             <property name="menuConfig_colors_thirdTextHover" type="iw_theme_color_token_editor" colspan="4">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_thirdTextHover</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_textHover_fallback_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <!-- Always shown, whatever the number of levels: they can be set
+                 ahead, and changing the levels never asks for a detour here.
+                 Empty, each falls back on the third level. -->
+            <property name="menuConfig_colors_fourthBg" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_fourthBg</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_fourthText" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_fourthText</title>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_fourthTextHover" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_fourthTextHover</title>
                     <info_text>iw_sulu_tailwind_theme.menu_colors_textHover_fallback_info</info_text>
                 </meta>
                 <params>
@@ -183,6 +214,16 @@
             <property name="menuConfig_colors_thirdChevron" type="iw_theme_color_token_editor" colspan="4">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_colors_thirdChevron</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_colors_chevron_info</info_text>
+                </meta>
+                <params>
+                    <param name="show_palette" value="true"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_colors_fourthChevron" type="iw_theme_color_token_editor" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_colors_fourthChevron</title>
                     <info_text>iw_sulu_tailwind_theme.menu_colors_chevron_info</info_text>
                 </meta>
                 <params>

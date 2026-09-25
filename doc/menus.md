@@ -19,7 +19,7 @@ These options are available regardless of the menu type:
 
 | Setting | Description |
 |---------|-------------|
-| **Child levels** | Number of sub-menu levels to render (1, 2, or 3). |
+| **Child levels** | Number of sub-menu levels to render (1 to 4). The colors of every level stay offered in Menu > Colors whatever the number, so it can change at any time. See [Four levels](#four-levels). |
 | **Logo desktop / mobile** | Media selection for logo images. Separate logos for each breakpoint. With *Display logo mobile* on and no mobile image, the desktop logo is shown on mobile, at the mobile height. |
 | **Logo desktop / mobile in transparent mode** | (Transparent navbar only) Alternate logos shown while the bar is transparent, typically light ones over a dark hero. Both variants are rendered and cross-faded on the same state as the background, so the logo never sits on the wrong surface mid-transition. Both take exactly the configured height, so two files of different sizes do not make the logo jump during the fade. Left empty, the regular logo is kept. Never applied inside overlays and side panels, which paint their own opaque background. |
 | **Display logo desktop / mobile** | Toggle logo visibility per breakpoint. |
@@ -128,7 +128,7 @@ Two groups of **Menu > Appearance** finish the dropdowns of the bar.
 | Setting | Description |
 |---------|-------------|
 | **Dropdown radius** | Corners of the dropdowns of the bar, their levels and the language dropdown (`--iw-menu-dropdown-radius`). Empty, the radius of the theme. The sub-lists of the panels (burger, mobile) are part of the panel and stay square. |
-| **Round the top corners too** | Off by default: a dropdown hanging from the bar keeps square top corners against it. On, it takes the radius on its four corners, for a dropdown that stands out from the bar on a different background (`--iw-menu-dropdown-top-radius`). A level 3, opening beside its parent, always has four round corners. |
+| **Round the top corners too** | Off by default: a dropdown hanging from the bar keeps square top corners against it. On, it takes the radius on its four corners, for a dropdown that stands out from the bar on a different background (`--iw-menu-dropdown-top-radius`). A level 3 or 4, opening beside its parent, always has four round corners. |
 
 **Chevron**
 
@@ -187,7 +187,7 @@ Tailwind utilities put on a button (`py-2`, `text-sm`) have no effect: the butto
 | **Background image** | Optional image shown on the left half of the screen, the links on the right half (curtain effect), from 768px up. Served in the `iw_theme_menu_curtain` format (1200×1400) as avif/webp, and only fetched when the panel opens: it waits in a `<template data-menu-deferred>` the controller unpacks, and never on mobile, where it is not shown. |
 | **Two columns** | Links in two columns balanced by height, each entry kept whole. From 768px without an image, from 1280px next to the image (the half screen then holds two columns of 320px). Two columns always start on the left. |
 | **Text alignment** | (One column only) Left, centered (default) or right. Also places the language switcher and the social icons at the foot of the panel. Aligned on a side, each sub-level is indented, with a thin rule on that side tying the children to their parent (`--iw-menu-fullscreen-indent`, default `1rem`, `--iw-menu-fullscreen-rule`, default the text color at 25%). |
-| **Folding sub-menus** | Which levels fold behind a chevron: the third level only (default), the second and third levels, or none (everything open). With the second level folded, a first-level entry with children becomes the toggle of its list, following **Parent page access** like the accordions: a link and a separate chevron in `split` mode, its own page first in the list in `selflink` mode. |
+| **Folding sub-menus** | Which levels fold behind a chevron: the third level and below (default), the second level and below, or none (everything open). A fourth level folds under its third-level entry whenever the third level folds. With the second level folded, a first-level entry with children becomes the toggle of its list, following **Parent page access** like the accordions: a link and a separate chevron in `split` mode, its own page first in the list in `selflink` mode. |
 | **Parent page access** | Same as burger: `none`, `split`, or `selflink`. |
 
 The panel content starts under the bar and scrolls in one box, links and foot together, so its scrollbar never runs along the close button. Without an image, the links sit in the container of the bar and line up with the logo. The logo is never repeated in the panel, and the social icons appear at its foot on mobile only, where the bar hides them. First-level titles take `--iw-menu-fullscreen-l1-size`, smaller in two columns and next to the image.
@@ -212,12 +212,27 @@ The former `sidebar` menu type is the side panel. A theme saved with it is read 
 
 ---
 
+## Four levels
+
+Set **Child levels** to 4 for a deeper tree. Every menu renders the fourth level where its third one goes:
+
+| Menu | Level 4 |
+|------|---------|
+| Navbar | A flyout beside its level 3 entry. At the edge of the window it opens to the left, over the levels before it, like the cascading menus of an operating system. |
+| Burger accordion, mobile panel of the navbar and mega menu | A sub-accordion of its level 3 entry, with the look of level 3. |
+| Drill-down panels | A sub-panel of level 4 (`.iw-menu__subpanel--level-4`). |
+| Fullscreen | A list under its level 3 entry, folded with the third level. |
+| Mega menu | A short list always open under its link, see [Native Mode](#mega-menu--native-mode). |
+
+The templates render their levels recursively (`_nav_accordion.html.twig`, the `dropdown` macro of `_navbar.html.twig`, `render_sublevel` in `_fullscreen.html.twig`), so an override changes every level at once.
+
 ## Mega Menu — Native Mode
 
 In **native** mode, the mega menu reads the Sulu page tree directly. Each top-level page becomes a navbar item. If a page has children, hovering it reveals a full-width dropdown panel displaying:
 
 - Children as **column headers** (level 2).
 - Grandchildren as **links** under each column (level 3).
+- Their children, with four levels, as a short **list always open** under their link, indented with a rule (level 4, `.iw-mega-menu__sublist`, rule color `--iw-mega-menu-rule`). A fold inside a column would read badly. It sits on the panel, so it takes the level 2 colors.
 
 The number of columns adapts automatically (max 5). No additional configuration is needed beyond the page tree structure.
 
@@ -356,7 +371,7 @@ The switch is made by bundle classes, compiled in the theme stylesheet: `.iw-men
 
 A dropdown never runs off a short screen: it stops at the bottom of the window (`max-height: calc(100dvh - var(--iw-menu-bar-height) - 1rem)`) and scrolls, with the mouse and with Tab. This applies to level 2 and 3 dropdowns, the language dropdown and the mega menu panel (`.iw-menu__dropdown--scroll`, `.iw-mega-menu__dropdown`).
 
-One exception: a level 2 dropdown that opens a level 3 beside it does not scroll, since its scroll box would clip the flyout. Keep such a level short.
+One exception: a dropdown that opens a deeper level beside it (level 2 opening a level 3, level 3 opening a level 4) does not scroll, since its scroll box would clip the flyout. Keep such a level short.
 
 ## Responsive Grid
 
@@ -387,6 +402,9 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | 3rd level BG | `--iw-menu-third-bg` | Sub-dropdown / featured column background. Also used for image cards with `show_background`. |
 | 3rd level text | `--iw-menu-third-text` | Sub-dropdown text color. |
 | 3rd level text hover | `--iw-menu-third-text-hover` | Sub-dropdown text hover color. Empty, the hover color of the second level, then of the first. |
+| 4th level BG | `--iw-menu-fourth-bg` | Level 4 flyouts, sub-lists and drill-down sub-panels. Empty, the level 3 background. |
+| 4th level text | `--iw-menu-fourth-text` | Level 4 text. Empty, the level 3 text. |
+| 4th level text hover | `--iw-menu-fourth-text-hover` | Level 4 text hover. Empty, the hover color of the level 3, then 2, then 1. |
 | Divider | `--iw-menu-divider` | Border/separator color between menu items. Not the bottom rule of the bar — that one is **Rule color** / `--iw-menu-border-color`, see [Bar chrome](#bar-chrome). |
 | Rule | `--iw-menu-border-color` | Bottom rule of the bar itself. |
 | Burger open | `--iw-menu-burger-open` | Burger icon color (closed state). |
@@ -395,7 +413,7 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Social media hover | `--iw-menu-social-media-hover` | Social media icon hover color. |
 | Transparent bar text | `--iw-menu-transparent-text` | Text, social icons and language switcher while the bar sits transparent over a hero. Falls back to the regular colors. |
 | Transparent bar burger | `--iw-menu-transparent-burger` | Burger icon over a hero. Falls back to the transparent bar text color. |
-| Chevrons, first / second / third level | `--iw-menu-chevron-color` / `--iw-menu-second-chevron-color` / `--iw-menu-third-chevron-color` | Chevron of each level. Falls back to the text color of the level. |
+| Chevrons, first to fourth level | `--iw-menu-chevron-color` / `--iw-menu-second-chevron-color` / `--iw-menu-third-chevron-color` / `--iw-menu-fourth-chevron-color` | Chevron of each level. Falls back to the text color of the level. |
 
 **One rule for every menu: a text takes the colors of the level whose background it sits on**, and a chevron with no color of its own takes the color of that text.
 
@@ -404,6 +422,8 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Bar, first-level entries, panels opened by the burger | Level 1 | Level 1 |
 | Dropdowns of the bar, accordion sub-lists, drill-down sub-panels of level 2 (header included), mega menu panel | Level 2 | Level 2 |
 | Level 3 flyouts and sub-lists, drill-down sub-panels of level 3, mega menu featured column and image cards with a background | Level 3 | Level 3 |
+| Level 4 flyouts and sub-lists, drill-down sub-panels of level 4 | Level 4 | Level 4 |
+| Level 4 of the mega menu, under its link in a column | Level 2 | Level 2 |
 | Fullscreen panel, all levels | Level 1 | Level 1, the hierarchy made by size and opacity |
 
 A color left empty is not written to the stylesheet at all, so every fallback above applies. Written empty, the variable would win over its fallback and paint nothing: a social icon with no color set used to vanish.
@@ -584,6 +604,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__text` | Level 1 text color with hover transition. |
 | `.iw-menu__text--level-2` | Level 2 text color. |
 | `.iw-menu__text--level-3` | Level 3 text color. |
+| `.iw-menu__text--level-4` | Level 4 text color. |
 | `.iw-menu__list` | A list of menu entries. Resets the list style in the base layer, so spacing utilities still apply. |
 | `.iw-menu__item--current` | The link of the page being displayed, with `aria-current="page"`. Color `--iw-menu-text-active`, underlined. |
 | `.iw-menu__item--ancestor` | An entry leading to the page being displayed (a parent link or the button of its branch). Color only. |
@@ -591,6 +612,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__button--block` | Full-width menu button, used in the mobile panel. |
 | `.iw-menu__dropdown--level-2` | Level 2 dropdown background. |
 | `.iw-menu__dropdown--level-3` | Level 3 dropdown background. |
+| `.iw-menu__dropdown--level-4` | Level 4 dropdown background. |
 | `.iw-menu__divider` | Divider border color. |
 | `.iw-menu__burger` | Burger button (3 lines). Toggle `.iw-menu__burger--open` to animate into an X. Controlled by the `menu_controller` Stimulus. |
 | `.iw-menu__lang` | Language switcher root, with `--dropdown` or `--inline` telling you which form it took. |
@@ -615,7 +637,7 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__fullscreen-body` + `--{left\|center\|right}` | Content of the panel, centered vertically when it fits, with its text alignment. |
 | `.iw-menu__fullscreen-list` + `--two` / `--split` | First-level list, in two balanced columns (without / next to the image). |
 | `.iw-menu__fullscreen-l1` | First-level title, sized by `--iw-menu-fullscreen-l1-size`. |
-| `.iw-menu__fullscreen-sublist` | A second or third level list. Indented with a rule when the text is aligned on a side. |
+| `.iw-menu__fullscreen-sublist` | A list of level 2 to 4. Indented with a rule when the text is aligned on a side. Its links are inline blocks, so the focus ring hugs the text. |
 | `.iw-menu__fullscreen-footer` | Foot of the panel: language switcher, social icons on mobile. |
 | `.iw-menu__backdrop` | Dark backdrop behind a side panel, under the bar. `--visible` while the panel is open. |
 | `.iw-menu__parent-item` | Wrapper around a parent item + its submenu in the accordions. |

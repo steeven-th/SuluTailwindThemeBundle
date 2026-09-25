@@ -12,7 +12,7 @@
     sub-panel covers it.
 
     Params:
-    - navItems:  the resolved navigation tree (L1 → L3)
+    - navItems:  the resolved navigation tree (up to four levels)
     - parentLinkable: bool — whether the section title links to the parent page
                       (panels mode has no split/selflink distinction, just on/off)
     - direction: menu slide direction ('top' | 'right' | 'bottom' | 'left')
@@ -42,9 +42,9 @@
    shares the same absolute positioning context. #}
 {% macro render_subpanel(item, panelId, parentLinkable, depth) %}
     {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
-    {# A sub-panel paints the background of its level, second or third, and
+    {# A sub-panel paints the background of its level, second to fourth, and
        everything on it, header included, takes the text of that level. #}
-    {% set depth = depth|default(2) >= 3 ? 3 : 2 %}
+    {% set depth = max(2, min(depth|default(2), 4)) %}
     {% set levelText = 'iw-menu__text--level-' ~ depth %}
     <section class="iw-menu__subpanel iw-menu__subpanel--level-{{ depth }}" id="iw-menu-subpanel-{{ panelId }}" data-menu-target="subPanel" inert>
         <div class="iw-menu__panel-header">

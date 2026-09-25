@@ -125,7 +125,7 @@ Returns the menu configuration for the active theme.
 | `megamenuSource` | `string` | Data source for mega menu: `'native'` (page tree) or `'snippet'` (manual structure). Only used when `type` is `megamenu`. Default: `'native'` |
 | `clickParentPage` | `string` | Parent page access mode: `'none'`, `'split'`, or `'selflink'` (default: `'none'`) |
 | `clickParentPageNavbar` | `bool` | Adds a self-link to parent page in navbar submenus (default: `false`) |
-| `childLevels` | `int` | Number of sub-menu levels to display (1, 2, or 3) |
+| `childLevels` | `int` | Number of sub-menu levels to display (1 to 4) |
 | `displayLogoDesktop` | `bool` | Show logo on desktop |
 | `displayLogoMobile` | `bool` | Show logo on mobile |
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
@@ -136,7 +136,7 @@ Returns the menu configuration for the active theme.
 | `panelSide` | `string` | Side of a side panel: `left` or `right` (default) |
 | `panelWidth` | `int` | Width of a side panel in pixels from 1024px (default: `288`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
-| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
+| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `thirdTextHover`, `fourthBg`, `fourthText`, `fourthTextHover`, `chevron`, `secondChevron`, `thirdChevron`, `fourthChevron`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
 | `logo` | `string\|null` | Path to logo image |
 | `siteName` | `string\|null` | Site name for display |
 

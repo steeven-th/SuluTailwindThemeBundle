@@ -1,0 +1,104 @@
+ <header data-controller="menu" data-menu-open-label-value="iw_sulu_tailwind_theme.menu_open" data-menu-close-label-value="iw_sulu_tailwind_theme.menu_close" data-menu-scroll-bg-value="true" data-menu-scroll-hide-value="false" class="iw-menu sticky top-0 z-40 w-full">
+<div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
+<div class="iw-menu__bar flex items-center justify-between">
+<div class="flex-shrink-0 flex items-center">
+<a href="/en" class="iw-menu__text flex items-center gap-2 no-underline">
+<span class="text-xl font-bold">Site</span>
+</a>
+</div>
+<div class="flex items-center gap-3">
+<style> .ID1-1 { -webkit-mask-image: url('/media/icon.svg'); mask-image: url('/media/icon.svg'); } </style>
+<ul class="iw-social-links hidden md:flex items-center gap-2">
+<li>
+<a href="https://mastodon.social/@acme" target="_blank" rel="noopener noreferrer" class="inline-flex items-center no-underline">
+<span class="iw-social-icon ID1-1" aria-hidden="true"></span>
+<span class="sr-only">Mastodon</span>
+<span class="sr-only"> iw_sulu_tailwind_theme.link_new_tab</span>
+</a>
+</li>
+</ul>
+<button type="button" data-action="menu#toggle" data-menu-target="burger" aria-expanded="false" aria-controls="ID2" aria-label="iw_sulu_tailwind_theme.menu_open" class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5">
+<span class="iw-menu__burger-line"></span>
+<span class="iw-menu__burger-line"></span>
+<span class="iw-menu__burger-line"></span>
+</button>
+</div>
+</div>
+</div>
+<div id="ID2" data-menu-target="panel" role="dialog" aria-label="iw_sulu_tailwind_theme.menu_dialog" class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--slide iw-menu__dialog--from-right fixed inset-0 z-30">
+<div class="iw-menu__fullscreen-scroll">
+<div class="iw-menu__fullscreen-body iw-menu__fullscreen-body--center container mx-auto px-4 sm:px-6 lg:px-8">
+<nav aria-label="iw_sulu_tailwind_theme.menu_main">
+<ul class="iw-menu__list iw-menu__fullscreen-list">
+<li class="iw-menu__parent-item">
+<a href="/en/services" class="iw-menu__text iw-menu__item--ancestor iw-menu__fullscreen-l1 font-bold hover:opacity-80 transition-opacity no-underline"> Services </a>
+<ul id="ID3" class="iw-menu__list iw-menu__fullscreen-sublist mt-2 space-y-1">
+<li class="iw-menu__parent-item">
+<button type="button" data-action="menu#toggleDisclosure" aria-expanded="false" aria-controls="ID4" class="iw-menu__text iw-menu__item--ancestor inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+<span>Audits</span>
+<svg class="iw-nav-arrow iw-nav-arrow--down w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M9 5l7 7-7 7"/>
+</svg>
+</button>
+<ul id="ID4" class="iw-menu__list iw-menu__fullscreen-sublist mt-1 space-y-1 hidden">
+<li>
+<a href="/en/services/audits" class="iw-menu__text iw-menu__item--ancestor inline-block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"> Audits </a>
+</li>
+<li>
+<a href="/en/services/audits/fire" aria-current="page" class="iw-menu__text iw-menu__item--current inline-block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"> Fire </a>
+</li>
+<li>
+<a href="/en/services/audits/electrical" class="iw-menu__text inline-block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"> Electrical </a>
+</li>
+</ul>
+</li>
+<li>
+<a href="/en/services/training" class="iw-menu__text inline-block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"> Training </a>
+</li>
+<li class="iw-menu__parent-item">
+<button type="button" data-action="menu#toggleDisclosure" aria-expanded="false" aria-controls="ID5" class="iw-menu__text inline-flex items-center gap-2 text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+<span>Consulting</span>
+<svg class="iw-nav-arrow iw-nav-arrow--down w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M9 5l7 7-7 7"/>
+</svg>
+</button>
+<ul id="ID5" class="iw-menu__list iw-menu__fullscreen-sublist mt-1 space-y-1 hidden">
+<li>
+<a href="/en/services/consulting" class="iw-menu__text inline-block text-sm opacity-50 hover:opacity-100 transition-opacity no-underline italic"> Consulting </a>
+</li>
+<li>
+<a href="/en/services/consulting/strategy" class="iw-menu__text inline-block text-sm opacity-60 hover:opacity-100 transition-opacity no-underline"> Strategy </a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="iw-menu__parent-item">
+<a href="/en/news" class="iw-menu__text iw-menu__fullscreen-l1 font-bold hover:opacity-80 transition-opacity no-underline"> News </a>
+</li>
+<li class="iw-menu__parent-item">
+<a href="/en/about" class="iw-menu__text iw-menu__fullscreen-l1 font-bold hover:opacity-80 transition-opacity no-underline"> About </a>
+<ul id="ID6" class="iw-menu__list iw-menu__fullscreen-sublist mt-2 space-y-1">
+<li>
+<a href="/en/about/team" class="iw-menu__text inline-block text-base md:text-lg opacity-60 hover:opacity-100 transition-opacity no-underline"> Team </a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class="iw-menu__fullscreen-footer">
+<style> .ID7-1 { -webkit-mask-image: url('/media/icon.svg'); mask-image: url('/media/icon.svg'); } </style>
+<ul class="iw-social-links flex md:hidden items-center gap-3">
+<li>
+<a href="https://mastodon.social/@acme" target="_blank" rel="noopener noreferrer" class="inline-flex items-center no-underline">
+<span class="iw-social-icon iw-social-icon--md ID7-1" aria-hidden="true"></span>
+<span class="sr-only">Mastodon</span>
+<span class="sr-only"> iw_sulu_tailwind_theme.link_new_tab</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</header> 

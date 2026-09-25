@@ -21,6 +21,64 @@
 
 {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
 
+{# A dropdown and the dropdowns opening beside it, one level each: the
+   second level hangs from the bar, the third and fourth open on the side of
+   their entry (the controller turns them to the left at the edge of the
+   window). A long list scrolls, unless a deeper level opens beside it: the
+   scroll box would clip that flyout. #}
+{% macro dropdown(parent, parentHref, parentState, id, depth, clickNavbar) %}
+    {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+    {% set text = 'iw-menu__text--level-' ~ depth %}
+    {% set opensDeeper = parent.children|filter(child => child.children is defined and child.children|length > 0)|length > 0 %}
+    <ul
+        id="{{ id }}"{% if depth > 2 %}
+        data-menu-placement="side"{% endif %}
+        class="iw-menu__list iw-menu__dropdown--level-{{ depth }}{{ depth == 2 ? ' iw-menu__bar-dropdown' : '' }}{{ opensDeeper ? '' : ' iw-menu__dropdown--scroll' }} hidden absolute{{ depth > 2 ? ' left-full top-0 ml-0.5' : '' }} w-48 shadow-lg py-1 z-50"
+    >
+        {% if clickNavbar %}
+            <li>
+                <a
+                    href="{{ parentHref }}"{{ nav.current(parentState) }}
+                    class="{{ text }}{{ nav.state_class(parentState) }} block px-4 py-2 text-sm font-medium transition-opacity no-underline hover:opacity-80 italic"
+                >
+                    {{ parent.title }}
+                </a>
+            </li>
+        {% endif %}
+        {% for child in parent.children %}
+            {% set childHref = sulu_content_path(child.url) %}
+            {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
+            {% if child.children is defined and child.children|length > 0 %}
+                {% set subdropdownId = iw_sulu_tailwind_theme_unique_id('menu-dropdown') %}
+                <li class="relative">
+                    <button
+                        type="button"
+                        data-action="menu#toggleDisclosure"
+                        data-menu-target="popupTrigger"
+                        aria-expanded="false"
+                        aria-controls="{{ subdropdownId }}"
+                        class="{{ text }}{{ nav.branch_class(childState) }} flex items-center justify-between w-full px-4 py-2 text-sm transition-opacity hover:opacity-80 text-left cursor-pointer"
+                    >
+                        {{ child.title }}
+                        {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'next', 'class': 'w-3 h-3 ml-2'} only %}
+                    </button>
+                    {{ _self.dropdown(child, childHref, childState, subdropdownId, depth + 1, clickNavbar) }}
+                </li>
+            {% else %}
+                <li>
+                    <a
+                        href="{{ childHref }}"{{ nav.current(childState) }}
+                        class="{{ text }}{{ nav.state_class(childState) }} block px-4 py-2 text-sm transition-opacity no-underline hover:opacity-80"
+                    >
+                        {{ child.title }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+
 {# Width under which the links give way to the burger (see ThemeCompiler). #}
 {% set collapseAt = config.collapseAt|default('auto') in ['md', 'lg', 'xl', 'auto'] ? config.collapseAt|default('auto') : 'auto' %}
 
@@ -59,9 +117,6 @@
                     {% if item.children is defined and item.children|length > 0 %}
                         {# Dropdown parent: the item is the hover and focus zone #}
                         {% set dropdownId = iw_sulu_tailwind_theme_unique_id('menu-dropdown') %}
-                        {# A long list scrolls, unless a level 3 opens beside it:
-                           the scroll box would clip that flyout. #}
-                        {% set hasLevel3 = item.children|filter(child => child.children is defined and child.children|length > 0)|length > 0 %}
                         <li class="relative">
                             <button
                                 type="button"
@@ -74,79 +129,7 @@
                                 {{ item.title }}
                                 {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                             </button>
-                            <ul
-                                id="{{ dropdownId }}"
-                                class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__bar-dropdown{{ hasLevel3 ? '' : ' iw-menu__dropdown--scroll' }} hidden absolute w-48 shadow-lg py-1 z-50"
-                            >
-                                {% if clickNavbar %}
-                                    <li>
-                                        <a
-                                            href="{{ itemHref }}"{{ nav.current(itemState) }}
-                                            class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block px-4 py-2 text-sm font-medium transition-opacity no-underline hover:opacity-80 italic"
-                                        >
-                                            {{ item.title }}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                                {% for child in item.children %}
-                                    {% set childHref = sulu_content_path(child.url) %}
-                                    {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
-                                    {% if child.children is defined and child.children|length > 0 %}
-                                        {# Level 2 item with children: opens level 3 on the side #}
-                                        {% set subdropdownId = iw_sulu_tailwind_theme_unique_id('menu-dropdown') %}
-                                        <li class="relative">
-                                            <button
-                                                type="button"
-                                                data-action="menu#toggleDisclosure"
-                                                data-menu-target="popupTrigger"
-                                                aria-expanded="false"
-                                                aria-controls="{{ subdropdownId }}"
-                                                class="iw-menu__text--level-2{{ nav.branch_class(childState) }} flex items-center justify-between w-full px-4 py-2 text-sm transition-opacity hover:opacity-80 text-left cursor-pointer"
-                                            >
-                                                {{ child.title }}
-                                                {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'next', 'class': 'w-3 h-3 ml-2'} only %}
-                                            </button>
-                                            <ul
-                                                id="{{ subdropdownId }}"
-                                                data-menu-placement="side"
-                                                class="iw-menu__list iw-menu__dropdown--level-3 iw-menu__dropdown--scroll hidden absolute left-full top-0 ml-0.5 w-48 shadow-lg py-1 z-50"
-                                            >
-                                                {% if clickNavbar %}
-                                                    <li>
-                                                        <a
-                                                            href="{{ childHref }}"{{ nav.current(childState) }}
-                                                            class="iw-menu__text--level-3{{ nav.state_class(childState) }} block px-4 py-2 text-sm font-medium transition-opacity no-underline hover:opacity-80 italic"
-                                                        >
-                                                            {{ child.title }}
-                                                        </a>
-                                                    </li>
-                                                {% endif %}
-                                                {% for grandchild in child.children %}
-                                                    {% set grandchildHref = sulu_content_path(grandchild.url) %}
-                                                    {% set grandchildState = iw_sulu_tailwind_theme_nav_state(grandchildHref) %}
-                                                    <li>
-                                                        <a
-                                                            href="{{ grandchildHref }}"{{ nav.current(grandchildState) }}
-                                                            class="iw-menu__text--level-3{{ nav.state_class(grandchildState) }} block px-4 py-2 text-sm transition-opacity no-underline hover:opacity-80"
-                                                        >
-                                                            {{ grandchild.title }}
-                                                        </a>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </li>
-                                    {% else %}
-                                        <li>
-                                            <a
-                                                href="{{ childHref }}"{{ nav.current(childState) }}
-                                                class="iw-menu__text--level-2{{ nav.state_class(childState) }} block px-4 py-2 text-sm transition-opacity no-underline hover:opacity-80"
-                                            >
-                                                {{ child.title }}
-                                            </a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
+                            {{ _self.dropdown(item, itemHref, itemState, dropdownId, 2, clickNavbar) }}
                         </li>
                     {% else %}
                         <li>

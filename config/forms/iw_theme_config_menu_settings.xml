@@ -275,6 +275,9 @@
                         <param name="3">
                             <meta><title>3</title></meta>
                         </param>
+                        <param name="4">
+                            <meta><title>4</title></meta>
+                        </param>
                     </param>
                 </params>
             </property>

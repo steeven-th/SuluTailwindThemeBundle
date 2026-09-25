@@ -211,6 +211,23 @@
                                            class="iw-menu__text--level-2{{ nav.state_class(grandchildState) }} text-sm no-underline hover:opacity-80 transition-opacity">
                                             {{ grandchild.title }}
                                         </a>
+                                        {# Fourth level: always open under its entry, indented
+                                           with a rule. A fold inside a column would read badly.
+                                           It sits on the panel, so it takes the level 2 text. #}
+                                        {% if grandchild.children is defined and grandchild.children|length > 0 %}
+                                            <ul class="iw-menu__list iw-mega-menu__sublist mt-1.5 space-y-1 pl-3">
+                                                {% for leaf in grandchild.children %}
+                                                    {% set leafHref = sulu_content_path(leaf.url) %}
+                                                    {% set leafState = iw_sulu_tailwind_theme_nav_state(leafHref) %}
+                                                    <li>
+                                                        <a href="{{ leafHref }}"{{ nav.current(leafState) }}
+                                                           class="iw-menu__text--level-2{{ nav.state_class(leafState) }} text-sm no-underline hover:opacity-80 transition-opacity">
+                                                            {{ leaf.title }}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
                                     </li>
                                 {% endfor %}
                             </ul>

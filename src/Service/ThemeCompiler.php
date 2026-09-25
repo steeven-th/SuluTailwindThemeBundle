@@ -2653,12 +2653,16 @@ class ThemeCompiler
         'chevron' => 'chevron-color',
         'secondChevron' => 'second-chevron-color',
         'thirdChevron' => 'third-chevron-color',
+        'fourthChevron' => 'fourth-chevron-color',
         'secondBg' => 'second-bg',
         'secondText' => 'second-text',
         'secondTextHover' => 'second-text-hover',
         'thirdBg' => 'third-bg',
         'thirdText' => 'third-text',
         'thirdTextHover' => 'third-text-hover',
+        'fourthBg' => 'fourth-bg',
+        'fourthText' => 'fourth-text',
+        'fourthTextHover' => 'fourth-text-hover',
         'divider' => 'divider',
         'burgerOpen' => 'burger-open',
         'burgerClose' => 'burger-close',
@@ -3078,6 +3082,8 @@ class ThemeCompiler
         $css .= ".iw-menu__text--level-2:hover { color: var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
         $css .= ".iw-menu__text--level-3 { color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); transition: color 0.2s ease; }\n";
         $css .= ".iw-menu__text--level-3:hover { color: var(--iw-menu-third-text-hover, var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))))); }\n";
+        $css .= ".iw-menu__text--level-4 { color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); transition: color 0.2s ease; }\n";
+        $css .= ".iw-menu__text--level-4:hover { color: var(--iw-menu-fourth-text-hover, var(--iw-menu-third-text-hover, var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))))))); }\n";
 
         // The page being displayed and the entries leading to it (see
         // menu/_nav_macros.html.twig). Each level falls back to its own hover
@@ -3090,14 +3096,16 @@ class ThemeCompiler
         $css .= ".iw-menu__text.iw-menu__item--current, .iw-menu__text.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-text-hover, var(--iw-menu-text))); opacity: 1; }\n";
         $css .= ".iw-menu__text--level-2.iw-menu__item--current, .iw-menu__text--level-2.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-second-text, var(--iw-menu-text))))); opacity: 1; }\n";
         $css .= ".iw-menu__text--level-3.iw-menu__item--current, .iw-menu__text--level-3.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-third-text-hover, var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))))))); opacity: 1; }\n";
+        $css .= ".iw-menu__text--level-4.iw-menu__item--current, .iw-menu__text--level-4.iw-menu__item--ancestor { color: var(--iw-menu-text-active, var(--iw-menu-fourth-text-hover, var(--iw-menu-third-text-hover, var(--iw-menu-second-text-hover, var(--iw-menu-text-hover, var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))))))))); opacity: 1; }\n";
         $css .= ".iw-menu__item--current { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }\n";
 
         // Dropdown backgrounds per level
         $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
         $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
         // The sub-lists of the panels are part of the panel, not dropdowns:
         // no radius.
-        $css .= ".iw-menu [role=\"dialog\"] :is(.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3) { border-radius: 0; }\n";
+        $css .= ".iw-menu [role=\"dialog\"] :is(.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3, .iw-menu__dropdown--level-4) { border-radius: 0; }\n";
         // Hanging from the bar, a dropdown is square against it, unless the
         // theme asks for round top corners (--iw-menu-dropdown-top-radius).
         $css .= ".iw-menu__dropdown--level-2.iw-menu__bar-dropdown { border-top-left-radius: var(--iw-menu-dropdown-top-radius, 0); border-top-right-radius: var(--iw-menu-dropdown-top-radius, 0); }\n";
@@ -3146,7 +3154,8 @@ class ThemeCompiler
         $css .= ".iw-menu [role=\"dialog\"] :is(a, button):focus-visible { outline-offset: -2px; }\n";
         $css .= ".iw-menu__overlay-nav .iw-menu__list:not(.iw-menu__lang) > li > :is(a, button), .iw-menu .iw-menu__panel-item { padding-inline: 0.5rem; margin-inline: -0.5rem; }\n";
         $css .= ".iw-menu__overlay-nav .iw-menu__list:not(.iw-menu__lang) > li > button, .iw-menu .iw-menu__panel-item { width: calc(100% + 1rem); }\n";
-        $css .= ".iw-menu__fullscreen-body :is(a, button):focus-visible { outline-offset: 3px; }\n";
+        // Scoped like the rule above, which it has to beat.
+        $css .= ".iw-menu [role=\"dialog\"] .iw-menu__fullscreen-body :is(a, button):focus-visible { outline-offset: 3px; }\n";
 
         // Animated burger button (3 lines → X). State is controlled by
         // toggling .iw-menu__burger--open via the menu_controller Stimulus.
@@ -3337,6 +3346,7 @@ class ThemeCompiler
         $css .= ".iw-menu .iw-menu__text .iw-nav-arrow { color: var(--iw-menu-chevron-color, currentColor); }\n";
         $css .= ".iw-menu .iw-menu__text--level-2 .iw-nav-arrow { color: var(--iw-menu-second-chevron-color, currentColor); }\n";
         $css .= ".iw-menu .iw-menu__text--level-3 .iw-nav-arrow { color: var(--iw-menu-third-chevron-color, currentColor); }\n";
+        $css .= ".iw-menu .iw-menu__text--level-4 .iw-nav-arrow { color: var(--iw-menu-fourth-chevron-color, currentColor); }\n";
         $css .= "@media (prefers-reduced-motion: reduce) {\n";
         $css .= "  .iw-menu__dialog, .iw-menu__curtain, .iw-menu__backdrop, .iw-menu__subpanel,\n";
         $css .= "  .iw-menu__burger-line, .iw-menu .iw-nav-arrow--down { transition-duration: 0s !important; transition-delay: 0s !important; }\n";
@@ -3367,6 +3377,7 @@ class ThemeCompiler
         // non-linked title included (links carry their level class).
         $css .= ".iw-menu__subpanel--level-2 { color: var(--iw-menu-second-text, var(--iw-menu-text)); }\n";
         $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
+        $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
         $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--iw-menu-panel-gutter, 1.5rem) 1rem; }\n";
         // Motion — enter side matches the menu slide direction; --active rests at 0.
         $css .= ".iw-menu__panels--from-right .iw-menu__subpanel { transform: translateX(100%); }\n";
@@ -3502,6 +3513,9 @@ class ThemeCompiler
         $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); ";
         $css .= "border-top: 1px solid var(--iw-menu-divider, rgba(0,0,0,0.1)); }\n";
         // Featured column
+        // Fourth level under its link in a column: the rule ties it to its
+        // parent, in the text color of the panel at 25%.
+        $css .= ".iw-mega-menu__sublist { border-left: 1px solid var(--iw-mega-menu-rule, color-mix(in srgb, var(--iw-menu-second-text, var(--iw-menu-text)) 25%, transparent)); }\n";
         $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
         $css .= "border-radius: var(--border-radius); padding: 1.5rem; }\n";
         // Image card (radius by default for consistent hover shadow)

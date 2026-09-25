@@ -25,6 +25,7 @@ The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
 | `--menu-secondTextHover` | Dropdown text hover color | `#1a73e8` |
 | `--menu-thirdBg` | Sub-dropdown / featured column background | `#f0f0f0` |
 | `--menu-thirdText` | Sub-dropdown text color | `#202124` |
+| `--iw-menu-fourth-bg` / `--iw-menu-fourth-text` / `--iw-menu-fourth-text-hover` | Level 4, each falling back on level 3 | - |
 | `--menu-divider` | Border/separator color | `rgba(0,0,0,0.1)` |
 | `--menu-burgerOpen` | Burger icon color (closed state) | `#202124` |
 | `--menu-burgerClose` | Burger icon color (open state) | `#ffffff` |
