@@ -32,10 +32,27 @@ final class MenuTransparentBarTest extends TestCase
         $css = $this->compile([]);
 
         // No rule drops the background of a transparent bar outside that state.
-        self::assertDoesNotMatchRegularExpression('/(^|\n|, )\.iw-menu(\.iw-menu--sidebar)?\.iw-menu--transparent[^\n{]*\{[^}]*background-color: transparent/', $css);
-        self::assertStringContainsString(self::OVER_HERO_PAGE . ':not(.iw-scroll-locked) .iw-menu--transparent:not(.iw-menu--scrolled), ', $css);
+        self::assertDoesNotMatchRegularExpression('/(^|\n|, )\.iw-menu\.iw-menu--transparent[^\n{]*\{[^}]*background-color: transparent/', $css);
+        self::assertStringContainsString(self::OVER_HERO_PAGE . ':not(.iw-scroll-locked) .iw-menu--transparent:not(.iw-menu--scrolled)::before {', $css);
         self::assertStringContainsString(self::OVER_HERO_PAGE . ' .iw-menu--transparent { margin-bottom: calc(-1 * var(--iw-menu-overlap)); }', $css);
         self::assertStringContainsString(self::OVER_HERO_PAGE . ' { --iw-menu-overlap: var(--iw-menu-bar-height); }', $css);
+        // With a panel open the bar takes its background at once.
+        self::assertStringContainsString('html.iw-scroll-locked .iw-menu::before { transition: none; }', $css);
+    }
+
+    #[Test]
+    public function theChromeOfTheBarPaintsAbovePanelsAndBelowItsContent(): void
+    {
+        $css = $this->compile(['borderWidth' => '2']);
+
+        // Panels are z-30, the content of the bar z-50: a panel sliding in
+        // from the top passes behind the background of the bar.
+        self::assertMatchesRegularExpression('/\.iw-menu::before \{[^}]*z-index: 40;[^}]*background-color: var\(--iw-menu-surface/', $css);
+        self::assertDoesNotMatchRegularExpression('/(^|\n)\.iw-menu \{[^}]*background-color/', $css);
+        self::assertStringContainsString('--iw-menu-border-width: 2px;', $css);
+        foreach (['_navbar', '_burger', '_fullscreen', '_megamenu'] as $type) {
+            self::assertStringContainsString('iw-menu__frame relative z-50', (string) file_get_contents(\dirname(__DIR__, 2) . "/templates/menu/{$type}.html.twig"), "{$type}: the bar content must sit above the chrome layer.");
+        }
     }
 
     #[Test]
@@ -85,7 +102,7 @@ final class MenuTransparentBarTest extends TestCase
         $theme->setMenuConfig(['type' => 'navbar', 'transparentNavbar' => true, 'scrollBg' => false]);
         self::assertFalse($mapper->serializeTheme($theme)['menuConfig_scrollBg']);
 
-        foreach (['_navbar', '_burger', '_fullscreen', '_sidebar', '_megamenu'] as $type) {
+        foreach (['_navbar', '_burger', '_fullscreen', '_megamenu'] as $type) {
             $source = (string) file_get_contents(\dirname(__DIR__, 2) . "/templates/menu/{$type}.html.twig");
             self::assertStringContainsString("data-menu-scroll-bg-value=\"{{ (config.scrollBg ?? true) ? 'true' : 'false' }}\"", $source, "{$type} does not default the background on scroll.");
         }

@@ -968,6 +968,63 @@ and `render_social_links` are gone, replaced by `render_panel_footer`, and
 
 ---
 
+## The sidebar menu becomes a burger on a side (breaking for template overrides)
+
+The `sidebar` and `burger` types opened the same navigation in a dialog, only
+the size of the dialog set them apart. They are now one type, `burger`, with a
+**Panel** setting: `Full screen` (the former burger) or `On a side` (the former
+sidebar), plus **Side** and **Panel width**.
+
+**Nothing to do for a stored theme.** A menu saved as `sidebar` is read as a
+burger on a side, with its width, its side and a sliding panel
+(`MenuConfigNormalizer`, applied by `ThemeConfig::getMenuConfig()`), and is
+written in the new shape on its next save. An export made before the change
+imports the same way.
+
+What changes on screen:
+
+- **The bar of a side panel stays at the top** of the window while scrolling
+  (the sidebar bar scrolled away), and follows **Hide on scroll down**, which
+  the sidebar ignored.
+- **A left panel moves the burger to the start of the bar**, next to the panel
+  it closes (the close button sat more than 800px away on a desktop).
+- **The side panel starts under the bar**, and so does the backdrop: the bar is
+  no longer dimmed.
+- **The accordion of the side panel is the one of the burger** (dividers, focus
+  ring, colors per level). The sidebar had its own copy, with smaller rows.
+- **Social icons**: in the bar from 768px, and at the foot of the panel. The
+  sidebar showed them in the bar only, on every width.
+- **The full-screen panel lines its content up with the logo**, and the rows
+  stop at `--iw-menu-panel-content-width` (default `40rem`) instead of running
+  along the whole screen.
+
+Renamed or removed:
+
+| Before | After |
+|--------|-------|
+| `menu/_sidebar.html.twig` | `menu/_burger.html.twig` with `panelLayout: 'side'` |
+| `sidebarWidth`, `sidebarPosition` | `panelWidth`, `panelSide` (new `panelLayout`) |
+| `--iw-menu-sidebar-width` | `--iw-menu-panel-width` |
+| `.iw-menu--sidebar`, `.iw-menu__sidebar--{left\|right\|open}` | `.iw-menu__overlay--side` + `--{left\|right}`, opened by `.iw-menu__dialog--open` |
+| `.iw-menu__bar-spacer` | Removed, the side panel starts under the bar |
+| `menu#toggleSidebar`, targets `sidebar` / `sidebarBurger` | `menu#toggle`, targets `panel` / `burger` |
+| `context: 'sidebar'` of `_nav_panels.html.twig` | Removed, the dialog sets `--iw-menu-panels-offset` |
+
+**The bar chrome moved onto `.iw-menu::before`** (all menu types): background,
+bottom rule, shadow and blur are painted by that layer, between the panels and
+the content of the bar. A panel sliding in from the top used to pass over the
+background of the bar, behind its logo only. A project that restyled the chrome
+on `.iw-menu` targets `.iw-menu::before` instead. Over a hero, a transparent bar
+takes its background at once when a panel opens, no longer through the scroll
+fade.
+
+The inline padding of the panels is now one variable, `--iw-menu-panel-gutter`
+(`1.5rem`, `2rem` from 640px), read by the accordion, the drill-down panels and
+their sub-panel headers. The `px-6 sm:px-8` utilities are gone from those
+templates.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so

@@ -9,7 +9,7 @@ The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
 `--iw-menu-button-padding-x`, `--iw-menu-button-font-size`) is documented in
 [`menus.md`](../menus.md#menu-buttons).
 
-> For the full reference on menu CSS classes (navbar, burger, fullscreen, sidebar, megamenu), see [`menus.md`](../menus.md).
+> For the full reference on menu CSS classes (navbar, burger, fullscreen, megamenu), see [`menus.md`](../menus.md).
 
 | Variable | Description | Example |
 |----------|-------------|---------|

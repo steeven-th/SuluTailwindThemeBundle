@@ -6,8 +6,7 @@
     and the section title sit at the top of each sub-panel; the title links to the
     parent page when parentLinkable is true.
 
-    Included by _burger.html.twig and _sidebar.html.twig when config.subMenuPanels
-    is on. Requires the menu Stimulus controller (openPanel / closePanel): a row
+    Included by _burger.html.twig when config.subMenuPanels is on. Requires the menu Stimulus controller (openPanel / closePanel): a row
     opening a sub-panel carries aria-expanded and aria-controls, the sub-panel
     stays inert until it is shown, and the level underneath goes inert while a
     sub-panel covers it.
@@ -22,9 +21,11 @@
     - config: the menuConfig object, for the language switcher (optional)
     - localizations: Sulu's localizations map, forwarded explicitly because this
       partial is included with `only` (optional)
-    - context: 'burger' (default) | 'sidebar'. Both fill their container and push
-      the panels below the bar via --iw-menu-panels-offset, which follows the
-      bar height (--iw-menu-bar-height) unless a project overrides it.
+
+    The panels fill their dialog. They clear the bar through
+    --iw-menu-panels-offset, which follows the bar height unless the dialog
+    already starts under the bar (side panel). Their inline padding is
+    --iw-menu-panel-gutter, which lines a full-screen panel up with the logo.
 
     Public CSS API:
     - .iw-menu__panels (+ --from-{dir} / --fade / --none) — the stack + its motion
@@ -36,7 +37,6 @@
 {# Sub-panels reuse the overlay motion. fade / none skip the slide; otherwise the
    panel enters from the menu's own direction. #}
 {% set panelsModifier = animation == 'fade' ? 'fade' : (animation == 'none' ? 'none' : 'from-' ~ (direction|default('right'))) %}
-{% set isSidebar = context|default('burger') == 'sidebar' %}
 
 {# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
    shares the same absolute positioning context. #}
@@ -101,10 +101,10 @@
 
 {# One navigation landmark around every level: the sub-panels are siblings of
    the root panel, not children, so the landmark has to hold them all. #}
-<nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__panels iw-menu__panels--{{ panelsModifier }}{{ isSidebar ? ' iw-menu__panels--sidebar' : '' }}" data-menu-target="panels">
+<nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__panels iw-menu__panels--{{ panelsModifier }}" data-menu-target="panels">
     {# Root panel — first level, always visible below the sub-panels. #}
     <div class="iw-menu__panel" data-panel-id="root">
-        <div class="iw-menu__panel-body iw-menu__panel-body--root px-6 sm:px-8">
+        <div class="iw-menu__panel-body iw-menu__panel-body--root">
             <ul class="iw-menu__list">
                 {% for item in navItems %}
                     {% set itemHref = sulu_content_path(item.url) %}

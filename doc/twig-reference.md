@@ -120,7 +120,7 @@ Returns the menu configuration for the active theme.
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `type` | `string` | `navbar`, `burger`, `fullscreen`, `sidebar`, or `megamenu` |
+| `type` | `string` | `navbar`, `burger`, `fullscreen`, or `megamenu`. A stored `sidebar` is read as `burger` with a side panel |
 | `animation` | `string` | `none`, `slide`, or `fade` |
 | `megamenuSource` | `string` | Data source for mega menu: `'native'` (page tree) or `'snippet'` (manual structure). Only used when `type` is `megamenu`. Default: `'native'` |
 | `clickParentPage` | `string` | Parent page access mode: `'none'`, `'split'`, or `'selflink'` (default: `'none'`) |
@@ -131,8 +131,10 @@ Returns the menu configuration for the active theme.
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
 | `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
 | `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
-| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger`, `fullscreen` and `sidebar` |
-| `sidebarWidth` | `int` | Sidebar panel width in pixels on large screens (default: `288`) |
+| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger` and `fullscreen` |
+| `panelLayout` | `string` | Burger panel: `full` (default) or `side` |
+| `panelSide` | `string` | Side of a side panel: `left` or `right` (default) |
+| `panelWidth` | `int` | Width of a side panel in pixels from 1024px (default: `288`) |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
 | `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
 | `logo` | `string\|null` | Path to logo image |

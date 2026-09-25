@@ -1,8 +1,15 @@
-{# Menu — always burger (hamburger icon), full overlay panel #}
+{# Menu - always a burger, which opens the navigation in a dialog.
 
-{# Animation config #}
+   The panel either covers the screen (panelLayout 'full', the default) or
+   slides in from a side (panelLayout 'side'), panelWidth wide from 1024px
+   with a dimmed page behind it. The former `sidebar` menu type is this side
+   panel (see MenuConfigNormalizer). #}
+
+{% set isSide = config.panelLayout|default('full') == 'side' %}
+{% set side = config.panelSide|default('right') == 'left' ? 'left' : 'right' %}
 {% set animation = config.animation|default('none') %}
-{% set slideDirection = config.slideDirection|default('top') %}
+{# A side panel comes from its side. #}
+{% set slideDirection = isSide ? side : config.slideDirection|default('top') %}
 
 {# Parent page click mode: none, split, or selflink (backward compat: boolean → string) #}
 {% set clickMode = config.clickParentPage|default('none') %}
@@ -20,6 +27,25 @@
 
 {% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
 
+{# The burger turns into the close button. A left panel puts it at the start
+   of the bar, next to the panel it closes. #}
+{% set burgerButton %}
+    <button
+        type="button"
+        data-action="menu#toggle"
+        data-menu-target="burger"
+        aria-expanded="false"
+        aria-controls="{{ panelId }}"
+        aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+        class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5 flex-shrink-0"
+    >
+        <span class="iw-menu__burger-line"></span>
+        <span class="iw-menu__burger-line"></span>
+        <span class="iw-menu__burger-line"></span>
+    </button>
+{% endset %}
+{% set burgerFirst = isSide and side == 'left' %}
+
 <header
     data-controller="menu"
     data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
@@ -31,55 +57,51 @@
     <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
 
-            {# LEFT — Logo + Site Name #}
-            <div class="flex-shrink-0 flex items-center">
+            {# LEFT - (Burger) + Logo + Site Name #}
+            <div class="flex-shrink-0 flex items-center gap-3">
+                {% if burgerFirst %}{{ burgerButton }}{% endif %}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_logo_link.html.twig'
                     with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
-            {# RIGHT — Language switcher + Social media + Burger #}
+            {# RIGHT - Language switcher + Social media + (Burger) #}
             <div class="flex items-center gap-3">
-                {# Language switcher — in the bar, reachable without opening the
+                {# Language switcher - in the bar, reachable without opening the
                    menu. Hidden when the theme places it in the panel only. #}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {config: config, align: 'right', slot: 'bar'} %}
 
-                {# Social media icons #}
                 {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                     links: socialLinks,
                     class: 'hidden md:flex items-center gap-2',
                     textClass: 'text-sm',
                 } only %}
 
-                {# Animated burger button — always visible #}
-                <button
-                    type="button"
-                    data-action="menu#toggle"
-                    data-menu-target="burger"
-                    aria-expanded="false"
-                    aria-controls="{{ panelId }}"
-                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
-                    class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                >
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                </button>
+                {% if not burgerFirst %}{{ burgerButton }}{% endif %}
             </div>
         </div>
     </div>
 
-    {# Overlay panel — positioned below the navbar #}
+    {% if isSide %}
+        {# The page behind a side panel is dimmed, a click on it closes the
+           panel. Stack: bar (z-50) > panel (z-30) > backdrop (z-20). #}
+        <div data-menu-target="backdrop"
+             data-action="click->menu#toggle"
+             class="iw-menu__backdrop fixed inset-0 z-20"></div>
+    {% endif %}
+
+    {# The dialog. Full: it covers the screen and its content clears the bar.
+       Side: it starts under the bar. #}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
     <div
         id="{{ panelId }}"
         data-menu-target="panel"
         role="dialog"
         aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
-        class="iw-menu__overlay iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed inset-0 z-30"
+        class="iw-menu__overlay iw-menu__overlay--{{ isSide ? 'side iw-menu__overlay--' ~ side : 'full' }} iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed z-30"
     >
         {% if config.subMenuPanels|default(false) %}
-        {# Drill-down panels mode (opt-in) — separate partial for maintainability. #}
+        {# Drill-down panels mode (opt-in) - separate partial for maintainability. #}
         {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
             navItems: navItems,
             parentLinkable: config.clickParentPagePanels|default(false),
@@ -90,11 +112,11 @@
             localizations: localizations|default([]),
         } only %}
         {% else %}
-        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav iw-menu__overlay-nav--below-bar px-6 sm:px-8 overflow-y-auto h-full">
+        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav{{ isSide ? '' : ' iw-menu__overlay-nav--below-bar' }} overflow-y-auto h-full">
             {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
                 with {navItems: navItems, clickMode: clickMode} only %}
 
-            {# Language switcher — inline: the overlay already covers the page,
+            {# Language switcher - inline: the overlay already covers the page,
                a dropdown on top of it would read badly. The vertical padding
                keeps it off the last nav item and the social row. #}
             <div class="pt-6 pb-2">
@@ -102,7 +124,6 @@
                     with {config: config, display: 'inline', slot: 'panel'} %}
             </div>
 
-            {# Social media icons in overlay #}
             {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
                 links: socialLinks,
                 class: 'flex items-center gap-3 pt-6 pb-4',

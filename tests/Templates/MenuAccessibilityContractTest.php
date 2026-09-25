@@ -25,7 +25,6 @@ final class MenuAccessibilityContractTest extends TestCase
         '_navbar.html.twig',
         '_burger.html.twig',
         '_fullscreen.html.twig',
-        '_sidebar.html.twig',
         '_megamenu.html.twig',
         '_nav_panels.html.twig',
         '_nav_accordion.html.twig',
@@ -94,9 +93,9 @@ final class MenuAccessibilityContractTest extends TestCase
     #[Test]
     public function everyPanelIsANamedDialog(): void
     {
-        foreach (['_navbar.html.twig', '_burger.html.twig', '_fullscreen.html.twig', '_sidebar.html.twig', '_megamenu.html.twig'] as $template) {
+        foreach (['_navbar.html.twig', '_burger.html.twig', '_fullscreen.html.twig', '_megamenu.html.twig'] as $template) {
             $source = self::read($template);
-            preg_match_all('/<(?:div|aside)\b[^>]*data-menu-target="(?:panel|sidebar)"[^>]*>/s', $source, $matches);
+            preg_match_all('/<(?:div|aside)\b[^>]*data-menu-target="panel"[^>]*>/s', $source, $matches);
 
             self::assertNotEmpty($matches[0], "{$template} has no dialog panel.");
             foreach ($matches[0] as $panel) {

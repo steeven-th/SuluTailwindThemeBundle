@@ -230,7 +230,7 @@ class ThemeFormMapper
         'barHeightDesktop', 'barHeightMobile', 'logoSpacing',
         'logoTransparentDesktop', 'logoTransparentMobile',
         'fullscreenImage', 'twoColumns', 'fullscreenAlign', 'fullscreenCollapse',
-        'sidebarPosition', 'sidebarWidth', 'transparentNavbar', 'scrollBg', 'scrollHide',
+        'panelLayout', 'panelWidth', 'panelSide', 'transparentNavbar', 'scrollBg', 'scrollHide',
         // Bar chrome, read by ThemeCompiler::compileMenu().
         'borderWidth', 'shadow', 'bgOpacity', 'blur',
         // Dropdowns of the bar, read by ThemeCompiler.

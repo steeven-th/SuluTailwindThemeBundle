@@ -134,6 +134,21 @@ final class MenuFinishingTest extends TestCase
         self::assertStringContainsString('--iw-social-icon-ratio: {{ item.ratio }};', $component);
     }
 
+    #[Test]
+    public function theBurgerPanelFitsItsLayout(): void
+    {
+        $css = $this->compile(['type' => 'burger', 'panelLayout' => 'side', 'panelWidth' => 360]);
+
+        self::assertStringContainsString('--iw-menu-panel-width: 360px;', $css);
+        self::assertStringContainsString('.iw-menu__overlay--side { top: var(--iw-menu-bar-height); bottom: 0; width: 100%; --iw-menu-panels-offset: 0px; }', $css);
+        self::assertStringContainsString('.iw-menu__backdrop { top: var(--iw-menu-bar-height);', $css);
+        // Full screen, the gutter follows the container of the bar.
+        self::assertStringContainsString('@media (min-width: 1280px) { .iw-menu__overlay--full { --iw-menu-panel-gutter: max(2rem, calc((100% - var(--iw-scrollbar-compensation, 0px) - 80rem) / 2 + 2rem)); } }', $css);
+        // A sub-panel waiting above the stack (slide from the top) must not
+        // paint the band of the bar.
+        self::assertMatchesRegularExpression('/\.iw-menu__panels \{[^}]*clip-path: inset\(var\(--iw-menu-panels-offset, var\(--iw-menu-bar-height, 4rem\)\) 0 0 0\)/', $css);
+    }
+
     /**
      * @param array<string, mixed> $menuConfig
      */

@@ -38,8 +38,8 @@ const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
  *   one per level at a time, opens on hover with a fine pointer, closes when
  *   the focus leaves it, on a click outside and on Escape. An accordion stays
  *   in the flow and only closes when asked.
- * - Dialog: the panels the burger opens (burger, fullscreen, navbar and mega
- *   menu on mobile) and the sidebar. On open, the page the panel hides is
+ * - Dialog: the panels the burger opens (burger, full screen or on a side,
+ *   fullscreen, navbar and mega menu on mobile). On open, the page the panel hides is
  *   made `inert`, the focus moves into the panel and the page stops scrolling
  *   without shifting sideways. Escape, the burger or the backdrop close it and
  *   give the focus back to the burger. The bar stays drawn above the panel and
@@ -65,21 +65,18 @@ const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
  *
  * Targets:
  *   - panel / burger: The dialog opened by the burger, and the burger
- *   - sidebar / sidebarBurger: The sidebar dialog, and its burger
- *   - backdrop: The dimmed layer behind the sidebar (click closes it)
+ *   - backdrop: The dimmed layer behind a side panel (click closes it)
  *   - popupTrigger: A disclosure trigger whose content floats over the page
  *   - subPanel: A drill-down sub-panel ("sub-menus as panels" mode)
  *
  * Actions:
  *   - toggle(): Open or close the burger dialog
- *   - toggleSidebar(): Open or close the sidebar dialog
  *   - toggleDisclosure(event): Open, pin or close the content of a trigger
  *   - openPanel(event) / closePanel(): Drill-down sub-panel navigation
  */
 export default class extends Controller {
     static targets = [
         'panel', 'burger',
-        'sidebar', 'sidebarBurger',
         'backdrop',
         'popupTrigger',
         'subPanel',
@@ -198,12 +195,7 @@ export default class extends Controller {
 
     /** Open or close the dialog the burger controls. */
     toggle() {
-        this._toggleDialog('overlay');
-    }
-
-    /** Open or close the sidebar dialog. */
-    toggleSidebar() {
-        this._toggleDialog('sidebar');
+        this._toggleDialog();
     }
 
     /**
@@ -404,31 +396,25 @@ export default class extends Controller {
 
     // ─── Dialog internals ────────────────────────────────────────────────────
 
-    /**
-     * @param {'overlay'|'sidebar'} kind
-     * @private
-     */
-    _toggleDialog(kind) {
+    /** @private */
+    _toggleDialog() {
         if (this._dialog) {
             this._closeDialog();
             return;
         }
 
-        const isSidebar = kind === 'sidebar';
-        const panel = isSidebar ? (this.hasSidebarTarget ? this.sidebarTarget : null) : (this.hasPanelTarget ? this.panelTarget : null);
+        const panel = this.hasPanelTarget ? this.panelTarget : null;
         if (!panel) return;
 
-        const burger = isSidebar
-            ? (this.hasSidebarBurgerTarget ? this.sidebarBurgerTarget : null)
-            : (this.hasBurgerTarget ? this.burgerTarget : null);
-        const openClass = isSidebar ? 'iw-menu__sidebar--open' : 'iw-menu__dialog--open';
+        const burger = this.hasBurgerTarget ? this.burgerTarget : null;
+        const openClass = 'iw-menu__dialog--open';
 
         this._closeAllPopups();
         this._dialog = { panel, burger, openClass };
 
         panel.classList.add(openClass);
         this._loadDeferred(panel);
-        if (isSidebar && this.hasBackdropTarget) {
+        if (this.hasBackdropTarget) {
             this.backdropTarget.classList.add('iw-menu__backdrop--visible');
         }
         this._setBurgerState(burger, true);
@@ -439,7 +425,7 @@ export default class extends Controller {
         // panel, so it stays usable: the burger to close, the logo and the
         // language switcher as they are. The backdrop must take the click.
         const bar = burger ? burger.closest('.iw-menu__frame') : null;
-        this._inertOutside([panel, bar ?? burger, isSidebar && this.hasBackdropTarget ? this.backdropTarget : null]);
+        this._inertOutside([panel, bar ?? burger, this.hasBackdropTarget ? this.backdropTarget : null]);
 
         this._focusFirst(panel);
     }

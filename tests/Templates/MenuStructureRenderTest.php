@@ -45,8 +45,8 @@ final class MenuStructureRenderTest extends TestCase
             'burger split' => [['type' => 'burger', 'clickParentPage' => 'split'] + $common],
             'burger panels' => [['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true] + $common],
             'fullscreen' => [['type' => 'fullscreen'] + $common],
-            'sidebar' => [['type' => 'sidebar'] + $common],
-            'sidebar panels' => [['type' => 'sidebar', 'subMenuPanels' => true, 'clickParentPagePanels' => true] + $common],
+            'burger side' => [['type' => 'burger', 'panelLayout' => 'side', 'panelSide' => 'left'] + $common],
+            'burger side panels' => [['type' => 'burger', 'panelLayout' => 'side', 'subMenuPanels' => true, 'clickParentPagePanels' => true] + $common],
             'megamenu' => [['type' => 'megamenu', 'megamenuSource' => 'native'] + $common],
         ];
     }
@@ -91,7 +91,7 @@ final class MenuStructureRenderTest extends TestCase
             self::assertInstanceOf(\DOMElement::class, $nav);
             self::assertSame('iw_sulu_tailwind_theme.menu_main', $nav->getAttribute('aria-label'), 'A navigation landmark has no name.');
             self::assertCount(0, $xpath->query('.//nav', $nav) ?: [], 'A navigation landmark is nested in another.');
-            self::assertCount(0, $xpath->query('.//*[@data-menu-target="burger" or @data-menu-target="sidebarBurger"]', $nav) ?: [], 'The burger sits in a navigation landmark.');
+            self::assertCount(0, $xpath->query('.//*[@data-menu-target="burger"]', $nav) ?: [], 'The burger sits in a navigation landmark.');
         }
 
         // The bar is a plain frame, and the dialog has its own shorter name.
@@ -393,6 +393,38 @@ final class MenuStructureRenderTest extends TestCase
 
         self::assertStringContainsString("closest('.iw-menu__frame')", $controller);
         self::assertStringNotContainsString("closest('nav')", $controller);
+    }
+
+    #[Test]
+    public function aSidePanelDimsThePageAndSitsBesideItsBurger(): void
+    {
+        $xpath = self::xpath(self::render(['type' => 'burger', 'panelLayout' => 'side', 'panelSide' => 'left']));
+
+        $panel = $xpath->query('//*[@data-menu-target="panel"]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $panel);
+        self::assertStringContainsString('iw-menu__overlay--side iw-menu__overlay--left', $panel->getAttribute('class'));
+        self::assertStringContainsString('iw-menu__dialog--from-left', $panel->getAttribute('class'));
+        self::assertCount(1, $xpath->query('//*[@data-menu-target="backdrop"][@data-action="click->menu#toggle"]') ?: []);
+
+        // A left panel: the burger opens the bar, before the logo.
+        $first = $xpath->query('(//*[contains(@class, "iw-menu__bar")]//button | //*[contains(@class, "iw-menu__bar")]//a)[1]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $first);
+        self::assertSame('burger', $first->getAttribute('data-menu-target'));
+    }
+
+    #[Test]
+    public function aFullScreenPanelHasNoBackdropAndKeepsItsBurgerOnTheRight(): void
+    {
+        $xpath = self::xpath(self::render(['type' => 'burger', 'panelSide' => 'left']));
+
+        $panel = $xpath->query('//*[@data-menu-target="panel"]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $panel);
+        self::assertStringContainsString('iw-menu__overlay--full', $panel->getAttribute('class'));
+        self::assertCount(0, $xpath->query('//*[@data-menu-target="backdrop"]') ?: []);
+
+        $first = $xpath->query('(//*[contains(@class, "iw-menu__bar")]//button | //*[contains(@class, "iw-menu__bar")]//a)[1]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $first);
+        self::assertNotSame('burger', $first->getAttribute('data-menu-target'));
     }
 
     /**
