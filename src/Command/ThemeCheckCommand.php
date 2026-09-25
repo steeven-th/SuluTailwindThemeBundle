@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Content\Migration\ButtonFieldAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
@@ -50,6 +51,7 @@ class ThemeCheckCommand extends Command
         private readonly WebspaceManagerInterface $webspaceManager,
         private readonly ThemeCompiler $compiler,
         private readonly AppearanceOverrideAudit $appearanceAudit,
+        private readonly ButtonFieldAudit $buttonFieldAudit,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
     ) {
@@ -177,6 +179,20 @@ class ThemeCheckCommand extends Command
                     \count($orphans) . ' override(s) name a site the article is not published on',
                 ];
             }
+        }
+
+        // ── Check: buttons and pictograms still in the flat shape ──
+        // Sulu no longer resolves them, so the page silently drops them.
+        $pendingButtons = array_filter($this->buttonFieldAudit->countPending());
+        if ([] === $pendingButtons) {
+            $checks[] = ['<fg=green>✓</>', 'Buttons and pictograms', 'All stored on their fields'];
+        } else {
+            $checks[] = [
+                '<fg=red>✗</>',
+                'Buttons and pictograms',
+                array_sum($pendingButtons) . ' content row(s) in the old shape, not rendered. Run iw-sulu:theme:migrate-buttons.',
+            ];
+            $hasErrors = true;
         }
 
         // ── Check: colour names shadowing a Tailwind palette ──

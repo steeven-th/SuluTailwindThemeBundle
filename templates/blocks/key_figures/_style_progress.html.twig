@@ -48,7 +48,7 @@
                                     style having no room above it. -#}
                                 {% set figureIcon %}
                                     {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-                                        item: item,
+                                        icon: item.icon ?? null,
                                         class: 'iw-key-figure__icon-img'
                                     } only -%}
                                 {% endset %}

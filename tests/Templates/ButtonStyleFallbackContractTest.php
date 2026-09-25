@@ -27,6 +27,13 @@ use PHPUnit\Framework\TestCase;
 final class ButtonStyleFallbackContractTest extends TestCase
 {
     /**
+     * Classes of every button that are not a style: the alias of the variant
+     * button and the modifiers of components/_button.html.twig, `icon-` being
+     * the prefix its gap classes are built on (`iw-button--icon-gap-6`).
+     */
+    private const MODIFIERS = ['variant', 'with-icon', 'icon-only', 'icon-'];
+
+    /**
      * No template writes a button slug into a class.
      */
     #[Test]
@@ -35,10 +42,14 @@ final class ButtonStyleFallbackContractTest extends TestCase
         $offenders = [];
 
         foreach (self::templates() as $path => $source) {
-            if (1 === preg_match('/iw-button--[a-z]/', $source, $matches)) {
-                // `iw-button--variant` is the alias, not a slug.
-                if (!str_contains($matches[0], 'iw-button--v')) {
+            // Every `iw-button--<word>` written literally. The alias
+            // `iw-button--variant` and the modifiers every button shares are
+            // not slugs: a class built from the stored style ends in a quote.
+            preg_match_all('/iw-button--([a-z][a-z0-9-]*)/', $source, $matches);
+            foreach ($matches[1] as $name) {
+                if (!\in_array($name, self::MODIFIERS, true) && 1 !== preg_match('/^icon-gap-\d+$/', $name)) {
                     $offenders[] = $path;
+                    break;
                 }
             }
 
@@ -63,14 +74,17 @@ final class ButtonStyleFallbackContractTest extends TestCase
     #[Test]
     public function anUnstyledCtaButtonFallsBackToTheVariantAlias(): void
     {
-        $cta = (string) file_get_contents(
-            \dirname(__DIR__, 2) . '/templates/blocks/common/_cta_buttons.html.twig',
-        );
+        $root = \dirname(__DIR__, 2);
+        $cta = (string) file_get_contents($root . '/templates/blocks/common/_cta_buttons.html.twig');
+        $button = (string) file_get_contents($root . '/templates/components/_button.html.twig');
+
+        // Every CTA goes through the button partial, where the fallback lives.
+        self::assertStringContainsString('components/_button.html.twig', $cta);
 
         self::assertStringContainsString(
-            "ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant'",
-            $cta,
-            'A CTA button with a style keeps it, one without must render the alias so the '
+            "buttonStyle ? 'iw-button--' ~ buttonStyle : 'iw-button--variant'",
+            $button,
+            'A button with a style keeps it, one without must render the alias so the '
             . "variant's default button style finally reaches it.",
         );
 
@@ -78,8 +92,8 @@ final class ButtonStyleFallbackContractTest extends TestCase
         // article published on several sites may name a different button style
         // for each, and the raw value is then a map, not a slug.
         self::assertStringContainsString(
-            "set ctaStyle = iw_sulu_tailwind_theme_site_value(cta.style|default(''))",
-            $cta,
+            "set buttonStyle = iw_sulu_tailwind_theme_site_value(button.style|default(''))",
+            $button,
             'The stored style must go through iw_sulu_tailwind_theme_site_value, which is '
             . 'what turns a per-site choice into the slug that applies here.',
         );

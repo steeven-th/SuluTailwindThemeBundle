@@ -436,7 +436,9 @@ class DemoContentCommand extends Command
         // result stays a JSON array rather than becoming an object.
         if (array_is_list($value)) {
             $kept = array_filter($value, function (mixed $item) use ($pageUuids): bool {
-                $href = \is_array($item) ? ($item['link']['href'] ?? null) : null;
+                // A link item holds its link directly, a call-to-action button
+                // inside its `iw_theme_button` value.
+                $href = \is_array($item) ? ($item['link']['href'] ?? $item['button']['link']['href'] ?? null) : null;
 
                 if (!\is_string($href) || !str_starts_with($href, '@page:')) {
                     return true;

@@ -361,21 +361,23 @@ colours keep them.
 
 ### The pictogram of a block element
 
-A card, a timeline step, a key figure and a call-to-action button all carry a
-pictogram the same way, through two shared fragments and one partial:
+A card, a timeline step and a key figure carry a pictogram through the
+`iw_theme_icon_picker` field type, and a button through the pictogram of its
+`iw_theme_button`. One property named freely, rendered by one partial:
 
 ```xml
-<xi:include href="../fragments/icon-picker.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-<!-- Only where the pictogram sits in line with a label -->
-<xi:include href="../fragments/icon-placement.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+<property name="icon" type="iw_theme_icon_picker">
+    <params>
+        <!-- Only where the pictogram sits in line with a label -->
+        <param name="with_placement" value="true"/>
+    </params>
+</property>
 ```
 
 ```twig
 {% set iconOutput %}
     {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-        item: card,
+        icon: card.icon ?? null,
         class: 'iw-card__icon-img'
     } only -%}
 {% endset %}
@@ -385,11 +387,15 @@ pictogram the same way, through two shared fragments and one partial:
 {% endif %}
 ```
 
+The `icon-picker.xml` and `icon-placement.xml` fragments are deprecated. They
+stay for project templates that include them, rendered with `item:` instead of
+`icon:`, and go in the next major version.
+
 Capture the output before deciding on a wrapper: the partial renders nothing at
 all when no pictogram was picked, so an empty slot is never opened.
 
-**Two fragments, because placement is not universal.** A pictogram beside a
-label has a side and a gap; one standing above a title has neither, and offering
+**Placement is an option, because it is not universal.** A pictogram beside a
+label has a side and a gap. One standing above a title has neither, and offering
 the fields there would be settings that do nothing.
 
 **Three renderings, one rule.** A library icon carries no colour of its own, so

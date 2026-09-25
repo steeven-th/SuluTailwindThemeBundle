@@ -334,6 +334,51 @@ a:hover {
     display: inline;
 }
 
+/* The gap between the icon and the label of an `iw_theme_button`, one class
+   per step of the spacing picker (components/_button.html.twig): the value
+   travels as a class, not as an inline style. The steps are those of
+   MarginSelector, the lengths those of ThemeCompiler::spacingToLength(). */
+.iw-button--icon-gap-0 { --iw-button-icon-gap: 0; }
+.iw-button--icon-gap-1 { --iw-button-icon-gap: 0.25rem; }
+.iw-button--icon-gap-2 { --iw-button-icon-gap: 0.5rem; }
+.iw-button--icon-gap-3 { --iw-button-icon-gap: 0.75rem; }
+.iw-button--icon-gap-4 { --iw-button-icon-gap: 1rem; }
+.iw-button--icon-gap-5 { --iw-button-icon-gap: 1.25rem; }
+.iw-button--icon-gap-6 { --iw-button-icon-gap: 1.5rem; }
+.iw-button--icon-gap-7 { --iw-button-icon-gap: 1.75rem; }
+.iw-button--icon-gap-8 { --iw-button-icon-gap: 2rem; }
+.iw-button--icon-gap-9 { --iw-button-icon-gap: 2.25rem; }
+.iw-button--icon-gap-10 { --iw-button-icon-gap: 2.5rem; }
+.iw-button--icon-gap-12 { --iw-button-icon-gap: 3rem; }
+.iw-button--icon-gap-16 { --iw-button-icon-gap: 4rem; }
+.iw-button--icon-gap-20 { --iw-button-icon-gap: 5rem; }
+.iw-button--icon-gap-24 { --iw-button-icon-gap: 6rem; }
+.iw-button--icon-gap-32 { --iw-button-icon-gap: 8rem; }
+
+/* A button shown as its pictogram alone: the pictogram is the button. No
+   background, no border, no shadow, no background effect on hover, whatever
+   the style says. The colour comes from the style instead, its background or
+   its border (ThemeCompiler::generateBareIconColors). The label stays in the
+   anchor for assistive technologies.
+   The padding widens the clickable area around the pictogram to about 40px,
+   and the negative margin gives that room back, so the pictogram sits in the
+   layout as if nothing surrounded it. The class is doubled to pass the
+   generated `.iw-button--<name>` rules, loaded after this stylesheet. */
+.iw-button--icon-only.iw-button--icon-only,
+.iw-button--icon-only.iw-button--icon-only:hover {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    animation: none;
+}
+.iw-button--icon-only.iw-button--icon-only {
+    padding: var(--iw-button-icon-only-hit, 0.5rem);
+    margin: calc(-1 * var(--iw-button-icon-only-hit, 0.5rem));
+}
+.iw-button--icon-only.iw-button--icon-only::before {
+    content: none;
+}
+
 /* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
    masonry) stores one of these class names, and the class only feeds
    `--iw-gap-choice`: the block's own rule keeps ownership of the `gap`

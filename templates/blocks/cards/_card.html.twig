@@ -15,8 +15,9 @@
    promise.
 
    Parameters:
-     - card          : the item {icon, image, title, text, link, linkStyle,
-                       ctaButtons, highlighted}
+     - card          : the item {icon, image, title, text, link, ctaButtons,
+                       highlighted}, `icon` an `iw_theme_icon_picker` value and
+                       `link` an `iw_theme_button` value
      - cardView      : the matching view data, carrying resolved links
      - style         : stacked | image_top | horizontal
      - index         : 0-based position, shown when `numbered` is on
@@ -33,12 +34,11 @@
      - clickable     : bool, whole card becomes the link target
    ───────────────────────────────────────────────────────────────────────── #}
 
-{#- The pictogram is rendered by the shared partial, which reads the picker
-    fields straight off the card. Captured first so the head can decide whether
-    to open a slot for it. -#}
+{#- The pictogram of the card, rendered by the shared partial. Captured first
+    so the head can decide whether to open a slot for it. -#}
 {% set iconOutput %}
     {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-        item: card,
+        icon: card.icon ?? null,
         class: 'iw-card__icon-img'
     } only -%}
 {% endset %}
@@ -57,12 +57,13 @@
     shows one or the other depending on the clickable setting, so the two can
     never be filled at once.
 
-    A clickable card keeps its button styling through `linkStyle`, drawn as a
-    span since the card itself is already the anchor. -#}
+    A clickable card draws its button as a span, since the card itself is
+    already the anchor. -#}
+{% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
 {% set clickableCard = clickable|default(false) %}
 
-{% set cardLink = card.link is defined and card.link is not iterable ? card.link : '' %}
-{% set wholeCardIsLink = clickableCard and cardLink is not empty %}
+{% set cardLink = clickableCard ? iw_sulu_tailwind_theme_button(card.link ?? null, cardView.link ?? null) : null %}
+{% set wholeCardIsLink = cardLink is not null %}
 
 {% set cardButtons = clickableCard ? [] : card.ctaButtons|default([]) %}
 {% set cardButtonsView = cardView.ctaButtons|default([]) %}
@@ -71,7 +72,7 @@
 <{{ wholeCardIsLink ? 'a' : 'div' }}
     class="iw-card iw-card--{{ style|replace({'_': '-'}) }}{{ shadow|default(false) ? ' iw-card--shadow' : '' }}{{ highlighted ? ' iw-card--highlighted iw-surface--accent' : ' iw-surface--card' }} {{ cardRadius|default('') }}"
     {% if wholeCardIsLink %}
-        href="{{ cardLink }}"
+        {{ links.attrs(cardLink) }}
     {% endif %}
 >
     {% if style == 'image_top' and hasImage %}
@@ -125,29 +126,22 @@
         {% endif %}
 
         {#- The card is the anchor, so its action is a span carrying the button
-            style. Without a label there is nothing to draw, which is the case
-            of a card made clickable with no link yet. -#}
+            style. Its label is the title carried by the link, then the title
+            of what it points at. A link that has neither falls back to its
+            URL, and a card is already clickable as a whole: a button labelled
+            with a raw URL would be worse than none, so none is drawn. -#}
         {%- if wholeCardIsLink -%}
-            {#- Same label chain as the CTA partial: the title carried by the
-                link, then the title of what it points at. No URL fallback
-                here - a card is already clickable as a whole, so a button
-                labelled with a raw URL would be worse than none. -#}
-            {% set cardLinkView = cardView.link|default({}) %}
-            {% set cardLinkLabel = cardLinkView.title|default('') %}
-            {% if cardLinkLabel is empty and cardLinkView.provider|default('') == 'page' and cardLinkView.href|default('') is not empty %}
-                {% set cardLinkLabel = sulu_page_load(cardLinkView.href, {'title': 'title'}).title|default('') %}
-            {% endif %}
-            {% if cardLinkLabel is empty and cardLinkView.provider|default('') == 'media' and cardLinkView.href|default('') is not empty %}
-                {% set cardLinkLabel = sulu_resolve_media(cardLinkView.href, app.request.locale).title|default('') %}
-            {% endif %}
-
-            {% if cardLinkLabel is not empty %}
-                {# A button style may name a choice per site, see iw_sulu_tailwind_theme_site_value. #}
-                {% set cardLinkStyle = iw_sulu_tailwind_theme_site_value(card.linkStyle|default('')) %}
+            {% if cardLink.label != cardLink.url %}
                 <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
-                    <span class="{{ cardLinkStyle ? 'iw-button--' ~ cardLinkStyle : 'iw-button--variant' }} iw-block__action">{{ cardLinkLabel }}</span>
+                    {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                        button: cardLink,
+                        class: 'iw-block__action',
+                        tag: 'span',
+                        iconOnly: false,
+                    } only %}
                 </span>
             {% endif %}
+            {{ links.new_tab_hint(cardLink) }}
         {%- elseif hasButtons -%}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_cta_buttons.html.twig' with {
                 buttons: cardButtons,

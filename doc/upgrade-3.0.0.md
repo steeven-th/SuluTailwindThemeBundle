@@ -1066,6 +1066,71 @@ sub-menus**. The links take the accordion of the burger, every level folding.
 
 ---
 
+## Button and pictogram fields (new)
+
+Two field types hold a whole button, or a pictogram, in one property named
+freely: `iw_theme_button` (link, button style, pictogram, pictogram alone) and
+`iw_theme_icon_picker` (library or media, outline or solid, size, placement). A
+level can carry several of them, where the fixed names of the old fragments
+collided silently. Render a button with `iw_sulu_tailwind_theme_button()` and
+`components/_button.html.twig`, see
+[Button and pictogram fields](button-field.md).
+
+The admin JS gains `sulu-media-bundle` as a peer dependency: rebuild the admin
+after the update.
+
+### Buttons and pictograms move onto their fields (breaking, migration provided)
+
+Every button and pictogram of the bundle now uses them:
+
+| Where | Before | After |
+|---|---|---|
+| `ctaButtons` of every block (`cta-buttons.xml`), cards and timeline steps included | `link`, `style`, `iconCustom`, `icon`, `iconMedia`, `iconSize`, `iconPosition`, `iconGap` on each item | one `button` (`iw_theme_button`) on each item |
+| Card | `iconCustom`, `icon`, `iconMedia`, `iconSize` | one `icon` (`iw_theme_icon_picker`) |
+| Clickable card | `link` (link) + `linkStyle` | one `link` (`iw_theme_button`) |
+| Key figure, timeline step | `iconCustom`, `icon`, `iconMedia`, `iconSize` | one `icon` (`iw_theme_icon_picker`) |
+| Mega menu, featured column and call to action | `cta_title`, `cta_link`, `cta_style` | one `cta` (`iw_theme_button`), the old text becoming the title attribute of the link |
+
+Sulu only resolves the properties a template declares, so content stored the
+old way renders its blocks without their buttons, its cards and figures without
+their pictograms. **Run the migration once, on every environment holding
+content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-buttons --dry-run
+php bin/console iw-sulu:theme:migrate-buttons
+php bin/console cache:pool:clear cache.app
+```
+
+It covers pages, snippets and articles, draft and live, on MySQL and
+PostgreSQL. It can be run twice: a value already moved is left alone. It also
+moves the oldest pictograms, a bare media stored under `icon` (cards, steps) or
+`image` (key figures), so `iw-sulu:theme:migrate-icons` is no longer needed.
+`iw:tailwind-theme:check` reports any content row still in the old shape.
+
+Only the blocks of the bundle are touched, recognised by their type. A project
+block that includes the old fragments keeps its content as it is.
+
+**Changes a template override has to follow:**
+
+- `blocks/common/_cta_buttons.html.twig` reads `cta.button` and draws each
+  button with `components/_button.html.twig`.
+- `blocks/common/_icon.html.twig` takes `icon:` (a resolved picker) where the
+  blocks passed `item:`.
+- A clickable card draws its button through the same partial with `tag: 'span'`,
+  and its anchor now carries the target and rel of the link.
+- The mega menu reads `cta` through `iw_sulu_tailwind_theme_button()`. A button
+  whose link has no title attribute is labelled with the title of the linked
+  page, where it used to need its own text.
+- The gap of a pictogram is a class (`.iw-button--icon-gap-<n>`), no longer an
+  inline `style`.
+
+**Deprecated:** the `icon-picker.xml` and `icon-placement.xml` fragments, and
+the `item:` shape of `_icon.html.twig`. They stay for project templates and go
+in the next major version.
+
+---
+
 ## CTA banner: the title alignment setting now applies (breaking, visual)
 
 The `--banner` style hardcoded `text-center` and never read `titleAlignment`, so
@@ -1441,6 +1506,10 @@ table by table. MySQL and PostgreSQL are both supported.
 Cards and timeline steps carry a pictogram too, and through the same shared
 picker, but both blocks appear in this version: nothing of theirs needs moving,
 and the migration leaves them alone.
+
+This command is superseded by `iw-sulu:theme:migrate-buttons`, which moves these
+pictograms straight onto the `iw_theme_icon_picker` field. See
+[Buttons and pictograms move onto their fields](#buttons-and-pictograms-move-onto-their-fields-breaking-migration-provided).
 
 In exchange, key figures gain what the buttons have: the theme library, a size,
 and a spacing.

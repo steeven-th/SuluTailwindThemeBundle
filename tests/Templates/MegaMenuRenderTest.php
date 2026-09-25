@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +81,7 @@ final class MegaMenuRenderTest extends TestCase
         $html = $this->render(['type' => 'megamenu', 'megamenuSource' => 'snippet'], self::snippet());
 
         // Bar CTA, mobile CTA and featured column CTA.
-        self::assertSame(3, substr_count($html, 'class="iw-menu__button '));
+        self::assertSame(3, preg_match_all('#class="[^"]*\biw-menu__button\b#', $html));
         // A button style sets its own display, so the bar CTA is hidden on
         // mobile through a wrapper rather than on the anchor itself.
         self::assertMatchesRegularExpression('#<div class="iw-menu__desktop-only">\s*<a\s+href="/en/contact"#', $html);
@@ -157,6 +158,7 @@ final class MegaMenuRenderTest extends TestCase
         $twig->addFunction(new TwigFunction('sulu_content_path', static fn (string $path): string => '/en' . ('/' === $path ? '' : $path)));
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (): ?array => null));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_link', LinkResolver::resolve(...)));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_button', ButtonReader::read(...)));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_site_value', static fn (mixed $value): mixed => \is_array($value) ? ($value['_default'] ?? '') : $value));
         $twig->addFilter(new TwigFilter('trans', static fn (string $key): string => $key));
         $ids = 0;
@@ -234,16 +236,22 @@ final class MegaMenuRenderTest extends TestCase
                             [
                                 'type' => 'featured_column',
                                 'title' => 'Offer',
-                                'cta_title' => 'See the offer',
-                                'cta_link' => '/en/offer',
-                                'cta_style' => ['_default' => 'primary', 'websitesecond' => 'secondary'],
+                                'cta' => [
+                                    'style' => ['_default' => 'primary', 'websitesecond' => 'secondary'],
+                                    'display' => 'button',
+                                    'icon' => null,
+                                    'link' => ['url' => '/en/offer', 'title' => 'Offer page'],
+                                ],
                             ],
                         ],
                     ],
                 ],
-                'cta_title' => 'Contact us',
-                'cta_link' => '/en/contact',
-                'cta_style' => 'primary',
+                'cta' => [
+                    'style' => 'primary',
+                    'display' => 'button',
+                    'icon' => null,
+                    'link' => ['url' => '/en/contact', 'title' => 'Contact page'],
+                ],
             ],
             'view' => [
                 'menu_items' => [
@@ -258,11 +266,11 @@ final class MegaMenuRenderTest extends TestCase
                                 ['link' => ['provider' => 'media', 'href' => '7', 'target' => '_blank']],
                             ]],
                             ['cards' => [['link' => $page('gone')]]],
-                            ['cta_link' => $page('offer')],
+                            ['cta' => ['link' => ['title' => 'See the offer'] + $page('offer')]],
                         ],
                     ],
                 ],
-                'cta_link' => $page('contact'),
+                'cta' => ['link' => ['title' => 'Contact us'] + $page('contact')],
             ],
         ];
     }

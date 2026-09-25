@@ -2434,7 +2434,61 @@ class ThemeCompiler
         $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
 
         // Hover state
-        return $css . $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
+        $css .= $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
+
+        return $css . $this->generateBareIconColors($selector, $props);
+    }
+
+    /**
+     * The colour of a button shown as its pictogram alone.
+     *
+     * Bare, the pictogram is the button: no background, no border (see
+     * `.iw-button--icon-only` in the stylesheet). It takes the colour that
+     * makes the button recognisable, the background of a filled button or the
+     * border of an outlined one, the text colour otherwise.
+     *
+     * On hover it follows the hover background, then the hover border. A hover
+     * background equal to the resting text colour is an inverted button (a
+     * pink button turning white with pink text): that colour is what surrounds
+     * the button, and a pictogram painted with it would vanish. It is skipped,
+     * and a style with nothing else to show keeps its resting colour. A style
+     * that only has a text colour follows its hover text.
+     *
+     * @param string               $selector The selector of the button
+     * @param array<string, mixed> $props    The button definition
+     *
+     * @return string The CSS rules
+     */
+    private function generateBareIconColors(string $selector, array $props): string
+    {
+        $color = function (string $key) use ($props): ?string {
+            $value = isset($props[$key]) ? (string) $props[$key] : '';
+
+            return '' === $value || 'none' === $value || 'transparent' === $value ? null : $this->resolveColorValue($value);
+        };
+
+        $text = $color('text');
+        $rest = $color('bg') ?? $color('border');
+        if (null === $rest) {
+            $rest = $text;
+            $hover = $color('hoverText');
+        } else {
+            $hover = null;
+            foreach (['hoverBg', 'hoverBorder'] as $key) {
+                $candidate = $color($key);
+                if (null !== $candidate && 0 !== strcasecmp($candidate, (string) $text)) {
+                    $hover = $candidate;
+                    break;
+                }
+            }
+        }
+        if (null === $rest) {
+            return '';
+        }
+        $hover ??= $rest;
+
+        return "{$selector}.iw-button--icon-only { color: {$rest}; }\n"
+            . "{$selector}.iw-button--icon-only:hover { color: {$hover}; }\n";
     }
 
     /**

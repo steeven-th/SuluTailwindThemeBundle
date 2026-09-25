@@ -15,6 +15,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
@@ -163,6 +164,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_site_value', $this->getSiteValue(...)),
             new TwigFunction('iw_sulu_tailwind_theme_link', $this->getLink(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_button', $this->getButton(...)),
             new TwigFunction('iw_sulu_tailwind_theme_nav_state', $this->getNavState(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
@@ -552,6 +554,22 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getLink(mixed $content, mixed $view = null, bool $forceNewTab = false): ?array
     {
         return LinkResolver::resolve($content, $view, $forceNewTab);
+    }
+
+    /**
+     * Read an `iw_theme_button` field into what a template renders.
+     *
+     * See ButtonReader for the label fallbacks and the null returned for a
+     * button whose link cannot be resolved.
+     *
+     * @param mixed $content The resolved content of the field
+     * @param mixed $view    The view of the field
+     *
+     * @return array<string, mixed>|null The button, or null when there is nothing to link to
+     */
+    public function getButton(mixed $content, mixed $view = null): ?array
+    {
+        return ButtonReader::read($content, $view);
     }
 
     /**

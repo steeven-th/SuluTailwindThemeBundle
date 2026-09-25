@@ -74,13 +74,13 @@ final class KeyFigureIconContractTest extends TestCase
         );
 
         self::assertStringContainsString(
-            'fragments/icon-picker.xml',
+            '<property name="icon" type="iw_theme_icon_picker"',
             $template,
             'The key figures block must offer the shared pictogram picker.',
         );
 
         self::assertDoesNotMatchRegularExpression(
-            '/icon-picker\.xml"[^>]*visibleCondition/',
+            '/type="iw_theme_icon_picker"[^>]*visibleCondition/',
             $template,
             'The pictogram picker must not hang off a style: every style renders it.',
         );

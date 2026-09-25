@@ -25,6 +25,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * turned on so the block keeps showing the editor's own file. Nothing else
  * changes, and content already migrated is left alone, so it can be run twice.
  *
+ * Superseded by iw-sulu:theme:migrate-buttons, which moves these pictograms
+ * straight onto the `iw_theme_icon_picker` field. This command stays for a
+ * project that already runs it in its upgrade scripts, and skips a pictogram
+ * already moved.
+ *
  * Only key figures are covered, on purpose. Cards and timelines carry a
  * pictogram too, but both blocks were born in 3.0.0 and no published site ever
  * stored one the old way.
@@ -244,8 +249,10 @@ class IconsMigrateCommand extends Command
     private function migrateItem(array $item, string $field, int &$count): array
     {
         // Already moved, or nothing to move. A media picker opened and left
-        // empty stores `{id: null}`, which is not a pictogram.
-        if (isset($item['iconMedia']) || !isset($item[$field]) || !\is_array($item[$field])) {
+        // empty stores `{id: null}`, which is not a pictogram. A pictogram
+        // already in the `iw_theme_icon_picker` shape is past this command:
+        // iw-sulu:theme:migrate-buttons moved it, `image` included.
+        if (isset($item['iconMedia']) || \is_array($item['icon'] ?? null) || !isset($item[$field]) || !\is_array($item[$field])) {
             return $item;
         }
 

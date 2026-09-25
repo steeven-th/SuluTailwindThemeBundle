@@ -316,9 +316,7 @@ A highlight column with a large image, description text, and a call-to-action bu
 | `description` | text_area | Description text. |
 | `image` | single_media_selection | Featured image. |
 | `image_ratio` | single_select | Image aspect ratio: `auto`, `1:1`, `9:16`, `16:9`. |
-| `cta_title` | text_line | Button label. |
-| `cta_link` | link | Button target URL. |
-| `cta_style` | iw_theme_button_style_picker | Button style: `primary`, `secondary`, or `accent` (uses theme button tokens). |
+| `cta` | iw_theme_button | The button: link, style of the theme and pictogram. Its label is the title attribute of the link, then the title of the linked page. |
 
 The featured column has a distinct background color (`--iw-menu-third-bg`) and padding, making it visually stand out from other columns.
 
@@ -336,9 +334,10 @@ An optional call-to-action button displayed in the navbar (right side). Useful f
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `cta_title` | text_line | Button label. |
-| `cta_link` | link | Button target URL. |
-| `cta_style` | single_select | Button variant: `primary`, `secondary`, or `accent`. |
+| `cta` | iw_theme_button | The button: link, style of the theme and pictogram. Its label is the title attribute of the link, then the title of the linked page. |
+
+Both buttons are drawn by `components/_button.html.twig`, see
+[Button and pictogram fields](button-field.md).
 
 ---
 

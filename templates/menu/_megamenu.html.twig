@@ -28,9 +28,7 @@
     {% set megaView = megaSnippet is not null and megaSnippet.view is defined ? megaSnippet.view : {} %}
     {% set menuItems = megaContent.menu_items|default([]) %}
     {% set menuItemsView = megaView.menu_items|default([]) %}
-    {% set ctaTitle = megaContent.cta_title|default(null) %}
-    {% set ctaLink = megaContent.cta_title|default(null) ? iw_sulu_tailwind_theme_link(megaContent.cta_link|default(null), megaView.cta_link|default(null)) : null %}
-    {% set ctaStyle = iw_sulu_tailwind_theme_site_value(megaContent.cta_style|default('')) %}
+    {% set ctaLink = iw_sulu_tailwind_theme_button(megaContent.cta ?? null, megaView.cta ?? null) %}
 {% else %}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(3), {title: 'title', url: 'url'}) %}
     {# The parent of a dropdown is a button, so its own page is reached through
@@ -141,9 +139,7 @@
                         {% set featImgPos = column.image_position|default('left') %}
                         {% set featRatioClasses = {'1-1': 'aspect-square', '9-16': 'aspect-[9/16]', '16-9': 'aspect-video'} %}
                         {% set featRatioClass = featRatioClasses[column.image_ratio|default('auto')]|default('') %}
-                        {# A button style may name a choice per site, see iw_sulu_tailwind_theme_site_value. #}
-                        {% set featBtnStyle = iw_sulu_tailwind_theme_site_value(column.cta_style|default('')) %}
-                        {% set featLink = column.cta_title|default(null) ? iw_sulu_tailwind_theme_link(column.cta_link|default(null), columnView.cta_link|default(null)) : null %}
+                        {% set featLink = iw_sulu_tailwind_theme_button(column.cta ?? null, columnView.cta ?? null) %}
                         <div class="iw-mega-menu__featured {{ featLayout == 'horizontal' ? 'iw-mega-menu__featured--horizontal' : '' }} {{ featLayout == 'horizontal' and featImgPos == 'right' ? 'iw-mega-menu__featured--img-right' : '' }}">
                             {% if column.image is defined and column.image.id|default(null) is not null %}
                                 {% set featMedia = sulu_resolve_media(column.image.id, app.request.locale) %}
@@ -164,12 +160,10 @@
                                 {% if column.description|default(null) %}
                                     <p class="iw-menu__text--level-3 text-xs opacity-70 mb-3">{{ column.description }}</p>
                                 {% endif %}
-                                {% if featLink %}
-                                    <a {{ links.attrs(featLink) }}
-                                       class="iw-menu__button {{ featBtnStyle ? 'iw-button--' ~ featBtnStyle : 'iw-button--variant' }} no-underline">
-                                        {{ column.cta_title }}{{ links.new_tab_hint(featLink) }}
-                                    </a>
-                                {% endif %}
+                                {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                                    button: featLink,
+                                    class: 'iw-menu__button no-underline',
+                                } only %}
                             </div>
                         </div>
                     {% endif %}
@@ -366,12 +360,10 @@
                        `display`, which would win over `hidden` on the anchor.
                        Sized by `iw-menu__button`, see the menu CSS variables. #}
                     <div class="iw-menu__desktop-only">
-                        <a
-                            {{ links.attrs(ctaLink) }}
-                            class="iw-menu__button {{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} no-underline"
-                        >
-                            {{ ctaTitle }}{{ links.new_tab_hint(ctaLink) }}
-                        </a>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                            button: ctaLink,
+                            class: 'iw-menu__button no-underline',
+                        } only %}
                     </div>
                 {% endif %}
 
@@ -490,11 +482,12 @@
                                         </ul>
                                     {% elseif column.type == 'featured_column' %}
                                         <span class="iw-menu__text--level-2 block py-2 font-semibold text-sm">{{ column.title }}</span>
-                                        {% set featLink = column.cta_title|default(null) ? iw_sulu_tailwind_theme_link(column.cta_link|default(null), columnView.cta_link|default(null)) : null %}
+                                        {% set featLink = iw_sulu_tailwind_theme_button(column.cta ?? null, columnView.cta ?? null) %}
                                         {% if featLink %}
+                                            {#- A plain link on mobile: the column shrinks to a line of the accordion. -#}
                                             <a {{ links.attrs(featLink) }}
                                                class="iw-menu__text--level-2 block py-1.5 text-sm opacity-70 hover:opacity-100 no-underline">
-                                                {{ column.cta_title }}{{ links.new_tab_hint(featLink) }}
+                                                {{ featLink.label }}{{ links.new_tab_hint(featLink) }}
                                             </a>
                                         {% endif %}
                                     {% endif %}
@@ -508,12 +501,10 @@
                 {# CTA button — mobile #}
                 {% if ctaLink %}
                     <div class="pt-4 pb-2">
-                        <a
-                            {{ links.attrs(ctaLink) }}
-                            class="iw-menu__button iw-menu__button--block {{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} no-underline"
-                        >
-                            {{ ctaTitle }}{{ links.new_tab_hint(ctaLink) }}
-                        </a>
+                        {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                            button: ctaLink,
+                            class: 'iw-menu__button iw-menu__button--block no-underline',
+                        } only %}
                     </div>
                 {% endif %}
             {% else %}

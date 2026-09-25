@@ -197,6 +197,33 @@ final class ThemeCompilerTest extends TestCase
     }
 
     #[Test]
+    public function aBarePictogramTakesTheColourThatMarksItsStyle(): void
+    {
+        $css = $this->compileCss([
+            'buttons' => [
+                ['slug' => 'filled', 'label' => 'Filled', 'bg' => '#aa0000', 'hoverBg' => '#550000', 'text' => '#ffffff'],
+                ['slug' => 'outlined', 'label' => 'Outlined', 'bg' => 'transparent', 'border' => '#00aa00', 'hoverBorder' => '#005500', 'text' => '#111111'],
+                ['slug' => 'plain', 'label' => 'Plain', 'bg' => 'transparent', 'text' => '#0000aa', 'hoverText' => '#000055'],
+                ['slug' => 'inverted', 'label' => 'Inverted', 'bg' => '#cc00cc', 'text' => '#ffffff', 'border' => '#cc00cc', 'hoverBg' => '#ffffff', 'hoverText' => '#cc00cc', 'hoverBorder' => '#660066'],
+                ['slug' => 'light', 'label' => 'Light', 'bg' => 'transparent', 'text' => '#ffffff', 'border' => '#ffffff', 'hoverBg' => '#ffffff', 'hoverText' => '#000000'],
+            ],
+        ]);
+
+        // A filled button: its background, an outlined one: its border, else its text.
+        self::assertStringContainsString('.iw-button--filled.iw-button--icon-only { color: #aa0000; }', $css);
+        self::assertStringContainsString('.iw-button--filled.iw-button--icon-only:hover { color: #550000; }', $css);
+        self::assertStringContainsString('.iw-button--outlined.iw-button--icon-only { color: #00aa00; }', $css);
+        self::assertStringContainsString('.iw-button--outlined.iw-button--icon-only:hover { color: #005500; }', $css);
+        self::assertStringContainsString('.iw-button--plain.iw-button--icon-only { color: #0000aa; }', $css);
+        self::assertStringContainsString('.iw-button--plain.iw-button--icon-only:hover { color: #000055; }', $css);
+        // A button turning into the colour of its text on hover is inverted:
+        // that colour surrounds it, the pictogram takes the hover border instead,
+        // or keeps its resting colour when there is none.
+        self::assertStringContainsString('.iw-button--inverted.iw-button--icon-only:hover { color: #660066; }', $css);
+        self::assertStringContainsString('.iw-button--light.iw-button--icon-only:hover { color: #ffffff; }', $css);
+    }
+
+    #[Test]
     public function itCompilesLegacyButtonMapShape(): void
     {
         // A pre-3.0.0 theme stores buttons as a role-keyed map with a `global`

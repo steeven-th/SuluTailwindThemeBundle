@@ -35,7 +35,7 @@
                         was actually picked. -#}
                     {% set figureIcon %}
                         {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-                            item: figure,
+                            icon: figure.icon ?? null,
                             class: 'iw-key-figure__icon-img'
                         } only -%}
                     {% endset %}

@@ -39,7 +39,7 @@
     is the same icon either way. -#}
 {% set iconOutput %}
     {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-        item: step,
+        icon: step.icon ?? null,
         class: 'iw-timeline-step__icon-img'
     } only -%}
 {% endset %}

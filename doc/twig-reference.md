@@ -372,6 +372,25 @@ See [Articles on several sites](multi-site-articles.md).
 
 ---
 
+### `iw_sulu_tailwind_theme_button(content, view)`
+
+Reads an `iw_theme_button` field into what `components/_button.html.twig`
+renders: `url`, `label` (title attribute of the link, then title of the page or
+media, then URL), `target`, `rel`, `newTab`, `style`, `icon`, `iconOnly`.
+
+```twig
+{% set button = iw_sulu_tailwind_theme_button(content.cta, view.cta) %}
+{% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {button: button} only %}
+```
+
+**Parameters:**
+- `content` (`mixed`): the resolved content of the field
+- `view` (`mixed`): the view of the field, holding the stored link
+
+**Returns:** `array|null`, null when there is nothing to link to (link blank, page deleted or unpublished). See [Button and pictogram fields](button-field.md).
+
+---
+
 ### `iw_sulu_tailwind_theme_link(content, view, forceNewTab)`
 
 Reads a Sulu 3 `link` field into the parts of an anchor.

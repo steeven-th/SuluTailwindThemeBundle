@@ -583,12 +583,16 @@ A button can carry an icon, taken from the theme library (Heroicons) or from the
 media library. It then becomes a row rather than a block of text:
 
 ```html
-<a class="iw-button--primary iw-block__action iw-button--with-icon"
-   style="--iw-button-icon-gap: 1rem; --iw-button-icon-size: 32px">
+<a class="iw-button--primary iw-button--with-icon iw-button--icon-gap-4 iw-block__action">
     <svg class="iw-button__icon">…</svg>
     <span class="iw-button__label">Label</span>
 </a>
 ```
+
+The gap picked on the button is a class, one per step of the spacing picker
+(`.iw-button--icon-gap-<n>` sets `--iw-button-icon-gap`). Every button of the
+bundle is drawn by `components/_button.html.twig`, see
+[Button and pictogram fields](../button-field.md).
 
 | Class | Role |
 |---|---|

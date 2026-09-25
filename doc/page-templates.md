@@ -276,7 +276,7 @@ the fields an editor already knows from the other blocks.
 | `block-heading-plain.xml` | Same two fields as plain `text_line`, without the accent markup | content |
 | `block-title-tag.xml` | `titleTag` alone (h2 / h3 / h4) | content |
 | `block-title-alignment.xml` | `titleAlignment` alone | content |
-| `cta-buttons.xml` | `ctaButtons` (repeatable block of link + style) + `ctaAlignment` + `ctaDirection`. Render them with `blocks/common/_cta_buttons.html.twig` | content |
+| `cta-buttons.xml` | `ctaButtons` (repeatable block, one `iw_theme_button` named `button` per item) + `ctaAlignment` + `ctaDirection`. Render them with `blocks/common/_cta_buttons.html.twig` | content |
 | `block-variant.xml` | `variant` (iw_theme_variant_picker) | appearance |
 | `block-spacing.xml` | `marginTop` + `marginBottom` + `lateralMargins` + `maxWidth` + `paddingTop` + `paddingBottom` + `paddingLateral` | settings |
 | `block-margins.xml` | The two vertical margins alone | settings |
