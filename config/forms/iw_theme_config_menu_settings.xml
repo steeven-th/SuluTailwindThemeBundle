@@ -24,9 +24,6 @@
                         <param name="burger">
                             <meta><title>iw_sulu_tailwind_theme.menu_type_burger</title></meta>
                         </param>
-                        <param name="fullscreen">
-                            <meta><title>iw_sulu_tailwind_theme.menu_type_fullscreen</title></meta>
-                        </param>
                         <param name="megamenu">
                             <meta><title>iw_sulu_tailwind_theme.menu_type_megamenu</title></meta>
                         </param>
@@ -125,7 +122,7 @@
             </property>
 
             <property name="menuConfig_panelSide" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout == 'side'">
+                      visibleCondition="menuConfig_type == 'burger'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_panelSide</title>
                     <info_text>iw_sulu_tailwind_theme.menu_panelSide_info</info_text>
@@ -143,24 +140,104 @@
                 </params>
             </property>
 
-            <!-- The bar stays visible above the open panel, with the social
-                 icons and the language switcher: a panel narrower than that
-                 row leaves them hanging over the page. -->
+            <property name="menuConfig_panelL1Size" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelL1Size</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelL1Size_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" type="string" value="normal"/>
+                    <param name="values" type="collection">
+                        <param name="normal">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelL1Size_normal</title></meta>
+                        </param>
+                        <param name="large">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelL1Size_large</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- Where the links sit in a full-screen panel. Automatic: against
+                 the picture, centered without one. -->
+            <property name="menuConfig_panelContentPosition" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelContentPosition</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelContentPosition_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" type="string" value="auto"/>
+                    <param name="values" type="collection">
+                        <param name="auto">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelContentPosition_auto</title></meta>
+                        </param>
+                        <param name="image">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelContentPosition_image</title></meta>
+                        </param>
+                        <param name="center">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelContentPosition_center</title></meta>
+                        </param>
+                        <param name="bar">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelContentPosition_bar</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- The side panel, or the links zone beside the picture of a
+                 full-screen panel. Empty, the default of each: 288px on a
+                 side, 480px beside a picture. On a side the bar stays visible
+                 above the open panel, with the social icons and the language
+                 switcher: a panel narrower than that row leaves them hanging
+                 over the page. -->
             <property name="menuConfig_panelWidth" type="number" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout == 'side'">
+                      visibleCondition="menuConfig_type == 'burger'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_panelWidth</title>
                     <info_text>iw_sulu_tailwind_theme.menu_panelWidth_info</info_text>
                 </meta>
                 <params>
-                    <param name="default_value" value="288"/>
                     <param name="min" value="200"/>
-                    <param name="max" value="640"/>
+                    <param name="max" value="960"/>
+                </params>
+            </property>
+
+            <!-- Full width: the only tall field of a section made of selects
+                 and toggles, so it would break whichever row it landed on. -->
+            <property name="menuConfig_panelImage" type="single_media_selection" colspan="12"
+                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelImage</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelImage_info</info_text>
+                </meta>
+            </property>
+
+            <property name="menuConfig_panelImageFrom" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelImageFrom</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelImageFrom_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" type="string" value="lg"/>
+                    <param name="values" type="collection">
+                        <param name="md">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelImageFrom_md</title></meta>
+                        </param>
+                        <param name="lg">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelImageFrom_lg</title></meta>
+                        </param>
+                        <param name="xl">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelImageFrom_xl</title></meta>
+                        </param>
+                    </param>
                 </params>
             </property>
 
             <property name="menuConfig_animation" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type != 'fullscreen' AND menuConfig_type != 'megamenu'">
+                      visibleCondition="menuConfig_type != 'megamenu'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_animation</title>
                 </meta>
@@ -180,7 +257,7 @@
             </property>
 
             <property name="menuConfig_slideDirection" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type != 'fullscreen' AND menuConfig_type != 'megamenu' AND (menuConfig_type != 'burger' OR menuConfig_panelLayout != 'side')"
+                      visibleCondition="menuConfig_type != 'megamenu' AND (menuConfig_type != 'burger' OR menuConfig_panelLayout != 'side')"
                       disabledCondition="menuConfig_animation != 'slide'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_slideDirection</title>
@@ -205,7 +282,7 @@
             </property>
 
             <property name="menuConfig_clickParentPage" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type != 'navbar' AND menuConfig_type != 'megamenu' AND (menuConfig_type != 'burger' OR menuConfig_subMenuPanels != true)">
+                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_subMenuPanels != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_clickParentPage</title>
                     <info_text>iw_sulu_tailwind_theme.menu_clickParentPage_info</info_text>
@@ -277,68 +354,6 @@
                         </param>
                         <param name="4">
                             <meta><title>4</title></meta>
-                        </param>
-                    </param>
-                </params>
-            </property>
-
-            <!-- Full width: the only tall field of a section made of selects
-                 and toggles, so it would break whichever row it landed on. -->
-            <property name="menuConfig_fullscreenImage" type="single_media_selection" colspan="12"
-                      visibleCondition="menuConfig_type == 'fullscreen'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_fullscreenImage</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_fullscreenImage_info</info_text>
-                </meta>
-            </property>
-
-            <property name="menuConfig_twoColumns" type="checkbox" colspan="6"
-                      visibleCondition="menuConfig_type == 'fullscreen'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_twoColumns</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_twoColumns_info</info_text>
-                </meta>
-            </property>
-
-            <!-- Two columns always start on the left, so only one column offers it. -->
-            <property name="menuConfig_fullscreenAlign" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'fullscreen' AND menuConfig_twoColumns != true">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_fullscreenAlign</title>
-                </meta>
-                <params>
-                    <param name="default_value" value="center"/>
-                    <param name="values" type="collection">
-                        <param name="left">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_left</title></meta>
-                        </param>
-                        <param name="center">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_center</title></meta>
-                        </param>
-                        <param name="right">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenAlign_right</title></meta>
-                        </param>
-                    </param>
-                </params>
-            </property>
-
-            <property name="menuConfig_fullscreenCollapse" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'fullscreen'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_fullscreenCollapse</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_fullscreenCollapse_info</info_text>
-                </meta>
-                <params>
-                    <param name="default_value" value="level3"/>
-                    <param name="values" type="collection">
-                        <param name="level3">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_level3</title></meta>
-                        </param>
-                        <param name="levels23">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_levels23</title></meta>
-                        </param>
-                        <param name="none">
-                            <meta><title>iw_sulu_tailwind_theme.menu_fullscreenCollapse_none</title></meta>
                         </param>
                     </param>
                 </params>

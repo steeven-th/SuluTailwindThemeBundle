@@ -25,7 +25,15 @@
 </div>
 </div>
 </div>
-<div id="ID2" data-menu-target="panel" role="dialog" aria-label="iw_sulu_tailwind_theme.menu_dialog" class="iw-menu__overlay iw-menu__overlay--full iw-menu__overlay--content-center iw-menu__dialog iw-menu__dialog--none iw-menu__dialog--from-top fixed z-30">
+<div id="ID2" data-menu-target="panel" role="dialog" aria-label="iw_sulu_tailwind_theme.menu_dialog" class="iw-menu__overlay iw-menu__overlay--full iw-menu__overlay--content-start iw-menu__overlay--image iw-menu__overlay--image-left iw-menu__overlay--image-from-lg iw-menu__dialog iw-menu__dialog--none iw-menu__dialog--from-top fixed z-30">
+<div class="iw-menu__panel-media" aria-hidden="true">
+<template data-menu-deferred>
+<picture class="contents">
+<img src="/media/curtain.jpg" alt="" loading="eager" class="w-full h-full object-cover">
+</picture>
+</template>
+</div>
+<div class="iw-menu__panel-main">
 <nav aria-label="iw_sulu_tailwind_theme.menu_main" class="iw-menu__panels iw-menu__panels--none" data-menu-target="panels">
 <div class="iw-menu__panel" data-panel-id="root">
 <div class="iw-menu__panel-body iw-menu__panel-body--root">
@@ -73,7 +81,7 @@
 <path d="M9 5l7 7-7 7"/>
 </svg>
 </button>
-<a href="/en/services" class="iw-menu__panel-title iw-menu__text--level-2 iw-menu__item--ancestor no-underline">Services</a>
+<span class="iw-menu__panel-title">Services</span>
 </div>
 <div class="iw-menu__panel-body">
 <ul class="iw-menu__list">
@@ -108,7 +116,7 @@
 <path d="M9 5l7 7-7 7"/>
 </svg>
 </button>
-<a href="/en/services/audits" class="iw-menu__panel-title iw-menu__text--level-3 iw-menu__item--ancestor no-underline">Audits</a>
+<span class="iw-menu__panel-title">Audits</span>
 </div>
 <div class="iw-menu__panel-body">
 <ul class="iw-menu__list">
@@ -132,7 +140,7 @@
 <path d="M9 5l7 7-7 7"/>
 </svg>
 </button>
-<a href="/en/services/consulting" class="iw-menu__panel-title iw-menu__text--level-3 no-underline">Consulting</a>
+<span class="iw-menu__panel-title">Consulting</span>
 </div>
 <div class="iw-menu__panel-body">
 <ul class="iw-menu__list">
@@ -151,7 +159,7 @@
 <path d="M9 5l7 7-7 7"/>
 </svg>
 </button>
-<a href="/en/about" class="iw-menu__panel-title iw-menu__text--level-2 no-underline">About</a>
+<span class="iw-menu__panel-title">About</span>
 </div>
 <div class="iw-menu__panel-body">
 <ul class="iw-menu__list">
@@ -164,5 +172,6 @@
 </div>
 </section>
 </nav>
+</div>
 </div>
 </header> 

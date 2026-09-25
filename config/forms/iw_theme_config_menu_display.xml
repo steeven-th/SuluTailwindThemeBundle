@@ -136,7 +136,7 @@
                  instead (bar on desktop, panel on mobile), which is dictated
                  by the layout rather than by taste. -->
             <property name="menuConfig_languageSwitcherPosition" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_displayLanguageSwitcher == true AND (menuConfig_type == 'burger' OR menuConfig_type == 'fullscreen')">
+                      visibleCondition="menuConfig_displayLanguageSwitcher == true AND menuConfig_type == 'burger'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition</title>
                     <info_text>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_info</info_text>

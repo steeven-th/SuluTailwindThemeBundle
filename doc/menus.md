@@ -9,8 +9,7 @@ Five menu types are available, selected via the **Menu type** dropdown:
 | Type | Description |
 |------|-------------|
 | `navbar` | Classic horizontal navigation bar. Links are displayed inline on desktop, with dropdown submenus on hover. |
-| `burger` | Always shows a burger icon. Clicking it opens the menu panel, full screen or on a side at a set width, with a configurable animation (slide, fade, or none). |
-| `fullscreen` | Fullscreen overlay menu. Supports an optional background image and a two-column split layout. |
+| `burger` | Always shows a burger icon. Clicking it opens the menu panel, full screen (with an optional picture beside the links) or on a side at a set width, with a configurable animation (slide, fade, or none). |
 | `megamenu` | Horizontal navbar with full-width dropdown panels. Supports two data sources: **native** (page tree) or **snippet** (manual structure). |
 
 ## Common Settings
@@ -29,7 +28,7 @@ These options are available regardless of the menu type:
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
-| **Switcher placement** | (`burger` and `fullscreen` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
+| **Switcher placement** | (`burger` only) Whether the switcher sits in the bar, in the open menu, or both (default). `navbar` and `megamenu` place it by breakpoint instead. |
 | **Language switcher in the bar** | (Language switcher and social media both shown) Before (default) or after the social icons. |
 | **Label format** | (Language switcher only) How each language is named: short code (`FR`), native name (`Français`), or the name written in the language currently being browsed. |
 | **Transparent navbar** | The bar drops its background and slides over the hero image at the top of a page. All five menu types. On a page that does not open with a hero image, the bar stays opaque. See [Transparent bar over a hero](#transparent-bar-over-a-hero). |
@@ -93,7 +92,7 @@ A transparent bar only works over a picture. On a white page it leaves white tex
 |-------|-----|
 | Top of the page, over the hero | Transparent, no rule, shadow or blur. Text, icons and burger in the *Transparent bar* colors. Transparent-mode logos. |
 | Scrolled past ~50px (*Background on scroll*) | Regular bar, in the same transition. |
-| A panel open (burger, fullscreen) | Regular bar: the panel paints its own background under it. |
+| A panel open (burger) | Regular bar: the panel paints its own background under it. |
 | Page without a marked hero | Regular bar, the content starts below it. |
 
 The header stays sticky and is pulled up by the bar height, so the hero starts at the top of the window. The hero grows by the part the bar covers, so the picture and the text keep the room they have under an opaque bar. A full-screen hero stays one screen tall.
@@ -173,33 +172,27 @@ Tailwind utilities put on a button (`py-2`, `text-sm`) have no effect: the butto
 | Setting | Description |
 |---------|-------------|
 | **Panel** | `Full screen` (default) or `On a side`. See [Full screen or side panel](#full-screen-or-side-panel). |
-| **Side** | (Side panel) `left` or `right` (default). The burger moves to the same side of the bar. |
-| **Panel width** | (Side panel) Width in pixels from 1024px (200-640, default 288), full width below. Worth raising when the bar carries social icons and a language switcher: the bar stays visible above the open panel, and a narrow panel leaves that row hanging over the page. Compiled to `--iw-menu-panel-width`. |
+| **Side** | `left` or `right` (default): where the burger sits in the bar. A side panel opens on that side. A full-screen panel puts its links there and its picture on the other side. |
+| **First level size** | `Normal` (default) or `Large` (`--iw-menu-panel-l1-size`, `clamp(1.5rem, 2.5vw, 2.25rem)`), an editorial look for a short menu on a wide screen. |
+| **Position of the links** | (Full screen) `Automatic` (default), `Against the picture`, `Centered` or `Against the edge`. Automatic puts the links against the picture, and centers them without one. Against the edge lines them up with the logo, or sets them against the outer side of their zone beside a picture. Against the picture falls back on the edge without one. |
+| **Panel width** | Width in pixels (200-960) of the side panel, or of the links zone beside the picture of a full-screen panel, the picture taking the rest. Empty: 288px on a side, 480px beside a picture. A side panel takes it from 1024px, full width below. Worth raising when the bar carries social icons and a language switcher: the bar stays visible above the open panel, and a narrow panel leaves that row hanging over the page. Compiled to `--iw-menu-panel-width`. |
+| **Picture** | (Full screen) Optional, shown beside the links on the side opposite the burger. Served in the `iw_theme_menu_curtain` format (1200×1400) as avif/webp, and only fetched when the panel opens: it waits in a `<template data-menu-deferred>` the controller unpacks when its zone is displayed. |
+| **Picture from** | (Full screen) 768px, 1024px (default) or 1280px. Below it the picture is hidden and never loaded, the links take the whole panel. Choose it after the length of the labels. |
 | **Animation** | Panel animation: `none`, `slide`, or `fade`. |
 | **Slide direction** | When animation is `slide`: `top`, `right`, `bottom`, or `left`. A side panel always slides in from its side, so the setting is hidden there. |
 | **Parent page access** | How parent pages with children behave on click. In accordion mode: `none` (toggle only), `split` (arrow + link), or `selflink` (whole item is a link). In panels mode this collapses to a simple **on/off** toggle (the section title links to the parent page, or not). |
 | **Sub-menus as panels** | Off (default): sub-menus expand inline as accordions. On: sub-menus open as stacked **drill-down panels** that slide in over the current level, reusing the menu's animation and direction. Each sub-panel shows a back button and the section title at the top — the title links to the parent page when parent-page access is on. Rendered by the `_nav_panels.html.twig` partial. |
 
-### Fullscreen
-
-| Setting | Description |
-|---------|-------------|
-| **Background image** | Optional image shown on the left half of the screen, the links on the right half (curtain effect), from 768px up. Served in the `iw_theme_menu_curtain` format (1200×1400) as avif/webp, and only fetched when the panel opens: it waits in a `<template data-menu-deferred>` the controller unpacks, and never on mobile, where it is not shown. |
-| **Two columns** | Links in two columns balanced by height, each entry kept whole. From 768px without an image, from 1280px next to the image (the half screen then holds two columns of 320px). Two columns always start on the left. |
-| **Text alignment** | (One column only) Left, centered (default) or right. Also places the language switcher and the social icons at the foot of the panel. Aligned on a side, each sub-level is indented, with a thin rule on that side tying the children to their parent (`--iw-menu-fullscreen-indent`, default `1rem`, `--iw-menu-fullscreen-rule`, default the text color at 25%). |
-| **Folding sub-menus** | Which levels fold behind a chevron: the third level and below (default), the second level and below, or none (everything open). A fourth level folds under its third-level entry whenever the third level folds. With the second level folded, a first-level entry with children becomes the toggle of its list, following **Parent page access** like the accordions: a link and a separate chevron in `split` mode, its own page first in the list in `selflink` mode. |
-| **Parent page access** | Same as burger: `none`, `split`, or `selflink`. |
-
-The panel content starts under the bar and scrolls in one box, links and foot together, so its scrollbar never runs along the close button. Without an image, the links sit in the container of the bar and line up with the logo. The logo is never repeated in the panel, and the social icons appear at its foot on mobile only, where the bar hides them. First-level titles take `--iw-menu-fullscreen-l1-size`, smaller in two columns and next to the image.
-
 #### Full screen or side panel
 
-The bar stays sticky and usable above the open panel in both forms: the burger turns into its close button.
+The bar stays sticky and usable above the open panel in both forms: the burger turns into its close button. Its chrome is painted by a layer (`.iw-menu::before`) between the panel and the content of the bar, so a panel sliding in passes behind the bar.
 
-- **Full screen**: the panel covers the window and its content starts under the bar. The content lines up with the logo (the gutter repeats the container of the bar, `--iw-menu-panel-gutter`) and stops at a readable width, `--iw-menu-panel-content-width` (default `40rem`), so the rows never run along a wide screen.
-- **On a side**: the panel starts under the bar and slides in from its side, `--iw-menu-panel-width` wide from 1024px and full width below. The page behind it is dimmed by a backdrop, a click on it closes the panel. A left panel puts the burger at the start of the bar, next to the panel it closes.
+- **Full screen**: the panel covers the window and its content starts under the bar. The links stop at a readable width, `--iw-menu-panel-content-width` (default `40rem`), placed by **Position of the links**. Against the bar, their edge repeats the container of the bar (`--iw-menu-panel-edge`).
+- **Full screen with a picture**: from **Picture from** up, the panel splits in two zones, the links on the side of the burger, **Panel width** wide (`.iw-menu__panel-main`), the picture on the other side, taking the rest (`.iw-menu__panel-media`). The links zone is then a panel of its own, with the gutter of a panel on each side (`--iw-menu-panel-gutter`, the side against the picture overridable with `--iw-menu-panel-image-gap`): against the edge, the links sit against its outer side. The accordion or the drill-down panels live in the links zone, the picture does not move. It comes in with a short fade and zoom once the panel is there (`--iw-menu-media-duration`, default `700ms`, `--iw-menu-media-delay`, default `150ms`), not under reduced motion.
+- **On a side**: the panel starts under the bar and slides in from its side, `--iw-menu-panel-width` wide from 1024px and full width below. The page behind it is dimmed by a backdrop, a click on it closes the panel.
 
-The former `sidebar` menu type is the side panel. A theme saved with it is read as a burger on a side (same width, same side, sliding in), see [the upgrade guide](upgrade-3.0.0.md).
+The former `sidebar` and `fullscreen` menu types are these panels. A theme saved with `sidebar` is read as a burger on a side (same width, same side, sliding in), one saved with `fullscreen` as a burger full screen with its picture and a large first level. See [the upgrade guide](upgrade-3.0.0.md).
+
 
 ### Mega Menu
 
@@ -221,10 +214,9 @@ Set **Child levels** to 4 for a deeper tree. Every menu renders the fourth level
 | Navbar | A flyout beside its level 3 entry. At the edge of the window it opens to the left, over the levels before it, like the cascading menus of an operating system. |
 | Burger accordion, mobile panel of the navbar and mega menu | A sub-accordion of its level 3 entry, with the look of level 3. |
 | Drill-down panels | A sub-panel of level 4 (`.iw-menu__subpanel--level-4`). |
-| Fullscreen | A list under its level 3 entry, folded with the third level. |
 | Mega menu | A short list always open under its link, see [Native Mode](#mega-menu--native-mode). |
 
-The templates render their levels recursively (`_nav_accordion.html.twig`, the `dropdown` macro of `_navbar.html.twig`, `render_sublevel` in `_fullscreen.html.twig`), so an override changes every level at once.
+The templates render their levels recursively (`_nav_accordion.html.twig` and the `dropdown` macro of `_navbar.html.twig`), so an override changes every level at once.
 
 ## Mega Menu — Native Mode
 
@@ -424,7 +416,6 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Level 3 flyouts and sub-lists, drill-down sub-panels of level 3, mega menu featured column and image cards with a background | Level 3 | Level 3 |
 | Level 4 flyouts and sub-lists, drill-down sub-panels of level 4 | Level 4 | Level 4 |
 | Level 4 of the mega menu, under its link in a column | Level 2 | Level 2 |
-| Fullscreen panel, all levels | Level 1 | Level 1, the hierarchy made by size and opacity |
 
 A color left empty is not written to the stylesheet at all, so every fallback above applies. Written empty, the variable would win over its fallback and paint nothing: a social icon with no color set used to vanish.
 
@@ -472,7 +463,6 @@ full-screen overlay reads badly:
 | `navbar` | dropdown (desktop) | inline (mobile) | no |
 | `megamenu` | dropdown (desktop) | inline (mobile) | no |
 | `burger` | dropdown | inline | yes |
-| `fullscreen` | dropdown | inline | yes |
 
 The dropdown reuses the `menu_controller` Stimulus already driving the navigation
 dropdowns, so it closes when another one opens, with no extra JavaScript.
@@ -532,7 +522,7 @@ Navbar dropdowns (levels 2 and 3), mega menu panels, mobile accordions and the l
 
 ### Dialog: the panels the burger opens
 
-Burger (full screen or on a side), fullscreen, and the mobile panel of the navbar and of the mega menu.
+Burger (full screen or on a side) and the mobile panel of the navbar and of the mega menu.
 
 - The panel carries `role="dialog"` and an accessible name ("Menu", translated). The links inside it sit in a `<nav>` named "Main menu". The burger carries `aria-expanded`, `aria-controls` and a label that switches between "Open menu" and "Close menu".
 - On open, the page the panel hides is made `inert`, so Tab never reaches it, and the focus moves to the first link of the panel. The bar, drawn above the panel, stays usable: burger, logo, language switcher.
@@ -582,7 +572,7 @@ The mobile accordion shared by the navbar, the burger and the mega menu lives in
 
 Classes generated by `ThemeCompiler` for the menu, following the strict BEM convention (`iw-menu__{element}--{modifier}`). The mega menu lives under its own `iw-mega-menu` sub-namespace.
 
-### Menu (navbar, burger, fullscreen)
+### Menu (navbar, burger)
 
 | Class | Description |
 |-------|-------------|
@@ -629,16 +619,11 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__overlay` | Background of the panel the burger opens. Sets `--iw-menu-panel-gutter`, the inline room of its content. |
 | `.iw-menu__overlay--full` | Burger panel over the whole window. Its gutter lines the content up with the logo, and the content stops at `--iw-menu-panel-content-width` (default `40rem`). |
 | `.iw-menu__overlay--side` + `--left` / `--right` | Burger panel on a side, under the bar, `--iw-menu-panel-width` wide from 1024px. |
-| `.iw-menu__dialog` | A panel opened by the burger (burger, fullscreen, navbar and mega menu on mobile). Hidden until `--open`. Motion: `--none`, `--fade`, `--slide` with `--from-{top\|right\|bottom\|left}`, `--curtain`. See [Accessibility](#accessibility). |
-| `.iw-menu__curtain` | One half of the fullscreen curtain (`--left`, `--right`), slides in when its dialog opens. |
-| `.iw-menu__overlay-nav` | Nav inside the overlay (full height). |
-| `.iw-menu__fullscreen-nav` | Fullscreen split layout (curtain effect). |
-| `.iw-menu__fullscreen-scroll` | The one scroll box of the fullscreen panel, starting under the bar. |
-| `.iw-menu__fullscreen-body` + `--{left\|center\|right}` | Content of the panel, centered vertically when it fits, with its text alignment. |
-| `.iw-menu__fullscreen-list` + `--two` / `--split` | First-level list, in two balanced columns (without / next to the image). |
-| `.iw-menu__fullscreen-l1` | First-level title, sized by `--iw-menu-fullscreen-l1-size`. |
-| `.iw-menu__fullscreen-sublist` | A list of level 2 to 4. Indented with a rule when the text is aligned on a side. Its links are inline blocks, so the focus ring hugs the text. |
-| `.iw-menu__fullscreen-footer` | Foot of the panel: language switcher, social icons on mobile. |
+| `.iw-menu__dialog` | A panel opened by the burger (burger, navbar and mega menu on mobile). Hidden until `--open`. Motion: `--none`, `--fade`, `--slide` with `--from-{top\|right\|bottom\|left}`. See [Accessibility](#accessibility). |
+| `.iw-menu__overlay--content-{start\|center\|end}` | The side of their zone the links of a full-screen panel hug, or its middle. Each side keeps a minimum room (`--iw-menu-panel-side-start` / `--iw-menu-panel-side-end`: the edge of the bar container against the window, a gap against the picture), and the result is set through `--iw-menu-panel-pad-start` / `--iw-menu-panel-pad-end`. |
+| `.iw-menu__overlay--image` + `--image-{left\|right}`, `--image-from-{md\|lg\|xl}` | A full-screen panel with a picture, its side and the width it shows from. |
+| `.iw-menu__panel-media` / `.iw-menu__panel-main` | The picture zone and the links zone of a full-screen panel with a picture. |
+| `.iw-menu__overlay--l1-large` | First level large (`--iw-menu-panel-l1-size`). |
 | `.iw-menu__backdrop` | Dark backdrop behind a side panel, under the bar. `--visible` while the panel is open. |
 | `.iw-menu__parent-item` | Wrapper around a parent item + its submenu in the accordions. |
 | `.iw-menu__panels` | Drill-down stack container (burger *Sub-menus as panels* mode). Motion modifiers: `--from-{right\|left\|top\|bottom}`, `--fade`, `--none` (set from the menu animation/direction). |
@@ -706,6 +691,6 @@ Add the following to your `base.html.twig` layout. The menu type is resolved dyn
 </main>
 ```
 
-The `iw_sulu_tailwind_theme_menu_config()` Twig function returns the full menu configuration object. When a menu type is configured, the matching template (`_navbar.html.twig`, `_burger.html.twig`, `_fullscreen.html.twig`, or `_megamenu.html.twig`) is included automatically. The `else` block provides a basic fallback navigation if no theme is configured.
+The `iw_sulu_tailwind_theme_menu_config()` Twig function returns the full menu configuration object. When a menu type is configured, the matching template (`_navbar.html.twig`, `_burger.html.twig`, or `_megamenu.html.twig`) is included automatically. The `else` block provides a basic fallback navigation if no theme is configured.
 
 See [Twig Reference](twig-reference.md) for details on `iw_sulu_tailwind_theme_menu_config()`.

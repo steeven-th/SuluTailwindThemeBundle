@@ -896,31 +896,14 @@ switching at 768px whatever the setting says.
 
 ---
 
-## Fullscreen menu: layout of the panel (breaking, visual)
+## Fullscreen menu: layout of the panel (superseded)
 
-The fullscreen panel is laid out again. See the Fullscreen settings in
-[menus.md](menus.md#fullscreen). What changes on screen:
-
-- **One scroll box under the bar** holds the links and the foot, instead of
-  the links alone scrolling next to the close button.
-- **Two columns are balanced by height.** They were a grid whose rows took
-  the height of their tallest entry, leaving large gaps. Next to the
-  background image, the two columns only start at 1280px.
-- **Smaller first-level titles** in two columns and next to the image
-  (`--iw-menu-fullscreen-l1-size`), so a long label no longer runs on six lines.
-- **The logo is no longer repeated** at the foot of the panel, and the social
-  icons only appear there on mobile.
-- **New Text alignment setting** for one column: left, centered (the previous
-  rendering, default) or right.
-- **New Folding sub-menus setting**: the third level only (the previous
-  rendering, default), the second and third levels, or none.
-- **The background image** is served in the new `iw_theme_menu_curtain` format
-  and only fetched when the panel opens, never on mobile. Clear the format
-  cache after the update: `bin/adminconsole sulu:media:format:cache:clear`.
-
-**If you override `_fullscreen.html.twig`**, the macros `render_overlay_logo`
-and `render_social_links` are gone, replaced by `render_panel_footer`, and
-`render_nav_items` takes the column mode and the alignment.
+This rework of the fullscreen panel is superseded within 3.0.0: the
+`fullscreen` type is now a burger full screen, see
+[The fullscreen menu becomes a burger with a picture](#the-fullscreen-menu-becomes-a-burger-with-a-picture-breaking-visual).
+The `iw_theme_menu_curtain` image format it brought stays, for the picture of
+the burger panel. Clear the format cache after the update:
+`bin/adminconsole sulu:media:format:cache:clear`.
 
 ---
 
@@ -994,9 +977,9 @@ What changes on screen:
   ring, colors per level). The sidebar had its own copy, with smaller rows.
 - **Social icons**: in the bar from 768px, and at the foot of the panel. The
   sidebar showed them in the bar only, on every width.
-- **The full-screen panel lines its content up with the logo**, and the rows
-  stop at `--iw-menu-panel-content-width` (default `40rem`) instead of running
-  along the whole screen.
+- **The rows of the full-screen panel stop at a readable width**,
+  `--iw-menu-panel-content-width` (default `40rem`), instead of running along
+  the whole screen. Where they sit is a setting, see below.
 
 Renamed or removed:
 
@@ -1031,21 +1014,55 @@ templates.
 chevron: `--iw-menu-fourth-*`, each falling back on level 3), always offered in
 Menu > Colors. See [Four levels](menus.md#four-levels).
 
-The accordion, the navbar dropdowns and the fullscreen sub-levels are now
-rendered by recursive macros instead of one block per level. Their markup for
-levels 1 to 3 is unchanged (pinned by `MenuLevelsSnapshotTest`), except:
+The accordion and the navbar dropdowns are now rendered by recursive macros
+instead of one block per level. Their markup for levels 1 to 3 is unchanged
+(pinned by `MenuLevelsSnapshotTest`), except:
 
-- **Fullscreen**: the links of levels 2 and below are inline blocks, no longer
-  blocks, so the focus ring hugs the text instead of running across the panel.
-- **Folding sub-menus** (fullscreen): `level3` now reads "the third level and
-  below", `levels23` "the second level and below". The stored values are
-  unchanged.
 - **Navbar**: a level 3 dropdown that opens a level 4 beside it no longer
   scrolls, like a level 2 opening a level 3.
 
-If you override `_nav_accordion.html.twig`, `_navbar.html.twig` or
-`_fullscreen.html.twig`, port your changes to the level macros: a block copied
+If you override `_nav_accordion.html.twig` or `_navbar.html.twig`, port your
+changes to the level macros: a block copied
 per level will not render the fourth one.
+
+---
+
+## The fullscreen menu becomes a burger with a picture (breaking, visual)
+
+The `fullscreen` type had its own panel and its own navigation: two curtains
+with the picture, large titles, two columns, folds. It is now the burger full
+screen, which gains what the fullscreen had to offer and keeps its accordion or
+drill-down panels:
+
+- **Picture** beside the links, on the side opposite the burger, from **Picture
+  from** up (768, 1024 or 1280px). The links zone is exactly **Panel width**
+  (the same field as the side panel, 480px by default here), the picture takes
+  the rest.
+  It is fetched only when the panel opens, and never below that width.
+- **Side** now places the burger in full screen too: on the left, the burger
+  opens the bar and the picture goes to the right.
+- **Position of the links**: automatic, against the picture, centered or
+  against the edge. Automatic puts them against the picture, and centers them
+  without one (they were lined up with the logo).
+- **First level size**: normal or large.
+
+**Nothing to do for a stored theme.** A menu saved as `fullscreen` is read as a
+burger full screen (`MenuConfigNormalizer`): its picture carried over, a large
+first level, centered links if it was centered and against the bar otherwise,
+a panel sliding in from the right. The next save writes it in the new shape.
+
+Gone with the type: **Two columns**, **Text alignment** and **Folding
+sub-menus**. The links take the accordion of the burger, every level folding.
+
+| Before | After |
+|--------|-------|
+| `menu/_fullscreen.html.twig` | `menu/_burger.html.twig`, full screen |
+| `fullscreenImage` | `panelImage` (new `panelImageFrom`, and `panelWidth` for the links zone) |
+| `fullscreenAlign` | `panelContentPosition` (`auto`, `image`, `center`, `bar`) |
+| `twoColumns`, `fullscreenCollapse` | Removed |
+| `.iw-menu__fullscreen-*`, `.iw-menu__curtain`, `.iw-menu__dialog--curtain` | `.iw-menu__overlay--image*`, `.iw-menu__panel-media`, `.iw-menu__panel-main` |
+| `--iw-menu-fullscreen-l1-size`, `--iw-menu-fullscreen-indent`, `--iw-menu-fullscreen-rule` | `--iw-menu-panel-l1-size` |
+| `--iw-menu-panel-gutter` computed on the container of the bar (full screen) | `--iw-menu-panel-edge`, with `--iw-menu-panel-pad-start` / `--iw-menu-panel-pad-end` placing the links |
 
 ---
 

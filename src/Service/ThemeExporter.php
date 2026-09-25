@@ -63,7 +63,7 @@ class ThemeExporter
         'menuConfig_logoMobile',
         'menuConfig_logoTransparentDesktop',
         'menuConfig_logoTransparentMobile',
-        'menuConfig_fullscreenImage',
+        'menuConfig_panelImage',
         'footerConfig_logo',
         'components_backToTopIconMedia',
         'components_mapsMarkerMedia',

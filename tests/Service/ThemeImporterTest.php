@@ -133,7 +133,7 @@ final class ThemeImporterTest extends TestCase
             'name' => 'production',
             'label' => 'Production theme',
             'palette' => [['role' => 'primary', 'slug' => 'primary', 'value' => '#ff0000']],
-            'menuConfig_type' => 'fullscreen',
+            'menuConfig_type' => 'megamenu',
         ], \JSON_THROW_ON_ERROR));
 
         $this->buildImporter()->importInto($payload, $target);
@@ -144,7 +144,7 @@ final class ThemeImporterTest extends TestCase
         $this->assertSame(['id' => 6], $target->getFooterConfig()['logo']);
 
         // The design itself did land.
-        $this->assertSame('fullscreen', $target->getMenuConfig()['type']);
+        $this->assertSame('megamenu', $target->getMenuConfig()['type']);
         $this->assertSame('#ff0000', $target->getTokens()['colors'][0]['value']);
     }
 

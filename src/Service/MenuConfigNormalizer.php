@@ -7,11 +7,16 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 /**
  * Brings a stored menu configuration up to the current shape.
  *
- * The `sidebar` menu type became the burger with a side panel: both opened the
- * same navigation in a dialog, and only the size of that dialog set them
- * apart. A theme saved with the former type keeps its rendering (width, side,
- * sliding panel) and is written in the current shape on its next save, so no
- * data migration is needed.
+ * Two former menu types became forms of the burger, which opens the same
+ * navigation in a dialog:
+ *
+ * - `sidebar` is the burger with a side panel (width, side, sliding panel).
+ * - `fullscreen` is the burger full screen, its picture beside the links,
+ *   its first level large. Its own layouts (two columns, folds, text
+ *   alignment) are gone: the links take the accordion of the burger.
+ *
+ * A theme saved with a former type is read in the current shape and written
+ * in it on its next save, so no data migration is needed.
  *
  * Called by {@see \ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig::getMenuConfig()},
  * which every reader goes through: the site, the compiler, the admin form and
@@ -23,9 +28,9 @@ final class MenuConfigNormalizer
     public const PANEL_SIDE = 'side';
 
     /**
-     * Keys of the former `sidebar` type, replaced by panelWidth and panelSide.
+     * Keys of the former `sidebar` and `fullscreen` types.
      */
-    private const LEGACY_SIDEBAR_KEYS = ['sidebarWidth', 'sidebarPosition'];
+    private const LEGACY_KEYS = ['sidebarWidth', 'sidebarPosition', 'fullscreenImage', 'twoColumns', 'fullscreenAlign', 'fullscreenCollapse'];
 
     /**
      * Normalize a menu configuration.
@@ -47,7 +52,22 @@ final class MenuConfigNormalizer
             $config['animation'] = 'slide';
         }
 
-        foreach (self::LEGACY_SIDEBAR_KEYS as $key) {
+        if ('fullscreen' === ($config['type'] ?? null)) {
+            $config['type'] = 'burger';
+            $config['panelLayout'] = self::PANEL_FULL;
+            if (!isset($config['panelImage']) && !empty($config['fullscreenImage']['id'] ?? null)) {
+                $config['panelImage'] = $config['fullscreenImage'];
+            }
+            // Its large first-level titles, and its alignment: centered stays
+            // centered, a side alignment follows the bar.
+            $config['panelL1Size'] ??= 'large';
+            $config['panelContentPosition'] ??= 'center' === ($config['fullscreenAlign'] ?? 'center') ? 'center' : 'bar';
+            // The panel without a picture slid in from the right.
+            $config['animation'] = 'slide';
+            $config['slideDirection'] = 'right';
+        }
+
+        foreach (self::LEGACY_KEYS as $key) {
             unset($config[$key]);
         }
 

@@ -38,12 +38,9 @@ final class MenuLevelsSnapshotTest extends TestCase
         ];
         foreach (['none', 'split', 'selflink'] as $mode) {
             $menus["burger-{$mode}"] = ['type' => 'burger', 'clickParentPage' => $mode];
-            foreach (['level3', 'levels23', 'none'] as $collapse) {
-                $menus["fullscreen-{$mode}-{$collapse}"] = ['type' => 'fullscreen', 'clickParentPage' => $mode, 'fullscreenCollapse' => $collapse];
-            }
         }
-        $menus['fullscreen-two-columns'] = ['type' => 'fullscreen', 'twoColumns' => true];
-        $menus['fullscreen-left'] = ['type' => 'fullscreen', 'fullscreenAlign' => 'left'];
+        $menus['burger-picture'] = ['type' => 'burger', 'panelImage' => ['id' => 10]];
+        $menus['burger-picture-panels'] = ['type' => 'burger', 'panelImage' => ['id' => 10], 'subMenuPanels' => true];
 
         return array_map(static fn (array $config): array => [$config + ['displaySocialMedia' => true, 'childLevels' => 3]], $menus);
     }

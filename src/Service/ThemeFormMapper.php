@@ -229,8 +229,8 @@ class ThemeFormMapper
         // Bar size, read by ThemeCompiler: the effective height also depends on the logo.
         'barHeightDesktop', 'barHeightMobile', 'logoSpacing',
         'logoTransparentDesktop', 'logoTransparentMobile',
-        'fullscreenImage', 'twoColumns', 'fullscreenAlign', 'fullscreenCollapse',
-        'panelLayout', 'panelWidth', 'panelSide', 'transparentNavbar', 'scrollBg', 'scrollHide',
+        'panelLayout', 'panelWidth', 'panelSide',
+        'panelImage', 'panelImageFrom', 'panelContentPosition', 'panelL1Size', 'transparentNavbar', 'scrollBg', 'scrollHide',
         // Bar chrome, read by ThemeCompiler::compileMenu().
         'borderWidth', 'shadow', 'bgOpacity', 'blur',
         // Dropdowns of the bar, read by ThemeCompiler.

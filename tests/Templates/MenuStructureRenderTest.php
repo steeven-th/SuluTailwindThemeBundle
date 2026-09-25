@@ -38,7 +38,7 @@ final class MenuStructureRenderTest extends TestCase
             'burger' => [['type' => 'burger'] + $common],
             'burger split' => [['type' => 'burger', 'clickParentPage' => 'split'] + $common],
             'burger panels' => [['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true] + $common],
-            'fullscreen' => [['type' => 'fullscreen'] + $common],
+            'burger with a picture' => [['type' => 'burger', 'panelImage' => ['id' => 10]] + $common],
             'burger side' => [['type' => 'burger', 'panelLayout' => 'side', 'panelSide' => 'left'] + $common],
             'burger side panels' => [['type' => 'burger', 'panelLayout' => 'side', 'subMenuPanels' => true, 'clickParentPagePanels' => true] + $common],
             'megamenu' => [['type' => 'megamenu', 'megamenuSource' => 'native'] + $common],
@@ -214,17 +214,18 @@ final class MenuStructureRenderTest extends TestCase
     }
 
     /**
-     * The fullscreen background image waited for nobody: the original file
-     * was fetched on every page, mobile included, where it is never shown.
+     * The picture of the full-screen panel waits for the panel to open: the
+     * original file was fetched on every page, mobile included, where it is
+     * never shown.
      */
     #[Test]
-    public function theFullscreenImageWaitsForThePanelToOpen(): void
+    public function thePanelPictureWaitsForThePanelToOpen(): void
     {
-        $html = self::render(['type' => 'fullscreen', 'fullscreenImage' => ['id' => 10]]);
+        $html = self::render(['type' => 'burger', 'panelImage' => ['id' => 10]]);
         $xpath = self::xpath($html);
 
         self::assertCount(0, $xpath->query('//*[@role="dialog"]//img[not(ancestor::template)]') ?: [], 'An image of the panel loads with the page.');
-        self::assertMatchesRegularExpression('#<template data-menu-deferred>\s*<picture[^>]*>.*?<img\s+src="/media/curtain\.jpg"#s', $html);
+        self::assertMatchesRegularExpression('#<div class="iw-menu__panel-media" aria-hidden="true">\s*<template data-menu-deferred>\s*<picture[^>]*>.*?<img\s+src="/media/curtain\.jpg"#s', $html);
 
         $controller = (string) file_get_contents(\dirname(__DIR__, 2) . '/assets/controllers/menu_controller.js');
         self::assertStringContainsString("querySelectorAll('template[data-menu-deferred]')", $controller);
@@ -232,53 +233,51 @@ final class MenuStructureRenderTest extends TestCase
     }
 
     /**
-     * The logo stays in the bar, the panel does not repeat it.
-     *
-     * @param array<string, mixed> $config
+     * @return array<string, array{0: array<string, mixed>, 1: list<string>, 2: list<string>}>
      */
-    #[Test]
-    #[DataProvider('fullscreenLayouts')]
-    public function theFullscreenPanelFollowsItsLayoutSettings(array $config, string $bodyClass, ?string $listClass): void
+    public static function panelPlacements(): array
     {
-        $xpath = self::xpath(self::render(['type' => 'fullscreen', 'displayLogoDesktop' => true] + $config));
-
-        $body = $xpath->query('//*[@role="dialog"]//*[contains(@class, "iw-menu__fullscreen-body")]')?->item(0);
-        self::assertInstanceOf(\DOMElement::class, $body);
-        self::assertStringContainsString($bodyClass, $body->getAttribute('class'));
-        self::assertNotNull($xpath->query('ancestor::*[contains(@class, "iw-menu__fullscreen-scroll")]', $body)?->item(0), 'The panel content is not in the scroll box.');
-
-        $list = $xpath->query('.//ul[contains(@class, "iw-menu__fullscreen-list")]', $body)?->item(0);
-        self::assertInstanceOf(\DOMElement::class, $list);
-        if (null === $listClass) {
-            self::assertStringNotContainsString('iw-menu__fullscreen-list--', $list->getAttribute('class'));
-        } else {
-            self::assertStringContainsString($listClass, $list->getAttribute('class'));
-        }
-
-        self::assertCount(0, $xpath->query('//*[@role="dialog"]//*[contains(@class, "iw-menu__logo")]') ?: [], 'The panel repeats the logo of the bar.');
-
-        // Every sub-level can take the indent, and a toggle is as wide as its
-        // label: a full-width one drew its focus ring across the whole panel.
-        self::assertCount(0, $xpath->query('.//ul[not(contains(@class, "iw-menu__fullscreen-sublist"))]', $list) ?: []);
-        foreach ($xpath->query('.//button[@aria-controls]', $list) ?: [] as $toggle) {
-            self::assertInstanceOf(\DOMElement::class, $toggle);
-            self::assertStringNotContainsString('w-full', $toggle->getAttribute('class'));
-        }
+        return [
+            // [config, classes of the dialog, classes it must not carry]
+            'no picture: centered' => [[], ['iw-menu__overlay--full', 'iw-menu__overlay--content-center'], ['iw-menu__overlay--image']],
+            'no picture, against the bar: under the logo' => [['panelContentPosition' => 'bar'], ['iw-menu__overlay--content-start'], []],
+            'picture, burger on the right: picture left, links against it' => [['panelImage' => ['id' => 10]], ['iw-menu__overlay--image-left', 'iw-menu__overlay--content-start', 'iw-menu__overlay--image-from-lg'], []],
+            'picture, burger on the left: picture right, links against it' => [['panelImage' => ['id' => 10], 'panelSide' => 'left'], ['iw-menu__overlay--image-right', 'iw-menu__overlay--content-end'], []],
+            'picture, links against the edge: under the burger' => [['panelImage' => ['id' => 10], 'panelContentPosition' => 'bar'], ['iw-menu__overlay--content-end'], []],
+            'picture on the right, links against the edge: under the burger' => [['panelImage' => ['id' => 10], 'panelContentPosition' => 'bar', 'panelSide' => 'left'], ['iw-menu__overlay--content-start'], []],
+            'no picture, against the picture falls back on the edge' => [['panelContentPosition' => 'image'], ['iw-menu__overlay--content-start'], []],
+            'picture, centered links' => [['panelImage' => ['id' => 10], 'panelContentPosition' => 'center'], ['iw-menu__overlay--content-center'], []],
+            'picture breakpoint' => [['panelImage' => ['id' => 10], 'panelImageFrom' => 'xl'], ['iw-menu__overlay--image-from-xl'], []],
+            'unknown values fall back' => [['panelImage' => ['id' => 10], 'panelImageFrom' => '2xl', 'panelContentPosition' => 'top'], ['iw-menu__overlay--image-from-lg', 'iw-menu__overlay--content-start'], []],
+            'large first level' => [['panelL1Size' => 'large'], ['iw-menu__overlay--l1-large'], []],
+            'a side panel never shows the picture' => [['panelLayout' => 'side', 'panelImage' => ['id' => 10]], ['iw-menu__overlay--side'], ['iw-menu__overlay--image', 'iw-menu__overlay--content-']],
+        ];
     }
 
     /**
-     * @return array<string, array{0: array<string, mixed>, 1: string, 2: string|null}>
+     * @param array<string, mixed> $config
+     * @param list<string>         $classes
+     * @param list<string>         $absent
      */
-    public static function fullscreenLayouts(): array
+    #[Test]
+    #[DataProvider('panelPlacements')]
+    public function theFullScreenPanelPlacesItsLinksAndPicture(array $config, array $classes, array $absent): void
     {
-        return [
-            'one column, centered by default' => [[], 'iw-menu__fullscreen-body--center', null],
-            'one column, on the left' => [['fullscreenAlign' => 'left'], 'iw-menu__fullscreen-body--left', null],
-            'one column, on the right' => [['fullscreenAlign' => 'right'], 'iw-menu__fullscreen-body--right', null],
-            'two columns start on the left' => [['twoColumns' => true, 'fullscreenAlign' => 'right'], 'iw-menu__fullscreen-body--left', 'iw-menu__fullscreen-list--two'],
-            'two columns next to the image' => [['twoColumns' => true, 'fullscreenImage' => ['id' => 10]], 'iw-menu__fullscreen-body--left', 'iw-menu__fullscreen-list--split'],
-            'an unknown alignment' => [['fullscreenAlign' => 'justify'], 'iw-menu__fullscreen-body--center', null],
-        ];
+        $xpath = self::xpath(self::render(['type' => 'burger'] + $config));
+        $panel = $xpath->query('//*[@data-menu-target="panel"]')?->item(0);
+        self::assertInstanceOf(\DOMElement::class, $panel);
+        $class = ' ' . $panel->getAttribute('class') . ' ';
+
+        foreach ($classes as $expected) {
+            self::assertStringContainsString(" {$expected} ", $class);
+        }
+        foreach ($absent as $unexpected) {
+            self::assertStringNotContainsString($unexpected, $class);
+        }
+
+        // With a picture, the links live in their own zone, beside it.
+        $hasPicture = str_contains($class, ' iw-menu__overlay--image ');
+        self::assertCount($hasPicture ? 1 : 0, $xpath->query('//*[@data-menu-target="panel"]/div[@class="iw-menu__panel-main"]/nav') ?: []);
     }
 
     /**
@@ -325,37 +324,6 @@ final class MenuStructureRenderTest extends TestCase
                 self::assertInstanceOf(\DOMElement::class, $element);
                 self::assertStringContainsString("iw-menu__text--level-{$level}", $element->getAttribute('class'));
             }
-        }
-    }
-
-    /**
-     * @return array<string, array{0: string, 1: int, 2: int}>
-     */
-    public static function fullscreenFolds(): array
-    {
-        // The test tree: one first-level entry with children, one of them with its own.
-        return [
-            'third level only, by default' => ['', 0, 1],
-            'second and third levels' => ['levels23', 1, 1],
-            'nothing folds' => ['none', 0, 0],
-        ];
-    }
-
-    #[Test]
-    #[DataProvider('fullscreenFolds')]
-    public function theFullscreenFoldsTheLevelsAsked(string $collapse, int $foldedLevel2, int $foldedLevel3): void
-    {
-        $config = ['type' => 'fullscreen'] + ('' === $collapse ? [] : ['fullscreenCollapse' => $collapse]);
-        $xpath = self::xpath(self::render($config));
-
-        $list = '//ul[contains(@class, "iw-menu__fullscreen-list")]';
-        self::assertCount($foldedLevel2, $xpath->query("{$list}/li/ul[contains(concat(' ', @class, ' '), ' hidden ')]") ?: []);
-        self::assertCount($foldedLevel3, $xpath->query("{$list}/li/ul/li/ul[contains(concat(' ', @class, ' '), ' hidden ')]") ?: []);
-
-        // Whatever folds is opened by a trigger that says so.
-        foreach ($xpath->query("{$list}//ul[contains(concat(' ', @class, ' '), ' hidden ')]") ?: [] as $folded) {
-            self::assertInstanceOf(\DOMElement::class, $folded);
-            self::assertCount(1, $xpath->query("//button[@aria-controls='{$folded->getAttribute('id')}'][@aria-expanded='false']") ?: []);
         }
     }
 
@@ -407,18 +375,20 @@ final class MenuStructureRenderTest extends TestCase
     }
 
     #[Test]
-    public function aFullScreenPanelHasNoBackdropAndKeepsItsBurgerOnTheRight(): void
+    public function aFullScreenPanelHasNoBackdropAndItsBurgerFollowsTheSide(): void
     {
-        $xpath = self::xpath(self::render(['type' => 'burger', 'panelSide' => 'left']));
+        foreach (['left' => true, 'right' => false] as $side => $burgerFirst) {
+            $xpath = self::xpath(self::render(['type' => 'burger', 'panelSide' => $side]));
 
-        $panel = $xpath->query('//*[@data-menu-target="panel"]')?->item(0);
-        self::assertInstanceOf(\DOMElement::class, $panel);
-        self::assertStringContainsString('iw-menu__overlay--full', $panel->getAttribute('class'));
-        self::assertCount(0, $xpath->query('//*[@data-menu-target="backdrop"]') ?: []);
+            $panel = $xpath->query('//*[@data-menu-target="panel"]')?->item(0);
+            self::assertInstanceOf(\DOMElement::class, $panel);
+            self::assertStringContainsString('iw-menu__overlay--full', $panel->getAttribute('class'));
+            self::assertCount(0, $xpath->query('//*[@data-menu-target="backdrop"]') ?: []);
 
-        $first = $xpath->query('(//*[contains(@class, "iw-menu__bar")]//button | //*[contains(@class, "iw-menu__bar")]//a)[1]')?->item(0);
-        self::assertInstanceOf(\DOMElement::class, $first);
-        self::assertNotSame('burger', $first->getAttribute('data-menu-target'));
+            $first = $xpath->query('(//*[contains(@class, "iw-menu__bar")]//button | //*[contains(@class, "iw-menu__bar")]//a)[1]')?->item(0);
+            self::assertInstanceOf(\DOMElement::class, $first);
+            self::assertSame($burgerFirst, 'burger' === $first->getAttribute('data-menu-target'), "Burger on the {$side}.");
+        }
     }
 
     /**

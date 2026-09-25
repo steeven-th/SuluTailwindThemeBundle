@@ -2,11 +2,34 @@
 
    The panel either covers the screen (panelLayout 'full', the default) or
    slides in from a side (panelLayout 'side'), panelWidth wide from 1024px
-   with a dimmed page behind it. The former `sidebar` menu type is this side
-   panel (see MenuConfigNormalizer). #}
+   with a dimmed page behind it. panelSide places the burger in the bar: a
+   side panel opens on that side, a full-screen panel puts its links there
+   and its optional picture on the other side, from panelImageFrom up: the
+   links zone is then panelWidth wide, the picture takes the rest. The
+   former `sidebar` and `fullscreen` menu types are these two panels (see
+   MenuConfigNormalizer). #}
 
 {% set isSide = config.panelLayout|default('full') == 'side' %}
 {% set side = config.panelSide|default('right') == 'left' ? 'left' : 'right' %}
+
+{# Full screen: the picture, the place of the links, the first level size. #}
+{% set panelMedia = not isSide and config.panelImage.id|default(null)
+    ? sulu_resolve_media(config.panelImage.id, app.request.locale)
+    : null %}
+{% set imageFrom = config.panelImageFrom|default('lg') in ['md', 'lg', 'xl'] ? config.panelImageFrom|default('lg') : 'lg' %}
+{% set position = config.panelContentPosition|default('auto') in ['auto', 'image', 'center', 'bar'] ? config.panelContentPosition|default('auto') : 'auto' %}
+{% if position == 'auto' %}{% set position = panelMedia ? 'image' : 'center' %}{% endif %}
+{% if position == 'image' and not panelMedia %}{% set position = 'bar' %}{% endif %}
+{# The side the links hug in their zone. Against the edge: under the logo, or
+   under the burger beside a picture. Against the picture: the other side. #}
+{% set burgerSide = side == 'right' ? 'end' : 'start' %}
+{% set imageSide = side == 'right' ? 'start' : 'end' %}
+{% set contentEdge = position == 'center' ? 'center' : (position == 'image' ? imageSide : (panelMedia ? burgerSide : 'start')) %}
+{% set panelClasses = isSide
+    ? 'iw-menu__overlay--side iw-menu__overlay--' ~ side
+    : 'iw-menu__overlay--full iw-menu__overlay--content-' ~ contentEdge
+        ~ (panelMedia ? ' iw-menu__overlay--image iw-menu__overlay--image-' ~ (side == 'right' ? 'left' : 'right') ~ ' iw-menu__overlay--image-from-' ~ imageFrom : '') %}
+{% if config.panelL1Size|default('normal') == 'large' %}{% set panelClasses = panelClasses ~ ' iw-menu__overlay--l1-large' %}{% endif %}
 {% set animation = config.animation|default('none') %}
 {# A side panel comes from its side. #}
 {% set slideDirection = isSide ? side : config.slideDirection|default('top') %}
@@ -27,8 +50,8 @@
 
 {% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
 
-{# The burger turns into the close button. A left panel puts it at the start
-   of the bar, next to the panel it closes. #}
+{# The burger turns into the close button. On the left side it opens the
+   bar, before the logo. #}
 {% set burgerButton %}
     <button
         type="button"
@@ -44,7 +67,7 @@
         <span class="iw-menu__burger-line"></span>
     </button>
 {% endset %}
-{% set burgerFirst = isSide and side == 'left' %}
+{% set burgerFirst = side == 'left' %}
 
 <header
     data-controller="menu"
@@ -98,8 +121,26 @@
         data-menu-target="panel"
         role="dialog"
         aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
-        class="iw-menu__overlay iw-menu__overlay--{{ isSide ? 'side iw-menu__overlay--' ~ side : 'full' }} iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed z-30"
+        class="iw-menu__overlay {{ panelClasses }} iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed z-30"
     >
+        {% if panelMedia %}
+            {# The picture waits in a <template> the controller unpacks when
+               the panel opens and this zone is shown: no request before, none
+               below panelImageFrom. Decorative, the links carry the menu. #}
+            <div class="iw-menu__panel-media" aria-hidden="true">
+                <template data-menu-deferred>
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                        media: panelMedia,
+                        format: 'iw_theme_menu_curtain',
+                        alt: '',
+                        raw: true,
+                        loading: 'eager',
+                        classes: 'w-full h-full object-cover',
+                    }) }}
+                </template>
+            </div>
+            <div class="iw-menu__panel-main">
+        {% endif %}
         {% if config.subMenuPanels|default(false) %}
         {# Drill-down panels mode (opt-in) - separate partial for maintainability. #}
         {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
@@ -131,6 +172,9 @@
                 textClass: '',
             } only %}
         </nav>
+        {% endif %}
+        {% if panelMedia %}
+            </div>
         {% endif %}
     </div>
 </header>

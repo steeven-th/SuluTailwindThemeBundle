@@ -142,8 +142,24 @@ final class MenuFinishingTest extends TestCase
         self::assertStringContainsString('--iw-menu-panel-width: 360px;', $css);
         self::assertStringContainsString('.iw-menu__overlay--side { top: var(--iw-menu-bar-height); bottom: 0; width: 100%; --iw-menu-panels-offset: 0px; }', $css);
         self::assertStringContainsString('.iw-menu__backdrop { top: var(--iw-menu-bar-height);', $css);
-        // Full screen, the gutter follows the container of the bar.
-        self::assertStringContainsString('@media (min-width: 1280px) { .iw-menu__overlay--full { --iw-menu-panel-gutter: max(2rem, calc((100% - var(--iw-scrollbar-compensation, 0px) - 80rem) / 2 + 2rem)); } }', $css);
+        // Full screen, the edge follows the container of the bar, measured on
+        // the window: beside a picture the links only have a part of it.
+        self::assertStringContainsString('@media (min-width: 1280px) { .iw-menu__overlay--full { --iw-menu-panel-edge: max(2rem, calc((100vw - var(--iw-scrollbar-compensation, 0px) - 80rem) / 2 + 2rem)); } }', $css);
+        self::assertStringContainsString('.iw-menu__overlay--content-end { --iw-menu-panel-pad-start: max(var(--iw-menu-panel-side-start), calc(100% - var(--iw-menu-panel-content-width, 40rem) - var(--iw-menu-panel-side-end))); --iw-menu-panel-pad-end: var(--iw-menu-panel-side-end); }', $css);
+        // Beside the picture, the plain gutter of a panel on each side, not
+        // the edge of the window: two edges on a narrow zone left the links
+        // no width at all.
+        self::assertStringContainsString('.iw-menu__overlay--image-from-lg.iw-menu__overlay--image-left { --iw-menu-panel-side-start: var(--iw-menu-panel-image-gap, var(--iw-menu-panel-gutter)); --iw-menu-panel-side-end: var(--iw-menu-panel-gutter); }', $css);
+        // The links zone is exactly the panel width, 30rem when unset, and
+        // keeps it whatever the window.
+        self::assertStringContainsString('.iw-menu__panel-main { position: relative; height: 100%; flex: 0 0 var(--iw-menu-panel-width, 30rem); max-width: 100%; min-width: 0; }', $css);
+        // Unset, the width is not written: each form keeps its own default.
+        self::assertStringNotContainsString('--iw-menu-panel-width:', $this->compile(['type' => 'burger']));
+        // The picture zone shows from the chosen width only, which is also
+        // what keeps its image from loading below it.
+        self::assertStringContainsString('@media (min-width: 1024px) { .iw-menu__overlay--image-from-lg { display: flex; } .iw-menu__overlay--image-from-lg > .iw-menu__panel-media { display: block; }', $css);
+        self::assertStringContainsString('.iw-menu__panel-media { display: none;', $css);
+        self::assertStringNotContainsString('fullscreen', $css);
         // A sub-panel waiting above the stack (slide from the top) must not
         // paint the band of the bar.
         self::assertMatchesRegularExpression('/\.iw-menu__panels \{[^}]*clip-path: inset\(var\(--iw-menu-panels-offset, var\(--iw-menu-bar-height, 4rem\)\) 0 0 0\)/', $css);

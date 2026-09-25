@@ -44,11 +44,44 @@ final class MenuConfigNormalizerTest extends TestCase
     }
 
     #[Test]
-    public function otherTypesOnlyLoseTheFormerSidebarKeys(): void
+    public function aFullscreenBecomesAFullScreenBurgerWithItsPicture(): void
+    {
+        $config = MenuConfigNormalizer::normalize([
+            'type' => 'fullscreen',
+            'fullscreenImage' => ['id' => 10],
+            'fullscreenAlign' => 'left',
+            'twoColumns' => true,
+            'fullscreenCollapse' => 'none',
+            'childLevels' => 3,
+        ]);
+
+        self::assertSame([
+            'type' => 'burger',
+            'childLevels' => 3,
+            'panelLayout' => 'full',
+            'panelImage' => ['id' => 10],
+            'panelL1Size' => 'large',
+            'panelContentPosition' => 'bar',
+            'animation' => 'slide',
+            'slideDirection' => 'right',
+        ], $config);
+    }
+
+    #[Test]
+    public function aCenteredFullscreenWithoutPictureStaysCentered(): void
+    {
+        $config = MenuConfigNormalizer::normalize(['type' => 'fullscreen', 'fullscreenImage' => null]);
+
+        self::assertSame('center', $config['panelContentPosition']);
+        self::assertArrayNotHasKey('panelImage', $config);
+    }
+
+    #[Test]
+    public function otherTypesOnlyLoseTheFormerKeys(): void
     {
         $config = ['type' => 'navbar', 'animation' => 'fade', 'logoDesktop' => null];
 
-        self::assertSame($config, MenuConfigNormalizer::normalize($config + ['sidebarWidth' => 300, 'sidebarPosition' => 'left']));
+        self::assertSame($config, MenuConfigNormalizer::normalize($config + ['sidebarWidth' => 300, 'sidebarPosition' => 'left', 'twoColumns' => true, 'fullscreenImage' => ['id' => 3]]));
     }
 
     #[Test]

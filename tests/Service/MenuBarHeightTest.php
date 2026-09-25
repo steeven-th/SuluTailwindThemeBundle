@@ -91,7 +91,7 @@ final class MenuBarHeightTest extends TestCase
             self::assertDoesNotMatchRegularExpression('/(?<![\w-])(?:md:)?(?:h-16|h-20|top-16|pt-16)(?![\w-])/', $source, basename($file) . ' hardcodes a bar height.');
         }
 
-        foreach (['_navbar', '_burger', '_fullscreen', '_megamenu'] as $type) {
+        foreach (['_navbar', '_burger', '_megamenu'] as $type) {
             self::assertStringContainsString('iw-menu__bar ', (string) file_get_contents("{$dir}/{$type}.html.twig"), "{$type} has no .iw-menu__bar.");
         }
     }

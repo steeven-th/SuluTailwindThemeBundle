@@ -120,7 +120,7 @@ Returns the menu configuration for the active theme.
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `type` | `string` | `navbar`, `burger`, `fullscreen`, or `megamenu`. A stored `sidebar` is read as `burger` with a side panel |
+| `type` | `string` | `navbar`, `burger`, or `megamenu`. A stored `sidebar` or `fullscreen` is read as `burger` (side panel, full-screen panel) |
 | `animation` | `string` | `none`, `slide`, or `fade` |
 | `megamenuSource` | `string` | Data source for mega menu: `'native'` (page tree) or `'snippet'` (manual structure). Only used when `type` is `megamenu`. Default: `'native'` |
 | `clickParentPage` | `string` | Parent page access mode: `'none'`, `'split'`, or `'selflink'` (default: `'none'`) |
@@ -131,10 +131,14 @@ Returns the menu configuration for the active theme.
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
 | `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
 | `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
-| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger` and `fullscreen` |
+| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger` |
 | `panelLayout` | `string` | Burger panel: `full` (default) or `side` |
 | `panelSide` | `string` | Side of a side panel: `left` or `right` (default) |
-| `panelWidth` | `int` | Width of a side panel in pixels from 1024px (default: `288`) |
+| `panelWidth` | `int` | Width in pixels (200-960) of a side panel, or of the links zone beside a picture. Unset: `288` on a side, `480` beside a picture |
+| `panelImage` | `array` | Picture of a full-screen panel (`{id}`) |
+| `panelImageFrom` | `string` | `md`, `lg` (default) or `xl`: the width the picture shows from |
+| `panelContentPosition` | `string` | `auto` (default), `image`, `center` or `bar` |
+| `panelL1Size` | `string` | `normal` (default) or `large` |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
 | `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `thirdTextHover`, `fourthBg`, `fourthText`, `fourthTextHover`, `chevron`, `secondChevron`, `thirdChevron`, `fourthChevron`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
 | `logo` | `string\|null` | Path to logo image |
@@ -973,7 +977,7 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
-| `iw_theme_menu_curtain` | 1200×1400 | outbound | Background image of the fullscreen menu (half screen, portrait) |
+| `iw_theme_menu_curtain` | 1200×1400 | outbound | Picture of the full-screen burger panel (a part of the screen, portrait) |
 | `iw_theme_avatar` | 200×200 | outbound | Author avatars |
 | `iw_theme_logo_desktop` | 1200×400 | inset | Header logo (covers the 200px height setting on a high-density screen) |
 | `iw_theme_logo_mobile` | 800×400 | inset | Mobile header logo |

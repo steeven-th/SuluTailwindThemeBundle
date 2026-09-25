@@ -26,12 +26,11 @@ final class MenuFourLevelsRenderTest extends TestCase
             'megamenu' => [['type' => 'megamenu', 'megamenuSource' => 'native'], 'iw-menu__text--level-2'],
             'burger panels' => [['type' => 'burger', 'subMenuPanels' => true], 'iw-menu__text--level-4'],
             'burger side' => [['type' => 'burger', 'panelLayout' => 'side'], 'iw-menu__text--level-4'],
+            'burger with a picture' => [['type' => 'burger', 'panelImage' => ['id' => 10]], 'iw-menu__text--level-4'],
+            'burger with a picture, panels' => [['type' => 'burger', 'panelImage' => ['id' => 10], 'subMenuPanels' => true], 'iw-menu__text--level-4'],
         ];
         foreach (['none', 'split', 'selflink'] as $mode) {
             $menus["burger {$mode}"] = [['type' => 'burger', 'clickParentPage' => $mode], 'iw-menu__text--level-4'];
-            foreach (['level3', 'levels23', 'none'] as $collapse) {
-                $menus["fullscreen {$mode} {$collapse}"] = [['type' => 'fullscreen', 'clickParentPage' => $mode, 'fullscreenCollapse' => $collapse], 'iw-menu__text'];
-            }
         }
 
         return $menus;

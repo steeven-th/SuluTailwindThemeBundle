@@ -71,7 +71,7 @@ Define **color schemes** for content blocks (e.g., light, accent, dark). Each va
 
 ## Menu tab
 
-Choose the **menu type** (navbar, burger, fullscreen, sidebar, megamenu), configure colors, animation, logo, and display options for desktop and mobile.
+Choose the **menu type** (navbar, burger, megamenu), configure colors, animation, logo, and display options for desktop and mobile.
 
 ![Menu configuration](images/screen/settings-theme-menu.png)
 

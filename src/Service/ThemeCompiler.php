@@ -2712,10 +2712,11 @@ class ThemeCompiler
      * untouched theme keeps rendering exactly as it did.
      */
     /**
-     * Default width of the side panel of the burger, in pixels: the `lg:w-72`
-     * the former sidebar menu shipped with.
+     * Bounds of the panel width of the burger, in pixels: the side panel, or
+     * the links zone beside the picture of a full-screen panel.
      */
-    private const PANEL_WIDTH_DEFAULT = 288;
+    private const PANEL_WIDTH_MIN = 200;
+    private const PANEL_WIDTH_MAX = 960;
 
     /**
      * Container of the menu bar per breakpoint (min width in px => [max
@@ -2855,8 +2856,12 @@ class ThemeCompiler
         // a variable stays overridable from the project's own stylesheet.
         $logoHeightDesktop = $this->normalizeLogoHeight($menuConfig['logoHeightDesktop'] ?? null, self::MENU_LOGO_HEIGHT_DESKTOP);
         $logoHeightMobile = $this->normalizeLogoHeight($menuConfig['logoHeightMobile'] ?? null, self::MENU_LOGO_HEIGHT_MOBILE);
+        // Left out when unset: each form of the panel has its own default
+        // (18rem on a side, 30rem for the links beside a picture).
         $panelWidth = $this->normalizePanelWidth($menuConfig['panelWidth'] ?? null);
-        $css .= "  --iw-menu-panel-width: {$panelWidth}px;\n";
+        if (null !== $panelWidth) {
+            $css .= "  --iw-menu-panel-width: {$panelWidth}px;\n";
+        }
         $css .= "  --iw-menu-logo-height-desktop: {$logoHeightDesktop}px;\n";
         $css .= "  --iw-menu-logo-height-mobile: {$logoHeightMobile}px;\n";
 
@@ -2922,29 +2927,26 @@ class ThemeCompiler
     }
 
     /**
-     * Clamp the configured width of the side panel to a usable pixel value.
+     * Read the configured panel width as a usable pixel value.
      *
-     * Mirrors the bounds of the admin number field (200-640). Anything outside
-     * that range falls back to the 288px the former sidebar shipped with, so a
-     * theme saved before the setting existed renders exactly as it did.
+     * Mirrors the bounds of the admin number field. Anything outside them
+     * counts as unset, and the stylesheet default of the panel form applies:
+     * the 288px the former sidebar shipped with, so a theme saved before the
+     * setting existed renders exactly as it did.
      *
      * @param mixed $value Raw width value from the configuration
      *
-     * @return int Width in pixels, between 200 and 640
+     * @return int|null Width in pixels, or null for the default
      */
-    private function normalizePanelWidth(mixed $value): int
+    private function normalizePanelWidth(mixed $value): ?int
     {
         if (!is_numeric($value)) {
-            return self::PANEL_WIDTH_DEFAULT;
+            return null;
         }
 
         $width = (int) $value;
 
-        if ($width < 200 || $width > 640) {
-            return self::PANEL_WIDTH_DEFAULT;
-        }
-
-        return $width;
+        return $width < self::PANEL_WIDTH_MIN || $width > self::PANEL_WIDTH_MAX ? null : $width;
     }
 
     /**
@@ -2997,7 +2999,7 @@ class ThemeCompiler
      * Generate CSS utility classes for the menu component.
      *
      * Covers: navbar base, text colors per level, dropdown backgrounds,
-     * dividers, burger icons, logo sizing, fullscreen overlay, and
+     * dividers, burger icons, logo sizing, the burger panel, and
      * social media icons (mask-image technique for SVG coloring).
      *
      * The mega menu lives under the `iw-mega-menu` sub-namespace so the
@@ -3013,8 +3015,8 @@ class ThemeCompiler
         // Transition background + transform so the scroll-bg fade and the
         // smart-hide slide animate smoothly (L16).
         // NOTE: no `will-change: transform` here. It would make .iw-menu a
-        // containing block for its `position: fixed` descendants (the fullscreen
-        // overlay and the burger panel), pinning them to the ~80px
+        // containing block for its `position: fixed` descendants (the burger
+        // panel and the mobile panels), pinning them to the ~80px
         // header instead of the viewport. The transform of .iw-menu--hidden only
         // applies transiently while smart-hiding, and the controller drops that
         // class whenever a panel is open.
@@ -3149,13 +3151,10 @@ class ThemeCompiler
         // divider of the entry above and was clipped by the scroll box. It is
         // drawn inside the entry instead, and the accordion entries, whose
         // text touches their edge, get some inner room given back by a
-        // negative margin: the text does not move, the ring clears it. The
-        // fullscreen titles have no divider, their ring stays off the text.
+        // negative margin: the text does not move, the ring clears it.
         $css .= ".iw-menu [role=\"dialog\"] :is(a, button):focus-visible { outline-offset: -2px; }\n";
         $css .= ".iw-menu__overlay-nav .iw-menu__list:not(.iw-menu__lang) > li > :is(a, button), .iw-menu .iw-menu__panel-item { padding-inline: 0.5rem; margin-inline: -0.5rem; }\n";
         $css .= ".iw-menu__overlay-nav .iw-menu__list:not(.iw-menu__lang) > li > button, .iw-menu .iw-menu__panel-item { width: calc(100% + 1rem); }\n";
-        // Scoped like the rule above, which it has to beat.
-        $css .= ".iw-menu [role=\"dialog\"] .iw-menu__fullscreen-body :is(a, button):focus-visible { outline-offset: 3px; }\n";
 
         // Animated burger button (3 lines → X). State is controlled by
         // toggling .iw-menu__burger--open via the menu_controller Stimulus.
@@ -3219,28 +3218,74 @@ class ThemeCompiler
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__logo-state { transition: none; } }\n";
 
         // Background of the panel the burger opens (burger, navbar and mega menu
-        // on mobile, fullscreen without image). Its motion is below.
+        // on mobile). Its motion is below.
         $css .= ".iw-menu__overlay {\n";
         $css .= "  background-color: var(--iw-menu-bg);\n";
         $css .= "  color: var(--iw-menu-text);\n";
         $css .= "}\n";
-        $css .= ".iw-menu__overlay-nav { height: 100%; padding-inline: var(--iw-menu-panel-gutter, 1.5rem); }\n";
+        $css .= ".iw-menu__overlay-nav { height: 100%; padding-inline: var(--iw-menu-panel-pad-start) var(--iw-menu-panel-pad-end); }\n";
         // Inline room of the panel content, read by the accordion and by the
-        // drill-down panels alike.
-        $css .= ".iw-menu__overlay { --iw-menu-panel-gutter: 1.5rem; }\n";
+        // drill-down panels alike: the same gutter on both sides, unless the
+        // full-screen panel places its links (below).
+        $css .= ".iw-menu__overlay { --iw-menu-panel-gutter: 1.5rem; --iw-menu-panel-pad-start: var(--iw-menu-panel-gutter); --iw-menu-panel-pad-end: var(--iw-menu-panel-gutter); }\n";
         $css .= "@media (min-width: 640px) { .iw-menu__overlay { --iw-menu-panel-gutter: 2rem; } }\n";
 
-        // Burger panel, full screen or on a side. Full screen, its content
-        // lines up with the logo: the gutter repeats the container of the bar
-        // (Tailwind `container` plus px-4 / sm:px-6 / lg:px-8), less the
-        // scrollbar the locked page gave back, and the content stops at a
-        // readable width instead of running along a wide screen.
-        $css .= ".iw-menu__overlay--full { inset: 0; --iw-menu-panel-gutter: 1rem; }\n";
+        // Burger panel, full screen or on a side. Full screen, the links stop
+        // at a readable width (--iw-menu-panel-content-width) and hug one
+        // side of their zone, or sit in its middle (content-start / -end /
+        // -center). Each side of the zone keeps a minimum room:
+        // - against the window, the edge repeating the container of the bar
+        //   (Tailwind `container` plus px-4 / sm:px-6 / lg:px-8), less the
+        //   scrollbar the locked page gave back, so the links line up with
+        //   the logo or the burger;
+        // - against the picture, a plain gap.
+        // The edge is measured on the window (vw), the rest on the zone of
+        // the links (%), which is only a part of the window beside a picture.
+        $css .= ".iw-menu__overlay--full { inset: 0; --iw-menu-panel-edge: 1rem; --iw-menu-panel-side-start: var(--iw-menu-panel-edge); --iw-menu-panel-side-end: var(--iw-menu-panel-edge); }\n";
         foreach (self::MENU_PANEL_CONTAINER as $breakpoint => [$container, $padding]) {
-            $css .= "@media (min-width: {$breakpoint}px) { .iw-menu__overlay--full { --iw-menu-panel-gutter: max({$padding}, calc((100% - var(--iw-scrollbar-compensation, 0px) - {$container}) / 2 + {$padding})); } }\n";
+            $css .= "@media (min-width: {$breakpoint}px) { .iw-menu__overlay--full { --iw-menu-panel-edge: max({$padding}, calc((100vw - var(--iw-scrollbar-compensation, 0px) - {$container}) / 2 + {$padding})); } }\n";
         }
-        $css .= ".iw-menu__overlay--full :is(.iw-menu__overlay-nav, .iw-menu__panel-body) > * { max-width: var(--iw-menu-panel-content-width, 40rem); }\n";
-        $css .= ".iw-menu__overlay--full .iw-menu__panel-header { margin-inline: var(--iw-menu-panel-gutter); padding-inline: 0; max-width: var(--iw-menu-panel-content-width, 40rem); }\n";
+        $width = 'var(--iw-menu-panel-content-width, 40rem)';
+        $css .= ".iw-menu__overlay--content-start { --iw-menu-panel-pad-start: var(--iw-menu-panel-side-start); --iw-menu-panel-pad-end: max(var(--iw-menu-panel-side-end), calc(100% - {$width} - var(--iw-menu-panel-side-start))); }\n";
+        $css .= ".iw-menu__overlay--content-end { --iw-menu-panel-pad-start: max(var(--iw-menu-panel-side-start), calc(100% - {$width} - var(--iw-menu-panel-side-end))); --iw-menu-panel-pad-end: var(--iw-menu-panel-side-end); }\n";
+        $css .= ".iw-menu__overlay--content-center { --iw-menu-panel-pad-start: max(var(--iw-menu-panel-side-start), calc((100% - {$width}) / 2)); --iw-menu-panel-pad-end: max(var(--iw-menu-panel-side-end), calc((100% - {$width}) / 2)); }\n";
+        $css .= ".iw-menu__overlay--full :is(.iw-menu__overlay-nav, .iw-menu__panel-body) > * { max-width: {$width}; }\n";
+        $css .= ".iw-menu__overlay--full .iw-menu__panel-header { margin-inline: var(--iw-menu-panel-pad-start) var(--iw-menu-panel-pad-end); padding-inline: 0; max-width: {$width}; }\n";
+
+        // Full screen with a picture: two zones, the picture on the side
+        // opposite the burger, the links on the side of the burger. Below the
+        // chosen width the picture zone is not displayed, so the controller
+        // never unpacks its image, and the links take the whole panel.
+        // The links zone is exactly the panel width, the picture takes the
+        // rest. Below the width the picture shows from, the zone is a plain
+        // block over the whole panel.
+        $css .= ".iw-menu__panel-main { position: relative; height: 100%; flex: 0 0 var(--iw-menu-panel-width, 30rem); max-width: 100%; min-width: 0; }\n";
+        $css .= ".iw-menu__panel-media { display: none; position: relative; flex: 1 1 0; min-width: 0; overflow: hidden; }\n";
+        $css .= ".iw-menu__overlay--image-right > .iw-menu__panel-media { order: 2; }\n";
+        $css .= ".iw-menu__panel-media :is(picture, img) { display: block; width: 100%; height: 100%; object-fit: cover; }\n";
+        // Once the picture shows, the links zone is a panel of its own, with
+        // the plain gutter of a panel on each side: the edge of the bar
+        // container, measured on the window, would make its content change
+        // with the window whatever the width set.
+        foreach (self::MENU_COLLAPSE_WIDTHS as $name => $breakpoint) {
+            $from = ".iw-menu__overlay--image-from-{$name}";
+            $css .= "@media (min-width: {$breakpoint}px) { {$from} { display: flex; } {$from} > .iw-menu__panel-media { display: block; }";
+            $css .= " {$from}.iw-menu__overlay--image-left { --iw-menu-panel-side-start: var(--iw-menu-panel-image-gap, var(--iw-menu-panel-gutter)); --iw-menu-panel-side-end: var(--iw-menu-panel-gutter); }";
+            $css .= " {$from}.iw-menu__overlay--image-right { --iw-menu-panel-side-start: var(--iw-menu-panel-gutter); --iw-menu-panel-side-end: var(--iw-menu-panel-image-gap, var(--iw-menu-panel-gutter)); } }\n";
+        }
+        // The picture comes in once the panel is there: an animation, not a
+        // transition, since the controller inserts it on opening.
+        $css .= "@keyframes iw-menu-media-in { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }\n";
+        $css .= ".iw-menu__dialog--open .iw-menu__panel-media > * { animation: iw-menu-media-in var(--iw-menu-media-duration, 700ms) ease var(--iw-menu-media-delay, 150ms) both; }\n";
+        $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__dialog--open .iw-menu__panel-media > * { animation: none; } }\n";
+
+        // First level large: an editorial look for a short menu. The rows of
+        // the accordion and the drill-down panels carry their size on a child
+        // (`text-lg`), which takes the size of its row here.
+        $l1 = '.iw-menu__overlay--l1-large :is(.iw-menu__overlay-nav, .iw-menu__panel-body--root) > .iw-menu__list > li > :is(a, button, div)';
+        $css .= ".iw-menu__overlay--l1-large { --iw-menu-panel-l1-size: clamp(1.5rem, 2.5vw, 2.25rem); }\n";
+        $css .= "{$l1} { font-size: var(--iw-menu-panel-l1-size); line-height: 1.2; }\n";
+        $css .= "{$l1} .text-lg { font-size: inherit; line-height: inherit; }\n";
         // On a side, the panel starts under the bar, which stays drawn in
         // full: the panels inside have no bar to clear. Full width on small
         // screens, where it covers the page anyway, --iw-menu-panel-width
@@ -3250,55 +3295,12 @@ class ThemeCompiler
         $css .= ".iw-menu__overlay--right { right: 0; }\n";
         $css .= "@media (min-width: 1024px) { .iw-menu__overlay--side { width: var(--iw-menu-panel-width, 18rem); } }\n";
 
-        // Fullscreen split layout (curtain effect)
-        $css .= ".iw-menu__fullscreen-nav { background-color: var(--iw-menu-bg); }\n";
-        // Fullscreen panel: one scroll box under the bar, holding the links and
-        // the foot together, so its scrollbar never runs along the close
-        // button. The content sits in the middle when it fits: the auto
-        // margins, unlike justify-content, never push it out of reach above.
-        $css .= ".iw-menu__fullscreen-scroll { position: absolute; inset: var(--iw-menu-bar-height, 4rem) 0 0 0; overflow-y: auto; overscroll-behavior: contain; }\n";
-        $css .= ".iw-menu__fullscreen-body { display: flex; flex-direction: column; min-height: 100%; padding-block: 2rem; }\n";
-        $css .= ".iw-menu__fullscreen-body > :first-child { margin-top: auto; }\n";
-        $css .= ".iw-menu__fullscreen-body > :last-child { margin-bottom: auto; }\n";
-        $css .= ".iw-menu__fullscreen-body--left { text-align: left; }\n";
-        $css .= ".iw-menu__fullscreen-body--center { text-align: center; }\n";
-        $css .= ".iw-menu__fullscreen-body--right { text-align: right; }\n";
-        // Aligned on a side, every level starts on the same edge: an indent
-        // and a thin rule on that side tie the children to their parent.
-        // Centered, the symmetry already shows the nesting.
-        $css .= ".iw-menu__fullscreen-body--left .iw-menu__fullscreen-sublist { margin-left: 0.25rem; padding-left: var(--iw-menu-fullscreen-indent, 1rem); border-left: 1px solid var(--iw-menu-fullscreen-rule, color-mix(in srgb, currentColor 25%, transparent)); }\n";
-        $css .= ".iw-menu__fullscreen-body--right .iw-menu__fullscreen-sublist { margin-right: 0.25rem; padding-right: var(--iw-menu-fullscreen-indent, 1rem); border-right: 1px solid var(--iw-menu-fullscreen-rule, color-mix(in srgb, currentColor 25%, transparent)); }\n";
-        // Centered, a title followed by its chevron was centered with it, so
-        // off the axis of the titles without children. The toggle keeps the
-        // room of its chevron on both sides and draws the chevron in the right
-        // one: the title sits on the axis, the focus ring still takes both.
-        $toggle = '.iw-menu__fullscreen-body--center .iw-menu__fullscreen-list button[aria-controls]:not([aria-label])';
-        $css .= "{$toggle} { position: relative; padding-inline: calc(var(--iw-menu-fullscreen-arrow, 1rem) + var(--iw-menu-fullscreen-arrow-gap, 0.5rem)); }\n";
-        $css .= "{$toggle} > .iw-nav-arrow { position: absolute; right: 0; top: 50%; margin-top: calc(var(--iw-menu-fullscreen-arrow, 1rem) / -2); }\n";
-        $css .= ".iw-menu__fullscreen-l1 { --iw-menu-fullscreen-arrow: 1.5rem; --iw-menu-fullscreen-arrow-gap: 0.75rem; }\n";
-        $css .= ".iw-menu__fullscreen-footer { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding-top: 2rem; }\n";
-        $css .= ".iw-menu__fullscreen-body--left .iw-menu__fullscreen-footer { align-items: flex-start; }\n";
-        $css .= ".iw-menu__fullscreen-body--right .iw-menu__fullscreen-footer { align-items: flex-end; }\n";
-        // First-level titles: one size for the whole panel, smaller where
-        // the room is shared (two columns, half of the screen next to the
-        // image), so a long label takes two lines, not six.
-        $css .= ".iw-menu__fullscreen-l1 { font-size: var(--iw-menu-fullscreen-l1-size, clamp(1.5rem, 4vw, 3rem)); line-height: 1.15; }\n";
-        $css .= ".iw-menu__fullscreen-list--two, .iw-menu__fullscreen-nav { --iw-menu-fullscreen-l1-size: clamp(1.5rem, 2.4vw, 2.25rem); }\n";
-        $css .= ".iw-menu__fullscreen-list > li { padding-bottom: 1.25rem; }\n";
-        $css .= "@media (min-width: 768px) { .iw-menu__fullscreen-list > li { padding-bottom: 1.75rem; } }\n";
-        // Two columns balanced by height, each entry kept whole: a grid lined
-        // every entry up with the tallest of its row. Next to the image, only
-        // once the half screen holds two columns of 320px.
-        $css .= ".iw-menu__fullscreen-list--two > li, .iw-menu__fullscreen-list--split > li { break-inside: avoid; }\n";
-        $css .= "@media (min-width: 768px) { .iw-menu__fullscreen-list--two { columns: 2; column-gap: 3rem; } }\n";
-        $css .= "@media (min-width: 1280px) { .iw-menu__fullscreen-list--split { columns: 2; column-gap: 3rem; } }\n";
-
         // Backdrop behind a side panel: hidden by default, faded in via --visible.
         // It starts under the bar, which stays usable and undimmed.
         $css .= ".iw-menu__backdrop { top: var(--iw-menu-bar-height); background-color: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }\n";
         $css .= ".iw-menu__backdrop--visible { opacity: 1; pointer-events: auto; }\n";
 
-        // ─── Dialog states (burger, fullscreen, mobile panels) ────────────────
+        // ─── Dialog states (burger, mobile panels) ────────────────────────────
         // The menu controller only switches classes: every motion lives here, so
         // a project can restyle it and reduced motion can switch it off. A closed
         // panel is `visibility: hidden`, which also takes it out of the focus
@@ -3314,13 +3316,6 @@ class ThemeCompiler
         $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-left { transform: translateX(-100%); }\n";
         $css .= ".iw-menu__dialog--slide.iw-menu__dialog--from-right { transform: translateX(100%); }\n";
         $css .= ".iw-menu__dialog--slide.iw-menu__dialog--open { transform: none; transition: transform 0.3s ease, visibility 0s; }\n";
-        // Curtain (fullscreen with image): the two halves slide, the panel waits.
-        $css .= ".iw-menu__dialog--curtain { transition: visibility 0s linear 0.5s; }\n";
-        $css .= ".iw-menu__dialog--curtain.iw-menu__dialog--open { transition: visibility 0s; }\n";
-        $css .= ".iw-menu__curtain { transition: transform 0.5s ease; }\n";
-        $css .= ".iw-menu__curtain--left { transform: translateX(-100%); }\n";
-        $css .= ".iw-menu__curtain--right { transform: translateX(100%); }\n";
-        $css .= ".iw-menu__dialog--open .iw-menu__curtain { transform: none; }\n";
         // The page under an open panel does not scroll. The room its scrollbar
         // took is given back as padding (width measured by the controller), so
         // the bar does not shift sideways. A reserved gutter would do the same
@@ -3348,7 +3343,7 @@ class ThemeCompiler
         $css .= ".iw-menu .iw-menu__text--level-3 .iw-nav-arrow { color: var(--iw-menu-third-chevron-color, currentColor); }\n";
         $css .= ".iw-menu .iw-menu__text--level-4 .iw-nav-arrow { color: var(--iw-menu-fourth-chevron-color, currentColor); }\n";
         $css .= "@media (prefers-reduced-motion: reduce) {\n";
-        $css .= "  .iw-menu__dialog, .iw-menu__curtain, .iw-menu__backdrop, .iw-menu__subpanel,\n";
+        $css .= "  .iw-menu__dialog, .iw-menu__backdrop, .iw-menu__subpanel,\n";
         $css .= "  .iw-menu__burger-line, .iw-menu .iw-nav-arrow--down { transition-duration: 0s !important; transition-delay: 0s !important; }\n";
         $css .= "}\n";
 
@@ -3362,7 +3357,7 @@ class ThemeCompiler
         $css .= ".iw-menu__panel { height: 100%; overflow-y: auto; }\n";
         $css .= ".iw-menu__panel-body { display: flex; flex-direction: column; }\n";
         // Root panel body clears the navbar with the same offset the sub-panels use.
-        $css .= ".iw-menu__panel-body--root { padding-top: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem)); padding-inline: var(--iw-menu-panel-gutter, 1.5rem); }\n";
+        $css .= ".iw-menu__panel-body--root { padding-top: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem)); padding-inline: var(--iw-menu-panel-pad-start) var(--iw-menu-panel-pad-end); }\n";
         // Sub-panel: it starts under the bar rather than sliding beneath it.
         // The burger bar paints no background of its own, so a sub-panel
         // under it showed its level background there, behind the text of the
@@ -3378,7 +3373,7 @@ class ThemeCompiler
         $css .= ".iw-menu__subpanel--level-2 { color: var(--iw-menu-second-text, var(--iw-menu-text)); }\n";
         $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
         $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
-        $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--iw-menu-panel-gutter, 1.5rem) 1rem; }\n";
+        $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--iw-menu-panel-pad-end) 1rem var(--iw-menu-panel-pad-start); }\n";
         // Motion — enter side matches the menu slide direction; --active rests at 0.
         $css .= ".iw-menu__panels--from-right .iw-menu__subpanel { transform: translateX(100%); }\n";
         $css .= ".iw-menu__panels--from-left .iw-menu__subpanel { transform: translateX(-100%); }\n";
@@ -3395,7 +3390,7 @@ class ThemeCompiler
         $css .= ".iw-menu__panels--none .iw-menu__subpanel { transition: none; transform: translateX(100%); }\n";
         $css .= ".iw-menu__panels--none .iw-menu__subpanel--active { transform: translate(0, 0); }\n";
         // Header: back button + (optionally linked) section title, one size up.
-        $css .= ".iw-menu__panel-header { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; padding: 0.75rem var(--iw-menu-panel-gutter, 1.5rem); border-bottom: 1px solid var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
+        $css .= ".iw-menu__panel-header { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; padding: 0.75rem var(--iw-menu-panel-pad-end) 0.75rem var(--iw-menu-panel-pad-start); border-bottom: 1px solid var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
         // Its padding is given back, so the arrow lines up with the rows.
         $css .= ".iw-menu__panel-back { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0.25rem; margin-inline-start: -0.25rem; cursor: pointer; }\n";
         // The color of its sub-panel level, without hover. A linkable title

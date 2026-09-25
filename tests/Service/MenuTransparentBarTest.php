@@ -50,7 +50,7 @@ final class MenuTransparentBarTest extends TestCase
         self::assertMatchesRegularExpression('/\.iw-menu::before \{[^}]*z-index: 40;[^}]*background-color: var\(--iw-menu-surface/', $css);
         self::assertDoesNotMatchRegularExpression('/(^|\n)\.iw-menu \{[^}]*background-color/', $css);
         self::assertStringContainsString('--iw-menu-border-width: 2px;', $css);
-        foreach (['_navbar', '_burger', '_fullscreen', '_megamenu'] as $type) {
+        foreach (['_navbar', '_burger', '_megamenu'] as $type) {
             self::assertStringContainsString('iw-menu__frame relative z-50', (string) file_get_contents(\dirname(__DIR__, 2) . "/templates/menu/{$type}.html.twig"), "{$type}: the bar content must sit above the chrome layer.");
         }
     }
@@ -102,7 +102,7 @@ final class MenuTransparentBarTest extends TestCase
         $theme->setMenuConfig(['type' => 'navbar', 'transparentNavbar' => true, 'scrollBg' => false]);
         self::assertFalse($mapper->serializeTheme($theme)['menuConfig_scrollBg']);
 
-        foreach (['_navbar', '_burger', '_fullscreen', '_megamenu'] as $type) {
+        foreach (['_navbar', '_burger', '_megamenu'] as $type) {
             $source = (string) file_get_contents(\dirname(__DIR__, 2) . "/templates/menu/{$type}.html.twig");
             self::assertStringContainsString("data-menu-scroll-bg-value=\"{{ (config.scrollBg ?? true) ? 'true' : 'false' }}\"", $source, "{$type} does not default the background on scroll.");
         }
