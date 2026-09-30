@@ -76,7 +76,7 @@
                                                class="iw-menu__text--level-2{{ nav.state_class(itemState) }} block no-underline hover:opacity-80 transition-opacity">
                                                 <span class="text-sm">{{ linkItem.title }}</span>{{ links.new_tab_hint(itemLink) }}
                                                 {% if linkItem.description|default(null) %}
-                                                    <span class="block text-xs opacity-60 mt-0.5">{{ linkItem.description }}</span>
+                                                    <span class="block text-xs opacity-75 mt-0.5">{{ linkItem.description }}</span>
                                                 {% endif %}
                                             </a>
                                         </li>
@@ -125,7 +125,7 @@
                                             <div class="{{ cardLayout == 'horizontal' ? 'iw-mega-menu__card-body' : '' }} p-2">
                                                 <span class="{{ cardHasBg ? 'iw-menu__text--level-3' : 'iw-menu__text--level-2' }} text-sm font-medium">{{ card.title }}</span>{% if cardLink %}{{ links.new_tab_hint(cardLink) }}{% endif %}
                                                 {% if card.description|default(null) %}
-                                                    <span class="{{ cardHasBg ? 'iw-menu__text--level-3' : 'iw-menu__text--level-2' }} block text-xs opacity-60 mt-0.5">{{ card.description }}</span>
+                                                    <span class="{{ cardHasBg ? 'iw-menu__text--level-3' : 'iw-menu__text--level-2' }} block text-xs opacity-75 mt-0.5">{{ card.description }}</span>
                                                 {% endif %}
                                             </div>
                                         </{{ cardTag }}>

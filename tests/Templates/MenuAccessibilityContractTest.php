@@ -106,6 +106,23 @@ final class MenuAccessibilityContractTest extends TestCase
     }
 
     /**
+     * Text dimmed by opacity loses contrast whatever the theme picks: the card
+     * descriptions of the mega menu, at 60%, fell to 3.88:1 on white with a
+     * dark navy text. Hover states are left out, they come back to full.
+     */
+    #[Test]
+    public function noMenuTextIsDimmedBelowSeventyPercent(): void
+    {
+        foreach (glob(\dirname(__DIR__, 2) . '/templates/menu/*.html.twig') ?: [] as $path) {
+            preg_match_all('/(?<![\w:-])opacity-(\d+)\b/', (string) file_get_contents($path), $matches);
+
+            foreach ($matches[1] as $value) {
+                self::assertGreaterThanOrEqual(70, (int) $value, basename($path) . " dims some text to opacity-{$value}: keep 70 or more.");
+            }
+        }
+    }
+
+    /**
      * Motion set inline by the script could not be switched off by
      * `prefers-reduced-motion`, and hiding the body scrollbar shifted the page.
      */
