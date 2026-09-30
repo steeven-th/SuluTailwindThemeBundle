@@ -94,14 +94,8 @@
                                     </params>
                                 </property>
 
-                                <!--
-                                    The pictogram of the step, shared picker. The
-                                    media field it replaces was named `icon`; the
-                                    migration command moves those values to
-                                    `iconMedia`.
-                                -->
-                                <xi:include href="../fragments/icon-picker.xml"
-                                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+                                <!-- From the theme library or the media library. -->
+                                <property name="icon" type="iw_theme_icon_picker" colspan="12"/>
 
                                 <property name="title" type="text_line">
                                     <meta><title>iw_sulu_tailwind_theme.title</title></meta>

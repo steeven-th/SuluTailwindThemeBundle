@@ -6,427 +6,399 @@ const SCROLL_BG_THRESHOLD = 50;
 /** Below this scroll position the navbar never hides (top-of-page safe zone). */
 const SCROLL_HIDE_MIN = 80;
 
-/** Minimum scroll delta to switch hide/reveal — avoids flicker (hysteresis). */
+/** Minimum scroll delta to switch hide/reveal, avoids flicker (hysteresis). */
 const SCROLL_HIDE_HYSTERESIS = 8;
 
+/** Delay before a hover-opened popup closes, so a diagonal move does not drop it. */
+const HOVER_CLOSE_DELAY = 150;
+
+/** Elements that can take the focus when a panel opens. */
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** A navbar or mega menu that switches to the burger when its links no longer fit. */
+const AUTO_COLLAPSE_CLASS = 'iw-menu--collapse-auto';
+
+/** Under this width the burger always wins, whatever fits (the md breakpoint of the stylesheet). */
+const AUTO_COLLAPSE_MIN_WIDTH = 768;
+
 /**
- * Menu controller — handles mobile fullscreen overlay, desktop dropdowns (click + hover),
- * level-3 sub-dropdowns with smart repositioning, and scroll behavior.
+ * The widths of the fixed switches to the burger (`.iw-menu--collapse-md|lg|xl`),
+ * as ThemeCompiler writes them. Above it, a bar that does not hold its content
+ * switches anyway: the width is a floor, not a promise that everything fits.
+ */
+const FIXED_COLLAPSE_WIDTHS = { md: 768, lg: 1024, xl: 1280 };
+
+/** Class put on <html> while a panel is open: no page scroll, no layout shift. */
+const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
+
+/**
+ * Menu controller, shared by the five menu types.
+ *
+ * Everything that opens and closes follows one of two W3C ARIA Authoring
+ * Practices patterns, and the ARIA state is the single source of truth:
+ *
+ * - Disclosure: dropdowns (levels 2 and 3), mega menu panels, mobile
+ *   accordions, the language dropdown. The trigger is a <button> carrying
+ *   `aria-expanded` and `aria-controls` (the id of what it shows). The content
+ *   is shown and hidden with the `hidden` class, in open() and close() only.
+ *   A "popup" (trigger with the `popupTrigger` target) floats over the page:
+ *   one per level at a time, opens on hover with a fine pointer, closes when
+ *   the focus leaves it, on a click outside and on Escape. An accordion stays
+ *   in the flow and only closes when asked.
+ * - Dialog: the panels the burger opens (burger, full screen or on a side,
+ *   fullscreen, navbar and mega menu on mobile). On open, the page the panel hides is
+ *   made `inert`, the focus moves into the panel and the page stops scrolling
+ *   without shifting sideways. Escape, the burger or the backdrop close it and
+ *   give the focus back to the burger. The bar stays drawn above the panel and
+ *   stays usable, burger included: that is why the panel has no `aria-modal`,
+ *   which would hide the bar from screen readers (see doc/menus.md,
+ *   Accessibility).
+ *
+ * Hover and click agree: hovering opens a popup, a click on a popup opened
+ * by hover pins it open, the next click closes it. A click never closes what
+ * the visitor has just seen appear.
+ *
+ * Motion lives in the stylesheet (state classes, `prefers-reduced-motion`
+ * honoured there): this controller only switches classes.
+ *
+ * A navbar or mega menu is measured on load and on resize: it gets
+ * `.iw-menu--collapsed` when its bar does not hold its content on one line.
+ * Set to switch automatically (`.iw-menu--collapse-auto`), that is the only
+ * rule. Set to a width (`.iw-menu--collapse-lg`), it switches below that width
+ * whatever happens, and above it only when the bar overflows, as a bar filled
+ * with actions can.
  *
  * Values:
- *   - animation: The animation type ("none", "slide", "fade")
- *   - slideDirection: The slide direction ("top", "right", "bottom", "left")
  *   - scrollBg: Transparent navbar takes its background once scrolled (boolean)
  *   - scrollHide: Hide navbar on scroll down, reveal on scroll up (boolean)
+ *   - openLabel / closeLabel: Translated accessible name of the burger
  *
  * Targets:
- *   - panel: The mobile fullscreen overlay panel
- *   - burger: The burger button element
- *   - dropdown: Desktop L2 dropdown menu containers
- *   - dropdownParent: Desktop L2 dropdown parent wrappers (for hover events)
- *   - subdropdown: Desktop L3 sub-dropdown menu containers
- *   - subdropdownParent: Desktop L3 sub-dropdown parent wrappers (for hover events)
- *   - submenu: Mobile submenu containers (toggled independently)
+ *   - panel / burger: The dialog opened by the burger, and the burger
+ *   - backdrop: The dimmed layer behind a side panel (click closes it)
+ *   - popupTrigger: A disclosure trigger whose content floats over the page
+ *   - subPanel: A drill-down sub-panel ("sub-menus as panels" mode)
  *
  * Actions:
- *   - toggle(): Toggle mobile overlay open/close
- *   - toggleDropdown(event): Toggle a desktop dropdown
- *   - toggleMobileSubmenu(event): Toggle a mobile submenu accordion
+ *   - toggle(): Open or close the burger dialog
+ *   - toggleDisclosure(event): Open, pin or close the content of a trigger
+ *   - openPanel(event) / closePanel(): Drill-down sub-panel navigation
  */
 export default class extends Controller {
     static targets = [
         'panel', 'burger',
-        'dropdown', 'dropdownParent',
-        'subdropdown', 'subdropdownParent',
-        'submenu',
-        'curtainLeft', 'curtainRight',
         'backdrop',
-        'sidebar', 'sidebarBurger',
-        'megaParent', 'megaDropdown',
-        'panels', 'subPanel',
+        'popupTrigger',
+        'subPanel',
     ];
 
-    /** @type {Array<Element>} Open drill-down panels, innermost last (a navigation stack) */
-    _panelStack = [];
-
     static values = {
-        animation: { type: String, default: 'none' },
-        slideDirection: { type: String, default: 'top' },
         scrollBg: { type: Boolean, default: false },
         scrollHide: { type: Boolean, default: false },
+        openLabel: { type: String, default: '' },
+        closeLabel: { type: String, default: '' },
     };
 
-    /** @type {number} Last known scroll position, for scroll-direction detection */
-    _lastScrollY = 0;
-
-    /** @type {boolean} Whether the mobile menu is currently open */
-    isOpen = false;
-
-    /** @type {Map<Element, number>} Timeout IDs for hover close delay per dropdown parent */
-    _hoverTimeouts = new Map();
-
-    /** @type {Array<Function>} Cleanup callbacks for hover listeners */
-    _hoverCleanups = [];
-
-    /** @type {boolean} Whether the desktop sidebar is currently open */
-    isSidebarOpen = false;
-
     connect() {
-        // Close dropdowns when clicking outside
+        /** @type {{panel: HTMLElement, burger: ?HTMLElement, openClass: string}|null} The open dialog */
+        this._dialog = null;
+        /** @type {Array<Element>} Elements made inert while a dialog is open */
+        this._inerted = [];
+        /** @type {Array<{panel: HTMLElement, trigger: HTMLElement, parent: ?HTMLElement}>} Open sub-panels, innermost last */
+        this._panelStack = [];
+        /** @type {Set<Element>} Popups pinned open by a click */
+        this._pinned = new Set();
+        /** @type {Map<Element, number>} Pending hover-close timeouts, per trigger */
+        this._hoverTimeouts = new Map();
+        /** @type {Array<Function>} Cleanup callbacks for hover listeners */
+        this._hoverCleanups = [];
+        /** @type {number} Last known scroll position, for scroll-direction detection */
+        this._lastScrollY = window.scrollY;
+
         this._onDocumentClick = this._handleDocumentClick.bind(this);
-        document.addEventListener('click', this._onDocumentClick);
-
-        // Scroll behavior: background-on-scroll and smart hide/reveal
+        this._onKeydown = this._handleKeydown.bind(this);
+        this._onFocusout = this._handleFocusout.bind(this);
         this._onScroll = this._handleScroll.bind(this);
+        this._onResize = this._handleResize.bind(this);
+        this._onRestore = () => {
+            this._syncScrolled();
+            this._lastScrollY = window.scrollY;
+        };
+
+        document.addEventListener('click', this._onDocumentClick);
+        document.addEventListener('keydown', this._onKeydown);
+        this.element.addEventListener('focusout', this._onFocusout);
         window.addEventListener('scroll', this._onScroll, { passive: true });
+        window.addEventListener('resize', this._onResize, { passive: true });
+        // A reload in the middle of the page: the browser puts the scroll
+        // position back around the load, without a scroll event this
+        // controller is sure to hear, and the bar stayed transparent.
+        window.addEventListener('load', this._onRestore);
+        window.addEventListener('pageshow', this._onRestore);
+        this._onRestore();
 
-        // Setup hover behavior for desktop dropdowns (L2 + L3)
-        this._setupHoverDropdowns();
-
-        // Set initial hidden transform on the panel based on animation config
-        this._setInitialPanelState();
+        this._setupHover();
+        this._setupAutoCollapse();
     }
 
     disconnect() {
         document.removeEventListener('click', this._onDocumentClick);
+        document.removeEventListener('keydown', this._onKeydown);
+        this.element.removeEventListener('focusout', this._onFocusout);
         window.removeEventListener('scroll', this._onScroll);
-        this._cleanupHoverDropdowns();
+        window.removeEventListener('resize', this._onResize);
+        window.removeEventListener('load', this._onRestore);
+        window.removeEventListener('pageshow', this._onRestore);
+        this._cleanupHover();
+
+        // A page swap (Turbo) must not leave the document inert or locked.
+        this._releaseInert();
+        this._unlockScroll();
     }
 
-    /** Toggle the mobile overlay visibility with animation. */
-    toggle() {
-        this.isOpen = !this.isOpen;
+    // ─── Disclosure ──────────────────────────────────────────────────────────
 
-        // Toggle animated burger (3 lines → X)
-        if (this.hasBurgerTarget) {
-            this.burgerTarget.classList.toggle('iw-menu__burger--open', this.isOpen);
+    /**
+     * Click on a disclosure trigger: open it, pin it when hover already opened
+     * it, close it otherwise.
+     *
+     * @param {Event} event
+     */
+    toggleDisclosure(event) {
+        const trigger = event.currentTarget;
+
+        if (!this._isExpanded(trigger)) {
+            this.open(trigger);
+            if (this._isPopup(trigger)) this._pinned.add(trigger);
+        } else if (this._isPopup(trigger) && !this._pinned.has(trigger)) {
+            // Opened by hover a moment ago: the click means "keep it".
+            this._pinned.add(trigger);
+            this._clearHoverTimeout(trigger);
+        } else {
+            this.close(trigger);
         }
-
-        // Reset the drill-down stack so the menu reopens on the root panel.
-        if (!this.isOpen) {
-            this._resetPanels();
-        }
-
-        this._updateOverlayState();
     }
 
     /**
-     * Drill-down panels: open the sub-panel referenced by the clicked row.
+     * Show the content of a trigger and mark it expanded.
      *
-     * @param {Event} event - Action event carrying params.panelId
+     * @param {HTMLElement} trigger
+     */
+    open(trigger) {
+        const content = this._contentOf(trigger);
+        if (!content || this._isExpanded(trigger)) return;
+
+        if (this._isPopup(trigger)) this._closeOtherPopups(trigger);
+
+        content.classList.remove('hidden');
+        trigger.setAttribute('aria-expanded', 'true');
+
+        if (this._isPopup(trigger)) this._reposition(content);
+    }
+
+    /**
+     * Hide the content of a trigger, and everything opened inside it.
+     *
+     * @param {HTMLElement} trigger
+     */
+    close(trigger) {
+        const content = this._contentOf(trigger);
+        this._pinned.delete(trigger);
+        this._clearHoverTimeout(trigger);
+        trigger.setAttribute('aria-expanded', 'false');
+        if (!content) return;
+
+        content.querySelectorAll('[aria-expanded="true"][aria-controls]').forEach((nested) => this.close(nested));
+        content.classList.add('hidden');
+        this._resetPosition(content);
+    }
+
+    // ─── Dialogs ─────────────────────────────────────────────────────────────
+
+    /** Open or close the dialog the burger controls. */
+    toggle() {
+        this._toggleDialog();
+    }
+
+    /**
+     * Drill-down panels: open the sub-panel the clicked row controls.
+     *
+     * @param {Event} event
      */
     openPanel(event) {
-        const id = event.params.panelId;
-        const panel = this.subPanelTargets.find((p) => p.dataset.panelId === id);
-        if (!panel || this._panelStack.includes(panel)) return;
+        const trigger = event.currentTarget;
+        const panel = this._contentOf(trigger);
+        if (!panel || this._panelStack.some((entry) => entry.panel === panel)) return;
+
+        // The level underneath stays visible but must not take the focus.
+        const parent = trigger.closest('.iw-menu__panel, .iw-menu__subpanel');
+        if (parent) parent.inert = true;
 
         panel.classList.add('iw-menu__subpanel--active');
-        panel.removeAttribute('inert');
-        this._panelStack.push(panel);
+        panel.inert = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        this._panelStack.push({ panel, trigger, parent });
+
+        this._focusFirst(panel, '.iw-menu__panel-back');
     }
 
-    /** Drill-down panels: close the top-most sub-panel (go one level back). */
+    /** Drill-down panels: close the top-most sub-panel (one level back). */
     closePanel() {
-        const panel = this._panelStack.pop();
-        if (!panel) return;
+        const entry = this._panelStack.pop();
+        if (!entry) return;
 
-        panel.classList.remove('iw-menu__subpanel--active');
-        panel.setAttribute('inert', '');
+        this._hideSubPanel(entry);
+        entry.trigger.focus({ preventScroll: true });
+    }
+
+    // ─── Event handlers ──────────────────────────────────────────────────────
+
+    /**
+     * Escape closes the deepest open thing: a popup, then a sub-panel, then
+     * the dialog. The focus goes back to what opened it.
+     *
+     * @param {KeyboardEvent} event
+     * @private
+     */
+    _handleKeydown(event) {
+        if (event.key !== 'Escape') return;
+
+        const popup = this._deepestOpenPopup();
+        if (popup) {
+            const zone = this._zoneOf(popup);
+            const hadFocus = zone.contains(document.activeElement);
+            this.close(popup);
+            // A popup opened by hover must not steal the focus from elsewhere.
+            if (hadFocus) popup.focus({ preventScroll: true });
+            event.preventDefault();
+            return;
+        }
+
+        if (this._dialog && this._panelStack.length > 0) {
+            this.closePanel();
+            event.preventDefault();
+            return;
+        }
+
+        if (this._dialog) {
+            this._closeDialog();
+            event.preventDefault();
+        }
     }
 
     /**
-     * Collapse every open sub-panel back to the root (called on menu close).
+     * Close a popup once the focus has left it (Tab past its last link).
      *
+     * @param {FocusEvent} event
      * @private
      */
-    _resetPanels() {
-        this._panelStack.forEach((panel) => {
-            panel.classList.remove('iw-menu__subpanel--active');
-            panel.setAttribute('inert', '');
+    _handleFocusout(event) {
+        const next = event.relatedTarget;
+        // No next element: a click on something unfocusable, handled on click.
+        if (!next) return;
+
+        this._openPopups().forEach((trigger) => {
+            const zone = this._zoneOf(trigger);
+            if (zone.contains(event.target) && !zone.contains(next)) this.close(trigger);
         });
-        this._panelStack = [];
     }
 
     /**
-     * Toggle a desktop dropdown menu.
-     *
-     * @param {Event} event
-     */
-    toggleDropdown(event) {
-        const button = event.currentTarget;
-        const dropdown = button.nextElementSibling;
-
-        if (!dropdown) return;
-
-        // Close all other dropdowns and their sub-dropdowns first
-        this.dropdownTargets.forEach((dd) => {
-            if (dd !== dropdown) {
-                dd.classList.add('hidden');
-                this._closeSubDropdownsInside(dd);
-            }
-        });
-
-        const willOpen = dropdown.classList.contains('hidden');
-        dropdown.classList.toggle('hidden');
-
-        if (willOpen) {
-            this._repositionDropdown(dropdown);
-        } else {
-            // Closing: also reset sub-dropdowns inside
-            this._closeSubDropdownsInside(dropdown);
-        }
-    }
-
-    /**
-     * Toggle a mobile submenu accordion.
-     *
-     * @param {Event} event
-     */
-    toggleMobileSubmenu(event) {
-        const button = event.currentTarget;
-        // Find the submenu: either next sibling of button, or next sibling of button's parent wrapper (split button case)
-        let submenu = button.nextElementSibling;
-        if (!submenu || !submenu.hasAttribute('data-menu-target')) {
-            submenu = button.closest('.iw-menu__parent-item')?.querySelector('[data-menu-target="submenu"]');
-        }
-        const arrow = button.querySelector('svg');
-
-        if (!submenu) return;
-
-        const isHidden = submenu.classList.contains('hidden');
-        submenu.classList.toggle('hidden');
-
-        // Rotate arrow indicator
-        if (arrow) {
-            arrow.style.transform = isHidden ? 'rotate(180deg)' : '';
-        }
-    }
-
-    /** Toggle the sidebar open/close (same behavior on every breakpoint). */
-    toggleSidebar() {
-        if (!this.hasSidebarTarget) return;
-
-        this.isSidebarOpen = !this.isSidebarOpen;
-        const sidebar = this.sidebarTarget;
-        const position = this.slideDirectionValue; // 'left' or 'right'
-        const hiddenClass = position === 'left' ? '-translate-x-full' : 'translate-x-full';
-
-        if (this.isSidebarOpen) {
-            sidebar.classList.remove(hiddenClass);
-            sidebar.classList.add('translate-x-0');
-        } else {
-            sidebar.classList.remove('translate-x-0');
-            sidebar.classList.add(hiddenClass);
-        }
-
-        // Burger → X
-        if (this.hasSidebarBurgerTarget) {
-            this.sidebarBurgerTarget.classList.toggle('iw-menu__burger--open', this.isSidebarOpen);
-        }
-
-        // Backdrop fade (CSS-driven) + body scroll lock.
-        if (this.hasBackdropTarget) {
-            this.backdropTarget.classList.toggle('iw-menu__backdrop--visible', this.isSidebarOpen);
-        }
-        document.body.style.overflow = this.isSidebarOpen ? 'hidden' : '';
-
-        // Collapse any open drill-down panels when the sidebar closes.
-        if (!this.isSidebarOpen) {
-            this._resetPanels();
-        }
-    }
-
-    /**
-     * Toggle a mega dropdown panel.
-     * Closes all other mega dropdowns before toggling the target one.
-     *
-     * @param {Event} event
-     */
-    toggleMegaDropdown(event) {
-        const button = event.currentTarget;
-        const index = this.megaParentTargets.indexOf(button);
-        const dropdown = this.megaDropdownTargets[index];
-        if (!dropdown) return;
-
-        // Close all other mega dropdowns
-        this.megaDropdownTargets.forEach((dd, i) => {
-            if (i !== index) {
-                dd.classList.add('hidden');
-                const arrow = this.megaParentTargets[i]?.querySelector('svg');
-                if (arrow) arrow.style.transform = '';
-            }
-        });
-
-        // Toggle this one
-        const isHidden = dropdown.classList.contains('hidden');
-        dropdown.classList.toggle('hidden');
-        const arrow = button.querySelector('svg');
-        if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : '';
-    }
-
-    /**
-     * Set the initial hidden state of the panel based on animation type.
-     *
-     * @private
-     */
-    _setInitialPanelState() {
-        // Panel starts hidden via Tailwind classes (invisible + opacity-0).
-        // No inline styles needed — _updateOverlayState() handles everything
-        // dynamically on open/close.
-    }
-
-    /**
-     * Get the CSS transform for slide animation.
-     *
-     * @param {boolean} open - Whether the panel should be in the open state
-     * @returns {string} CSS transform value
-     * @private
-     */
-    _getSlideTransform(open) {
-        if (open) return 'translate(0, 0)';
-
-        const direction = this.slideDirectionValue;
-        switch (direction) {
-            case 'top': return 'translateY(-100%)';
-            case 'bottom': return 'translateY(100%)';
-            case 'left': return 'translateX(-100%)';
-            case 'right': return 'translateX(100%)';
-            default: return 'translateY(-100%)';
-        }
-    }
-
-    /**
-     * Update the fullscreen overlay state with animation.
-     *
-     * @private
-     */
-    _updateOverlayState() {
-        if (!this.hasPanelTarget) return;
-
-        const panel = this.panelTarget;
-        const animation = this.animationValue;
-
-        if (this.isOpen) {
-            // Clean all inline styles and remove Tailwind hiding classes
-            panel.style.cssText = '';
-            panel.classList.remove('invisible', 'opacity-0');
-
-            if (animation === 'slide') {
-                // Fully visible but positioned off-screen
-                panel.style.opacity = '1';
-                panel.style.transform = this._getSlideTransform(false);
-                panel.offsetHeight; // eslint-disable-line no-unused-expressions
-                // Animate only the transform
-                panel.style.transition = 'transform 0.3s ease';
-                panel.style.transform = this._getSlideTransform(true);
-            } else if (animation === 'fade') {
-                // Start transparent
-                panel.style.opacity = '0';
-                panel.offsetHeight; // eslint-disable-line no-unused-expressions
-                // Animate only the opacity
-                panel.style.transition = 'opacity 0.3s ease';
-                panel.style.opacity = '1';
-            } else if (animation === 'curtain') {
-                // Curtain effect: left panel slides from left, right panel slides from right
-                panel.style.opacity = '1';
-                const left = this.hasCurtainLeftTarget ? this.curtainLeftTarget : null;
-                const right = this.hasCurtainRightTarget ? this.curtainRightTarget : null;
-                if (left) {
-                    left.style.transform = 'translateX(-100%)';
-                    left.offsetHeight; // eslint-disable-line no-unused-expressions
-                    left.style.transition = 'transform 0.5s ease';
-                    left.style.transform = 'translateX(0)';
-                }
-                if (right) {
-                    right.style.transform = 'translateX(100%)';
-                    right.offsetHeight; // eslint-disable-line no-unused-expressions
-                    right.style.transition = 'transform 0.5s ease';
-                    right.style.transform = 'translateX(0)';
-                }
-            }
-            // "none": panel is already visible, nothing to animate
-
-            // Show backdrop (sidebar mobile overlay)
-            if (this.hasBackdropTarget) {
-                this.backdropTarget.style.opacity = '0';
-                this.backdropTarget.offsetHeight; // eslint-disable-line no-unused-expressions
-                this.backdropTarget.style.transition = 'opacity 0.3s ease';
-                this.backdropTarget.style.opacity = '1';
-            }
-
-            document.body.style.overflow = 'hidden';
-        } else {
-            // Closing: animate out then clean up
-            if (animation === 'slide') {
-                panel.style.transition = 'transform 0.3s ease';
-                panel.style.transform = this._getSlideTransform(false);
-            } else if (animation === 'fade') {
-                panel.style.transition = 'opacity 0.3s ease';
-                panel.style.opacity = '0';
-            } else if (animation === 'curtain') {
-                const left = this.hasCurtainLeftTarget ? this.curtainLeftTarget : null;
-                const right = this.hasCurtainRightTarget ? this.curtainRightTarget : null;
-                if (left) {
-                    left.style.transition = 'transform 0.5s ease';
-                    left.style.transform = 'translateX(-100%)';
-                }
-                if (right) {
-                    right.style.transition = 'transform 0.5s ease';
-                    right.style.transform = 'translateX(100%)';
-                }
-            }
-
-            // Hide backdrop (sidebar mobile overlay)
-            if (this.hasBackdropTarget) {
-                this.backdropTarget.style.transition = 'opacity 0.3s ease';
-                this.backdropTarget.style.opacity = '0';
-            }
-
-            if (animation !== 'none') {
-                // Determine which element to listen for transitionend on
-                let transitionTarget = panel;
-                if (animation === 'curtain') {
-                    transitionTarget = this.hasCurtainRightTarget ? this.curtainRightTarget
-                                     : this.hasCurtainLeftTarget ? this.curtainLeftTarget
-                                     : panel;
-                }
-
-                // After transition completes, wipe inline styles and restore hiding classes.
-                // Must filter by e.target to ignore bubbled events from children
-                // (e.g. buttons with transition-opacity finishing before the slide).
-                const onEnd = (e) => {
-                    if (e.target !== transitionTarget || e.propertyName !== 'transform') return;
-                    transitionTarget.removeEventListener('transitionend', onEnd);
-                    panel.style.cssText = '';
-                    panel.classList.add('invisible', 'opacity-0');
-                    // Clean curtain inline styles
-                    if (animation === 'curtain') {
-                        if (this.hasCurtainLeftTarget) this.curtainLeftTarget.style.cssText = '';
-                        if (this.hasCurtainRightTarget) this.curtainRightTarget.style.cssText = '';
-                    }
-                };
-                transitionTarget.addEventListener('transitionend', onEnd);
-            } else {
-                // No animation: hide instantly
-                panel.style.cssText = '';
-                panel.classList.add('invisible', 'opacity-0');
-            }
-
-            document.body.style.overflow = '';
-        }
-    }
-
-    /**
-     * Close desktop dropdowns when clicking outside.
+     * A click outside the header closes every popup.
      *
      * @param {Event} event
      * @private
      */
     _handleDocumentClick(event) {
-        if (!this.element.contains(event.target)) {
-            this.dropdownTargets.forEach((dd) => dd.classList.add('hidden'));
-            this._resetAllSubDropdowns();
-            this._closeAllMegaDropdowns();
+        if (this.element.contains(event.target)) {
+            // Inside the header, a click outside a popup closes that popup.
+            this._openPopups().forEach((trigger) => {
+                if (!this._zoneOf(trigger).contains(event.target)) this.close(trigger);
+            });
+            return;
+        }
+        this._closeAllPopups();
+    }
+
+    /**
+     * A dialog whose panel only exists below a breakpoint (navbar and mega
+     * menu on mobile) is released when the window grows past it, otherwise
+     * the page would stay inert behind a panel nobody can see.
+     *
+     * @private
+     */
+    _handleResize() {
+        if (this._autoCollapse) {
+            this._measureBar();
+        }
+        if (this._dialog && this._dialog.panel.getClientRects().length === 0) {
+            this._closeDialog({ restoreFocus: false });
+        }
+    }
+
+    /**
+     * Unpack the content a panel keeps in a <template data-menu-deferred>,
+     * such as the fullscreen background image: nothing is fetched until the
+     * panel opens, and nothing at all where its container is not displayed.
+     *
+     * @param {HTMLElement} panel
+     * @private
+     */
+    _loadDeferred(panel) {
+        panel.querySelectorAll('template[data-menu-deferred]').forEach((template) => {
+            const container = template.parentElement;
+            if (!container || container.getClientRects().length === 0) return;
+            template.replaceWith(template.content.cloneNode(true));
+        });
+    }
+
+    /**
+     * Automatic switch to the burger: measure the bar now, and again once the
+     * web fonts and the logo, which change its width, have loaded.
+     *
+     * @private
+     */
+    _setupAutoCollapse() {
+        const fixed = Object.keys(FIXED_COLLAPSE_WIDTHS).find((name) => this.element.classList.contains('iw-menu--collapse-' + name));
+        this._collapseFrom = fixed ? FIXED_COLLAPSE_WIDTHS[fixed] : AUTO_COLLAPSE_MIN_WIDTH;
+        this._autoCollapse = this.element.classList.contains(AUTO_COLLAPSE_CLASS) || !!fixed;
+        if (!this._autoCollapse) return;
+
+        this._measureBar();
+        document.fonts?.ready.then(() => this._measureBar());
+        this.element.querySelectorAll('.iw-menu__frame img').forEach((img) => {
+            if (!img.complete) img.addEventListener('load', () => this._measureBar(), { once: true });
+        });
+    }
+
+    /**
+     * Lay the links out, measure whether the bar holds them, and fall back to
+     * the burger when it does not. Class changes and measure run in the same
+     * task, so the browser never paints the links it then hides.
+     *
+     * @private
+     */
+    _measureBar() {
+        const bar = this.element.querySelector('.iw-menu__bar');
+        if (!bar) return;
+
+        this.element.classList.add('iw-menu--measured');
+        this.element.classList.remove('iw-menu--collapsed');
+        if (window.innerWidth < this._collapseFrom) return;
+
+        this.element.classList.toggle('iw-menu--collapsed', bar.scrollWidth > bar.clientWidth + 1);
+    }
+
+    /**
+     * Give a transparent bar its background once the page is scrolled past
+     * the threshold, from wherever the page is: on a scroll, and on load when
+     * the browser brings a reloaded page back to where it was.
+     *
+     * @private
+     */
+    _syncScrolled() {
+        if (this.scrollBgValue) {
+            this.element.classList.toggle('iw-menu--scrolled', window.scrollY > SCROLL_BG_THRESHOLD);
         }
     }
 
@@ -434,31 +406,20 @@ export default class extends Controller {
      * Handle scroll: optional background-on-scroll for a transparent navbar,
      * and optional smart hide/reveal by scroll direction.
      *
-     * The drop shadow is no longer forced here: it is a theme setting
-     * (Menu > Bar chrome > Shadow) compiled to --iw-menu-shadow, so that the
-     * bar looks the same at rest and once scrolled unless the theme says
-     * otherwise.
-     *
      * @private
      */
     _handleScroll() {
         const y = window.scrollY;
 
-        // Background on scroll: a transparent navbar becomes solid past the
-        // threshold and turns transparent again at the top of the page.
-        if (this.scrollBgValue) {
-            this.element.classList.toggle('iw-menu--scrolled', y > SCROLL_BG_THRESHOLD);
-        }
+        this._syncScrolled();
 
-        // Smart hide: slide the navbar away on scroll down, reveal on scroll up.
-        // A small hysteresis avoids flicker on jittery scrolls; the navbar never
-        // hides near the top of the page nor while a menu is open. Keeping it
-        // revealed while an overlay/sidebar is open also avoids re-introducing a
-        // transform (containing block) on the header that hosts those fixed panels.
+        // The navbar never hides near the top of the page nor while a panel is
+        // open. Keeping it revealed then also avoids re-introducing a transform
+        // (containing block) on the header that hosts those fixed panels.
         if (this.scrollHideValue) {
             const delta = y - this._lastScrollY;
 
-            if (y < SCROLL_HIDE_MIN || this.isOpen || this.isSidebarOpen) {
+            if (y < SCROLL_HIDE_MIN || this._dialog) {
                 this.element.classList.remove('iw-menu--hidden');
             } else if (Math.abs(delta) > SCROLL_HIDE_HYSTERESIS) {
                 this.element.classList.toggle('iw-menu--hidden', delta > 0);
@@ -468,287 +429,327 @@ export default class extends Controller {
         this._lastScrollY = y;
     }
 
+    // ─── Dialog internals ────────────────────────────────────────────────────
+
+    /** @private */
+    _toggleDialog() {
+        if (this._dialog) {
+            this._closeDialog();
+            return;
+        }
+
+        const panel = this.hasPanelTarget ? this.panelTarget : null;
+        if (!panel) return;
+
+        const burger = this.hasBurgerTarget ? this.burgerTarget : null;
+        const openClass = 'iw-menu__dialog--open';
+
+        this._closeAllPopups();
+        this._dialog = { panel, burger, openClass };
+
+        panel.classList.add(openClass);
+        this._loadDeferred(panel);
+        if (this.hasBackdropTarget) {
+            this.backdropTarget.classList.add('iw-menu__backdrop--visible');
+        }
+        this._setBurgerState(burger, true);
+        this.element.classList.remove('iw-menu--hidden');
+
+        this._lockScroll();
+        // Only what the panel hides goes inert. The bar stays drawn above the
+        // panel, so it stays usable: the burger to close, the logo and the
+        // language switcher as they are. The backdrop must take the click.
+        const bar = burger ? burger.closest('.iw-menu__frame') : null;
+        this._inertOutside([panel, bar ?? burger, this.hasBackdropTarget ? this.backdropTarget : null]);
+
+        this._focusFirst(panel);
+    }
+
     /**
-     * Setup mouseenter/mouseleave listeners on dropdown parents (L2 + L3)
-     * for desktop hover behavior. Uses a small delay on mouseleave to
-     * prevent accidental closures.
+     * @param {{restoreFocus?: boolean}} options
+     * @private
+     */
+    _closeDialog({ restoreFocus = true } = {}) {
+        const dialog = this._dialog;
+        if (!dialog) return;
+        this._dialog = null;
+
+        this._resetPanels();
+        dialog.panel.classList.remove(dialog.openClass);
+        if (this.hasBackdropTarget) this.backdropTarget.classList.remove('iw-menu__backdrop--visible');
+        this._setBurgerState(dialog.burger, false);
+
+        this._releaseInert();
+        this._unlockScroll();
+
+        if (restoreFocus && dialog.burger) dialog.burger.focus({ preventScroll: true });
+    }
+
+    /**
+     * Stop the page from scrolling. The scrollbar that disappears is given
+     * back as padding (see the compiled stylesheet), so nothing shifts.
      *
      * @private
      */
-    _setupHoverDropdowns() {
-        // Only enable hover on non-touch devices (desktop)
-        const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
-        if (!mediaQuery.matches) return;
+    _lockScroll() {
+        const root = document.documentElement;
+        const scrollbar = window.innerWidth - root.clientWidth;
+        root.style.setProperty('--iw-scrollbar-compensation', `${Math.max(scrollbar, 0)}px`);
+        root.classList.add(SCROLL_LOCK_CLASS);
+    }
 
-        // L2 dropdown parents
-        if (this.hasDropdownParentTarget) {
-            this.dropdownParentTargets.forEach((parent) => {
-                const dropdown = parent.querySelector('[data-menu-target="dropdown"]');
-                if (!dropdown) return;
+    /** @private */
+    _unlockScroll() {
+        const root = document.documentElement;
+        root.classList.remove(SCROLL_LOCK_CLASS);
+        root.style.removeProperty('--iw-scrollbar-compensation');
+    }
 
-                const onEnter = () => {
-                    this._clearHoverTimeout(parent);
+    /**
+     * @param {?HTMLElement} burger
+     * @param {boolean} open
+     * @private
+     */
+    _setBurgerState(burger, open) {
+        if (!burger) return;
 
-                    // Close other L2 dropdowns
-                    this.dropdownTargets.forEach((dd) => {
-                        if (dd !== dropdown) {
-                            dd.classList.add('hidden');
-                            this._closeSubDropdownsInside(dd);
-                        }
-                    });
+        burger.classList.toggle('iw-menu__burger--open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        const label = open ? this.closeLabelValue : this.openLabelValue;
+        if (label) burger.setAttribute('aria-label', label);
+    }
 
-                    dropdown.classList.remove('hidden');
-                    this._repositionDropdown(dropdown);
-                };
+    /**
+     * Make everything inert except the given elements and their ancestors,
+     * which is what keeps the focus inside an open panel.
+     *
+     * @param {Array<?Element>} keep
+     * @private
+     */
+    _inertOutside(keep) {
+        const kept = keep.filter(Boolean);
+        const inerted = [];
 
-                const onLeave = () => {
-                    const timeout = setTimeout(() => {
-                        dropdown.classList.add('hidden');
-                        this._closeSubDropdownsInside(dropdown);
-                        this._hoverTimeouts.delete(parent);
-                    }, 150);
-                    this._hoverTimeouts.set(parent, timeout);
-                };
+        kept.forEach((element) => {
+            let node = element;
+            while (node && node !== document.body && node.parentElement) {
+                for (const sibling of node.parentElement.children) {
+                    if (sibling.inert || kept.some((k) => sibling.contains(k))) continue;
+                    if (['SCRIPT', 'STYLE', 'TEMPLATE', 'LINK'].includes(sibling.tagName)) continue;
+                    sibling.inert = true;
+                    inerted.push(sibling);
+                }
+                node = node.parentElement;
+            }
+        });
 
-                parent.addEventListener('mouseenter', onEnter);
-                parent.addEventListener('mouseleave', onLeave);
+        this._inerted = inerted;
+    }
 
-                this._hoverCleanups.push(() => {
-                    parent.removeEventListener('mouseenter', onEnter);
-                    parent.removeEventListener('mouseleave', onLeave);
-                });
-            });
-        }
+    /** @private */
+    _releaseInert() {
+        this._inerted.forEach((element) => { element.inert = false; });
+        this._inerted = [];
+    }
 
-        // Mega dropdown parents (L1 buttons for mega menus)
-        if (this.hasMegaParentTarget) {
-            this.megaParentTargets.forEach((button, index) => {
-                const dropdown = this.megaDropdownTargets[index];
-                if (!dropdown) return;
+    /**
+     * Move the focus to the first focusable element of a container, once it
+     * is rendered.
+     *
+     * @param {HTMLElement} container
+     * @param {?string} preferred - Selector tried first
+     * @private
+     */
+    _focusFirst(container, preferred = null) {
+        requestAnimationFrame(() => {
+            const candidates = [
+                ...(preferred ? container.querySelectorAll(preferred) : []),
+                ...container.querySelectorAll(FOCUSABLE),
+            ];
+            const target = candidates.find((el) => !el.closest('[inert]') && el.getClientRects().length > 0);
+            if (target) target.focus({ preventScroll: true });
+        });
+    }
 
-                // Wrap button + dropdown in a virtual hover zone
-                // mouseenter on button opens, mouseleave with delay closes
-                const onEnterButton = () => {
-                    this._clearHoverTimeout(button);
-                    // Close other mega dropdowns
-                    this.megaDropdownTargets.forEach((dd, i) => {
-                        if (i !== index) {
-                            dd.classList.add('hidden');
-                            const arrow = this.megaParentTargets[i]?.querySelector('svg');
-                            if (arrow) arrow.style.transform = '';
-                        }
-                    });
-                    dropdown.classList.remove('hidden');
-                    const arrow = button.querySelector('svg');
-                    if (arrow) arrow.style.transform = 'rotate(180deg)';
-                };
-
-                const onLeaveButton = () => {
-                    const timeout = setTimeout(() => {
-                        dropdown.classList.add('hidden');
-                        const arrow = button.querySelector('svg');
-                        if (arrow) arrow.style.transform = '';
-                        this._hoverTimeouts.delete(button);
-                    }, 150);
-                    this._hoverTimeouts.set(button, timeout);
-                };
-
-                const onEnterDropdown = () => {
-                    this._clearHoverTimeout(button);
-                };
-
-                const onLeaveDropdown = () => {
-                    const timeout = setTimeout(() => {
-                        dropdown.classList.add('hidden');
-                        const arrow = button.querySelector('svg');
-                        if (arrow) arrow.style.transform = '';
-                        this._hoverTimeouts.delete(button);
-                    }, 150);
-                    this._hoverTimeouts.set(button, timeout);
-                };
-
-                button.addEventListener('mouseenter', onEnterButton);
-                button.addEventListener('mouseleave', onLeaveButton);
-                dropdown.addEventListener('mouseenter', onEnterDropdown);
-                dropdown.addEventListener('mouseleave', onLeaveDropdown);
-
-                this._hoverCleanups.push(() => {
-                    button.removeEventListener('mouseenter', onEnterButton);
-                    button.removeEventListener('mouseleave', onLeaveButton);
-                    dropdown.removeEventListener('mouseenter', onEnterDropdown);
-                    dropdown.removeEventListener('mouseleave', onLeaveDropdown);
-                });
-            });
-        }
-
-        // L3 sub-dropdown parents
-        if (this.hasSubdropdownParentTarget) {
-            this.subdropdownParentTargets.forEach((parent) => {
-                const subdropdown = parent.querySelector('[data-menu-target="subdropdown"]');
-                if (!subdropdown) return;
-
-                const onEnter = () => {
-                    this._clearHoverTimeout(parent);
-                    subdropdown.classList.remove('hidden');
-                    this._repositionSubDropdown(subdropdown);
-                };
-
-                const onLeave = () => {
-                    const timeout = setTimeout(() => {
-                        subdropdown.classList.add('hidden');
-                        this._resetSubDropdownPosition(subdropdown);
-                        this._hoverTimeouts.delete(parent);
-                    }, 150);
-                    this._hoverTimeouts.set(parent, timeout);
-                };
-
-                parent.addEventListener('mouseenter', onEnter);
-                parent.addEventListener('mouseleave', onLeave);
-
-                this._hoverCleanups.push(() => {
-                    parent.removeEventListener('mouseenter', onEnter);
-                    parent.removeEventListener('mouseleave', onLeave);
-                });
-            });
+    /**
+     * Collapse every open sub-panel back to the root, without moving focus.
+     *
+     * @private
+     */
+    _resetPanels() {
+        while (this._panelStack.length > 0) {
+            this._hideSubPanel(this._panelStack.pop());
         }
     }
 
     /**
-     * Remove all hover event listeners and clear pending timeouts.
+     * @param {{panel: HTMLElement, trigger: HTMLElement, parent: ?HTMLElement}} entry
+     * @private
+     */
+    _hideSubPanel(entry) {
+        entry.panel.classList.remove('iw-menu__subpanel--active');
+        entry.panel.inert = true;
+        entry.trigger.setAttribute('aria-expanded', 'false');
+        if (entry.parent) entry.parent.inert = false;
+    }
+
+    // ─── Disclosure internals ────────────────────────────────────────────────
+
+    /**
+     * @param {Element} trigger
+     * @returns {?HTMLElement} The element the trigger controls
+     * @private
+     */
+    _contentOf(trigger) {
+        const id = trigger.getAttribute('aria-controls');
+        return id ? document.getElementById(id) : null;
+    }
+
+    /** @private */
+    _isExpanded(trigger) {
+        return trigger.getAttribute('aria-expanded') === 'true';
+    }
+
+    /** @private */
+    _isPopup(trigger) {
+        return this.popupTriggerTargets.includes(trigger);
+    }
+
+    /**
+     * The area a popup lives in: its trigger and its content share a wrapper,
+     * which is where hover and focus are tracked.
+     *
+     * @param {HTMLElement} trigger
+     * @returns {HTMLElement}
+     * @private
+     */
+    _zoneOf(trigger) {
+        return trigger.parentElement;
+    }
+
+    /** @private */
+    _openPopups() {
+        return this.popupTriggerTargets.filter((trigger) => this._isExpanded(trigger));
+    }
+
+    /**
+     * The open popup nested deepest, the one Escape closes first.
+     *
+     * @returns {?HTMLElement}
+     * @private
+     */
+    _deepestOpenPopup() {
+        const open = this._openPopups();
+        return open.find((trigger) => {
+            const content = this._contentOf(trigger);
+            return !open.some((other) => other !== trigger && content?.contains(other));
+        }) ?? null;
+    }
+
+    /**
+     * Close every open popup that is not an ancestor of the given trigger:
+     * one popup per level, and opening a level 3 keeps its level 2 open.
+     *
+     * @param {HTMLElement} trigger
+     * @private
+     */
+    _closeOtherPopups(trigger) {
+        this._openPopups().forEach((other) => {
+            if (other !== trigger && !this._contentOf(other)?.contains(trigger)) this.close(other);
+        });
+    }
+
+    /** @private */
+    _closeAllPopups() {
+        this._openPopups().forEach((trigger) => this.close(trigger));
+    }
+
+    /**
+     * Hover opens popups on a device with a fine pointer. Touch devices open
+     * them with a tap, which is the same click as a mouse or a keyboard.
      *
      * @private
      */
-    _cleanupHoverDropdowns() {
+    _setupHover() {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+        this.popupTriggerTargets.forEach((trigger) => {
+            const zone = this._zoneOf(trigger);
+
+            const onEnter = () => {
+                this._clearHoverTimeout(trigger);
+                this.open(trigger);
+            };
+            const onLeave = () => {
+                if (this._pinned.has(trigger)) return;
+                const timeout = setTimeout(() => {
+                    this._hoverTimeouts.delete(trigger);
+                    if (!this._pinned.has(trigger)) this.close(trigger);
+                }, HOVER_CLOSE_DELAY);
+                this._hoverTimeouts.set(trigger, timeout);
+            };
+
+            zone.addEventListener('mouseenter', onEnter);
+            zone.addEventListener('mouseleave', onLeave);
+            this._hoverCleanups.push(() => {
+                zone.removeEventListener('mouseenter', onEnter);
+                zone.removeEventListener('mouseleave', onLeave);
+            });
+        });
+    }
+
+    /** @private */
+    _cleanupHover() {
         this._hoverCleanups.forEach((cleanup) => cleanup());
         this._hoverCleanups = [];
-
         this._hoverTimeouts.forEach((timeout) => clearTimeout(timeout));
         this._hoverTimeouts.clear();
     }
 
-    /**
-     * Clear a pending hover timeout for a specific element.
-     *
-     * @param {Element} element
-     * @private
-     */
-    _clearHoverTimeout(element) {
-        const timeout = this._hoverTimeouts.get(element);
+    /** @private */
+    _clearHoverTimeout(trigger) {
+        const timeout = this._hoverTimeouts.get(trigger);
         if (timeout) {
             clearTimeout(timeout);
-            this._hoverTimeouts.delete(element);
+            this._hoverTimeouts.delete(trigger);
         }
     }
 
     /**
-     * Reposition an L2 dropdown to prevent it from overflowing the viewport.
-     * Adjusts left/right positioning based on available space.
+     * Keep a popup inside the viewport. A dropdown below its trigger shifts to
+     * the right edge; a side popup (level 3, `data-menu-placement="side"`)
+     * opens to the left instead of the right.
      *
-     * @param {HTMLElement} dropdown
+     * @param {HTMLElement} content
      * @private
      */
-    _repositionDropdown(dropdown) {
-        // Reset positioning first
-        dropdown.style.left = '';
-        dropdown.style.right = '';
+    _reposition(content) {
+        this._resetPosition(content);
+        const side = content.dataset.menuPlacement === 'side';
 
         requestAnimationFrame(() => {
-            const rect = dropdown.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
+            const rect = content.getBoundingClientRect();
+            const viewportWidth = document.documentElement.clientWidth;
 
             if (rect.right > viewportWidth) {
-                dropdown.style.left = 'auto';
-                dropdown.style.right = '0';
+                content.style.left = 'auto';
+                content.style.right = side ? '100%' : '0';
+                if (side) {
+                    content.style.marginLeft = '0';
+                    content.style.marginRight = '0.125rem';
+                }
             } else if (rect.left < 0) {
-                dropdown.style.left = '0';
-                dropdown.style.right = 'auto';
+                content.style.left = side ? '100%' : '0';
+                content.style.right = 'auto';
             }
         });
     }
 
-    /**
-     * Reposition an L3 sub-dropdown to prevent it from overflowing the viewport.
-     *
-     * Default: opens to the right (left-full via Tailwind).
-     * If it overflows right, flips to open to the left instead.
-     *
-     * @param {HTMLElement} subdropdown
-     * @private
-     */
-    _repositionSubDropdown(subdropdown) {
-        // Reset inline overrides — Tailwind's left-full ml-0.5 applies
-        this._resetSubDropdownPosition(subdropdown);
-
-        requestAnimationFrame(() => {
-            const rect = subdropdown.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-
-            if (rect.right > viewportWidth) {
-                // Overflow right: flip to open left
-                subdropdown.style.left = 'auto';
-                subdropdown.style.right = '100%';
-                subdropdown.style.marginLeft = '0';
-                subdropdown.style.marginRight = '0.125rem';
-            } else if (rect.left < 0) {
-                // Overflow left: ensure opens right
-                subdropdown.style.left = '100%';
-                subdropdown.style.right = 'auto';
-            }
-        });
-    }
-
-    /**
-     * Reset a sub-dropdown's inline position overrides so Tailwind classes apply.
-     *
-     * @param {HTMLElement} subdropdown
-     * @private
-     */
-    _resetSubDropdownPosition(subdropdown) {
-        subdropdown.style.left = '';
-        subdropdown.style.right = '';
-        subdropdown.style.marginLeft = '';
-        subdropdown.style.marginRight = '';
-    }
-
-    /**
-     * Close and reset all L3 sub-dropdowns inside a given L2 dropdown.
-     *
-     * @param {HTMLElement} dropdown
-     * @private
-     */
-    _closeSubDropdownsInside(dropdown) {
-        dropdown.querySelectorAll('[data-menu-target="subdropdown"]').forEach((sd) => {
-            sd.classList.add('hidden');
-            this._resetSubDropdownPosition(sd);
-        });
-    }
-
-    /**
-     * Reset all L3 sub-dropdowns to hidden state with default positioning.
-     *
-     * @private
-     */
-    _resetAllSubDropdowns() {
-        if (!this.hasSubdropdownTarget) return;
-
-        this.subdropdownTargets.forEach((sd) => {
-            sd.classList.add('hidden');
-            this._resetSubDropdownPosition(sd);
-        });
-    }
-
-    /**
-     * Close all mega dropdowns and reset their arrow indicators.
-     *
-     * @private
-     */
-    _closeAllMegaDropdowns() {
-        if (!this.hasMegaDropdownTarget) return;
-
-        this.megaDropdownTargets.forEach((dd, i) => {
-            dd.classList.add('hidden');
-            const arrow = this.megaParentTargets[i]?.querySelector('svg');
-            if (arrow) arrow.style.transform = '';
-        });
+    /** @private */
+    _resetPosition(content) {
+        content.style.left = '';
+        content.style.right = '';
+        content.style.marginLeft = '';
+        content.style.marginRight = '';
     }
 }

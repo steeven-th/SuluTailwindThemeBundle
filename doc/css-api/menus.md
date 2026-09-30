@@ -5,19 +5,27 @@ chrome variables — `--iw-menu-surface`, `--iw-menu-border-width`,
 `--iw-menu-border-color`, `--iw-menu-shadow`, `--iw-menu-backdrop` — come from
 the Bar chrome section and are documented in
 [`menus.md`](../menus.md#bar-chrome).
+The size of the buttons inside the menu (`--iw-menu-button-padding-y`,
+`--iw-menu-button-padding-x`, `--iw-menu-button-font-size`) is documented in
+[`menus.md`](../menus.md#menu-buttons).
 
-> For the full reference on menu CSS classes (navbar, burger, fullscreen, sidebar, megamenu), see [`menus.md`](../menus.md).
+> For the full reference on menu CSS classes (navbar, burger, megamenu), see [`menus.md`](../menus.md).
 
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `--menu-bg` | Main menu background | `#ffffff` |
 | `--menu-text` | Primary text color | `#202124` |
 | `--menu-textHover` | Text color on hover | `#1a73e8` |
+| `--iw-menu-transparent-text` | Text over a hero while the bar is transparent (falls back to the regular text color) | `#ffffff` |
+| `--iw-menu-transparent-burger` | Burger icon over a hero (falls back to the transparent text color) | `#ffffff` |
+| `--iw-menu-overlap` | Height of the bar sitting over the hero, `0` otherwise, for a hero to keep its content out from under it | `80px` |
+| `--iw-menu-text-active` | Link of the current page and the entries leading to it (falls back to each level's hover color) | `#facc15` |
 | `--menu-secondBg` | Dropdown background (level 2) | `#f8f9fa` |
 | `--menu-secondText` | Dropdown text color | `#202124` |
 | `--menu-secondTextHover` | Dropdown text hover color | `#1a73e8` |
 | `--menu-thirdBg` | Sub-dropdown / featured column background | `#f0f0f0` |
 | `--menu-thirdText` | Sub-dropdown text color | `#202124` |
+| `--iw-menu-fourth-bg` / `--iw-menu-fourth-text` / `--iw-menu-fourth-text-hover` | Level 4, each falling back on level 3 | - |
 | `--menu-divider` | Border/separator color | `rgba(0,0,0,0.1)` |
 | `--menu-burgerOpen` | Burger icon color (closed state) | `#202124` |
 | `--menu-burgerClose` | Burger icon color (open state) | `#ffffff` |

@@ -1,8 +1,38 @@
-{# Menu — always burger (hamburger icon), full overlay panel #}
+{# Menu - always a burger, which opens the navigation in a dialog.
 
-{# Animation config #}
+   The panel either covers the screen (panelLayout 'full', the default) or
+   slides in from a side (panelLayout 'side'), panelWidth wide from 1024px
+   with a dimmed page behind it. panelSide places the burger in the bar: a
+   side panel opens on that side, a full-screen panel puts its links there
+   and its optional picture on the other side, from panelImageFrom up: the
+   links zone is then panelWidth wide, the picture takes the rest. The
+   former `sidebar` and `fullscreen` menu types are these two panels (see
+   MenuConfigNormalizer). #}
+
+{% set isSide = config.panelLayout|default('full') == 'side' %}
+{% set side = config.panelSide|default('right') == 'left' ? 'left' : 'right' %}
+
+{# Full screen: the picture, the place of the links, the first level size. #}
+{% set panelMedia = not isSide and config.panelImage.id|default(null)
+    ? sulu_resolve_media(config.panelImage.id, app.request.locale)
+    : null %}
+{% set imageFrom = config.panelImageFrom|default('lg') in ['md', 'lg', 'xl'] ? config.panelImageFrom|default('lg') : 'lg' %}
+{% set position = config.panelContentPosition|default('auto') in ['auto', 'image', 'center', 'bar'] ? config.panelContentPosition|default('auto') : 'auto' %}
+{% if position == 'auto' %}{% set position = panelMedia ? 'image' : 'center' %}{% endif %}
+{% if position == 'image' and not panelMedia %}{% set position = 'bar' %}{% endif %}
+{# The side the links hug in their zone. Against the edge: under the logo, or
+   under the burger beside a picture. Against the picture: the other side. #}
+{% set burgerSide = side == 'right' ? 'end' : 'start' %}
+{% set imageSide = side == 'right' ? 'start' : 'end' %}
+{% set contentEdge = position == 'center' ? 'center' : (position == 'image' ? imageSide : (panelMedia ? burgerSide : 'start')) %}
+{% set panelClasses = isSide
+    ? 'iw-menu__overlay--side iw-menu__overlay--' ~ side
+    : 'iw-menu__overlay--full iw-menu__overlay--content-' ~ contentEdge
+        ~ (panelMedia ? ' iw-menu__overlay--image iw-menu__overlay--image-' ~ (side == 'right' ? 'left' : 'right') ~ ' iw-menu__overlay--image-from-' ~ imageFrom : '') %}
+{% if config.panelL1Size|default('normal') == 'large' %}{% set panelClasses = panelClasses ~ ' iw-menu__overlay--l1-large' %}{% endif %}
 {% set animation = config.animation|default('none') %}
-{% set slideDirection = config.slideDirection|default('top') %}
+{# A side panel comes from its side. #}
+{% set slideDirection = isSide ? side : config.slideDirection|default('top') %}
 
 {# Parent page click mode: none, split, or selflink (backward compat: boolean → string) #}
 {% set clickMode = config.clickParentPage|default('none') %}
@@ -18,87 +48,109 @@
     {% endif %}
 {% endif %}
 
+{% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
+{# The width under which the bar actions move to the panel. #}
+{% set actionsAt = config.barActionsBreakpoint|default('lg') in ['md', 'lg', 'xl'] ? config.barActionsBreakpoint|default('lg') : 'lg' %}
+{# The language switcher set to "both" moves from the bar to the open menu at
+   that same width, rather than showing twice. #}
+{% set langBoth = config.displayLanguageSwitcher|default(false) and config.languageSwitcherPosition|default('both') == 'both' %}
+
+{# The burger turns into the close button. On the left side it opens the
+   bar, before the logo. #}
+{% set burgerButton %}
+    <button
+        type="button"
+        data-action="menu#toggle"
+        data-menu-target="burger"
+        aria-expanded="false"
+        aria-controls="{{ panelId }}"
+        aria-label="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+        class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5 flex-shrink-0"
+    >
+        <span class="iw-menu__burger-line"></span>
+        <span class="iw-menu__burger-line"></span>
+        <span class="iw-menu__burger-line"></span>
+    </button>
+{% endset %}
+{% set burgerFirst = side == 'left' %}
+
 <header
     data-controller="menu"
-    data-menu-animation-value="{{ animation }}"
-    data-menu-slide-direction-value="{{ slideDirection }}"
-    data-menu-scroll-bg-value="{{ (config.scrollBg ?? false) ? 'true' : 'false' }}"
+    data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
+    data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
+    data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
+    class="iw-menu{{ config.displayBarActions|default(false) or langBoth ? ' iw-menu--actions-at-' ~ actionsAt : '' }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
-    <nav class="relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+    <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="iw-menu__bar flex items-center justify-between">
 
-            {# LEFT — Logo + Site Name #}
-            <div class="flex-shrink-0 flex items-center">
-                <a href="{{ sulu_content_path('/') }}" class="iw-menu__text flex items-center gap-2 no-underline">
-                    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
-                        with { config: config } only %}
-                    {% if config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('') }}</span>
-                    {% endif %}
-                    {# Fallback: show site name if no logo and no siteName option checked #}
-                    {% if not config.displayLogoDesktop|default(false) and not config.displayLogoMobile|default(false) and not config.displaySiteName|default(false) %}
-                        <span class="text-xl font-bold">{{ config.siteName|default('Site') }}</span>
-                    {% endif %}
-                </a>
+            {# LEFT - (Burger) + Logo + Site Name #}
+            <div class="flex-shrink-0 flex items-center gap-3">
+                {% if burgerFirst %}{{ burgerButton }}{% endif %}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_logo_link.html.twig'
+                    with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
-            {# RIGHT — Language switcher + Social media + Burger #}
+            {# RIGHT - Bar actions + Language switcher + Social media + (Burger) #}
             <div class="flex items-center gap-3">
-                {# Language switcher — in the bar, reachable without opening the
+                {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                    with {config: config, slot: 'bar'} only %}
+
+                {# Language switcher - in the bar, reachable without opening the
                    menu. Hidden when the theme places it in the panel only. #}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {config: config, align: 'right', slot: 'bar'} %}
 
-                {# Social media icons #}
-                {% if socialLinks|length > 0 %}
-                    <div class="hidden md:flex items-center gap-2">
-                        {% for link in socialLinks %}
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center">
-                                {% if link.icon is defined and link.icon.id is defined %}
-                                    {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                                    {% if iconMedia is not null and iconMedia.url is defined %}
-                                        {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                        <span class="iw-social-icon w-5 h-5"
-                                              style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                              aria-label="{{ link.name|default('') }}"></span>
-                                    {% else %}
-                                        <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="iw-social-text text-sm">{{ link.name|default('') }}</span>
-                                {% endif %}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                    links: socialLinks,
+                    class: 'hidden md:flex items-center gap-2',
+                    textClass: 'text-sm',
+                } only %}
 
-                {# Animated burger button — always visible #}
-                <button
-                    type="button"
-                    data-action="menu#toggle"
-                    data-menu-target="burger"
-                    class="iw-menu__burger w-10 h-10 flex flex-col items-center justify-center gap-1.5"
-                    aria-label="Menu"
-                >
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                    <span class="iw-menu__burger-line"></span>
-                </button>
+                {% if not burgerFirst %}{{ burgerButton }}{% endif %}
             </div>
         </div>
-    </nav>
+    </div>
 
-    {# Overlay panel — positioned below the navbar #}
+    {% if isSide %}
+        {# The page behind a side panel is dimmed, a click on it closes the
+           panel. Stack: bar (z-50) > panel (z-30) > backdrop (z-20). #}
+        <div data-menu-target="backdrop"
+             data-action="click->menu#toggle"
+             class="iw-menu__backdrop fixed inset-0 z-20"></div>
+    {% endif %}
+
+    {# The dialog. Full: it covers the screen and its content clears the bar.
+       Side: it starts under the bar. #}
     {% set navItems = sulu_page_navigation_root_tree('main', config.childLevels|default(2), {title: 'title', url: 'url'}) %}
     <div
+        id="{{ panelId }}"
         data-menu-target="panel"
-        class="iw-menu__overlay fixed inset-0 z-30 invisible opacity-0"
+        role="dialog"
+        aria-label="{{ 'iw_sulu_tailwind_theme.menu_dialog'|trans({}, 'messages') }}"
+        class="iw-menu__overlay {{ panelClasses }} iw-menu__dialog iw-menu__dialog--{{ animation }} iw-menu__dialog--from-{{ slideDirection }} fixed z-30"
     >
+        {% if panelMedia %}
+            {# The picture waits in a <template> the controller unpacks when
+               the panel opens and this zone is shown: no request before, none
+               below panelImageFrom. Decorative, the links carry the menu. #}
+            <div class="iw-menu__panel-media" aria-hidden="true">
+                <template data-menu-deferred>
+                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                        media: panelMedia,
+                        format: 'iw_theme_menu_curtain',
+                        alt: '',
+                        raw: true,
+                        loading: 'eager',
+                        classes: 'w-full h-full object-cover',
+                    }) }}
+                </template>
+            </div>
+            <div class="iw-menu__panel-main">
+        {% endif %}
         {% if config.subMenuPanels|default(false) %}
-        {# Drill-down panels mode (opt-in) — separate partial for maintainability. #}
+        {# Drill-down panels mode (opt-in) - separate partial for maintainability. #}
         {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
             navItems: navItems,
             parentLinkable: config.clickParentPagePanels|default(false),
@@ -109,152 +161,31 @@
             localizations: localizations|default([]),
         } only %}
         {% else %}
-        <nav class="iw-menu__overlay-nav pt-16 px-6 sm:px-8 overflow-y-auto h-full">
-            {% if navItems is not empty %}
-                {% for item in navItems %}
-                    {% if item.children is defined and item.children|length > 0 %}
-                        <div class="iw-menu__divider border-b iw-menu__parent-item">
-                            {% if clickMode == 'split' %}
-                                {# Split button: link + separate chevron toggle #}
-                                <div class="flex items-center justify-between w-full">
-                                    <a
-                                        href="{{ sulu_content_path(item.url) }}"
-                                        class="iw-menu__text flex-1 py-4 text-lg font-medium no-underline"
-                                    >
-                                        {{ item.title }}
-                                    </a>
-                                    <button
-                                        type="button"
-                                        data-action="menu#toggleMobileSubmenu"
-                                        class="iw-menu__text p-2 cursor-pointer"
-                                    >
-                                        <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </button>
-                                </div>
-                            {% else %}
-                                {# Default button (none + selflink) #}
-                                <button
-                                    type="button"
-                                    data-action="menu#toggleMobileSubmenu"
-                                    class="iw-menu__text flex items-center justify-between w-full py-4 text-left cursor-pointer"
-                                >
-                                    <span class="text-lg font-medium">{{ item.title }}</span>
-                                    <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                            {% endif %}
-                            <div data-menu-target="submenu" class="iw-menu__dropdown--level-2 hidden pb-3 mt-1 px-4">
-                                {# Self-link: add parent page as first item in submenu #}
-                                {% if clickMode == 'selflink' %}
-                                    <a
-                                        href="{{ sulu_content_path(item.url) }}"
-                                        class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline italic"
-                                    >
-                                        {{ item.title }}
-                                    </a>
-                                {% endif %}
-                                {% for child in item.children %}
-                                    {% if child.children is defined and child.children|length > 0 %}
-                                        {# Level 2 with level 3 sub-accordion #}
-                                        <div class="iw-menu__parent-item">
-                                            {% if clickMode == 'split' %}
-                                                <div class="flex items-center justify-between w-full">
-                                                    <a
-                                                        href="{{ sulu_content_path(child.url) }}"
-                                                        class="iw-menu__text--level-2 flex-1 py-2.5 no-underline"
-                                                    >
-                                                        {{ child.title }}
-                                                    </a>
-                                                    <button
-                                                        type="button"
-                                                        data-action="menu#toggleMobileSubmenu"
-                                                        class="iw-menu__text--level-2 p-1 cursor-pointer"
-                                                    >
-                                                        <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                                    </button>
-                                                </div>
-                                            {% else %}
-                                                <button
-                                                    type="button"
-                                                    data-action="menu#toggleMobileSubmenu"
-                                                    class="iw-menu__text--level-2 flex items-center justify-between w-full py-2.5 text-left cursor-pointer"
-                                                >
-                                                    <span>{{ child.title }}</span>
-                                                    <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                                </button>
-                                            {% endif %}
-                                            <div data-menu-target="submenu" class="iw-menu__dropdown--level-3 hidden pb-2 mt-1 px-4">
-                                                {% if clickMode == 'selflink' %}
-                                                    <a
-                                                        href="{{ sulu_content_path(child.url) }}"
-                                                        class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline italic"
-                                                    >
-                                                        {{ child.title }}
-                                                    </a>
-                                                {% endif %}
-                                                {% for grandchild in child.children %}
-                                                    <a
-                                                        href="{{ sulu_content_path(grandchild.url) }}"
-                                                        class="iw-menu__text--level-3 block py-2 text-sm opacity-70 hover:opacity-100 no-underline"
-                                                    >
-                                                        {{ grandchild.title }}
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <a
-                                            href="{{ sulu_content_path(child.url) }}"
-                                            class="iw-menu__text--level-2 block py-2.5 opacity-80 hover:opacity-100 no-underline"
-                                        >
-                                            {{ child.title }}
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <a
-                            href="{{ sulu_content_path(item.url) }}"
-                            class="iw-menu__text iw-menu__divider block py-4 text-lg font-medium border-b no-underline"
-                        >
-                            {{ item.title }}
-                        </a>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+        <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav{{ isSide ? '' : ' iw-menu__overlay-nav--below-bar' }} overflow-y-auto h-full">
+            {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
+                with {navItems: navItems, clickMode: clickMode} only %}
 
-            {# Language switcher — inline: the overlay already covers the page,
+            {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                with {config: config, slot: 'panel'} only %}
+
+            {# Language switcher - inline: the overlay already covers the page,
                a dropdown on top of it would read badly. The vertical padding
                keeps it off the last nav item and the social row. #}
-            <div class="pt-6 pb-2">
+            <div class="pt-6 pb-2{{ langBoth ? ' iw-menu__narrow-only' : '' }}">
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {config: config, display: 'inline', slot: 'panel'} %}
             </div>
 
-            {# Social media icons in overlay #}
-            {% if socialLinks|length > 0 %}
-                <div class="flex items-center gap-3 pt-6 pb-4">
-                    {% for link in socialLinks %}
-                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center">
-                            {% if link.icon is defined and link.icon.id is defined %}
-                                {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
-                                {% if iconMedia is not null and iconMedia.url is defined %}
-                                    {% set iconUrl = iconMedia.thumbnails['50x50']|default(iconMedia.url) %}
-                                    <span class="iw-social-icon w-6 h-6"
-                                          style="-webkit-mask-image: url('{{ iconUrl }}'); mask-image: url('{{ iconUrl }}');"
-                                          aria-label="{{ link.name|default('') }}"></span>
-                                {% else %}
-                                    <span class="iw-social-text">{{ link.name|default('') }}</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="iw-social-text">{{ link.name|default('') }}</span>
-                            {% endif %}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+                links: socialLinks,
+                class: 'flex items-center gap-3 pt-6 pb-4',
+                size: 'md',
+                textClass: '',
+            } only %}
         </nav>
+        {% endif %}
+        {% if panelMedia %}
+            </div>
         {% endif %}
     </div>
 </header>

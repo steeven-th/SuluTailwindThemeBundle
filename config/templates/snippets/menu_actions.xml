@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<!--
+    Snippet: the actions of the menu bar.
+
+    A few direct links kept in sight beside the burger or the navigation: a
+    call to action, access by profile, a small "My account" list. Rendered by
+    menu/_bar_actions.html.twig once the theme turns them on (Menu > Display),
+    on every menu type. A snippet rather than theme settings: it holds Sulu
+    links and is translated per locale like any content.
+-->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>iw_theme_menu_actions</key>
+
+    <meta>
+        <title>iw_sulu_tailwind_theme.snippet.menu_actions</title>
+    </meta>
+
+    <areas>
+        <area key="iw_theme_menu_actions">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet.menu_actions_area</title>
+            </meta>
+        </area>
+    </areas>
+
+    <properties>
+        <xi:include href="../fragments/snippet-area-notice.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet_title</title>
+            </meta>
+            <tag name="sulu.node.name"/>
+        </property>
+
+        <block name="actions" default-type="action_link" minOccurs="0">
+            <meta>
+                <title>iw_sulu_tailwind_theme.menu_actions</title>
+                <info_text>iw_sulu_tailwind_theme.menu_actions_info</info_text>
+            </meta>
+            <types>
+                <type name="action_link">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_action_link</title>
+                    </meta>
+                    <properties>
+                        <property name="button" type="iw_theme_button" colspan="12">
+                            <params>
+                                <param name="with_display" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="visibility" type="single_select" colspan="12">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_action_visibility</title>
+                                <info_text>iw_sulu_tailwind_theme.menu_action_visibility_info</info_text>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="desktop"/>
+                                <param name="values" type="collection">
+                                    <param name="desktop"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_desktop</title></meta></param>
+                                    <param name="always"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_always</title></meta></param>
+                                    <param name="panel"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_panel</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+                    </properties>
+                </type>
+
+                <!-- Not a button: an entry of the menu that opens a short list
+                     of links, drawn like the language switcher in the menu
+                     colours. Its label is typed, the links carry theirs. -->
+                <type name="action_dropdown">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.menu_action_dropdown</title>
+                    </meta>
+                    <properties>
+                        <property name="title" type="text_line" mandatory="true" colspan="12">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_action_dropdown_title</title>
+                            </meta>
+                            <tag name="sulu.block_preview" priority="100"/>
+                        </property>
+
+                        <!-- "Pictogram alone" opens the list from its pictogram
+                             only, "my account" as a person icon. Without a
+                             pictogram, the label shows. -->
+                        <property name="icon" type="iw_theme_icon_picker" colspan="12">
+                            <params>
+                                <param name="with_placement" value="true"/>
+                                <param name="with_display" value="true"/>
+                            </params>
+                        </property>
+
+                        <property name="visibility" type="single_select" colspan="12">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_action_visibility</title>
+                                <info_text>iw_sulu_tailwind_theme.menu_action_visibility_info</info_text>
+                            </meta>
+                            <params>
+                                <param name="default_value" value="desktop"/>
+                                <param name="values" type="collection">
+                                    <param name="desktop"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_desktop</title></meta></param>
+                                    <param name="always"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_always</title></meta></param>
+                                    <param name="panel"><meta><title>iw_sulu_tailwind_theme.menu_action_visibility_panel</title></meta></param>
+                                </param>
+                            </params>
+                        </property>
+
+                        <!-- Entries of a list: no style either. -->
+                        <block name="items" default-type="action_item" minOccurs="1">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_action_dropdown_items</title>
+                            </meta>
+                            <types>
+                                <type name="action_item">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.menu_action_dropdown_item</title>
+                                    </meta>
+                                    <properties>
+                                        <property name="link" type="iw_theme_button" colspan="12">
+                                            <params>
+                                                <param name="with_style" value="false"/>
+                                            </params>
+                                        </property>
+                                    </properties>
+                                </type>
+                            </types>
+                        </block>
+                    </properties>
+                </type>
+            </types>
+        </block>
+    </properties>
+</template>

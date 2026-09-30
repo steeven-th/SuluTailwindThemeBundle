@@ -15,6 +15,9 @@
                   block accordingly (see news classic). Requires:
     - breadcrumbPageUuid: UUID for the page trail (view.url.page.uuid)
     - breadcrumbCurrentTitle: current item label (content.title)
+    - menuOverlay: the hero opens the page, nothing above it, so a transparent
+                  menu bar may sit over its image (data-iw-menu-overlay).
+                  Ignored on the contained style, framed by the page margins.
 
     Public CSS API:
     - .iw-article-hero (block)
@@ -70,7 +73,7 @@
         {% set showBreadcrumb = breadcrumb|default(false)
             and iw_sulu_tailwind_theme.breadcrumbs_enabled|default('both') in ['both', 'articles'] %}
 
-        <div class="iw-article-hero iw-article-hero--{{ modifier }} iw-article-hero--h-{{ heroHeight }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}>
+        <div class="iw-article-hero iw-article-hero--{{ modifier }} iw-article-hero--h-{{ heroHeight }}"{% if maxHeight is defined and maxHeight is not empty %} style="--iw-article-hero-max-height: {{ maxHeight }};"{% endif %}{% if menuOverlay|default(false) and modifier != 'contained' %} data-iw-menu-overlay{% endif %}>
             {% set heroImageParams = {
                 media: media,
                 format: heroFormat,

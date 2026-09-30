@@ -17,6 +17,17 @@
     box-sizing: border-box;
 }
 
+/* A button shows the hand, like a link. Tailwind 4 gave buttons the default
+   cursor in its reset, so a button read as plain text in every browser. In the
+   base layer, as the reset it corrects: a `cursor-*` utility still wins, and a
+   disabled button keeps the default cursor. */
+@layer base {
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]) {
+        cursor: pointer;
+    }
+}
+
 /* Absorb the fullbleed overflow.
    A block that breaks out of its container does so with `width: 100vw`, which
    counts the scrollbar while the usable area does not — leaving a stray
@@ -332,6 +343,51 @@ a:hover {
    the text without reaching the icon beside it. */
 .iw-button__label {
     display: inline;
+}
+
+/* The gap between the icon and the label of an `iw_theme_button`, one class
+   per step of the spacing picker (components/_button.html.twig): the value
+   travels as a class, not as an inline style. The steps are those of
+   MarginSelector, the lengths those of ThemeCompiler::spacingToLength(). */
+.iw-button--icon-gap-0 { --iw-button-icon-gap: 0; }
+.iw-button--icon-gap-1 { --iw-button-icon-gap: 0.25rem; }
+.iw-button--icon-gap-2 { --iw-button-icon-gap: 0.5rem; }
+.iw-button--icon-gap-3 { --iw-button-icon-gap: 0.75rem; }
+.iw-button--icon-gap-4 { --iw-button-icon-gap: 1rem; }
+.iw-button--icon-gap-5 { --iw-button-icon-gap: 1.25rem; }
+.iw-button--icon-gap-6 { --iw-button-icon-gap: 1.5rem; }
+.iw-button--icon-gap-7 { --iw-button-icon-gap: 1.75rem; }
+.iw-button--icon-gap-8 { --iw-button-icon-gap: 2rem; }
+.iw-button--icon-gap-9 { --iw-button-icon-gap: 2.25rem; }
+.iw-button--icon-gap-10 { --iw-button-icon-gap: 2.5rem; }
+.iw-button--icon-gap-12 { --iw-button-icon-gap: 3rem; }
+.iw-button--icon-gap-16 { --iw-button-icon-gap: 4rem; }
+.iw-button--icon-gap-20 { --iw-button-icon-gap: 5rem; }
+.iw-button--icon-gap-24 { --iw-button-icon-gap: 6rem; }
+.iw-button--icon-gap-32 { --iw-button-icon-gap: 8rem; }
+
+/* A button shown as its pictogram alone: the pictogram is the button. No
+   background, no border, no shadow, no background effect on hover, whatever
+   the style says. The colour comes from the style instead, its background or
+   its border (ThemeCompiler::generateBareIconColors). The label stays in the
+   anchor for assistive technologies.
+   The padding widens the clickable area around the pictogram to about 40px,
+   and the negative margin gives that room back, so the pictogram sits in the
+   layout as if nothing surrounded it. The class is doubled to pass the
+   generated `.iw-button--<name>` rules, loaded after this stylesheet. */
+.iw-button--icon-only.iw-button--icon-only,
+.iw-button--icon-only.iw-button--icon-only:hover {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    animation: none;
+}
+.iw-button--icon-only.iw-button--icon-only {
+    padding: var(--iw-button-icon-only-hit, 0.5rem);
+    margin: calc(-1 * var(--iw-button-icon-only-hit, 0.5rem));
+}
+.iw-button--icon-only.iw-button--icon-only::before {
+    content: none;
 }
 
 /* Editor-picked spacing scale. A block field (mosaic images, gallery grid and
@@ -4365,6 +4421,20 @@ section.block:has([data-slider-fullbleed-value]) {
     max-height: none;
 }
 
+/* Under a transparent menu bar: same treatment as the page hero, the banner
+   grows by the part of it the bar covers (see .iw-page-hero[data-iw-menu-overlay]). */
+.iw-article-hero[data-iw-menu-overlay] {
+    box-sizing: content-box;
+    padding-top: var(--iw-menu-overlap, 0px);
+}
+.iw-article-hero[data-iw-menu-overlay] .iw-article-hero__image:not(.parallax-slide-img) {
+    position: absolute;
+    inset: 0;
+}
+.iw-article-hero--h-full[data-iw-menu-overlay] {
+    height: calc(100svh - var(--iw-menu-overlap, 0px));
+}
+
 /* A viewport-tall banner makes no sense once the hero sits inside the page
    container with rounded corners, so "full" falls back to the large preset. */
 .iw-article-hero--h-full.iw-article-hero--contained {
@@ -4394,6 +4464,24 @@ section.block:has([data-slider-fullbleed-value]) {
 .iw-page-hero--h-md { --iw-page-hero-ratio: 16 / 9; --iw-page-hero-max-height: 560px; }
 .iw-page-hero--h-lg { --iw-page-hero-ratio: 16 / 11; --iw-page-hero-max-height: 720px; }
 .iw-page-hero--h-full { --iw-page-hero-ratio: auto; --iw-page-hero-height: 100svh; --iw-page-hero-max-height: none; }
+
+/* Under a transparent menu bar (data-iw-menu-overlay, --iw-menu-overlap set by
+   the theme stylesheet), the banner grows by the part the bar covers: the
+   height and the ratio apply below the bar, so the picture and the text keep
+   the room they have on a page with an opaque bar. The padding holds that
+   part, the image fills it, and a full-screen banner stays one screen tall.
+   Without a transparent bar the overlap is 0 and nothing moves. */
+.iw-page-hero[data-iw-menu-overlay] {
+    box-sizing: content-box;
+    padding-top: var(--iw-menu-overlap, 0px);
+}
+.iw-page-hero[data-iw-menu-overlay] .iw-page-hero__image:not(.iw-page-hero__image--parallax) {
+    position: absolute;
+    inset: 0;
+}
+.iw-page-hero--h-full[data-iw-menu-overlay] {
+    --iw-page-hero-height: calc(100svh - var(--iw-menu-overlap, 0px));
+}
 
 /* No banner image: the header sits on the page background instead of a photo,
    so it drops the light-on-dark treatment and takes the theme text colors.
@@ -4440,6 +4528,9 @@ section.block:has([data-slider-fullbleed-value]) {
     display: flex;
     flex-direction: column;
     padding-block: var(--iw-page-hero-overlay-padding-block, 2rem);
+    /* Under a transparent menu bar, the top of the banner is covered by the
+       bar: --iw-menu-overlap (0 otherwise) keeps the title out from under it. */
+    padding-top: calc(var(--iw-page-hero-overlay-padding-block, 2rem) + var(--iw-menu-overlap, 0px));
     pointer-events: none; /* let clicks reach the page; links re-enable below */
 }
 .iw-page-hero__overlay > * { pointer-events: auto; }

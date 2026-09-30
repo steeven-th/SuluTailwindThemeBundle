@@ -15,6 +15,9 @@ use ItechWorld\SuluTailwindThemeBundle\Service\FormViewDuplicator;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\IconRenderer;
 use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
+use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -160,6 +163,9 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_variant_config', $this->getVariantConfig(...)),
             new TwigFunction('iw_sulu_tailwind_theme_button_slug', $this->getButtonSlug(...)),
             new TwigFunction('iw_sulu_tailwind_theme_site_value', $this->getSiteValue(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_link', $this->getLink(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_button', $this->getButton(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_nav_state', $this->getNavState(...)),
             new TwigFunction('iw_sulu_tailwind_theme_color_scheme', $this->getColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_with_color_scheme', $this->withColorScheme(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reusable_form', $this->reusableForm(...)),
@@ -530,6 +536,61 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getSiteValue(mixed $stored): mixed
     {
         return WebspaceScopedValue::forWebspace($stored, $this->themeProvider->getCurrentWebspaceKey());
+    }
+
+    /**
+     * Read a Sulu 3 `link` field into the parts of an anchor.
+     *
+     * The URL lives in the content, the target, rel and title in the view at
+     * the same path. See LinkResolver for the details.
+     *
+     * @param mixed $content     The field's content value
+     * @param mixed $view        The field's view value
+     * @param bool  $forceNewTab Open in a new tab whatever the link says
+     *
+     * @return array{url: string, target: string|null, rel: string|null, title: string, provider: string, newTab: bool}|null
+     *         Null when there is nothing to link to
+     */
+    public function getLink(mixed $content, mixed $view = null, bool $forceNewTab = false): ?array
+    {
+        return LinkResolver::resolve($content, $view, $forceNewTab);
+    }
+
+    /**
+     * Read an `iw_theme_button` field into what a template renders.
+     *
+     * See ButtonReader for the label fallbacks and the null returned for a
+     * button whose link cannot be resolved.
+     *
+     * @param mixed $content The resolved content of the field
+     * @param mixed $view    The view of the field
+     *
+     * @return array<string, mixed>|null The button, or null when there is nothing to link to
+     */
+    public function getButton(mixed $content, mixed $view = null): ?array
+    {
+        return ButtonReader::read($content, $view);
+    }
+
+    /**
+     * Tell whether a menu link leads to the page being displayed or to one of
+     * its ancestors.
+     *
+     * @param string|null $url The link URL, as the anchor prints it
+     *
+     * @return string|null 'current', 'ancestor', or null (also outside a request)
+     */
+    public function getNavState(?string $url): ?string
+    {
+        $request = $this->requestStack?->getMainRequest();
+        if (null === $request || null === $url || '' === $url) {
+            return null;
+        }
+
+        $base = $request->getBaseUrl();
+        $prefix = $this->requestAnalyzer?->getResourceLocatorPrefix() ?? '';
+
+        return NavigationState::of($url, $base . $request->getPathInfo(), $base . $prefix, $request->getHost());
     }
 
     public function getVariantSlug(mixed $variant, array $variants): string

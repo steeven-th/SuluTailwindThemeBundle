@@ -1,0 +1,177 @@
+{# The actions of the menu bar, from the `iw_theme_menu_actions` snippet.
+
+   One partial, called twice by each menu: once for the bar, once for the open
+   panel. Each action says where it goes (`visibility`):
+     - desktop : in the bar on wide screens, in the panel below that width
+     - always  : always in the bar. Below the width, an action with a
+                 pictogram shrinks to the pictogram alone, one without keeps
+                 its label.
+     - panel   : in the panel only
+
+   Parameters:
+     - config      : the menuConfig object (required)
+     - slot        : 'bar' or 'panel'
+     - wideClass   : class of what only shows on wide screens. The burger
+                     passes `iw-menu__wide-only`, set by the theme width
+                     (.iw-menu--actions-at-*), navbar and mega menu their
+                     `iw-menu__desktop-only`.
+     - narrowClass : the opposite. Empty in a panel that only exists below
+                     the width anyway (navbar, mega menu).
+
+   Nothing is rendered when the theme leaves the actions off, the snippet is
+   empty or no action has a link left to follow: no empty list, no gap.
+   Every button is drawn by components/_button.html.twig, with the size of the
+   menu buttons (`iw-menu__button`). A dropdown shown as its pictogram alone
+   keeps its label for assistive technologies, and as the title of its group
+   in the panel. #}
+{% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+
+{% set actionsConfig = config|default({}) %}
+{% set actionsSlot = slot|default('bar') == 'panel' ? 'panel' : 'bar' %}
+{% set actionsWide = wideClass ?? 'iw-menu__wide-only' %}
+{% set actionsNarrow = narrowClass ?? 'iw-menu__narrow-only' %}
+
+{% if actionsConfig.displayBarActions|default(false) %}
+    {% set actionsSnippet = sulu_snippet_load_by_area('iw_theme_menu_actions') %}
+    {% set actionsContent = actionsSnippet.content.actions ?? [] %}
+    {% set actionsView = actionsSnippet.view.actions ?? [] %}
+
+    {#- Read first, rendered after: each entry is {kind, visibility, button,
+        items, iconPicked}, only for the actions with somewhere to lead. -#}
+    {% set actionsRead = [] %}
+    {% for action in actionsContent is iterable ? actionsContent : [] %}
+        {% set actionView = actionsView[loop.index0] ?? {} %}
+        {% set visibility = action.visibility|default('desktop') in ['desktop', 'always', 'panel'] ? action.visibility|default('desktop') : 'desktop' %}
+
+        {% if action.type|default('') == 'action_dropdown' %}
+            {% set items = [] %}
+            {% for item in action.items ?? [] %}
+                {% set itemButton = iw_sulu_tailwind_theme_button(item.link ?? null, actionView.items[loop.index0].link ?? null) %}
+                {% if itemButton is not null %}{% set items = items|merge([itemButton]) %}{% endif %}
+            {% endfor %}
+            {% set icon = action.icon ?? null %}
+            {% set iconPicked = icon is iterable and ((icon.custom ?? false) ? (icon.media ?? null) is not null : (icon.icon ?? '') is not empty) %}
+            {% if items|length > 0 and action.title|default('')|trim is not empty %}
+                {% set actionsRead = actionsRead|merge([{
+                    kind: 'dropdown',
+                    visibility: visibility,
+                    button: {label: action.title|trim, icon: iconPicked ? icon : null, iconOnly: iconPicked and (icon.iconOnly ?? false)},
+                    items: items,
+                    iconPicked: iconPicked,
+                }]) %}
+            {% endif %}
+        {% else %}
+            {% set button = iw_sulu_tailwind_theme_button(action.button ?? null, actionView.button ?? null) %}
+            {% if button is not null %}
+                {% set actionsRead = actionsRead|merge([{
+                    kind: 'link',
+                    visibility: visibility,
+                    button: button,
+                    items: [],
+                    iconPicked: button.icon is not null,
+                }]) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {#- What this slot shows: [entry, class of its <li>, compact]. -#}
+    {% set shown = [] %}
+    {% for entry in actionsRead %}
+        {% if actionsSlot == 'bar' %}
+            {% if entry.visibility == 'desktop' %}
+                {% set shown = shown|merge([[entry, actionsWide, false]]) %}
+            {% elseif entry.visibility == 'always' %}
+                {% if entry.iconPicked and not entry.button.iconOnly %}
+                    {% set shown = shown|merge([[entry, actionsWide, false], [entry, actionsNarrow, true]]) %}
+                {% else %}
+                    {% set shown = shown|merge([[entry, '', false]]) %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% if entry.visibility == 'desktop' %}
+                {% set shown = shown|merge([[entry, actionsNarrow, false]]) %}
+            {% elseif entry.visibility == 'panel' %}
+                {% set shown = shown|merge([[entry, '', false]]) %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% if shown|length > 0 %}
+        {% set chevron %}
+            {%- include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'iw-menu__action-chevron w-4 h-4 flex-shrink-0'} only -%}
+        {% endset %}
+
+        <ul class="iw-menu__actions iw-menu__actions--{{ actionsSlot }}">
+            {% for row in shown %}
+                {% set entry = row[0] %}
+                {#- Compact: the pictogram alone, asked for by the action or
+                    forced on a narrow screen for an `always` action. -#}
+                {% set compact = row[2] or (entry.button.iconOnly ?? false) %}
+                <li class="iw-menu__action iw-menu__action--{{ entry.kind }}{{ compact ? ' iw-menu__action--compact' : '' }}{{ row[1] ? ' ' ~ row[1] : '' }}">
+                    {% if entry.kind == 'link' %}
+                        {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                            button: entry.button,
+                            class: 'iw-menu__button no-underline' ~ (actionsSlot == 'panel' ? ' iw-menu__button--block' : ''),
+                            iconOnly: compact ? true : null,
+                        } only %}
+                    {% elseif actionsSlot == 'bar' %}
+                        {#- Not a button: an entry of the menu, drawn like the
+                            language switcher and working like it, the same
+                            disclosure with Escape, focus handling and mutual
+                            closing. Compact, its pictogram alone. -#}
+                        {% set listId = iw_sulu_tailwind_theme_unique_id('menu-action') %}
+                        {% set triggerIcon %}
+                            {%- if entry.button.icon %}{% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {icon: entry.button.icon, class: 'iw-menu__action-trigger-icon'} only %}{% endif -%}
+                        {% endset %}
+                        {% set iconLeft = entry.button.icon.position|default('right') == 'left' %}
+                        <div class="iw-menu__action-dropdown{{ compact ? ' iw-menu__action-dropdown--compact' : '' }}">
+                            <button type="button"
+                                    data-action="menu#toggleDisclosure"
+                                    data-menu-target="popupTrigger"
+                                    aria-expanded="false"
+                                    aria-controls="{{ listId }}"
+                                    class="iw-menu__text iw-menu__action-trigger flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-opacity">
+                                {%- if compact -%}
+                                    {{ triggerIcon }}<span class="sr-only">{{ entry.button.label }}</span>
+                                {%- else -%}
+                                    {% if iconLeft %}{{ triggerIcon }}{% endif %}
+                                    <span class="iw-menu__action-trigger-label">{{ entry.button.label }}</span>
+                                    {% if not iconLeft %}{{ triggerIcon }}{% endif %}
+                                    {{ chevron }}
+                                {%- endif -%}
+                            </button>
+                            <ul id="{{ listId }}"
+                                class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__bar-dropdown iw-menu__dropdown--scroll iw-menu__action-dropdown-list hidden absolute shadow-lg py-1 z-50">
+                                {% for item in entry.items %}
+                                    <li>
+                                        <a {{ links.attrs(item) }}
+                                           class="iw-menu__text--level-2 iw-menu__action-dropdown-item px-4 py-2 text-sm font-medium no-underline transition-opacity hover:opacity-80">
+                                            {%- if item.icon %}{% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {icon: item.icon, class: 'iw-menu__action-dropdown-icon'} only %}{% endif -%}
+                                            <span>{{ item.label }}</span>{{ links.new_tab_hint(item) }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        {#- In the panel, a group rather than a popup over a
+                            panel that already covers the page. -#}
+                        {% set groupId = iw_sulu_tailwind_theme_unique_id('menu-action-group') %}
+                        <span id="{{ groupId }}" class="iw-menu__text iw-menu__action-group-title">{{ entry.button.label }}</span>
+                        <ul class="iw-menu__action-group-list" aria-labelledby="{{ groupId }}">
+                            {% for item in entry.items %}
+                                <li>
+                                    <a {{ links.attrs(item) }}
+                                       class="iw-menu__text iw-menu__action-dropdown-item py-1.5 text-sm no-underline transition-opacity hover:opacity-80">
+                                        {%- if item.icon %}{% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {icon: item.icon, class: 'iw-menu__action-dropdown-icon'} only %}{% endif -%}
+                                        <span>{{ item.label }}</span>{{ links.new_tab_hint(item) }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endif %}

@@ -194,7 +194,7 @@ class NavbarHeightSubscriber implements EventSubscriberInterface
         }
 
         $event->addVariable('--app-navbar-height', $height . 'px');
-        $event->addRule('.iw-menu > nav { min-height: var(--app-navbar-height); }');
+        $event->addRule('.iw-menu > .iw-menu__frame { min-height: var(--app-navbar-height); }');
     }
 }
 ```
@@ -211,7 +211,7 @@ Recompile with `php bin/console iw-sulu:theme:compile` and the output carries:
 /* ... every built-in class ... */
 
 /* Project contributions */
-.iw-menu > nav { min-height: var(--app-navbar-height); }
+.iw-menu > .iw-menu__frame { min-height: var(--app-navbar-height); }
 ```
 
 ### Where contributions land

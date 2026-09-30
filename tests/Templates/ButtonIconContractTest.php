@@ -221,17 +221,17 @@ final class ButtonIconContractTest extends TestCase
     public function theTemplateHonoursBothSides(): void
     {
         $partial = (string) file_get_contents(
-            self::root() . '/templates/blocks/common/_cta_buttons.html.twig',
+            self::root() . '/templates/components/_button.html.twig',
         );
 
-        self::assertStringContainsString('ctaIconLeft', $partial);
+        self::assertStringContainsString('buttonIconLeft', $partial);
         self::assertStringContainsString('iw-button__label', $partial);
 
         // The label sits between the two prints, so the side decides which one
         // fires. Matched loosely on purpose: what the condition tests has
         // changed once already, when the icon gained a second source.
         self::assertMatchesRegularExpression(
-            '/and ctaIconLeft.*iw-button__label.*and not ctaIconLeft/s',
+            '/buttonIconLeft or buttonIconOnly.*iw-button__label.*not buttonIconLeft/s',
             $partial,
             'The icon must be printed before the label when it goes left, and after it otherwise.',
         );

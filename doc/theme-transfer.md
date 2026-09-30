@@ -104,7 +104,7 @@ Sulu shows in its native snackbar.
 
 This is the one thing to know before relying on the feature.
 
-The logos, the fullscreen menu image, the map marker, the back-to-top icon, the
+The logos, the picture of the burger panel, the map marker, the back-to-top icon, the
 social sharing image and a variant's separator image are all **media
 references**: the theme stores the id of a row in the media library. That id
 means nothing in another installation, where it points at an unrelated image or

@@ -1,0 +1,30 @@
+{# Link to the home page, carrying the logo and the site name.
+
+   Params:
+   - config: the menuConfig object
+   - nameClass: classes of the site name
+
+   The logo images have an empty alt: the link is named once, here. With the
+   site name shown, that name is the visible text. With the logo alone, the
+   link gets an aria-label, otherwise a screen reader announces its URL. #}
+
+{% set displayLogo = config.displayLogoDesktop|default(false) or config.displayLogoMobile|default(false) %}
+{% set displaySiteName = config.displaySiteName|default(false) %}
+{% set siteName = config.siteName|default('')|trim %}
+
+{% if displayLogo and not displaySiteName %}
+    {% set homeLabel = siteName is not empty
+        ? 'iw_sulu_tailwind_theme.menu_home'|trans({'%site%': siteName}, 'messages')
+        : 'iw_sulu_tailwind_theme.menu_home_untitled'|trans({}, 'messages') %}
+{% endif %}
+
+<a href="{{ sulu_content_path('/') }}"{% if homeLabel is defined %} aria-label="{{ homeLabel }}"{% endif %} class="iw-menu__text flex items-center gap-2 no-underline">
+    {% include '@ItechWorldSuluTailwindTheme/menu/_logo_images.html.twig'
+        with { config: config } only %}
+    {% if displaySiteName %}
+        <span class="{{ nameClass|default('text-xl font-bold') }}">{{ siteName }}</span>
+    {% elseif not displayLogo %}
+        {# Nothing configured: the site name keeps the link visible and named. #}
+        <span class="{{ nameClass|default('text-xl font-bold') }}">{{ siteName|default('Site') }}</span>
+    {% endif %}
+</a>

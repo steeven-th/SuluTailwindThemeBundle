@@ -2,7 +2,10 @@
    library.
 
    Expected variables:
-     - item        : the data holding the icon fields (a button, a card, a step)
+     - icon        : an `iw_theme_icon_picker` value, as resolved for the website
+     - item        : or the data holding the flat icon fields, for project
+                     templates still on the icon-picker.xml fragment.
+                     Deprecated with the fragment.
      - class       : extra classes for the icon itself
      - blockPrefix : BEM prefix of the calling block, for a hook of its own
 
@@ -28,15 +31,24 @@
    The size travels as a custom property rather than a class: the field offers a
    handful of steps today and enumerating them in CSS would mean keeping a copy
    of that list in step. #}
-{% set iconCustom = item.iconCustom ?? false %}
-{% set iconName = iconCustom ? '' : item.icon|default('') %}
-{% set iconSize = item.iconSize|default('') %}
+{#- Two shapes. `icon`: an `iw_theme_icon_picker` field as resolved for the
+    website ({custom, icon, weight, media, size}), the media already loaded. `item`:
+    the flat fields of the icon-picker.xml fragment, the media an id to load. -#}
+{% set picker = icon is defined and icon is iterable ? icon : null %}
+{% set iconCustom = picker ? (picker.custom ?? false) : (item.iconCustom ?? false) %}
+{% set iconName = iconCustom ? '' : (picker ? picker.icon|default('') : item.icon|default('')) %}
+{% set iconWeight = picker ? picker.weight|default('outline') : 'outline' %}
+{% set iconSize = picker ? picker.size|default('') : item.iconSize|default('') %}
 {% set iconClass = ('iw-icon ' ~ (class|default('')) ~ (blockPrefix|default('') ? ' ' ~ blockPrefix ~ '__icon' : ''))|trim %}
 
 {% set iconMediaUrl = '' %}
 {% set iconMediaVector = false %}
-{% if iconCustom and item.iconMedia.id is defined %}
-    {% set iconMediaResolved = sulu_resolve_media(item.iconMedia.id, app.request.locale) %}
+{% if iconCustom %}
+    {% if picker %}
+        {% set iconMediaResolved = picker.media ?? null %}
+    {% else %}
+        {% set iconMediaResolved = item.iconMedia.id is defined ? sulu_resolve_media(item.iconMedia.id, app.request.locale) : null %}
+    {% endif %}
     {% if iconMediaResolved is not null %}
         {% set iconMediaVector = 'image/svg+xml' == iconMediaResolved.mimeType|default('') %}
         {% set iconMediaUrl = iconMediaVector
@@ -45,8 +57,8 @@
     {% endif %}
 {% endif %}
 
-{%- if iconName and iw_sulu_tailwind_theme_has_icon(iconName) -%}
-    {{ iw_sulu_tailwind_theme_icon(iconName, 'outline', {
+{%- if iconName and iw_sulu_tailwind_theme_has_icon(iconName, iconWeight) -%}
+    {{ iw_sulu_tailwind_theme_icon(iconName, iconWeight, {
         class: iconClass,
         width: 24,
         height: 24,

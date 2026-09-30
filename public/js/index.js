@@ -29,6 +29,9 @@ import TitleEditor from './components/TitleEditor/TitleEditor';
 import BlockScopeSelector from './components/BlockScopeSelector/BlockScopeSelector';
 import VariantEditor from './components/VariantEditor/VariantEditor';
 import TitleBlockPreviewTransformer from './blockPreview/TitleBlockPreviewTransformer';
+import ButtonBlockPreviewTransformer from './blockPreview/ButtonBlockPreviewTransformer';
+import IconPicker from './components/IconPicker/IconPicker';
+import ButtonField from './components/ButtonField/ButtonField';
 import QuotePlugin from './ckeditor/QuotePlugin';
 import TextColorPlugin from './ckeditor/TextColorPlugin';
 import UppercasePlugin from './ckeditor/UppercasePlugin';
@@ -118,6 +121,10 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);
     fieldRegistry.add('iw_theme_block_scope', BlockScopeSelector);
     fieldRegistry.add('iw_theme_variant_editor', VariantEditor);
+    // A pictogram and a whole button, each in one property named freely (see
+    // IconPickerPropertyResolver and ButtonPropertyResolver for the website).
+    fieldRegistry.add('iw_theme_icon_picker', IconPicker);
+    fieldRegistry.add('iw_theme_button', ButtonField);
 
     // What a collapsed block shows in its header. Sulu picks those fields from
     // the types it can render, so a type of ours was simply never considered:
@@ -131,6 +138,13 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         'iw_theme_title_editor',
         new TitleBlockPreviewTransformer(),
         2048,
+    );
+    // Below the titles: a block with a title is named by it, a block made of
+    // buttons alone by their labels.
+    blockPreviewTransformerRegistry.add(
+        'iw_theme_button',
+        new ButtonBlockPreviewTransformer(),
+        1024,
     );
 
     // Rich-text tools. Registered rather than bolted onto a text editor of our

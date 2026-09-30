@@ -35,6 +35,8 @@
     {{ encore_entry_link_tags('app') }}
 </head>
 <body class="bg-[var(--color-background)] text-[var(--color-text)]">
+    {% include '@ItechWorldSuluTailwindTheme/components/_skip_link.html.twig' %}
+
     {# Theme: dynamic menu #}
     {% set menuConfig = iw_sulu_tailwind_theme_menu_config() %}
     {% block header %}
@@ -56,7 +58,7 @@
         {% endif %}
     {% endblock %}
 
-    <main>
+    <main id="main-content" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
 

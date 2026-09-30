@@ -24,6 +24,11 @@ import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
  * @param {Function} props.onChange - Callback when a value is selected
  * @param {boolean} props.disabled - Whether the field is disabled
  */
+/**
+ * Resource key of the theme form (ThemeConfig::RESOURCE_KEY).
+ */
+const THEME_RESOURCE_KEY = 'iw_theme_configs';
+
 @observer
 export default class ButtonStylePicker extends React.Component {
     /** @type {Object|null} Cached palette for ref resolution */
@@ -110,7 +115,10 @@ export default class ButtonStylePicker extends React.Component {
     _getButtons() {
         const {formInspector} = this.props;
 
-        if (formInspector) {
+        // Only the theme form holds the buttons at `/buttons`. On a page, a
+        // property of that name is the page's own, and read as the theme's it
+        // turned the previews into grey placeholders.
+        if (formInspector && formInspector.resourceKey === THEME_RESOURCE_KEY) {
             // getValueByPath may return a MobX observable array (fails Array.isArray).
             const raw = formInspector.getValueByPath('/buttons');
             if (raw && raw.length) {

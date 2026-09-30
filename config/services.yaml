@@ -39,6 +39,13 @@ services:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
 
+    # ─── Content: field types resolved for the website ──────────────────
+    # Tagged `sulu_content.property_resolver` by autoconfiguration, keyed by
+    # getType(): the XML type name of the field.
+    ItechWorld\SuluTailwindThemeBundle\Content\PropertyResolver\IconPickerPropertyResolver: ~
+
+    ItechWorld\SuluTailwindThemeBundle\Content\PropertyResolver\ButtonPropertyResolver: ~
+
     # ─── Controllers ─────────────────────────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Controller\Admin\ThemeConfigController:
         autowire: true
@@ -126,6 +133,13 @@ services:
     # the class for why they are reported rather than deleted.
     itech_world.sulu_tailwind_theme.appearance_override_audit:
         class: ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    # Content still holding buttons and pictograms in the flat shape, reported
+    # by the check command (see iw-sulu:theme:migrate-buttons).
+    itech_world.sulu_tailwind_theme.button_field_audit:
+        class: ItechWorld\SuluTailwindThemeBundle\Content\Migration\ButtonFieldAudit
         arguments:
             - '@doctrine.orm.entity_manager'
 
@@ -404,6 +418,12 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\ButtonsMigrateCommand:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\BlockStylesMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -434,6 +454,7 @@ services:
             - '@sulu_core.webspace.webspace_manager'
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@itech_world.sulu_tailwind_theme.appearance_override_audit'
+            - '@itech_world.sulu_tailwind_theme.button_field_audit'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
         tags:

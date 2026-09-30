@@ -120,21 +120,30 @@ Returns the menu configuration for the active theme.
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `type` | `string` | `navbar`, `burger`, `fullscreen`, `sidebar`, or `megamenu` |
+| `type` | `string` | `navbar`, `burger`, or `megamenu`. A stored `sidebar` or `fullscreen` is read as `burger` (side panel, full-screen panel) |
 | `animation` | `string` | `none`, `slide`, or `fade` |
 | `megamenuSource` | `string` | Data source for mega menu: `'native'` (page tree) or `'snippet'` (manual structure). Only used when `type` is `megamenu`. Default: `'native'` |
 | `clickParentPage` | `string` | Parent page access mode: `'none'`, `'split'`, or `'selflink'` (default: `'none'`) |
 | `clickParentPageNavbar` | `bool` | Adds a self-link to parent page in navbar submenus (default: `false`) |
-| `childLevels` | `int` | Number of sub-menu levels to display (1, 2, or 3) |
+| `childLevels` | `int` | Number of sub-menu levels to display (1 to 4) |
 | `displayLogoDesktop` | `bool` | Show logo on desktop |
 | `displayLogoMobile` | `bool` | Show logo on mobile |
 | `displayMenuDesktop` | `bool` | Show menu on desktop |
 | `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
 | `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
-| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger`, `fullscreen` and `sidebar` |
-| `sidebarWidth` | `int` | Sidebar panel width in pixels on large screens (default: `288`) |
+| `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger` |
+| `displayBarActions` | `bool` | Show the bar actions of the `iw_theme_menu_actions` snippet (default: `false`) |
+| `barActionsBreakpoint` | `string` | `md`, `lg` (default) or `xl`: the width under which the burger moves its bar actions into the panel |
+| `buttonPaddingY`, `buttonPaddingX`, `buttonFontSize` | `int` | Size of the menu buttons in pixels. Unset: 10, 20 and 14 |
+| `panelLayout` | `string` | Burger panel: `full` (default) or `side` |
+| `panelSide` | `string` | Side of a side panel: `left` or `right` (default) |
+| `panelWidth` | `int` | Width in pixels (200-960) of a side panel, or of the links zone beside a picture. Unset: `288` on a side, `480` beside a picture |
+| `panelImage` | `array` | Picture of a full-screen panel (`{id}`) |
+| `panelImageFrom` | `string` | `md`, `lg` (default) or `xl`: the width the picture shows from |
+| `panelContentPosition` | `string` | `auto` (default), `image`, `center` or `bar` |
+| `panelL1Size` | `string` | `normal` (default) or `large` |
 | `displayMenuMobile` | `bool` | Show menu on mobile |
-| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`) |
+| `colors` | `array` | Menu color tokens (`bg`, `text`, `textHover`, `textActive`, `secondBg`, `secondText`, `secondTextHover`, `thirdBg`, `thirdText`, `thirdTextHover`, `fourthBg`, `fourthText`, `fourthTextHover`, `chevron`, `secondChevron`, `thirdChevron`, `fourthChevron`, `divider`, `burgerOpen`, `burgerClose`, `socialMedia`, `socialMediaHover`, `transparentText`, `transparentBurger`) |
 | `logo` | `string\|null` | Path to logo image |
 | `siteName` | `string\|null` | Site name for display |
 
@@ -363,6 +372,93 @@ See [Articles on several sites](multi-site-articles.md).
 - `stored` (`mixed`) — The stored value, plain or naming a choice per site
 
 **Returns:** `mixed` — The value that applies on the site being rendered.
+
+---
+
+### `iw_sulu_tailwind_theme_button(content, view)`
+
+Reads an `iw_theme_button` field into what `components/_button.html.twig`
+renders: `url`, `label` (title attribute of the link, then title of the page or
+media, then URL), `target`, `rel`, `newTab`, `style`, `icon`, `iconOnly`.
+
+```twig
+{% set button = iw_sulu_tailwind_theme_button(content.cta, view.cta) %}
+{% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {button: button} only %}
+```
+
+**Parameters:**
+- `content` (`mixed`): the resolved content of the field
+- `view` (`mixed`): the view of the field, holding the stored link
+
+**Returns:** `array|null`, null when there is nothing to link to (link blank, page deleted or unpublished). See [Button and pictogram fields](button-field.md).
+
+---
+
+### `iw_sulu_tailwind_theme_link(content, view, forceNewTab)`
+
+Reads a Sulu 3 `link` field into the parts of an anchor.
+
+Sulu 3 resolves a link in two halves. The content holds the final URL as a
+string, already localized, so it goes into `href` as it is (no
+`sulu_content_path`). The view holds the stored data at the same path:
+`provider`, `href`, `target`, `title`, `rel`. Reading `link.url` as under
+Sulu 2 always yields null.
+
+A link Sulu could not resolve (deleted or unpublished page, removed media)
+comes back as its raw structure, and the function returns `null`: render
+nothing rather than a link to `#`. A new tab always gets `noopener noreferrer`,
+added to any `rel` the editor set.
+
+The macros of `components/_link_macros.html.twig` print the attributes and the
+screen reader hint for a new tab:
+
+```twig
+{% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+{% set link = iw_sulu_tailwind_theme_link(item.link, itemView.link|default(null)) %}
+{% if link %}
+    <a {{ links.attrs(link) }}>{{ item.title }}{{ links.new_tab_hint(link) }}</a>
+{% endif %}
+```
+
+**Parameters:**
+- `content` (`mixed`) - The field's content value
+- `view` (`mixed`) - The field's view value, optional
+- `forceNewTab` (`bool`) - Open in a new tab whatever the link says, for a field with its own "new tab" checkbox. Default `false`
+
+**Returns:** `array|null` - `{url, target, rel, title, provider, newTab}`, or `null` when there is nothing to link to.
+
+---
+
+### `iw_sulu_tailwind_theme_nav_state(url)`
+
+Tells whether a menu link leads to the page being displayed or to one of its
+ancestors. Pass the URL the anchor prints (`sulu_content_path(item.url)`, or
+`link.url` for a resolved `link` field).
+
+The comparison works on whole path segments and ignores a trailing slash and a
+`.html` suffix. The home page is never an ancestor, `/news` never matches
+`/newsletter`, and an absolute URL to another host never matches. Sulu's own
+`sulu_page_navigation_is_active()` does none of that: it matches the item path
+anywhere in the request path.
+
+The macros of `menu/_nav_macros.html.twig` turn the answer into markup:
+
+```twig
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+{% set href = sulu_content_path(item.url) %}
+{% set state = iw_sulu_tailwind_theme_nav_state(href) %}
+<a href="{{ href }}"{{ nav.current(state) }} class="iw-menu__text{{ nav.state_class(state) }}">{{ item.title }}</a>
+```
+
+`nav.current()` prints `aria-current="page"` on the page itself only,
+`nav.state_class()` adds `iw-menu__item--current` or `iw-menu__item--ancestor`,
+and `nav.branch_class()` marks the button opening a branch that leads to the
+page.
+
+**Parameters:**
+- `url` (`string|null`) - The link URL, relative or absolute
+
+**Returns:** `string|null` - `'current'`, `'ancestor'`, or `null` (also outside a request).
 
 ---
 
@@ -903,9 +999,10 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
+| `iw_theme_menu_curtain` | 1200×1400 | outbound | Picture of the full-screen burger panel (a part of the screen, portrait) |
 | `iw_theme_avatar` | 200×200 | outbound | Author avatars |
-| `iw_theme_logo_desktop` | 400×80 | inset | Header logo |
-| `iw_theme_logo_mobile` | 200×64 | inset | Mobile header logo |
+| `iw_theme_logo_desktop` | 1200×400 | inset | Header logo (covers the 200px height setting on a high-density screen) |
+| `iw_theme_logo_mobile` | 800×400 | inset | Mobile header logo |
 | `iw_og_image` | 1200×630 | outbound | `og:image`, `twitter:image`, JSON-LD |
 
 > `iw_og_image` also serves the theme-wide fallback thumbnail set in **Components > Sharing > Default share image** (`iw_sulu_tailwind_theme.components_shareDefaultImage`), used when a page carries neither an excerpt image nor a hero image.

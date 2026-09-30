@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\MenuConfigNormalizer;
 
 /**
  * Represents a theme configuration with design tokens, menu config, footer config, and block styles.
@@ -183,7 +184,8 @@ class ThemeConfig
     public function getMenuConfig(): array
     {
         // Null-safe against partial hydration / newly-added columns (see getFooterConfig).
-        return $this->menuConfig ?? [];
+        // A theme saved with a former shape is read in the current one.
+        return MenuConfigNormalizer::normalize($this->menuConfig ?? []);
     }
 
     /**

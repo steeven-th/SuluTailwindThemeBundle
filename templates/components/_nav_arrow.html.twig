@@ -7,7 +7,8 @@
 
    Expected variables:
      - direction : 'next' | 'prev' | 'up' | 'down' (default 'next')
-     - role      : 'control' | 'chevron' (default 'control')
+     - role      : 'control' | 'chevron' | 'menu' (default 'control'). 'menu'
+                   is the chevron of the menus, with its own optional setting
      - class     : extra classes for the svg
 
    Two roles, two settings, because they are not the same object. A control is
@@ -39,7 +40,20 @@
 
 {%- set role = role|default('control') -%}
 
-{%- if 'chevron' == role -%}
+{#- The menus draw a third kind, 'menu': the theme chevron, unless the menu
+    settings give the menu one of its own (Menu > Appearance). -#}
+{%- set menuOwn = false -%}
+{%- if 'menu' == role -%}
+    {%- set menuConfig = iw_sulu_tailwind_theme_menu_config() -%}
+    {%- set menuOwn = menuConfig.chevronOwn|default(false) -%}
+{%- endif -%}
+
+{%- if menuOwn -%}
+    {%- set arrowCustom = menuConfig.chevronIconCustom|default(false) -%}
+    {%- set arrowIcon = menuConfig.chevronIcon|default('') -%}
+    {%- set arrowMedia = menuConfig.chevronIconMedia|default(null) -%}
+    {%- set arrowSize = menuConfig.chevronIconSize|default('') -%}
+{%- elseif 'chevron' == role or 'menu' == role -%}
     {%- set arrowCustom = iw_sulu_tailwind_theme.components_controlsChevronIconCustom|default(false) -%}
     {%- set arrowIcon = iw_sulu_tailwind_theme.components_controlsChevronIcon|default('') -%}
     {%- set arrowMedia = iw_sulu_tailwind_theme.components_controlsChevronIconMedia|default(null) -%}

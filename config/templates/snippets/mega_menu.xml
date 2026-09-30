@@ -331,21 +331,10 @@
                                             </params>
                                         </property>
 
-                                        <property name="cta_title" type="text_line">
+                                        <!-- Its label is the title attribute of the link. -->
+                                        <property name="cta" type="iw_theme_button">
                                             <meta>
-                                                <title>iw_sulu_tailwind_theme.mega_cta_title</title>
-                                            </meta>
-                                        </property>
-
-                                        <property name="cta_link" type="link">
-                                            <meta>
-                                                <title>iw_sulu_tailwind_theme.mega_cta_link</title>
-                                            </meta>
-                                        </property>
-
-                                        <property name="cta_style" type="iw_theme_button_style_picker">
-                                            <meta>
-                                                <title>iw_sulu_tailwind_theme.mega_cta_style</title>
+                                                <title>iw_sulu_tailwind_theme.mega_cta</title>
                                             </meta>
                                         </property>
                                     </properties>
@@ -363,35 +352,13 @@
                 <title>iw_sulu_tailwind_theme.mega_cta_section</title>
             </meta>
             <properties>
-                <property name="cta_title" type="text_line" colspan="4">
+                <!-- The section already groups the button: no card of its own. -->
+                <property name="cta" type="iw_theme_button">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.mega_cta_title</title>
-                    </meta>
-                </property>
-
-                <property name="cta_link" type="link" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.mega_cta_link</title>
-                    </meta>
-                </property>
-
-                <property name="cta_style" type="single_select" colspan="4">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.mega_cta_style</title>
+                        <title>iw_sulu_tailwind_theme.mega_cta</title>
                     </meta>
                     <params>
-                        <param name="default_value" type="string" value="primary"/>
-                        <param name="values" type="collection">
-                            <param name="primary">
-                                <meta><title>iw_sulu_tailwind_theme.buttons_primary</title></meta>
-                            </param>
-                            <param name="secondary">
-                                <meta><title>iw_sulu_tailwind_theme.buttons_secondary</title></meta>
-                            </param>
-                            <param name="accent">
-                                <meta><title>iw_sulu_tailwind_theme.buttons_accent</title></meta>
-                            </param>
-                        </param>
+                        <param name="with_card" value="false"/>
                     </params>
                 </property>
             </properties>

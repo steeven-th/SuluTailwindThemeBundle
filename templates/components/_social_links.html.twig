@@ -1,0 +1,72 @@
+{# Social media links, as a list.
+
+   {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
+       links: socialLinks,
+       class: 'flex items-center gap-3',
+       size: 'md',
+       textClass: 'text-sm',
+   } only %}
+
+   - links: the `blocks_social_medias` items of a social media snippet
+   - class: classes of the <ul>
+   - size: 'sm' (default, --iw-social-icon-size 1.25rem) or 'md' (1.5rem)
+   - textClass: classes of the name shown when an item has no icon
+
+   The name is the accessible name of the anchor, never an attribute of the
+   icon: a span has no role, so a screen reader skips an aria-label put on it
+   and the link is announced by its URL. The icons are masks recolored by the
+   surrounding theme: their URLs go in a <style> block under a per-render
+   class, so two lists on one page never share an index. Each icon keeps the
+   ratio of its file (--iw-social-icon-ratio, from the media), so a tall, a
+   square and a wide logo all get the same height. #}
+
+{% set links = links|default([]) %}
+
+{% if links|length > 0 %}
+    {% set prefix = iw_sulu_tailwind_theme_unique_id('iw-social') %}
+    {% set items = [] %}
+    {% for link in links %}
+        {% set iconUrl = null %}
+        {% set iconRatio = null %}
+        {% if link.icon is defined and link.icon.id is defined %}
+            {% set iconMedia = sulu_resolve_media(link.icon.id, app.request.locale) %}
+            {% if iconMedia is not null and iconMedia.url is defined %}
+                {# A vector as it is, a raster through the inset icon format:
+                   the square thumbnail used before cropped a wide logo. #}
+                {% set iconUrl = 'image/svg+xml' == iconMedia.mimeType|default('')
+                    ? iconMedia.url
+                    : iconMedia.thumbnails['iw_theme_icon']|default(iconMedia.url) %}
+                {% set iconWidth = iconMedia.properties.width|default(0) %}
+                {% set iconHeight = iconMedia.properties.height|default(0) %}
+                {% if iconWidth > 0 and iconHeight > 0 %}
+                    {% set iconRatio = (iconWidth / iconHeight)|round(4) %}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% set items = items|merge([{url: link.url|default(''), name: link.name|default(''), icon: iconUrl, ratio: iconRatio}]) %}
+    {% endfor %}
+
+    {% if items|filter(item => item.icon)|length > 0 %}
+        <style>
+            {% for item in items %}{% if item.icon %}
+            .{{ prefix }}-{{ loop.index }} { -webkit-mask-image: url('{{ item.icon }}'); mask-image: url('{{ item.icon }}');{% if item.ratio %} --iw-social-icon-ratio: {{ item.ratio }};{% endif %} }
+            {% endif %}{% endfor %}
+        </style>
+    {% endif %}
+
+    <ul class="iw-social-links {{ class|default('flex items-center gap-2') }}">
+        {% for item in items %}
+            <li>
+                <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center no-underline">
+                    {% if item.icon %}
+                        <span class="iw-social-icon{{ size|default('sm') == 'md' ? ' iw-social-icon--md' : '' }} {{ prefix }}-{{ loop.index }}" aria-hidden="true"></span>
+                        <span class="sr-only">{{ item.name }}</span>
+                    {% else %}
+                        <span class="iw-social-text {{ textClass|default('') }}">{{ item.name }}</span>
+                    {% endif %}
+                    <span class="sr-only"> {{ 'iw_sulu_tailwind_theme.link_new_tab'|trans }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

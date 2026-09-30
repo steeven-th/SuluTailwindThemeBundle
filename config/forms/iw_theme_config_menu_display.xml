@@ -12,6 +12,10 @@
     <key>iw_theme_config_menu_display</key>
 
     <properties>
+            <!-- Groups open on a heading, which closes the row: nothing a group hides
+                 shifts the next one. Inside a group, a field that does not apply is
+                 disabled rather than hidden, so the pairs hold still. -->
+
             <property name="menuConfig_logoDesktop" type="single_media_selection" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoDesktop</title>
@@ -21,6 +25,7 @@
             <property name="menuConfig_logoMobile" type="single_media_selection" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoMobile</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_logoMobile_info</info_text>
                 </meta>
             </property>
 
@@ -31,7 +36,7 @@
             </property>
 
             <property name="menuConfig_logoHeightDesktop" type="number" colspan="6"
-                      visibleCondition="menuConfig_displayLogoDesktop == true">
+                      disabledCondition="menuConfig_displayLogoDesktop != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoHeightDesktop</title>
                     <info_text>iw_sulu_tailwind_theme.menu_logoHeightDesktop_info</info_text>
@@ -50,7 +55,7 @@
             </property>
 
             <property name="menuConfig_logoHeightMobile" type="number" colspan="6"
-                      visibleCondition="menuConfig_displayLogoMobile == true">
+                      disabledCondition="menuConfig_displayLogoMobile != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoHeightMobile</title>
                     <info_text>iw_sulu_tailwind_theme.menu_logoHeightMobile_info</info_text>
@@ -59,6 +64,52 @@
                     <param name="default_value" value="32"/>
                     <param name="min" value="12"/>
                     <param name="max" value="200"/>
+                </params>
+            </property>
+
+            <!-- Bar size. The heights are minimums: the bar grows to hold the
+                 logo plus the space around it, so a logo never overflows it. -->
+            <property name="menuConfig_barHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_barHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_barHeightDesktop" type="number" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barHeightDesktop</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barHeight_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="80"/>
+                    <param name="min" value="40"/>
+                    <param name="max" value="240"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_barHeightMobile" type="number" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barHeightMobile</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barHeight_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="64"/>
+                    <param name="min" value="40"/>
+                    <param name="max" value="240"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_logoSpacing" type="number" colspan="12">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_logoSpacing</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_logoSpacing_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="12"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="48"/>
                 </params>
             </property>
 
@@ -74,6 +125,22 @@
                 </meta>
             </property>
 
+            <!-- Smart hide on scroll down, reveal on scroll up (any background) -->
+            <property name="menuConfig_scrollHide" type="checkbox" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_scrollHide</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_scrollHide_info</info_text>
+                </meta>
+            </property>
+
+            <property name="menuConfig_languageHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_language</title></meta>
+                    </param>
+                </params>
+            </property>
+
             <!-- Language switcher. The languages themselves are never
                  configured here: they come from the webspace XML, so adding
                  a localization there is enough for it to show up. -->
@@ -84,12 +151,54 @@
                 </meta>
             </property>
 
+            <property name="menuConfig_languageSwitcherLabel" type="single_select" colspan="6"
+                      disabledCondition="menuConfig_displayLanguageSwitcher != true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="code"/>
+                    <param name="values" type="collection">
+                        <param name="code">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_code</title>
+                            </meta>
+                        </param>
+                        <param name="native">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_native</title>
+                            </meta>
+                        </param>
+                        <param name="translated">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_translated</title>
+                            </meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_languageSwitcherBarOrder" type="single_select" colspan="12"
+                      disabledCondition="menuConfig_displayLanguageSwitcher != true OR menuConfig_displaySocialMedia != true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="before"/>
+                    <param name="values" type="collection">
+                        <param name="before"><meta><title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder_before</title></meta></param>
+                        <param name="after"><meta><title>iw_sulu_tailwind_theme.menu_languageSwitcherBarOrder_after</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
             <!-- Only the menu types whose bar stays visible next to an open
                  panel. navbar and megamenu place the switcher by breakpoint
                  instead (bar on desktop, panel on mobile), which is dictated
                  by the layout rather than by taste. -->
             <property name="menuConfig_languageSwitcherPosition" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_displayLanguageSwitcher == true AND (menuConfig_type == 'burger' OR menuConfig_type == 'fullscreen' OR menuConfig_type == 'sidebar')">
+                      visibleCondition="menuConfig_type == 'burger'"
+                      disabledCondition="menuConfig_displayLanguageSwitcher != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_languageSwitcherPosition</title>
                     <info_text>iw_sulu_tailwind_theme.menu_languageSwitcherPosition_info</info_text>
@@ -116,29 +225,10 @@
                 </params>
             </property>
 
-            <property name="menuConfig_languageSwitcherLabel" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_displayLanguageSwitcher == true">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel</title>
-                </meta>
+            <property name="menuConfig_transparentHeading" type="heading">
                 <params>
-                    <param name="default_value" value="code"/>
-                    <param name="values" type="collection">
-                        <param name="code">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_code</title>
-                            </meta>
-                        </param>
-                        <param name="native">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_native</title>
-                            </meta>
-                        </param>
-                        <param name="translated">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.menu_languageSwitcherLabel_translated</title>
-                            </meta>
-                        </param>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_transparent</title></meta>
                     </param>
                 </params>
             </property>
@@ -150,13 +240,22 @@
                 </meta>
             </property>
 
+            <!-- Background on scroll: only relevant for a transparent navbar -->
+            <property name="menuConfig_scrollBg" type="checkbox" colspan="6"
+                      disabledCondition="menuConfig_transparentNavbar != true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_scrollBg</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_scrollBg_info</info_text>
+                </meta>
+            </property>
+
             <!-- Transparent-mode logos: a bar sitting over a dark hero usually
                  needs a light logo, while the same bar once scrolled back over
                  a light background needs the regular one. Both variants are
                  rendered and cross-faded on the scrolled state, so the swap
                  happens exactly when the background comes back. -->
             <property name="menuConfig_logoTransparentDesktop" type="single_media_selection" colspan="6"
-                      visibleCondition="menuConfig_transparentNavbar == true">
+                      disabledCondition="menuConfig_transparentNavbar != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoTransparentDesktop</title>
                     <info_text>iw_sulu_tailwind_theme.menu_logoTransparentDesktop_info</info_text>
@@ -167,7 +266,7 @@
             </property>
 
             <property name="menuConfig_logoTransparentMobile" type="single_media_selection" colspan="6"
-                      visibleCondition="menuConfig_transparentNavbar == true">
+                      disabledCondition="menuConfig_transparentNavbar != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_logoTransparentMobile</title>
                     <info_text>iw_sulu_tailwind_theme.menu_logoTransparentMobile_info</info_text>
@@ -177,21 +276,86 @@
                 </params>
             </property>
 
-            <!-- Background on scroll: only relevant for a transparent navbar -->
-            <property name="menuConfig_scrollBg" type="checkbox" colspan="6"
-                      visibleCondition="menuConfig_transparentNavbar == true">
+            <!-- Bar actions: the links of the iw_theme_menu_actions snippet,
+                 beside the burger or the navigation. Off by default, so an
+                 updated site looks the same. -->
+            <property name="menuConfig_barActionsHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_barActionsHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_displayBarActions" type="checkbox" colspan="6">
                 <meta>
-                    <title>iw_sulu_tailwind_theme.menu_scrollBg</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_scrollBg_info</info_text>
+                    <title>iw_sulu_tailwind_theme.menu_displayBarActions</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_displayBarActions_info</info_text>
                 </meta>
             </property>
 
-            <!-- Smart hide on scroll down, reveal on scroll up (any background) -->
-            <property name="menuConfig_scrollHide" type="checkbox" colspan="6">
+            <!-- Burger only: navbar and mega menu move their actions to the
+                 panel where their links do, at the collapse width. The language
+                 switcher set to "both" moves at this width too. -->
+            <property name="menuConfig_barActionsBreakpoint" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger'"
+                      disabledCondition="menuConfig_displayBarActions != true AND (menuConfig_displayLanguageSwitcher != true OR menuConfig_languageSwitcherPosition == 'bar' OR menuConfig_languageSwitcherPosition == 'panel')">
                 <meta>
-                    <title>iw_sulu_tailwind_theme.menu_scrollHide</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_scrollHide_info</info_text>
+                    <title>iw_sulu_tailwind_theme.menu_barActionsBreakpoint</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barActionsBreakpoint_info</info_text>
                 </meta>
+                <params>
+                    <param name="default_value" value="lg"/>
+                    <param name="values" type="collection">
+                        <param name="md"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_md</title></meta></param>
+                        <param name="lg"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_lg</title></meta></param>
+                        <param name="xl"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_xl</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- The size of every button of the menu: the bar actions and the
+                 call to action of the mega menu. They keep their style, only
+                 the padding and the text size are the menu's. -->
+            <property name="menuConfig_buttonsHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_buttonsHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonPaddingY" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonPaddingY</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="10"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="40"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonPaddingX" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonPaddingX</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="20"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="64"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonFontSize" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonFontSize</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="14"/>
+                    <param name="min" value="10"/>
+                    <param name="max" value="24"/>
+                </params>
             </property>
     </properties>
 </form>

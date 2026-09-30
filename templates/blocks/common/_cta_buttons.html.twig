@@ -2,8 +2,9 @@
    includes the `cta-buttons.xml` fragment.
 
    Expected variables:
-     - buttons: the block's `ctaButtons` list ({ link, style } each)
-     - buttonsView: the matching view data, for link targets and labels
+     - buttons: the block's `ctaButtons` list ({button} each, an
+       `iw_theme_button` value as resolved for the website)
+     - buttonsView: the matching view data, for link targets and rel
      - alignment: `ctaAlignment` (title | left | center | right)
      - direction: `ctaDirection` (row | column)
      - titleAlignment: the block's own title alignment, used when the
@@ -15,94 +16,32 @@
    block; a two-zone layout sets `ctaInline` and includes this partial under
    its text column instead. #}
 {% set ctaList = buttons is defined and buttons is iterable ? buttons : [] %}
+{% set ctaView = buttonsView is defined and buttonsView is iterable ? buttonsView : [] %}
 
-{% if ctaList|length > 0 %}
-    {% set ctaView = buttonsView is defined and buttonsView is iterable ? buttonsView : [] %}
+{#- Read first, rendered after: the row only opens once a button has a link to
+    follow, so a button added and left blank in the admin, or pointing to a page
+    unpublished since, leaves no stray gap. -#}
+{% set ctaRead = [] %}
+{% for cta in ctaList %}
+    {% set ctaButton = iw_sulu_tailwind_theme_button(cta.button ?? null, ctaView[loop.index0].button ?? null) %}
+    {% if ctaButton is not null %}
+        {% set ctaRead = ctaRead|merge([ctaButton]) %}
+    {% endif %}
+{% endfor %}
+
+{% if ctaRead|length > 0 %}
     {% set ctaAlign = alignment|default('title') %}
     {% if ctaAlign == 'title' %}
         {% set ctaAlign = titleAlignment|default('left') %}
     {% endif %}
     {% set ctaDir = direction|default('row') == 'column' ? 'column' : 'row' %}
 
-    {# Rendered only once the list holds at least one resolvable link, so a
-       button added and left blank in the admin leaves no stray gap. Filtered
-       rather than flagged inside a loop: a `set` there would not survive it. #}
-    {% set ctaResolvable = ctaList|filter(cta => cta.link is defined and cta.link is not iterable and cta.link is not empty) %}
-
-    {% if ctaResolvable|length > 0 %}
-        <div class="iw-block__actions iw-block__actions--{{ ctaDir }} iw-block__actions--align-{{ ctaAlign }}{{ flush|default(false) ? ' iw-block__actions--flush' : '' }}">
-            {% for cta in ctaList %}
-                {# An unresolvable link - deleted or unpublished target - comes back
-                   as the raw reference structure rather than a URL string. #}
-                {% set ctaUrl = cta.link is defined and cta.link is not iterable ? cta.link : '' %}
-
-                {% if ctaUrl is not empty %}
-                    {% set ctaLinkView = ctaView[loop.index0].link|default({}) %}
-                    {% set ctaTarget = ctaLinkView.target|default('_self') %}
-                    {% set ctaRel = ctaLinkView.rel|default('') %}
-                    {% set ctaLabel = ctaLinkView.title|default('') %}
-
-                    {# Label fallbacks: link attribute, then the linked page or
-                       media title, then the raw URL. #}
-                    {% if ctaLabel is empty and ctaLinkView.provider|default('') == 'page' and ctaLinkView.href|default('') is not empty %}
-                        {% set ctaLabel = sulu_page_load(ctaLinkView.href, {'title': 'title'}).title|default('') %}
-                    {% endif %}
-                    {% if ctaLabel is empty and ctaLinkView.provider|default('') == 'media' and ctaLinkView.href|default('') is not empty %}
-                        {# A media deleted from the library resolves to null. #}
-                        {% set ctaMedia = sulu_resolve_media(ctaLinkView.href, app.request.locale) %}
-                        {% set ctaLabel = ctaMedia is not null ? ctaMedia.title|default('') : '' %}
-                    {% endif %}
-                    {% if ctaLabel is empty %}
-                        {% set ctaLabel = ctaUrl %}
-                    {% endif %}
-
-                    {# Attributes are written as markup, not built as strings inside
-                       `{{ }}`: autoescaping turns the quotes of a concatenated
-                       expression into `&quot;`, which yields `target=&quot;_blank&quot;`
-                       and a link that never opens in a new tab. A literal string
-                       escapes the same way the moment a variable joins it. #}
-                    {# The pictogram, when the editor picked one. It is inlined
-                       rather than linked, so it paints itself with the colour of
-                       the label beside it - the same icon reads correctly on a
-                       primary button, on a dark variant and on an accent surface
-                       without a rule of its own.
-
-                       `aria-hidden` stays as Heroicons ships it: the icon
-                       repeats what the label already says, and a screen reader
-                       announcing "arrow right" after the label helps nobody. A
-                       button with no label would be another matter, and this
-                       block has none - the label falls back to the URL. #}
-                    {#- The pictogram, rendered by the shared partial: the
-                        same markup and the same three renderings serve every
-                        block that carries one. Captured rather than printed on
-                        the spot, because the label sits between the two places
-                        it can go. -#}
-                    {% set ctaIconOutput %}
-                        {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-                            item: cta,
-                            class: 'iw-button__icon',
-                            recolor: true
-                        } only -%}
-                    {% endset %}
-                    {% set ctaHasIcon = ctaIconOutput|trim is not empty %}
-                    {% set ctaIconLeft = (cta.iconPosition|default('right')) == 'left' %}
-                    {% set ctaIconGap = iw_sulu_tailwind_theme_spacing_length(cta.iconGap|default('')) %}
-                    {% set ctaIconVars = ctaIconGap ? '--iw-button-icon-gap: ' ~ ctaIconGap ~ ';' : '' %}
-                    {# A button style may name a choice per site, see iw_sulu_tailwind_theme_site_value. #}
-                    {% set ctaStyle = iw_sulu_tailwind_theme_site_value(cta.style|default('')) %}
-
-                    <a href="{{ ctaUrl }}"
-                       class="{{ ctaStyle ? 'iw-button--' ~ ctaStyle : 'iw-button--variant' }} iw-block__action{{ ctaHasIcon ? ' iw-button--with-icon' : '' }}"
-                       {% if ctaHasIcon and ctaIconVars %}style="{{ ctaIconVars }}"{% endif %}
-                       {% if ctaTarget != '_self' %}target="{{ ctaTarget }}"{% endif %}
-                       {% if ctaRel is not empty %}rel="{{ ctaRel }}"{% elseif ctaTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
-                    >
-                        {% if ctaHasIcon and ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
-                        <span class="iw-button__label">{{ ctaLabel }}</span>
-                        {% if ctaHasIcon and not ctaIconLeft %}{{ ctaIconOutput }}{% endif %}
-                    </a>
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div class="iw-block__actions iw-block__actions--{{ ctaDir }} iw-block__actions--align-{{ ctaAlign }}{{ flush|default(false) ? ' iw-block__actions--flush' : '' }}">
+        {% for ctaButton in ctaRead %}
+            {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
+                button: ctaButton,
+                class: 'iw-block__action',
+            } only %}
+        {% endfor %}
+    </div>
 {% endif %}

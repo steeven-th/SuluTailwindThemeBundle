@@ -706,33 +706,57 @@
       "ctaButtons": [
        {
         "_id": "ctabtn600",
-        "link": {
-         "rel": null,
-         "href": "@page:text",
-         "query": null,
-         "title": null,
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "page"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "@page:text",
+          "query": null,
+          "title": null,
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "page"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        },
        {
         "_id": "ctabtn601",
-        "link": {
-         "rel": null,
-         "href": "https://google.com",
-         "query": null,
-         "title": "Google",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
-        },
-        "style": "@button:2",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "https://google.com",
+          "query": null,
+          "title": "Google",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "@button:2",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "title",
@@ -767,18 +791,30 @@
       "ctaButtons": [
        {
         "_id": "ctabtn800",
-        "link": {
-         "rel": null,
-         "href": "@page:text",
-         "query": null,
-         "title": null,
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "page"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "@page:text",
+          "query": null,
+          "title": null,
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "page"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "center",
@@ -803,33 +839,57 @@
       "ctaButtons": [
        {
         "_id": "ctabtn600",
-        "link": {
-         "rel": null,
-         "href": "@page:text",
-         "query": null,
-         "title": null,
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "page"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "@page:text",
+          "query": null,
+          "title": null,
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "page"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        },
        {
         "_id": "ctabtn601",
-        "link": {
-         "rel": null,
-         "href": "https://google.com",
-         "query": null,
-         "title": "Google",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
-        },
-        "style": "@button:2",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "https://google.com",
+          "query": null,
+          "title": "Google",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "@button:2",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "title",
@@ -860,18 +920,30 @@
       "ctaButtons": [
        {
         "_id": "ctabtn800",
-        "link": {
-         "rel": null,
-         "href": "https://google.com",
-         "query": null,
-         "title": "Google",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "https://google.com",
+          "query": null,
+          "title": "Google",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "title",
@@ -903,18 +975,30 @@
       "ctaButtons": [
        {
         "_id": "ctabtn800",
-        "link": {
-         "rel": null,
-         "href": "https://google.com",
-         "query": null,
-         "title": "Google",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "https://google.com",
+          "query": null,
+          "title": "Google",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "title",
@@ -961,18 +1045,30 @@
       "ctaButtons": [
        {
         "_id": "ctabtn800",
-        "link": {
-         "rel": null,
-         "href": "@page:text",
-         "query": null,
-         "title": null,
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "page"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "@page:text",
+          "query": null,
+          "title": null,
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "page"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "title",
@@ -995,33 +1091,57 @@
       "ctaButtons": [
        {
         "_id": "ctabtn600",
-        "link": {
-         "rel": null,
-         "href": "@page:text",
-         "query": null,
-         "title": null,
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "page"
-        },
-        "style": "@button:1",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "@page:text",
+          "query": null,
+          "title": null,
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "page"
+         },
+         "style": "@button:1",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        },
        {
         "_id": "ctabtn601",
-        "link": {
-         "rel": null,
-         "href": "https://google.com",
-         "query": null,
-         "title": "Google",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
-        },
-        "style": "@button:2",
-        "type": "cta_button"
+        "type": "cta_button",
+        "button": {
+         "link": {
+          "rel": null,
+          "href": "https://google.com",
+          "query": null,
+          "title": "Google",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "@button:2",
+         "icon": {
+          "custom": false,
+          "icon": null,
+          "weight": "outline",
+          "media": null,
+          "size": "",
+          "position": "right",
+          "gap": ""
+         },
+         "display": "button"
+        }
        }
       ],
       "ctaAlignment": "center",
@@ -1067,8 +1187,15 @@
         "title": "Information and prevention visit",
         "text": "<p>Checking that the role carries no risk for the employee's health.</p>",
         "icon": {
-         "id": "@media:4",
-         "displayOption": null
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:4"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
         }
        },
        {
@@ -1076,11 +1203,18 @@
         "type": "card",
         "title": "Medical examination on hiring",
         "text": "<p>Confirming fitness for the role before any exposure.</p>",
+        "highlighted": true,
         "icon": {
-         "id": "@media:5",
-         "displayOption": null
-        },
-        "highlighted": true
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:5"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "card003",
@@ -1088,8 +1222,15 @@
         "title": "Periodic visit",
         "text": "<p>Reviewing health against the risks of the role.</p>",
         "icon": {
-         "id": "@media:6",
-         "displayOption": null
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:6"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
         }
        }
       ]
@@ -1132,33 +1273,57 @@
         "ctaButtons": [
          {
           "_id": "cardbtn040",
-          "link": {
-           "rel": null,
-           "href": "https://sulu.io/docs",
-           "query": null,
-           "title": "Articles",
-           "anchor": null,
-           "locale": "en",
-           "target": "_self",
-           "provider": "external"
-          },
-          "style": "@button:1",
-          "type": "cta_button"
+          "type": "cta_button",
+          "button": {
+           "link": {
+            "rel": null,
+            "href": "https://sulu.io/docs",
+            "query": null,
+            "title": "Articles",
+            "anchor": null,
+            "locale": "en",
+            "target": "_self",
+            "provider": "external"
+           },
+           "style": "@button:1",
+           "icon": {
+            "custom": false,
+            "icon": null,
+            "weight": "outline",
+            "media": null,
+            "size": "",
+            "position": "right",
+            "gap": ""
+           },
+           "display": "button"
+          }
          },
          {
           "_id": "cardbtn041",
-          "link": {
-           "rel": null,
-           "href": "https://sulu.io",
-           "query": null,
-           "title": "Sulu",
-           "anchor": null,
-           "locale": "en",
-           "target": "_self",
-           "provider": "external"
-          },
-          "style": "@button:2",
-          "type": "cta_button"
+          "type": "cta_button",
+          "button": {
+           "link": {
+            "rel": null,
+            "href": "https://sulu.io",
+            "query": null,
+            "title": "Sulu",
+            "anchor": null,
+            "locale": "en",
+            "target": "_self",
+            "provider": "external"
+           },
+           "style": "@button:2",
+           "icon": {
+            "custom": false,
+            "icon": null,
+            "weight": "outline",
+            "media": null,
+            "size": "",
+            "position": "right",
+            "gap": ""
+           },
+           "display": "button"
+          }
          }
         ]
        },
@@ -1174,18 +1339,30 @@
         "ctaButtons": [
          {
           "_id": "cardbtn050",
-          "link": {
-           "rel": null,
-           "href": "https://symfony.com",
-           "query": null,
-           "title": "Symfony",
-           "anchor": null,
-           "locale": "en",
-           "target": "_self",
-           "provider": "external"
-          },
-          "style": "@button:3",
-          "type": "cta_button"
+          "type": "cta_button",
+          "button": {
+           "link": {
+            "rel": null,
+            "href": "https://symfony.com",
+            "query": null,
+            "title": "Symfony",
+            "anchor": null,
+            "locale": "en",
+            "target": "_self",
+            "provider": "external"
+           },
+           "style": "@button:3",
+           "icon": {
+            "custom": false,
+            "icon": null,
+            "weight": "outline",
+            "media": null,
+            "size": "",
+            "position": "right",
+            "gap": ""
+           },
+           "display": "button"
+          }
          }
         ]
        }
@@ -1220,42 +1397,64 @@
         "type": "card",
         "title": "First step",
         "text": "<p>The visual sits beside the text.</p>",
-        "icon": {
-         "id": "@media:9",
-         "displayOption": null
-        },
         "link": {
-         "rel": null,
-         "href": "https://sulu.io/docs",
-         "query": null,
-         "title": "Articles",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
+         "link": {
+          "rel": null,
+          "href": "https://sulu.io/docs",
+          "query": null,
+          "title": "Articles",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "primary",
+         "icon": null,
+         "display": "button"
         },
-        "linkStyle": "primary"
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:9"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "card007",
         "type": "card",
         "title": "Second step",
         "text": "<p>The whole card leads to the page.</p>",
-        "icon": {
-         "id": "@media:10",
-         "displayOption": null
-        },
         "link": {
-         "rel": null,
-         "href": "https://sulu.io",
-         "query": null,
-         "title": "Learn more",
-         "anchor": null,
-         "locale": "en",
-         "target": "_self",
-         "provider": "external"
+         "link": {
+          "rel": null,
+          "href": "https://sulu.io",
+          "query": null,
+          "title": "Learn more",
+          "anchor": null,
+          "locale": "en",
+          "target": "_self",
+          "provider": "external"
+         },
+         "style": "secondary",
+         "icon": null,
+         "display": "button"
         },
-        "linkStyle": "secondary"
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:10"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ]
      },
@@ -1289,8 +1488,15 @@
         "title": "Narrow",
         "text": "<p>One third of the row.</p>",
         "icon": {
-         "id": "@media:11",
-         "displayOption": null
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:11"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
         }
        },
        {
@@ -1299,8 +1505,15 @@
         "title": "Wide",
         "text": "<p>Two thirds of the row, with the pictogram above the title.</p>",
         "icon": {
-         "id": "@media:12",
-         "displayOption": null
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:12"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
         }
        }
       ]
@@ -1982,68 +2195,110 @@
        {
         "_id": "98a04eb0",
         "type": "figure",
-        "image": {
-         "id": "@media:4",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:4"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "0b4c10bf",
         "type": "figure",
-        "image": {
-         "id": "@media:5",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:5"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "1998b039",
         "type": "figure",
-        "image": {
-         "id": "@media:6",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:6"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "cebb0c6a",
         "type": "figure",
-        "image": {
-         "id": "@media:7",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:7"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "acbe551d",
         "type": "figure",
-        "image": {
-         "id": "@media:8",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:8"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "71081c00",
         "type": "figure",
-        "image": {
-         "id": "@media:9",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:9"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ],
       "variant": 0,
@@ -2063,68 +2318,110 @@
        {
         "_id": "bb4518a0",
         "type": "figure",
-        "image": {
-         "id": "@media:10",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:10"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "58fedda3",
         "type": "figure",
-        "image": {
-         "id": "@media:11",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:11"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "51fd411e",
         "type": "figure",
-        "image": {
-         "id": "@media:12",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:12"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "108fd6da",
         "type": "figure",
-        "image": {
-         "id": "@media:1",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:1"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "7cfa6d8b",
         "type": "figure",
-        "image": {
-         "id": "@media:2",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:2"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "4e600efd",
         "type": "figure",
-        "image": {
-         "id": "@media:3",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:3"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ],
       "variant": 1,
@@ -2144,68 +2441,110 @@
        {
         "_id": "ccf71925",
         "type": "figure",
-        "image": {
-         "id": "@media:4",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:4"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "b901a791",
         "type": "figure",
-        "image": {
-         "id": "@media:5",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:5"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "27ab8954",
         "type": "figure",
-        "image": {
-         "id": "@media:6",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:6"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "918c3a68",
         "type": "figure",
-        "image": {
-         "id": "@media:7",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:7"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "ebd8372a",
         "type": "figure",
-        "image": {
-         "id": "@media:8",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:8"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "46e37d2d",
         "type": "figure",
-        "image": {
-         "id": "@media:9",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:9"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ],
       "variant": 0,
@@ -2225,68 +2564,110 @@
        {
         "_id": "fdc54bc8",
         "type": "figure",
-        "image": {
-         "id": "@media:10",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:10"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "b7e30418",
         "type": "figure",
-        "image": {
-         "id": "@media:11",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:11"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "1fdcb6b8",
         "type": "figure",
-        "image": {
-         "id": "@media:12",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:12"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "c8b8ae4e",
         "type": "figure",
-        "image": {
-         "id": "@media:1",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:1"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "0784e8a9",
         "type": "figure",
-        "image": {
-         "id": "@media:2",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:2"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "e489406f",
         "type": "figure",
-        "image": {
-         "id": "@media:3",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:3"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ],
       "variant": 1,
@@ -2306,68 +2687,110 @@
        {
         "_id": "b711d659",
         "type": "figure",
-        "image": {
-         "id": "@media:4",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:4"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "c70c2afe",
         "type": "figure",
-        "image": {
-         "id": "@media:5",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:5"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "c0963754",
         "type": "figure",
-        "image": {
-         "id": "@media:6",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:6"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "7548b88d",
         "type": "figure",
-        "image": {
-         "id": "@media:7",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:7"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "3e03bdeb",
         "type": "figure",
-        "image": {
-         "id": "@media:8",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:8"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        },
        {
         "_id": "05ada4b1",
         "type": "figure",
-        "image": {
-         "id": "@media:9",
-         "displayOption": null
-        },
         "title": "titre",
         "number": "5",
-        "subTitle": "sous titre"
+        "subTitle": "sous titre",
+        "icon": {
+         "custom": true,
+         "icon": null,
+         "weight": "outline",
+         "media": {
+          "id": "@media:9"
+         },
+         "size": "",
+         "position": "right",
+         "gap": ""
+        }
        }
       ],
       "variant": 0,

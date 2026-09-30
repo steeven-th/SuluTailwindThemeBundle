@@ -2,6 +2,10 @@
 <!--
     Fragment: where a pictogram sits next to its label, and how far from it.
 
+    DEPRECATED along with icon-picker.xml: `iw_theme_icon_picker` offers the
+    same choices with `with_placement`. Kept for project templates, removed in
+    the next major version.
+
     Only for a pictogram rendered in line with text - a button, a link. One
     standing above a title has no side to take, and the field would be a setting
     that does nothing.

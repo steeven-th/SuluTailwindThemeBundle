@@ -10,6 +10,8 @@ This guide explains how to use the SuluTailwindThemeBundle in your own custom co
 - [4. Accessing theme data in PHP](#4-accessing-theme-data-in-php)
 - [5. Tailwind CSS integration](#5-tailwind-css-integration)
 - [6. Reusing the bundle's Stimulus controllers](#6-reusing-the-bundles-stimulus-controllers)
+- [7. Skip link and main landmark](#7-skip-link-and-main-landmark)
+- [8. A hero of your own under a transparent menu bar](#8-a-hero-of-your-own-under-a-transparent-menu-bar)
 
 ---
 
@@ -359,21 +361,23 @@ colours keep them.
 
 ### The pictogram of a block element
 
-A card, a timeline step, a key figure and a call-to-action button all carry a
-pictogram the same way, through two shared fragments and one partial:
+A card, a timeline step and a key figure carry a pictogram through the
+`iw_theme_icon_picker` field type, and a button through the pictogram of its
+`iw_theme_button`. One property named freely, rendered by one partial:
 
 ```xml
-<xi:include href="../fragments/icon-picker.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-<!-- Only where the pictogram sits in line with a label -->
-<xi:include href="../fragments/icon-placement.xml"
-            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+<property name="icon" type="iw_theme_icon_picker">
+    <params>
+        <!-- Only where the pictogram sits in line with a label -->
+        <param name="with_placement" value="true"/>
+    </params>
+</property>
 ```
 
 ```twig
 {% set iconOutput %}
     {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
-        item: card,
+        icon: card.icon ?? null,
         class: 'iw-card__icon-img'
     } only -%}
 {% endset %}
@@ -383,11 +387,15 @@ pictogram the same way, through two shared fragments and one partial:
 {% endif %}
 ```
 
+The `icon-picker.xml` and `icon-placement.xml` fragments are deprecated. They
+stay for project templates that include them, rendered with `item:` instead of
+`icon:`, and go in the next major version.
+
 Capture the output before deciding on a wrapper: the partial renders nothing at
 all when no pictogram was picked, so an empty slot is never opened.
 
-**Two fragments, because placement is not universal.** A pictogram beside a
-label has a side and a gap; one standing above a title has neither, and offering
+**Placement is an option, because it is not universal.** A pictogram beside a
+label has a side and a gap. One standing above a title has neither, and offering
 the fields there would be settings that do nothing.
 
 **Three renderings, one rule.** A library icon carries no colour of its own, so
@@ -519,6 +527,15 @@ field types the blocks never use, and the tall ones are listed with the rest in
 the test: the palette and variant editors, the font picker and the article
 style picker. The weight picker and the colour token editor look like they
 belong there but do not, both rendering a single line.
+
+In the theme configuration forms, a condition is also a layout decision. A
+field hidden by a `visibleCondition` pulls every field after it one slot back,
+so a form reshuffles its pairs each time an option changes. The menu forms
+follow three rules: a heading opens each group, so a group can only ever leave
+its own last row half full. A whole group that does not apply to the menu type
+is hidden, heading included. Inside a group, a field that does not apply is
+disabled (`disabledCondition`) rather than hidden, and two alternatives that
+never show together take the same slot.
 
 `BlockSectionsContractTest` enforces all of this on every block the bundle
 ships, both what Appearance may hold and what Content may hold.
@@ -822,3 +839,46 @@ class="... {{ loop.first ? '' : 'invisible pointer-events-none' }}"
 ```
 
 Getting it wrong is harmless since 3.0.0 - the controller clears both families on every pass - but the flash then shows the wrong slides.
+
+---
+
+## 7. Skip link and main landmark
+
+A keyboard user should not have to tab through the whole menu on every page (WCAG 2.4.1). The bundle `base.html.twig` does it for you. A project with its own base template adds two things:
+
+```twig
+<body>
+    {% include '@ItechWorldSuluTailwindTheme/components/_skip_link.html.twig' %}
+
+    {# the menu #}
+
+    <main id="main-content" tabindex="-1">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+```
+
+- The link must be the **first focusable element** of the page. It stays off screen until it takes the focus, then shows over the bar in the menu colors swapped (`.iw-skip-link`).
+- `tabindex="-1"` on `<main>` lets the browser move the focus there, not only scroll: without it, the next Tab starts again from the top of the page. `#main-content:focus` draws no outline, the ring around the whole page would say nothing.
+- Another target id is passed with `{% include '...' with {target: 'content'} %}`.
+
+---
+
+## 8. A hero of your own under a transparent menu bar
+
+With **Transparent navbar** on, the bar only turns transparent over a hero that says it may sit under it. The bundle heroes do it for you. A hero of your own, on a homepage template or any page that does not go through the bundle page hero, needs two things:
+
+```twig
+<section class="my-hero" data-iw-menu-overlay>
+```
+
+```css
+.my-hero { box-sizing: content-box; padding-top: var(--iw-menu-overlap, 0px); }
+```
+
+- Put the attribute only on a hero that **opens the page with a picture or a dark background**. Anywhere else the bar would turn transparent over a light page.
+- `--iw-menu-overlap` is the bar height while the bar sits over the hero, `0` otherwise, so the padding keeps your content out from under the bar and costs nothing on other pages.
+- Without the attribute, nothing changes: the bar stays opaque and the page starts below it.
+
+See [Transparent bar over a hero](menus.md#transparent-bar-over-a-hero) for the states and the colors.
+

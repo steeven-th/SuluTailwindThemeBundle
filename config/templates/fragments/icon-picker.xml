@@ -2,6 +2,11 @@
 <!--
     Fragment: the pictogram a block element can carry.
 
+    DEPRECATED: the blocks of the bundle use the `iw_theme_icon_picker` field
+    type instead, one property named freely (see doc/button-field.md). This
+    fragment stays for the project templates that include it, and goes in the
+    next major version.
+
     One picker, two sources. The theme library (Heroicons, shipped with the
     bundle) covers what a sign usually has to say; the media library covers what
     only this project has - a logo, a trade symbol. A toggle decides, so the two

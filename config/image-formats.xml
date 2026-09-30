@@ -72,22 +72,24 @@
         <scale x="400" y="300" mode="outbound"/>
     </format>
 
-    <!-- Logo desktop (max 400x80, keeps aspect ratio) -->
+    <!-- Logo desktop (max 1200x400, keeps aspect ratio). The logo height
+         setting goes up to 200px: 400px covers it on a high-density screen.
+         A smaller format silently caps a raster logo below the height set. -->
     <format key="iw_theme_logo_desktop">
         <meta>
             <title lang="en">Theme Logo Desktop</title>
             <title lang="fr">Thème Logo Desktop</title>
         </meta>
-        <scale x="400" y="80" mode="inset"/>
+        <scale x="1200" y="400" mode="inset"/>
     </format>
 
-    <!-- Logo mobile (max 200x64, keeps aspect ratio) -->
+    <!-- Logo mobile (max 800x400, keeps aspect ratio), same reason. -->
     <format key="iw_theme_logo_mobile">
         <meta>
             <title lang="en">Theme Logo Mobile</title>
             <title lang="fr">Thème Logo Mobile</title>
         </meta>
-        <scale x="200" y="64" mode="inset"/>
+        <scale x="800" y="400" mode="inset"/>
     </format>
 
     <!-- Mega menu image card (16:10 ratio, 400x250) -->
@@ -106,6 +108,15 @@
             <title lang="fr">Thème Bannière Hero</title>
         </meta>
         <scale x="1920" y="800" mode="outbound"/>
+    </format>
+
+    <!-- Picture of the full-screen burger panel, beside the links (a part of the screen, portrait) -->
+    <format key="iw_theme_menu_curtain">
+        <meta>
+            <title lang="en">Theme Menu Curtain</title>
+            <title lang="fr">Thème Rideau du menu</title>
+        </meta>
+        <scale x="1200" y="1400" mode="outbound"/>
     </format>
 
     <!-- Open Graph / social share format (1.91:1 ratio, used by og:image, twitter:image and JSON-LD) -->

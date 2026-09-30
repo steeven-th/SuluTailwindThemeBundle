@@ -1,0 +1,8 @@
+{# First element of <body>: lets a keyboard user jump over the menu.
+
+   Targets `main-content`, so the page needs <main id="main-content" tabindex="-1">.
+   The tabindex lets the browser move the focus there, not only scroll:
+   without it, the next Tab starts again from the top of the page (WCAG 2.4.1).
+
+   {% include '@ItechWorldSuluTailwindTheme/components/_skip_link.html.twig' %} #}
+<a href="#{{ target|default('main-content') }}" class="iw-skip-link">{{ 'iw_sulu_tailwind_theme.skip_to_content'|trans({}, 'messages') }}</a>

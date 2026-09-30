@@ -1,0 +1,21 @@
+{# Anchor helpers for a link read with iw_sulu_tailwind_theme_link().
+
+   {% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
+   {% set link = iw_sulu_tailwind_theme_link(item.link, itemView.link|default(null)) %}
+   {% if link %}
+       <a {{ links.attrs(link) }} class="...">{{ item.title }}{{ links.new_tab_hint(link) }}</a>
+   {% endif %}
+
+   The attributes are written as markup rather than concatenated: a quote
+   built inside `{{ }}` gets autoescaped into `&quot;`. #}
+
+{# href, plus target and rel when the link sets them. #}
+{% macro attrs(link) -%}
+    href="{{ link.url }}"{% if link.target %} target="{{ link.target }}"{% endif %}{% if link.rel %} rel="{{ link.rel }}"{% endif %}
+{%- endmacro %}
+
+{# Tells a screen reader user the link opens a new tab (WCAG 3.2.5, RGAA 13.2).
+   Goes inside the anchor, after its label. #}
+{% macro new_tab_hint(link) -%}
+    {%- if link.newTab %}<span class="sr-only"> {{ 'iw_sulu_tailwind_theme.link_new_tab'|trans }}</span>{% endif -%}
+{%- endmacro %}

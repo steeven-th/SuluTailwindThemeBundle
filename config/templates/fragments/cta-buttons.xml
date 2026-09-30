@@ -18,8 +18,7 @@
     column of a two-zone layout - sets `ctaInline` and includes the partial
     itself.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template"
-            xmlns:xi="http://www.w3.org/2001/XInclude">
+<properties xmlns="http://schemas.sulu.io/template/template">
     <property name="ctaHeading" type="heading">
         <params>
             <param name="label">
@@ -39,30 +38,14 @@
                     <title>iw_sulu_tailwind_theme.cta_button</title>
                 </meta>
                 <properties>
-                    <!-- The label comes from the link attributes, falling back
-                         to the linked page or media title, then to the URL. -->
-                    <property name="link" type="link" colspan="12">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.cta_button_link</title>
-                            <info_text>iw_sulu_tailwind_theme.cta_button_link_info</info_text>
-                        </meta>
+                    <!-- One field for the whole button: link, style and
+                         pictogram (see doc/button-field.md). The label is the
+                         title attribute of the link, then the title of the
+                         linked page or media, then the URL. -->
+                    <property name="button" type="iw_theme_button" colspan="12">
                         <params>
-                            <param name="enable_attributes" value="true"/>
+                            <param name="with_display" value="true"/>
                         </params>
-                    </property>
-                    <!--
-                        The pictogram and where it sits. Shared fragments: the
-                        same picker serves every block that carries one, and a
-                        copy here would drift the day one of them gains a field.
-                    -->
-                    <xi:include href="icon-picker.xml"
-                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                    <xi:include href="icon-placement.xml"
-                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                    <property name="style" type="iw_theme_button_style_picker" colspan="12">
-                        <meta>
-                            <title>iw_sulu_tailwind_theme.cta_button_style</title>
-                        </meta>
                     </property>
                 </properties>
             </type>

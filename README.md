@@ -794,6 +794,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Button Hover Effects](doc/button-effects.md) | Catalog of composable hover effects (shadow, transform, opacity, duration, easing) |
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Title editor](doc/title-editor.md) | Multi-line titles with highlighted words: the `iw_theme_title_editor` field type, its stored syntax, and the classes behind it |
+| [Button and pictogram fields](doc/button-field.md) | A whole button (link, style, pictogram, display) or a pictogram in one property: the `iw_theme_button` and `iw_theme_icon_picker` field types, their resolution and the `components/_button.html.twig` partial |
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
 | [Extending the theme configuration](doc/extensibility.md) | Adding your own admin fields (`custom_*` namespaces) and contributing CSS through `ThemeCompileEvent` |

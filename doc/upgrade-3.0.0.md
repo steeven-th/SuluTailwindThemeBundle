@@ -685,16 +685,17 @@ of the page too, which is the intended behavior. `transition-shadow` was dropped
 from the menu templates at the same time; the transition lives in the compiled
 CSS.
 
-### `.iw-menu > nav` no longer inherits the background
+### The frame of the bar no longer inherits the background
 
 It used to repaint the bar background, which was invisible with an opaque color
-but would double a translucent one. The inner `<nav>` is now transparent — the
-header spans the full width and already paints it.
+but would double a translucent one. The frame around the bar (`<nav>` then,
+`.iw-menu__frame` since the menu structure change below) is now transparent,
+the header spans the full width and already paints it.
 
-The **sidebar** menu is the exception: there the sticky element *is* the `<nav>`,
+The **sidebar** menu is the exception: there the sticky element *is* the frame,
 so its header carries a new `.iw-menu--sidebar` class that moves the chrome onto
-that `<nav>`. If you override a sidebar menu template, keep the class on the
-`<header>`.
+`.iw-menu--sidebar > .iw-menu__frame`. If you override a sidebar menu template,
+keep the class on the `<header>`.
 
 ### Logo markup moved to a partial
 
@@ -705,6 +706,442 @@ resolution, switch to the include — otherwise the transparent-mode variants ne
 render. Pass `transparentSwap: false` inside overlays and side panels: they paint
 their own opaque background, so the pale variant would show over the wrong
 surface.
+
+---
+
+## Mega menu: snippet links fixed, parent pages reachable (fixed, visual)
+
+In snippet mode, every link of the mega menu pointed to `#` under Sulu 3: the
+template read `link.url`, a Sulu 2 shape. Links are now read with
+[`iw_sulu_tailwind_theme_link()`](twig-reference.md#iw_sulu_tailwind_theme_linkcontent-view-forcenewtab),
+which takes the URL from the snippet content and the target from its view.
+What changes on screen:
+
+- **Unresolved links disappear.** An item whose page was deleted or
+  unpublished is no longer rendered, instead of pointing to `#`. An image
+  card stays, without its link.
+- **The dropdown's own link is rendered.** A Mega Dropdown with its `link`
+  filled now shows it, with its title, at the top of the panel and of the
+  mobile accordion.
+- **Native mode can reach parent pages.** The **Parent page access** checkbox
+  of the navbar now also applies to the native mega menu. A theme where it was
+  already checked shows the link at once.
+- **Menu buttons get the menu size.** The global CTA and the featured column
+  CTA use `.iw-menu__button`: their style is kept, their size no longer
+  follows the page buttons. See [Menu buttons](menus.md#menu-buttons).
+- **Card and featured images are decorative** (`alt=""`), their title is
+  right beside them.
+
+If you override `_megamenu.html.twig`, read every `link` field through the
+function: `link.url` is always null under Sulu 3.
+
+---
+
+## Menus: keyboard, focus and ARIA (breaking for template overrides)
+
+The `menu` Stimulus controller was rewritten around two ARIA patterns,
+disclosure for what drops down and dialog for the panels the burger opens. See
+[Accessibility](menus.md#accessibility). On screen, the menus look the same.
+What changes for the visitor: Escape closes, the focus is managed, level 3 of
+the navbar opens without a mouse, a click no longer closes a dropdown hover
+just opened, and opening a panel no longer shifts the page.
+
+**If you override a menu template**, the old controller API is gone:
+
+| Removed | Now |
+|---------|-----|
+| `menu#toggleDropdown`, `menu#toggleMobileSubmenu`, `menu#toggleMegaDropdown` | `menu#toggleDisclosure` on a button with `aria-expanded="false"` and `aria-controls="<id>"` |
+| targets `dropdown`, `dropdownParent`, `subdropdown`, `subdropdownParent`, `submenu`, `megaParent`, `megaDropdown` | `popupTrigger` on the button of a floating dropdown; the content is found by its id |
+| targets `curtainLeft`, `curtainRight` | classes `iw-menu__curtain iw-menu__curtain--left` / `--right` |
+| values `animation`, `slideDirection` | classes on the panel: `iw-menu__dialog iw-menu__dialog--{none\|fade\|slide\|curtain}` and `--from-{top\|right\|bottom\|left}` |
+| `invisible opacity-0` on the panel, translate utilities on the sidebar | `iw-menu__dialog`, `iw-menu__sidebar--{left\|right}`, opened by `--open` |
+| `data-menu-panel-id-param` on a drill-down row | `aria-controls` pointing to the sub-panel id |
+
+The panels also need `role="dialog"` and an `aria-label`, and the burger
+`aria-controls`. The sidebar panel is now a `<div>`, not an `<aside>`: it is
+not complementary content, and `dialog` is not an allowed role on `<aside>`. In the mega menu, each panel now sits right after its button,
+inside a `.iw-mega-menu__item` wrapper, and the `<nav>` became full width with
+the container inside it. A `MenuAccessibilityContractTest` in the bundle lists
+every rule a template must follow.
+
+The chevrons of the menus now go through `components/_nav_arrow.html.twig`:
+they follow the theme's chevron setting like every other chevron of the site.
+With no chevron set, they look as before.
+
+
+## Menu bar height becomes a setting (breaking, visual)
+
+The bar height was written in the templates (`h-16 md:h-20`, `h-16` for the
+burger) while the logo height was a setting going up to 200px, so a tall logo
+stuck out of the bar and covered the first link of the panels. The **Bar**
+group of the Menu tab now sets it, and the bar grows to hold the logo. See
+[Bar height](menus.md#bar-height). What changes on screen:
+
+- **The burger bar is 80px on desktop**, like the other types. It used to stay
+  at 64px.
+- **Dropdowns hang from the bar**, not from their button: the navbar level 2
+  and the language dropdown now start at the bottom edge of the bar.
+- **A tall logo grows the bar** instead of overflowing it.
+- **Logos reach the height set.** The `iw_theme_logo_desktop` and
+  `iw_theme_logo_mobile` image formats capped a raster logo at 80 and 64px
+  whatever the setting. They now go up to 400px. Clear the format cache so
+  existing logos are regenerated:
+  `bin/adminconsole sulu:media:format:cache:clear`.
+
+If you override a menu template, replace `h-16`, `md:h-20`, `top-16` and
+`pt-16` with the classes of the [reference](menus.md#css-classes-reference):
+`.iw-menu__bar`, `.iw-menu__below-bar`, `.iw-menu__bar-spacer`,
+`.iw-menu__overlay-nav--below-bar`, `.iw-menu__bar-dropdown`.
+
+---
+
+## Menus: lists, landmarks and current page (breaking for template overrides)
+
+A screen reader user now gets the structure a sighted visitor sees. See
+[Structure and current page](menus.md#structure-and-current-page). On screen,
+the menus look the same, except for the page being displayed:
+
+- **The current page is marked.** Its link is underlined and colored, the
+  entries leading to it are colored. The color is the new **Current page text**
+  setting of the menu colors (`--iw-menu-text-active`). Unset, each level uses
+  its hover color.
+- **Skip link.** The bundle `base.html.twig` starts with a "Skip to content"
+  link, and `<main>` became `<main id="main-content" tabindex="-1">`. A project
+  base template adds both, see
+  [Custom integration](custom-integration.md#7-skip-link-and-main-landmark).
+
+**If you override a menu template or target its markup in CSS:**
+
+| Before | Now |
+|--------|-----|
+| The bar wrapped in a `<nav>` (`.iw-menu > nav`, `.iw-menu--sidebar > nav`) | A `<div class="iw-menu__frame">`. Only the lists of links are a `<nav aria-label="Main menu">` |
+| Menu entries as sibling `<a>`, `<button>` and `<div>` | `<ul class="iw-menu__list">` and `<li>` at every level, language switcher and social links included |
+| The panel named "Main menu" | The panel is named "Menu", the `<nav>` inside it "Main menu" |
+| A `<nav>` per drill-down level | One `<nav>` around every level (`.iw-menu__panels`), a `<div class="iw-menu__panel-body">` per level |
+| Social links inlined in each template, the name as an `aria-label` on the icon `<span>`, the icon as an inline `style` | `components/_social_links.html.twig`: the name inside the link, the icon `aria-hidden`, the icon URLs in a `<style>` block |
+| The logo link built in each template, unnamed with the logo alone | `menu/_logo_link.html.twig`, named "Home page of {site name}" when the name is hidden |
+| Mobile accordions copied in the navbar, burger and mega menu | `menu/_nav_accordion.html.twig` |
+
+The mobile accordion of the **native mega menu** used to differ from the navbar
+one: its level 2 had no `iw-menu__dropdown--level-2` background and its level 3
+always repeated the parent link. It now shares the accordion of the other
+types, so it takes the level 2 background and repeats the parent link only
+when **Parent page access** is checked.
+
+The controller keeps the bar usable through `.iw-menu__frame`, so a template
+without it leaves the logo and the burger inert while the panel is open.
+`MenuStructureRenderTest` in the bundle renders every type and checks these
+rules.
+
+---
+
+## Transparent menu bar: only over a hero (breaking, visual)
+
+The **Transparent navbar** setting made the bar transparent on every page,
+while nothing slid under it: the content started below the bar, which then
+showed the page background. With the usual white text, the links, the logo
+and the burger vanished on a white page. See
+[Transparent bar over a hero](menus.md#transparent-bar-over-a-hero). What
+changes on screen:
+
+- **The bar is transparent only over a hero image that opens the page**, and
+  the hero now slides under it, up to the top of the window. On any other
+  page the bar stays opaque.
+- **The hero grows by the height of the bar**, so its picture and text keep
+  the room they had. A full-screen hero stays one screen tall.
+- **Background on scroll is on by default.** A theme saved without the
+  setting now gets its background back on scroll. Uncheck it to keep the old
+  behavior.
+- **The blur is dropped too** while the bar is transparent, and the regular
+  bar comes back while a panel is open.
+- **New colors** for the bar over a hero, in the *Transparent bar, over a
+  hero* group of the menu colors. Empty, the regular colors apply.
+- **All five types** follow the setting. The documentation used to say
+  navbar and mega menu only, while the burger, fullscreen and sidebar already
+  applied it.
+- **The sidebar** now honours *Background on scroll*: its bar never took the
+  background back.
+
+**If you override a hero template**, add `data-iw-menu-overlay` to its outer
+element when it opens the page with an image, and pad its content with
+`--iw-menu-overlap`. The bundle heroes take a `menuOverlay` parameter for it.
+`HeroMenuOverlayRenderTest` and `MenuTransparentBarTest` in the bundle guard
+these rules.
+
+---
+
+## Navbar and mega menu: the burger width becomes a setting (breaking, visual)
+
+The links gave way to the burger at 768px, written in the templates. With five
+or six entries, a long label or social icons, the bar overflowed the screen
+between 768 and 1100px. **Switch to the mobile menu** in the Menu tab now sets
+that width: automatic, 768px, 1024px or 1280px. See
+[Links or burger](menus.md#links-or-burger). What changes on screen:
+
+- **The default is Automatic.** The links show from 768px wherever they fit
+  on one line, the burger takes over where they do not. A site whose links
+  overflowed between 768 and 1100px now shows the burger there. Pick 768px to
+  keep the old behavior.
+- **First-level labels stay on one line.** They wrapped on up to three lines.
+- **Long dropdowns scroll** instead of running off a short screen, except a
+  level 2 that opens a level 3 beside it.
+- **Mega menu grids of 4 and 5 columns keep 3 columns** between 768 and
+  1024px, instead of 2.
+
+**If you override `_navbar.html.twig` or `_megamenu.html.twig`**, replace the
+`hidden md:block`, `hidden md:flex` and `md:hidden` of the bar with
+`iw-menu__desktop-only` and `iw-menu__mobile-only`, and put
+`iw-menu--collapse-{{ collapseAt }}` on the header. Otherwise the template keeps
+switching at 768px whatever the setting says.
+
+---
+
+## Fullscreen menu: layout of the panel (superseded)
+
+This rework of the fullscreen panel is superseded within 3.0.0: the
+`fullscreen` type is now a burger full screen, see
+[The fullscreen menu becomes a burger with a picture](#the-fullscreen-menu-becomes-a-burger-with-a-picture-breaking-visual).
+The `iw_theme_menu_curtain` image format it brought stays, for the picture of
+the burger panel. Clear the format cache after the update:
+`bin/adminconsole sulu:media:format:cache:clear`.
+
+---
+
+## Menus: finishing (visual)
+
+- **Social icons share one height** and keep the ratio of their file, in the
+  menu and the footer. A raster icon is served through the `iw_theme_icon`
+  format instead of the square `50x50` thumbnail, which cropped a wide logo.
+  An icon with no color set now takes the text color: it vanished.
+- **An empty menu color is no longer written** to the stylesheet. It was
+  written as an empty variable, which beat every fallback.
+- **Dropdown radius** and **Round the top corners too** settings. A dropdown
+  hanging from the bar now has square top corners by default.
+- **A chevron of its own for the menu**, with one color per level and an
+  optional rotation. The menu templates draw `_nav_arrow.html.twig` with the
+  new `role: 'menu'`.
+- **Dividers of the mobile accordion and the drill-down panels** moved from the
+  entries to their `<li>`, and the entries got some inner room (given back by a
+  negative margin): the focus ring is drawn inside the entry, off the text,
+  without running into the divider above. If you override those templates,
+  keep `iw-menu__divider border-b` on the `<li>`.
+- **The inline language switcher** lines up with the links above it, and the
+  current language is written with the second-level text color on its
+  second-level background (it took the panel text color, white on white with
+  a light second level).
+- **Sidebar sub-lists** take the level backgrounds like the other accordions:
+  their text already took the level colors, and could vanish on the sidebar
+  background.
+- **Language switcher before or after the social icons** in the bar, a new
+  setting.
+- **The pictogram points** setting turns a menu chevron drawn facing another
+  way than right back before use.
+- **Third level text hover** is now offered in Menu > Colors (the variable
+  existed, the field did not). A level with no hover color of its own takes
+  the one of the level above: the second and third levels used to fall back
+  to their own text color, so hovering them changed nothing.
+- **Colors per level, everywhere**: a text takes the colors of the level whose
+  background it sits on. Drill-down sub-panels of level 3 take the level 3
+  background and text (they took level 2), and their header takes the colors of
+  its sub-panel (it took level 1). The fullscreen panel writes all its levels in
+  the level 1 text, since they all sit on its background. In the mega menu, the
+  links of the panel take the level 2 text, the featured column the level 3
+  text, and the mobile accordion of the snippet mode paints its level 2
+  background. See [Menu Colors](menus.md#menu-colors).
+
+---
+
+## The sidebar menu becomes a burger on a side (breaking for template overrides)
+
+The `sidebar` and `burger` types opened the same navigation in a dialog, only
+the size of the dialog set them apart. They are now one type, `burger`, with a
+**Panel** setting: `Full screen` (the former burger) or `On a side` (the former
+sidebar), plus **Side** and **Panel width**.
+
+**Nothing to do for a stored theme.** A menu saved as `sidebar` is read as a
+burger on a side, with its width, its side and a sliding panel
+(`MenuConfigNormalizer`, applied by `ThemeConfig::getMenuConfig()`), and is
+written in the new shape on its next save. An export made before the change
+imports the same way.
+
+What changes on screen:
+
+- **The bar of a side panel stays at the top** of the window while scrolling
+  (the sidebar bar scrolled away), and follows **Hide on scroll down**, which
+  the sidebar ignored.
+- **A left panel moves the burger to the start of the bar**, next to the panel
+  it closes (the close button sat more than 800px away on a desktop).
+- **The side panel starts under the bar**, and so does the backdrop: the bar is
+  no longer dimmed.
+- **The accordion of the side panel is the one of the burger** (dividers, focus
+  ring, colors per level). The sidebar had its own copy, with smaller rows.
+- **Social icons**: in the bar from 768px, and at the foot of the panel. The
+  sidebar showed them in the bar only, on every width.
+- **The rows of the full-screen panel stop at a readable width**,
+  `--iw-menu-panel-content-width` (default `40rem`), instead of running along
+  the whole screen. Where they sit is a setting, see below.
+
+Renamed or removed:
+
+| Before | After |
+|--------|-------|
+| `menu/_sidebar.html.twig` | `menu/_burger.html.twig` with `panelLayout: 'side'` |
+| `sidebarWidth`, `sidebarPosition` | `panelWidth`, `panelSide` (new `panelLayout`) |
+| `--iw-menu-sidebar-width` | `--iw-menu-panel-width` |
+| `.iw-menu--sidebar`, `.iw-menu__sidebar--{left\|right\|open}` | `.iw-menu__overlay--side` + `--{left\|right}`, opened by `.iw-menu__dialog--open` |
+| `.iw-menu__bar-spacer` | Removed, the side panel starts under the bar |
+| `menu#toggleSidebar`, targets `sidebar` / `sidebarBurger` | `menu#toggle`, targets `panel` / `burger` |
+| `context: 'sidebar'` of `_nav_panels.html.twig` | Removed, the dialog sets `--iw-menu-panels-offset` |
+
+**The bar chrome moved onto `.iw-menu::before`** (all menu types): background,
+bottom rule, shadow and blur are painted by that layer, between the panels and
+the content of the bar. A panel sliding in from the top used to pass over the
+background of the bar, behind its logo only. A project that restyled the chrome
+on `.iw-menu` targets `.iw-menu::before` instead. Over a hero, a transparent bar
+takes its background at once when a panel opens, no longer through the scroll
+fade.
+
+The inline padding of the panels is now one variable, `--iw-menu-panel-gutter`
+(`1.5rem`, `2rem` from 640px), read by the accordion, the drill-down panels and
+their sub-panel headers. The `px-6 sm:px-8` utilities are gone from those
+templates.
+
+---
+
+## Menus: a fourth level (new, breaking for template overrides)
+
+**Child levels** goes up to 4, with its own colors (background, text, hover,
+chevron: `--iw-menu-fourth-*`, each falling back on level 3), always offered in
+Menu > Colors. See [Four levels](menus.md#four-levels).
+
+The accordion and the navbar dropdowns are now rendered by recursive macros
+instead of one block per level. Their markup for levels 1 to 3 is unchanged
+(pinned by `MenuLevelsSnapshotTest`), except:
+
+- **Navbar**: a level 3 dropdown that opens a level 4 beside it no longer
+  scrolls, like a level 2 opening a level 3.
+
+If you override `_nav_accordion.html.twig` or `_navbar.html.twig`, port your
+changes to the level macros: a block copied
+per level will not render the fourth one.
+
+---
+
+## The fullscreen menu becomes a burger with a picture (breaking, visual)
+
+The `fullscreen` type had its own panel and its own navigation: two curtains
+with the picture, large titles, two columns, folds. It is now the burger full
+screen, which gains what the fullscreen had to offer and keeps its accordion or
+drill-down panels:
+
+- **Picture** beside the links, on the side opposite the burger, from **Picture
+  from** up (768, 1024 or 1280px). The links zone is exactly **Panel width**
+  (the same field as the side panel, 480px by default here), the picture takes
+  the rest.
+  It is fetched only when the panel opens, and never below that width.
+- **Side** now places the burger in full screen too: on the left, the burger
+  opens the bar and the picture goes to the right.
+- **Position of the links**: automatic, against the picture, centered or
+  against the edge. Automatic puts them against the picture, and centers them
+  without one (they were lined up with the logo).
+- **First level size**: normal or large.
+
+**Nothing to do for a stored theme.** A menu saved as `fullscreen` is read as a
+burger full screen (`MenuConfigNormalizer`): its picture carried over, a large
+first level, centered links if it was centered and against the bar otherwise,
+a panel sliding in from the right. The next save writes it in the new shape.
+
+Gone with the type: **Two columns**, **Text alignment** and **Folding
+sub-menus**. The links take the accordion of the burger, every level folding.
+
+| Before | After |
+|--------|-------|
+| `menu/_fullscreen.html.twig` | `menu/_burger.html.twig`, full screen |
+| `fullscreenImage` | `panelImage` (new `panelImageFrom`, and `panelWidth` for the links zone) |
+| `fullscreenAlign` | `panelContentPosition` (`auto`, `image`, `center`, `bar`) |
+| `twoColumns`, `fullscreenCollapse` | Removed |
+| `.iw-menu__fullscreen-*`, `.iw-menu__curtain`, `.iw-menu__dialog--curtain` | `.iw-menu__overlay--image*`, `.iw-menu__panel-media`, `.iw-menu__panel-main` |
+| `--iw-menu-fullscreen-l1-size`, `--iw-menu-fullscreen-indent`, `--iw-menu-fullscreen-rule` | `--iw-menu-panel-l1-size` |
+| `--iw-menu-panel-gutter` computed on the container of the bar (full screen) | `--iw-menu-panel-edge`, with `--iw-menu-panel-pad-start` / `--iw-menu-panel-pad-end` placing the links |
+
+---
+
+## Burger: the language switcher no longer shows twice (breaking, visual)
+
+**Switcher placement** set to its default, formerly *bar and open menu*, showed
+the switcher in the bar and in the open menu at once: on a phone, with the
+menu open, the same choice sat twice on the screen. The default now splits by
+width, *bar on a wide screen, open menu on a phone*, at the width of **Menu >
+Display > Move into the open menu** (1024px by default). A site that wants the
+switcher in the bar on a phone too picks *bar only*.
+
+Below 768px, the dropdown of the bar also shows the short code of the language
+whatever the label format, a full name taking room a phone's bar does not have.
+
+---
+
+## Button and pictogram fields (new)
+
+Two field types hold a whole button, or a pictogram, in one property named
+freely: `iw_theme_button` (link, button style, pictogram, pictogram alone) and
+`iw_theme_icon_picker` (library or media, outline or solid, size, placement). A
+level can carry several of them, where the fixed names of the old fragments
+collided silently. Render a button with `iw_sulu_tailwind_theme_button()` and
+`components/_button.html.twig`, see
+[Button and pictogram fields](button-field.md).
+
+The admin JS gains `sulu-media-bundle` as a peer dependency: rebuild the admin
+after the update.
+
+### Buttons and pictograms move onto their fields (breaking, migration provided)
+
+Every button and pictogram of the bundle now uses them:
+
+| Where | Before | After |
+|---|---|---|
+| `ctaButtons` of every block (`cta-buttons.xml`), cards and timeline steps included | `link`, `style`, `iconCustom`, `icon`, `iconMedia`, `iconSize`, `iconPosition`, `iconGap` on each item | one `button` (`iw_theme_button`) on each item |
+| Card | `iconCustom`, `icon`, `iconMedia`, `iconSize` | one `icon` (`iw_theme_icon_picker`) |
+| Clickable card | `link` (link) + `linkStyle` | one `link` (`iw_theme_button`) |
+| Key figure, timeline step | `iconCustom`, `icon`, `iconMedia`, `iconSize` | one `icon` (`iw_theme_icon_picker`) |
+| Mega menu, featured column and call to action | `cta_title`, `cta_link`, `cta_style` | one `cta` (`iw_theme_button`), the old text becoming the title attribute of the link |
+
+Sulu only resolves the properties a template declares, so content stored the
+old way renders its blocks without their buttons, its cards and figures without
+their pictograms. **Run the migration once, on every environment holding
+content:**
+
+```bash
+php bin/console iw-sulu:theme:migrate-buttons --dry-run
+php bin/console iw-sulu:theme:migrate-buttons
+php bin/console cache:pool:clear cache.app
+```
+
+It covers pages, snippets and articles, draft and live, on MySQL and
+PostgreSQL. It can be run twice: a value already moved is left alone. It also
+moves the oldest pictograms, a bare media stored under `icon` (cards, steps) or
+`image` (key figures), so `iw-sulu:theme:migrate-icons` is no longer needed.
+`iw:tailwind-theme:check` reports any content row still in the old shape.
+
+Only the blocks of the bundle are touched, recognised by their type. A project
+block that includes the old fragments keeps its content as it is.
+
+**Changes a template override has to follow:**
+
+- `blocks/common/_cta_buttons.html.twig` reads `cta.button` and draws each
+  button with `components/_button.html.twig`.
+- `blocks/common/_icon.html.twig` takes `icon:` (a resolved picker) where the
+  blocks passed `item:`.
+- A clickable card draws its button through the same partial with `tag: 'span'`,
+  and its anchor now carries the target and rel of the link.
+- The mega menu reads `cta` through `iw_sulu_tailwind_theme_button()`. A button
+  whose link has no title attribute is labelled with the title of the linked
+  page, where it used to need its own text.
+- The gap of a pictogram is a class (`.iw-button--icon-gap-<n>`), no longer an
+  inline `style`.
+
+**Deprecated:** the `icon-picker.xml` and `icon-placement.xml` fragments, and
+the `item:` shape of `_icon.html.twig`. They stay for project templates and go
+in the next major version.
 
 ---
 
@@ -1083,6 +1520,10 @@ table by table. MySQL and PostgreSQL are both supported.
 Cards and timeline steps carry a pictogram too, and through the same shared
 picker, but both blocks appear in this version: nothing of theirs needs moving,
 and the migration leaves them alone.
+
+This command is superseded by `iw-sulu:theme:migrate-buttons`, which moves these
+pictograms straight onto the `iw_theme_icon_picker` field. See
+[Buttons and pictograms move onto their fields](#buttons-and-pictograms-move-onto-their-fields-breaking-migration-provided).
 
 In exchange, key figures gain what the buttons have: the theme library, a size,
 and a spacing.

@@ -55,13 +55,10 @@ final class CardLinkContractTest extends TestCase
     {
         $source = self::card();
 
-        // The class is built by an expression now, since an unstyled action
-        // falls back to the variant alias, so the button hook is matched
-        // through the block class beside it rather than literally. The closing
-        // quote matters: without it this also matches the `iw-block__actions`
-        // wrapper a line above, and the check passes on an anchor.
+        // Drawn by the button partial, asked for a span: the card around it
+        // is the anchor, and an anchor cannot hold another one.
         self::assertMatchesRegularExpression(
-            '/if wholeCardIsLink[\s\S]{0,1500}<span class="[^"]*iw-block__action"/',
+            "/if wholeCardIsLink[\\s\\S]{0,1500}components\\/_button\\.html\\.twig[\\s\\S]{0,200}tag: 'span'/",
             $source,
             'A clickable card must draw its action as a span, not an anchor.',
         );
@@ -120,7 +117,7 @@ final class CardLinkContractTest extends TestCase
         );
 
         self::assertMatchesRegularExpression(
-            '/<property name="link" type="link"\s+visibleCondition="__parent\.__parent\.clickableCard">/',
+            '/<property name="link" type="iw_theme_button"\s+visibleCondition="__parent\.__parent\.clickableCard">/',
             $xml,
             'The card link must be revealed by the clickable setting, through two parent levels.',
         );
