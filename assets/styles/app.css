@@ -17,6 +17,17 @@
     box-sizing: border-box;
 }
 
+/* A button shows the hand, like a link. Tailwind 4 gave buttons the default
+   cursor in its reset, so a button read as plain text in every browser. In the
+   base layer, as the reset it corrects: a `cursor-*` utility still wins, and a
+   disabled button keeps the default cursor. */
+@layer base {
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]) {
+        cursor: pointer;
+    }
+}
+
 /* Absorb the fullbleed overflow.
    A block that breaks out of its container does so with `width: 100vw`, which
    counts the scrollbar while the usable area does not — leaving a stray
