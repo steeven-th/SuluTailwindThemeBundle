@@ -136,7 +136,8 @@
             {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
                 with {config: config|default({}), slot: 'panel'} only %}
 
-            <div class="pt-6 pb-2">
+            {% set langBoth = config.displayLanguageSwitcher|default(false) and config.languageSwitcherPosition|default('both') == 'both' %}
+            <div class="pt-6 pb-2{{ langBoth ? ' iw-menu__narrow-only' : '' }}">
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {
                         config: config|default({}),

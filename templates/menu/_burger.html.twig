@@ -51,6 +51,9 @@
 {% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
 {# The width under which the bar actions move to the panel. #}
 {% set actionsAt = config.barActionsBreakpoint|default('lg') in ['md', 'lg', 'xl'] ? config.barActionsBreakpoint|default('lg') : 'lg' %}
+{# The language switcher set to "both" moves from the bar to the open menu at
+   that same width, rather than showing twice. #}
+{% set langBoth = config.displayLanguageSwitcher|default(false) and config.languageSwitcherPosition|default('both') == 'both' %}
 
 {# The burger turns into the close button. On the left side it opens the
    bar, before the logo. #}
@@ -77,7 +80,7 @@
     data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu{{ config.displayBarActions|default(false) ? ' iw-menu--actions-at-' ~ actionsAt : '' }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
+    class="iw-menu{{ config.displayBarActions|default(false) or langBoth ? ' iw-menu--actions-at-' ~ actionsAt : '' }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
@@ -168,7 +171,7 @@
             {# Language switcher - inline: the overlay already covers the page,
                a dropdown on top of it would read badly. The vertical padding
                keeps it off the last nav item and the social row. #}
-            <div class="pt-6 pb-2">
+            <div class="pt-6 pb-2{{ langBoth ? ' iw-menu__narrow-only' : '' }}">
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {config: config, display: 'inline', slot: 'panel'} %}
             </div>

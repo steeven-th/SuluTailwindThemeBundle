@@ -13,7 +13,11 @@ namespace ItechWorld\SuluTailwindThemeBundle\Content;
  * plus the weight of a library icon, outline or solid:
  *
  *     {custom: bool, icon: ?string, weight: 'outline'|'solid',
- *      media: ?{id: int}, size: string, position: 'left'|'right', gap: string}
+ *      media: ?{id: int}, size: string, position: 'left'|'right', gap: string,
+ *      iconOnly: bool}
+ *
+ * `iconOnly` is only offered with the `with_display` option: the pictogram
+ * shown alone, its label kept for assistive technologies.
  *
  * A property named freely can appear as often as wanted on one level, which
  * the fragments cannot: their fixed names collide, and Sulu keeps the last
@@ -37,7 +41,7 @@ final class IconPickerValue
      *
      * @param mixed $data The stored value
      *
-     * @return array{custom: bool, icon: string, weight: string, mediaId: int|null, size: string, position: string, gap: string}
+     * @return array{custom: bool, icon: string, weight: string, mediaId: int|null, size: string, position: string, gap: string, iconOnly: bool}
      */
     public static function normalize(mixed $data): array
     {
@@ -54,6 +58,7 @@ final class IconPickerValue
             'size' => \in_array($size, self::SIZES, true) ? $size : '',
             'position' => 'left' === ($data['position'] ?? 'right') ? 'left' : 'right',
             'gap' => \is_string($data['gap'] ?? null) ? $data['gap'] : '',
+            'iconOnly' => true === ($data['iconOnly'] ?? false),
         ];
     }
 

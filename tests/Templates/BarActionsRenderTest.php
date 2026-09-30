@@ -74,6 +74,30 @@ final class BarActionsRenderTest extends TestCase
         self::assertStringNotContainsString('toggleDisclosure', $panel);
     }
 
+    /**
+     * A list can open from a pictogram alone: its label stays for screen
+     * readers in the bar, and titles the group in the panel.
+     */
+    #[Test]
+    public function aDropdownCanOpenFromItsPictogramAlone(): void
+    {
+        $snippet = self::snippet();
+        $snippet['content']['actions'][4]['icon']['iconOnly'] = true;
+
+        $bar = $this->render(['displayBarActions' => true], 'bar', $snippet);
+        $panel = $this->render(['displayBarActions' => true], 'panel', $snippet);
+
+        self::assertMatchesRegularExpression('#class="iw-menu__text iw-menu__action-trigger[^"]*">\s*<svg[^>]*envelope[^>]*></svg><span class="sr-only">My account</span>\s*</button>#', $bar);
+        self::assertStringNotContainsString('iw-menu__action-chevron', $bar, 'a pictogram alone goes without its chevron');
+        // Far narrower than its list, it has the list centred under it.
+        self::assertStringContainsString('<div class="iw-menu__action-dropdown iw-menu__action-dropdown--compact">', $bar);
+        self::assertStringContainsString('iw-menu__action-group-title">My account</span>', $panel);
+
+        // Without a pictogram, the label shows whatever the toggle says.
+        $snippet['content']['actions'][4]['icon'] = ['custom' => false, 'icon' => '', 'weight' => 'outline', 'size' => '', 'position' => 'left', 'gap' => '', 'iconOnly' => true];
+        self::assertStringContainsString('<span class="iw-menu__action-trigger-label">My account</span>', $this->render(['displayBarActions' => true], 'bar', $snippet));
+    }
+
     #[Test]
     public function theWidthClassesAreTheMenusOwn(): void
     {

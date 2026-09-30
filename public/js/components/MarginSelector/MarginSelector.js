@@ -24,6 +24,12 @@ const MARGIN_VALUES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 32];
 const THEME_DEFAULT_KEY = 'theme';
 
 /**
+ * What the compiler uses for a theme default left unset, per defaults key
+ * (ThemeCompiler, block default variables).
+ */
+const THEME_FALLBACKS = {buttonIconGap: 'gap-2'};
+
+/**
  * MarginSelector field component for the Sulu admin.
  *
  * Displays a compact grid of buttons representing spacing values (0-32).
@@ -44,7 +50,7 @@ export default class MarginSelector extends React.Component {
      * ordinary spacing picker, which is what the theme's own defaults form
      * needs: the value it edits IS the theme default, so it cannot follow it.
      *
-     * @returns {string|null} "top", "bottom", "lateral", or null
+     * @returns {string|null} "top", "bottom", "lateral", another defaults key (buttonIconGap), or null
      */
     themeKey() {
         const {schemaOptions} = this.props;
@@ -64,13 +70,18 @@ export default class MarginSelector extends React.Component {
             return null;
         }
 
-        const stored = themeConfigStore.defaults[{
+        // The block paddings are named by their edge, any other key is the
+        // theme defaults key itself (buttonIconGap).
+        const defaultsKey = {
             top: 'blockPaddingTop',
             bottom: 'blockPaddingBottom',
             lateral: 'blockPaddingLateral',
-        }[key]];
+        }[key] || key;
+        const stored = themeConfigStore.defaults[defaultsKey];
 
-        return this.parseCurrentValue(stored);
+        // A theme saved before the setting existed has no value: the one the
+        // compiler falls back to is the one in effect, so it is the one shown.
+        return this.parseCurrentValue(stored === undefined || stored === null || stored === '' ? THEME_FALLBACKS[defaultsKey] : stored);
     }
 
     /**

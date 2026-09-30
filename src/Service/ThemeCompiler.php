@@ -3633,6 +3633,17 @@ class ThemeCompiler
         // its button and wrap a longer label.
         $css .= ".iw-menu__lang-panel, .iw-menu__action-dropdown-list { width: max-content; min-width: 100%; max-width: calc(100vw - 2rem); }\n";
         $css .= ".iw-menu__lang-panel a, .iw-menu__action-dropdown-item { white-space: nowrap; }\n";
+        // The bar has no room for a language name on a phone: the switcher
+        // shows the code there (menu/_language_switcher.html.twig).
+        $css .= ".iw-menu__lang-current--code { display: none; }\n";
+        $css .= "@media (max-width: 767.98px) { .iw-menu__lang-current--full { display: none; } .iw-menu__lang-current--code { display: inline; } }\n";
+        // Opened from a pictogram alone, the list is far wider than its
+        // trigger: hung from its right edge it ran under the next button.
+        // Centred under the pictogram, it reads as its own.
+        $css .= ".iw-menu__action-dropdown--compact > .iw-menu__action-dropdown-list { right: auto; left: 50%; transform: translateX(-50%); }\n";
+        // On a phone the pictogram sits against the right edge of the bar,
+        // where a centred list would run off the screen: hung from the edge.
+        $css .= "@media (max-width: 767.98px) { .iw-menu__action-dropdown--compact > .iw-menu__action-dropdown-list { right: 0; left: auto; transform: none; } }\n";
         $css .= ".iw-menu__action-dropdown-item { display: flex; align-items: center; gap: 0.5rem; }\n";
         // Opened in the panel, the list reads as a group: a title, its links.
         $css .= ".iw-menu__action-group-title { display: block; font-weight: 600; margin-bottom: 0.25rem; }\n";

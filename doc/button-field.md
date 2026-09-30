@@ -69,6 +69,7 @@ fragments only offer outline.
 | Param | Default | Effect |
 |-------|---------|--------|
 | `with_placement` | `false` | Offer the side of the pictogram and its gap to the label. |
+| `with_display` | `false` | Offer "pictogram alone" beside the pictogram, laid out as on a button, stored as `iconOnly`. The side and the gap then go. Used by the dropdown of the menu bar actions. |
 | `with_card` | outside a block | Wrap the fields in a collapsible card. By default a field inside a block item goes without, the block already being one. |
 
 ---

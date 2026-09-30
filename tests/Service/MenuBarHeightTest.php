@@ -79,7 +79,11 @@ final class MenuBarHeightTest extends TestCase
     #[Test]
     public function aBarListIsAsWideAsItsContent(): void
     {
-        self::assertStringContainsString('.iw-menu__lang-panel, .iw-menu__action-dropdown-list { width: max-content; min-width: 100%; max-width: calc(100vw - 2rem); }', $this->compile([]));
+        $css = $this->compile([]);
+        self::assertStringContainsString('.iw-menu__lang-panel, .iw-menu__action-dropdown-list { width: max-content; min-width: 100%; max-width: calc(100vw - 2rem); }', $css);
+        // Opened from a pictogram alone: centred under it, hung from the edge on a phone.
+        self::assertStringContainsString('.iw-menu__action-dropdown--compact > .iw-menu__action-dropdown-list { right: auto; left: 50%; transform: translateX(-50%); }', $css);
+        self::assertStringContainsString('@media (max-width: 767.98px) { .iw-menu__action-dropdown--compact > .iw-menu__action-dropdown-list { right: 0; left: auto; transform: none; } }', $css);
         self::assertStringNotContainsString('min-w-[8rem]', (string) file_get_contents(\dirname(__DIR__, 2) . '/templates/menu/_language_switcher.html.twig'));
     }
 

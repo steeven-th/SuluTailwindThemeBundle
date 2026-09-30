@@ -295,10 +295,11 @@
             </property>
 
             <!-- Burger only: navbar and mega menu move their actions to the
-                 panel where their links do, at the collapse width. -->
+                 panel where their links do, at the collapse width. The language
+                 switcher set to "both" moves at this width too. -->
             <property name="menuConfig_barActionsBreakpoint" type="single_select" colspan="6"
                       visibleCondition="menuConfig_type == 'burger'"
-                      disabledCondition="menuConfig_displayBarActions != true">
+                      disabledCondition="menuConfig_displayBarActions != true AND (menuConfig_displayLanguageSwitcher != true OR menuConfig_languageSwitcherPosition == 'bar' OR menuConfig_languageSwitcherPosition == 'panel')">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_barActionsBreakpoint</title>
                     <info_text>iw_sulu_tailwind_theme.menu_barActionsBreakpoint_info</info_text>

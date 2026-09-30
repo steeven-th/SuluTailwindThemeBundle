@@ -87,9 +87,13 @@
                             <tag name="sulu.block_preview" priority="100"/>
                         </property>
 
+                        <!-- "Pictogram alone" opens the list from its pictogram
+                             only, "my account" as a person icon. Without a
+                             pictogram, the label shows. -->
                         <property name="icon" type="iw_theme_icon_picker" colspan="12">
                             <params>
                                 <param name="with_placement" value="true"/>
+                                <param name="with_display" value="true"/>
                             </params>
                         </property>
 

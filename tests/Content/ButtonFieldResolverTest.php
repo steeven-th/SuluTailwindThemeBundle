@@ -106,11 +106,11 @@ final class ButtonFieldResolverTest extends TestCase
     public function aStoredValueIsReadWhateverItHolds(): void
     {
         self::assertSame(
-            ['custom' => false, 'icon' => '', 'weight' => 'outline', 'mediaId' => null, 'size' => '', 'position' => 'right', 'gap' => ''],
+            ['custom' => false, 'icon' => '', 'weight' => 'outline', 'mediaId' => null, 'size' => '', 'position' => 'right', 'gap' => '', 'iconOnly' => false],
             IconPickerValue::normalize('junk'),
         );
         self::assertSame(
-            ['custom' => true, 'icon' => '', 'weight' => 'outline', 'mediaId' => 7, 'size' => '', 'position' => 'left', 'gap' => 'gap-4'],
+            ['custom' => true, 'icon' => '', 'weight' => 'outline', 'mediaId' => 7, 'size' => '', 'position' => 'left', 'gap' => 'gap-4', 'iconOnly' => false],
             IconPickerValue::normalize(['custom' => true, 'icon' => 'x', 'media' => ['id' => '7'], 'size' => '999', 'position' => 'left', 'gap' => 'gap-4']),
         );
     }

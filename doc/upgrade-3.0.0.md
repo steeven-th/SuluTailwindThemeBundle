@@ -1066,6 +1066,20 @@ sub-menus**. The links take the accordion of the burger, every level folding.
 
 ---
 
+## Burger: the language switcher no longer shows twice (breaking, visual)
+
+**Switcher placement** set to its default, formerly *bar and open menu*, showed
+the switcher in the bar and in the open menu at once: on a phone, with the
+menu open, the same choice sat twice on the screen. The default now splits by
+width, *bar on a wide screen, open menu on a phone*, at the width of **Menu >
+Display > Move into the open menu** (1024px by default). A site that wants the
+switcher in the bar on a phone too picks *bar only*.
+
+Below 768px, the dropdown of the bar also shows the short code of the language
+whatever the label format, a full name taking room a phone's bar does not have.
+
+---
+
 ## Button and pictogram fields (new)
 
 Two field types hold a whole button, or a pictogram, in one property named

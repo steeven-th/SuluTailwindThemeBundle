@@ -23,13 +23,13 @@ const ICON_SETS = {outline: 'iw_theme_outline', solid: 'iw_theme_solid'};
 /**
  * What an unset picker holds.
  */
-const EMPTY = {custom: false, icon: null, weight: 'outline', media: null, size: '', position: 'right', gap: ''};
+const EMPTY = {custom: false, icon: null, weight: 'outline', media: null, size: '', position: 'right', gap: '', iconOnly: false};
 
 /**
  * Read a stored value, whatever it holds, in the shape the picker edits.
  *
  * @param {*} value - The stored value
- * @return {Object} {custom, icon, weight, media, size, position, gap}
+ * @return {Object} {custom, icon, weight, media, size, position, gap, iconOnly}
  */
 export function normalizeIcon(value: mixed): Object {
     if (!value || typeof value !== 'object') {
@@ -44,6 +44,7 @@ export function normalizeIcon(value: mixed): Object {
         size: typeof value.size === 'string' && SIZES.includes(value.size) ? value.size : '',
         position: value.position === 'left' ? 'left' : 'right',
         gap: typeof value.gap === 'string' ? value.gap : '',
+        iconOnly: value.iconOnly === true,
     };
 }
 
@@ -236,21 +237,27 @@ export function iconFields(options: Object): Array<*> {
  *
  * Schema options:
  *   - with_placement (default false): offer the side and the gap to the label
+ *   - with_display (default false): offer "pictogram alone", beside the
+ *     pictogram as on a button. The side and the gap then go, there is no
+ *     label to sit beside.
  *   - with_card: wrap the fields in a card. By default, only outside a block,
  *     which already is a card
  *
- * Stored value: {custom, icon, weight, media: {id}, size, position, gap}.
+ * Stored value: {custom, icon, weight, media: {id}, size, position, gap, iconOnly}.
  */
 export default class IconPicker extends React.Component<Object> {
     get value(): Object {
         return normalizeIcon(this.props.value);
     }
 
-    get withPlacement(): boolean {
+    option(name: string): boolean {
         const {schemaOptions} = this.props;
+        const value = schemaOptions && schemaOptions[name] ? schemaOptions[name].value : false;
 
-        return !!(schemaOptions && schemaOptions.with_placement && schemaOptions.with_placement.value);
+        return value === true || value === 'true';
     }
+
+    handleIconOnlyChange = (iconOnly: boolean) => this.update({iconOnly});
 
     get locale(): Object {
         const {formInspector} = this.props;
@@ -271,6 +278,7 @@ export default class IconPicker extends React.Component<Object> {
         const withCard = schemaOptions && schemaOptions.with_card
             ? schemaOptions.with_card.value !== false && schemaOptions.with_card.value !== 'false'
             : !insideBlock(dataPath);
+        const withDisplay = this.option('with_display');
 
         return (
             <FieldCard
@@ -287,7 +295,19 @@ export default class IconPicker extends React.Component<Object> {
                     formInspector,
                     dataPath,
                     locale: this.locale,
-                    withPlacement: this.withPlacement,
+                    withPlacement: this.option('with_placement') && !(withDisplay && this.value.iconOnly),
+                    beside: withDisplay ? (
+                        <Form.Field
+                            colSpan={6}
+                            description={translate('iw_sulu_tailwind_theme.icon_only_info')}
+                            key="display"
+                            label={translate('iw_sulu_tailwind_theme.button_display')}
+                        >
+                            <Toggler checked={this.value.iconOnly} disabled={!!disabled} onChange={this.handleIconOnlyChange}>
+                                {translate('iw_sulu_tailwind_theme.button_display_icon')}
+                            </Toggler>
+                        </Form.Field>
+                    ) : null,
                 })}
             </Form>
             </FieldCard>

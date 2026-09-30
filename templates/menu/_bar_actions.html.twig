@@ -21,7 +21,9 @@
    Nothing is rendered when the theme leaves the actions off, the snippet is
    empty or no action has a link left to follow: no empty list, no gap.
    Every button is drawn by components/_button.html.twig, with the size of the
-   menu buttons (`iw-menu__button`). #}
+   menu buttons (`iw-menu__button`). A dropdown shown as its pictogram alone
+   keeps its label for assistive technologies, and as the title of its group
+   in the panel. #}
 {% import '@ItechWorldSuluTailwindTheme/components/_link_macros.html.twig' as links %}
 
 {% set actionsConfig = config|default({}) %}
@@ -53,7 +55,7 @@
                 {% set actionsRead = actionsRead|merge([{
                     kind: 'dropdown',
                     visibility: visibility,
-                    button: {label: action.title|trim, icon: iconPicked ? icon : null},
+                    button: {label: action.title|trim, icon: iconPicked ? icon : null, iconOnly: iconPicked and (icon.iconOnly ?? false)},
                     items: items,
                     iconPicked: iconPicked,
                 }]) %}
@@ -102,7 +104,9 @@
         <ul class="iw-menu__actions iw-menu__actions--{{ actionsSlot }}">
             {% for row in shown %}
                 {% set entry = row[0] %}
-                {% set compact = row[2] %}
+                {#- Compact: the pictogram alone, asked for by the action or
+                    forced on a narrow screen for an `always` action. -#}
+                {% set compact = row[2] or (entry.button.iconOnly ?? false) %}
                 <li class="iw-menu__action iw-menu__action--{{ entry.kind }}{{ compact ? ' iw-menu__action--compact' : '' }}{{ row[1] ? ' ' ~ row[1] : '' }}">
                     {% if entry.kind == 'link' %}
                         {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
@@ -120,7 +124,7 @@
                             {%- if entry.button.icon %}{% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {icon: entry.button.icon, class: 'iw-menu__action-trigger-icon'} only %}{% endif -%}
                         {% endset %}
                         {% set iconLeft = entry.button.icon.position|default('right') == 'left' %}
-                        <div class="iw-menu__action-dropdown">
+                        <div class="iw-menu__action-dropdown{{ compact ? ' iw-menu__action-dropdown--compact' : '' }}">
                             <button type="button"
                                     data-action="menu#toggleDisclosure"
                                     data-menu-target="popupTrigger"

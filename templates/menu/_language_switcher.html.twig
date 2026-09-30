@@ -22,7 +22,10 @@
       is anchored to, so it never opens off-screen.
     - slot: 'bar' or 'panel' — where this particular call sits. Checked against
       the theme's `languageSwitcherPosition` so an editor can keep the switcher
-      out of the bar, out of the open menu, or in both. Omit it on menu types
+      out of the bar, out of the open menu, or in both. "Both" splits by width
+      rather than showing it twice: in the bar on a wide screen, in the open
+      menu below (`iw-menu__wide-only` / `iw-menu__narrow-only`, set by the
+      width of the bar actions on the burger). Omit it on menu types
       that place the switcher by breakpoint (navbar, megamenu): there the
       position is dictated by the layout, not by taste, and the setting does
       not apply.
@@ -34,6 +37,7 @@
     {% set wantedPosition = switcherConfig.languageSwitcherPosition|default('both') %}
     {% set slotAllowed = slot is not defined or wantedPosition == 'both' or wantedPosition == slot %}
     {% set entries = slotAllowed ? localizations|default([]) : [] %}
+    {% set slotClass = slot is defined and wantedPosition == 'both' ? (slot == 'bar' ? ' iw-menu__wide-only' : ' iw-menu__narrow-only') : '' %}
 
     {# One language is not a choice, so the switcher stays out of the way. #}
     {% if entries|length > 1 %}
@@ -48,7 +52,7 @@
         {% set currentLabel = iw_sulu_tailwind_theme_language_label(currentEntry.locale|default(currentLocale), labelFormat) %}
 
         {% if switcherDisplay == 'inline' %}
-            <ul class="iw-menu__list iw-menu__lang iw-menu__lang--inline flex items-center gap-1 flex-wrap"
+            <ul class="iw-menu__list iw-menu__lang iw-menu__lang--inline flex items-center gap-1 flex-wrap{{ slotClass }}"
                 aria-label="{{ 'iw_sulu_tailwind_theme.menu_languageSwitcher'|trans({}, 'messages') }}">
                 {% for entry in entries %}
                     {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}
@@ -70,7 +74,7 @@
             {# A disclosure like the navigation dropdowns: same toggle, same
                mutual closing, Escape and focus handling, no extra JS. #}
             {% set langPanelId = iw_sulu_tailwind_theme_unique_id('menu-lang') %}
-            <div class="iw-menu__lang iw-menu__lang--dropdown relative">
+            <div class="iw-menu__lang iw-menu__lang--dropdown relative{{ slotClass }}">
                 <button
                     type="button"
                     data-action="menu#toggleDisclosure"
@@ -84,7 +88,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
                     </svg>
-                    <span class="iw-menu__lang-current">{{ currentLabel }}</span>
+                    {#- A full name takes room a phone's bar does not have: the
+                        code stands in for it there. -#}
+                    {% if labelFormat == 'code' %}
+                        <span class="iw-menu__lang-current">{{ currentLabel }}</span>
+                    {% else %}
+                        <span class="iw-menu__lang-current iw-menu__lang-current--full">{{ currentLabel }}</span>
+                        <span class="iw-menu__lang-current iw-menu__lang-current--code">{{ iw_sulu_tailwind_theme_language_label(currentEntry.locale|default(currentLocale), 'code') }}</span>
+                    {% endif %}
                     {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'down', 'class': 'w-4 h-4 flex-shrink-0'} only %}
                 </button>
                 <ul

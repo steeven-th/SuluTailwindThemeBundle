@@ -29,7 +29,7 @@ final class IconPickerPropertyResolver implements PropertyResolverInterface
      * @param string  $locale The locale of the content
      * @param mixed[] $params The params of the property
      *
-     * @return ContentView `{custom, icon, weight, media, size, position, gap}`, media being a
+     * @return ContentView `{custom, icon, weight, media, size, position, gap, iconOnly}`, media being a
      *                     resolved media or absent
      */
     public function resolve(mixed $data, string $locale, array $params = []): ContentView
@@ -43,6 +43,7 @@ final class IconPickerPropertyResolver implements PropertyResolverInterface
             'size' => $value['size'],
             'position' => $value['position'],
             'gap' => $value['gap'],
+            'iconOnly' => $value['iconOnly'],
         ];
 
         if (null !== $value['mediaId']) {
