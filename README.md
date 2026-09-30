@@ -732,8 +732,9 @@ php bin/adminconsole iw-sulu:theme:sync-fonts
 # Migrate from isActive to multi-webspace (upgrade from previous version)
 php bin/adminconsole iw-sulu:theme:migrate-webspaces
 
-# Run integration diagnostics (theme, CSS, assets, article bundle, and
-# per-site appearance choices naming a site their article left)
+# Run integration diagnostics (theme, CSS, assets, article bundle,
+# per-site appearance choices naming a site their article left, and buttons
+# naming a style their site's theme does not define)
 php bin/adminconsole iw:tailwind-theme:check
 
 # Create a set of demo pages showing every block and its variants

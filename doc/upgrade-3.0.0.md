@@ -1122,6 +1122,14 @@ moves the oldest pictograms, a bare media stored under `icon` (cards, steps) or
 `image` (key figures), so `iw-sulu:theme:migrate-icons` is no longer needed.
 `iw:tailwind-theme:check` reports any content row still in the old shape.
 
+The migration moves a style as it finds it, it does not rename it. Content
+written against the style names of an older theme (`primary`, `secondary`,
+`accent`) keeps them, and on a theme naming its buttons otherwise the class
+matches no rule: the button shows the generic look of `app.css` instead of the
+theme's colours. `iw:tailwind-theme:check` lists these buttons, one line per
+content, site and style, drafts included. Pick one of the theme's styles in
+the admin, the check does not guess which one was meant.
+
 Only the blocks of the bundle are touched, recognised by their type. A project
 block that includes the old fragments keeps its content as it is.
 

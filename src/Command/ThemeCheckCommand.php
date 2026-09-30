@@ -8,6 +8,8 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Content\Migration\ButtonFieldAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonStyleAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -22,7 +24,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Diagnostic command that checks the integration health of the Tailwind Theme Bundle.
  *
  * Verifies: active theme exists per webspace, CSS is compiled,
- * bridge CSS is importable, and Stimulus assets are registered.
+ * bridge CSS is importable, and Stimulus assets are registered. Reports the
+ * content the rendering cannot flag on its own: buttons in the old shape or
+ * naming a style their theme lacks, and per-site choices pointing nowhere.
  */
 #[AsCommand(
     name: 'iw:tailwind-theme:check',
@@ -52,6 +56,7 @@ class ThemeCheckCommand extends Command
         private readonly ThemeCompiler $compiler,
         private readonly AppearanceOverrideAudit $appearanceAudit,
         private readonly ButtonFieldAudit $buttonFieldAudit,
+        private readonly ButtonStyleAudit $buttonStyleAudit,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
     ) {
@@ -86,6 +91,8 @@ class ThemeCheckCommand extends Command
 
         // ── Check 2: Webspace theme assignments ──
         $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
+        // Webspace key => the button styles of its theme, for the style check.
+        $buttonSlugsBySite = [];
         foreach ($webspaces as $webspace) {
             $wsKey = $webspace->getKey();
             $wsTheme = $this->webspaceThemeRepository->findThemeForWebspace($wsKey);
@@ -94,6 +101,7 @@ class ThemeCheckCommand extends Command
                 $checks[] = ['<fg=yellow>!</>', 'Webspace "' . $wsKey . '"', 'No theme assigned. Assign one in Admin > Settings.'];
             } else {
                 $checks[] = ['<fg=green>✓</>', 'Webspace "' . $wsKey . '"', 'Theme: ' . $wsTheme->getLabel()];
+                $buttonSlugsBySite[$wsKey] = array_column(ButtonResolver::normalizeButtons($wsTheme->getTokens()['buttons'] ?? []), 'slug');
             }
         }
 
@@ -195,6 +203,20 @@ class ThemeCheckCommand extends Command
             $hasErrors = true;
         }
 
+        // ── Check: button styles the theme of their site does not define ──
+        // The button falls back to the generic look of app.css, so nothing
+        // looks broken enough to be noticed: a warning, not a failure.
+        $unknownStyles = $this->buttonStyleAudit->findUnknown($buttonSlugsBySite);
+        if ([] === $unknownStyles) {
+            $checks[] = ['<fg=green>✓</>', 'Button styles', 'Every button names a style of its site\'s theme'];
+        } else {
+            $checks[] = [
+                '<fg=yellow>!</>',
+                'Button styles',
+                \count(array_unique(array_column($unknownStyles, 'id'))) . ' content(s) hold buttons naming a style their site\'s theme does not define',
+            ];
+        }
+
         // ── Check: colour names shadowing a Tailwind palette ──
         // The compiler emits `bg-<slug>` for every colour named outside the
         // base roles, which is what makes an admin colour usable as a utility
@@ -240,6 +262,30 @@ class ThemeCheckCommand extends Command
                         $orphan['property'],
                     ],
                     $orphans,
+                ),
+            );
+        }
+
+        if ([] !== $unknownStyles) {
+            $io->section('Buttons naming a style their theme does not define');
+            $io->text(
+                'Each row is a button whose class matches no style of the theme: it shows the generic look of app.css '
+                . 'instead of the theme\'s colours. Open the content and pick one of the theme\'s styles. '
+                . 'Site "' . ButtonStyleAudit::ANY_SITE . '" means a snippet no area assigns, which no theme defines the style for.',
+            );
+            $io->table(
+                ['Content', 'Title', 'Id', 'Site', 'Style', 'Buttons', 'Found in'],
+                array_map(
+                    static fn (array $group): array => [
+                        $group['kind'],
+                        $group['title'],
+                        $group['id'],
+                        $group['site'],
+                        $group['style'],
+                        $group['buttons'],
+                        implode(', ', $group['versions']),
+                    ],
+                    ButtonStyleAudit::byContent($unknownStyles),
                 ),
             );
         }

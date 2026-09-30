@@ -143,6 +143,14 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
 
+    # Buttons naming a style their site's theme does not define, reported by
+    # the check command.
+    itech_world.sulu_tailwind_theme.button_style_audit:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\ButtonStyleAudit
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.snippet_webspace_locator'
+
     # Which sites show a given snippet, so its form can offer their theme. The
     # Sulu repository is optional: the bundle runs without SuluSnippetBundle.
     itech_world.sulu_tailwind_theme.snippet_webspace_locator:
@@ -455,6 +463,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.compiler'
             - '@itech_world.sulu_tailwind_theme.appearance_override_audit'
             - '@itech_world.sulu_tailwind_theme.button_field_audit'
+            - '@itech_world.sulu_tailwind_theme.button_style_audit'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
         tags:
