@@ -29,6 +29,12 @@ Drives the `box-shadow` on hover. The four `glow-*` presets reference the active
 
 > Animated presets emit a CSS `animation` declaration on `:hover` instead of a static `box-shadow`; the keyframes are emitted once at the top of the button section. Animations stop when the hover ends, but the glow stays vivid as long as the cursor is over the button.
 
+#### Shadow at rest (`shadow`)
+
+Not a hover axis, but it shares the catalog: a style can carry a shadow when idle, set by the **Shadow at rest** field. Only the plain elevations are offered (`none` by default, `sm`, `md`, `lg`, same values as above), since a glow or an inset shadow at rest reads as a state rather than a style. Other values are ignored by `ButtonEffectCatalog::resolveRestShadow()`.
+
+When a hover shadow is also set, it replaces the resting one for the time of the hover, through the `box-shadow` transition already in place. With no hover shadow, the resting one stays on hover. The native file button of the forms never takes it, and a button shown as its pictogram alone drops it like every other decoration.
+
 ### `hoverTransform`
 
 Drives the `transform` on hover.

@@ -53,7 +53,11 @@ final class ButtonPreviewBorderContractTest extends TestCase
             $source,
             $path . ' draws a theme button, so it must take its border from the shared helper.',
         );
-        self::assertStringContainsString('buttonBorder(', $source);
+        self::assertStringContainsString(
+            'buttonBorderStyle(',
+            $source,
+            $path . ' must draw the border through buttonBorderStyle(), the only form that knows the sides.',
+        );
     }
 
     /**
@@ -107,6 +111,11 @@ final class ButtonPreviewBorderContractTest extends TestCase
             'borderStyle',
             $source,
             'The stored line style must reach the preview, or dashed and dotted show as solid.',
+        );
+        self::assertStringContainsString(
+            'borderSides',
+            $source,
+            'A border drawn on some sides only must show that way, or the styles of a project differing by their rule look alike.',
         );
         self::assertMatchesRegularExpression(
             '/test\(width\)|\/\^\\\\d\+/',

@@ -96,6 +96,11 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('required_button_styles')
+                    ->scalarPrototype()->end()
+                    ->defaultValue([])
+                    ->info('Button style slugs the project CSS depends on. Reported by iw-sulu:theme:compile and iw:tailwind-theme:check when a theme lacks one')
+                ->end()
             ->end()
             ->append($this->titleEditorNode(true))
             ->append($this->blocksNode(true))
@@ -585,6 +590,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.article_templates_types',
             $config['article_templates']['types'],
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.required_button_styles',
+            $config['required_button_styles'],
         );
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.title_editor',

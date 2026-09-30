@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
+use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -27,6 +29,7 @@ class ThemeCompileCommand extends Command
     public function __construct(
         private readonly ThemeConfigRepository $repository,
         private readonly ThemeCompiler $compiler,
+        private readonly RequiredButtonStyles $requiredButtonStyles,
     ) {
         parent::__construct();
     }
@@ -69,6 +72,7 @@ class ThemeCompileCommand extends Command
             $io->info(sprintf('Compiling theme "%s" (%s)...', $theme->getLabel(), $theme->getName()));
 
             $cssPath = $this->compiler->compile($theme);
+            $this->warnAboutMissingButtonStyles($io, $theme);
 
             $io->success('Theme compiled successfully!');
             $io->writeln(sprintf('  CSS file: <info>%s</info>', $cssPath));
@@ -85,11 +89,36 @@ class ThemeCompileCommand extends Command
             foreach ($themes as $theme) {
                 $io->info(sprintf('Compiling theme "%s" (%s)...', $theme->getLabel(), $theme->getName()));
                 $this->compiler->compile($theme);
+                $this->warnAboutMissingButtonStyles($io, $theme);
             }
 
             $io->success(sprintf('%d theme(s) compiled successfully!', count($themes)));
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Warn when the theme lacks a button style the project CSS depends on.
+     *
+     * A warning and not a failure: the theme compiles and works, only the
+     * project rules targeting the missing classes match nothing.
+     *
+     * @param SymfonyStyle $io    The console style
+     * @param ThemeConfig  $theme The theme just compiled
+     */
+    private function warnAboutMissingButtonStyles(SymfonyStyle $io, ThemeConfig $theme): void
+    {
+        $missing = $this->requiredButtonStyles->missingIn($theme);
+        if ([] === $missing) {
+            return;
+        }
+
+        $io->warning(sprintf(
+            'Theme "%s" defines no button style for %s, which the project CSS depends on (required_button_styles). '
+            . 'Create the style in the admin or restore its slug.',
+            $theme->getLabel(),
+            implode(', ', $missing),
+        ));
     }
 }

@@ -5,7 +5,8 @@ import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
-import buttonBorder from '../../utils/buttonBorder';
+import {buttonBorderStyle} from '../../utils/buttonBorder';
+import buttonStyleExtras from '../../utils/buttonStyleExtras';
 import {valueFor, withValue} from '../../utils/scopedValue';
 import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 
@@ -14,7 +15,8 @@ import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
  *
  * Displays a horizontal row of radio-like cards, one per button style defined
  * in the theme (unlimited, named by slug), each rendering a real button preview
- * using that button's colors (bg, text, border, radius). The selected card is
+ * using that button's colors (bg, text, border and its sides, radius) and its
+ * shadow, weight and case. The selected card is
  * highlighted with the Sulu primary accent.
  *
  * Stored value is the selected button's slug.
@@ -198,12 +200,15 @@ export default class ButtonStylePicker extends React.Component {
                         borderRadius: btnData.radius || '8px',
                         // Transparent rather than absent when the button draws
                         // none, so the preview keeps the same size either way.
-                        border: buttonBorder(btnData) || '1px solid transparent',
+                        ...buttonBorderStyle(btnData, '1px solid transparent'),
                         fontSize: '11px',
                         fontWeight: '600',
                         lineHeight: '1.4',
                         pointerEvents: 'none',
                         whiteSpace: 'nowrap',
+                        // Shadow, weight and case: what tells apart styles
+                        // sharing their colours.
+                        ...buttonStyleExtras(btnData),
                     } : {
                         display: 'inline-block',
                         padding: '6px 20px',

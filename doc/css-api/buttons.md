@@ -30,11 +30,18 @@ Shared by every variant.
 | `--iw-button-{variant}-hover-bg` | Background on hover |
 | `--iw-button-{variant}-hover-text` | Text color on hover |
 | `--iw-button-{variant}-hover-border` | Border shorthand on hover (or `none`) |
+| `--iw-button-{variant}-accent` | Accent colour of the style, only when set |
+
+### On the class of a style
+
+| Variable | Description |
+|----------|-------------|
+| `--iw-button-accent` | Accent colour, set on `.iw-button--{slug}` (and on the variant copy of the style) when the style defines one. Not used by the bundle: a hook for project CSS |
 
 Where `{variant}` is the **slug** of any button you defined in the admin
 (buttons are unlimited and named by slug — no longer the 3 fixed roles).
 
-> Border `width` and `style` are configured per button in the admin and folded directly into the `--iw-button-{slug}-border` shorthand. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{slug}` rules and do not produce standalone CSS variables.
+> Border `width` and `style` are configured per button in the admin and folded directly into the `--iw-button-{slug}-border` shorthand. That shorthand always describes four sides: a style drawing its border on some sides only is written with longhands in its class, and the variable does not reflect the sides. Hover effects (shadow, transform, opacity, duration, easing) are applied in the generated `.iw-button--{slug}` rules and do not produce standalone CSS variables.
 
 ---
 
@@ -47,13 +54,69 @@ Ready-to-use button classes with hover transitions. They follow the strict BEM c
 | `.iw-button` | Base button (rarely used alone — apply a style) |
 | `.iw-button--<slug>` | One class per button defined in the admin (e.g. `.iw-button--primary`, `.iw-button--cta`, `.iw-button--employeur`) |
 
-Each button rule includes `background-color`, `color`, `border`, `border-radius`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
+Each button rule includes `background-color`, `color`, `border`, `border-radius`, `padding`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
+
+**Same box for every style.** The border is drawn inside the padding: each side of the padding is `var(--iw-button-padding-*)` minus the border width on that side (never below zero). A filled button and an outlined one side by side are therefore the same size, and their labels sit at the same place. Keep this in mind when restyling a button in CSS: changing its `border-width` without its `padding` brings the size difference back.
 
 **Usage in Twig:**
 ```twig
 <a href="/contact" class="iw-button iw-button--primary inline-block px-6 py-3">Contact us</a>
 <a href="/learn-more" class="iw-button iw-button--secondary inline-block px-6 py-3">Learn more</a>
 ```
+
+---
+
+## Style settings
+
+Beyond colours, radius and hover effects, each style in the **Buttons** tab takes:
+
+| Field | Values | Compiled as |
+|-------|--------|-------------|
+| Border sides (`borderSides`) | `all` *(default)*, `top`, `right`, `bottom`, `left`, `x` (left and right), `y` (top and bottom) | `all` keeps the `border` shorthand. Any other value writes `border-style`, `border-color` and `border-width` with `0` on the sides left out, so the hover border colour only recolours the drawn sides |
+| Accent colour (`accent`) | a palette reference or a colour, optional | `--iw-button-accent` on the class, see [Project-specific ornaments](#project-specific-ornaments) |
+| Shadow at rest (`shadow`) | `none` *(default)*, `sm`, `md`, `lg` | `box-shadow`, replaced by the hover shadow while hovered, see [`button-effects.md`](../button-effects.md) |
+| Label weight (`fontWeight`) | inherited *(default)*, normal, medium, semi-bold, bold | `font-weight: 400` to `700` |
+| Label case (`textTransform`) | inherited *(default)*, as typed, uppercase | `text-transform` |
+
+A field left on its default writes nothing, so a style that never opens them compiles exactly as before. There is no font size per style: the size belongs to the context (a block, the menu), not to the style.
+
+A border on one side keeps the corners of the button: with a large radius the rule curves up at its ends. A bottom rule reads best with a small radius or none.
+
+---
+
+## Project-specific ornaments
+
+What a charter adds on top of a style (a coloured dot after the label, a slanted corner) has no field in the admin, on purpose: it would grow the form for one project at a time. The style is created in the admin, so it shows in the picker and works in every block, and the project completes it in CSS keyed on its slug.
+
+**1. Create the styles in the admin.** For example three profile entries, white background, 4px bottom rule, one accent each: `profile-employer`, `profile-employee`, `profile-self-employed`. Point the border and the accent at the same palette colour to type it once.
+
+**2. Contribute the rule** through `ThemeCompileEvent` (see [`extensibility.md`](../extensibility.md#4-contributing-css)). One rule serves the three styles, each dot taking the accent of its own style:
+
+```php
+public function onCompile(ThemeCompileEvent $event): void
+{
+    $event->addRule('[class*="iw-button--profile-"]::after { content: "."; color: var(--iw-button-accent); }');
+}
+```
+
+**3. Declare the slugs** the rule depends on. A slug is typed in the admin, and renaming it there silently detaches the rule:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    required_button_styles: [profile-employer, profile-employee, profile-self-employed]
+```
+
+A theme lacking one of them is then reported, never blocked: a warning from `iw-sulu:theme:compile`, a warning in the log each time the theme is compiled (which is what a save in the admin does), and an orange line per site theme in `iw:tailwind-theme:check`.
+
+**Inside a block variant**, the button of the variant carries `.iw-button--variant`, not the class of its style: it gets the colours, the rule and `--iw-button-accent` of the style, but a selector keyed on the slug does not reach it. Name those variants in the rule when they use a decorated style:
+
+```css
+[class*="iw-button--profile-"]::after,
+.iw-variant--profiles .iw-button--variant::after { content: "."; color: var(--iw-button-accent); }
+```
+
+**Accessibility.** A white button with a bottom rule on a white page is recognised by its rule alone, which WCAG 1.4.11 asks to contrast by at least 3:1 with the page. The label keeps its own 4.5:1 against the button background, and the focus ring stays the one of the theme: do not remove the outline in the project rule.
 
 ---
 

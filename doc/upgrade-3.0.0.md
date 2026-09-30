@@ -56,6 +56,23 @@ number of named buttons. `tokens.buttons` changes from a role-keyed map to a
 slug** (a legacy `primary`/`secondary`/`accent` value still resolves when a
 button keeps that slug).
 
+### Every button style shares the same box (breaking, visual)
+
+A border used to add to the size of a button: with the same padding
+everywhere, an outlined style stood taller and wider than a filled one by twice
+its border width (44px against 40px with a 2px border). The border is now
+taken off the padding, side by side:
+
+```css
+padding: max(0px, calc(var(--iw-button-padding-y, 0.75rem) - 2px))
+         max(0px, calc(var(--iw-button-padding-x, 1.5rem) - 2px));
+```
+
+The padding setting is therefore the actual size of every button, and
+outlined buttons shrink by twice their border to match the filled ones. A
+layout that relied on the extra size of an outlined button raises
+`--iw-button-padding-*` instead.
+
 ### Renaming a slug is breaking
 
 A slug is the stable identifier stored in content and refs. Renaming a brand

@@ -11,6 +11,7 @@ use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Event\ThemeCompileEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -125,6 +126,8 @@ class ThemeCompiler
         private readonly GoogleFontsResolver $googleFontsResolver,
         private readonly OklchPaletteGenerator $paletteGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly ?RequiredButtonStyles $requiredButtonStyles = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -170,6 +173,17 @@ class ThemeCompiler
         $filePath = $this->buildFilePath($theme);
 
         file_put_contents($filePath, $css);
+
+        // Saving the theme in the admin compiles it, and that save is where a
+        // style the project depends on gets renamed. Logged, never thrown: the
+        // theme stays usable, only the project ornaments are lost.
+        $missing = $this->requiredButtonStyles?->missingIn($theme) ?? [];
+        if ([] !== $missing) {
+            $this->logger?->warning('Theme "{theme}" defines no button style for {slugs}, which the project CSS depends on (required_button_styles).', [
+                'theme' => $theme->getName(),
+                'slugs' => implode(', ', $missing),
+            ]);
+        }
 
         return $filePath;
     }
@@ -2373,10 +2387,11 @@ class ThemeCompiler
     /**
      * Emit the rules of one button under the given selector.
      *
-     * The selector is a parameter because the same button is emitted twice:
-     * once under its own slug, and once as `.iw-button--variant` for the first
-     * button of the theme. The variant name stays the slug either way, since it
-     * keys the @keyframes emitted earlier.
+     * The selector is a parameter because the same button is emitted under
+     * several: its own slug, `.iw-button--variant` for the first button of the
+     * theme, and `.iw-variant--<name> .iw-button--variant` for every block
+     * variant pointing at it. The variant name stays the slug either way, since
+     * it keys the @keyframes emitted earlier.
      *
      * @param string               $selector The CSS selector to emit under
      * @param string               $variant  The button slug, keying its keyframes
@@ -2393,8 +2408,7 @@ class ThemeCompiler
         string $paddingX,
         string $paddingY,
     ): string {
-        $borderWidth = isset($props['borderWidth']) ? (string) $props['borderWidth'] : '1px';
-        $borderStyle = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
+        $border = $this->resolveButtonBorder($props);
 
         $duration = ButtonEffectCatalog::resolveDuration((string) ($props['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($props['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
@@ -2411,12 +2425,9 @@ class ThemeCompiler
         if (isset($props['radius'])) {
             $css .= "  border-radius: {$this->resolveRadius((string) $props['radius'])};\n";
         }
-        if (isset($props['border']) && 'none' !== $props['border']) {
-            $css .= "  border: {$borderWidth} {$borderStyle} {$this->resolveColorValue((string) $props['border'])};\n";
-        } else {
-            $css .= "  border: none;\n";
-        }
-        $css .= "  padding: var(--iw-button-padding-y, {$paddingY}) var(--iw-button-padding-x, {$paddingX});\n";
+        $css .= $border['css'];
+        $css .= '  padding: ' . self::buttonPadding($border['widths'], $paddingX, $paddingY) . ";\n";
+        $css .= $this->generateButtonStyleExtras($props);
         $css .= "  cursor: pointer;\n";
         $css .= "  display: inline-block;\n";
         $css .= "  text-decoration: none;\n";
@@ -2437,6 +2448,173 @@ class ThemeCompiler
         $css .= $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
 
         return $css . $this->generateBareIconColors($selector, $props);
+    }
+
+    /**
+     * Label weights a button style may set, stored value => CSS value.
+     */
+    private const BUTTON_FONT_WEIGHTS = ['normal' => '400', 'medium' => '500', 'semibold' => '600', 'bold' => '700'];
+
+    /**
+     * Label cases a button style may set.
+     */
+    private const BUTTON_TEXT_TRANSFORMS = ['none', 'uppercase'];
+
+    /**
+     * The optional settings of a button style: accent, resting shadow, label
+     * weight and case.
+     *
+     * Each is written only when set, so a style that never opens them compiles
+     * as before and keeps inheriting its weight and case from the context.
+     *
+     * The accent is a hook for projects rather than something the bundle
+     * paints: set on the class, `var(--iw-button-accent)` in one project rule
+     * takes the right colour on every style that defines one.
+     *
+     * @param array<string, mixed> $props The button definition
+     *
+     * @return string CSS declarations
+     */
+    private function generateButtonStyleExtras(array $props): string
+    {
+        $css = '';
+
+        $accent = isset($props['accent']) ? (string) $props['accent'] : '';
+        if ('' !== $accent && 'none' !== $accent) {
+            $css .= "  --iw-button-accent: {$this->resolveColorValue($accent)};\n";
+        }
+
+        $shadow = ButtonEffectCatalog::resolveRestShadow((string) ($props['shadow'] ?? ''));
+        if (null !== $shadow) {
+            $css .= "  box-shadow: {$shadow};\n";
+        }
+
+        $weight = self::BUTTON_FONT_WEIGHTS[(string) ($props['fontWeight'] ?? '')] ?? null;
+        if (null !== $weight) {
+            $css .= "  font-weight: {$weight};\n";
+        }
+
+        $transform = (string) ($props['textTransform'] ?? '');
+        if (\in_array($transform, self::BUTTON_TEXT_TRANSFORMS, true)) {
+            $css .= "  text-transform: {$transform};\n";
+        }
+
+        return $css;
+    }
+
+    /**
+     * The sides a button border can be drawn on, per `borderSides` value.
+     *
+     * A bottom rule is the common case (tabs, underlined links, profile
+     * entries), the others come for free with it.
+     */
+    private const BUTTON_BORDER_SIDES = [
+        'all' => ['top', 'right', 'bottom', 'left'],
+        'top' => ['top'],
+        'right' => ['right'],
+        'bottom' => ['bottom'],
+        'left' => ['left'],
+        'x' => ['right', 'left'],
+        'y' => ['top', 'bottom'],
+    ];
+
+    /**
+     * The border of a button, and how wide it is on each side.
+     *
+     * The widths are returned apart from the declaration because the padding
+     * gives them back (see buttonPadding): a border drawn inside the padding
+     * keeps every style the same size, outlined or not.
+     *
+     * A border on some sides only is written as longhands with a zero width
+     * elsewhere, never as `border: none` plus one side: the hover rule only
+     * changes `border-color`, which then recolours the drawn sides alone.
+     *
+     * @param array<string, mixed> $props The button definition
+     *
+     * @return array{css: string, widths: array{top: string, right: string, bottom: string, left: string}}
+     */
+    private function resolveButtonBorder(array $props): array
+    {
+        $none = ['top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0'];
+
+        $color = isset($props['border']) ? (string) $props['border'] : '';
+        if ('' === $color || 'none' === $color) {
+            return ['css' => "  border: none;\n", 'widths' => $none];
+        }
+
+        $width = self::buttonBorderWidth($props['borderWidth'] ?? null);
+        $style = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
+        $color = $this->resolveColorValue($color);
+        $sides = self::BUTTON_BORDER_SIDES[(string) ($props['borderSides'] ?? 'all')] ?? self::BUTTON_BORDER_SIDES['all'];
+
+        if (4 === \count($sides)) {
+            return [
+                'css' => "  border: {$width} {$style} {$color};\n",
+                'widths' => ['top' => $width, 'right' => $width, 'bottom' => $width, 'left' => $width],
+            ];
+        }
+
+        $widths = $none;
+        foreach ($sides as $side) {
+            $widths[$side] = $width;
+        }
+
+        return [
+            'css' => "  border-style: {$style};\n"
+                . "  border-color: {$color};\n"
+                . '  border-width: ' . implode(' ', $widths) . ";\n",
+            'widths' => $widths,
+        ];
+    }
+
+    /**
+     * A stored border width as a CSS length.
+     *
+     * The form stores `2px`, but a bare number is read as pixels rather than
+     * dropped: the padding subtracts this value, and a unitless length would
+     * turn the whole `calc()` invalid.
+     *
+     * @param mixed $stored The stored width, `1px` when missing
+     *
+     * @return string The CSS length
+     */
+    private static function buttonBorderWidth(mixed $stored): string
+    {
+        $width = null === $stored || '' === $stored ? '1px' : trim((string) $stored);
+
+        return 1 === preg_match('/^\d+(\.\d+)?$/', $width) ? $width . 'px' : $width;
+    }
+
+    /**
+     * The padding of a button, less its border on each side.
+     *
+     * A border adds to the size of the box. Two styles side by side, one
+     * filled and one outlined, would otherwise differ by twice the border
+     * width. Taking it off the padding makes the padding setting the actual
+     * size of every button, and leaves the label where a borderless button
+     * has it. `max()` stops a thick border from turning a small padding
+     * negative, which the browser would drop.
+     *
+     * @param array{top: string, right: string, bottom: string, left: string} $widths   Border width per side
+     * @param string                                                            $paddingX Global horizontal padding fallback
+     * @param string                                                            $paddingY Global vertical padding fallback
+     *
+     * @return string The padding value
+     */
+    private static function buttonPadding(array $widths, string $paddingX, string $paddingY): string
+    {
+        $side = static function (string $axis, string $fallback, string $width): string {
+            $base = "var(--iw-button-padding-{$axis}, {$fallback})";
+
+            return 0.0 === (float) $width ? $base : "max(0px, calc({$base} - {$width}))";
+        };
+
+        $top = $side('y', $paddingY, $widths['top']);
+        $right = $side('x', $paddingX, $widths['right']);
+        $bottom = $side('y', $paddingY, $widths['bottom']);
+        $left = $side('x', $paddingX, $widths['left']);
+
+        return $top === $bottom && $right === $left ? "{$top} {$right}" : "{$top} {$right} {$bottom} {$left}";
     }
 
     /**
@@ -2607,6 +2785,7 @@ class ThemeCompiler
         'hoverBg' => 'hover-bg',
         'hoverText' => 'hover-text',
         'hoverBorder' => 'hover-border',
+        'accent' => 'accent',
     ];
 
     /**
@@ -2655,6 +2834,11 @@ class ThemeCompiler
 
                 $suffix = self::BUTTON_PROP_VAR_SUFFIX[$prop] ?? null;
                 if (null === $suffix) {
+                    continue;
+                }
+                // The accent is optional: a cleared field publishes nothing,
+                // so a project rule can fall back with var(..., fallback).
+                if ('accent' === $prop && \in_array($value, [null, '', 'none'], true)) {
                     continue;
                 }
 
@@ -5068,13 +5252,14 @@ class ThemeCompiler
     /**
      * Generate CSS for variant-specific button styling.
      *
-     * Reads the variant's buttonStyle choice (primary, secondary, accent) and
-     * generates a `.iw-button--variant` class with the chosen button's direct values.
-     * Mirrors generateButtonClasses() so that variant-scoped buttons inherit
-     * the same border, padding, and hover effects as the standalone
-     * .iw-button--<variant> classes. The file-selector-button shares padding
-     * and opacity with the main button but skips transform/shadow because
-     * those would feel out of place on a native input control.
+     * Reads the variant's buttonStyle choice (a button slug) and emits that
+     * button under `.iw-variant--<name> .iw-button--variant`, through the same
+     * method as the standalone `.iw-button--<slug>` classes: a setting added to
+     * the buttons reaches the variants without being written twice.
+     *
+     * The native file-selector-button shares the colours, border and padding
+     * of the button but skips transform, shadow and background effects, which
+     * would feel out of place on a native input control.
      *
      * @param string               $variantName The variant key
      * @param array<string, mixed> $props       The variant properties
@@ -5106,54 +5291,19 @@ class ThemeCompiler
         $paddingX = isset($global['paddingX']) ? (string) $global['paddingX'] : '1.5rem';
         $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
 
-        $borderWidth = isset($btnData['borderWidth']) ? (string) $btnData['borderWidth'] : '1px';
-        $borderStyle = isset($btnData['borderStyle']) ? (string) $btnData['borderStyle'] : 'solid';
+        $css = $this->generateOneButtonClass(
+            ".iw-variant--{$variantName} .iw-button--variant",
+            $buttonStyle,
+            $btnData,
+            $paddingX,
+            $paddingY,
+        );
 
         $duration = ButtonEffectCatalog::resolveDuration((string) ($btnData['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($btnData['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
-        $bgEffectKey = (string) ($btnData['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
-        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
-
-        $btnSelector = ".iw-variant--{$variantName} .iw-button--variant";
-
-        $css = "{$btnSelector} {\n";
-        if (isset($btnData['bg'])) {
-            $css .= "  background-color: {$this->resolveColorValue((string) $btnData['bg'])};\n";
-        }
-        if (isset($btnData['text'])) {
-            $css .= "  color: {$this->resolveColorValue((string) $btnData['text'])};\n";
-        }
-        if (isset($btnData['radius'])) {
-            $css .= "  border-radius: {$this->resolveRadius((string) $btnData['radius'])};\n";
-        }
-        if (isset($btnData['border']) && 'none' !== $btnData['border']) {
-            $css .= "  border: {$borderWidth} {$borderStyle} {$this->resolveColorValue((string) $btnData['border'])};\n";
-        } else {
-            $css .= "  border: none;\n";
-        }
-        $css .= "  padding: var(--iw-button-padding-y, {$paddingY}) var(--iw-button-padding-x, {$paddingX});\n";
-        $css .= "  cursor: pointer;\n";
-        $css .= "  display: inline-block;\n";
-        $css .= "  text-decoration: none;\n";
-        if ($hasBgEffect && 'pulse-bg' !== $bgEffectKey) {
-            $css .= "  position: relative;\n";
-            $css .= "  overflow: hidden;\n";
-            $css .= "  isolation: isolate;\n";
-        }
-        $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
-        $css .= "}\n";
-
-        // ::before overlay reuses the per-variant CSS vars (--iw-button-{primary|secondary|accent}-hover-bg)
-        // emitted globally by generateButtonVariables.
-        $css .= $this->generateButtonBgEffectBefore($btnSelector, $buttonStyle, $bgEffectKey, $duration, $easing);
-
-        // :hover state (animations reference the variant-level keyframes already emitted)
-        $css .= $this->generateButtonHoverRules($btnSelector, $buttonStyle, $btnData, $bgEffectKey);
-
-        // File input button — same colors and padding as .iw-button--variant,
-        // but we skip transform/shadow/bg-effect because those would feel
-        // awkward on a native form control.
         $opacityKey = (string) ($btnData['hoverOpacity'] ?? ButtonEffectCatalog::DEFAULT_OPACITY);
+        $border = $this->resolveButtonBorder($btnData);
+
         $css .= ".iw-variant--{$variantName} .iw-form__file::file-selector-button {\n";
         if (isset($btnData['bg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $btnData['bg'])};\n";
@@ -5164,12 +5314,8 @@ class ThemeCompiler
         if (isset($btnData['radius'])) {
             $css .= "  border-radius: {$this->resolveRadius((string) $btnData['radius'])};\n";
         }
-        if (isset($btnData['border']) && 'none' !== $btnData['border']) {
-            $css .= "  border: {$borderWidth} {$borderStyle} {$this->resolveColorValue((string) $btnData['border'])};\n";
-        } else {
-            $css .= "  border: none;\n";
-        }
-        $css .= "  padding: var(--iw-button-padding-y, {$paddingY}) var(--iw-button-padding-x, {$paddingX});\n";
+        $css .= $border['css'];
+        $css .= '  padding: ' . self::buttonPadding($border['widths'], $paddingX, $paddingY) . ";\n";
         $css .= "  transition: background-color {$duration} {$easing}, color {$duration} {$easing}, opacity {$duration} {$easing};\n";
         $css .= "}\n";
 

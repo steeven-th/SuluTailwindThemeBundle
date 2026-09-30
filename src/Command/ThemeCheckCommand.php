@@ -10,6 +10,7 @@ use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonStyleAudit;
+use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -57,6 +58,7 @@ class ThemeCheckCommand extends Command
         private readonly AppearanceOverrideAudit $appearanceAudit,
         private readonly ButtonFieldAudit $buttonFieldAudit,
         private readonly ButtonStyleAudit $buttonStyleAudit,
+        private readonly RequiredButtonStyles $requiredButtonStyles,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
     ) {
@@ -93,6 +95,8 @@ class ThemeCheckCommand extends Command
         $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
         // Webspace key => the button styles of its theme, for the style check.
         $buttonSlugsBySite = [];
+        // Theme id => theme, for the themes a site shows.
+        $assignedThemes = [];
         foreach ($webspaces as $webspace) {
             $wsKey = $webspace->getKey();
             $wsTheme = $this->webspaceThemeRepository->findThemeForWebspace($wsKey);
@@ -102,6 +106,7 @@ class ThemeCheckCommand extends Command
             } else {
                 $checks[] = ['<fg=green>✓</>', 'Webspace "' . $wsKey . '"', 'Theme: ' . $wsTheme->getLabel()];
                 $buttonSlugsBySite[$wsKey] = array_column(ButtonResolver::normalizeButtons($wsTheme->getTokens()['buttons'] ?? []), 'slug');
+                $assignedThemes[$wsTheme->getId()] = $wsTheme;
             }
         }
 
@@ -215,6 +220,22 @@ class ThemeCheckCommand extends Command
                 'Button styles',
                 \count(array_unique(array_column($unknownStyles, 'id'))) . ' content(s) hold buttons naming a style their site\'s theme does not define',
             ];
+        }
+
+        // ── Check: button styles the project CSS depends on ──
+        // Only the themes a site shows: a spare theme lacking them breaks
+        // nothing until it is assigned, and would be flagged forever.
+        if ([] !== $this->requiredButtonStyles->all()) {
+            foreach ($assignedThemes as $theme) {
+                $missing = $this->requiredButtonStyles->missingIn($theme);
+                $checks[] = [] === $missing
+                    ? ['<fg=green>✓</>', 'Required button styles', $theme->getLabel() . ': all defined']
+                    : [
+                        '<fg=yellow>!</>',
+                        'Required button styles',
+                        $theme->getLabel() . ': missing ' . implode(', ', $missing) . ' - the project CSS targeting them matches nothing',
+                    ];
+            }
         }
 
         // ── Check: colour names shadowing a Tailwind palette ──
