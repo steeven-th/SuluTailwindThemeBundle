@@ -50,6 +50,7 @@ written before is moved by `iw-sulu:theme:migrate-buttons`, see
 |-------|---------|--------|
 | `with_icon` | `true` | Offer a pictogram. |
 | `with_display` | `false` | Offer the "pictogram alone" toggle. |
+| `with_style` | `true` | Offer a button style. Off for a link drawn as an entry of a list, as the links of a menu dropdown. |
 | `excluded_types` | none | Link types left out, comma-separated, as for a `link` field. |
 | `with_card` | outside a block | Wrap the fields in a collapsible card. By default a field inside a block item goes without, the block already being one. |
 

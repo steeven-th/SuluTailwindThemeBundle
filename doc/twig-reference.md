@@ -132,6 +132,9 @@ Returns the menu configuration for the active theme.
 | `displayLanguageSwitcher` | `bool` | Show the language switcher (languages come from the webspace XML, not from here) |
 | `languageSwitcherLabel` | `string` | `code`, `native` or `translated` (default: `code`) |
 | `languageSwitcherPosition` | `string` | `both` (default), `bar` or `panel`. Only honoured by `burger` |
+| `displayBarActions` | `bool` | Show the bar actions of the `iw_theme_menu_actions` snippet (default: `false`) |
+| `barActionsBreakpoint` | `string` | `md`, `lg` (default) or `xl`: the width under which the burger moves its bar actions into the panel |
+| `buttonPaddingY`, `buttonPaddingX`, `buttonFontSize` | `int` | Size of the menu buttons in pixels. Unset: 10, 20 and 14 |
 | `panelLayout` | `string` | Burger panel: `full` (default) or `side` |
 | `panelSide` | `string` | Side of a side panel: `left` or `right` (default) |
 | `panelWidth` | `int` | Width in pixels (200-960) of a side panel, or of the links zone beside a picture. Unset: `288` on a side, `480` beside a picture |

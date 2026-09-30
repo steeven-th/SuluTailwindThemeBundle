@@ -2936,6 +2936,15 @@ class ThemeCompiler
         $css .= "  --iw-menu-bar-height-desktop: {$barDesktop}px;\n";
         $css .= "  --iw-menu-bar-height-mobile: {$barMobile}px;\n";
 
+        // The size of the menu buttons, only when set: the defaults live in
+        // the rule that reads them (see compileMenu(), "Menu buttons").
+        foreach (['buttonPaddingY' => ['padding-y', 0, 40], 'buttonPaddingX' => ['padding-x', 0, 64], 'buttonFontSize' => ['font-size', 10, 24]] as $key => [$name, $min, $max]) {
+            if (is_numeric($menuConfig[$key] ?? null)) {
+                $length = max($min, min($max, (int) $menuConfig[$key]));
+                $css .= "  --iw-menu-button-{$name}: {$length}px;\n";
+            }
+        }
+
         return $css . "\n";
     }
 
@@ -3502,10 +3511,14 @@ class ThemeCompiler
         // width set by `collapseAt` (.iw-menu--collapse-*). Written here rather
         // than as Tailwind breakpoints in the templates: a class built from a
         // setting would never reach the Tailwind build.
+        // Above its width, a bar that overflows is collapsed all the same by
+        // the controller (.iw-menu--collapsed), a full bar being worse than a
+        // burger.
         foreach (self::MENU_COLLAPSE_WIDTHS as $name => $width) {
             $below = $width - 0.02;
             $css .= "@media (max-width: {$below}px) { .iw-menu--collapse-{$name} .iw-menu__desktop-only { display: none; } }\n";
-            $css .= "@media (min-width: {$width}px) { .iw-menu--collapse-{$name} .iw-menu__mobile-only { display: none; } }\n";
+            $css .= "@media (min-width: {$width}px) { .iw-menu--collapse-{$name}:not(.iw-menu--collapsed) .iw-menu__mobile-only { display: none; }";
+            $css .= " .iw-menu--collapse-{$name}.iw-menu--collapsed .iw-menu__desktop-only { display: none; } }\n";
         }
         // Automatic: the controller measures the bar and sets --collapsed when
         // the links do not fit. Below 768px the burger always wins. Until the
@@ -3536,7 +3549,9 @@ class ThemeCompiler
         $css .= "@media (min-width: 768px) { :root { --iw-menu-bar-height: var(--iw-menu-bar-height-desktop, 80px); } }\n";
         // A sticky bar would cover the target of an in-page link.
         $css .= "html { scroll-padding-top: var(--iw-menu-bar-height); }\n";
-        $css .= ".iw-menu__bar { height: var(--iw-menu-bar-height); }\n";
+        // The groups of the bar (logo, links, right side) keep a gap between
+        // them once the bar is full: bar actions can fill it up.
+        $css .= ".iw-menu__bar { height: var(--iw-menu-bar-height); column-gap: var(--iw-menu-bar-gap, 1.5rem); }\n";
         $css .= ".iw-menu__below-bar { top: var(--iw-menu-bar-height); }\n";
         $css .= ".iw-menu__overlay-nav--below-bar { padding-top: var(--iw-menu-bar-height); }\n";
         // A dropdown hangs from the bottom of the bar, not from its button:
@@ -3556,6 +3571,33 @@ class ThemeCompiler
         $css .= "font-size: var(--iw-menu-button-font-size, 0.875rem); line-height: 1.25rem; white-space: nowrap; }\n";
         // Full-width variant, for the mobile panel
         $css .= ".iw-menu .iw-menu__button--block { display: block; text-align: center; white-space: normal; }\n\n";
+        // ─── Bar actions ──────────────────────────────────────────────────────
+        // The links of the iw_theme_menu_actions snippet (menu/_bar_actions).
+        // In the bar, a row that never stretches the bar: the buttons take
+        // the menu size above. An action shown in the bar above a width and
+        // in the panel below it carries `--wide-only` or `--narrow-only`. On
+        // the burger, the width is the theme setting (.iw-menu--actions-at-*),
+        // navbar and mega menu use their own collapse classes instead.
+        $css .= ".iw-menu__actions { display: flex; align-items: center; gap: var(--iw-menu-actions-gap, 0.75rem); margin: 0; padding: 0; list-style: none; }\n";
+        // An action keeps its label on one line and its width: a full bar
+        // squeezed a trigger onto two lines.
+        $css .= ".iw-menu__actions > li { display: flex; align-items: center; flex-shrink: 0; }\n";
+        $css .= ".iw-menu__action-trigger { white-space: nowrap; }\n";
+        foreach (self::MENU_COLLAPSE_WIDTHS as $name => $width) {
+            $below = $width - 0.02;
+            $css .= "@media (max-width: {$below}px) { .iw-menu--actions-at-{$name} .iw-menu__wide-only { display: none; } }\n";
+            $css .= "@media (min-width: {$width}px) { .iw-menu--actions-at-{$name} .iw-menu__narrow-only { display: none; } }\n";
+        }
+        // In the open panel, a column of full-width buttons under the links.
+        $css .= ".iw-menu__actions--panel { flex-direction: column; align-items: stretch; gap: var(--iw-menu-actions-panel-gap, 0.75rem); padding-top: 1.5rem; padding-bottom: 1.5rem; }\n";
+        $css .= ".iw-menu__actions--panel > li { display: block; }\n";
+        // A dropdown of the bar hangs from its trigger, like the language list.
+        $css .= ".iw-menu__action-dropdown { position: relative; }\n";
+        $css .= ".iw-menu__action-dropdown-list { right: 0; min-width: 12rem; margin: 0; list-style: none; }\n";
+        $css .= ".iw-menu__action-dropdown-item { display: flex; align-items: center; gap: 0.5rem; }\n";
+        // Opened in the panel, the list reads as a group: a title, its links.
+        $css .= ".iw-menu__action-group-title { display: block; font-weight: 600; margin-bottom: 0.25rem; }\n";
+        $css .= ".iw-menu__action-group-list { margin: 0; padding: 0; list-style: none; }\n\n";
 
         // ─── Mega menu (sub-namespace iw-mega-menu) ──────────────────────────
         // Dropdown panel

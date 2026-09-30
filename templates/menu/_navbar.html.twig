@@ -147,6 +147,11 @@
 
             {# RIGHT — Language switcher + Social media (desktop + mobile) + Burger #}
             <div class="flex items-center gap-3">
+                {# Bar actions — in the bar with the links, in the panel with them
+                   once the menu collapses. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                    with {config: config, slot: 'bar', wideClass: 'iw-menu__desktop-only', narrowClass: 'iw-menu__mobile-only'} only %}
+
                 {# Language switcher — desktop. Anchored right: it sits at the
                    end of the bar, so a left-anchored panel would overflow. #}
                 <div class="iw-menu__desktop-only">
@@ -192,6 +197,10 @@
         <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav overflow-y-auto h-full">
             {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
                 with {navItems: navItems, clickMode: clickNavbar ? 'selflink' : 'none'} only %}
+
+            {# Bar actions left out of the bar, under the links #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                with {config: config, slot: 'panel', narrowClass: ''} only %}
 
             {# Language switcher — mobile overlay, inline: a popup inside a
                panel that already covers the page reads badly. #}

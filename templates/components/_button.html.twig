@@ -12,8 +12,12 @@
                   dead link behind.
      - class    : extra classes on the anchor
      - tag      : 'span' to draw the button inside an element that is already
-                  the link (a clickable card), 'a' otherwise. A span carries no
-                  link attributes, the element around it does.
+                  the link (a clickable card), 'button' for a button that opens
+                  something instead of leading somewhere (a dropdown), 'a'
+                  otherwise. Only the anchor carries the link attributes.
+     - attributes : extra attributes, a map printed on the element (the ARIA
+                  and Stimulus wiring of a dropdown trigger)
+     - trailing : markup after the label, a chevron for instance
      - iconOnly : force the pictogram alone (true), or the label back (false),
                   whatever the field says. A button without a pictogram always
                   shows its label.
@@ -43,12 +47,14 @@
        per step rather than an inline style. #}
     {% set buttonGap = button.icon.gap|default('') matches '/^gap-\\d+$/' ? ' iw-button--icon-' ~ button.icon.gap : '' %}
 
-    {% set buttonTag = tag|default('a') == 'span' ? 'span' : 'a' %}
-    <{{ buttonTag }} {% if buttonTag == 'a' %}{{ links.attrs({url: button.url, target: button.target, rel: button.rel}) }}{% endif %}
+    {% set buttonTag = tag|default('a') in ['span', 'button'] ? tag : 'a' %}
+    <{{ buttonTag }} {% if buttonTag == 'a' %}{{ links.attrs({url: button.url, target: button.target, rel: button.rel}) }}{% elseif buttonTag == 'button' %}type="button"{% endif %}
+       {%- for name, value in attributes|default({}) %} {{ name }}="{{ value }}"{% endfor %}
        class="{{ buttonStyle ? 'iw-button--' ~ buttonStyle : 'iw-button--variant' }}{{ buttonHasIcon ? ' iw-button--with-icon' ~ buttonGap : '' }}{{ buttonIconOnly ? ' iw-button--icon-only' : '' }}{{ class|default('') ? ' ' ~ class : '' }}">
         {%- if buttonHasIcon and (buttonIconLeft or buttonIconOnly) %}{{ buttonIcon }}{% endif -%}
         <span class="{{ buttonIconOnly ? 'sr-only' : 'iw-button__label' }}">{{ button.label }}</span>
         {%- if buttonTag == 'a' %}{{ links.new_tab_hint({newTab: button.newTab}) }}{% endif -%}
         {%- if buttonHasIcon and not buttonIconLeft and not buttonIconOnly %}{{ buttonIcon }}{% endif -%}
+        {{- trailing|default('') -}}
     </{{ buttonTag }}>
 {% endif %}

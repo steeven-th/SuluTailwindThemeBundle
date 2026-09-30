@@ -49,6 +49,8 @@
 {% endif %}
 
 {% set panelId = iw_sulu_tailwind_theme_unique_id('menu-panel') %}
+{# The width under which the bar actions move to the panel. #}
+{% set actionsAt = config.barActionsBreakpoint|default('lg') in ['md', 'lg', 'xl'] ? config.barActionsBreakpoint|default('lg') : 'lg' %}
 
 {# The burger turns into the close button. On the left side it opens the
    bar, before the logo. #}
@@ -75,7 +77,7 @@
     data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
+    class="iw-menu{{ config.displayBarActions|default(false) ? ' iw-menu--actions-at-' ~ actionsAt : '' }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
     <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
@@ -87,8 +89,11 @@
                     with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
-            {# RIGHT - Language switcher + Social media + (Burger) #}
+            {# RIGHT - Bar actions + Language switcher + Social media + (Burger) #}
             <div class="flex items-center gap-3">
+                {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                    with {config: config, slot: 'bar'} only %}
+
                 {# Language switcher - in the bar, reachable without opening the
                    menu. Hidden when the theme places it in the panel only. #}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
@@ -156,6 +161,9 @@
         <nav aria-label="{{ 'iw_sulu_tailwind_theme.menu_main'|trans({}, 'messages') }}" class="iw-menu__overlay-nav{{ isSide ? '' : ' iw-menu__overlay-nav--below-bar' }} overflow-y-auto h-full">
             {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
                 with {navItems: navItems, clickMode: clickMode} only %}
+
+            {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                with {config: config, slot: 'panel'} only %}
 
             {# Language switcher - inline: the overlay already covers the page,
                a dropdown on top of it would read badly. The vertical padding

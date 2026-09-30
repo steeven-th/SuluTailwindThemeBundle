@@ -21,6 +21,13 @@ const AUTO_COLLAPSE_CLASS = 'iw-menu--collapse-auto';
 /** Under this width the burger always wins, whatever fits (the md breakpoint of the stylesheet). */
 const AUTO_COLLAPSE_MIN_WIDTH = 768;
 
+/**
+ * The widths of the fixed switches to the burger (`.iw-menu--collapse-md|lg|xl`),
+ * as ThemeCompiler writes them. Above it, a bar that does not hold its content
+ * switches anyway: the width is a floor, not a promise that everything fits.
+ */
+const FIXED_COLLAPSE_WIDTHS = { md: 768, lg: 1024, xl: 1280 };
+
 /** Class put on <html> while a panel is open: no page scroll, no layout shift. */
 const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
 
@@ -54,9 +61,12 @@ const SCROLL_LOCK_CLASS = 'iw-scroll-locked';
  * Motion lives in the stylesheet (state classes, `prefers-reduced-motion`
  * honoured there): this controller only switches classes.
  *
- * A navbar or mega menu set to switch to the burger automatically
- * (`.iw-menu--collapse-auto`) is measured on load and on resize: it gets
- * `.iw-menu--collapsed` when its links do not fit on one line.
+ * A navbar or mega menu is measured on load and on resize: it gets
+ * `.iw-menu--collapsed` when its bar does not hold its content on one line.
+ * Set to switch automatically (`.iw-menu--collapse-auto`), that is the only
+ * rule. Set to a width (`.iw-menu--collapse-lg`), it switches below that width
+ * whatever happens, and above it only when the bar overflows, as a bar filled
+ * with actions can.
  *
  * Values:
  *   - scrollBg: Transparent navbar takes its background once scrolled (boolean)
@@ -337,7 +347,9 @@ export default class extends Controller {
      * @private
      */
     _setupAutoCollapse() {
-        this._autoCollapse = this.element.classList.contains(AUTO_COLLAPSE_CLASS);
+        const fixed = Object.keys(FIXED_COLLAPSE_WIDTHS).find((name) => this.element.classList.contains('iw-menu--collapse-' + name));
+        this._collapseFrom = fixed ? FIXED_COLLAPSE_WIDTHS[fixed] : AUTO_COLLAPSE_MIN_WIDTH;
+        this._autoCollapse = this.element.classList.contains(AUTO_COLLAPSE_CLASS) || !!fixed;
         if (!this._autoCollapse) return;
 
         this._measureBar();
@@ -360,7 +372,7 @@ export default class extends Controller {
 
         this.element.classList.add('iw-menu--measured');
         this.element.classList.remove('iw-menu--collapsed');
-        if (window.innerWidth < AUTO_COLLAPSE_MIN_WIDTH) return;
+        if (window.innerWidth < this._collapseFrom) return;
 
         this.element.classList.toggle('iw-menu--collapsed', bar.scrollWidth > bar.clientWidth + 1);
     }

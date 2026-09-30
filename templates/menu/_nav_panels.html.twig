@@ -132,6 +132,10 @@
             {# Language switcher, above the social icons. Inline: the panels
                already fill the screen. The padding keeps its current-language
                pill off the divider of the last row, as in the accordion. #}
+            {# Bar actions left out of the bar, under the links. #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                with {config: config|default({}), slot: 'panel'} only %}
+
             <div class="pt-6 pb-2">
                 {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
                     with {

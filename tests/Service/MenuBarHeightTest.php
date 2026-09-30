@@ -56,7 +56,7 @@ final class MenuBarHeightTest extends TestCase
     {
         $css = $this->compile([]);
 
-        self::assertStringContainsString('.iw-menu__bar { height: var(--iw-menu-bar-height); }', $css);
+        self::assertStringContainsString('.iw-menu__bar { height: var(--iw-menu-bar-height); column-gap: var(--iw-menu-bar-gap, 1.5rem); }', $css);
         self::assertStringContainsString('html { scroll-padding-top: var(--iw-menu-bar-height); }', $css);
         self::assertStringContainsString('--iw-menu-bar-height: var(--iw-menu-bar-height-desktop', $css);
         self::assertStringContainsString('var(--iw-menu-panels-offset, var(--iw-menu-bar-height', $css);
@@ -70,7 +70,8 @@ final class MenuBarHeightTest extends TestCase
         foreach (['md' => 768, 'lg' => 1024, 'xl' => 1280] as $name => $width) {
             $below = $width - 0.02;
             self::assertStringContainsString("@media (max-width: {$below}px) { .iw-menu--collapse-{$name} .iw-menu__desktop-only { display: none; } }", $css);
-            self::assertStringContainsString("@media (min-width: {$width}px) { .iw-menu--collapse-{$name} .iw-menu__mobile-only { display: none; } }", $css);
+            // Above the width, a bar that overflows is collapsed all the same.
+            self::assertStringContainsString("@media (min-width: {$width}px) { .iw-menu--collapse-{$name}:not(.iw-menu--collapsed) .iw-menu__mobile-only { display: none; } .iw-menu--collapse-{$name}.iw-menu--collapsed .iw-menu__desktop-only { display: none; } }", $css);
         }
         // Automatic, before the controller measured or without JavaScript: as 1024px.
         self::assertStringContainsString('.iw-menu--collapse-auto:not(.iw-menu--measured) .iw-menu__mobile-only { display: none; }', $css);

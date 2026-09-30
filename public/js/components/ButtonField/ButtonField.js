@@ -35,6 +35,8 @@ function option(schemaOptions: ?Object, name: string, fallback: boolean): boolea
  *
  * Schema options:
  *   - with_icon (default true): offer a pictogram
+ *   - with_style (default true): offer a button style, off for a link drawn
+ *     as an entry of a list rather than as a button
  *   - with_display (default false): offer "pictogram alone"
  *   - with_card: wrap the fields in a card. By default, only outside a block,
  *     which already is a card
@@ -156,6 +158,7 @@ export default class ButtonField extends React.Component<Object, {linkName: stri
                     />
                 </Form.Field>
 
+                {option(schemaOptions, 'with_style', true) && (
                 <Form.Field colSpan={12} label={translate('iw_sulu_tailwind_theme.cta_button_style')}>
                     <ButtonStylePicker
                         dataPath={(dataPath || '') + '/style'}
@@ -167,6 +170,7 @@ export default class ButtonField extends React.Component<Object, {linkName: stri
                         value={value.style}
                     />
                 </Form.Field>
+                )}
 
                 {withIcon && iconFields({
                     value: value.icon,

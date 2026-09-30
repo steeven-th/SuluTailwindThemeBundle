@@ -141,7 +141,7 @@ The chevron colors are set per level in **Menu > Colors**, since each level has 
 
 ## Menu buttons
 
-A button placed in the menu (the mega menu CTA, the CTA of a featured column) keeps the style picked for it, colors, border and radius, but not the size of a page button. At the theme padding, a page button can be taller than the bar itself. The `.iw-menu__button` class sizes it for the menu by redefining, on the button only, the variables the button rules read:
+A button placed in the menu (the bar actions, the mega menu CTA, the CTA of a featured column) keeps the style picked for it, colors, border and radius, but not the size of a page button. At the theme padding, a page button can be taller than the bar itself. The `.iw-menu__button` class sizes it for the menu by redefining, on the button only, the variables the button rules read:
 
 | Variable | Default | Role |
 |----------|---------|------|
@@ -149,13 +149,38 @@ A button placed in the menu (the mega menu CTA, the CTA of a featured column) ke
 | `--iw-menu-button-padding-x` | `1.25rem` | Horizontal padding, fed to `--iw-button-padding-x`. |
 | `--iw-menu-button-font-size` | `0.875rem` | Label size. |
 
-The defaults give a 40px button, which sits in both bar heights. To change them, set the variables on `.iw-menu` in the project stylesheet:
+The defaults give a 40px button, which sits in both bar heights. **Menu > Display > Menu buttons** sets them from the admin, in pixels (vertical padding, horizontal padding, text size). A project can also set the variables on `.iw-menu` in its stylesheet:
 
 ```css
 .iw-menu { --iw-menu-button-padding-y: 0.5rem; --iw-menu-button-font-size: 1rem; }
 ```
 
 Tailwind utilities put on a button (`py-2`, `text-sm`) have no effect: the button rules are not in a cascade layer, so they win over any utility.
+
+## Bar actions
+
+A few direct links kept in sight in the bar, beside the navigation or the burger: a call to action, access by profile, a small "My account" list. Every menu type shows them.
+
+**Turning them on.** Tick **Menu > Display > Show the bar actions**, then fill a snippet of the **Menu actions** template and assign it to the **Menu bar actions** area of the site. Off by default: a site updated without it looks the same.
+
+**Two kinds of action**, in the `actions` block of the snippet:
+
+| Type | Fields |
+|------|--------|
+| `action_link` | One `iw_theme_button` (link, button style, pictogram, pictogram alone), see [Button and pictogram fields](button-field.md). The label is the title attribute of the link, then the title of the linked page. |
+| `action_dropdown` | An entry of the menu that opens a list, drawn like the language switcher in the menu colours rather than as a button: a label, a pictogram, and its links (`iw_theme_button` without a style, each with an optional pictogram). |
+
+**Where each action goes** (`visibility`), since a small screen has no room for five buttons:
+
+| Value | Wide screen | Narrow screen |
+|-------|-------------|---------------|
+| `desktop` (default) | In the bar | In the open menu |
+| `always` | In the bar | In the bar, shrunk to its pictogram when it has one, with its label kept for screen readers |
+| `panel` | In the open menu | In the open menu |
+
+The width between the two is **Menu > Display > Move into the open menu** on the burger (768, 1024 or 1280px, default 1024px). Navbar and mega menu move their actions with their links, at their own collapse width. Their open menu only exists on a narrow screen, so a `panel` action only shows there.
+
+**Rendering.** `menu/_bar_actions.html.twig`, called once for the bar (`slot: 'bar'`) and once for the open menu (`slot: 'panel'`). In the bar the actions come before the language switcher and the social icons. In the open menu they sit under the links, as full-width buttons, and a dropdown becomes a group: its label, then its links. Every button is drawn by `components/_button.html.twig` at the size of the [menu buttons](#menu-buttons). A dropdown of the bar is a disclosure like the language switcher: `aria-expanded` kept up to date, closed by Escape (focus back on the trigger), by a click outside or by leaving it with the keyboard. Nothing is rendered when the actions are off, the snippet is empty or no link can be followed.
 
 ## Type-Specific Settings
 
@@ -347,12 +372,12 @@ The navbar and the mega menu show their links in the bar on wide screens and a b
 
 | Value | Links from |
 |-------|------------|
-| 768px | 768px. Tight with more than four entries or long labels. |
-| 1024px | 1024px. |
-| 1280px | 1280px. |
+| 768px | 768px, and above only as long as the bar holds its content. |
+| 1024px | 1024px, same rule. |
+| 1280px | 1280px, same rule. |
 | Automatic (default) | 768px, as long as they fit on one line. The controller measures the bar on load, once the fonts and the logo are in, and on every resize, and switches to the burger when the links do not fit. |
 
-A fixed width cannot know the content. The labels, the language, the logo and the icons decide what fits: with long labels, the links can still overflow the bar right above the width set. Automatic is the value that never overflows, hence the default. Until the controller has measured, or without JavaScript, it behaves as 1024px, so between 1024px and the width the links need, a visitor may see them for an instant before the burger takes over.
+A fixed width cannot know the content. The labels, the language, the logo, the icons and the bar actions decide what fits. So a fixed width is a floor: below it, the burger always. Above it, the controller measures the bar like in automatic mode and switches to the burger when it overflows, rather than letting it run off the screen. Automatic starts from 768px instead. Until the controller has measured, or without JavaScript, it behaves as 1024px, so between 1024px and the width the links need, a visitor may see them for an instant before the burger takes over.
 
 First-level entries stay on one line (`white-space: nowrap`): an overflow shows as such instead of labels wrapped on three lines and squashed chevrons.
 
@@ -599,6 +624,11 @@ Classes generated by `ThemeCompiler` for the menu, following the strict BEM conv
 | `.iw-menu__item--ancestor` | An entry leading to the page being displayed (a parent link or the button of its branch). Color only. |
 | `.iw-menu__button` | A button inside the menu: menu size, button style kept. See [Menu buttons](#menu-buttons). |
 | `.iw-menu__button--block` | Full-width menu button, used in the mobile panel. |
+| `.iw-menu__actions` | The list of the bar actions. `--panel` in the open menu, a column. Gap: `--iw-menu-actions-gap` (`0.75rem`), `--iw-menu-actions-panel-gap` in the panel. |
+| `.iw-menu__action` | One action. `--link` or `--dropdown`, `--compact` for the pictogram alone of an `always` action on a narrow screen. |
+| `.iw-menu__wide-only`, `.iw-menu__narrow-only` | Burger: shown above, or below, the width set for the actions (`.iw-menu--actions-at-md\|lg\|xl` on the header). |
+| `.iw-menu__action-dropdown`, `.iw-menu__action-trigger`, `.iw-menu__action-dropdown-list`, `.iw-menu__action-dropdown-item` | A dropdown of the bar: wrapper, trigger (menu text, like the language switcher), list, link. |
+| `.iw-menu__action-group-title`, `.iw-menu__action-group-list` | A dropdown opened in the panel: its label and its links. |
 | `.iw-menu__dropdown--level-2` | Level 2 dropdown background. |
 | `.iw-menu__dropdown--level-3` | Level 3 dropdown background. |
 | `.iw-menu__dropdown--level-4` | Level 4 dropdown background. |

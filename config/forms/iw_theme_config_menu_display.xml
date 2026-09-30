@@ -254,5 +254,85 @@
                     <info_text>iw_sulu_tailwind_theme.menu_scrollHide_info</info_text>
                 </meta>
             </property>
+
+            <!-- Bar actions: the links of the iw_theme_menu_actions snippet,
+                 beside the burger or the navigation. Off by default, so an
+                 updated site looks the same. -->
+            <property name="menuConfig_barActionsHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_barActionsHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_displayBarActions" type="checkbox" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_displayBarActions</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_displayBarActions_info</info_text>
+                </meta>
+            </property>
+
+            <!-- Burger only: navbar and mega menu move their actions to the
+                 panel where their links do, at the collapse width. -->
+            <property name="menuConfig_barActionsBreakpoint" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_displayBarActions == true AND menuConfig_type == 'burger'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barActionsBreakpoint</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barActionsBreakpoint_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="lg"/>
+                    <param name="values" type="collection">
+                        <param name="md"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_md</title></meta></param>
+                        <param name="lg"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_lg</title></meta></param>
+                        <param name="xl"><meta><title>iw_sulu_tailwind_theme.menu_collapseAt_xl</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- The size of every button of the menu: the bar actions and the
+                 call to action of the mega menu. They keep their style, only
+                 the padding and the text size are the menu's. -->
+            <property name="menuConfig_buttonsHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_buttonsHeading</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonPaddingY" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonPaddingY</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="10"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="40"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonPaddingX" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonPaddingX</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="20"/>
+                    <param name="min" value="0"/>
+                    <param name="max" value="64"/>
+                </params>
+            </property>
+
+            <property name="menuConfig_buttonFontSize" type="number" colspan="4">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_buttonFontSize</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="14"/>
+                    <param name="min" value="10"/>
+                    <param name="max" value="24"/>
+                </params>
+            </property>
     </properties>
 </form>

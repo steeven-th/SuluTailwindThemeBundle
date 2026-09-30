@@ -240,6 +240,10 @@ class ThemeFormMapper
         'clickParentPageNavbar',
         'megamenuSource',
         'subMenuPanels', 'clickParentPagePanels',
+        // Bar actions, read by menu/_bar_actions.html.twig and ThemeCompiler.
+        'displayBarActions', 'barActionsBreakpoint',
+        // Size of the menu buttons, read by ThemeCompiler.
+        'buttonPaddingY', 'buttonPaddingX', 'buttonFontSize',
     ];
 
     /**

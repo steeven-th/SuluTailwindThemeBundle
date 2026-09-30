@@ -341,6 +341,11 @@
 
             {# RIGHT — Language switcher + Social media + CTA (snippet) + Burger (mobile) #}
             <div class="flex items-center gap-3">
+                {# Bar actions — in the bar with the links, in the panel with them
+                   once the menu collapses. #}
+                {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                    with {config: config, slot: 'bar', wideClass: 'iw-menu__desktop-only', narrowClass: 'iw-menu__mobile-only'} only %}
+
                 {# Language switcher — desktop, anchored right (end of the bar) #}
                 <div class="iw-menu__desktop-only">
                     {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
@@ -512,6 +517,10 @@
                 {% include '@ItechWorldSuluTailwindTheme/menu/_nav_accordion.html.twig'
                     with {navItems: navItems, clickMode: parentLinkable ? 'selflink' : 'none'} only %}
             {% endif %}
+
+            {# Bar actions left out of the bar, under the links #}
+            {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
+                with {config: config, slot: 'panel', narrowClass: ''} only %}
 
             {# Language switcher — mobile overlay, inline #}
             {% include '@ItechWorldSuluTailwindTheme/menu/_language_switcher.html.twig'
