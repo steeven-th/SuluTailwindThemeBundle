@@ -358,6 +358,17 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 
 On a multi-site project each site can pin its own providers — see [Per-site settings](#per-site-settings-multi-site-projects).
 
+### Declaring the button styles your CSS depends on (optional)
+
+Project CSS that decorates a button style targets its slug (`.iw-button--profile-employer`), which editors can rename in the admin. List those slugs and a theme lacking one is reported by `iw-sulu:theme:compile`, the log and `iw:tailwind-theme:check`, instead of the rule silently matching nothing:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    required_button_styles: [profile-employer, profile-employee]
+```
+
+See [Project-specific ornaments](doc/css-api/buttons.md#project-specific-ornaments).
+
 ### Code block: allowing unsandboxed execution (optional, off by default)
 
 The code block lets editors paste a third-party widget. By default that markup always runs inside a sandboxed iframe: it can execute its own scripts, but cannot reach the page's DOM, cookies, or your admin session.

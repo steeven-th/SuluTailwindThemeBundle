@@ -40,6 +40,8 @@ final class ButtonBoxTest extends TestCase
             '.iw-button--outlined',
             '.iw-button--thick',
             '.iw-button--bare-number',
+            '.iw-button--underlined',
+            '.iw-button--sided',
             '.iw-button--variant',
             '.iw-variant--dark .iw-button--variant',
             '.iw-variant--dark .iw-form__file::file-selector-button',
@@ -80,6 +82,29 @@ final class ButtonBoxTest extends TestCase
         self::assertStringContainsString('max(0px, calc(var(--iw-button-padding-y, 0.75rem) - 4px))', $rule);
     }
 
+    #[Test]
+    public function aBorderOnOneSideIsDrawnThereAlone(): void
+    {
+        $rule = self::rule($this->compile(self::buttons()), '.iw-button--underlined');
+
+        self::assertStringContainsString('border-width: 0 0 4px 0;', $rule);
+        self::assertStringContainsString('border-color: #666666;', $rule);
+        // A `border: none` next to the longhands would wipe the drawn side
+        // out, depending on the order.
+        self::assertStringNotContainsString('border: ', $rule);
+    }
+
+    #[Test]
+    public function hoveringABorderOnOneSideOnlyRecoloursIt(): void
+    {
+        $css = $this->compile([
+            ['slug' => 'underlined', 'label' => 'Underlined', 'border' => '#666666', 'hoverBorder' => '#111111', 'borderWidth' => '4px', 'borderSides' => 'bottom'],
+        ]);
+
+        self::assertMatchesRegularExpression('/\\.iw-button--underlined:hover \\{[^}]*border-color: #111111;/', $css);
+        self::assertDoesNotMatchRegularExpression('/\\.iw-button--underlined:hover \\{[^}]*border(-width)?: /', $css);
+    }
+
     /**
      * Styles covering every stored shape of a border.
      *
@@ -93,6 +118,8 @@ final class ButtonBoxTest extends TestCase
             ['slug' => 'outlined', 'label' => 'Outlined', 'bg' => 'transparent', 'border' => '#333333', 'borderWidth' => '2px'],
             ['slug' => 'thick', 'label' => 'Thick', 'border' => '#444444', 'borderWidth' => '4px', 'borderStyle' => 'dashed'],
             ['slug' => 'bare-number', 'label' => 'Bare number', 'border' => '#555555', 'borderWidth' => '3'],
+            ['slug' => 'underlined', 'label' => 'Underlined', 'bg' => '#ffffff', 'border' => '#666666', 'borderWidth' => '4px', 'borderSides' => 'bottom'],
+            ['slug' => 'sided', 'label' => 'Sided', 'border' => '#777777', 'borderWidth' => '2px', 'borderSides' => 'x'],
         ];
     }
 
@@ -107,7 +134,7 @@ final class ButtonBoxTest extends TestCase
         $theme = $ref->newInstanceWithoutConstructor();
         $tokens = [
             'buttons' => $buttons,
-            'blockVariants' => [['slug' => 'dark', 'label' => 'Dark', 'buttonStyle' => 'outlined']],
+            'blockVariants' => [['slug' => 'dark', 'label' => 'Dark', 'buttonStyle' => 'underlined']],
         ];
         foreach (['tokens' => $tokens, 'menuConfig' => [], 'blockStyles' => [], 'label' => 'Test'] as $property => $value) {
             if ($ref->hasProperty($property)) {

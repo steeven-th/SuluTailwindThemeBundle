@@ -247,6 +247,14 @@ audience is you and not a content editor:
 Contributing the same variable twice keeps the last value, exactly as the
 cascade would.
 
+### Decorating a button style
+
+A rule keyed on a button style (`.iw-button--<slug>`) depends on a slug typed in
+the admin. Declare the slugs in `required_button_styles` so a renamed or deleted
+style is reported instead of silently detaching the rule. The complete example,
+with the per-style `--iw-button-accent` hook, is in
+[Project-specific ornaments](css-api/buttons.md#project-specific-ornaments).
+
 ## Cache busting
 
 Compiled filenames carry a hash (`theme-12-9bd4ff32.css`) built from the theme's

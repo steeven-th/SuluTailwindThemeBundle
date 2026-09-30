@@ -19,9 +19,38 @@
 
 type Button = {
     border?: ?string,
+    borderSides?: ?string,
     borderStyle?: ?string,
     borderWidth?: ?(string | number),
 };
+
+/**
+ * The sides drawn per `borderSides` value, in CSS order: top right bottom left.
+ * Mirrors ThemeCompiler::BUTTON_BORDER_SIDES.
+ */
+const SIDES = {
+    all: [true, true, true, true],
+    top: [true, false, false, false],
+    right: [false, true, false, false],
+    bottom: [false, false, true, false],
+    left: [false, false, false, true],
+    x: [false, true, false, true],
+    y: [true, false, true, false],
+};
+
+/**
+ * The stored width as a CSS length, `1px` when missing.
+ */
+function widthOf(button: Button): string {
+    const raw = button.borderWidth;
+    if (undefined === raw || null === raw || '' === raw) {
+        return '1px';
+    }
+
+    const width = String(raw);
+
+    return /^\d+(\.\d+)?$/.test(width) ? width + 'px' : width;
+}
 
 /**
  * @param button A button of the theme, with its refs already resolved.
@@ -39,14 +68,33 @@ export default function buttonBorder(button: ?Button): ?string {
         return null;
     }
 
-    const raw = button.borderWidth;
-    let width = '1px';
-    if (undefined !== raw && null !== raw && '' !== raw) {
-        width = String(raw);
-        if (/^\d+(\.\d+)?$/.test(width)) {
-            width += 'px';
-        }
+    return widthOf(button) + ' ' + (button.borderStyle || 'solid') + ' ' + color;
+}
+
+/**
+ * The border of a theme button as longhand style properties, sides included.
+ *
+ * A button can draw its border on some sides only (a bottom rule), which the
+ * shorthand above cannot express. Longhands also keep React from warning
+ * about a shorthand and a longhand set on the same element.
+ *
+ * @param button   A button of the theme, with its refs already resolved.
+ * @param fallback The border to draw when the button has none, so a preview
+ *                 can keep the same size either way.
+ *
+ * @return Style properties to spread into a `style` object.
+ */
+export function buttonBorderStyle(button: ?Button, fallback: ?string = null): {[string]: string} {
+    if (!buttonBorder(button) || !button) {
+        return fallback ? {border: fallback} : {};
     }
 
-    return width + ' ' + (button.borderStyle || 'solid') + ' ' + color;
+    const width = widthOf(button);
+    const sides = SIDES[button.borderSides || 'all'] || SIDES.all;
+
+    return {
+        borderColor: String(button.border),
+        borderStyle: button.borderStyle || 'solid',
+        borderWidth: sides.map((drawn) => (drawn ? width : '0')).join(' '),
+    };
 }

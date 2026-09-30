@@ -106,6 +106,14 @@ services:
             # Lets a project contribute CSS variables and rules to the compiled
             # theme, via ThemeCompileEvent.
             $eventDispatcher: '@event_dispatcher'
+            $requiredButtonStyles: '@itech_world.sulu_tailwind_theme.required_button_styles'
+            $logger: '@?logger'
+
+    # The button styles the project CSS depends on (required_button_styles).
+    itech_world.sulu_tailwind_theme.required_button_styles:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles
+        arguments:
+            - '%itech_world_sulu_tailwind_theme.required_button_styles%'
 
     itech_world.sulu_tailwind_theme.provider:
         class: ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider
@@ -407,6 +415,7 @@ services:
         arguments:
             - '@itech_world.sulu_tailwind_theme.repository'
             - '@itech_world.sulu_tailwind_theme.compiler'
+            - '@itech_world.sulu_tailwind_theme.required_button_styles'
         tags:
             - { name: 'console.command' }
 
@@ -464,6 +473,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.appearance_override_audit'
             - '@itech_world.sulu_tailwind_theme.button_field_audit'
             - '@itech_world.sulu_tailwind_theme.button_style_audit'
+            - '@itech_world.sulu_tailwind_theme.required_button_styles'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
         tags:

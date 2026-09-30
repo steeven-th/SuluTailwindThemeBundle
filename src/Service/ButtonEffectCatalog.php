@@ -69,6 +69,13 @@ class ButtonEffectCatalog
     ];
 
     /**
+     * Shadow presets a button may carry at rest.
+     *
+     * @var list<string>
+     */
+    public const REST_SHADOWS = ['sm', 'md', 'lg'];
+
+    /**
      * Animated shadow presets (rendered as @keyframes instead of static box-shadow).
      *
      * Maps the admin key to the @keyframes name emitted globally by the
@@ -169,6 +176,21 @@ class ButtonEffectCatalog
     public static function resolveShadow(string $key): string
     {
         return self::SHADOWS[$key] ?? self::SHADOWS[self::DEFAULT_SHADOW];
+    }
+
+    /**
+     * Resolve a resting shadow key (the `shadow` setting of a button).
+     *
+     * Same values as the hover presets, restricted to the plain elevations: a
+     * glow or an inset shadow at rest reads as a state, not as a style.
+     *
+     * @param string $key The key configured in the admin (none, sm, md, lg)
+     *
+     * @return string|null The box-shadow value, or null when there is none
+     */
+    public static function resolveRestShadow(string $key): ?string
+    {
+        return \in_array($key, self::REST_SHADOWS, true) ? self::SHADOWS[$key] : null;
     }
 
     /**

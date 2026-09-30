@@ -11,6 +11,7 @@ use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Event\ThemeCompileEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -125,6 +126,8 @@ class ThemeCompiler
         private readonly GoogleFontsResolver $googleFontsResolver,
         private readonly OklchPaletteGenerator $paletteGenerator,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly ?RequiredButtonStyles $requiredButtonStyles = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -170,6 +173,17 @@ class ThemeCompiler
         $filePath = $this->buildFilePath($theme);
 
         file_put_contents($filePath, $css);
+
+        // Saving the theme in the admin compiles it, and that save is where a
+        // style the project depends on gets renamed. Logged, never thrown: the
+        // theme stays usable, only the project ornaments are lost.
+        $missing = $this->requiredButtonStyles?->missingIn($theme) ?? [];
+        if ([] !== $missing) {
+            $this->logger?->warning('Theme "{theme}" defines no button style for {slugs}, which the project CSS depends on (required_button_styles).', [
+                'theme' => $theme->getName(),
+                'slugs' => implode(', ', $missing),
+            ]);
+        }
 
         return $filePath;
     }
@@ -2413,6 +2427,7 @@ class ThemeCompiler
         }
         $css .= $border['css'];
         $css .= '  padding: ' . self::buttonPadding($border['widths'], $paddingX, $paddingY) . ";\n";
+        $css .= $this->generateButtonStyleExtras($props);
         $css .= "  cursor: pointer;\n";
         $css .= "  display: inline-block;\n";
         $css .= "  text-decoration: none;\n";
@@ -2436,11 +2451,83 @@ class ThemeCompiler
     }
 
     /**
+     * Label weights a button style may set, stored value => CSS value.
+     */
+    private const BUTTON_FONT_WEIGHTS = ['normal' => '400', 'medium' => '500', 'semibold' => '600', 'bold' => '700'];
+
+    /**
+     * Label cases a button style may set.
+     */
+    private const BUTTON_TEXT_TRANSFORMS = ['none', 'uppercase'];
+
+    /**
+     * The optional settings of a button style: accent, resting shadow, label
+     * weight and case.
+     *
+     * Each is written only when set, so a style that never opens them compiles
+     * as before and keeps inheriting its weight and case from the context.
+     *
+     * The accent is a hook for projects rather than something the bundle
+     * paints: set on the class, `var(--iw-button-accent)` in one project rule
+     * takes the right colour on every style that defines one.
+     *
+     * @param array<string, mixed> $props The button definition
+     *
+     * @return string CSS declarations
+     */
+    private function generateButtonStyleExtras(array $props): string
+    {
+        $css = '';
+
+        $accent = isset($props['accent']) ? (string) $props['accent'] : '';
+        if ('' !== $accent && 'none' !== $accent) {
+            $css .= "  --iw-button-accent: {$this->resolveColorValue($accent)};\n";
+        }
+
+        $shadow = ButtonEffectCatalog::resolveRestShadow((string) ($props['shadow'] ?? ''));
+        if (null !== $shadow) {
+            $css .= "  box-shadow: {$shadow};\n";
+        }
+
+        $weight = self::BUTTON_FONT_WEIGHTS[(string) ($props['fontWeight'] ?? '')] ?? null;
+        if (null !== $weight) {
+            $css .= "  font-weight: {$weight};\n";
+        }
+
+        $transform = (string) ($props['textTransform'] ?? '');
+        if (\in_array($transform, self::BUTTON_TEXT_TRANSFORMS, true)) {
+            $css .= "  text-transform: {$transform};\n";
+        }
+
+        return $css;
+    }
+
+    /**
+     * The sides a button border can be drawn on, per `borderSides` value.
+     *
+     * A bottom rule is the common case (tabs, underlined links, profile
+     * entries), the others come for free with it.
+     */
+    private const BUTTON_BORDER_SIDES = [
+        'all' => ['top', 'right', 'bottom', 'left'],
+        'top' => ['top'],
+        'right' => ['right'],
+        'bottom' => ['bottom'],
+        'left' => ['left'],
+        'x' => ['right', 'left'],
+        'y' => ['top', 'bottom'],
+    ];
+
+    /**
      * The border of a button, and how wide it is on each side.
      *
      * The widths are returned apart from the declaration because the padding
      * gives them back (see buttonPadding): a border drawn inside the padding
      * keeps every style the same size, outlined or not.
+     *
+     * A border on some sides only is written as longhands with a zero width
+     * elsewhere, never as `border: none` plus one side: the hover rule only
+     * changes `border-color`, which then recolours the drawn sides alone.
      *
      * @param array<string, mixed> $props The button definition
      *
@@ -2457,10 +2544,26 @@ class ThemeCompiler
 
         $width = self::buttonBorderWidth($props['borderWidth'] ?? null);
         $style = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
+        $color = $this->resolveColorValue($color);
+        $sides = self::BUTTON_BORDER_SIDES[(string) ($props['borderSides'] ?? 'all')] ?? self::BUTTON_BORDER_SIDES['all'];
+
+        if (4 === \count($sides)) {
+            return [
+                'css' => "  border: {$width} {$style} {$color};\n",
+                'widths' => ['top' => $width, 'right' => $width, 'bottom' => $width, 'left' => $width],
+            ];
+        }
+
+        $widths = $none;
+        foreach ($sides as $side) {
+            $widths[$side] = $width;
+        }
 
         return [
-            'css' => "  border: {$width} {$style} {$this->resolveColorValue($color)};\n",
-            'widths' => ['top' => $width, 'right' => $width, 'bottom' => $width, 'left' => $width],
+            'css' => "  border-style: {$style};\n"
+                . "  border-color: {$color};\n"
+                . '  border-width: ' . implode(' ', $widths) . ";\n",
+            'widths' => $widths,
         ];
     }
 
@@ -2682,6 +2785,7 @@ class ThemeCompiler
         'hoverBg' => 'hover-bg',
         'hoverText' => 'hover-text',
         'hoverBorder' => 'hover-border',
+        'accent' => 'accent',
     ];
 
     /**
@@ -2730,6 +2834,11 @@ class ThemeCompiler
 
                 $suffix = self::BUTTON_PROP_VAR_SUFFIX[$prop] ?? null;
                 if (null === $suffix) {
+                    continue;
+                }
+                // The accent is optional: a cleared field publishes nothing,
+                // so a project rule can fall back with var(..., fallback).
+                if ('accent' === $prop && \in_array($value, [null, '', 'none'], true)) {
                     continue;
                 }
 
