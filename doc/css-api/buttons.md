@@ -47,7 +47,9 @@ Ready-to-use button classes with hover transitions. They follow the strict BEM c
 | `.iw-button` | Base button (rarely used alone — apply a style) |
 | `.iw-button--<slug>` | One class per button defined in the admin (e.g. `.iw-button--primary`, `.iw-button--cta`, `.iw-button--employeur`) |
 
-Each button rule includes `background-color`, `color`, `border`, `border-radius`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
+Each button rule includes `background-color`, `color`, `border`, `border-radius`, `padding`, `cursor: pointer`, `display: inline-block`, `text-decoration: none` and a `transition`. Hover states are also generated.
+
+**Same box for every style.** The border is drawn inside the padding: each side of the padding is `var(--iw-button-padding-*)` minus the border width on that side (never below zero). A filled button and an outlined one side by side are therefore the same size, and their labels sit at the same place. Keep this in mind when restyling a button in CSS: changing its `border-width` without its `padding` brings the size difference back.
 
 **Usage in Twig:**
 ```twig
