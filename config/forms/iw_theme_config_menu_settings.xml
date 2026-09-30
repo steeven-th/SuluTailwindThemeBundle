@@ -12,6 +12,11 @@
     <key>iw_theme_config_menu_settings</key>
 
     <properties>
+            <!-- Groups open on a heading, which takes the full width and closes the
+                 row: a group left half filled, or hidden with its type of menu,
+                 never shifts the next one. Inside a group a field that does not
+                 apply is disabled rather than hidden, so the pairs hold still. -->
+
             <property name="menuConfig_type" type="single_select" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_type</title>
@@ -46,6 +51,15 @@
                         <param name="snippet">
                             <meta><title>iw_sulu_tailwind_theme.mega_source_snippet</title></meta>
                         </param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_barLinksHeading" type="heading"
+                      visibleCondition="menuConfig_type == 'navbar' OR menuConfig_type == 'megamenu'">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_barLinks</title></meta>
                     </param>
                 </params>
             </property>
@@ -99,6 +113,24 @@
                 </params>
             </property>
 
+            <property name="menuConfig_clickParentPageNavbar" type="checkbox" colspan="6"
+                      disabledCondition="menuConfig_type == 'megamenu' AND menuConfig_megamenuSource == 'snippet'"
+                      visibleCondition="menuConfig_type == 'navbar' OR menuConfig_type == 'megamenu'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_clickParentPageNavbar</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_clickParentPageNavbar_info</info_text>
+                </meta>
+            </property>
+
+            <property name="menuConfig_panelHeading" type="heading"
+                      visibleCondition="menuConfig_type == 'burger'">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_panel</title></meta>
+                    </param>
+                </params>
+            </property>
+
             <!-- The burger opens its panel over the whole screen, or on a
                  side at a set width with the page dimmed behind it. The
                  former sidebar menu type is the side panel. -->
@@ -140,6 +172,24 @@
                 </params>
             </property>
 
+            <!-- The side panel, or the links zone beside the picture of a
+                 full-screen panel. Empty, the default of each: 288px on a
+                 side, 480px beside a picture. On a side the bar stays visible
+                 above the open panel, with the social icons and the language
+                 switcher: a panel narrower than that row leaves them hanging
+                 over the page. -->
+            <property name="menuConfig_panelWidth" type="number" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelWidth</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelWidth_info</info_text>
+                </meta>
+                <params>
+                    <param name="min" value="200"/>
+                    <param name="max" value="960"/>
+                </params>
+            </property>
+
             <property name="menuConfig_panelL1Size" type="single_select" colspan="6"
                       visibleCondition="menuConfig_type == 'burger'">
                 <meta>
@@ -162,7 +212,8 @@
             <!-- Where the links sit in a full-screen panel. Automatic: against
                  the picture, centered without one. -->
             <property name="menuConfig_panelContentPosition" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
+                      visibleCondition="menuConfig_type == 'burger'"
+                      disabledCondition="menuConfig_panelLayout == 'side'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_panelContentPosition</title>
                     <info_text>iw_sulu_tailwind_theme.menu_panelContentPosition_info</info_text>
@@ -186,36 +237,9 @@
                 </params>
             </property>
 
-            <!-- The side panel, or the links zone beside the picture of a
-                 full-screen panel. Empty, the default of each: 288px on a
-                 side, 480px beside a picture. On a side the bar stays visible
-                 above the open panel, with the social icons and the language
-                 switcher: a panel narrower than that row leaves them hanging
-                 over the page. -->
-            <property name="menuConfig_panelWidth" type="number" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_panelWidth</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_panelWidth_info</info_text>
-                </meta>
-                <params>
-                    <param name="min" value="200"/>
-                    <param name="max" value="960"/>
-                </params>
-            </property>
-
-            <!-- Full width: the only tall field of a section made of selects
-                 and toggles, so it would break whichever row it landed on. -->
-            <property name="menuConfig_panelImage" type="single_media_selection" colspan="12"
-                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_panelImage</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_panelImage_info</info_text>
-                </meta>
-            </property>
-
             <property name="menuConfig_panelImageFrom" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_panelLayout != 'side'">
+                      visibleCondition="menuConfig_type == 'burger'"
+                      disabledCondition="menuConfig_panelLayout == 'side'">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_panelImageFrom</title>
                     <info_text>iw_sulu_tailwind_theme.menu_panelImageFrom_info</info_text>
@@ -232,6 +256,26 @@
                         <param name="xl">
                             <meta><title>iw_sulu_tailwind_theme.menu_panelImageFrom_xl</title></meta>
                         </param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- Full width: the only tall field of a section made of selects
+                 and toggles, so it would break whichever row it landed on. -->
+            <property name="menuConfig_panelImage" type="single_media_selection" colspan="12"
+                      visibleCondition="menuConfig_type == 'burger'"
+                      disabledCondition="menuConfig_panelLayout == 'side'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelImage</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelImage_info</info_text>
+                </meta>
+            </property>
+
+            <property name="menuConfig_animationHeading" type="heading"
+                      visibleCondition="menuConfig_type != 'megamenu'">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_animation</title></meta>
                     </param>
                 </params>
             </property>
@@ -257,8 +301,8 @@
             </property>
 
             <property name="menuConfig_slideDirection" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type != 'megamenu' AND (menuConfig_type != 'burger' OR menuConfig_panelLayout != 'side')"
-                      disabledCondition="menuConfig_animation != 'slide'">
+                      visibleCondition="menuConfig_type != 'megamenu'"
+                      disabledCondition="menuConfig_animation != 'slide' OR (menuConfig_type == 'burger' AND menuConfig_panelLayout == 'side')">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_slideDirection</title>
                 </meta>
@@ -280,6 +324,52 @@
                     </param>
                 </params>
             </property>
+
+            <property name="menuConfig_submenusHeading" type="heading">
+                <params>
+                    <param name="label">
+                        <meta><title>iw_sulu_tailwind_theme.menu_heading_submenus</title></meta>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_childLevels" type="single_select" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_childLevels</title>
+                </meta>
+                <params>
+                    <param name="values" type="collection">
+                        <param name="1">
+                            <meta><title>1</title></meta>
+                        </param>
+                        <param name="2">
+                            <meta><title>2</title></meta>
+                        </param>
+                        <param name="3">
+                            <meta><title>3</title></meta>
+                        </param>
+                        <param name="4">
+                            <meta><title>4</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- Drill-down: sub-menus open as stacked sliding panels instead of
+                 inline accordions (burger menu). -->
+            <property name="menuConfig_subMenuPanels" type="checkbox" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_subMenuPanels</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_subMenuPanels_info</info_text>
+                </meta>
+                <params>
+                    <param name="type" value="toggler"/>
+                </params>
+            </property>
+
+            <!-- Two alternatives in one place: the list of the panel or its drill-down
+                 panels. Only one shows, so switching moves nothing. -->
 
             <property name="menuConfig_clickParentPage" type="single_select" colspan="6"
                       visibleCondition="menuConfig_type == 'burger' AND menuConfig_subMenuPanels != true">
@@ -315,49 +405,5 @@
                     <param name="type" value="toggler"/>
                 </params>
             </property>
-
-            <!-- Drill-down: sub-menus open as stacked sliding panels instead of
-                 inline accordions (burger menu). -->
-            <property name="menuConfig_subMenuPanels" type="checkbox" colspan="6"
-                      visibleCondition="menuConfig_type == 'burger'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_subMenuPanels</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_subMenuPanels_info</info_text>
-                </meta>
-                <params>
-                    <param name="type" value="toggler"/>
-                </params>
-            </property>
-
-            <property name="menuConfig_clickParentPageNavbar" type="checkbox" colspan="6"
-                      visibleCondition="menuConfig_type == 'navbar' OR (menuConfig_type == 'megamenu' AND menuConfig_megamenuSource != 'snippet')">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_clickParentPageNavbar</title>
-                    <info_text>iw_sulu_tailwind_theme.menu_clickParentPageNavbar_info</info_text>
-                </meta>
-            </property>
-
-            <property name="menuConfig_childLevels" type="single_select" colspan="6">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_childLevels</title>
-                </meta>
-                <params>
-                    <param name="values" type="collection">
-                        <param name="1">
-                            <meta><title>1</title></meta>
-                        </param>
-                        <param name="2">
-                            <meta><title>2</title></meta>
-                        </param>
-                        <param name="3">
-                            <meta><title>3</title></meta>
-                        </param>
-                        <param name="4">
-                            <meta><title>4</title></meta>
-                        </param>
-                    </param>
-                </params>
-            </property>
-
     </properties>
 </form>

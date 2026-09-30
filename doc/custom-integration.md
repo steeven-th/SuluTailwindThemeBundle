@@ -528,6 +528,15 @@ the test: the palette and variant editors, the font picker and the article
 style picker. The weight picker and the colour token editor look like they
 belong there but do not, both rendering a single line.
 
+In the theme configuration forms, a condition is also a layout decision. A
+field hidden by a `visibleCondition` pulls every field after it one slot back,
+so a form reshuffles its pairs each time an option changes. The menu forms
+follow three rules: a heading opens each group, so a group can only ever leave
+its own last row half full. A whole group that does not apply to the menu type
+is hidden, heading included. Inside a group, a field that does not apply is
+disabled (`disabledCondition`) rather than hidden, and two alternatives that
+never show together take the same slot.
+
 `BlockSectionsContractTest` enforces all of this on every block the bundle
 ships, both what Appearance may hold and what Content may hold.
 
