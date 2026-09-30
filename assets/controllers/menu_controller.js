@@ -120,12 +120,22 @@ export default class extends Controller {
         this._onFocusout = this._handleFocusout.bind(this);
         this._onScroll = this._handleScroll.bind(this);
         this._onResize = this._handleResize.bind(this);
+        this._onRestore = () => {
+            this._syncScrolled();
+            this._lastScrollY = window.scrollY;
+        };
 
         document.addEventListener('click', this._onDocumentClick);
         document.addEventListener('keydown', this._onKeydown);
         this.element.addEventListener('focusout', this._onFocusout);
         window.addEventListener('scroll', this._onScroll, { passive: true });
         window.addEventListener('resize', this._onResize, { passive: true });
+        // A reload in the middle of the page: the browser puts the scroll
+        // position back around the load, without a scroll event this
+        // controller is sure to hear, and the bar stayed transparent.
+        window.addEventListener('load', this._onRestore);
+        window.addEventListener('pageshow', this._onRestore);
+        this._onRestore();
 
         this._setupHover();
         this._setupAutoCollapse();
@@ -137,6 +147,8 @@ export default class extends Controller {
         this.element.removeEventListener('focusout', this._onFocusout);
         window.removeEventListener('scroll', this._onScroll);
         window.removeEventListener('resize', this._onResize);
+        window.removeEventListener('load', this._onRestore);
+        window.removeEventListener('pageshow', this._onRestore);
         this._cleanupHover();
 
         // A page swap (Turbo) must not leave the document inert or locked.
@@ -378,6 +390,19 @@ export default class extends Controller {
     }
 
     /**
+     * Give a transparent bar its background once the page is scrolled past
+     * the threshold, from wherever the page is: on a scroll, and on load when
+     * the browser brings a reloaded page back to where it was.
+     *
+     * @private
+     */
+    _syncScrolled() {
+        if (this.scrollBgValue) {
+            this.element.classList.toggle('iw-menu--scrolled', window.scrollY > SCROLL_BG_THRESHOLD);
+        }
+    }
+
+    /**
      * Handle scroll: optional background-on-scroll for a transparent navbar,
      * and optional smart hide/reveal by scroll direction.
      *
@@ -386,9 +411,7 @@ export default class extends Controller {
     _handleScroll() {
         const y = window.scrollY;
 
-        if (this.scrollBgValue) {
-            this.element.classList.toggle('iw-menu--scrolled', y > SCROLL_BG_THRESHOLD);
-        }
+        this._syncScrolled();
 
         // The navbar never hides near the top of the page nor while a panel is
         // open. Keeping it revealed then also avoids re-introducing a transform

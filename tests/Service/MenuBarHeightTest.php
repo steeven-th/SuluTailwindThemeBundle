@@ -41,6 +41,63 @@ final class MenuBarHeightTest extends TestCase
     /**
      * @param array<string, mixed> $menuConfig
      */
+    /**
+     * A translucent bar sits over a hero like a transparent one: kept in the
+     * flow, its see-through background showed the white of the page instead.
+     */
+    #[Test]
+    public function aTranslucentBarSitsOverTheHero(): void
+    {
+        $rule = ':root:has(main [data-iw-menu-overlay]) .iw-menu { margin-bottom: calc(-1 * var(--iw-menu-overlap)); }';
+
+        self::assertStringContainsString($rule, $this->compile(['bgOpacity' => 80]));
+        self::assertStringContainsString(':root:has(main [data-iw-menu-overlay]) { --iw-menu-overlap: var(--iw-menu-bar-height); }', $this->compile(['bgOpacity' => 0]));
+        // Opaque, or saved before the setting existed: the bar keeps its room.
+        self::assertStringNotContainsString($rule, $this->compile(['bgOpacity' => 100]));
+        self::assertStringNotContainsString($rule, $this->compile([]));
+    }
+
+    /**
+     * A list hanging from a bar that paints nothing floats: round top corners
+     * over a hero, and on a bar with no background at all.
+     */
+    #[Test]
+    public function aListHangingFromNothingTakesItsTopCornersRound(): void
+    {
+        $round = '{ --iw-menu-dropdown-top-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }';
+
+        self::assertStringContainsString('.iw-menu--transparent:not(.iw-menu--scrolled) ' . $round, $this->compile([]));
+        self::assertStringContainsString("\n.iw-menu " . $round, $this->compile(['bgOpacity' => 0]));
+        self::assertStringNotContainsString("\n.iw-menu " . $round, $this->compile(['bgOpacity' => 40]));
+    }
+
+    /**
+     * A list hanging from a button of the bar fits its content, never
+     * narrower than its button: a fixed minimum left two language codes in a
+     * box twice as wide as the button.
+     */
+    #[Test]
+    public function aBarListIsAsWideAsItsContent(): void
+    {
+        self::assertStringContainsString('.iw-menu__lang-panel, .iw-menu__action-dropdown-list { width: max-content; min-width: 100%; max-width: calc(100vw - 2rem); }', $this->compile([]));
+        self::assertStringNotContainsString('min-w-[8rem]', (string) file_get_contents(\dirname(__DIR__, 2) . '/templates/menu/_language_switcher.html.twig'));
+    }
+
+    /**
+     * Reloaded in the middle of a page, the bar has to know it is scrolled:
+     * the browser restores the position around the load, with no scroll
+     * event the controller is sure to hear.
+     */
+    #[Test]
+    public function theScrolledStateIsReadOnLoad(): void
+    {
+        $controller = (string) file_get_contents(\dirname(__DIR__, 2) . '/assets/controllers/menu_controller.js');
+
+        self::assertStringContainsString("window.addEventListener('load', this._onRestore);", $controller);
+        self::assertStringContainsString("window.addEventListener('pageshow', this._onRestore);", $controller);
+        self::assertStringContainsString('this._onRestore();', $controller);
+    }
+
     #[Test]
     #[DataProvider('configurations')]
     public function theBarHoldsTheLogo(array $menuConfig, int $desktop, int $mobile): void

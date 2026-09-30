@@ -89,7 +89,7 @@
                 </button>
                 <ul
                     id="{{ langPanelId }}"
-                    class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__lang-panel iw-menu__bar-dropdown iw-menu__dropdown--scroll hidden absolute min-w-[8rem] shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
+                    class="iw-menu__list iw-menu__dropdown--level-2 iw-menu__lang-panel iw-menu__bar-dropdown iw-menu__dropdown--scroll hidden absolute shadow-lg py-1 z-50 {{ switcherAlign == 'right' ? 'right-0' : 'left-0' }}"
                 >
                     {% for entry in entries %}
                         {% set isCurrent = entry.locale == currentEntry.locale|default(currentLocale) %}

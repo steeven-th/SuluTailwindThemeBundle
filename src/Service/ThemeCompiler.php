@@ -299,7 +299,7 @@ class ThemeCompiler
         $css .= $this->generateButtonClasses($buttonList);
 
         // Menu utility classes (navbar, dropdowns, overlay, social icons)
-        $css .= $this->generateMenuClasses();
+        $css .= $this->generateMenuClasses($menuConfig);
 
         // Footer component classes (typography/spacing for the footer partials).
         // Emitted as plain (unlayered) CSS so footer sizing wins over the theme's
@@ -2699,6 +2699,12 @@ class ThemeCompiler
      */
     private const MENU_OVER_HERO = self::MENU_OVER_HERO_PAGE . ':not(.iw-scroll-locked) .iw-menu--transparent:not(.iw-menu--scrolled)';
 
+    /**
+     * The page starts with a hero that may sit under the bar, whatever the
+     * transparent mode: read when the theme makes the bar translucent.
+     */
+    private const MENU_TRANSLUCENT_OVER_HERO_PAGE = ':root:has(main [data-iw-menu-overlay])';
+
     private const MENU_COLOR_VAR_SUFFIX = [
         'bg' => 'bg',
         'text' => 'text',
@@ -3068,9 +3074,12 @@ class ThemeCompiler
      * The mega menu lives under the `iw-mega-menu` sub-namespace so the
      * megamenu classes are not confused with the regular menu primitives.
      *
+     * @param array<string, mixed> $menuConfig Menu configuration values, for
+     *                                         the rules that depend on a setting
+     *
      * @return string CSS class declarations
      */
-    private function generateMenuClasses(): string
+    private function generateMenuClasses(array $menuConfig = []): string
     {
         $css = "/* Menu component */\n";
 
@@ -3133,6 +3142,24 @@ class ThemeCompiler
         $css .= "  --iw-menu-text: var(--iw-menu-transparent-text);\n";
         $css .= "  --iw-menu-social-media: var(--iw-menu-transparent-social);\n";
         $css .= "  --iw-menu-burger-open: var(--iw-menu-transparent-burger); }\n";
+        // A list hanging from a bar that paints nothing hangs from nothing: it
+        // takes its top corners round, whatever the setting, which comes back
+        // with the background of the bar once scrolled.
+        $css .= "{$overHero} { --iw-menu-dropdown-top-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        // A translucent bar (background opacity under 100%) sits over the hero
+        // the same way: seen through, the white of the page under a bar that
+        // kept its room looked like a bug. It keeps its background, its chrome
+        // and its regular colors: only the transparent mode drops them.
+        if ($this->normalizeMenuOpacity($menuConfig['bgOpacity'] ?? null) < 100) {
+            $translucentPage = self::MENU_TRANSLUCENT_OVER_HERO_PAGE;
+            $css .= "{$translucentPage} { --iw-menu-overlap: var(--iw-menu-bar-height); }\n";
+            $css .= "{$translucentPage} .iw-menu { margin-bottom: calc(-1 * var(--iw-menu-overlap)); }\n";
+        }
+        // No background at all, on every page and scrolled or not: the lists
+        // hanging from the bar hang from nothing, as over a hero.
+        if (0 === $this->normalizeMenuOpacity($menuConfig['bgOpacity'] ?? null)) {
+            $css .= ".iw-menu { --iw-menu-dropdown-top-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        }
         $css .= ".iw-menu.iw-menu--hidden { transform: translateY(-100%); }\n";
         // Respect reduced-motion: no slide/fade animation, instant state change
         $css .= "html.iw-scroll-locked .iw-menu::before { transition: none; }\n";
@@ -3173,7 +3200,10 @@ class ThemeCompiler
         $css .= ".iw-menu [role=\"dialog\"] :is(.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3, .iw-menu__dropdown--level-4) { border-radius: 0; }\n";
         // Hanging from the bar, a dropdown is square against it, unless the
         // theme asks for round top corners (--iw-menu-dropdown-top-radius).
-        $css .= ".iw-menu__dropdown--level-2.iw-menu__bar-dropdown { border-top-left-radius: var(--iw-menu-dropdown-top-radius, 0); border-top-right-radius: var(--iw-menu-dropdown-top-radius, 0); }\n";
+        // The corners ease into shape when the bar takes its background back
+        // under an open list (see the transparent bar above).
+        $css .= ".iw-menu__dropdown--level-2.iw-menu__bar-dropdown { border-top-left-radius: var(--iw-menu-dropdown-top-radius, 0); border-top-right-radius: var(--iw-menu-dropdown-top-radius, 0); transition: border-radius 0.2s ease; }\n";
+        $css .= "@media (prefers-reduced-motion: reduce) { .iw-menu__dropdown--level-2.iw-menu__bar-dropdown { transition: none; } }\n";
 
         // Dividers
         $css .= ".iw-menu__divider { border-color: var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
@@ -3464,12 +3494,14 @@ class ThemeCompiler
 
         // Skip link (components/_skip_link.html.twig): off screen until it
         // takes the focus, then drawn over the bar in the menu colors swapped,
-        // so it stands out from the bar it covers.
+        // so it stands out from the bar it covers. The shadow comes with the
+        // focus: hidden above the window, it still bled into the top of a page
+        // under a transparent bar.
         $css .= ".iw-skip-link { position: fixed; top: 0.5rem; left: 1rem; z-index: 100; padding: 0.75rem 1.25rem;\n";
         $css .= "  background-color: var(--iw-menu-text, var(--color-text, #000)); color: var(--iw-menu-bg, var(--color-background, #fff));\n";
         $css .= "  border-radius: var(--border-radius, 0.375rem); font-weight: 600; text-decoration: none;\n";
-        $css .= "  box-shadow: 0 4px 16px -2px rgb(0 0 0 / 0.18); transform: translateY(calc(-100% - 1rem)); transition: transform 0.15s ease; }\n";
-        $css .= ".iw-skip-link:focus { transform: none; }\n";
+        $css .= "  transform: translateY(calc(-100% - 1rem)); transition: transform 0.15s ease; }\n";
+        $css .= ".iw-skip-link:focus { transform: none; box-shadow: 0 4px 16px -2px rgb(0 0 0 / 0.18); }\n";
         $css .= "@media (prefers-reduced-motion: reduce) { .iw-skip-link { transition: none; } }\n";
         // The target only takes the focus to move the reading position: a ring
         // around the whole page would say nothing more.
@@ -3593,7 +3625,14 @@ class ThemeCompiler
         $css .= ".iw-menu__actions--panel > li { display: block; }\n";
         // A dropdown of the bar hangs from its trigger, like the language list.
         $css .= ".iw-menu__action-dropdown { position: relative; }\n";
-        $css .= ".iw-menu__action-dropdown-list { right: 0; min-width: 12rem; margin: 0; list-style: none; }\n";
+        $css .= ".iw-menu__action-dropdown-list { right: 0; margin: 0; list-style: none; }\n";
+        // A list hanging from a button of the bar (language, action) is as wide
+        // as its content and never narrower than its button. A fixed minimum
+        // left two language codes in a box twice as wide as the button, and
+        // without `max-content` the positioned list would take the width of
+        // its button and wrap a longer label.
+        $css .= ".iw-menu__lang-panel, .iw-menu__action-dropdown-list { width: max-content; min-width: 100%; max-width: calc(100vw - 2rem); }\n";
+        $css .= ".iw-menu__lang-panel a, .iw-menu__action-dropdown-item { white-space: nowrap; }\n";
         $css .= ".iw-menu__action-dropdown-item { display: flex; align-items: center; gap: 0.5rem; }\n";
         // Opened in the panel, the list reads as a group: a title, its links.
         $css .= ".iw-menu__action-group-title { display: block; font-weight: 600; margin-bottom: 0.25rem; }\n";

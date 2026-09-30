@@ -44,7 +44,7 @@ What detaches the bar from the content scrolling underneath. All four settings l
 | **Bottom rule** | `--iw-menu-border-width` | None (default), 1px, 2px, 3px. This is what separates the bar from the content when both are light. |
 | **Rule color** | `--iw-menu-border-color` | Free color (palette or custom). Distinct from **Divider** (`--iw-menu-divider`), which colors the separators *between menu levels*, not the edge of the bar. |
 | **Drop shadow** | `--iw-menu-shadow` | None (default), Subtle, Strong. Applied at all times, including at the top of the page. |
-| **Background opacity** | folded into `--iw-menu-surface` | 0–100 (default 100). Below 100 the bar is painted with `color-mix(in srgb, <bg> N%, transparent)`. |
+| **Background opacity** | folded into `--iw-menu-surface` | 0–100 (default 100). Below 100 the bar is painted with `color-mix(in srgb, <bg> N%, transparent)`, and sits over the hero at the top of a page (see [Transparent bar over a hero](#transparent-bar-over-a-hero)). |
 | **Backdrop blur** | `--iw-menu-backdrop` | None (default), Light (4px), Medium (8px), Strong (16px). |
 
 Two things worth knowing:
@@ -78,6 +78,8 @@ With the defaults (80, 40 and 12 on desktop), nothing changes: `max(80, 64) = 80
 `html` gets `scroll-padding-top: var(--iw-menu-bar-height)`, so the target of an in-page link does not land under the sticky bar.
 
 ## Transparent bar over a hero
+
+A **translucent bar** (background opacity under 100%) sits over the hero the same way, from the same attribute: the bar is pulled up and `--iw-menu-overlap` tells the hero how much of it the bar covers. It keeps its background at that opacity, its blur, border and shadow, and its regular colors and logo. Only the transparent mode below drops all of them. The two combine: transparent over the hero, translucent once scrolled past it.
 
 A transparent bar only works over a picture. On a white page it leaves white text on white. So the bar turns transparent only when the page **opens with a hero image** that says the bar may sit over it, with the `data-iw-menu-overlay` attribute.
 
@@ -127,7 +129,7 @@ Two groups of **Menu > Appearance** finish the dropdowns of the bar.
 | Setting | Description |
 |---------|-------------|
 | **Dropdown radius** | Corners of the dropdowns of the bar, their levels and the language dropdown (`--iw-menu-dropdown-radius`). Empty, the radius of the theme. The sub-lists of the panels (burger, mobile) are part of the panel and stay square. |
-| **Round the top corners too** | Off by default: a dropdown hanging from the bar keeps square top corners against it. On, it takes the radius on its four corners, for a dropdown that stands out from the bar on a different background (`--iw-menu-dropdown-top-radius`). A level 3 or 4, opening beside its parent, always has four round corners. |
+| **Round the top corners too** | Off by default: a dropdown hanging from the bar keeps square top corners against it. On, it takes the radius on its four corners, for a dropdown that stands out from the bar on a different background (`--iw-menu-dropdown-top-radius`). A level 3 or 4, opening beside its parent, always has four round corners. A bar that paints nothing (transparent over a hero, or at 0% background opacity) has nothing to hang from: the dropdowns then take four round corners whatever this setting, which comes back once the bar takes its background again. |
 
 **Chevron**
 
