@@ -29,19 +29,22 @@ final class BlockSurfaceToggleContractTest extends TestCase
     private const SURFACES_FRAGMENT = 'block-surfaces.xml';
 
     /**
+     * The four switches, in the order the fragment declares them.
+     */
+    private const SWITCHES = ['showBackground', 'showBlockBorder', 'showContentBackground', 'showContentBorder'];
+
+    /**
      * Blocks that compose their own switches instead of including the group.
      *
      * They still paint surfaces, so they still have to offer a way out of
-     * them: the exception is about where the field is declared, never about
-     * whether it exists.
+     * them: the exception is about where the fields are declared, never about
+     * whether they exist, and all four are required. The separator used to sit
+     * here with its background toggler alone, so its border could not be
+     * removed, and a check on that one field let it through.
      *
      * @var array<string, string>
      */
-    private const COMPOSES_ITS_OWN = [
-        'blocks/separator.xml' => 'The separator is a rule or a gap, so its background is a '
-            . 'yes/no the editor flips often: it declares a toggler of its own rather than the '
-            . 'shared checkbox.',
-    ];
+    private const COMPOSES_ITS_OWN = [];
 
     /**
      * Every block template of the bundle, keyed for readable failures.
@@ -75,15 +78,19 @@ final class BlockSurfaceToggleContractTest extends TestCase
     public function everyBlockWithASurfaceCanSwitchItOff(string $path, string $name): void
     {
         if (isset(self::COMPOSES_ITS_OWN[$name])) {
-            self::assertMatchesRegularExpression(
-                '/<property name="showBackground"/',
-                (string) file_get_contents($path),
-                \sprintf(
-                    '%s is listed as composing its own switches, so it must declare them. %s',
-                    $name,
-                    self::COMPOSES_ITS_OWN[$name],
-                ),
-            );
+            $source = (string) file_get_contents($path);
+            foreach (self::SWITCHES as $property) {
+                self::assertMatchesRegularExpression(
+                    '/<property name="' . $property . '"/',
+                    $source,
+                    \sprintf(
+                        '%s is listed as composing its own switches, so it must declare %s. %s',
+                        $name,
+                        $property,
+                        self::COMPOSES_ITS_OWN[$name],
+                    ),
+                );
+            }
 
             return;
         }
@@ -112,7 +119,7 @@ final class BlockSurfaceToggleContractTest extends TestCase
         $fragments = self::fragmentSources(self::SURFACES_FRAGMENT);
         $source = implode("\n", $fragments);
 
-        foreach (['showBackground', 'showBlockBorder', 'showContentBackground', 'showContentBorder'] as $property) {
+        foreach (self::SWITCHES as $property) {
             self::assertMatchesRegularExpression(
                 '/<property name="' . $property . '" type="checkbox".*?default_value" value="true"/s',
                 $source,

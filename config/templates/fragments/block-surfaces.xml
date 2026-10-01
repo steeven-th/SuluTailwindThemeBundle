@@ -22,10 +22,8 @@
         <xi:include href="../fragments/block-surfaces.xml"
                     xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 
-    Every block includes it, `separator` excepted: that one paints a surface
-    like the others but declares its own background toggler, since a rule or a
-    gap is something an editor fills and unfills often.
-    `BlockSurfaceToggleContractTest` keeps that exception list honest.
+    Every block includes it. `BlockSurfaceToggleContractTest` fails on a
+    block that paints a variant without offering the four switches.
 -->
 <properties xmlns="http://schemas.sulu.io/template/template"
             xmlns:xi="http://www.w3.org/2001/XInclude">

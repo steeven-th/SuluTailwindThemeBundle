@@ -101,23 +101,8 @@
                 </property>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
-                <!--
-                    A toggler rather than the shared `block-background` fragment,
-                    kept for the separator alone: the block is a rule or a gap, so
-                    the background is a yes/no the editor flips often. Placed last
-                    all the same, where every other block has it.
-                -->
-                <property name="showBackground" type="checkbox">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="default_value" value="true"/>
-                        <param name="label">
-                            <meta>
-                                <title>iw_sulu_tailwind_theme.show_background</title>
-                            </meta>
-                        </param>
-                    </params>
-                </property>
+                <xi:include href="../fragments/block-surfaces.xml"
+                            xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
     </properties>

@@ -1926,6 +1926,12 @@ The block `text` gained the group with the others. It was the only block with a
 block radius and no background switch, so its surface was painted whether the
 editor wanted it or not.
 
+The block `separator` gained it too. It used to declare a background toggler of
+its own and nothing else, so a variant with a border drew an outline around
+every separator that no editor could remove. The toggler is now the **Fond du
+bloc** checkbox of the group. The property is still `showBackground`, so
+published separators keep their answer.
+
 **Migration.** Nothing to change in your content: published pages carry none of
 these keys and every one of them reads as on when absent, so a site renders
 exactly as before until an editor unticks a box. Recompile the themes
