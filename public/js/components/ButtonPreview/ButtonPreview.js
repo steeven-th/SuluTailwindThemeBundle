@@ -17,8 +17,12 @@ import type {ThemePreview} from '../../utils/themePreviewCss';
  *
  * It renders inside an iframe. The stylesheet is written for a page of its own
  * (`:root` variables, a font `@import`, rules on `body`), and the admin styles
- * must neither leak in nor be overridden by it. The iframe runs no script: the
- * component writes into its document, which `allow-same-origin` permits.
+ * must neither leak in nor be overridden by it. The component writes into its
+ * document, which holds no script of its own: two stylesheets and a link.
+ *
+ * Not sandboxed, deliberately. A sandbox would protect nothing here, CSS runs
+ * no code, while it blocks the scripts browser extensions inject into every
+ * frame and fills the console with one error per open preview.
  *
  * The field holds no value. It sits in the item of a button and reads the form
  * through the form inspector.
@@ -227,7 +231,6 @@ export default class ButtonPreview extends React.Component<Props, State> {
                 <iframe
                     onLoad={this.handleFrameLoad}
                     ref={this.setFrame}
-                    sandbox="allow-same-origin"
                     srcDoc={FRAME_DOCUMENT}
                     style={{
                         width: '100%',
