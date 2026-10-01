@@ -11,6 +11,7 @@ use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 use ItechWorld\SuluTailwindThemeBundle\Exception\TypographyWeightException;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
@@ -280,6 +281,75 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         }
 
         return new JsonResponse($palette);
+    }
+
+    /**
+     * Compile the stylesheet of a theme as the form currently holds it.
+     *
+     * Feeds the live button preview of the theme form, which has to show the
+     * front rendering of values that are not saved yet. The form data is
+     * mapped onto a clone of the theme: the clone is not managed by Doctrine
+     * and nothing is flushed or written to disk, so a preview never changes
+     * the theme or its compiled file.
+     *
+     * Routed as a POST because the body is the whole form, too large for a
+     * query string. The security listener reads a POST on any action but
+     * `postAction` as an edit, the permission the form itself requires.
+     *
+     * @param Request $request The HTTP request carrying the form data as JSON
+     * @param int     $id      The theme configuration ID
+     *
+     * @return JsonResponse `{css, buttons}`: the stylesheet and the button
+     *                      slugs in form order, or a 400 for a body that is not a JSON object,
+     *                      or a 422 while the form holds a duplicate slug
+     *
+     * @throws NotFoundHttpException If the theme is not found
+     */
+    #[Route('/admin/api/iw-theme-configs/{id}/preview-css', name: 'iw_sulu_tailwind_theme.preview_theme_css', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function previewCssAction(Request $request, int $id): JsonResponse
+    {
+        $theme = $this->repository->find($id);
+
+        if (null === $theme) {
+            throw new NotFoundHttpException(sprintf('Theme config with ID "%d" not found.', $id));
+        }
+
+        try {
+            $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $data = null;
+        }
+
+        if (!is_array($data)) {
+            return new JsonResponse(['code' => Response::HTTP_BAD_REQUEST], Response::HTTP_BAD_REQUEST);
+        }
+
+        $draft = clone $theme;
+
+        try {
+            /** @var array<string, mixed> $data */
+            $this->formMapper->mapDataToEntity($data, $draft);
+        } catch (SlugValidationException) {
+            // A duplicate slug is a normal state while the editor types one.
+            // The preview keeps its last rendering, the save reports the error.
+            return new JsonResponse(['code' => Response::HTTP_UNPROCESSABLE_ENTITY], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // The class names the stylesheet uses, normalized the way the compiler
+        // normalizes them: a slug being typed is not the class it compiles to.
+        $buttons = array_map(
+            static fn (array $button): string => (string) $button['slug'],
+            ButtonResolver::normalizeButtons($draft->getTokens()['buttons'] ?? []),
+        );
+
+        return new JsonResponse(
+            [
+                'css' => $this->compiler->compileToString($draft),
+                'buttons' => $buttons,
+            ],
+            Response::HTTP_OK,
+            ['Cache-Control' => 'no-store'],
+        );
     }
 
     /**

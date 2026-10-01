@@ -65,6 +65,14 @@
                         <title>iw_sulu_tailwind_theme.button</title>
                     </meta>
                     <properties>
+                        <!-- Holds no value: renders the button from the form as it stands. -->
+                        <property name="preview" type="iw_theme_button_preview">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.button_preview</title>
+                                <info_text>iw_sulu_tailwind_theme.button_preview_info</info_text>
+                            </meta>
+                        </property>
+
                         <property name="label" type="text_line" colspan="6" mandatory="true">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.button_label</title>

@@ -189,6 +189,22 @@ class ThemeCompiler
     }
 
     /**
+     * Generate the stylesheet of a theme without writing it anywhere.
+     *
+     * The admin previews render the real buttons of a theme whose changes are
+     * not saved yet, so they need the CSS of an entity that never reaches the
+     * database or the disk. Same output as compile(), file aside.
+     *
+     * @param ThemeConfig $theme The theme configuration, saved or not
+     *
+     * @return string The full stylesheet
+     */
+    public function compileToString(ThemeConfig $theme): string
+    {
+        return $this->generateCss($theme);
+    }
+
+    /**
      * Get the web-accessible CSS path for a theme.
      *
      * Looks for the actual compiled file on disk rather than computing

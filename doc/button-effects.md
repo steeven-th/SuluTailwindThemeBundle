@@ -157,6 +157,18 @@ The admin preview needs the same entry in [`buttonHoverStyle.js`](../public/js/u
 
 ## Preview in the admin
 
+### In the buttons form of the theme
+
+Every button of the **Buttons** tab opens on a live preview of itself, rendered with the real stylesheet of the site. Hover it, click it or tab to it: the hover rule, the background effects, the keyframes and the transition are the ones the compiler emits, not a copy of them.
+
+The preview follows the form before it is saved. About 400 ms after a change, the form data goes to `POST /admin/api/iw-theme-configs/{id}/preview-css`, which maps it onto a copy of the theme and returns the compiled stylesheet. Nothing is flushed and no file is written, so a preview never changes the theme or what the site serves. The open previews share that request.
+
+The colour picker under the preview sets its background: a palette colour, resolved against the palette of the form, or any custom colour. Transparent, or empty, is the checkerboard of the media library. The choice is shared by every preview and kept in the browser.
+
+What it does not show: the CSS of the project. A rule of your own stylesheet on `.iw-button--<slug>` applies on the site but not in the preview, which only loads the theme stylesheet and the body typography of the bundle.
+
+### In the button style picker
+
 The button style picker shows each style on the checkerboard of the Sulu media library, so a white or transparent button stays visible. The card under the pointer, or the one holding the keyboard focus, shows its button hovered, with the duration and easing of the style.
 
 The hover colours, shadow, transform and opacity are the ones the site draws. Animated effects show their end state, since an inline style cannot carry a `@keyframes` rule:

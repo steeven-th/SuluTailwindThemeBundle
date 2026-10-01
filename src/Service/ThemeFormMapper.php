@@ -814,7 +814,9 @@ class ThemeFormMapper
                 continue;
             }
             $props = $item;
-            unset($props['type']);
+            // `preview` is the admin preview field of the item, which holds no
+            // value. Dropped in case the form ever sends it.
+            unset($props['type'], $props['preview']);
             $slug = (isset($props['slug']) && is_string($props['slug'])) ? trim($props['slug']) : '';
             if ('' === $slug) {
                 $label = (isset($props['label']) && is_string($props['label'])) ? $props['label'] : '';
