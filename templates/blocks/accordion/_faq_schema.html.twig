@@ -4,11 +4,18 @@
    that the block IS a list of frequently asked questions; using it on a generic
    accordion would misdescribe the page.
 
-   Answers keep their HTML: schema.org/acceptedAnswer accepts a limited subset
-   and search engines strip the rest. json_encode escapes quotes, backslashes
-   and control characters, and — with default flags — forward slashes too, so a
-   `</script>` inside the content comes out as `<\/script>` and cannot close the
-   tag early. `|raw` is required because Twig's HTML autoescaping would turn the
+   Answers keep the plain HTML schema.org accepts in an answer (headings,
+   paragraphs, lists, emphasis) and lose every other tag. That includes the
+   `<sulu-link>` tags the text editor stores for an internal link, whose text
+   stays. They must not reach the JSON: json_encode escapes the closing tag as
+   `<\/sulu-link>`, and Sulu's markup parser, which rewrites these tags across
+   the whole response, then counts a tag it can never extract and calls itself
+   again until the request times out.
+
+   json_encode escapes quotes, backslashes and control characters, and - with
+   default flags - forward slashes too, so a `</script>` inside the content
+   comes out as `<\/script>` and cannot close the tag early. Keep the default
+   flags. `|raw` is required because Twig's HTML autoescaping would turn the
    JSON quotes into entities and break the document.
 
    Expected variables:
@@ -22,7 +29,7 @@
             'name': item.itemTitle,
             'acceptedAnswer': {
                 '@type': 'Answer',
-                'text': item.itemContent
+                'text': item.itemContent|striptags('<h1><h2><h3><h4><h5><h6><p><br><ul><ol><li><strong><b><em><i>')
             }
         }]) %}
     {% endif %}

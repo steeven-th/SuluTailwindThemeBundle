@@ -633,7 +633,10 @@ Two consequences when overriding it: there is **no state class** (target
 derives it from the open state, and writing it by hand desynchronises.
 
 Styles: `list` (default), `cards`, `bordered`. Optional schema.org `FAQPage`
-markup. Each panel gets an id, so a single answer can be linked to directly.
+markup, whose answers keep only the plain HTML schema.org accepts (headings,
+paragraphs, lists, emphasis): a link of the answer keeps its text in the markup
+and stays a link on the page. Each panel gets an id, so a single answer can be
+linked to directly.
 
 **New Stimulus controller** `accordion`, **optional**: it only backfills the
 exclusive grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130,
