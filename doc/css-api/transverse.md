@@ -875,7 +875,7 @@ theme setting only overrules that.
 |----------|-------------|---------|
 | `--iw-controls-on-content-color` | Colour of every control over content | unset, so `currentColor` |
 | `--iw-accordion-icon-color` | The accordion chevron alone | the shared token |
-| `--iw-block-linked-pages-nav-color` | The dots of a linked-pages carousel | the shared token |
+| `--iw-block-linked-pages-nav-color` | The arrows and dots of a linked-pages carousel | the shared token |
 | `--iw-block-testimonial-dot-color` | The dots of a testimonial slider | the shared token |
 
 Set from **Settings > Themes > Default settings > Navigation > Arrows and

@@ -48,6 +48,30 @@ final class NavigationControlsContractTest extends TestCase
     }
 
     /**
+     * Every read of a control hook falls back the same way.
+     *
+     * The test above finds the cascade once per hook. The carousel arrows of
+     * the linked pages slipped past it: their veil read the same hook as the
+     * dots with the separator colour as fallback, and the dots alone satisfied
+     * the check.
+     */
+    #[Test]
+    #[DataProvider('controls')]
+    public function noReadOfAControlHookFallsBackElsewhere(string $hook): void
+    {
+        preg_match_all('/var\(' . preg_quote($hook, '/') . ',\s*([^;]*)/', self::stylesheet(), $matches);
+
+        self::assertNotEmpty($matches[1], \sprintf('%s is read nowhere.', $hook));
+        foreach ($matches[1] as $fallback) {
+            self::assertStringStartsWith(
+                'var(--iw-controls-on-content-color, currentColor))',
+                $fallback,
+                \sprintf('A read of %s falls back to something other than the shared control colour: %s', $hook, $fallback),
+            );
+        }
+    }
+
+    /**
      * Each control falls back to the shared token, then to currentColor.
      */
     #[Test]

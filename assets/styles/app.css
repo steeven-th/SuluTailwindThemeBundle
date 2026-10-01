@@ -1526,15 +1526,18 @@ img.object-cover {
     width: var(--iw-block-linked-pages-nav-size, 2.5rem);
     height: var(--iw-block-linked-pages-nav-size, 2.5rem);
     border-radius: 9999px;
-    background-color: color-mix(in srgb, var(--iw-block-linked-pages-nav-color, var(--iw-variant-hr-color, var(--color-primary))) 10%, transparent);
+    background-color: color-mix(in srgb, var(--iw-block-linked-pages-nav-color, var(--iw-controls-on-content-color, currentColor)) 10%, transparent);
     transition: background-color 0.2s ease;
     border: none;
     cursor: pointer;
-    color: inherit;
+    /* Same colour as the dots below: the chevron is drawn in it, the veil is
+       a tint of it. The veil used to follow the separator of the variant,
+       which put pink arrows next to navy dots in one carousel. */
+    color: var(--iw-block-linked-pages-nav-color, var(--iw-controls-on-content-color, currentColor));
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav:hover {
-    background-color: color-mix(in srgb, var(--iw-block-linked-pages-nav-color, var(--iw-variant-hr-color, var(--color-primary))) 20%, transparent);
+    background-color: color-mix(in srgb, var(--iw-block-linked-pages-nav-color, var(--iw-controls-on-content-color, currentColor)) 20%, transparent);
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__nav--prev { left: 0; }

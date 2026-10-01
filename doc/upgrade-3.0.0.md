@@ -2328,3 +2328,25 @@ The SEO partials moved the same way, from `extension.excerpt.images.ids|first` t
 `extension.excerpt.image`. Published content is untouched: the parameter name lives
 in the template, never in the database, so nothing needs migrating and no image has
 to be re-selected.
+
+## Linked pages carousel: the arrows follow the controls colour (visual)
+
+The arrows of the carousel style read the separator colour of the variant for
+their veil, while the dots next to them read the controls colour. A variant with
+a pink rule and navy text put pink arrows next to navy dots in the same block.
+
+Both now follow the cascade every control over content uses: the block hook
+`--iw-block-linked-pages-nav-color`, then the theme setting **Navigation > Arrows
+and dots** (`--iw-controls-on-content-color`), then the surrounding text. The
+chevron is drawn in that colour, the veil is a 10% tint of it (20% on hover).
+
+**What changes on a site:** the arrow veil switches from a tint of the separator
+to a tint of the text, or of the controls colour when the theme sets one. A
+project preferring the separator colour can set the hook to it, which moves the
+dots along with the arrows:
+
+```css
+.iw-block-linked-pages--carousel {
+    --iw-block-linked-pages-nav-color: var(--iw-variant-hr-color, var(--color-primary));
+}
+```
