@@ -65,7 +65,7 @@ The two are exclusive, and the admin enforces it: turning **whole card is a link
 
 A card cannot be both, because an anchor cannot contain anchors. The browser recovers from that by splitting the outer anchor, so the card ends up clickable in some places and not others - a failure nothing reports and only a click reveals.
 
-A clickable card draws its action as a `<span>` carrying the button style, since the card itself is already the anchor. With no title on the link nothing is drawn at all, and the card stays clickable as a whole: a button labelled with a raw URL would be worse than none.
+A clickable card draws its action as a `<span>` carrying the button style, since the card itself is already the anchor. It is drawn only when the editor typed a title on the link. Left empty, nothing is drawn, whatever the link points at (a page, a media or an external URL), and the card stays clickable as a whole: a button repeating the title of its target, or its URL, would add nothing to a card that already says where it leads.
 
 ---
 

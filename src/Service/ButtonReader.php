@@ -12,7 +12,9 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
  *
  * The label is the title attribute of the link, then the title of the page
  * or media it points to, then the URL: the same order as the call-to-action
- * buttons of the blocks. A button without a resolvable link - left blank, or
+ * buttons of the blocks. `labelIsOwn` tells the first case from the others,
+ * for a template that draws a button only when the editor named it. A button
+ * without a resolvable link - left blank, or
  * pointing to a page deleted or unpublished since - reads as null, so the
  * template renders nothing rather than a dead link.
  */
@@ -24,7 +26,7 @@ final class ButtonReader
      * @param mixed $content The resolved content of the field (see ButtonPropertyResolver)
      * @param mixed $view    The view of the field, holding the stored link
      *
-     * @return array{url: string, label: string, target: string|null, rel: string|null, newTab: bool, style: mixed, icon: array<string, mixed>|null, iconOnly: bool}|null
+     * @return array{url: string, label: string, labelIsOwn: bool, target: string|null, rel: string|null, newTab: bool, style: mixed, icon: array<string, mixed>|null, iconOnly: bool}|null
      */
     public static function read(mixed $content, mixed $view = null): ?array
     {
@@ -39,7 +41,8 @@ final class ButtonReader
         }
 
         $linkView = \is_array($view) && \is_array($view['link'] ?? null) ? $view['link'] : [];
-        $label = self::firstText($linkView['title'] ?? null, $link['title'] ?? null) ?? $url;
+        $ownLabel = self::firstText($linkView['title'] ?? null);
+        $label = $ownLabel ?? self::firstText($link['title'] ?? null) ?? $url;
 
         $target = \is_string($linkView['target'] ?? null) && '' !== $linkView['target'] && '_self' !== $linkView['target']
             ? $linkView['target']
@@ -56,6 +59,7 @@ final class ButtonReader
         return [
             'url' => $url,
             'label' => $label,
+            'labelIsOwn' => null !== $ownLabel,
             'target' => $target,
             'rel' => $rel,
             'newTab' => '_blank' === $target,

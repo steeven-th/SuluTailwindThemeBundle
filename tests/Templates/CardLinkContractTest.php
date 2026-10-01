@@ -71,6 +71,26 @@ final class CardLinkContractTest extends TestCase
     }
 
     /**
+     * A clickable card draws its button only for a label the editor typed.
+     *
+     * It used to hide the button when the label equalled the URL. That held
+     * for an external link alone: a link to a page or a media falls back to
+     * the title of its target, so an empty label still drew a button there.
+     */
+    #[Test]
+    public function aLinkedCardDrawsItsButtonOnlyForATypedLabel(): void
+    {
+        $source = self::card();
+
+        self::assertMatchesRegularExpression(
+            '/if wholeCardIsLink[\s\S]{0,200}if cardLink\.labelIsOwn/',
+            $source,
+            'A clickable card must draw its button only when the link carries a label of its own.',
+        );
+        self::assertStringNotContainsString('cardLink.label != cardLink.url', $source);
+    }
+
+    /**
      * The buttons offered on a card match the shared fragment, field for field.
      *
      * They are copied rather than included, because a `visibleCondition` cannot

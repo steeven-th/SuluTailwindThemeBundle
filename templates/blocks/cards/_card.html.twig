@@ -126,12 +126,12 @@
         {% endif %}
 
         {#- The card is the anchor, so its action is a span carrying the button
-            style. Its label is the title carried by the link, then the title
-            of what it points at. A link that has neither falls back to its
-            URL, and a card is already clickable as a whole: a button labelled
-            with a raw URL would be worse than none, so none is drawn. -#}
+            style. It is drawn only when the editor typed a label on the link:
+            the card is already clickable as a whole, and a button repeating
+            the title of the page or media it points at, or its URL, adds
+            nothing. Same rule for every kind of link. -#}
         {%- if wholeCardIsLink -%}
-            {% if cardLink.label != cardLink.url %}
+            {% if cardLink.labelIsOwn %}
                 <span class="iw-block__actions iw-block__actions--{{ ctaDirection|default('row') }} iw-block__actions--flush">
                     {% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with {
                         button: cardLink,
