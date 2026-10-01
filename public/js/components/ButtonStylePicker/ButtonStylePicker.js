@@ -5,10 +5,15 @@ import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
+import {paletteFor} from '../../utils/formPalette';
 import {buttonBorderStyle} from '../../utils/buttonBorder';
 import buttonStyleExtras from '../../utils/buttonStyleExtras';
+import buttonHoverStyle, {buttonTransition, paletteRoleProperties} from '../../utils/buttonHoverStyle';
 import {valueFor, withValue} from '../../utils/scopedValue';
 import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
+// The checkerboard of the media library, so a white or transparent button reads
+// against the same background editors already know for transparent images.
+import checkerBackground from 'sulu-media-bundle/components/MediaCard/checkerBackground.gif';
 
 /**
  * ButtonStylePicker field component for the Sulu admin.
@@ -16,8 +21,9 @@ import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
  * Displays a horizontal row of radio-like cards, one per button style defined
  * in the theme (unlimited, named by slug), each rendering a real button preview
  * using that button's colors (bg, text, border and its sides, radius) and its
- * shadow, weight and case. The selected card is
- * highlighted with the Sulu primary accent.
+ * shadow, weight and case, over the checkerboard of the media library. The
+ * card under the pointer or the keyboard focus shows the hover state of its
+ * button. The selected card is highlighted with the Sulu primary accent.
  *
  * Stored value is the selected button's slug.
  *
@@ -35,6 +41,9 @@ const THEME_RESOURCE_KEY = 'iw_theme_configs';
 export default class ButtonStylePicker extends React.Component {
     /** @type {Object|null} Cached palette for ref resolution */
     _palette = null;
+
+    /** Slug of the card under the pointer or the keyboard focus. */
+    state = {hovered: null};
 
     componentDidMount() {
         // The button previews are the edited site's, not the first site's.
@@ -82,6 +91,18 @@ export default class ButtonStylePicker extends React.Component {
                 // Palette loading failed — button previews will use raw values
             });
     }
+
+    handleHover = (slug) => {
+        if (!this.props.disabled) {
+            this.setState({hovered: slug});
+        }
+    };
+
+    handleLeave = (slug) => {
+        // A blur arriving after the pointer moved to another card must not
+        // clear the hover of that card.
+        this.setState((state) => (state.hovered === slug ? {hovered: null} : null));
+    };
 
     handleSelect = (key) => {
         const {onChange, disabled, value} = this.props;
@@ -143,6 +164,8 @@ export default class ButtonStylePicker extends React.Component {
         const buttons = this._getButtons();
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
+        // The glows of the site read the palette roles.
+        const roleProperties = paletteRoleProperties(paletteFor(this.props.formInspector, this._palette));
 
         const containerStyle = {
             display: 'flex',
@@ -172,13 +195,12 @@ export default class ButtonStylePicker extends React.Component {
                     const label = btnData.label || slug;
                     const isSelected = selected === slug;
                     const hasData = btnData && typeof btnData === 'object';
+                    const isHovered = hasData && this.state.hovered === slug;
 
                     const cardStyle = {
                         display: 'inline-flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
+                        alignItems: 'stretch',
                         width: '160px',
                         height: '90px',
                         border: isSelected ? `2px solid ${primary}` : '1px solid #d0d0d0',
@@ -188,7 +210,20 @@ export default class ButtonStylePicker extends React.Component {
                         transition: 'all 0.15s',
                         outline: 'none',
                         opacity: disabled ? 0.5 : (hasData ? 1 : 0.4),
-                        padding: '10px',
+                        padding: 0,
+                    };
+
+                    // Same tile and size as the media cards: the GIF holds a
+                    // 24px pattern and Sulu draws it unscaled.
+                    const stageStyle = {
+                        flex: '1 1 auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundImage: `url(${checkerBackground})`,
+                        // The inner radius of the card, whose border thickens
+                        // when it is selected.
+                        borderRadius: isSelected ? '6px 6px 0 0' : '7px 7px 0 0',
                     };
 
                     // Render the button preview with actual theme colors
@@ -209,6 +244,9 @@ export default class ButtonStylePicker extends React.Component {
                         // Shadow, weight and case: what tells apart styles
                         // sharing their colours.
                         ...buttonStyleExtras(btnData),
+                        ...roleProperties,
+                        transition: buttonTransition(btnData),
+                        ...(isHovered ? buttonHoverStyle(btnData) : {}),
                     } : {
                         display: 'inline-block',
                         padding: '6px 20px',
@@ -224,6 +262,7 @@ export default class ButtonStylePicker extends React.Component {
                     };
 
                     const labelStyle = {
+                        padding: '6px 4px 7px',
                         fontSize: '11px',
                         fontWeight: isSelected ? 'bold' : 'normal',
                         color: isSelected ? primary : '#555',
@@ -236,11 +275,17 @@ export default class ButtonStylePicker extends React.Component {
                             type="button"
                             style={cardStyle}
                             onClick={() => this.handleSelect(slug)}
+                            onMouseEnter={() => this.handleHover(slug)}
+                            onMouseLeave={() => this.handleLeave(slug)}
+                            onFocus={() => this.handleHover(slug)}
+                            onBlur={() => this.handleLeave(slug)}
                             title={label}
                             disabled={disabled}
                         >
-                            <span style={btnPreviewStyle}>
-                                {hasData ? 'Button' : '—'}
+                            <span style={stageStyle}>
+                                <span style={btnPreviewStyle}>
+                                    {hasData ? 'Button' : '—'}
+                                </span>
                             </span>
                             <span style={labelStyle}>{label}</span>
                         </button>

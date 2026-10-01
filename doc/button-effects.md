@@ -151,6 +151,24 @@ Then expose the new key in the form XML:
 
 …and add the matching translation entries (`admin.fr.json`, `admin.en.json`, `admin.de.json`). No compiler change is required — the lookup picks up the new key automatically.
 
+The admin preview needs the same entry in [`buttonHoverStyle.js`](../public/js/utils/buttonHoverStyle.js), written with the same value. `ButtonPreviewHoverContractTest` fails until it is there, so the picker cannot show a hover the site never draws.
+
+---
+
+## Preview in the admin
+
+The button style picker shows each style on the checkerboard of the Sulu media library, so a white or transparent button stays visible. The card under the pointer, or the one holding the keyboard focus, shows its button hovered, with the duration and easing of the style.
+
+The hover colours, shadow, transform and opacity are the ones the site draws. Animated effects show their end state, since an inline style cannot carry a `@keyframes` rule:
+
+| Setting | Preview |
+|---------|---------|
+| `hoverBgEffect` `slide-*` or `pulse-bg` | The hover background, as at the end of the slide or at the peak of the pulse |
+| `hoverBgEffect` `gradient-shift` | The final gradient, without its fade |
+| `hoverShadow` `glow-pulse-*` | The widest frame of the pulse |
+
+The glows read `--color-primary`, `--color-secondary` and `--color-accent`, which the preview declares from the palette of the theme being edited.
+
 ---
 
 ## See also
