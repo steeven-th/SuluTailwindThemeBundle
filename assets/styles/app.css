@@ -6309,6 +6309,12 @@ aside .iw-toc {
 
    The line height tightens as the size grows: a title standing in for a figure
    is short, and the ratio a paragraph needs leaves a hole above and below it. */
+.iw-block-cards__grid--title-medium .iw-card__title {
+    font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
+        * var(--iw-cards-title-scale-medium, 1.25));
+    line-height: 1.3;
+}
+
 .iw-block-cards__grid--title-large .iw-card__title {
     font-size: calc(var(--iw-card-title-size, var(--iw-cards-title-size, 1.0625rem))
         * var(--iw-cards-title-scale-large, 1.5));

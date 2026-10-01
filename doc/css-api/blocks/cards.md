@@ -37,7 +37,7 @@ That is why there is no "bordered", "elevated" or "minimal" layout: the first tw
 | `.iw-block-cards__grid--width-compact` / `--width-medium` / `--width-large` | Cap the track through `--iw-card-track`, so a row can be narrower than the block. Without one the cards share the full width. |
 | `.iw-block-cards__grid--place-left` / `--place-center` / `--place-right` | Where a capped row sits. Does nothing while the cards fill the width. `--place-left` is the default and carries no rule of its own. |
 | `.iw-block-cards__grid--align-left` / `--align-center` | Text alignment inside the cards. `--align-left` is the default and carries no rule of its own. `--align-center` names both flex axes, because the two pictogram positions turn the head the other way: naming only `justify-content` centred the title and left the pictogram of a stacked head against the edge. |
-| `.iw-block-cards__grid--title-normal` / `--title-large` / `--title-xlarge` | How much the title leads over the text, from **Settings > Title size**. A multiplier on the theme's own card title size rather than a size, so a site that raised it keeps the proportion it chose. `--title-normal` is the default and carries no rule of its own. |
+| `.iw-block-cards__grid--title-normal` / `--title-medium` / `--title-large` / `--title-xlarge` | How much the title leads over the text, from **Settings > Title size**. A multiplier on the theme's own card title size rather than a size, so a site that raised it keeps the proportion it chose. `--title-normal` is the default and carries no rule of its own. |
 
 ### The card
 
@@ -81,7 +81,7 @@ A clickable card draws its action as a `<span>` carrying the button style, since
 | `--iw-card-padding` | `1.25rem` | Padding of the body. |
 | `--iw-card-icon-size` / `--iw-card-icon-size-stacked` | `1.6rem` / `3rem` | Pictogram size. |
 | `--iw-card-title-size` / `--iw-card-text-size` | `1.0625rem` / `0.9375rem` | Type scale inside a card. Both read the theme values (`--iw-cards-title-size`, `--iw-cards-text-size`) first, set under **Defaults > Cards**. |
-| `--iw-cards-title-scale-large` / `--iw-cards-title-scale-xlarge` | `1.5` / `2.25` | What the two title-size modifiers multiply the title by. Two pixels separated a default title from its text, which reads as an accident rather than as a hierarchy, and raising the theme value grew every card of the site. |
+| `--iw-cards-title-scale-medium` / `--iw-cards-title-scale-large` / `--iw-cards-title-scale-xlarge` | `1.25` / `1.5` / `2.25` | What the three title-size modifiers multiply the title by. Two pixels separated a default title from its text, which reads as an accident rather than as a hierarchy, and raising the theme value grew every card of the site. |
 | `--iw-card-number-size` | `1.75rem` | Size of the position number. |
 | `--iw-card-shadow` / `--iw-card-shadow-hover` | `--iw-variant-card-shadow*`, then `--iw-cards-shadow*` | Per-block override of either shadow. Behind it the variant of the block decides, and behind that the site-wide setting for cards no variant reaches. |
 | `--iw-card-shadow-color` | the colour already in the value | Replaces the colour of whichever shadow applies, for a project singling out one block. The colour itself is chosen per variant (**Cards > Shadow colour**) and site-wide under **Components > Cards**, and the opacity is applied to it with `color-mix()` - a hex or a palette reference carries no alpha of its own. |

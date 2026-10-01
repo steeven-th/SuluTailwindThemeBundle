@@ -249,6 +249,7 @@
                         <param name="default_value" value="normal"/>
                         <param name="values" type="collection">
                             <param name="normal"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_normal</title></meta></param>
+                            <param name="medium"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_medium</title></meta></param>
                             <param name="large"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_large</title></meta></param>
                             <param name="xlarge"><meta><title>iw_sulu_tailwind_theme.cards_title_scale_xlarge</title></meta></param>
                         </param>
