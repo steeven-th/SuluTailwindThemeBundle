@@ -129,6 +129,7 @@
     "iw_sulu_tailwind_theme.button_preview_info": "The button as the site renders it, unsaved settings included. Hover it, click it or reach it with the keyboard to see its states.",
     "iw_sulu_tailwind_theme.button_preview_text": "Button",
     "iw_sulu_tailwind_theme.button_preview_unsaved": "The preview shows once the theme has been saved a first time.",
+    "iw_sulu_tailwind_theme.required_buttons_missing": "The site CSS decorates these button styles, missing from this theme: {slugs}. Recreate a style with that slug, or their decoration will disappear from the site.",
     "iw_sulu_tailwind_theme.button_preview_background": "Preview background",
     "iw_sulu_tailwind_theme.button_slug": "Slug",
     "iw_sulu_tailwind_theme.button_slug_info": "Stable identifier used in the CSS class (.iw-button--slug). Renaming it breaks blocks that already use this button.",

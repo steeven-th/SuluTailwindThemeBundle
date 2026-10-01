@@ -1,4 +1,5 @@
 // @flow
+import {reaction, toJS} from 'mobx';
 import {Requester} from 'sulu-admin-bundle/services';
 
 /**
@@ -13,7 +14,10 @@ import {Requester} from 'sulu-admin-bundle/services';
 export type ThemePreview = {
     buttons: Array<string>,
     css: string,
+    missingButtons: Array<string>,
 };
+
+const DEBOUNCE_MS = 400;
 
 let last: {key: ?string, promise: ?Promise<ThemePreview>} = {key: null, promise: null};
 
@@ -41,4 +45,54 @@ export default function loadThemePreviewCss(themeId: string | number, data: Obje
     });
 
     return promise;
+}
+
+/**
+ * Follow a theme form and hand over its compiled preview after each change.
+ *
+ * Changes are debounced, the first preview is asked for at once. A failed
+ * request, typically a duplicate slug while one is typed, is skipped: the
+ * previous preview stays until the next change compiles.
+ *
+ * @param formInspector The inspector of the theme form.
+ * @param onPreview     Called with every preview received.
+ *
+ * @return A function that stops following the form.
+ */
+export function watchThemePreview(formInspector: Object, onPreview: (ThemePreview) => void): () => void {
+    let stopped = false;
+    let timer = null;
+
+    const load = (data: Object) => {
+        const {id} = formInspector;
+        if (!id) {
+            return;
+        }
+
+        loadThemePreviewCss(id, data)
+            .then((preview) => {
+                if (!stopped) {
+                    onPreview(preview);
+                }
+            })
+            .catch(() => {});
+    };
+
+    // Deep conversion, so a change anywhere in the form is seen: a palette
+    // colour edited in another tab changes the buttons that reference it.
+    const dispose = reaction(
+        () => toJS(formInspector.formStore.data),
+        (data) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => load(data), DEBOUNCE_MS);
+        },
+    );
+
+    load(toJS(formInspector.formStore.data));
+
+    return () => {
+        stopped = true;
+        clearTimeout(timer);
+        dispose();
+    };
 }

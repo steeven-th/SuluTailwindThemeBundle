@@ -17,6 +17,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.article_webspace_defaults'
             - '%itech_world_sulu_tailwind_theme.article_templates_enabled%'
             - '%itech_world_sulu_tailwind_theme.title_editor%'
+            - '@itech_world.sulu_tailwind_theme.required_button_styles'
         tags:
             - { name: 'sulu.admin' }
             - { name: 'sulu.context', context: 'admin' }
@@ -57,6 +58,7 @@ services:
             $restHelper: '@sulu_core.doctrine_rest_helper'
             $googleFontsCatalog: '@itech_world.sulu_tailwind_theme.google_fonts_catalog'
             $webspaceThemeRepository: '@itech_world.sulu_tailwind_theme.webspace_theme_repository'
+            $requiredButtonStyles: '@itech_world.sulu_tailwind_theme.required_button_styles'
         tags:
             - { name: 'controller.service_arguments' }
 

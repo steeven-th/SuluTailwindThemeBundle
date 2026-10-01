@@ -360,7 +360,7 @@ On a multi-site project each site can pin its own providers — see [Per-site se
 
 ### Declaring the button styles your CSS depends on (optional)
 
-Project CSS that decorates a button style targets its slug (`.iw-button--profile-employer`), which editors can rename in the admin. List those slugs and a theme lacking one is reported by `iw-sulu:theme:compile`, the log and `iw:tailwind-theme:check`, instead of the rule silently matching nothing:
+Project CSS that decorates a button style targets its slug (`.iw-button--profile-employer`), which editors can rename in the admin. List those slugs and a theme lacking one is reported by `iw-sulu:theme:compile`, the log, `iw:tailwind-theme:check` and a warning in the Buttons tab of the theme while it is being edited, instead of the rule silently matching nothing:
 
 ```yaml
 itech_world_sulu_tailwind_theme:

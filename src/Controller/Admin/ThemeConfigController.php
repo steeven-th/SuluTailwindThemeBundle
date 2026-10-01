@@ -14,6 +14,7 @@ use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
 use ItechWorld\SuluTailwindThemeBundle\Service\TypographyWeightValidator;
@@ -63,6 +64,7 @@ class ThemeConfigController extends AbstractController implements SecuredControl
         private readonly ThemeFormMapper $formMapper,
         private readonly TranslatorInterface $translator,
         private readonly TypographyWeightValidator $weightValidator,
+        private readonly ?RequiredButtonStyles $requiredButtonStyles = null,
     ) {
     }
 
@@ -299,8 +301,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
      * @param Request $request The HTTP request carrying the form data as JSON
      * @param int     $id      The theme configuration ID
      *
-     * @return JsonResponse `{css, buttons}`: the stylesheet and the button
-     *                      slugs in form order, or a 400 for a body that is not a JSON object,
+     * @return JsonResponse `{css, buttons, missingButtons}`: the stylesheet,
+     *                      the button slugs in form order and the required
+     *                      styles the form lacks, or a 400 for a body that is not a JSON object,
      *                      or a 422 while the form holds a duplicate slug
      *
      * @throws NotFoundHttpException If the theme is not found
@@ -346,6 +349,9 @@ class ThemeConfigController extends AbstractController implements SecuredControl
             [
                 'css' => $this->compiler->compileToString($draft),
                 'buttons' => $buttons,
+                // The styles the project CSS depends on and this form no
+                // longer defines, which the buttons form warns about.
+                'missingButtons' => $this->requiredButtonStyles?->missingIn($draft) ?? [],
             ],
             Response::HTTP_OK,
             ['Cache-Control' => 'no-store'],

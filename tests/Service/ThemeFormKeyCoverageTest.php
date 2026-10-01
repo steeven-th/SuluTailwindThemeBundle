@@ -29,6 +29,13 @@ use PHPUnit\Framework\TestCase;
 final class ThemeFormKeyCoverageTest extends TestCase
 {
     /**
+     * Field types that render something and store nothing.
+     *
+     * @var list<string>
+     */
+    private const DISPLAY_ONLY_TYPES = ['heading', 'iw_theme_required_buttons_notice'];
+
+    /**
      * Prefixes the mapper carries wholesale, whatever the field is called.
      *
      * Each is read by an unflatten pass that walks the data looking for the
@@ -137,7 +144,8 @@ final class ThemeFormKeyCoverageTest extends TestCase
     /**
      * The fields of a form that reach the mapper as flat keys.
      *
-     * A heading holds no value. A field declared inside a block is not a flat
+     * A heading holds no value, nor does a field that only displays something
+     * (DISPLAY_ONLY_TYPES). A field declared inside a block is not a flat
      * key either: it names a property of a repeated item, which the mapper
      * rebuilds from the block as a whole, so `slug` in the buttons form is not
      * a setting called `slug`.
@@ -159,7 +167,7 @@ final class ThemeFormKeyCoverageTest extends TestCase
         foreach ($fields as $field) {
             \assert($field instanceof \DOMElement);
 
-            if ('heading' === $field->getAttribute('type')) {
+            if (\in_array($field->getAttribute('type'), self::DISPLAY_ONLY_TYPES, true)) {
                 continue;
             }
 

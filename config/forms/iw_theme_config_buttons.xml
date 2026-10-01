@@ -53,6 +53,9 @@
             </properties>
         </section>
 
+        <!-- Holds no value: warns while a style the project CSS depends on is missing. -->
+        <property name="requiredButtonsNotice" type="iw_theme_required_buttons_notice"/>
+
         <!-- Buttons - unlimited, named by slug (repeatable block) -->
         <block name="buttons" default-type="button" minOccurs="0">
             <meta>

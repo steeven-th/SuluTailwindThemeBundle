@@ -24,6 +24,7 @@ import RadiusSelector from './components/RadiusSelector/RadiusSelector';
 import ShadowEditor from './components/ShadowEditor/ShadowEditor';
 import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker';
 import ButtonPreview from './components/ButtonPreview/ButtonPreview';
+import RequiredButtonsNotice from './components/RequiredButtonsNotice/RequiredButtonsNotice';
 import WeightPicker from './components/WeightPicker/WeightPicker';
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
 import TitleEditor from './components/TitleEditor/TitleEditor';
@@ -75,6 +76,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
         ArticleStylePicker.articleStyles = config.articleStyles || {};
         collapsibleSections.init(config.collapsibleSections || {});
         FontPicker.hasApiKey = config.hasApiKey || false;
+        RequiredButtonsNotice.requiredSlugs = config.requiredButtonStyles || [];
         BlockScopeSelector.blockStyles = config.blockStyles || {};
         BlockScopeSelector.suggestedScope = config.maxWidthSuggestedScope || [];
     }
@@ -118,6 +120,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_shadow_editor', ShadowEditor);
     fieldRegistry.add('iw_theme_button_style_picker', ButtonStylePicker);
     fieldRegistry.add('iw_theme_button_preview', ButtonPreview);
+    fieldRegistry.add('iw_theme_required_buttons_notice', RequiredButtonsNotice);
     fieldRegistry.add('iw_theme_weight_picker', WeightPicker);
     fieldRegistry.add('iw_theme_article_style_picker', ArticleStylePicker);
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);

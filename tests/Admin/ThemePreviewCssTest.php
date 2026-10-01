@@ -13,6 +13,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\CustomFieldSanitizer;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
@@ -97,6 +98,31 @@ final class ThemePreviewCssTest extends TestCase
     }
 
     /**
+     * The check the compiler logs, run on the unsaved form: the buttons form
+     * warns with it before the save.
+     */
+    #[Test]
+    public function itReportsTheRequiredStylesTheFormLacks(): void
+    {
+        $required = new RequiredButtonStyles(['main', 'profile-employer']);
+        $response = $this->controller(self::theme(), $required)->previewCssAction(self::request([
+            'buttons' => [['type' => 'button', 'label' => 'Main', 'slug' => 'main']],
+        ]), 20);
+
+        self::assertSame(['profile-employer'], self::body($response)['missingButtons']);
+    }
+
+    #[Test]
+    public function aProjectDeclaringNoStyleMissesNone(): void
+    {
+        $response = $this->controller(self::theme())->previewCssAction(self::request([
+            'buttons' => [],
+        ]), 20);
+
+        self::assertSame([], self::body($response)['missingButtons']);
+    }
+
+    /**
      * A duplicate slug is a normal state while one is being typed.
      */
     #[Test]
@@ -135,7 +161,7 @@ final class ThemePreviewCssTest extends TestCase
         self::assertArrayNotHasKey('preview', $theme->getTokens()['buttons'][0]);
     }
 
-    private function controller(ThemeConfig $theme): ThemeConfigController
+    private function controller(ThemeConfig $theme, ?RequiredButtonStyles $required = null): ThemeConfigController
     {
         $repository = $this->createStub(ThemeConfigRepository::class);
         $repository->method('find')->willReturn($theme);
@@ -157,6 +183,7 @@ final class ThemePreviewCssTest extends TestCase
             new ThemeFormMapper(new SlugValidator(), new CustomFieldSanitizer()),
             $this->createStub(TranslatorInterface::class),
             $this->createStub(TypographyWeightValidator::class),
+            $required,
         );
     }
 

@@ -1,10 +1,9 @@
 // @flow
 import React from 'react';
-import {reaction, toJS} from 'mobx';
 import {translate} from 'sulu-admin-bundle/utils';
 import checkerBackground from 'sulu-media-bundle/components/MediaCard/checkerBackground.gif';
 import {parseRef} from '../../utils/colorRefResolver';
-import loadThemePreviewCss from '../../utils/themePreviewCss';
+import {watchThemePreview} from '../../utils/themePreviewCss';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
 import type {ThemePreview} from '../../utils/themePreviewCss';
 
@@ -24,8 +23,6 @@ import type {ThemePreview} from '../../utils/themePreviewCss';
  * The field holds no value. It sits in the item of a button and reads the form
  * through the form inspector.
  */
-
-const DEBOUNCE_MS = 400;
 
 const STORAGE_KEY = 'iw_sulu_tailwind_theme.button_preview_background';
 
@@ -124,21 +121,10 @@ export default class ButtonPreview extends React.Component<Props, State> {
     frame: ?HTMLIFrameElement = null;
     frameReady: boolean = false;
     paintedCss: ?string = null;
-    timer: ?TimeoutID = null;
-    disposeReaction: ?() => void = null;
-    unmounted: boolean = false;
+    stopWatching: ?() => void = null;
 
     componentDidMount() {
-        const {formInspector} = this.props;
-
-        // Deep conversion, so a change anywhere in the form is seen: a palette
-        // colour edited in another tab changes the buttons that reference it.
-        this.disposeReaction = reaction(
-            () => toJS(formInspector.formStore.data),
-            (data) => this.schedule(data),
-        );
-
-        this.load(toJS(formInspector.formStore.data));
+        this.stopWatching = watchThemePreview(this.props.formInspector, (preview) => this.setState({preview}));
     }
 
     componentDidUpdate() {
@@ -146,34 +132,9 @@ export default class ButtonPreview extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        this.unmounted = true;
-        clearTimeout(this.timer);
-        if (this.disposeReaction) {
-            this.disposeReaction();
+        if (this.stopWatching) {
+            this.stopWatching();
         }
-    }
-
-    schedule(data: Object) {
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => this.load(data), DEBOUNCE_MS);
-    }
-
-    load(data: Object) {
-        const {id} = this.props.formInspector;
-        if (!id) {
-            return;
-        }
-
-        loadThemePreviewCss(id, data)
-            .then((preview) => {
-                if (!this.unmounted) {
-                    this.setState({preview});
-                }
-            })
-            .catch(() => {
-                // A duplicate slug while typing, or a failed request: the
-                // previous rendering stays until the next change compiles.
-            });
     }
 
     /**

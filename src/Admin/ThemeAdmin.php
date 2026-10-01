@@ -9,6 +9,7 @@ use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ArticleWebspaceDefaults;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog;
+use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
@@ -242,6 +243,7 @@ class ThemeAdmin extends Admin
         private bool $articleTemplatesEnabled = false,
         /** @var array<string, array<string, bool>> Buttons the title editor offers, per context */
         private array $titleEditorConfig = [],
+        private ?RequiredButtonStyles $requiredButtonStyles = null,
     ) {
     }
 
@@ -769,6 +771,10 @@ class ThemeAdmin extends Admin
             // still wins, so a project can override one field without giving up
             // the site-wide setting.
             'titleEditor' => $this->titleEditorConfig,
+            // The button styles the project CSS depends on. The buttons form
+            // warns while one of them is missing, and stays silent, without a
+            // request, on a project that declares none.
+            'requiredButtonStyles' => $this->requiredButtonStyles?->all() ?? [],
         ]);
     }
 

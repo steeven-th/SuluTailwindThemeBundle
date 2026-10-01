@@ -129,6 +129,7 @@
     "iw_sulu_tailwind_theme.button_preview_info": "Die Schaltfläche, wie die Website sie darstellt, nicht gespeicherte Einstellungen inbegriffen. Mit der Maus darüberfahren, klicken oder per Tastatur ansteuern, um ihre Zustände zu sehen.",
     "iw_sulu_tailwind_theme.button_preview_text": "Schaltfläche",
     "iw_sulu_tailwind_theme.button_preview_unsaved": "Die Vorschau erscheint, sobald das Theme einmal gespeichert wurde.",
+    "iw_sulu_tailwind_theme.required_buttons_missing": "Das CSS der Website gestaltet diese Schaltflächenstile, die in diesem Theme fehlen: {slugs}. Legen Sie einen Stil mit diesem Slug neu an, sonst verschwindet ihre Gestaltung von der Website.",
     "iw_sulu_tailwind_theme.button_preview_background": "Vorschau-Hintergrund",
     "iw_sulu_tailwind_theme.button_slug": "Slug",
     "iw_sulu_tailwind_theme.button_slug_info": "Stabiler Bezeichner für die CSS-Klasse (.iw-button--slug). Umbenennen beschädigt Blöcke, die diese Schaltfläche bereits verwenden.",

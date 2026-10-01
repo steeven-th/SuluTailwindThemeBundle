@@ -109,6 +109,8 @@ itech_world_sulu_tailwind_theme:
 
 A theme lacking one of them is then reported, never blocked: a warning from `iw-sulu:theme:compile`, a warning in the log each time the theme is compiled (which is what a save in the admin does), and an orange line per site theme in `iw:tailwind-theme:check`.
 
+The editor is warned too, where the mistake is made: the **Buttons** tab of the theme shows a warning above the list as soon as a declared slug is renamed or deleted, before the save. It names the missing slugs, goes away once they are back, and never prevents saving. A project declaring no slug gets no warning and no request.
+
 **Inside a block variant**, the button of the variant carries `.iw-button--variant`, not the class of its style: it gets the colours, the rule and `--iw-button-accent` of the style, but a selector keyed on the slug does not reach it. Name those variants in the rule when they use a decorated style:
 
 ```css
