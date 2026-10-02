@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
 use Twig\Environment;
@@ -35,7 +36,13 @@ final class MenuTemplateRenderer
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
         $twig->addGlobal('app', ['request' => ['locale' => 'en']]);
 
-        $twig->addFunction(new TwigFunction('sulu_snippet_load_by_area', static fn (string $area): ?array => \in_array($area, ['iw_theme_menu_social_media_links', 'iw_theme_footer_social_media_links'], true) ? self::socialSnippet() : null));
+        $twig->addFunction(new TwigFunction('sulu_snippet_load_by_area', static fn (string $area): ?array => match ($area) {
+            'iw_theme_menu_social_media_links', 'iw_theme_footer_social_media_links' => self::socialSnippet(),
+            'iw_theme_menu_actions' => self::actionsSnippet(),
+            default => null,
+        }));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_button', ButtonReader::read(...)));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_site_value', static fn (mixed $value): mixed => \is_array($value) ? ($value['_default'] ?? '') : $value));
         $twig->addFunction(new TwigFunction('sulu_page_navigation_root_tree', static fn (): array => $tree));
         $twig->addFunction(new TwigFunction('sulu_content_path', static fn (string $path): string => '/en' . ('/' === $path ? '' : $path)));
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (int $id): array => 10 === $id ? ['url' => '/media/curtain.jpg', 'thumbnails' => []] : ['url' => '/media/icon.svg', 'thumbnails' => []]));
@@ -50,6 +57,20 @@ final class MenuTemplateRenderer
         $twig->registerUndefinedFunctionCallback(static fn (string $name): TwigFunction => new TwigFunction($name, static fn (): null => null));
 
         return $twig->render($template ?? '@ItechWorldSuluTailwindTheme/menu/_' . $config['type'] . '.html.twig', ['config' => $config]);
+    }
+
+    /**
+     * One bar action, shown only once a config turns `displayBarActions` on.
+     *
+     * @return array<string, mixed>
+     */
+    private static function actionsSnippet(): array
+    {
+        return ['content' => ['actions' => [[
+            'type' => 'action_link',
+            'visibility' => 'always',
+            'button' => ['style' => 'primary', 'display' => 'button', 'link' => ['url' => '/en/join', 'title' => 'Join']],
+        ]]]];
     }
 
     /**

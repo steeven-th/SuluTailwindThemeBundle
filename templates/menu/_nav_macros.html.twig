@@ -24,3 +24,16 @@
 {% macro branch_class(state) -%}
     {%- if state %} iw-menu__item--ancestor{% endif -%}
 {%- endmacro %}
+
+{# Layout classes of the bar, on the root of every menu type.
+
+   - iw-menu--links-<left|center|right>: where the links of the bar sit, after
+     the logo, in the middle of the page, or before the right-hand group.
+   - iw-menu--wide: the bar is no longer held to the width of the content. It
+     stretches up to `--iw-menu-frame-max` (emitted from the theme), so the
+     logo and the burger move out to the edges of the screen. #}
+{% macro bar_layout_class(config, position) -%}
+    {%- set position = position in ['left', 'center', 'right'] ? position : 'center' -%}
+    {{- ' iw-menu--links-' ~ position -}}
+    {%- if config.barWidth|default('') in ['1920', '2560', '3840', 'none'] %} iw-menu--wide{% endif -%}
+{%- endmacro %}

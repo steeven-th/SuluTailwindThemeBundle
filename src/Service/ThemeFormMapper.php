@@ -228,6 +228,9 @@ class ThemeFormMapper
         'logoDesktop', 'logoMobile', 'logoHeightDesktop', 'logoHeightMobile',
         // Bar size, read by ThemeCompiler: the effective height also depends on the logo.
         'barHeightDesktop', 'barHeightMobile', 'logoSpacing',
+        // Width of the bar and position of the burger bar actions, read by the
+        // menu templates and ThemeCompiler.
+        'barWidth', 'barActionsPosition',
         'logoTransparentDesktop', 'logoTransparentMobile',
         'panelLayout', 'panelWidth', 'panelSide',
         'panelImage', 'panelImageFrom', 'panelContentPosition', 'panelL1Size', 'transparentNavbar', 'scrollBg', 'scrollHide',

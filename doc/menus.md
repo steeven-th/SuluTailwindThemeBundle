@@ -25,6 +25,7 @@ These options are available regardless of the menu type:
 | **Logo height desktop / mobile** | (Shown when the matching logo is displayed) Logo height in pixels, 12 to 200, defaulting to 40 desktop / 32 mobile. Raster logos are capped at that height and never upscaled, SVG logos are rendered at exactly that height. The logo image formats go up to 400px high, so a raster logo reaches the height set even on a high-density screen. Compiled to `--iw-menu-logo-height-desktop` / `--iw-menu-logo-height-mobile`. |
 | **Bar height desktop / mobile** | Minimum bar height in pixels, 40 to 240, defaulting to 80 desktop / 64 mobile. The bar grows to hold a displayed logo plus the space around it. See [Bar height](#bar-height). |
 | **Space around the logo** | Pixels kept above and below the logo, 0 to 48, default 12. |
+| **Bar width** | *Same as the content* (default), up to 1920, 2560 or 3840 px, or full width. Past the content width, the logo and the burger move out to the edges of the screen. See [Bar width](#bar-width). |
 | **Display site name** | Show the site name next to the logo. |
 | **Display social media** | Show social media icons (loaded from the `iw_theme_menu_social_media_links` snippet area). |
 | **Show language switcher** | Offer the visitor a way to switch language. The languages are **not** configured here: they are read from the webspace XML, so adding a `<localization>` there is all it takes for one to appear. See [Language switcher](#language-switcher). |
@@ -76,6 +77,34 @@ With the defaults (80, 40 and 12 on desktop), nothing changes: `max(80, 64) = 80
 | `--iw-menu-panels-offset` | Top offset of the drill-down panels. Follows `--iw-menu-bar-height` unless a project overrides it, `0` in a side panel, which already starts under the bar. |
 
 `html` gets `scroll-padding-top: var(--iw-menu-bar-height)`, so the target of an in-page link does not land under the sticky bar.
+
+## Bar width
+
+By default the content of the bar holds to the width of the page content, the Tailwind `container`. A wider setting stretches it up to the chosen width and centres it beyond, so on a large screen the logo and the burger sit near the edges of the window while the page content stays centred. All three types, from the `md` breakpoint (below it, the bar is already full width).
+
+| Class / variable | Role |
+|------------------|------|
+| `.iw-menu--wide` | On the root of the menu when a width is chosen. |
+| `.iw-menu__container` | The element holding the bar to its width: the frame of the navbar and the burger, the inner wrapper of the mega menu (whose frame stays full width for its panels). |
+| `--iw-menu-frame-max` | The chosen width (`1920px`, `none`…), compiled from the setting. A project can set its own on `.iw-menu--wide`. |
+| `--iw-menu-frame-padding-wide` | Side padding of a wide bar from 1280px, default `3rem` (48px). Below that, the usual 16/24/32px. |
+
+The logo no longer lines up with the left edge of the blocks once the bar is wider than the content. That is the point of the setting, not a side effect to correct.
+
+## Position of the bar links
+
+The links of the bar sit after the logo, in the middle of the page, or before the right-hand group (language switcher, social icons and burger). The language switcher and the social icons always stay at the right end, with the burger when it is on the right. With the burger on the left, it opens the bar before the logo and the icons keep the right end.
+
+**Centered** means centered on the page, not in the space left between the logo and the right-hand group: from `md` up, the bar becomes a three-column grid whose sides share the remaining width equally (`.iw-menu--links-center`). A side wider than its share keeps its content and pushes the links off centre rather than overlapping them, and the bar then overflows, which is what the automatic switch to the burger measures.
+
+| Class | Role |
+|-------|------|
+| `.iw-menu--links-left` / `--links-center` / `--links-right` | On the root of the menu. |
+| `.iw-menu__bar-start` | Logo, site name, and the burger when it is on the left. |
+| `.iw-menu__bar-links` | The links of a navbar or mega menu, the actions of a burger bar once moved out. |
+| `.iw-menu__bar-end` | Language switcher, social icons, bar actions of a navbar, and the burger when it is on the right. |
+
+The navbar and the mega menu read **Nav position** (default centered). The burger reads **Position of the bar buttons** (default right), a key of its own: a burger theme stores the navbar default of **Nav position**, and reading it would move the actions of every existing burger bar to the middle. On the right, the actions stay inside `.iw-menu__bar-end` as they always were. Below `md` they always sit on the right.
 
 ## Transparent bar over a hero
 
@@ -190,7 +219,7 @@ The width between the two is **Menu > Display > Move into the open menu** on the
 
 | Setting | Description |
 |---------|-------------|
-| **Nav position** | Alignment of navigation links: `left`, `center`, or `right`. |
+| **Nav position** | Alignment of navigation links: `left` (after the logo), `center` (default, on the page) or `right` (before the icons). See [Position of the bar links](#position-of-the-bar-links). |
 | **Switch to the mobile menu** | Width under which the links give way to the burger: automatic (default), 768px, 1024px or 1280px. See [Links or burger](#links-or-burger). |
 | **Parent page access (navbar)** | Checkbox — adds a self-link to parent pages in navbar submenus so the parent page itself is clickable. |
 
@@ -199,6 +228,7 @@ The width between the two is **Menu > Display > Move into the open menu** on the
 | Setting | Description |
 |---------|-------------|
 | **Panel** | `Full screen` (default) or `On a side`. See [Full screen or side panel](#full-screen-or-side-panel). |
+| **Position of the bar buttons** | `left` (after the logo), `center` (on the page) or `right` (default, before the icons and the burger), from `md` up. See [Position of the bar links](#position-of-the-bar-links). |
 | **Side** | `left` or `right` (default): where the burger sits in the bar. A side panel opens on that side. A full-screen panel puts its links there and its picture on the other side. |
 | **First level size** | `Normal` (default) or `Large` (`--iw-menu-panel-l1-size`, `clamp(1.5rem, 2.5vw, 2.25rem)`), an editorial look for a short menu on a wide screen. |
 | **Position of the links** | (Full screen) `Automatic` (default), `Against the picture`, `Centered` or `Against the edge`. Automatic puts the links against the picture, and centers them without one. Against the edge lines them up with the logo, or sets them against the outer side of their zone beside a picture. Against the picture falls back on the edge without one. |
@@ -225,7 +255,7 @@ The former `sidebar` and `fullscreen` menu types are these panels. A theme saved
 
 | Setting | Description |
 |---------|-------------|
-| **Nav position** | Alignment of navigation links: `left`, `center`, or `right`. |
+| **Nav position** | Same setting as the navbar. See [Position of the bar links](#position-of-the-bar-links). |
 | **Switch to the mobile menu** | Same setting as the navbar. See [Links or burger](#links-or-burger). |
 | **Data source** | `native` (page tree) or `snippet` (manual structure via snippet). |
 | **Parent page access** | (`native` source only) Same checkbox as the navbar. A parent with children is a button that opens its panel, so its own page is reached through a link carrying its title at the top of the panel (desktop) and of the accordion (mobile). In `snippet` mode, the `link` field of each Mega Dropdown plays this role instead. |

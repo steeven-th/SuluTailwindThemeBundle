@@ -113,6 +113,74 @@
                 </params>
             </property>
 
+            <!-- Width and position of the bar side by side. Every type gets a
+                 position (navPosition for the links of a navbar or a mega menu,
+                 barActionsPosition for the actions of a burger), so the row is
+                 always complete and the pairs of checkboxes below keep their
+                 parity. -->
+            <property name="menuConfig_barWidth" type="single_select" colspan="6">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barWidth</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barWidth_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value=""/>
+                    <param name="values" type="collection">
+                        <param name=""><meta><title>iw_sulu_tailwind_theme.menu_barWidth_content</title></meta></param>
+                        <param name="1920"><meta><title>iw_sulu_tailwind_theme.menu_barWidth_1920</title></meta></param>
+                        <param name="2560"><meta><title>iw_sulu_tailwind_theme.menu_barWidth_2560</title></meta></param>
+                        <param name="3840"><meta><title>iw_sulu_tailwind_theme.menu_barWidth_3840</title></meta></param>
+                        <param name="none"><meta><title>iw_sulu_tailwind_theme.menu_barWidth_none</title></meta></param>
+                    </param>
+                </params>
+            </property>
+
+            <property name="menuConfig_navPosition" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'navbar' OR menuConfig_type == 'megamenu'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_navPosition</title>
+                </meta>
+                <params>
+                    <param name="default_value" value="center"/>
+                    <param name="values" type="collection">
+                        <param name="left">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_left</title></meta>
+                        </param>
+                        <param name="center">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_center</title></meta>
+                        </param>
+                        <param name="right">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_right</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
+            <!-- The burger bar shows actions, not links. A key of its own: a
+                 burger theme stores the navbar default of navPosition, and
+                 reading it would centre every existing burger bar. -->
+            <property name="menuConfig_barActionsPosition" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_barActionsPosition</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_barActionsPosition_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" value="right"/>
+                    <param name="values" type="collection">
+                        <param name="left">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_left</title></meta>
+                        </param>
+                        <param name="center">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_center</title></meta>
+                        </param>
+                        <param name="right">
+                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_right</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
+
             <property name="menuConfig_displaySiteName" type="checkbox" colspan="6">
                 <meta>
                     <title>iw_sulu_tailwind_theme.menu_displaySiteName</title>

@@ -64,27 +64,6 @@
                 </params>
             </property>
 
-            <property name="menuConfig_navPosition" type="single_select" colspan="6"
-                      visibleCondition="menuConfig_type == 'navbar' OR menuConfig_type == 'megamenu'">
-                <meta>
-                    <title>iw_sulu_tailwind_theme.menu_navPosition</title>
-                </meta>
-                <params>
-                    <param name="default_value" value="center"/>
-                    <param name="values" type="collection">
-                        <param name="left">
-                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_left</title></meta>
-                        </param>
-                        <param name="center">
-                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_center</title></meta>
-                        </param>
-                        <param name="right">
-                            <meta><title>iw_sulu_tailwind_theme.menu_navPosition_right</title></meta>
-                        </param>
-                    </param>
-                </params>
-            </property>
-
             <!-- Width under which the bar gives way to the burger. The labels,
                  the logo and the icons decide what fits, hence the automatic
                  value, which measures the bar instead of guessing a width. -->

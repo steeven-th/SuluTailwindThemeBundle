@@ -3142,6 +3142,15 @@ class ThemeCompiler
         $css .= "  --iw-menu-bar-height-desktop: {$barDesktop}px;\n";
         $css .= "  --iw-menu-bar-height-mobile: {$barMobile}px;\n";
 
+        // How far a wide bar may stretch (see generateMenuClasses(), "Bar
+        // width"). Left out for the default, where the content width holds it.
+        $barWidth = (string) ($menuConfig['barWidth'] ?? '');
+        if (\in_array($barWidth, ['1920', '2560', '3840'], true)) {
+            $css .= "  --iw-menu-frame-max: {$barWidth}px;\n";
+        } elseif ('none' === $barWidth) {
+            $css .= "  --iw-menu-frame-max: none;\n";
+        }
+
         // The size of the menu buttons, only when set: the defaults live in
         // the rule that reads them (see compileMenu(), "Menu buttons").
         foreach (['buttonPaddingY' => ['padding-y', 0, 40], 'buttonPaddingX' => ['padding-x', 0, 64], 'buttonFontSize' => ['font-size', 10, 24]] as $key => [$name, $min, $max]) {
@@ -3790,6 +3799,33 @@ class ThemeCompiler
         // the button is centred in the bar, so the bottom edge is half the
         // bar below the middle of the button's wrapper.
         $css .= ".iw-menu__bar-dropdown { top: calc(50% + var(--iw-menu-bar-height) / 2); }\n\n";
+
+        // ─── Bar width and links position ─────────────────────────────────────
+        // A wide bar leaves the width of the content: it stretches up to the
+        // theme value (see generateMenuVariables()), and the logo and the
+        // burger move out to the edges. Unlayered, so it beats the Tailwind
+        // `container` the frame carries for the default width. The side
+        // padding grows on a large screen, where 32px against the edge of the
+        // window reads as cramped.
+        $css .= ".iw-menu--wide .iw-menu__container { max-width: var(--iw-menu-frame-max, none); }\n";
+        $css .= "@media (min-width: 1280px) { .iw-menu--wide .iw-menu__container { padding-inline: var(--iw-menu-frame-padding-wide, 3rem); } }\n";
+        // Centred links sit in the middle of the page, not in the space left
+        // between the logo and the right-hand group: three columns whose sides
+        // share what remains equally. A side wider than its share keeps its
+        // content (max-content) and pushes the links off centre rather than
+        // overlapping them, and the bar then overflows, which is what the
+        // automatic switch to the burger measures. Named areas, so a hidden
+        // group (the links of a collapsed bar) leaves the others in place.
+        $css .= "@media (min-width: 768px) {\n";
+        $css .= "  .iw-menu--links-center .iw-menu__bar { display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); grid-template-areas: \"start links end\"; }\n";
+        $css .= "  .iw-menu--links-center .iw-menu__bar-start { grid-area: start; justify-self: start; }\n";
+        $css .= "  .iw-menu--links-center .iw-menu__bar-links { grid-area: links; margin-inline: 0; }\n";
+        $css .= "  .iw-menu--links-center .iw-menu__bar-end { grid-area: end; justify-self: end; }\n";
+        $css .= "}\n";
+        // Below md the burger actions moved out of the right-hand group still
+        // sit against it, at the spacing of that group (gap-3) rather than at
+        // the wider gap between groups. The links of a navbar are hidden there.
+        $css .= "@media (max-width: 767.98px) { .iw-menu__bar-links:not(.iw-menu__desktop-only) + .iw-menu__bar-end { margin-left: calc(0.75rem - var(--iw-menu-bar-gap, 1.5rem)); } }\n\n";
 
         // ─── Menu buttons ─────────────────────────────────────────────────────
         // A page button is sized for a page: at the theme padding it can be

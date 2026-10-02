@@ -74,28 +74,46 @@
 {% endset %}
 {% set burgerFirst = side == 'left' %}
 
+{# Where the bar actions sit on a wide screen. Right, the default, keeps them
+   in the right-hand group as they always were. Left and centre take them out
+   into a group of their own, which the bar places (see ThemeCompiler). A key
+   of its own rather than `navPosition`: a burger theme stores the navbar
+   default `center` for that one, so reading it would move every existing
+   burger bar to the middle. #}
+{% set actionsPosition = config.barActionsPosition|default('right') in ['left', 'center', 'right'] ? config.barActionsPosition|default('right') : 'right' %}
+{% set barActions %}{% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig' with {config: config, slot: 'bar'} only %}{% endset %}
+{% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
+
 <header
     data-controller="menu"
     data-menu-open-label-value="{{ 'iw_sulu_tailwind_theme.menu_open'|trans({}, 'messages') }}"
     data-menu-close-label-value="{{ 'iw_sulu_tailwind_theme.menu_close'|trans({}, 'messages') }}"
     data-menu-scroll-bg-value="{{ (config.scrollBg ?? true) ? 'true' : 'false' }}"
     data-menu-scroll-hide-value="{{ (config.scrollHide ?? false) ? 'true' : 'false' }}"
-    class="iw-menu{{ config.displayBarActions|default(false) or langBoth ? ' iw-menu--actions-at-' ~ actionsAt : '' }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
+    class="iw-menu{{ config.displayBarActions|default(false) or langBoth ? ' iw-menu--actions-at-' ~ actionsAt : '' }}{{ nav.bar_layout_class(config, actionsPosition) }} {{ config.transparentNavbar|default(false) ? 'iw-menu--transparent' : '' }} sticky top-0 z-40 w-full"
 >
-    <div class="iw-menu__frame relative z-50 container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="iw-menu__frame relative z-50 iw-menu__container container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="iw-menu__bar flex items-center justify-between">
 
             {# LEFT - (Burger) + Logo + Site Name #}
-            <div class="flex-shrink-0 flex items-center gap-3">
+            <div class="iw-menu__bar-start flex-shrink-0 flex items-center gap-3">
                 {% if burgerFirst %}{{ burgerButton }}{% endif %}
                 {% include '@ItechWorldSuluTailwindTheme/menu/_logo_link.html.twig'
                     with {config: config, nameClass: 'text-xl font-bold'} only %}
             </div>
 
-            {# RIGHT - Bar actions + Language switcher + Social media + (Burger) #}
-            <div class="flex items-center gap-3">
-                {% include '@ItechWorldSuluTailwindTheme/menu/_bar_actions.html.twig'
-                    with {config: config, slot: 'bar'} only %}
+            {# Bar actions, placed on their own after the logo or in the
+               middle of the page. Pushed to the right below the md breakpoint,
+               where the bar is a plain row. #}
+            {% if actionsPosition != 'right' and barActions|trim is not empty %}
+                <div class="iw-menu__bar-links flex items-center ml-auto{{ actionsPosition == 'left' ? ' md:ml-0 md:mr-auto' : '' }}">
+                    {{ barActions }}
+                </div>
+            {% endif %}
+
+            {# RIGHT - (Bar actions) + Language switcher + Social media + (Burger) #}
+            <div class="iw-menu__bar-end flex items-center gap-3">
+                {% if actionsPosition == 'right' %}{{ barActions }}{% endif %}
 
                 {# Language switcher - in the bar, reachable without opening the
                    menu. Hidden when the theme places it in the panel only. #}
