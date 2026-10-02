@@ -34,11 +34,27 @@
                     </param>
                 </params>
             </property>
-            <property name="youtubeId" type="text_line"
+            <!-- Beside the provider, on the row it leaves free. A playlist is
+                 embedded by its own id, the one after `list=`, and through
+                 another address: two fields rather than one, so each keeps a
+                 label and a help that say what to paste, and switching back
+                 keeps the video id. -->
+            <property name="youtubePlaylist" type="checkbox" colspan="6"
                       visibleCondition="__parent.provider == 'youtube'">
+                <meta><title>iw_sulu_tailwind_theme.video_youtube_playlist</title></meta>
+            </property>
+            <property name="youtubeId" type="text_line"
+                      visibleCondition="__parent.provider == 'youtube' AND __parent.youtubePlaylist != true">
                 <meta>
                     <title>iw_sulu_tailwind_theme.video_youtube_id</title>
                     <info_text>iw_sulu_tailwind_theme.video_youtube_id_info</info_text>
+                </meta>
+            </property>
+            <property name="youtubePlaylistId" type="text_line"
+                      visibleCondition="__parent.provider == 'youtube' AND __parent.youtubePlaylist == true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_youtube_playlist_id</title>
+                    <info_text>iw_sulu_tailwind_theme.video_youtube_playlist_id_info</info_text>
                 </meta>
             </property>
             <property name="vimeoId" type="text_line"

@@ -1781,7 +1781,10 @@ republish.
 
 `text_images` in `--classic` gets a **Media type** field: *Images* (unchanged)
 or *Video*, with a YouTube id, a Vimeo id or a hosted file plus its poster. The
-media zone then renders the player instead of the image slider.
+media zone then renders the player instead of the image slider. A **Playlist**
+toggle on YouTube swaps the video id for a playlist id, the part after `list=`
+in its link, and embeds the playlist. YouTube only plays a public or unlisted
+one.
 
 `key_figures` gets titles, a subtitle and a rich text - it was the only block
 without them - and a `--split` style putting that text beside the figures. The

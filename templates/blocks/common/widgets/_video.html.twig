@@ -8,6 +8,8 @@
    Parameters:
      - provider    : youtube | vimeo | file
      - youtubeId / vimeoId : the id for the matching provider
+     - youtubePlaylist   : true to embed a YouTube playlist instead of a video
+     - youtubePlaylistId : the playlist id, the part after `list=` in its link
      - videoFile   : Sulu media object, when the video is hosted here
      - videoPoster : Sulu media object. The `poster` of a hosted video, and
                      the facade of an embedded one: with it, the frame only
@@ -27,9 +29,20 @@
    before the click. `_embed_frame` already does exactly that for the iframe
    block, placeholder image included, so the widget hands the work over rather
    than growing its own. Without a poster the frame loads as before. #}
+{# A playlist is embedded through YouTube's `videoseries` address, which plays
+   the list in order. Its id goes in a query string, hence the encoding. #}
+{% set youtubeSrc = '' %}
+{% if youtubePlaylist|default(false) %}
+    {% if youtubePlaylistId|default('') is not empty %}
+        {% set youtubeSrc = 'https://www.youtube.com/embed/videoseries?list=' ~ youtubePlaylistId|trim|url_encode %}
+    {% endif %}
+{% elseif youtubeId|default('') is not empty %}
+    {% set youtubeSrc = 'https://www.youtube.com/embed/' ~ youtubeId %}
+{% endif %}
+
 {% set embedSrc = '' %}
-{% if kind == 'youtube' and youtubeId|default('') is not empty %}
-    {% set embedSrc = 'https://www.youtube.com/embed/' ~ youtubeId %}
+{% if kind == 'youtube' and youtubeSrc is not empty %}
+    {% set embedSrc = youtubeSrc %}
 {% elseif kind == 'vimeo' and vimeoId|default('') is not empty %}
     {% set embedSrc = 'https://player.vimeo.com/video/' ~ vimeoId %}
 {% endif %}
@@ -51,9 +64,9 @@
     } only %}
 {% else %}
 <div class="iw-widget__video-wrap{% if videoRadius|default('') %} {{ videoRadius }} overflow-hidden{% endif %}">
-    {% if kind == 'youtube' and youtubeId|default('') is not empty %}
+    {% if kind == 'youtube' and youtubeSrc is not empty %}
         <iframe
-            src="https://www.youtube.com/embed/{{ youtubeId }}"
+            src="{{ youtubeSrc }}"
             class="iw-widget__video w-full border-0 iw-ratio--16-9"
             loading="lazy"
             title="{{ 'iw_sulu_tailwind_theme.media_video'|trans }}"

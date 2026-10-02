@@ -34,6 +34,8 @@
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/widgets/_video.html.twig' with {
                 provider: item.provider|default('youtube'),
                 youtubeId: item.youtubeId|default(''),
+                youtubePlaylist: item.youtubePlaylist|default(false),
+                youtubePlaylistId: item.youtubePlaylistId|default(''),
                 vimeoId: item.vimeoId|default(''),
                 videoFile: item.videoFile|default(null),
                 videoPoster: item.videoPoster|default(null),
