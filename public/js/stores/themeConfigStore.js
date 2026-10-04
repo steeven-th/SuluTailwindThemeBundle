@@ -177,6 +177,11 @@ class ThemeConfigStore {
         return this.current.defaults || {};
     }
 
+    /** Settings shared by every button (padding, pictogram size and gap). */
+    @computed get buttonsGlobal(): Object {
+        return this.current.buttonsGlobal || {};
+    }
+
     /** Which buttons the title editor offers, per context, for this site. */
     @computed get titleEditor(): Object {
         return this.current.titleEditor || {};

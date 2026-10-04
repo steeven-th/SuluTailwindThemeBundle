@@ -71,6 +71,24 @@ final class ButtonIconContractTest extends TestCase
     }
 
     /**
+     * The theme default sits below the size picked on the button.
+     *
+     * Read first, it would make every per-button size a setting that does
+     * nothing as soon as the theme sets one.
+     */
+    #[Test]
+    public function theSizePickedOnTheButtonBeatsTheThemeDefault(): void
+    {
+        $css = (string) file_get_contents(self::root() . '/assets/styles/app.css');
+
+        self::assertMatchesRegularExpression(
+            '/\.iw-button__icon\s*\{\s*width:\s*var\(--iw-button-icon-size,\s*var\(--iw-icon-size,\s*var\(--iw-button-icon-default-size,/s',
+            $css,
+            'The per-button size must be read before the theme default.',
+        );
+    }
+
+    /**
      * The side field is revealed through the parent scope.
      *
      * A button is a block type, so its fields sit in a child scope: a condition

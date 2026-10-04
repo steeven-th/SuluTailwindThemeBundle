@@ -332,10 +332,11 @@ a:hover {
 }
 
 /* On a button, the icon also answers to the button's own size variable, kept
-   for the sites that already set it. */
+   for the sites that already set it. Below the size picked on the button comes
+   the theme default (Buttons > Global settings), then the label's size. */
 .iw-button__icon {
-    width: var(--iw-button-icon-size, var(--iw-icon-size, min(1.25em, 24px)));
-    height: var(--iw-button-icon-size, var(--iw-icon-size, min(1.25em, 24px)));
+    width: var(--iw-button-icon-size, var(--iw-icon-size, var(--iw-button-icon-default-size, min(1.25em, 24px))));
+    height: var(--iw-button-icon-size, var(--iw-icon-size, var(--iw-button-icon-default-size, min(1.25em, 24px))));
 }
 
 

@@ -60,7 +60,7 @@ A collapsed block shows the label of its button in its header.
 
 The choices of the deprecated `icon-picker.xml` and `icon-placement.xml` fragments: a
 pictogram of the theme library or an image of the media library, its size
-(automatic or 16 to 72px) and, with `with_placement`, the side it sits on and
+(the default, automatic or 16 to 72px) and, with `with_placement`, the side it sits on and
 its gap to the label. A library pictogram also has a weight, outline or solid,
 the two sets of Heroicons. The overlay browses the weight picked, and the two
 sets share their names, so switching the weight keeps the pictogram. The

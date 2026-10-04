@@ -108,7 +108,7 @@ class ThemeFormMapper
      * These are stored under tokens.buttonsGlobal.<prop> but exposed in the
      * form as flat keys without a group segment (e.g. buttons_paddingX).
      */
-    public const BUTTON_GLOBAL_PROPS = ['paddingX', 'paddingY'];
+    public const BUTTON_GLOBAL_PROPS = ['paddingX', 'paddingY', 'iconSize', 'iconGap'];
 
     /**
      * Typography assignment elements expected in the form.
@@ -316,7 +316,8 @@ class ThemeFormMapper
 
         // Buttons: repeatable block (tokens.buttons list → data.buttons) + flat
         // global padding (tokens.buttonsGlobal.paddingX → buttons_paddingX).
-        $this->flattenButtons($data, $tokens['buttons'] ?? [], $tokens['buttonsGlobal'] ?? []);
+        $legacyIconGap = $tokens['defaults']['buttonIconGap'] ?? null;
+        $this->flattenButtons($data, $tokens['buttons'] ?? [], $tokens['buttonsGlobal'] ?? [], \is_string($legacyIconGap) ? $legacyIconGap : null);
 
         // Typography: 3 fixed font family slots
         $this->serializeFontFamilySlots($data, $tokens['typography']['families'] ?? []);
@@ -667,6 +668,13 @@ class ThemeFormMapper
         $tokens['buttons'] = $this->unflattenButtons($data);
         $this->slugValidator->validateSlugs(array_column($tokens['buttons'], 'slug'));
         $tokens['buttonsGlobal'] = $this->unflattenButtonsGlobal($data, $legacyGlobal);
+        // The pictogram gap used to live in the block defaults. Carried over
+        // before the old key goes, so saving any tab of a theme that never
+        // opened the Buttons tab keeps the gap it had.
+        if (isset($tokens['defaults']['buttonIconGap'])) {
+            $tokens['buttonsGlobal']['iconGap'] ??= $tokens['defaults']['buttonIconGap'];
+            unset($tokens['defaults']['buttonIconGap']);
+        }
         $tokens['typography'] = $this->unflattenTypography($data, $tokens['typography'] ?? []);
         $tokens['blockVariants'] = $this->unflattenBlockVariants($data, $tokens['blockVariants'] ?? []);
         $this->slugValidator->validateSlugs(array_column($tokens['blockVariants'], 'slug'));
@@ -773,8 +781,9 @@ class ThemeFormMapper
      * @param array<string, mixed> $data          Target array (mutated)
      * @param array<string, mixed> $buttons        Source buttons tokens (list or legacy map)
      * @param array<string, mixed> $buttonsGlobal  Source global padding tokens
+     * @param string|null          $legacyIconGap  Pictogram gap of a theme saved when it was a block default
      */
-    private function flattenButtons(array &$data, array $buttons, array $buttonsGlobal): void
+    private function flattenButtons(array &$data, array $buttons, array $buttonsGlobal, ?string $legacyIconGap = null): void
     {
         // Buttons as a repeatable Sulu block: [{type:'button', slug, label, ...}].
         // ButtonResolver normalizes the stored shape (new list or legacy map) and
@@ -787,6 +796,7 @@ class ThemeFormMapper
         // Global padding — flat form keys (no group segment), sourced from
         // tokens.buttonsGlobal (or the legacy buttons.global for old themes).
         $global = [] !== $buttonsGlobal ? $buttonsGlobal : ButtonResolver::extractLegacyGlobal($buttons);
+        $global['iconGap'] ??= $legacyIconGap;
         foreach (self::BUTTON_GLOBAL_PROPS as $prop) {
             if (isset($global[$prop]) && !is_array($global[$prop])) {
                 $data[self::PREFIX_BUTTONS . $prop] = $global[$prop];
@@ -833,7 +843,7 @@ class ThemeFormMapper
     }
 
     /**
-     * Rebuild the global button padding from the flat form keys.
+     * Rebuild the global button settings (padding, pictogram) from the flat form keys.
      *
      * @param array<string, mixed> $data     Source form data
      * @param array<string, mixed> $existing Existing global values (fallback)

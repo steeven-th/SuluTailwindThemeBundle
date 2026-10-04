@@ -59,6 +59,19 @@ final class FormLayoutContractTest extends TestCase
     ];
 
     /**
+     * Pairs of different heights kept on purpose, as `first|second`.
+     *
+     * Each one closes its section, so no row below it can be shifted, and the
+     * gap under the short field is taken by its description. Anything added
+     * here has to meet both conditions.
+     *
+     * @var list<string>
+     */
+    private const ACCEPTED_PAIRS = [
+        'buttons_iconSize|buttons_iconGap',
+    ];
+
+    /**
      * @return array<string, array{0: string}>
      */
     public static function blockTemplates(): array
@@ -164,7 +177,9 @@ final class FormLayoutContractTest extends TestCase
                     continue;
                 }
 
-                if (2 === \count($row) && self::height($row[0][1]) !== self::height($row[1][1])) {
+                if (2 === \count($row)
+                    && self::height($row[0][1]) !== self::height($row[1][1])
+                    && !\in_array($row[0][0] . '|' . $row[1][0], self::ACCEPTED_PAIRS, true)) {
                     $mismatched[] = \sprintf(
                         '%s (%s) beside %s (%s)',
                         $row[0][0], self::height($row[0][1]),

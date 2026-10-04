@@ -101,8 +101,22 @@ final class ButtonComponentRenderTest extends TestCase
     public function thePickerSizesAreTheSameOnBothSides(): void
     {
         $picker = (string) file_get_contents(self::ROOT . '/public/js/components/IconPicker/IconPicker.js');
-        self::assertStringContainsString("const SIZES = ['', '16', '24', '32', '48', '64', '72'];", $picker);
-        self::assertSame(['', '16', '24', '32', '48', '64', '72'], \ItechWorld\SuluTailwindThemeBundle\Content\IconPickerValue::SIZES);
+        self::assertStringContainsString("const SIZES = ['', 'auto', '16', '24', '32', '48', '64', '72'];", $picker);
+        self::assertSame(['', 'auto', '16', '24', '32', '48', '64', '72'], \ItechWorld\SuluTailwindThemeBundle\Content\IconPickerValue::SIZES);
+    }
+
+    /**
+     * Default leaves the size to the theme, automatic pins the label's size
+     * whatever the theme sets, a number pins that number.
+     */
+    #[Test]
+    public function aPictogramSizeRendersAsPicked(): void
+    {
+        $render = fn (string $size): string => $this->render(['link' => ['url' => '/fr/a', 'title' => 'A'], 'icon' => ['custom' => false, 'icon' => 'star', 'size' => $size]]);
+
+        self::assertStringNotContainsString('--iw-icon-size', $render(''));
+        self::assertStringContainsString('--iw-icon-size: min(1.25em, 24px)', $render('auto'));
+        self::assertStringContainsString('--iw-icon-size: 32px', $render('32'));
     }
 
     /**
@@ -121,7 +135,7 @@ final class ButtonComponentRenderTest extends TestCase
         // Only called for the flat fields of the fragment, never for a resolved picker.
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (): never => throw new \LogicException('A resolved picker needs no media query.')));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_has_icon', static fn (string $name): bool => '' !== $name));
-        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_icon', static fn (string $name, string $variant, array $attrs): string => '<svg class="' . $attrs['class'] . ' ' . $name . '" data-weight="' . $variant . '"></svg>', ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_icon', static fn (string $name, string $variant, array $attrs): string => '<svg class="' . $attrs['class'] . ' ' . $name . '" data-weight="' . $variant . '"' . (($attrs['style'] ?? false) ? ' style="' . $attrs['style'] . '"' : '') . '></svg>', ['is_safe' => ['html']]));
 
         return $twig->createTemplate("{% include '@ItechWorldSuluTailwindTheme/components/_button.html.twig' with vars only %}")
             ->render(['vars' => ['button' => ButtonReader::read($content, $view), 'class' => 'extra'] + $vars]);

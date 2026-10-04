@@ -182,6 +182,50 @@ class ThemeFormMapperTest extends TestCase
     }
 
     /**
+     * The pictogram settings sit with the other global button settings.
+     */
+    public function testButtonIconSettingsTravelBetweenTheFormAndTheTokens(): void
+    {
+        $data = $this->mapper->serializeTheme($this->buildTheme());
+
+        $this->assertSame('20', $data['buttons_iconSize']);
+        $this->assertSame('gap-3', $data['buttons_iconGap']);
+
+        $data['buttons_iconSize'] = '';
+        $data['buttons_iconGap'] = 'gap-4';
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertSame('', $target->getTokens()['buttonsGlobal']['iconSize']);
+        $this->assertSame('gap-4', $target->getTokens()['buttonsGlobal']['iconGap']);
+    }
+
+    /**
+     * A theme saved while the pictogram gap was a block default shows that gap
+     * in its new field, and the first save moves it there for good - whichever
+     * tab is saved, the Buttons one included or not.
+     */
+    public function testALegacyPictogramGapMovesToTheButtonSettings(): void
+    {
+        $theme = $this->buildTheme();
+        $tokens = $theme->getTokens();
+        unset($tokens['buttonsGlobal']['iconGap']);
+        $tokens['defaults']['buttonIconGap'] = 'gap-5';
+        $theme->setTokens($tokens);
+
+        $data = $this->mapper->serializeTheme($theme);
+        $this->assertSame('gap-5', $data['buttons_iconGap']);
+
+        // A form that does not carry the field keeps the gap all the same.
+        unset($data['buttons_iconGap']);
+        $target = new ThemeConfig();
+        $this->mapper->mapDataToEntity($data, $target);
+
+        $this->assertSame('gap-5', $target->getTokens()['buttonsGlobal']['iconGap']);
+        $this->assertArrayNotHasKey('buttonIconGap', $target->getTokens()['defaults']);
+    }
+
+    /**
      * The scope is a list, which the depth-1 flattening skips by design, so it
      * travels through a dedicated path. A theme that never opened the modal
      * stores no scope, and that null is meaningful: the renderer reads it as
@@ -256,7 +300,7 @@ class ThemeFormMapperTest extends TestCase
             'buttons' => [
                 ['slug' => 'primary', 'label' => 'Primary', 'bg' => '#3366ff', 'text' => '#ffffff'],
             ],
-            'buttonsGlobal' => ['paddingX' => '1rem', 'paddingY' => '0.5rem'],
+            'buttonsGlobal' => ['paddingX' => '1rem', 'paddingY' => '0.5rem', 'iconSize' => '20', 'iconGap' => 'gap-3'],
             'typography' => [
                 'families' => [
                     ['role' => 'heading', 'name' => 'Inter', 'source' => 'google', 'fallback' => 'sans-serif'],

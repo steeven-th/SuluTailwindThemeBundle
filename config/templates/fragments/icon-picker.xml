@@ -67,7 +67,8 @@
         <params>
             <param name="default_value" value=""/>
             <param name="values" type="collection">
-                <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
+                <param name=""><meta><title>iw_sulu_tailwind_theme.button_icon_size_default</title></meta></param>
+                <param name="auto"><meta><title>iw_sulu_tailwind_theme.button_icon_size_auto</title></meta></param>
                 <param name="16"><meta><title>16 px</title></meta></param>
                 <param name="24"><meta><title>24 px</title></meta></param>
                 <param name="32"><meta><title>32 px</title></meta></param>

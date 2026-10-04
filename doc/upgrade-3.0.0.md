@@ -1583,8 +1583,8 @@ every button style without a colour setting. A media icon follows the same rule
 when it is an SVG; a bitmap is shown as it is, since masking a logo would turn
 it into a silhouette.
 
-Two site-wide settings come with it: **Defaults > Button icon / text spacing**,
-and the per-button override beside it. Render an icon anywhere with
+Two site-wide settings come with it under **Buttons > Global button settings**,
+the icon size and the icon / text spacing, each with a per-button override. Render an icon anywhere with
 `iw_sulu_tailwind_theme_icon()`, see
 [`twig-reference.md`](./css-api/../twig-reference.md).
 
@@ -2356,3 +2356,21 @@ dots along with the arrows:
     --iw-block-linked-pages-nav-color: var(--iw-variant-hr-color, var(--color-primary));
 }
 ```
+
+## Button pictograms: size and spacing move to the button settings (admin)
+
+The space between a button pictogram and its label left **Defaults > Blocks** for
+**Buttons > Global button settings**, next to a new **Icon size**. The pictogram
+size of a button gains a *Default* option, now the empty value: it takes the theme
+icon size, which stays on *Automatic* (follows the label, 24px at most) until set.
+*Automatic* stays available on the button (stored as `auto`) to follow the label
+whatever the theme sets.
+
+**Stored data:** the gap moves from `tokens.defaults.buttonIconGap` to
+`tokens.buttonsGlobal.iconGap`, next to the new `tokens.buttonsGlobal.iconSize`.
+Nothing to migrate by hand. A theme not saved since keeps its gap, read from the
+old key, and the first save of any tab moves it.
+
+**CSS:** the theme writes `--iw-button-icon-default-size` when a size is set. It
+sits below the size picked on the button, so `--iw-button-icon-size` keeps
+overriding both.
