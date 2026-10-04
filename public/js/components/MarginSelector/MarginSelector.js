@@ -77,7 +77,11 @@ export default class MarginSelector extends React.Component {
             bottom: 'blockPaddingBottom',
             lateral: 'blockPaddingLateral',
         }[key] || key;
-        const stored = themeConfigStore.defaults[defaultsKey];
+        // The pictogram gap moved to the global button settings. A theme not
+        // saved since still holds it in its block defaults.
+        const stored = 'buttonIconGap' === defaultsKey && themeConfigStore.buttonsGlobal.iconGap
+            ? themeConfigStore.buttonsGlobal.iconGap
+            : themeConfigStore.defaults[defaultsKey];
 
         // A theme saved before the setting existed has no value: the one the
         // compiler falls back to is the one in effect, so it is the one shown.

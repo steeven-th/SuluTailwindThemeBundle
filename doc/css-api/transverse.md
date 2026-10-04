@@ -604,10 +604,17 @@ bundle is drawn by `components/_button.html.twig`, see
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `--iw-button-icon-gap` | theme default, `0.5rem` out of the box | Space between the icon and the label. Set site-wide under **Defaults > Button icon / text spacing**, and per button from its own field. |
-| `--iw-button-icon-size` | `min(1.25em, 24px)` | Icon size. On *Automatic* it follows the font size of the button without growing past 24px; a button can pin it to a fixed size instead. |
+| `--iw-button-icon-gap` | theme default, `0.5rem` out of the box | Space between the icon and the label. Set site-wide under **Buttons > Global button settings**, and per button from its own field. |
+| `--iw-button-icon-default-size` | unset | Icon size of the buttons left on *Default*. Written by the theme when **Buttons > Global button settings > Icon size** is not on *Automatic*. |
+| `--iw-button-icon-size` | unset | Project override, read before everything else. Set it on a button style rather than on `:root`, or the size picked on each button stops applying. |
 
-Both are set on the element when the editor picks something, so a project
+The size resolves in this order: `--iw-button-icon-size`, the size picked on the
+button (`--iw-icon-size`), the theme default (`--iw-button-icon-default-size`),
+then `min(1.25em, 24px)`, which follows the font size of the button without
+growing past 24px. A button set to *Automatic* writes that last value as its own
+size, so it follows its label whatever the theme default.
+
+The gap and the size picked on a button are set on the element, so a project
 restyling them targets `.iw-button--with-icon` and wins by proximity.
 
 **The icons paint themselves with `currentColor`**, which is why a single icon

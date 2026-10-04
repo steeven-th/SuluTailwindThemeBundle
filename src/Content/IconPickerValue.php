@@ -26,9 +26,10 @@ namespace ItechWorld\SuluTailwindThemeBundle\Content;
 final class IconPickerValue
 {
     /**
-     * Sizes offered by the field, in pixels. Empty follows the text.
+     * Sizes offered by the field, in pixels. Empty takes the default of where
+     * the pictogram sits (the theme for a button), `auto` follows the text.
      */
-    public const SIZES = ['', '16', '24', '32', '48', '64', '72'];
+    public const SIZES = ['', 'auto', '16', '24', '32', '48', '64', '72'];
 
     /**
      * Weights of the library, the directories IconRenderer reads. A value

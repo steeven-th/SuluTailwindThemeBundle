@@ -10,9 +10,24 @@ import MarginSelector from '../MarginSelector/MarginSelector';
 import FieldCard, {insideBlock} from '../FieldCard/FieldCard';
 
 /**
- * Sizes offered, in pixels. Empty follows the text. Mirrors IconPickerValue::SIZES.
+ * Sizes offered, in pixels. Empty takes the default of where the pictogram
+ * sits, `auto` follows the text. Mirrors IconPickerValue::SIZES.
  */
-const SIZES = ['', '16', '24', '32', '48', '64', '72'];
+const SIZES = ['', 'auto', '16', '24', '32', '48', '64', '72'];
+
+/**
+ * The label of a size option.
+ *
+ * @param {string} size - One of SIZES
+ * @return {string}
+ */
+function sizeLabel(size: string): string {
+    if ('' === size) {
+        return translate('iw_sulu_tailwind_theme.button_icon_size_default');
+    }
+
+    return 'auto' === size ? translate('iw_sulu_tailwind_theme.button_icon_size_auto') : size + ' px';
+}
 
 /**
  * The icon set of each weight, registered by the bundle. Both hold the same
@@ -73,7 +88,7 @@ export function iconSummary(value: Object): string {
         ? translate('iw_sulu_tailwind_theme.button_icon_media')
         : value.icon + (value.weight === 'solid' ? ' ' + translate('iw_sulu_tailwind_theme.button_icon_weight_solid').toLowerCase() : '');
 
-    return value.size ? name + ' ' + value.size + ' px' : name;
+    return value.size ? name + ' ' + sizeLabel(value.size).toLowerCase() : name;
 }
 
 /**
@@ -179,8 +194,8 @@ export function iconFields(options: Object): Array<*> {
         >
             <SingleSelect disabled={!!disabled} onChange={(size) => update({size})} value={value.size}>
                 {SIZES.map((size) => (
-                    <SingleSelect.Option key={size || 'auto'} value={size}>
-                        {size ? size + ' px' : translate('iw_sulu_tailwind_theme.button_icon_size_auto')}
+                    <SingleSelect.Option key={size || 'default'} value={size}>
+                        {sizeLabel(size)}
                     </SingleSelect.Option>
                 ))}
             </SingleSelect>

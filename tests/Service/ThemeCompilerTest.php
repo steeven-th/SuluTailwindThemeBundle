@@ -324,6 +324,33 @@ final class ThemeCompilerTest extends TestCase
     }
 
     #[Test]
+    public function itEmitsTheButtonPictogramSettings(): void
+    {
+        $css = $this->compileCss(['buttonsGlobal' => ['iconGap' => 'gap-4', 'iconSize' => '20']]);
+
+        self::assertStringContainsString('--iw-button-icon-gap: 1rem;', $css);
+        self::assertStringContainsString('--iw-button-icon-default-size: 20px;', $css);
+    }
+
+    #[Test]
+    public function itLeavesThePictogramSizeToTheLabelOnAutomatic(): void
+    {
+        $css = $this->compileCss(['buttonsGlobal' => ['iconSize' => '']]);
+
+        self::assertStringContainsString('--iw-button-icon-gap: 0.5rem;', $css);
+        self::assertStringNotContainsString('--iw-button-icon-default-size', $css);
+    }
+
+    #[Test]
+    public function itReadsThePictogramGapOfAThemeSavedAsABlockDefault(): void
+    {
+        $css = $this->compileCss(['defaults' => ['buttonIconGap' => 'gap-3']]);
+
+        self::assertStringContainsString('--iw-button-icon-gap: 0.75rem;', $css);
+        self::assertSame(1, substr_count($css, '--iw-button-icon-gap:'));
+    }
+
+    #[Test]
     public function itEmitsTheSiteWideComponentGapToken(): void
     {
         $css = $this->compileCss(['defaults' => ['componentGap' => '2rem']]);

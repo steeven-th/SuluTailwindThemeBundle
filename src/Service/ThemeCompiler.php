@@ -286,6 +286,9 @@ class ThemeCompiler
         // Buttons are a slug-keyed list; the shared padding is separate.
         $buttonList = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
         $this->buttonsGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
+        // A theme not saved since the pictogram gap left the block defaults
+        // still holds it there.
+        $this->buttonsGlobal['iconGap'] ??= $tokens['defaults']['buttonIconGap'] ?? null;
         $css = "/* Theme: {$theme->getLabel()} — Auto-generated, do not edit */\n\n";
 
         // Google Fonts import
@@ -2362,10 +2365,6 @@ class ThemeCompiler
         $titleGap = self::spacingToLength((string) ($defaults['titleGap'] ?? 'gap-6'));
         $imageGap = self::spacingToLength((string) ($defaults['imageGap'] ?? 'gap-6'));
         $componentGap = self::spacingToLength((string) ($defaults['componentGap'] ?? 'gap-6'));
-        // Space between a button's pictogram and its label. A button can still
-        // step away from it through its own Icon / text spacing field, whose
-        // classes set the same variable closer to the element.
-        $buttonIconGap = self::spacingToLength((string) ($defaults['buttonIconGap'] ?? 'gap-2'));
         $maxWidth = self::MAX_WIDTH_MAP[(string) ($defaults['blockMaxWidth'] ?? 'none')] ?? 'none';
 
         // Space between a surface and what sits on it. The paragraph defaults
@@ -2381,7 +2380,6 @@ class ThemeCompiler
         $css .= "  --iw-blocks-title-gap: {$titleGap};\n";
         $css .= "  --iw-blocks-image-gap: {$imageGap};\n";
         $css .= "  --iw-blocks-component-gap: {$componentGap};\n";
-        $css .= "  --iw-button-icon-gap: {$buttonIconGap};\n";
         $css .= "  --iw-blocks-max-width: {$maxWidth};\n";
         $css .= "  --iw-surface-content-padding-x: {$contentPadX};\n";
         $css .= "  --iw-surface-content-padding-y: {$contentPadY};\n";
@@ -2807,9 +2805,10 @@ class ThemeCompiler
     /**
      * Generate CSS custom properties for button tokens.
      *
-     * Emits one --iw-button-<variant>-<prop> entry per token plus two global
-     * --iw-button-padding-x / --iw-button-padding-y vars driven by the
-     * buttons.global sub-array. Border and hoverBorder are emitted as full
+     * Emits one --iw-button-<variant>-<prop> entry per token plus the global
+     * vars driven by tokens.buttonsGlobal: --iw-button-padding-x / -y,
+     * --iw-button-icon-gap, and --iw-button-icon-default-size when a size is
+     * picked. Border and hoverBorder are emitted as full
      * shorthands (width style color) so consumers can drop them straight into
      * a border declaration without producing invalid CSS.
      *
@@ -2827,6 +2826,19 @@ class ThemeCompiler
         $paddingY = isset($global['paddingY']) ? (string) $global['paddingY'] : '0.75rem';
         $css .= "  --iw-button-padding-x: {$paddingX};\n";
         $css .= "  --iw-button-padding-y: {$paddingY};\n";
+
+        // Space between a button's pictogram and its label. A button can still
+        // override it through its own Icon / text spacing field, whose classes
+        // set the same variable closer to the element.
+        $iconGap = self::spacingToLength((string) ($global['iconGap'] ?? 'gap-2'));
+        $css .= "  --iw-button-icon-gap: {$iconGap};\n";
+
+        // Pictogram size when a button keeps its own on "default". Left on
+        // "auto", nothing is written and the size follows the label.
+        $iconSize = (string) ($global['iconSize'] ?? '');
+        if (ctype_digit($iconSize)) {
+            $css .= "  --iw-button-icon-default-size: {$iconSize}px;\n";
+        }
 
         foreach ($buttons as $props) {
             if (!is_array($props) || !isset($props['slug'])) {

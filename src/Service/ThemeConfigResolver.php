@@ -29,7 +29,7 @@ class ThemeConfigResolver
      *
      * @param ThemeConfig|null $theme The theme to resolve, or null for empty defaults
      *
-     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, borders: array<string, mixed>}
+     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, borders: array<string, mixed>, defaults: array<string, mixed>, buttonsGlobal: array<string, mixed>}
      */
     public function resolve(?ThemeConfig $theme): array
     {
@@ -130,6 +130,8 @@ class ThemeConfigResolver
             // Block defaults, so a selector left on "follow the theme" can name
             // the value it will take rather than just say it follows something.
             'defaults' => $tokens['defaults'] ?? [],
+            // Same reason, for the pictogram gap a button follows when left empty.
+            'buttonsGlobal' => $tokens['buttonsGlobal'] ?? [],
         ];
     }
 

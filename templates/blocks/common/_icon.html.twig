@@ -39,6 +39,9 @@
 {% set iconName = iconCustom ? '' : (picker ? picker.icon|default('') : item.icon|default('')) %}
 {% set iconWeight = picker ? picker.weight|default('outline') : 'outline' %}
 {% set iconSize = picker ? picker.size|default('') : item.iconSize|default('') %}
+{# `auto` follows the text whatever default the theme or the block hands down,
+   a number pins the size. Empty leaves that default alone. #}
+{% set iconSizeValue = 'auto' == iconSize ? 'min(1.25em, 24px)' : (iconSize ? iconSize ~ 'px' : '') %}
 {% set iconClass = ('iw-icon ' ~ (class|default('')) ~ (blockPrefix|default('') ? ' ' ~ blockPrefix ~ '__icon' : ''))|trim %}
 
 {% set iconMediaUrl = '' %}
@@ -62,15 +65,15 @@
         class: iconClass,
         width: 24,
         height: 24,
-        style: iconSize ? '--iw-icon-size: ' ~ iconSize ~ 'px' : false
+        style: iconSizeValue ? '--iw-icon-size: ' ~ iconSizeValue : false
     }) }}
 {%- elseif iconMediaUrl and iconMediaVector and recolor|default(false) -%}
     <span class="{{ iconClass }} iw-icon--mask"
-          style="--iw-icon-media: url('{{ iconMediaUrl }}'){{ iconSize ? '; --iw-icon-size: ' ~ iconSize ~ 'px' : '' }}"
+          style="--iw-icon-media: url('{{ iconMediaUrl }}'){{ iconSizeValue ? '; --iw-icon-size: ' ~ iconSizeValue : '' }}"
           aria-hidden="true"></span>
 {%- elseif iconMediaUrl -%}
     {#- Decorative: whatever it stands beside already says it. -#}
     <img class="{{ iconClass }} iw-icon--image" src="{{ iconMediaUrl }}" alt=""
          width="24" height="24" loading="lazy"
-         {%- if iconSize %} style="--iw-icon-size: {{ iconSize }}px"{% endif %}>
+         {%- if iconSizeValue %} style="--iw-icon-size: {{ iconSizeValue }}"{% endif %}>
 {%- endif -%}
