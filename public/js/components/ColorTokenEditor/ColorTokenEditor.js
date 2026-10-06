@@ -8,6 +8,7 @@ import Popover from 'sulu-admin-bundle/components/Popover';
 import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
 import loadFormPalette, {formPaletteColors, paletteFor} from '../../utils/formPalette';
+import {getSuluPrimaryColor} from '../../utils/suluColors';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -92,8 +93,8 @@ function ensurePickerStyles() {
             color: #333;
         }
         .iw-palette-tab--active {
-            color: #1a56db;
-            border-bottom-color: #1a56db;
+            color: ${getSuluPrimaryColor()};
+            border-bottom-color: ${getSuluPrimaryColor()};
         }
         .iw-color-picker-tabbed {
             background: #fff;
@@ -129,6 +130,8 @@ function ensurePickerStyles() {
  * @param {boolean} props.disabled - Whether the field is disabled
  * @param {Object} props.schemaOptions - Schema params from XML config
  * @param {boolean} props.clearable - Set false to hide the clear button (default: shown)
+ * @param {string} props.placeholder - What an empty field stands for. A hex color also tints the swatch,
+ *                                     so an empty field shows the color it falls back to (default: "#000000")
  */
 @observer
 export default class ColorTokenEditor extends React.Component {
@@ -570,9 +573,13 @@ export default class ColorTokenEditor extends React.Component {
         const resolvedValue = isRef(internalValue)
             ? resolveRef(internalValue, palette)
             : internalValue;
-        const displayColor = isTransparent
-            ? 'transparent'
-            : (HEX_COLOR_PATTERN.test(resolvedValue) ? resolvedValue : '#000000');
+        const placeholder = this.props.placeholder || '#000000';
+        let displayColor = HEX_COLOR_PATTERN.test(resolvedValue) ? resolvedValue : '#000000';
+        if (isTransparent) {
+            displayColor = 'transparent';
+        } else if (!internalValue && this.props.placeholder) {
+            displayColor = HEX_COLOR_PATTERN.test(placeholder) ? placeholder : 'transparent';
+        }
 
         const iconStyle = {
             color: isTransparent ? 'transparent' : displayColor,
@@ -607,7 +614,7 @@ export default class ColorTokenEditor extends React.Component {
                     onChange={this.handleInputChange}
                     onClearClick={showClear ? this.handleClearClick : undefined}
                     onIconClick={!disabled ? this.handleIconClick : undefined}
-                    placeholder="#000000"
+                    placeholder={placeholder}
                     valid={!error}
                     value={internalValue}
                 />

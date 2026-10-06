@@ -3,6 +3,7 @@ import React from 'react';
 import {observer} from 'mobx-react';
 import {translate} from 'sulu-admin-bundle/utils';
 import themeConfigStore from '../../stores/themeConfigStore';
+import {getSuluPrimaryColor} from '../../utils/suluColors';
 
 /**
  * Shade levels matching Tailwind CSS v4.
@@ -97,10 +98,10 @@ function ensureGridStyles() {
             border-right: 1px solid rgba(0,0,0,0.12);
         }
         .iw-palette-swatch--selected {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${getSuluPrimaryColor()};
         }
         .iw-palette-swatch--selected:hover {
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a56db, 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${getSuluPrimaryColor()}, 0 2px 8px rgba(0,0,0,0.2);
         }
         .iw-palette-grid {
             padding: 6px 0;

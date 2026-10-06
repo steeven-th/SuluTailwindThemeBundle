@@ -56,6 +56,7 @@
     "iw_sulu_tailwind_theme.palette_slug_duplicate": "Ce nom est déjà utilisé par une autre couleur.",
     "iw_sulu_tailwind_theme.palette_slug_reserved": "Ce nom est réservé et ne peut pas être utilisé.",
     "iw_sulu_tailwind_theme.palette_add": "Ajouter une couleur",
+    "iw_sulu_tailwind_theme.css_variables": "{count, plural, one {Variable CSS} other {Variables CSS}}",
     "iw_sulu_tailwind_theme.palette_remove": "Supprimer cette couleur",
 
     "iw_sulu_tailwind_theme.typography": "Typographie",
