@@ -131,6 +131,40 @@ Same pattern for every role (`--color-secondary-*`, `--color-accent-*`, …,
 > color picker, the configured color is the larger swatch at the start of each
 > row, set apart from the eleven levels.
 
+### Gradients
+
+Every named gradient of the theme emits two variables, and nothing is emitted
+for a theme without gradients:
+
+```css
+--gradient-<slug>: linear-gradient(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.2)), linear-gradient(180deg, #3a4b8f 0%, #172f57 100%);
+--gradient-<slug>-fallback: #20315b;
+```
+
+- `--gradient-<slug>` is a `background-image` value. The optional overlay comes
+  first, CSS painting the first layer on top. Stops pointing at the palette
+  (`ref:secondary`) are resolved at compile time, so a gradient follows the
+  palette on the next compile.
+- `--gradient-<slug>-fallback` is the solid color standing in for the
+  gradient. Unless one is set on the gradient, it is computed: the stops
+  averaged in OKLab and weighted by their opacity, with the overlay painted on
+  top. It is an 8-digit hex when the gradient is translucent, `transparent`
+  when nothing of it shows.
+
+Paint the fallback under the image, so the area is never empty while the
+image is not rendered:
+
+```css
+.my-band {
+    background-color: var(--gradient-bleu-leger-fallback);
+    background-image: var(--gradient-bleu-leger);
+}
+```
+
+The slugs are created in the admin, so Tailwind cannot know them at build
+time and there is no `bg-gradient-<slug>` utility. Use the arbitrary value
+syntax, which works with any slug: `bg-(image:--gradient-bleu-leger)`.
+
 ---
 
 ## Typography variables

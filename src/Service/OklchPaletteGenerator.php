@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
+use ItechWorld\SuluTailwindThemeBundle\Color\Oklab;
 
 /**
  * Generates Tailwind-style color palettes (50→950) using the OKLCH color space.
@@ -106,8 +107,8 @@ class OklchPaletteGenerator
      */
     public function generatePalette(string $hex): array
     {
-        $rgb = $this->hexToSrgb($hex);
-        $oklab = $this->srgbToOklab($rgb);
+        $rgb = Oklab::hexToSrgb($hex);
+        $oklab = Oklab::fromSrgb($rgb);
         $oklch = $this->oklabToOklch($oklab);
 
         $sourceL = $oklch[0];
@@ -129,8 +130,8 @@ class OklchPaletteGenerator
             $clampedC = $this->gamutClamp($targetL, $targetC, $hue);
 
             $shadeOklab = $this->oklchToOklab($targetL, $clampedC, $hue);
-            $shadeRgb = $this->oklabToSrgb($shadeOklab);
-            $palette[$shade] = $this->srgbToHex($shadeRgb);
+            $shadeRgb = Oklab::toSrgb($shadeOklab);
+            $palette[$shade] = Oklab::srgbToHex($shadeRgb);
         }
 
         return $palette;
@@ -167,142 +168,6 @@ class OklchPaletteGenerator
         }
 
         return $targets;
-    }
-
-    /**
-     * Convert a hex color string to sRGB values (0-1).
-     *
-     * @param string $hex Hex color (e.g. "#3B82F6" or "#abc")
-     *
-     * @return array{0: float, 1: float, 2: float} [r, g, b] in 0-1 range
-     */
-    private function hexToSrgb(string $hex): array
-    {
-        $hex = ltrim($hex, '#');
-
-        // Expand shorthand (3 digits) to 6 digits
-        if (strlen($hex) === 3) {
-            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
-        }
-
-        // Handle 8-digit hex (with alpha) — ignore the alpha channel
-        if (strlen($hex) === 8) {
-            $hex = substr($hex, 0, 6);
-        }
-
-        $r = hexdec(substr($hex, 0, 2)) / 255.0;
-        $g = hexdec(substr($hex, 2, 2)) / 255.0;
-        $b = hexdec(substr($hex, 4, 2)) / 255.0;
-
-        return [$r, $g, $b];
-    }
-
-    /**
-     * Convert sRGB (0-1) to a hex color string.
-     *
-     * @param array{0: float, 1: float, 2: float} $rgb [r, g, b] in 0-1 range
-     *
-     * @return string Hex color (e.g. "#3b82f6")
-     */
-    private function srgbToHex(array $rgb): string
-    {
-        $r = (int) round(max(0.0, min(1.0, $rgb[0])) * 255);
-        $g = (int) round(max(0.0, min(1.0, $rgb[1])) * 255);
-        $b = (int) round(max(0.0, min(1.0, $rgb[2])) * 255);
-
-        return sprintf('#%02x%02x%02x', $r, $g, $b);
-    }
-
-    /**
-     * Linearize an sRGB component (inverse gamma).
-     *
-     * @param float $c sRGB component (0-1)
-     *
-     * @return float Linear RGB component
-     */
-    private function srgbToLinear(float $c): float
-    {
-        return $c <= 0.04045
-            ? $c / 12.92
-            : pow(($c + 0.055) / 1.055, 2.4);
-    }
-
-    /**
-     * Apply sRGB gamma to a linear RGB component.
-     *
-     * @param float $c Linear RGB component
-     *
-     * @return float sRGB component (0-1)
-     */
-    private function linearToSrgb(float $c): float
-    {
-        return $c <= 0.0031308
-            ? $c * 12.92
-            : 1.055 * pow($c, 1.0 / 2.4) - 0.055;
-    }
-
-    /**
-     * Convert sRGB to OKLab color space.
-     *
-     * Uses Björn Ottosson's method: sRGB → Linear RGB → LMS → OKLab.
-     *
-     * @param array{0: float, 1: float, 2: float} $rgb sRGB values (0-1)
-     *
-     * @return array{0: float, 1: float, 2: float} OKLab [L, a, b]
-     */
-    private function srgbToOklab(array $rgb): array
-    {
-        $lr = $this->srgbToLinear($rgb[0]);
-        $lg = $this->srgbToLinear($rgb[1]);
-        $lb = $this->srgbToLinear($rgb[2]);
-
-        // Linear RGB to LMS (cone response)
-        $l = 0.4122214708 * $lr + 0.5363325363 * $lg + 0.0514459929 * $lb;
-        $m = 0.2119034982 * $lr + 0.6806995451 * $lg + 0.1073969566 * $lb;
-        $s = 0.0883024619 * $lr + 0.2817188376 * $lg + 0.6299787005 * $lb;
-
-        // Cube root (pow with 1/3 exponent, handling negative values)
-        $lc = ($l >= 0 ? 1 : -1) * pow(abs($l), 1.0 / 3.0);
-        $mc = ($m >= 0 ? 1 : -1) * pow(abs($m), 1.0 / 3.0);
-        $sc = ($s >= 0 ? 1 : -1) * pow(abs($s), 1.0 / 3.0);
-
-        // LMS to OKLab
-        $labL = 0.2104542553 * $lc + 0.7936177850 * $mc - 0.0040720468 * $sc;
-        $labA = 1.9779984951 * $lc - 2.4285922050 * $mc + 0.4505937099 * $sc;
-        $labB = 0.0259040371 * $lc + 0.7827717662 * $mc - 0.8086757660 * $sc;
-
-        return [$labL, $labA, $labB];
-    }
-
-    /**
-     * Convert OKLab to sRGB color space.
-     *
-     * @param array{0: float, 1: float, 2: float} $lab OKLab [L, a, b]
-     *
-     * @return array{0: float, 1: float, 2: float} sRGB [r, g, b] (may be out of 0-1 if not gamut-clamped)
-     */
-    private function oklabToSrgb(array $lab): array
-    {
-        // OKLab to LMS (cube root space)
-        $lc = $lab[0] + 0.3963377774 * $lab[1] + 0.2158037573 * $lab[2];
-        $mc = $lab[0] - 0.1055613458 * $lab[1] - 0.0638541728 * $lab[2];
-        $sc = $lab[0] - 0.0894841775 * $lab[1] - 1.2914855480 * $lab[2];
-
-        // Cube
-        $l = $lc * $lc * $lc;
-        $m = $mc * $mc * $mc;
-        $s = $sc * $sc * $sc;
-
-        // LMS to linear RGB
-        $lr = +4.0767416621 * $l - 3.3077115913 * $m + 0.2309699292 * $s;
-        $lg = -1.2684380046 * $l + 2.6097574011 * $m - 0.3413193965 * $s;
-        $lb = -0.0041960863 * $l - 0.7034186147 * $m + 1.7076147010 * $s;
-
-        return [
-            $this->linearToSrgb($lr),
-            $this->linearToSrgb($lg),
-            $this->linearToSrgb($lb),
-        ];
     }
 
     /**
@@ -369,7 +234,7 @@ class OklchPaletteGenerator
     {
         // Quick check: if already in gamut, return as-is
         $oklab = $this->oklchToOklab($l, $c, $h);
-        $rgb = $this->oklabToSrgb($oklab);
+        $rgb = Oklab::toSrgb($oklab);
 
         if ($this->isInGamut($rgb)) {
             return $c;
@@ -382,7 +247,7 @@ class OklchPaletteGenerator
         for ($i = 0; $i < self::GAMUT_CLAMP_ITERATIONS; $i++) {
             $mid = ($lo + $hi) / 2.0;
             $oklab = $this->oklchToOklab($l, $mid, $h);
-            $rgb = $this->oklabToSrgb($oklab);
+            $rgb = Oklab::toSrgb($oklab);
 
             if ($this->isInGamut($rgb)) {
                 $lo = $mid;

@@ -8,6 +8,8 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorLuminance;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientRenderer;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
 
 /**
  * Tells whether a block variant renders on a light or a dark surface.
@@ -63,6 +65,7 @@ class VariantColorSchemeResolver
             : [];
 
         $colorSet = ColorSet::fromTokens($tokens);
+        $gradientSet = GradientSet::fromTokens($tokens);
 
         // Ordered candidates: the surface the widget actually sits on first,
         // then the page background as a fallback. A block with its background
@@ -79,7 +82,7 @@ class VariantColorSchemeResolver
                 continue;
             }
 
-            $isDark = ColorLuminance::isDark($this->resolveColorValue($candidate, $colorSet));
+            $isDark = ColorLuminance::isDark($this->resolveColorValue($candidate, $colorSet, $gradientSet));
             if (null !== $isDark) {
                 return $isDark ? self::SCHEME_DARK : self::SCHEME_LIGHT;
             }
@@ -93,15 +96,29 @@ class VariantColorSchemeResolver
      *
      * Mirrors what the compiler emits for the same token, so the scheme
      * decision is made on the color the visitor actually sees. Values that are
-     * not references (hex, rgba, transparent) are returned untouched.
+     * not references (hex, rgba, transparent) are returned untouched. A
+     * gradient is judged on its solid fallback, the compiler's stand-in for it.
      *
-     * @param string   $value    The raw token value
-     * @param ColorSet $colorSet The theme's normalized palette
+     * @param string      $value       The raw token value
+     * @param ColorSet    $colorSet    The theme's normalized palette
+     * @param GradientSet $gradientSet The theme's gradients
      *
      * @return string The resolved color, or the original value when it is not a ref
      */
-    private function resolveColorValue(string $value, ColorSet $colorSet): string
+    private function resolveColorValue(string $value, ColorSet $colorSet, GradientSet $gradientSet): string
     {
+        $gradientSlug = GradientSet::parseRef($value);
+        $gradient = null !== $gradientSlug ? $gradientSet->get($gradientSlug) : null;
+        if (null !== $gradient) {
+            $renderer = new GradientRenderer(
+                fn (string $stop): ?string => str_starts_with($stop, GradientSet::REF_PREFIX)
+                    ? null
+                    : $this->resolveColorValue($stop, $colorSet, $gradientSet),
+            );
+
+            return $renderer->fallback($gradient);
+        }
+
         $parsed = ColorSet::parseRef($value);
         if (null === $parsed) {
             return $value;

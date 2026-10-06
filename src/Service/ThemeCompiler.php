@@ -8,6 +8,8 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientRenderer;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
@@ -41,6 +43,18 @@ class ThemeCompiler
      * @var array<string, array<int, string>>
      */
     private array $resolvedPalettes = [];
+
+    /**
+     * Gradients of the theme being compiled, null outside compile().
+     */
+    private ?GradientSet $gradientSet = null;
+
+    /**
+     * Gradient fallbacks already computed, cached per compile() call.
+     *
+     * @var array<string, string>
+     */
+    private array $gradientFallbacks = [];
 
     /**
      * Global button padding (paddingX/paddingY) for the current compile() call.
@@ -286,6 +300,8 @@ class ThemeCompiler
         // Initialize class-level state for ref: resolution
         $this->colorSet = ColorSet::fromTokens($tokens);
         $this->resolvedPalettes = [];
+        $this->gradientSet = GradientSet::fromTokens($tokens);
+        $this->gradientFallbacks = [];
         // Buttons are a slug-keyed list; the shared padding is separate.
         $buttonList = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
         $this->buttonsGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
@@ -305,6 +321,7 @@ class ThemeCompiler
         $css .= ":root {\n";
         $css .= $this->generateColorVariables();
         $css .= $this->generatePaletteVariables();
+        $css .= $this->generateGradientVariables();
         $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateControlVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
@@ -386,6 +403,8 @@ class ThemeCompiler
         // exception: buildFilename() reads it after generateCss() has returned.
         $this->colorSet = null;
         $this->resolvedPalettes = [];
+        $this->gradientSet = null;
+        $this->gradientFallbacks = [];
         $this->buttonsGlobal = [];
 
         return $css;
@@ -1132,12 +1151,21 @@ class ThemeCompiler
      * Returns the value unchanged if it is not a ref.
      * Returns #000000 as a safe CSS fallback for invalid/unresolvable refs.
      *
-     * @param string $value The color value (hex, transparent, rgba, or ref:...)
+     * A `gradient:` reference resolves to the gradient's solid fallback: a
+     * slot that can only take a color still gets the one standing in for the
+     * gradient. An unknown gradient resolves to transparent.
+     *
+     * @param string $value The color value (hex, transparent, rgba, ref:... or gradient:...)
      *
      * @return string The resolved hex color or the original value
      */
     private function resolveColorValue(string $value): string
     {
+        $gradientSlug = GradientSet::parseRef($value);
+        if (null !== $gradientSlug || str_starts_with($value, GradientSet::REF_PREFIX)) {
+            return null !== $gradientSlug ? $this->gradientFallback($gradientSlug) : 'transparent';
+        }
+
         $parsed = ColorSet::parseRef($value);
         if (null === $parsed) {
             return $value;
@@ -1161,6 +1189,70 @@ class ThemeCompiler
         }
 
         return $this->paletteFor($baseHex)[$parsed['shade']] ?? '#000000';
+    }
+
+    /**
+     * Get the solid fallback of a gradient, cached per compile() call.
+     *
+     * @param string $slug The gradient slug
+     *
+     * @return string The fallback color, `transparent` when the theme has no such gradient
+     */
+    private function gradientFallback(string $slug): string
+    {
+        if (isset($this->gradientFallbacks[$slug])) {
+            return $this->gradientFallbacks[$slug];
+        }
+
+        $gradient = $this->gradientSet?->get($slug);
+
+        return $this->gradientFallbacks[$slug] = null !== $gradient
+            ? $this->gradientRenderer()->fallback($gradient)
+            : 'transparent';
+    }
+
+    /**
+     * Build the renderer that writes gradients with this compile's palette.
+     *
+     * Stops resolve like any color field. A stop pointing at a gradient is
+     * refused, a gradient cannot nest another one.
+     *
+     * @return GradientRenderer The renderer
+     */
+    private function gradientRenderer(): GradientRenderer
+    {
+        return new GradientRenderer(
+            fn (string $value): ?string => str_starts_with($value, GradientSet::REF_PREFIX)
+                ? null
+                : $this->resolveColorValue($value),
+        );
+    }
+
+    /**
+     * Generate the custom properties of the theme's gradients.
+     *
+     * Two per gradient: `--gradient-<slug>` holds the image (overlay first),
+     * `--gradient-<slug>-fallback` the solid color painted under it and used
+     * wherever a gradient cannot be. A theme without gradients emits nothing,
+     * so its stylesheet stays byte for byte what it was.
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateGradientVariables(): string
+    {
+        if (null === $this->gradientSet || $this->gradientSet->isEmpty()) {
+            return '';
+        }
+
+        $renderer = $this->gradientRenderer();
+        $css = "  /* Gradients */\n";
+        foreach ($this->gradientSet->all() as $gradient) {
+            $slug = $gradient->getSlug();
+            $css .= "  --gradient-{$slug}: {$renderer->image($gradient)};\n";
+            $css .= "  --gradient-{$slug}-fallback: {$this->gradientFallback($slug)};\n";
+        }
+
+        return $css . "\n";
     }
 
     /**
