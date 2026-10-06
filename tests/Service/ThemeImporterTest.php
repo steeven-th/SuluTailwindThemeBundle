@@ -149,6 +149,25 @@ final class ThemeImporterTest extends TestCase
     }
 
     /**
+     * The footer colors are a sub-object of their column, carried through the
+     * export like any form field.
+     */
+    #[Test]
+    public function theFooterColorsTravelWithTheTheme(): void
+    {
+        $source = new ThemeConfig();
+        $source->setName('source');
+        $source->setFooterConfig(['type' => 'columns', 'mutedText' => false, 'colors' => ['bg' => 'ref:primary-900', 'linkHover' => '#f97316']]);
+
+        $target = new ThemeConfig();
+        $importer = $this->buildImporter();
+        $importer->importInto($importer->decode((new ThemeExporter($this->mapper))->exportToJson($source)), $target);
+
+        $this->assertSame(['bg' => 'ref:primary-900', 'linkHover' => '#f97316'], $target->getFooterConfig()['colors']);
+        $this->assertFalse($target->getFooterConfig()['mutedText']);
+    }
+
+    /**
      * The machine name is unique in the database, so importing the same file
      * twice has to land somewhere rather than fail on a constraint.
      */

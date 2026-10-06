@@ -1,10 +1,7 @@
 {# Footer — centered layout: stacked brand, horizontal nav, social, copyright.
    The inline nav uses the FIRST column of the Footer snippet (fallback: the
-   top-level page navigation). The <footer> carries the picked color variant. #}
-
-{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(config.variant|default(null), allVariants) %}
-{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+   top-level page navigation). Colors come from the compiled `.iw-footer`
+   rules, fed by the footer colors of the theme. #}
 
 {# Inline links: first column of the Footer snippet. No snippet → no links. #}
 {% set navLinks = [] %}
@@ -14,7 +11,7 @@
     {% set navLinks = footerSnippet.content.columns[0].pages %}
 {% endif %}
 
-<footer class="iw-footer iw-footer--centered {{ variantClass }}" data-has-bg="true" data-has-border="true">
+<footer class="iw-footer iw-footer--centered">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center gap-7">
         {% include '@ItechWorldSuluTailwindTheme/footer/_footer_brand.html.twig' with {config: config, align: 'center'} %}
 

@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
+use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
@@ -279,6 +280,8 @@ class ThemeCompiler
     {
         $tokens = $theme->getTokens();
         $menuConfig = $theme->getMenuConfig();
+        $footerConfig = $theme->getFooterConfig();
+        $footerConfig['colors'] = FooterVariantColors::inherit($footerConfig, $tokens['blockVariants'] ?? []);
 
         // Initialize class-level state for ref: resolution
         $this->colorSet = ColorSet::fromTokens($tokens);
@@ -309,6 +312,7 @@ class ThemeCompiler
         $css .= $this->generateBlockDefaultVariables($tokens['defaults'] ?? []);
         $css .= $this->generateButtonVariables($buttonList);
         $css .= $this->generateMenuVariables($menuConfig);
+        $css .= $this->generateFooterVariables($footerConfig);
         $css .= $this->generateArticleVariables($tokens);
         $css .= $this->generateArticleCardVariables($tokens);
         $css .= $this->generateBackToTopVariables($tokens);
@@ -338,7 +342,7 @@ class ThemeCompiler
         // Emitted as plain (unlayered) CSS so footer sizing wins over the theme's
         // unlayered element rules — Tailwind utilities live in @layer utilities
         // and would otherwise lose the cascade against `h*`/base element styles.
-        $css .= $this->generateFooterClasses($theme->getFooterConfig());
+        $css .= $this->generateFooterClasses($footerConfig);
 
         // Form field utility class
         $css .= $this->generateFormFieldClass();
@@ -2917,6 +2921,22 @@ class ThemeCompiler
      */
     private const MENU_TRANSLUCENT_OVER_HERO_PAGE = ':root:has(main [data-iw-menu-overlay])';
 
+    /**
+     * Footer color settings, keyed by their footerConfig.colors key, and the
+     * suffix of the `--iw-footer-*` custom property each one publishes.
+     */
+    public const FOOTER_COLOR_VAR_SUFFIX = [
+        'bg' => 'bg',
+        'text' => 'text',
+        'title' => 'title',
+        'link' => 'link',
+        'linkHover' => 'link-hover',
+        'accent' => 'accent',
+        'divider' => 'divider',
+        'socialMedia' => 'social',
+        'socialMediaHover' => 'social-hover',
+    ];
+
     private const MENU_COLOR_VAR_SUFFIX = [
         'bg' => 'bg',
         'text' => 'text',
@@ -4173,14 +4193,52 @@ class ThemeCompiler
     }
 
     /**
+     * Publish the footer colors as `--iw-footer-*` custom properties.
+     *
+     * Written on :root rather than on `.iw-footer`, so that a project zone
+     * redefining one of them (on its own wrapper, or on the footer itself)
+     * wins by proximity, without having to beat the specificity of a rule.
+     * An empty color is left out: `--x: ;` is a valid, empty value that would
+     * make the fallback of every `var()` reading it unreachable.
+     *
+     * @param array<string, mixed> $footerConfig The theme's footer configuration
+     *
+     * @return string CSS declarations, inside :root
+     */
+    private function generateFooterVariables(array $footerConfig): string
+    {
+        $colors = \is_array($footerConfig['colors'] ?? null) ? $footerConfig['colors'] : [];
+
+        $declarations = '';
+        foreach (self::FOOTER_COLOR_VAR_SUFFIX as $key => $suffix) {
+            $resolved = $this->menuColorOrNull($colors[$key] ?? null);
+            if (null !== $resolved) {
+                $declarations .= "  --iw-footer-{$suffix}: {$resolved};\n";
+            }
+        }
+
+        return '' === $declarations ? '' : "  /* Footer colors */\n" . $declarations;
+    }
+
+    /**
      * Generate the .iw-footer* component classes.
      *
      * Emitted as plain (unlayered) CSS. Only properties that would otherwise
-     * lose the cascade against the theme's unlayered element rules live here —
-     * font-size (headings/base), the muted opacity treatment, link hover, the
-     * auto-fit column grid and the divider. Layout (flex/gap/padding/container)
-     * stays on Tailwind utilities in the footer partials. Colors are left to the
-     * active color variant (`.iw-variant--<slug>` on the `<footer>`).
+     * lose the cascade against the theme's unlayered element rules live here:
+     * colors, font-size (headings/base), the muted opacity treatment, link
+     * hover, the auto-fit column grid and the divider. Layout
+     * (flex/gap/padding/container) stays on Tailwind utilities in the footer
+     * partials.
+     *
+     * Colors read the `--iw-footer-*` properties of generateFooterVariables(),
+     * each falling back to what the footer inherits when left empty.
+     *
+     * Muting (the `mutedText` setting, on unless switched off) dims the
+     * secondary text, the links at rest and the divider with an opacity, each
+     * one overridable through its `--iw-footer-*-opacity` property. Switched
+     * off, every color shows as picked. The divider stays dimmed while it has
+     * no color of its own, since a full-strength currentColor rule is not a
+     * separator anymore.
      *
      * @param array<string, mixed> $footerConfig The theme's footer configuration
      *
@@ -4189,6 +4247,16 @@ class ThemeCompiler
     private function generateFooterClasses(array $footerConfig = []): string
     {
         $css = "\n/* Footer component classes */\n";
+
+        $muted = false !== ($footerConfig['mutedText'] ?? true);
+        $colors = \is_array($footerConfig['colors'] ?? null) ? $footerConfig['colors'] : [];
+        $hasDivider = null !== $this->menuColorOrNull($colors['divider'] ?? null);
+        $opacity = static fn (string $name, string $value): string => $muted
+            ? " opacity: var(--iw-footer-{$name}-opacity, {$value});"
+            : '';
+
+        // Surface and running text. Paragraphs and list items inherit it.
+        $css .= ".iw-footer { background-color: var(--iw-footer-bg, transparent); color: var(--iw-footer-text, inherit); }\n";
 
         // Brand — logo capped by a configurable max-height (keeps aspect ratio,
         // never upscales a small logo). Width auto + max-width guard for narrow columns.
@@ -4202,32 +4270,53 @@ class ThemeCompiler
         // --vector modifier is applied by the footer Twig partials, which know
         // the media's mime type.
         $css .= ".iw-footer__logo--vector { height: {$logoHeight}px; object-fit: contain; }\n";
+        // The site name sits inside the brand link, so it takes the link colors.
         $css .= ".iw-footer__site-name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }\n";
-        $css .= ".iw-footer__tagline { font-size: 0.875rem; line-height: 1.6; opacity: 0.7; }\n";
+        $css .= '.iw-footer__tagline { font-size: 0.875rem; line-height: 1.6;' . $opacity('tagline', '0.7') . " }\n";
 
         // Column titles (plain labels) + page links
-        $css .= ".iw-footer__col-title { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.55; margin-bottom: 0.85rem; }\n";
+        $css .= '.iw-footer__col-title { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.85rem; color: var(--iw-footer-title, inherit);' . $opacity('title', '0.55') . " }\n";
         $css .= ".iw-footer__links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }\n";
-        $css .= ".iw-footer__links a { font-size: 0.875rem; line-height: 1.4; text-decoration: none; opacity: 0.75; transition: opacity 0.2s ease, color 0.2s ease; }\n";
-        $css .= ".iw-footer__links a:hover { opacity: 1; }\n";
+        $css .= '.iw-footer__links a { font-size: 0.875rem; line-height: 1.4; text-decoration: none;' . $opacity('link', '0.75') . " transition: opacity 0.2s ease, color 0.2s ease; }\n";
+
+        // Every link of the footer, buttons aside. (0,1,1) on purpose: enough
+        // to beat the site-wide `a` rule, and no more, so a project rule such
+        // as `.my-zone a` still wins.
+        $css .= ".iw-footer a:where(:not([class*=\"iw-button--\"])) { color: var(--iw-footer-link, inherit); }\n";
+        $css .= ".iw-footer a:where(:not([class*=\"iw-button--\"])):is(:hover, :focus-visible) { color: var(--iw-footer-link-hover, var(--iw-footer-link, inherit)); }\n";
+        $css .= ".iw-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }\n";
 
         // Auto-fit column grid — adapts to any number of editor-defined columns
         $css .= ".iw-footer__nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 2rem; }\n";
 
         // Inline nav row (centered / minimal layouts)
         $css .= ".iw-footer__nav-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; list-style: none; margin: 0; padding: 0; }\n";
-        $css .= ".iw-footer__nav-inline a { font-size: 0.875rem; text-decoration: none; opacity: 0.75; transition: opacity 0.2s ease, color 0.2s ease; }\n";
-        $css .= ".iw-footer__nav-inline a:hover { opacity: 1; }\n";
+        $css .= '.iw-footer__nav-inline a { font-size: 0.875rem; text-decoration: none;' . $opacity('link', '0.75') . " transition: opacity 0.2s ease, color 0.2s ease; }\n";
+        if ($muted) {
+            $css .= ".iw-footer__links a:is(:hover, :focus-visible),\n";
+            $css .= ".iw-footer__nav-inline a:is(:hover, :focus-visible) { opacity: 1; }\n";
+        }
 
         // Copyright + divider
-        $css .= ".iw-footer__copyright { font-size: 0.8125rem; opacity: 0.55; }\n";
-        $css .= ".iw-footer__divider { border: 0; height: 1px; background-color: currentColor; opacity: 0.12; }\n";
+        $css .= '.iw-footer__copyright { font-size: 0.8125rem;' . $opacity('copyright', '0.55') . " }\n";
+        $dividerOpacity = $muted || !$hasDivider ? ' opacity: var(--iw-footer-divider-opacity, 0.12);' : '';
+        $css .= ".iw-footer__divider { border: 0; height: 1px; background-color: var(--iw-footer-divider, currentColor);{$dividerOpacity} }\n";
 
         // Social list. Each <li> is a flex box so the icon is vertically
         // centered on the row (a list-item <li> keeps a baseline offset that
         // pushes the icon off-center relative to the text links).
         $css .= ".iw-footer__social { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }\n";
         $css .= ".iw-footer__social li { display: flex; }\n";
+
+        // Social icons follow the footer rather than the menu social colors.
+        // Each selector outranks its site-wide counterpart from
+        // generateMenuClasses() by one class.
+        $social = 'var(--iw-footer-social, var(--iw-footer-link, currentColor))';
+        $socialHover = 'var(--iw-footer-social-hover, var(--iw-footer-link-hover, ' . $social . '))';
+        $css .= ".iw-footer .iw-social-icon { background-color: {$social}; }\n";
+        $css .= ".iw-footer a:is(:hover, :focus-visible) > .iw-social-icon { background-color: {$socialHover}; }\n";
+        $css .= ".iw-footer .iw-social-text { color: {$social}; }\n";
+        $css .= ".iw-footer a:is(:hover, :focus-visible) > .iw-social-text { color: {$socialHover}; }\n";
 
         return $css . "\n";
     }

@@ -52,6 +52,7 @@ final class ThemeFormKeyCoverageTest extends TestCase
         ThemeFormMapper::PREFIX_CUSTOM,
         ThemeFormMapper::PREFIX_MENU_COLORS,
         ThemeFormMapper::PREFIX_MENU_CUSTOM,
+        ThemeFormMapper::PREFIX_FOOTER_COLORS,
         ThemeFormMapper::PREFIX_FOOTER_CUSTOM,
         'typography_',
     ];

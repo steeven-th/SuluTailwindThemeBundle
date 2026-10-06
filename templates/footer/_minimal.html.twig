@@ -1,11 +1,7 @@
 {# Footer — minimal layout: one tidy row. Left: optional compact logo/name +
    copyright. Right: inline links + social. The inline links use the FIRST
-   column of the Footer snippet (fallback: top-level navigation). Typography
-   from the compiled `.iw-footer*` classes; the <footer> carries the variant. #}
-
-{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(config.variant|default(null), allVariants) %}
-{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+   column of the Footer snippet (fallback: top-level navigation). Colors and
+   typography from the compiled `.iw-footer*` classes. #}
 
 {# Inline links: first column of the Footer snippet. No snippet → no links. #}
 {% set navLinks = [] %}
@@ -30,7 +26,7 @@
 {% endif %}
 {% set showName = config.displaySiteName|default(false) and config.siteName|default('') is not empty %}
 
-<footer class="iw-footer iw-footer--minimal {{ variantClass }}" data-has-bg="true" data-has-border="true">
+<footer class="iw-footer iw-footer--minimal">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
         {# Left: brand (optional) + copyright #}

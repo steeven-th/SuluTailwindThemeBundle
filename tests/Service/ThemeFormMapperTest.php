@@ -94,6 +94,67 @@ class ThemeFormMapperTest extends TestCase
         $this->assertTrue($theme->getFooterConfig()['custom']['showBackToTop']);
     }
 
+    /**
+     * The footer colors live in a sub-object of their own column, like the
+     * menu ones. Missing from the mapper, they were shown in the form and
+     * reverted on save.
+     */
+    public function testFooterColorsAreCarriedBothWays(): void
+    {
+        $data = $this->mapper->serializeTheme($this->buildTheme());
+        $this->assertSame('ref:primary-900', $data['footerConfig_colors_bg']);
+        $this->assertSame('#ffffff', $data['footerConfig_colors_link']);
+
+        $theme = new ThemeConfig();
+        $this->mapper->mapDataToEntity(['footerConfig_colors_linkHover' => 'ref:accent', 'footerConfig_mutedText' => false], $theme);
+        $this->assertSame(['linkHover' => 'ref:accent'], $theme->getFooterConfig()['colors']);
+        $this->assertFalse($theme->getFooterConfig()['mutedText']);
+    }
+
+    /**
+     * A theme saved before the setting shows it checked, which is what the
+     * site does with it.
+     */
+    public function testFooterTextIsMutedUntilSwitchedOff(): void
+    {
+        $this->assertTrue($this->mapper->serializeTheme($this->buildTheme())['footerConfig_mutedText']);
+    }
+
+    /**
+     * A footer still on its variant shows the colors it renders with, so the
+     * form says what the site does, and saving writes them down.
+     */
+    public function testAFooterStillOnItsVariantShowsTheColorsItRendersWith(): void
+    {
+        $theme = $this->buildTheme();
+        $tokens = $theme->getTokens();
+        $tokens['blockVariants'][0] += ['blockBg' => '#020617', 'link' => '#ffffff'];
+        $theme->setTokens($tokens);
+        $theme->setFooterConfig(['type' => 'columns', 'variant' => '', 'colors' => ['link' => '#22c55e']]);
+
+        $data = $this->mapper->serializeTheme($theme);
+
+        $this->assertSame('#020617', $data['footerConfig_colors_bg']);
+        $this->assertSame('#22c55e', $data['footerConfig_colors_link']);
+    }
+
+    /**
+     * The variant is no longer a field. A save must neither offer it nor drop
+     * it: the migration command reads it to write the colors, and a theme
+     * saved before the migration ran would otherwise lose its footer colors.
+     */
+    public function testTheFormerFooterVariantIsNeitherOfferedNorDropped(): void
+    {
+        $theme = $this->buildTheme();
+        $theme->setFooterConfig(['type' => 'columns', 'variant' => 'dark']);
+
+        $data = $this->mapper->serializeTheme($theme);
+        $this->assertArrayNotHasKey('footerConfig_variant', $data);
+
+        $this->mapper->mapDataToEntity($data + ['footerConfig_variant' => 'light'], $theme);
+        $this->assertSame('dark', $theme->getFooterConfig()['variant']);
+    }
+
     public function testProjectDefinedFieldsSurviveTheRoundTrip(): void
     {
         $theme = $this->buildTheme();
@@ -315,7 +376,7 @@ class ThemeFormMapperTest extends TestCase
             ],
         ]);
         $theme->setMenuConfig(['type' => 'navbar', 'colors' => ['bg' => '#111111']]);
-        $theme->setFooterConfig(['type' => 'columns']);
+        $theme->setFooterConfig(['type' => 'columns', 'colors' => ['bg' => 'ref:primary-900', 'link' => '#ffffff']]);
 
         return $theme;
     }

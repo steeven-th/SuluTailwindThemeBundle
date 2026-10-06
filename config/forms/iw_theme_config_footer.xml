@@ -33,16 +33,111 @@
                     </params>
                 </property>
 
-                <!--
-                    Footer color is a named color variant applied on the <footer>.
-                    Full width, as in `block-variant.xml`: the picker draws a grid
-                    of thumbnails, and half a row is too narrow to lay them out.
-                -->
-                <property name="footerConfig_variant" type="iw_theme_variant_picker" colspan="12">
+                <property name="footerConfig_mutedText" type="checkbox" colspan="6">
                     <meta>
-                        <title>iw_sulu_tailwind_theme.footer_variant</title>
-                        <info_text>iw_sulu_tailwind_theme.footer_variant_info</info_text>
+                        <title>iw_sulu_tailwind_theme.footer_mutedText</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_mutedText_info</info_text>
                     </meta>
+                    <params>
+                        <param name="default_value" value="true"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Colors: three per row, each falls back to the footer's surroundings when empty -->
+        <section name="footerColors">
+            <meta>
+                <title>iw_sulu_tailwind_theme.footer_colors</title>
+            </meta>
+            <properties>
+                <property name="footerConfig_colors_bg" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_bg</title>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_text" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_text</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_text_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_title" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_title</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_title_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_link" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_link</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_link_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_linkHover" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_linkHover</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_linkHover_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_accent" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_accent</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_accent_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_divider" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_divider</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_divider_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_socialMedia" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_socialMedia</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_socialMedia_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
+                </property>
+
+                <property name="footerConfig_colors_socialMediaHover" type="iw_theme_color_token_editor" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.footer_colors_socialMediaHover</title>
+                        <info_text>iw_sulu_tailwind_theme.footer_colors_socialMediaHover_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="show_palette" value="true"/>
+                    </params>
                 </property>
             </properties>
         </section>

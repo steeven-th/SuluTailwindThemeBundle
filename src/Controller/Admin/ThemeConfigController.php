@@ -46,7 +46,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *   - typography assignments: typography_assignments_{el}_{prop} → tokens.typography.assignments.{el}.{prop}
  *   - blockVariants: blockVariants (block) → tokens.blockVariants
  *   - menu: menuConfig_{key} / menuConfig_colors_{key} → menuConfig.{key} / menuConfig.colors.{key}
- *   - footer: footerConfig_{key} → footerConfig.{key}
+ *   - footer: footerConfig_{key} / footerConfig_colors_{key} → footerConfig.{key} / footerConfig.colors.{key}
  */
 class ThemeConfigController extends AbstractController implements SecuredControllerInterface
 {

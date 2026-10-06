@@ -2,9 +2,9 @@
 
    Loaded from the `iw_theme_footer_social_media_links` snippet area (declared in
    config/templates/snippets/social_media.xml). Reuses the `.iw-social-icon`
-   mask-image technique, but recolors icons from the footer color variant
-   (`--iw-variant-link-color`) instead of the menu social color, so the footer is
-   self-contained and inherits its picked variant. #}
+   mask-image technique. The compiled `.iw-footer` rules recolor the icons from
+   the footer social colors (`--iw-footer-social`, then the link color) instead
+   of the menu ones. #}
 
 {% set socialLinks = [] %}
 {% set socialSnippet = sulu_snippet_load_by_area('iw_theme_footer_social_media_links') %}
@@ -13,12 +13,6 @@
 {% endif %}
 
 {% if socialLinks|length > 0 %}
-    <style>
-        .iw-footer .iw-social-icon { background-color: var(--iw-variant-link-color, currentColor); }
-        .iw-footer a:hover > .iw-social-icon { background-color: var(--iw-variant-link-hover, var(--iw-variant-link-color, currentColor)); }
-        .iw-footer .iw-social-text { color: var(--iw-variant-link-color, currentColor); }
-    </style>
-
     {% include '@ItechWorldSuluTailwindTheme/components/_social_links.html.twig' with {
         links: socialLinks,
         class: 'iw-footer__social',

@@ -6,6 +6,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
+use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
@@ -70,6 +71,11 @@ class ThemeFormMapper
      * Prefix used for footer config form fields.
      */
     public const PREFIX_FOOTER = 'footerConfig_';
+
+    /**
+     * Prefix used for footer color form fields.
+     */
+    public const PREFIX_FOOTER_COLORS = 'footerConfig_colors_';
 
     /**
      * Prefixes of the open `custom` namespaces, one per JSON column.
@@ -252,12 +258,13 @@ class ThemeFormMapper
     /**
      * Footer config keys, stored in the dedicated footerConfig JSON column.
      *
-     * The footer is colored through a color `variant` slug (no granular color
-     * fields), so this is a flat list of scalars/media objects — no nested
-     * `colors` sub-object like the menu.
+     * Scalars and media objects only. The colors live in a nested `colors`
+     * sub-object, carried by PREFIX_FOOTER_COLORS like the menu ones. The
+     * former `variant` key is gone on purpose: left in this list, a save would
+     * write it back after `iw-sulu:theme:migrate-footer-colors` removed it.
      */
     public const FOOTER_SCALAR_KEYS = [
-        'type', 'variant',
+        'type', 'mutedText',
         'displayLogo', 'logo', 'logoHeight', 'displaySiteName', 'siteNamePosition', 'tagline',
         'displaySocialMedia', 'copyright',
     ];
@@ -338,7 +345,9 @@ class ThemeFormMapper
         // Flatten menuConfig scalars and nested colors
         $this->flattenMenuConfig($data, $menuConfig);
 
-        // Flatten footerConfig scalars (footer color is a variant slug)
+        // Flatten footerConfig scalars and nested colors. A footer still on its
+        // variant shows the colors it renders with, and saving writes them.
+        $footerConfig['colors'] = FooterVariantColors::inherit($footerConfig, $tokens['blockVariants'] ?? []);
         $this->flattenFooterConfig($data, $footerConfig);
 
         // Article configuration: flat keys passed through directly
@@ -546,18 +555,35 @@ class ThemeFormMapper
     /**
      * Flatten footerConfig into prefixed keys.
      *
-     * All footer keys are flat scalars/media objects (footerConfig_{key}); the
-     * footer color is a variant slug, so there is no nested colors sub-object.
+     * Scalar keys become footerConfig_{key}, nested colors become
+     * footerConfig_colors_{key}.
      *
      * @param array<string, mixed> $data         Target array (mutated)
      * @param array<string, mixed> $footerConfig Source footer config
      */
     private function flattenFooterConfig(array &$data, array $footerConfig): void
     {
-        foreach ($footerConfig as $key => $value) {
-            if (in_array($key, self::FOOTER_SCALAR_KEYS, true)) {
+        // Walked in the order of FOOTER_SCALAR_KEYS rather than the stored one,
+        // which is the order mapping back produces, so a round trip is a fixed
+        // point whatever order the column was written in.
+        foreach (self::FOOTER_SCALAR_KEYS as $key) {
+            if ('mutedText' === $key) {
+                // Muted unless switched off. Mirrors the `?? true` of
+                // ThemeCompiler, so the admin shows what the site does for a
+                // theme saved before the setting existed.
+                $data[self::PREFIX_FOOTER . $key] = $footerConfig[$key] ?? true;
+            } elseif (array_key_exists($key, $footerConfig)) {
                 // Pass through known keys (scalars + media objects like {id: X})
-                $data[self::PREFIX_FOOTER . $key] = $value;
+                $data[self::PREFIX_FOOTER . $key] = $footerConfig[$key];
+            }
+        }
+
+        $colors = $footerConfig['colors'] ?? [];
+        if (is_array($colors)) {
+            foreach ($colors as $colorKey => $colorValue) {
+                if (!is_array($colorValue)) {
+                    $data[self::PREFIX_FOOTER_COLORS . $colorKey] = $colorValue;
+                }
             }
         }
     }
@@ -1086,7 +1112,7 @@ class ThemeFormMapper
     }
 
     /**
-     * Unflatten footerConfig form keys back into a flat structure.
+     * Unflatten footerConfig form keys back into scalars and a colors sub-object.
      *
      * @param array<string, mixed> $data     Source flat data
      * @param array<string, mixed> $existing Existing footer config
@@ -1100,6 +1126,16 @@ class ThemeFormMapper
             if (array_key_exists($formKey, $data)) {
                 $existing[$key] = $data[$formKey];
             }
+        }
+
+        $colors = $existing['colors'] ?? [];
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, self::PREFIX_FOOTER_COLORS) && !is_array($value)) {
+                $colors[substr($key, strlen(self::PREFIX_FOOTER_COLORS))] = $value;
+            }
+        }
+        if (!empty($colors)) {
+            $existing['colors'] = $colors;
         }
 
         return $existing;

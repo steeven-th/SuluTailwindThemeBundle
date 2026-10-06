@@ -3,13 +3,9 @@
    Columns are editorial: they come from the "Footer" snippet (area
    `iw_theme_footer`). Each column has a label and a smart_content page
    selection. The number of columns is whatever the editor created. Brand,
-   social and copyright come from the theme's Footer config. Typography/muting
-   is handled by the compiled `.iw-footer*` classes; the <footer> carries the
-   picked color variant (`.iw-variant--<slug>`). #}
-
-{% set allVariants = iw_sulu_tailwind_theme.blockVariants|default([]) %}
-{% set variantSlug = iw_sulu_tailwind_theme_variant_slug(config.variant|default(null), allVariants) %}
-{% set variantClass = variantSlug ? 'iw-variant--' ~ variantSlug : '' %}
+   social and copyright come from the theme's Footer config. Colors,
+   typography and muting are handled by the compiled `.iw-footer*` classes,
+   fed by the footer colors of the theme. #}
 
 {% set columns = [] %}
 {% set footerSnippet = sulu_snippet_load_by_area('iw_theme_footer') %}
@@ -17,7 +13,7 @@
     {% set columns = footerSnippet.content.columns %}
 {% endif %}
 
-<footer class="iw-footer iw-footer--columns {{ variantClass }}" data-has-bg="true" data-has-border="true">
+<footer class="iw-footer iw-footer--columns">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
 

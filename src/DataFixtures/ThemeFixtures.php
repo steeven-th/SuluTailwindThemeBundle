@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\DataFixtures;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
+use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
 
 /**
  * Provides preset theme data for the built-in themes (3.0.0 color model).
@@ -41,7 +42,7 @@ class ThemeFixtures
      */
     public static function getPresets(): array
     {
-        return [
+        return array_map(self::withFooterColors(...), [
             'corporate' => self::getCorporatePreset(),
             'creative' => self::getCreativePreset(),
             'minimal' => self::getMinimalPreset(),
@@ -49,7 +50,25 @@ class ThemeFixtures
             'halloween' => self::getHalloweenPreset(),
             'christmas' => self::getChristmasPreset(),
             'megamenu' => self::getMegamenuPreset(),
-        ];
+        ]);
+    }
+
+    /**
+     * Give a preset footer the colors of its first block variant.
+     *
+     * That variant is what the footer wore before it had colors of its own, so
+     * a preset installed today looks like one installed and then migrated.
+     *
+     * @param array<string, mixed> $preset A preset
+     *
+     * @return array<string, mixed> The preset, its footer colored
+     */
+    private static function withFooterColors(array $preset): array
+    {
+        $firstVariant = $preset['tokens']['blockVariants'][0] ?? [];
+        $preset['footerConfig']['colors'] = FooterVariantColors::fromVariant($firstVariant);
+
+        return $preset;
     }
 
     /**
@@ -1525,7 +1544,7 @@ class ThemeFixtures
     {
         return [
             'type' => 'columns',
-            'variant' => '',
+            'mutedText' => true,
             'displayLogo' => false,
             'logoHeight' => 40,
             'displaySiteName' => true,
