@@ -98,7 +98,7 @@
         </property>
         <property name="components_tagHoverBg" type="iw_theme_color_token_editor" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_hover_bg</title></meta>
-            <params><param name="show_palette" value="true"/></params>
+            <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
         </property>
         <property name="components_tagHoverBorder" type="iw_theme_color_token_editor" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_hover_border</title></meta>

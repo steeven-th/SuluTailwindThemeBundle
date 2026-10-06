@@ -23,11 +23,13 @@ Shared by every variant.
 
 | Variable pattern | Description |
 |-----------------|-------------|
-| `--iw-button-{variant}-bg` | Background color |
+| `--iw-button-{variant}-bg` | Background color (the fallback color of a [gradient](../gradients.md), `transparent` for a translucent one) |
+| `--iw-button-{variant}-bg-image` | The background gradient, when there is one |
 | `--iw-button-{variant}-text` | Text color |
 | `--iw-button-{variant}-border` | Full border shorthand (`{width} {style} {color}`) or `none` |
 | `--iw-button-{variant}-radius` | Border radius |
 | `--iw-button-{variant}-hover-bg` | Background on hover |
+| `--iw-button-{variant}-hover-bg-image` | The hover gradient, when there is one. Painted on the `::before` layer, see [Button hover effects](../button-effects.md#with-a-gradient-background) |
 | `--iw-button-{variant}-hover-text` | Text color on hover |
 | `--iw-button-{variant}-hover-border` | Border shorthand on hover (or `none`) |
 | `--iw-button-{variant}-accent` | Accent colour of the style, only when set |

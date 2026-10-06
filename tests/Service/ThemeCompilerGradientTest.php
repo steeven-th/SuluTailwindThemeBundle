@@ -286,4 +286,79 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringContainsString("  --iw-category-badge-bg-image: var(--gradient-bleu-leger);", $css);
         self::assertStringContainsString("  --iw-article-card-badge-bg-image: var(--gradient-bleu-leger);", $css);
     }
+
+    /**
+     * @param array<string, mixed> $button
+     */
+    private function compileButton(array $button): string
+    {
+        return $this->compileCss($this->tokens('#172F57', [
+            'buttons' => [['slug' => 'cta', 'label' => 'CTA', 'text' => '#ffffff', 'hoverDuration' => '500ms'] + $button],
+        ]));
+    }
+
+    #[Test]
+    public function aGradientButtonFadesToItsHoverBackgroundOnALayer(): void
+    {
+        $css = $this->compileButton(['bg' => 'gradient:bleu-leger', 'hoverBg' => '#000000']);
+
+        self::assertStringContainsString("  --iw-button-cta-bg: var(--gradient-bleu-leger-fallback);\n  --iw-button-cta-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString(".iw-button--cta {\n  background-color: var(--gradient-bleu-leger-fallback);\n  background-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  isolation: isolate;", $css);
+        self::assertStringContainsString(
+            ".iw-button--cta::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  z-index: -1;\n  background-color: var(--iw-button-cta-hover-bg);\n  background-image: var(--iw-button-cta-hover-bg-image, none);\n  opacity: 0;\n  transition: opacity 500ms ",
+            $css,
+        );
+        self::assertStringContainsString(".iw-button--cta:hover::before {\n  opacity: 1;\n}", $css);
+        self::assertSame(1, preg_match('/\.iw-button--cta:hover \{(.*?)\}/s', $css, $hover));
+        self::assertStringNotContainsString('background-color', $hover[1], 'The layer paints the hover background, not the button.');
+    }
+
+    #[Test]
+    public function aGradientHoverBackgroundFadesInOverAPlainButton(): void
+    {
+        $css = $this->compileButton(['bg' => '#000000', 'hoverBg' => 'gradient:bleu-leger']);
+
+        self::assertStringContainsString('  --iw-button-cta-hover-bg-image: var(--gradient-bleu-leger);', $css);
+        self::assertStringContainsString(".iw-button--cta:hover::before {\n  opacity: 1;\n}", $css);
+    }
+
+    #[Test]
+    public function thePulseMovesOntoTheLayerWhenAGradientIsInvolved(): void
+    {
+        $css = $this->compileButton(['bg' => 'gradient:bleu-leger', 'hoverBg' => '#000000', 'hoverBgEffect' => 'pulse-bg']);
+
+        self::assertStringContainsString("@keyframes iw-button-layer-pulse {\n  0%, 100% { opacity: 0; }\n  50% { opacity: 1; }\n}", $css);
+        self::assertStringContainsString(".iw-button--cta:hover::before {\n  animation: iw-button-layer-pulse 2s ease-in-out infinite;\n}", $css);
+        self::assertStringNotContainsString('@keyframes iw-button-cta-bg-pulse', $css);
+    }
+
+    #[Test]
+    public function aSlidePaintsTheHoverGradient(): void
+    {
+        $css = $this->compileButton(['bg' => '#000000', 'hoverBg' => 'gradient:bleu-leger', 'hoverBgEffect' => 'slide-right']);
+
+        self::assertStringContainsString("  background-color: var(--iw-button-cta-hover-bg);\n  background-image: var(--iw-button-cta-hover-bg-image, none);\n  transform: translateX(-100%);", $css);
+    }
+
+    #[Test]
+    public function aPlainButtonGetsNoLayer(): void
+    {
+        $css = $this->compileButton(['bg' => '#000000', 'hoverBg' => '#333333']);
+
+        self::assertStringNotContainsString('.iw-button--cta::before', $css);
+        self::assertStringNotContainsString('iw-button-layer-pulse', $css);
+        self::assertStringContainsString(".iw-button--cta:hover {\n  background-color: #333333;", $css);
+    }
+
+    #[Test]
+    public function aComponentWithAGradientFadesItsHoverOnALayer(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', ['components_tagBg' => 'gradient:bleu-leger', 'components_tagHoverBg' => '#ffffff']));
+        $plain = $this->compileCss($this->tokens('#172F57', ['components_tagBg' => '#eeeeee', 'components_tagHoverBg' => '#ffffff']));
+
+        self::assertStringContainsString('.iw-tag { position: relative; isolation: isolate; overflow: hidden; }', $css);
+        self::assertStringContainsString('.iw-tag:hover { background: var(--iw-tag-bg-image, none), var(--iw-tag-bg, transparent); }', $css);
+        self::assertStringNotContainsString('.iw-tag::before', $plain);
+    }
 }

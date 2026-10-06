@@ -223,6 +223,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverTransform_skew": "Distorsion",
     "iw_sulu_tailwind_theme.buttons_hoverTransform_pop": "Pop",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect": "Effet de fond au survol",
+    "iw_sulu_tailwind_theme.buttons_hoverBgEffect_info": "Avec un fond ou un fond au survol en dégradé, « Aucun » devient un fondu sur la durée du survol, comme pour un bouton uni, et la pulsation passe sur un calque. Les glissements peignent le dégradé.",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_none": "Aucun",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right": "Balayage vers la droite",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left": "Balayage vers la gauche",

@@ -405,6 +405,7 @@ class ThemeCompiler
         $this->resolvedPalettes = [];
         $this->gradientSet = null;
         $this->gradientFallbacks = [];
+        $this->buttonHoverImages = [];
         $this->buttonsGlobal = [];
 
         return $css;
@@ -606,7 +607,14 @@ class ThemeCompiler
             $css .= "  --iw-back-to-top-bg-image: {$bgImage};\n";
         }
         $css .= "  --iw-back-to-top-color: {$color};\n";
+        $hoverImage = $this->paintImage($tokens['components_backToTopHoverBg'] ?? '');
+        if (null !== $hoverImage) {
+            $hoverBg = $this->resolvePaint(trim((string) $tokens['components_backToTopHoverBg']))['color'];
+        }
         $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
+        if (null !== $hoverImage) {
+            $css .= "  --iw-back-to-top-hover-bg-image: {$hoverImage};\n";
+        }
 
         $shadow = trim((string) ($tokens['components_backToTopShadow'] ?? ''));
         if (isset(self::SHADOWS[$shadow])) {
@@ -678,11 +686,14 @@ class ThemeCompiler
                 $tokens['components_controlsOnMediaBgHover'] ?? '',
                 "color-mix(in srgb, {$resolved}, {$towards} 15%)",
             );
+            if (null !== $this->paintImage($tokens['components_controlsOnMediaBgHover'] ?? '')) {
+                $hover = $this->paintShorthand((string) $tokens['components_controlsOnMediaBgHover']);
+            }
             $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
         } elseif ('' !== (string) ($tokens['components_controlsOnMediaBgHover'] ?? '')) {
             // A hover colour with no background of its own still applies, over
             // the white veil the stylesheet draws at rest.
-            $hover = $this->resolveColorValue((string) $tokens['components_controlsOnMediaBgHover']);
+            $hover = $this->paintShorthand((string) $tokens['components_controlsOnMediaBgHover']);
             $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
         }
 
@@ -1475,7 +1486,7 @@ class ThemeCompiler
      *
      * @var list<string>
      */
-    private const GRADIENT_OWN_COLOR_KEYS = ['components_tagBg', 'components_badgeBg'];
+    private const GRADIENT_OWN_COLOR_KEYS = ['components_tagBg', 'components_tagHoverBg', 'components_badgeBg'];
 
     /**
      * Components whose colours are written as their own variables rather than
@@ -1770,7 +1781,8 @@ class ThemeCompiler
             . $this->generateComponentShadows($tokens)
             . $this->generateComponentSpacing($tokens)
             . $this->generateComponentTextSizes($tokens)
-            . $this->generateComponentOwnColors($tokens);
+            . $this->generateComponentOwnColors($tokens)
+            . $this->generateHoverFadeLayers($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1798,6 +1810,75 @@ class ThemeCompiler
             if ('' !== $declarations) {
                 $css .= "{$selector} {\n{$declarations}}\n\n";
             }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Components whose hover background can be a gradient, and how they paint.
+     *
+     * selector => [rest setting, hover setting, rest background, hover
+     * background, transition, whether the stylesheet already positions it].
+     * The backgrounds are the shorthand values each component paints with,
+     * fallbacks included, so the layer shows exactly what the hover showed.
+     *
+     * @var array<string, array{0: string, 1: string, 2: string, 3: string, 4: string, 5: bool}>
+     */
+    private const HOVER_FADE_LAYERS = [
+        '.iw-tag' => [
+            'components_tagBg',
+            'components_tagHoverBg',
+            'var(--iw-tag-bg-image, none), var(--iw-tag-bg, transparent)',
+            'var(--iw-tag-hover-bg-image, none), var(--iw-tag-hover-bg, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 12%, var(--iw-tag-bg, transparent)))',
+            '0.2s ease',
+            false,
+        ],
+        '.iw-back-to-top' => [
+            'components_backToTopBg',
+            'components_backToTopHoverBg',
+            'var(--iw-back-to-top-bg-image, none), var(--iw-back-to-top-bg, var(--color-surface-accent))',
+            'var(--iw-back-to-top-hover-bg-image, none), var(--iw-back-to-top-hover-bg, var(--color-surface-accent))',
+            'var(--iw-back-to-top-transition, 0.25s ease)',
+            true,
+        ],
+        '.iw-gallery-nav' => [
+            'components_controlsOnMediaBg',
+            'components_controlsOnMediaBgHover',
+            'var(--_bg)',
+            'var(--_bg-hover)',
+            '0.2s ease',
+            false,
+        ],
+    ];
+
+    /**
+     * Fade the hover background of a component in on a layer.
+     *
+     * A background-image cannot be transitioned, so a gradient at rest or on
+     * hover would swap at once where a color fades. Where one is involved,
+     * the hover background is painted on a ::before layer whose opacity
+     * moves, and the component keeps its resting background under it.
+     * Nothing is written for a component painted with colors.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateHoverFadeLayers(array $tokens): string
+    {
+        $css = '';
+        foreach (self::HOVER_FADE_LAYERS as $selector => [$restKey, $hoverKey, $rest, $hover, $transition, $positioned]) {
+            if (null === $this->paintImage($this->settingValue($tokens, $restKey))
+                && null === $this->paintImage($this->settingValue($tokens, $hoverKey))) {
+                continue;
+            }
+
+            $css .= "{$selector} {" . ($positioned ? '' : ' position: relative;') . " isolation: isolate; overflow: hidden; }\n";
+            $css .= "{$selector}::before { content: \"\"; position: absolute; inset: 0; z-index: -1; pointer-events: none;\n";
+            $css .= "  border-radius: inherit; background: {$hover}; opacity: 0; transition: opacity {$transition}; }\n";
+            $css .= "{$selector}:hover { background: {$rest}; }\n";
+            $css .= "{$selector}:hover::before { opacity: 1; }\n\n";
         }
 
         return $css;
@@ -2645,12 +2726,16 @@ class ThemeCompiler
 
         $duration = ButtonEffectCatalog::resolveDuration((string) ($props['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($props['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
-        $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
-        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
+        $bgEffectKey = $this->buttonBgEffect($props);
+        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || \in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true);
 
         $css = "{$selector} {\n";
         if (isset($props['bg'])) {
-            $css .= "  background-color: {$this->resolveColorValue((string) $props['bg'])};\n";
+            $bgPaint = $this->resolvePaint(trim((string) $props['bg']));
+            $css .= "  background-color: {$bgPaint['color']};\n";
+            if (null !== $bgPaint['image']) {
+                $css .= "  background-image: {$bgPaint['image']};\n";
+            }
         }
         if (isset($props['text'])) {
             $css .= "  color: {$this->resolveColorValue((string) $props['text'])};\n";
@@ -2674,7 +2759,8 @@ class ThemeCompiler
         $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
         $css .= "}\n";
 
-        // Overlay pseudo-element for slide-* / gradient-shift effects
+        // Overlay pseudo-element for slide-* / gradient-shift effects, and for
+        // the fade a gradient background needs (see buttonBgEffect()).
         $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
 
         // Hover state
@@ -3083,6 +3169,7 @@ class ThemeCompiler
                 if (null === $suffix) {
                     continue;
                 }
+                $image = null;
                 // The accent is optional: a cleared field publishes nothing,
                 // so a project rule can fall back with var(..., fallback).
                 if ('accent' === $prop && \in_array($value, [null, '', 'none'], true)) {
@@ -3091,6 +3178,10 @@ class ThemeCompiler
 
                 if ('radius' === $prop) {
                     $value = $this->resolveRadius((string) $value);
+                } elseif ('bg' === $prop || 'hoverBg' === $prop) {
+                    $paint = $this->resolvePaint(trim((string) $value));
+                    $value = $paint['color'];
+                    $image = $paint['image'];
                 } elseif ('border' === $prop || 'hoverBorder' === $prop) {
                     // Border vars must hold a full shorthand (width style color),
                     // otherwise consumers using `border: var(--iw-button-X-border, ...)`
@@ -3102,6 +3193,9 @@ class ThemeCompiler
                     $value = $this->resolveColorValue((string) $value);
                 }
                 $css .= "  --iw-button-{$variant}-{$suffix}: {$value};\n";
+                if (null !== $image) {
+                    $css .= "  --iw-button-{$variant}-{$suffix}-image: {$image};\n";
+                }
             }
         }
 
@@ -4317,15 +4411,20 @@ class ThemeCompiler
         $css .= ButtonEffectCatalog::buildSharedKeyframes();
 
         // Per-button @keyframes emitted only when bg-pulse is configured.
+        $layerPulse = false;
         foreach ($buttons as $props) {
             if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
             $variant = $props['slug'];
-            $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
+            $bgEffectKey = $this->buttonBgEffect($props);
             if (ButtonEffectCatalog::bgEffectNeedsKeyframes($bgEffectKey)) {
                 $css .= ButtonEffectCatalog::buildBgPulseKeyframes($variant);
             }
+            $layerPulse = $layerPulse || self::BG_EFFECT_LAYER_PULSE === $bgEffectKey;
+        }
+        if ($layerPulse) {
+            $css .= "@keyframes iw-button-layer-pulse {\n  0%, 100% { opacity: 0; }\n  50% { opacity: 1; }\n}\n";
         }
         $css .= "\n";
 
@@ -4388,7 +4487,8 @@ class ThemeCompiler
      */
     private function generateButtonBgEffectBefore(string $baseSelector, string $variant, string $bgEffectKey, string $duration, string $easing): string
     {
-        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || 'pulse-bg' === $bgEffectKey) {
+        $layer = \in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true);
+        if (!$layer && (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || 'pulse-bg' === $bgEffectKey)) {
             return '';
         }
 
@@ -4397,6 +4497,29 @@ class ThemeCompiler
         $css .= "  position: absolute;\n";
         $css .= "  inset: 0;\n";
         $css .= "  z-index: -1;\n";
+
+        if ($layer) {
+            // The hover background, gradient or color, painted on a layer
+            // whose opacity moves: a background-image cannot be transitioned,
+            // its layer can. Same duration and easing as every other button,
+            // so a gradient button fades like a plain one.
+            $css .= "  background-color: var(--iw-button-{$variant}-hover-bg);\n";
+            $css .= "  background-image: var(--iw-button-{$variant}-hover-bg-image, none);\n";
+            $css .= "  opacity: 0;\n";
+            if (self::BG_EFFECT_FADE === $bgEffectKey) {
+                $css .= "  transition: opacity {$duration} {$easing};\n";
+                $css .= "}\n";
+                $css .= "{$baseSelector}:hover::before {\n";
+                $css .= "  opacity: 1;\n";
+            } else {
+                $css .= "}\n";
+                $css .= "{$baseSelector}:hover::before {\n";
+                $css .= "  animation: iw-button-layer-pulse 2s ease-in-out infinite;\n";
+            }
+            $css .= "}\n";
+
+            return $css;
+        }
 
         if ('gradient-shift' === $bgEffectKey) {
             // Gradient overlay that fades in on hover for a smooth color transition.
@@ -4418,6 +4541,9 @@ class ThemeCompiler
         // breaking the illusion of a clean fill. The bounce easing remains in
         // effect for the button's own transform (.iw-button-- transition).
         $css .= "  background-color: var(--iw-button-{$variant}-hover-bg);\n";
+        if (null !== $this->buttonHoverImage($variant)) {
+            $css .= "  background-image: var(--iw-button-{$variant}-hover-bg-image, none);\n";
+        }
         $initial = match ($bgEffectKey) {
             'slide-right' => 'translateX(-100%)',
             'slide-left' => 'translateX(100%)',
@@ -4432,6 +4558,78 @@ class ThemeCompiler
         $css .= "}\n";
 
         return $css;
+    }
+
+    /**
+     * Background effect a gradient button falls back on when it has none.
+     */
+    private const BG_EFFECT_FADE = 'fade';
+
+    /**
+     * The pulse effect, moved onto a layer when a gradient is involved.
+     */
+    private const BG_EFFECT_LAYER_PULSE = 'pulse-layer';
+
+    /**
+     * Effects painting the hover background on the ::before layer.
+     *
+     * @var list<string>
+     */
+    private const BG_LAYER_EFFECTS = [self::BG_EFFECT_FADE, self::BG_EFFECT_LAYER_PULSE];
+
+    /**
+     * Button slugs whose hover background is a gradient, for this compile.
+     *
+     * @var array<string, string>
+     */
+    private array $buttonHoverImages = [];
+
+    /**
+     * The background effect a button actually renders with.
+     *
+     * The configured one, except where a gradient is involved: a
+     * background-image cannot be transitioned or animated, so a gradient
+     * button with no effect would change at once on hover while a plain one
+     * fades. It gets a fade instead, on a layer, with no setting to turn on.
+     * The pulse moves onto the same layer for the same reason. The slides
+     * already paint a layer and keep their effect.
+     *
+     * @param array<string, mixed> $props The button definition
+     *
+     * @return string The effect key
+     */
+    private function buttonBgEffect(array $props): string
+    {
+        $configured = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
+        $bgImage = isset($props['bg']) ? $this->paintImage($props['bg']) : null;
+        $hoverImage = isset($props['hoverBg']) ? $this->paintImage($props['hoverBg']) : null;
+        if (null !== $hoverImage && isset($props['slug'])) {
+            $this->buttonHoverImages[(string) $props['slug']] = $hoverImage;
+        }
+        if (null === $bgImage && null === $hoverImage) {
+            return $configured;
+        }
+
+        if (!isset($props['hoverBg'])) {
+            return $configured;
+        }
+        if ('pulse-bg' === $configured) {
+            return self::BG_EFFECT_LAYER_PULSE;
+        }
+
+        return ButtonEffectCatalog::isActiveBgEffect($configured) ? $configured : self::BG_EFFECT_FADE;
+    }
+
+    /**
+     * The hover gradient of a button, when it has one.
+     *
+     * @param string $slug The button slug
+     *
+     * @return string|null The CSS image, or null for a color
+     */
+    private function buttonHoverImage(string $slug): ?string
+    {
+        return $this->buttonHoverImages[$slug] ?? null;
     }
 
     /**
@@ -4475,7 +4673,7 @@ class ThemeCompiler
         // underlying button while the overlay is mid-slide, masking the effect
         // (the overlay and the now-tinted bg merge into a single flat color
         // before the slide finishes). Only emit it when no bg-effect is active.
-        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) && isset($props['hoverBg'])) {
+        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) && !\in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true) && isset($props['hoverBg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $props['hoverBg'])};\n";
         }
         if (isset($props['hoverText'])) {

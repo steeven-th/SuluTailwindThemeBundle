@@ -225,7 +225,7 @@
                         <title>iw_sulu_tailwind_theme.components_back_to_top_hover_bg</title>
                         <info_text>iw_sulu_tailwind_theme.components_back_to_top_hover_bg_info</info_text>
                     </meta>
-                    <params><param name="show_palette" value="true"/></params>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
 <property name="components_backToTopShadow" type="single_select" colspan="6">
@@ -361,7 +361,7 @@
                         <title>iw_sulu_tailwind_theme.components_controls_on_media_bg_hover</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_on_media_bg_hover_info</info_text>
                     </meta>
-                    <params><param name="show_palette" value="true"/></params>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
                 <property name="controlsIconHeading" type="heading">

@@ -57,6 +57,8 @@ tints, and the table cells, stripes and hover, which stack over the data.
 | Tags | Tag and category badge backgrounds | `--iw-tag-bg-image`, `--iw-category-badge-bg-image` |
 | Cards | Badge background | `--iw-article-card-badge-bg-image` |
 | Articles > Reading | Reading progress bar | in `--iw-reading-progress-color` itself, see below |
+| Buttons | Background, hover background | `--iw-button-<slug>-bg-image`, `--iw-button-<slug>-hover-bg-image` (see [Button hover effects](button-effects.md#with-a-gradient-background)) |
+| Hover backgrounds | Tags, back-to-top button, controls over media | `--iw-tag-hover-bg-image`, `--iw-back-to-top-hover-bg-image`, in `--iw-gallery-nav-bg-hover` itself |
 
 Each background keeps its color variable, set to the gradient's fallback (or
 `transparent` for a translucent gradient), and gets an `-image` variable
@@ -71,11 +73,21 @@ own CSS does not change.
 The map popups and controls (Leaflet) take the panel color, not its
 gradient: the tip of a popup is drawn separately and would not line up.
 
-Hover states drop the gradient for now and show their own color. A smooth
-transition between a gradient and a hover color comes with the button work.
-
 A field that only takes a color and is handed a `gradient:` value anyway paints
 the gradient's fallback.
+
+## Hover
+
+A `background-image` cannot be transitioned, so wherever a gradient is
+involved at rest or on hover, the hover background is painted on a `::before`
+layer whose opacity fades in, on the same duration as a plain color would.
+Buttons do it with their hover duration and easing (see
+[Button hover effects](button-effects.md#with-a-gradient-background)), tags,
+the back-to-top button and the controls over media with their own transition.
+The rules are written only for what has a gradient.
+
+The pagination and the share buttons offer no hover background of their own:
+over a gradient they show their hover color, without fading.
 
 ## How it is stored
 

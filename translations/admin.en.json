@@ -223,6 +223,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverTransform_skew": "Skew",
     "iw_sulu_tailwind_theme.buttons_hoverTransform_pop": "Pop",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect": "Hover background effect",
+    "iw_sulu_tailwind_theme.buttons_hoverBgEffect_info": "With a gradient background or hover background, \"None\" becomes a fade on the hover duration, like a plain button, and the pulse runs on a layer. Slides paint the gradient.",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_none": "None",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right": "Slide to the right",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left": "Slide to the left",

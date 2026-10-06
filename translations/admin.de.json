@@ -223,6 +223,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverTransform_skew": "Verzerren",
     "iw_sulu_tailwind_theme.buttons_hoverTransform_pop": "Pop",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect": "Hintergrundeffekt bei Hover",
+    "iw_sulu_tailwind_theme.buttons_hoverBgEffect_info": "Mit einem Verlauf als Hintergrund oder Hover-Hintergrund wird „Keiner“ zu einer Überblendung über die Hover-Dauer, wie bei einem einfarbigen Button, und das Pulsieren läuft auf einer Ebene. Die Schiebeeffekte malen den Verlauf.",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_none": "Keiner",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_right": "Wischen nach rechts",
     "iw_sulu_tailwind_theme.buttons_hoverBgEffect_slide_left": "Wischen nach links",
