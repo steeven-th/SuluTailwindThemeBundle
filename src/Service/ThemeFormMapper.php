@@ -242,7 +242,7 @@ class ThemeFormMapper
         'chevronOwn', 'chevronIconCustom', 'chevronIcon', 'chevronIconMedia', 'chevronIconSize', 'chevronIconDirection', 'chevronRotate',
         'clickParentPageNavbar',
         'megamenuSource',
-        'subMenuPanels', 'clickParentPagePanels',
+        'subMenuPanels', 'clickParentPagePanels', 'panelsParentLinkPosition',
         // Bar actions, read by menu/_bar_actions.html.twig and ThemeCompiler.
         'displayBarActions', 'barActionsBreakpoint',
         // Size of the menu buttons, read by ThemeCompiler.

@@ -172,6 +172,7 @@
         {% include '@ItechWorldSuluTailwindTheme/menu/_nav_panels.html.twig' with {
             navItems: navItems,
             parentLinkable: config.clickParentPagePanels|default(false),
+            parentLinkPosition: config.panelsParentLinkPosition|default('header'),
             direction: slideDirection,
             animation: animation,
             socialLinks: socialLinks,

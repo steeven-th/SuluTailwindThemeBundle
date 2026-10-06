@@ -327,6 +327,33 @@ final class MenuStructureRenderTest extends TestCase
         }
     }
 
+    /**
+     * In the list position, the back button carries a visible label instead of
+     * an aria-label, the header has no title, and the parent page heads the
+     * list of every sub-panel.
+     */
+    #[Test]
+    public function parentLinkInListLabelsTheBackButton(): void
+    {
+        $xpath = self::xpath(self::render(['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true, 'panelsParentLinkPosition' => 'list']));
+
+        $panels = $xpath->query('//section[contains(@class, "iw-menu__subpanel")]') ?: [];
+        self::assertGreaterThan(0, $panels->length);
+        foreach ($panels as $panel) {
+            self::assertInstanceOf(\DOMElement::class, $panel);
+            self::assertSame(0, $xpath->query('.//*[contains(@class, "iw-menu__panel-title")]', $panel)?->length);
+
+            $back = $xpath->query('.//button[contains(@class, "iw-menu__panel-back")]', $panel)?->item(0);
+            self::assertInstanceOf(\DOMElement::class, $back);
+            self::assertFalse($back->hasAttribute('aria-label'));
+            self::assertNotSame('', trim((string) $xpath->query('.//*[contains(@class, "iw-menu__panel-back-label")]', $back)?->item(0)?->textContent));
+
+            $first = $xpath->query('.//ul[contains(@class, "iw-menu__list")]/li[1]/a', $panel)?->item(0);
+            self::assertInstanceOf(\DOMElement::class, $first);
+            self::assertStringContainsString('iw-menu__panel-parent', $first->getAttribute('class'));
+        }
+    }
+
     #[Test]
     public function theFooterSharesTheSocialList(): void
     {

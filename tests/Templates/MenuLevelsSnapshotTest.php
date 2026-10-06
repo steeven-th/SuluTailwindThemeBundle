@@ -34,6 +34,7 @@ final class MenuLevelsSnapshotTest extends TestCase
             'megamenu-parent-link' => ['type' => 'megamenu', 'megamenuSource' => 'native', 'clickParentPageNavbar' => true],
             'burger-panels' => ['type' => 'burger', 'subMenuPanels' => true],
             'burger-panels-linkable' => ['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true],
+            'burger-panels-parent-in-list' => ['type' => 'burger', 'subMenuPanels' => true, 'clickParentPagePanels' => true, 'panelsParentLinkPosition' => 'list'],
             'burger-side' => ['type' => 'burger', 'panelLayout' => 'side', 'panelSide' => 'left'],
         ];
         foreach (['none', 'split', 'selflink'] as $mode) {

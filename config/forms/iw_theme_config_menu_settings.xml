@@ -384,5 +384,26 @@
                     <param name="type" value="toggler"/>
                 </params>
             </property>
+
+            <!-- A linked title next to the back arrow reads as part of the back
+                 button. "list" labels the arrow and moves the link to the first row. -->
+            <property name="menuConfig_panelsParentLinkPosition" type="single_select" colspan="6"
+                      visibleCondition="menuConfig_type == 'burger' AND menuConfig_subMenuPanels == true AND menuConfig_clickParentPagePanels == true">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.menu_panelsParentLinkPosition</title>
+                    <info_text>iw_sulu_tailwind_theme.menu_panelsParentLinkPosition_info</info_text>
+                </meta>
+                <params>
+                    <param name="default_value" type="string" value="header"/>
+                    <param name="values" type="collection">
+                        <param name="header">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelsParentLinkPosition_header</title></meta>
+                        </param>
+                        <param name="list">
+                            <meta><title>iw_sulu_tailwind_theme.menu_panelsParentLinkPosition_list</title></meta>
+                        </param>
+                    </param>
+                </params>
+            </property>
     </properties>
 </form>

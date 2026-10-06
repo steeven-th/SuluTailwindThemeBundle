@@ -3710,6 +3710,10 @@ class ThemeCompiler
         // The color of its sub-panel level, without hover. A linkable title
         // also carries the level text class, whose :hover signals the link.
         $css .= ".iw-menu__panel-title { color: inherit; font-size: 1.25rem; font-weight: 700; line-height: 1.2; }\n";
+        // Parent link in the list: the back button gets a visible label, and
+        // the parent page row keeps the weight of the header title it replaces.
+        $css .= ".iw-menu__panel-back-label { margin-inline-start: 0.25rem; font-size: 1rem; line-height: 1.2; }\n";
+        $css .= ".iw-menu__panel-parent { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }\n";
         // Rows: title on the left, chevron pushed to the right.
         $css .= ".iw-menu__panel-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0.75rem 0; text-align: left; cursor: pointer; }\n";
 

@@ -15,6 +15,10 @@
     - navItems:  the resolved navigation tree (up to four levels)
     - parentLinkable: bool — whether the section title links to the parent page
                       (panels mode has no split/selflink distinction, just on/off)
+    - parentLinkPosition: 'header' | 'list' - where that link sits when
+                      parentLinkable is on. 'header' links the section title.
+                      'list' labels the back button and leaves the header
+                      untitled, the parent page becoming the first row.
     - direction: menu slide direction ('top' | 'right' | 'bottom' | 'left')
     - animation: 'none' | 'slide' | 'fade'
     - socialLinks: resolved social media links (rendered at the bottom of the root)
@@ -31,7 +35,9 @@
     - .iw-menu__panels (+ --from-{dir} / --fade / --none) — the stack + its motion
     - .iw-menu__panel / .iw-menu__subpanel (+ --active) — a level / an overlay level
     - .iw-menu__panel-header / __panel-back / __panel-title — the sub-panel header
+    - .iw-menu__panel-back-label - the visible "Back" label ('list' position)
     - .iw-menu__panel-body / __panel-item - the scrollable level / a row
+    - .iw-menu__panel-parent - the parent page row ('list' position)
 #}
 
 {# Sub-panels reuse the overlay motion. fade / none skip the slide; otherwise the
@@ -40,21 +46,30 @@
 
 {# Macro: a sub-panel + its deeper panels, flattened as siblings so every panel
    shares the same absolute positioning context. #}
-{% macro render_subpanel(item, panelId, parentLinkable, depth) %}
+{% macro render_subpanel(item, panelId, parentLinkable, depth, parentLinkPosition) %}
     {% import '@ItechWorldSuluTailwindTheme/menu/_nav_macros.html.twig' as nav %}
     {# A sub-panel paints the background of its level, second to fourth, and
        everything on it, header included, takes the text of that level. #}
     {% set depth = max(2, min(depth|default(2), 4)) %}
     {% set levelText = 'iw-menu__text--level-' ~ depth %}
+    {# A linked title next to the back arrow reads as part of the back button,
+       so 'list' moves the link out of the header and names the arrow. #}
+    {% set parentInList = parentLinkable and parentLinkPosition|default('header') == 'list' %}
     <section class="iw-menu__subpanel iw-menu__subpanel--level-{{ depth }}" id="iw-menu-subpanel-{{ panelId }}" data-menu-target="subPanel" inert>
         <div class="iw-menu__panel-header">
+            {# The label is visible in 'list' mode, an aria-label otherwise. #}
             <button type="button"
                     data-action="menu#closePanel"
                     class="iw-menu__panel-back {{ levelText }}"
-                    aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}">
+                    {%- if not parentInList %} aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}"{% endif %}>
                 {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'prev', 'class': 'w-5 h-5'} only %}
+                {% if parentInList %}
+                    <span class="iw-menu__panel-back-label">{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}</span>
+                {% endif %}
             </button>
-            {% if parentLinkable %}
+            {% if parentInList %}
+                {# No title: the parent page heads the list instead. #}
+            {% elseif parentLinkable %}
                 {# Linkable: the level text class carries the hover feedback of a link. #}
                 {% set itemHref = sulu_content_path(item.url) %}
                 {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
@@ -66,6 +81,15 @@
         </div>
         <div class="iw-menu__panel-body">
             <ul class="iw-menu__list">
+                {% if parentInList %}
+                    {% set itemHref = sulu_content_path(item.url) %}
+                    {% set itemState = iw_sulu_tailwind_theme_nav_state(itemHref) %}
+                    <li>
+                        <a href="{{ itemHref }}"{{ nav.current(itemState) }} class="iw-menu__panel-item iw-menu__panel-parent {{ levelText }}{{ nav.state_class(itemState) }} no-underline">
+                            <span>{{ item.title }}</span>
+                        </a>
+                    </li>
+                {% endif %}
                 {% for child in item.children %}
                     {% set childHref = sulu_content_path(child.url) %}
                     {% set childState = iw_sulu_tailwind_theme_nav_state(childHref) %}
@@ -92,7 +116,7 @@
     {# Deeper panels, emitted as siblings (flattened). #}
     {% for child in item.children %}
         {% if child.children is defined and child.children|length > 0 %}
-            {{ _self.render_subpanel(child, panelId ~ '-' ~ loop.index, parentLinkable, depth + 1) }}
+            {{ _self.render_subpanel(child, panelId ~ '-' ~ loop.index, parentLinkable, depth + 1, parentLinkPosition) }}
         {% endif %}
     {% endfor %}
 {% endmacro %}
@@ -160,7 +184,7 @@
     {# Sub-panels for every branch, flattened as siblings. #}
     {% for item in navItems %}
         {% if item.children is defined and item.children|length > 0 %}
-            {{ _self.render_subpanel(item, 'p-' ~ loop.index, parentLinkable, 2) }}
+            {{ _self.render_subpanel(item, 'p-' ~ loop.index, parentLinkable, 2, parentLinkPosition|default('header')) }}
         {% endif %}
     {% endfor %}
 </nav>

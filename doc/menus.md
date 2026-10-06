@@ -238,6 +238,7 @@ The width between the two is **Menu > Display > Move into the open menu** on the
 | **Animation** | Panel animation: `none`, `slide`, or `fade`. |
 | **Slide direction** | When animation is `slide`: `top`, `right`, `bottom`, or `left`. A side panel always slides in from its side, so the setting is hidden there. |
 | **Parent page access** | How parent pages with children behave on click. In accordion mode: `none` (toggle only), `split` (arrow + link), or `selflink` (whole item is a link). In panels mode this collapses to a simple **on/off** toggle (the section title links to the parent page, or not). |
+| **Parent link position** | (Panels mode, parent page access on) Where the link to the parent page sits in a sub-panel. `Header title` (default): the section title next to the back arrow is the link. `First row of the list`: the back arrow reads *Back* (translated, `iw_sulu_tailwind_theme.menu_panel_back`), the header carries no title, and the parent page becomes the first row of the list, emphasized like the header title (`.iw-menu__panel-parent`). Pick it when visitors mistake the linked title for the back button. |
 | **Sub-menus as panels** | Off (default): sub-menus expand inline as accordions. On: sub-menus open as stacked **drill-down panels** that slide in over the current level, reusing the menu's animation and direction. Each sub-panel shows a back button and the section title at the top — the title links to the parent page when parent-page access is on. Rendered by the `_nav_panels.html.twig` partial. |
 
 #### Full screen or side panel
