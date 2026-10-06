@@ -238,6 +238,26 @@ class ThemeCheckCommand extends Command
             }
         }
 
+        // ── Check: footers still holding their block variant ──
+        // They render, their colors read through the variant, but an empty
+        // footer color keeps following it until the command writes them down.
+        $variantFooters = [];
+        foreach ($themes as $theme) {
+            if (\array_key_exists('variant', $theme->getFooterConfig())) {
+                $variantFooters[] = $theme->getLabel();
+            }
+        }
+
+        if ([] === $variantFooters) {
+            $checks[] = ['<fg=green>✓</>', 'Footer colors', 'Every footer holds colors of its own'];
+        } else {
+            $checks[] = [
+                '<fg=yellow>!</>',
+                'Footer colors',
+                implode(', ', $variantFooters) . ': footer colors still read through a color variant. Run iw-sulu:theme:migrate-footer-colors.',
+            ];
+        }
+
         // ── Check: colour names shadowing a Tailwind palette ──
         // The compiler emits `bg-<slug>` for every colour named outside the
         // base roles, which is what makes an admin colour usable as a utility
