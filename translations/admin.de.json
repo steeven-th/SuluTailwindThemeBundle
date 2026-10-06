@@ -83,6 +83,7 @@
     "iw_sulu_tailwind_theme.gradient_position_unit": "% Position",
     "iw_sulu_tailwind_theme.gradient_overlay": "Überlagerung",
     "iw_sulu_tailwind_theme.gradient_overlay_none": "Keine Überlagerung",
+    "iw_sulu_tailwind_theme.gradient_picker_empty": "Dieses Theme hat noch keinen Verlauf. Lege einen unter Farben > Verläufe an.",
     "iw_sulu_tailwind_theme.gradient_fallback": "Ersatzfarbe",
     "iw_sulu_tailwind_theme.gradient_fallback_computed": "Berechnet, wenn leer: {value}",
 

@@ -1,4 +1,5 @@
 // @flow
+import {resolveRef} from './colorRefResolver';
 
 /**
  * Admin mirror of the PHP Color\Gradient, Color\GradientRenderer and
@@ -333,4 +334,54 @@ export function gradientFallback(gradient, resolveColor) {
     }
 
     return computedFallback(gradient, resolveColor);
+}
+
+/**
+ * The gradients a picker can offer, already painted.
+ *
+ * Inside a theme form they come from the form, so a gradient created a moment
+ * ago and not saved yet is offered, and painted with the palette being edited.
+ * Anywhere else the store holds them, rendered by the server.
+ *
+ * @param {Object} formInspector Sulu form inspector, from the field props
+ * @param {Function} resolveColor Turns a stored color into a CSS color, null when it cannot
+ * @param {Array<Object>} storeGradients The pre-rendered gradients of the store
+ * @returns {Array<Object>} [{slug, label, image, fallback}]
+ */
+export function availableGradients(formInspector, resolveColor, storeGradients) {
+    const raw = formInspector ? formInspector.getValueByPath('/gradients') : undefined;
+    if (raw === undefined || raw === null) {
+        return Array.from(storeGradients || []);
+    }
+
+    return Array.from(raw)
+        .filter((gradient) => gradient && typeof gradient.slug === 'string' && gradient.slug !== '')
+        .map((gradient) => ({
+            slug: gradient.slug,
+            label: gradient.label || gradient.slug,
+            image: gradientImage(gradient, resolveColor),
+            fallback: gradientFallback(gradient, resolveColor),
+        }))
+        .filter((gradient) => gradient.image !== null);
+}
+
+/**
+ * A color resolver over a palette, agreeing with the compiler.
+ *
+ * An unknown `ref:` compiles to black, so the previews paint it black. While
+ * the palette is still loading (null) nothing is resolved, so nothing wrong
+ * is painted in the meantime.
+ *
+ * @param {?Object} palette The palette keyed by role and slug, null while it loads
+ * @returns {Function} The resolver
+ */
+export function paletteColorResolver(palette) {
+    return (value) => {
+        if (!palette) {
+            return typeof value === 'string' && value.startsWith('ref:') ? null : value;
+        }
+        const resolved = resolveRef(value, palette);
+
+        return typeof resolved === 'string' && resolved.startsWith('ref:') ? '#000000' : resolved;
+    };
 }

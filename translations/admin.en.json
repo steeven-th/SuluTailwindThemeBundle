@@ -83,6 +83,7 @@
     "iw_sulu_tailwind_theme.gradient_position_unit": "% position",
     "iw_sulu_tailwind_theme.gradient_overlay": "Overlay",
     "iw_sulu_tailwind_theme.gradient_overlay_none": "No overlay",
+    "iw_sulu_tailwind_theme.gradient_picker_empty": "This theme has no gradient yet. Create one in Colors > Gradients.",
     "iw_sulu_tailwind_theme.gradient_fallback": "Fallback color",
     "iw_sulu_tailwind_theme.gradient_fallback_computed": "Computed when empty: {value}",
 

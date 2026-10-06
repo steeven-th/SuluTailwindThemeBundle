@@ -4,7 +4,6 @@ import {observer} from 'mobx-react';
 import {translate} from 'sulu-admin-bundle/utils';
 import {Button, Input, Number as NumberInput, SingleSelect} from 'sulu-admin-bundle/components';
 import ColorTokenEditor from '../ColorTokenEditor/ColorTokenEditor';
-import {resolveRef} from '../../utils/colorRefResolver';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
 import {
     DEFAULT_ANGLE,
@@ -14,6 +13,7 @@ import {
     POSITIONS,
     computedFallback,
     gradientImage,
+    paletteColorResolver,
 } from '../../utils/gradient';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 
@@ -248,12 +248,9 @@ export default class GradientEditor extends React.Component {
      * @param {string} value A hex, `transparent` or `ref:` value
      * @returns {?string} The CSS color
      */
-    resolveColor = (value) => {
-        const palette = paletteFor(this.props.formInspector, this.state.localPalette);
-        const resolved = resolveRef(value, palette || {});
-
-        return typeof resolved === 'string' && resolved.startsWith('ref:') ? null : resolved;
-    };
+    resolveColor = (value) => paletteColorResolver(
+        paletteFor(this.props.formInspector, this.state.localPalette),
+    )(value);
 
     /**
      * Emit an updated list and tell the form the edit is complete.

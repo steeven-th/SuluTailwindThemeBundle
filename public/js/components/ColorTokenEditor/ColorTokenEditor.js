@@ -9,6 +9,8 @@ import PaletteGrid from '../PaletteGrid/PaletteGrid';
 import {isRef, resolveRef} from '../../utils/colorRefResolver';
 import loadFormPalette, {formPaletteColors, paletteFor} from '../../utils/formPalette';
 import {getSuluPrimaryColor} from '../../utils/suluColors';
+import themeConfigStore from '../../stores/themeConfigStore';
+import {availableGradients, gradientSlug, isGradientRef, paletteColorResolver} from '../../utils/gradient';
 
 /**
  * Regex for validating hex color codes (3, 6 or 8 digit with alpha).
@@ -101,6 +103,40 @@ function ensurePickerStyles() {
             border: 1px solid #c0c0c0;
             border-radius: 3px;
         }
+        .iw-gradient-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .iw-gradient-grid__item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0;
+            border: 0;
+            background: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 11px;
+            color: #333;
+        }
+        .iw-gradient-grid__swatch {
+            height: 36px;
+            border-radius: 3px;
+            border: 1px solid rgba(0,0,0,0.15);
+            background-color: #fff;
+        }
+        .iw-gradient-grid__item--selected .iw-gradient-grid__swatch {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${getSuluPrimaryColor()};
+        }
+        .iw-gradient-grid__empty {
+            padding: 16px 12px;
+            font-size: 12px;
+            color: #888;
+        }
         .iw-color-picker-tabbed .chrome-picker {
             width: 100% !important;
             box-shadow: none !important;
@@ -124,12 +160,17 @@ function ensurePickerStyles() {
  * - Palette tab: OKLCH-generated swatches for primary, secondary, accent, background
  * - Custom tab: ChromePicker + EyeDropper
  *
+ * When `allow_gradient` is enabled as well, a Gradients tab offers the theme's
+ * named gradients and stores `gradient:<slug>`. A field without it never
+ * offers one: a gradient only makes sense where the compiler can paint it.
+ *
  * @param {Object} props - Sulu form field props
  * @param {string} props.value - Current color value (hex or "transparent")
  * @param {Function} props.onChange - Callback when color changes
  * @param {boolean} props.disabled - Whether the field is disabled
  * @param {Object} props.schemaOptions - Schema params from XML config
  * @param {boolean} props.clearable - Set false to hide the clear button (default: shown)
+ * @param {boolean} props.allowGradient - Also offer the theme's gradients (same as the `allow_gradient` schema param)
  * @param {string} props.placeholder - What an empty field stands for. A hex color also tints the swatch,
  *                                     so an empty field shows the color it falls back to (default: "#000000")
  */
@@ -145,15 +186,22 @@ export default class ColorTokenEditor extends React.Component {
         super(props);
 
         const showPalette = !!props.schemaOptions?.show_palette?.value;
+        const allowGradient = !!(props.allowGradient || props.schemaOptions?.allow_gradient?.value);
+
+        let activeTab = showPalette ? 'palette' : 'custom';
+        if (allowGradient && isGradientRef(props.value)) {
+            activeTab = 'gradients';
+        }
 
         this.state = {
             popoverOpen: false,
             internalValue: props.value || '',
-            activeTab: showPalette ? 'palette' : 'custom',
+            activeTab,
             localPalette: null,
         };
 
         this.showPalette = showPalette;
+        this.allowGradient = allowGradient;
         this.anchorRef = null;
     }
 
@@ -181,7 +229,7 @@ export default class ColorTokenEditor extends React.Component {
      * palette (saved state) when not in a theme form.
      */
     _loadPaletteFromForm() {
-        if (!this.showPalette) return;
+        if (!this.showPalette && !this.allowGradient) return;
 
         loadFormPalette(this.props.formInspector).then((palette) => {
             if (palette) {
@@ -237,8 +285,8 @@ export default class ColorTokenEditor extends React.Component {
             return;
         }
 
-        // Accept ref: values without hex validation
-        if (isRef(value)) {
+        // Accept ref: values without hex validation, gradient: ones where allowed
+        if (isRef(value) || (this.allowGradient && isGradientRef(value))) {
             this.props.onChange(value);
             return;
         }
@@ -275,7 +323,12 @@ export default class ColorTokenEditor extends React.Component {
     handleBlur = () => {
         const {internalValue} = this.state;
 
-        if (internalValue === 'transparent' || internalValue === '' || isRef(internalValue)) {
+        if (
+            internalValue === 'transparent'
+            || internalValue === ''
+            || isRef(internalValue)
+            || (this.allowGradient && isGradientRef(internalValue))
+        ) {
             if (this.props.onFinish) {
                 this.props.onFinish();
             }
@@ -376,10 +429,47 @@ export default class ColorTokenEditor extends React.Component {
     };
 
     /**
+     * Pick one of the theme's gradients.
+     *
+     * @param {string} slug The gradient slug
+     */
+    handleGradientClick = (slug) => {
+        const value = 'gradient:' + slug;
+        this.setState({internalValue: value});
+        this.props.onChange(value);
+
+        if (this.props.onFinish) {
+            this.props.onFinish();
+        }
+    };
+
+    /**
+     * The gradients this field can offer, painted with the current palette.
+     *
+     * @returns {Array<Object>} [{slug, label, image, fallback}]
+     */
+    get gradients() {
+        if (!this.allowGradient) {
+            return [];
+        }
+
+        return availableGradients(
+            this.props.formInspector,
+            paletteColorResolver(paletteFor(this.props.formInspector, this.state.localPalette)),
+            themeConfigStore.gradients,
+        );
+    }
+
+    /**
      * Copy the current color to clipboard.
      */
     handleCopy = () => {
         const {internalValue} = this.state;
+        if (internalValue && isGradientRef(internalValue) && navigator.clipboard) {
+            navigator.clipboard.writeText('var(--gradient-' + gradientSlug(internalValue) + ')');
+
+            return;
+        }
         if (internalValue && navigator.clipboard) {
             const palette = paletteFor(this.props.formInspector, this.state.localPalette);
             const resolved = resolveRef(internalValue, palette);
@@ -437,6 +527,87 @@ export default class ColorTokenEditor extends React.Component {
     }
 
     /**
+     * Render the gradients tab: one swatch per gradient of the theme.
+     */
+    renderGradientTab() {
+        const gradients = this.gradients;
+        const current = gradientSlug(this.state.internalValue);
+
+        if (gradients.length === 0) {
+            return (
+                <div className="iw-gradient-grid__empty">
+                    {translate('iw_sulu_tailwind_theme.gradient_picker_empty')}
+                </div>
+            );
+        }
+
+        return (
+            <div className="iw-gradient-grid">
+                {gradients.map((gradient) => (
+                    <button
+                        className={'iw-gradient-grid__item'
+                            + (gradient.slug === current ? ' iw-gradient-grid__item--selected' : '')}
+                        key={gradient.slug}
+                        onClick={() => this.handleGradientClick(gradient.slug)}
+                        title={'gradient:' + gradient.slug}
+                        type="button"
+                    >
+                        <span className="iw-gradient-grid__swatch" style={{backgroundImage: gradient.image}} />
+                        {gradient.label}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
+    /**
+     * Render the tab bar and the content of the active tab.
+     *
+     * @param {boolean} hasPalette Whether the palette tab is offered
+     * @returns {React.Node} The tabs
+     */
+    renderTabs(hasPalette) {
+        const tabs = [];
+        if (hasPalette) {
+            tabs.push({key: 'palette', label: 'iw_sulu_tailwind_theme.palette_tab'});
+        }
+        if (this.allowGradient) {
+            tabs.push({key: 'gradients', label: 'iw_sulu_tailwind_theme.gradients'});
+        }
+        tabs.push({key: 'custom', label: 'iw_sulu_tailwind_theme.custom_tab'});
+
+        const activeTab = tabs.some((tab) => tab.key === this.state.activeTab) ? this.state.activeTab : tabs[0].key;
+
+        let content = this.renderCustomTab();
+        if (activeTab === 'palette') {
+            content = this.renderPaletteTab();
+        } else if (activeTab === 'gradients') {
+            content = this.renderGradientTab();
+        }
+
+        return (
+            <div className="iw-color-picker-tabbed">
+                <div className="iw-palette-tabs">
+                    {tabs.map((tab) => (
+                        <button
+                            className={'iw-palette-tab' + (activeTab === tab.key ? ' iw-palette-tab--active' : '')}
+                            key={tab.key}
+                            onClick={() => this.handleTabChange(tab.key)}
+                            type="button"
+                        >
+                            {translate(tab.label)}
+                        </button>
+                    ))}
+                </div>
+
+                {content}
+
+                {this.renderFooter()}
+            </div>
+        );
+    }
+
+    /**
      * Render the ChromePicker + EyeDropper custom tab.
      */
     renderCustomTab() {
@@ -446,7 +617,7 @@ export default class ColorTokenEditor extends React.Component {
         return (
             <div>
                 <ChromePicker
-                    color={isTransparent ? undefined : (internalValue || undefined)}
+                    color={isTransparent || isGradientRef(internalValue) ? undefined : (internalValue || undefined)}
                     disableAlpha={false}
                     onChangeComplete={this.handlePickerChange}
                 />
@@ -566,7 +737,7 @@ export default class ColorTokenEditor extends React.Component {
 
     render() {
         const {disabled, error, dataPath, clearable} = this.props;
-        const {popoverOpen, internalValue, activeTab} = this.state;
+        const {popoverOpen, internalValue} = this.state;
 
         const isTransparent = internalValue === 'transparent';
         const palette = paletteFor(this.props.formInspector, this.state.localPalette);
@@ -581,13 +752,30 @@ export default class ColorTokenEditor extends React.Component {
             displayColor = HEX_COLOR_PATTERN.test(placeholder) ? placeholder : 'transparent';
         }
 
-        const iconStyle = {
+        let iconStyle = {
             color: isTransparent ? 'transparent' : displayColor,
         };
+
+        // A gradient paints the swatch glyph itself, clipped to its shape.
+        const selectedGradient = isGradientRef(internalValue)
+            ? this.gradients.find((gradient) => gradient.slug === gradientSlug(internalValue))
+            : null;
+        if (isGradientRef(internalValue) && !selectedGradient) {
+            // A gradient deleted from the theme renders nothing on the site.
+            iconStyle = {color: 'transparent'};
+        } else if (selectedGradient) {
+            iconStyle = {
+                color: 'transparent',
+                backgroundImage: selectedGradient.image,
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+            };
+        }
 
         const hasPalette = this.showPalette
             && palette
             && Object.keys(palette).length > 0;
+        const tabbed = hasPalette || this.allowGradient;
 
         const showClear = !disabled && false !== clearable && !!internalValue;
 
@@ -630,47 +818,12 @@ export default class ColorTokenEditor extends React.Component {
                         <div
                             className="iw-color-picker-popover"
                             ref={setPopoverElementRef}
-                            style={{...popoverStyle, width: hasPalette ? '380px' : undefined}}
+                            style={{...popoverStyle, width: tabbed ? '380px' : undefined}}
                         >
-                            {hasPalette ? (
-                                <div className="iw-color-picker-tabbed">
-                                    {/* Tab bar */}
-                                    <div className="iw-palette-tabs">
-                                        <button
-                                            type="button"
-                                            className={
-                                                'iw-palette-tab'
-                                                + (activeTab === 'palette' ? ' iw-palette-tab--active' : '')
-                                            }
-                                            onClick={() => this.handleTabChange('palette')}
-                                        >
-                                            {translate('iw_sulu_tailwind_theme.palette_tab')}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={
-                                                'iw-palette-tab'
-                                                + (activeTab === 'custom' ? ' iw-palette-tab--active' : '')
-                                            }
-                                            onClick={() => this.handleTabChange('custom')}
-                                        >
-                                            {translate('iw_sulu_tailwind_theme.custom_tab')}
-                                        </button>
-                                    </div>
-
-                                    {/* Tab content */}
-                                    {activeTab === 'palette'
-                                        ? this.renderPaletteTab()
-                                        : this.renderCustomTab()
-                                    }
-
-                                    {/* Common footer */}
-                                    {this.renderFooter()}
-                                </div>
-                            ) : (
+                            {tabbed ? this.renderTabs(hasPalette) : (
                                 <div>
                                     <ChromePicker
-                                        color={isTransparent ? undefined : (internalValue || undefined)}
+                                        color={isTransparent || isGradientRef(internalValue) ? undefined : (internalValue || undefined)}
                                         disableAlpha={false}
                                         onChangeComplete={this.handlePickerChange}
                                     />

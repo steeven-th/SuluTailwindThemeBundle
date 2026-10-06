@@ -83,6 +83,7 @@
     "iw_sulu_tailwind_theme.gradient_position_unit": "% position",
     "iw_sulu_tailwind_theme.gradient_overlay": "Voile",
     "iw_sulu_tailwind_theme.gradient_overlay_none": "Aucun voile",
+    "iw_sulu_tailwind_theme.gradient_picker_empty": "Ce thème n'a encore aucun dégradé. Créez-en un dans Couleurs > Dégradés.",
     "iw_sulu_tailwind_theme.gradient_fallback": "Couleur de repli",
     "iw_sulu_tailwind_theme.gradient_fallback_computed": "Calculée si vide : {value}",
 

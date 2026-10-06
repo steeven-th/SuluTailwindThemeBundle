@@ -168,6 +168,11 @@ class ThemeConfigStore {
         return this.current.colors || [];
     }
 
+    /** Named gradients, pre-rendered: [{slug, label, image, fallback}] */
+    @computed get gradients(): Array<Object> {
+        return this.current.gradients || [];
+    }
+
     @computed get borders(): Object {
         return this.current.borders || {};
     }

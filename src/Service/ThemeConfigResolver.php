@@ -6,6 +6,8 @@ namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientRenderer;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 
 /**
@@ -29,7 +31,7 @@ class ThemeConfigResolver
      *
      * @param ThemeConfig|null $theme The theme to resolve, or null for empty defaults
      *
-     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, borders: array<string, mixed>, defaults: array<string, mixed>, buttonsGlobal: array<string, mixed>}
+     * @return array{variants: list<array<string, mixed>>, buttons: array<string, mixed>, palette: array<string, mixed>, colors: list<array<string, mixed>>, gradients: list<array{slug: string, label: string, image: string, fallback: string}>, borders: array<string, mixed>, defaults: array<string, mixed>, buttonsGlobal: array<string, mixed>}
      */
     public function resolve(?ThemeConfig $theme): array
     {
@@ -126,6 +128,7 @@ class ThemeConfigResolver
             'buttons' => $buttons,
             'palette' => $palette,
             'colors' => $colors,
+            'gradients' => $this->resolveGradients($theme, $palette, $baseHexes),
             'borders' => $borders,
             // Block defaults, so a selector left on "follow the theme" can name
             // the value it will take rather than just say it follows something.
@@ -133,6 +136,47 @@ class ThemeConfigResolver
             // Same reason, for the pictogram gap a button follows when left empty.
             'buttonsGlobal' => $tokens['buttonsGlobal'] ?? [],
         ];
+    }
+
+    /**
+     * Render the theme's gradients for the admin pickers.
+     *
+     * Each one travels with its CSS image and its fallback, so a field outside
+     * the theme form paints a `gradient:` value without knowing the palette.
+     *
+     * @param ThemeConfig|null                    $theme     The theme, or null
+     * @param array<string, array<int, string>>   $palette   Generated shades keyed by role/slug
+     * @param array<string, string>               $baseHexes Base hex values keyed by role/slug
+     *
+     * @return list<array{slug: string, label: string, image: string, fallback: string}>
+     */
+    private function resolveGradients(?ThemeConfig $theme, array $palette, array $baseHexes): array
+    {
+        if (null === $theme) {
+            return [];
+        }
+
+        $renderer = new GradientRenderer(function (string $value) use ($palette, $baseHexes): ?string {
+            if (str_starts_with($value, GradientSet::REF_PREFIX)) {
+                return null;
+            }
+            $this->resolveRef($value, $palette, $baseHexes);
+
+            // An unknown ref compiles to black, the preview says the same.
+            return str_starts_with($value, 'ref:') ? '#000000' : $value;
+        });
+
+        $gradients = [];
+        foreach (GradientSet::fromTokens($theme->getTokens())->all() as $gradient) {
+            $gradients[] = [
+                'slug' => $gradient->getSlug(),
+                'label' => $gradient->getLabel(),
+                'image' => $renderer->image($gradient),
+                'fallback' => $renderer->fallback($gradient),
+            ];
+        }
+
+        return $gradients;
     }
 
     /**
