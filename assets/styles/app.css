@@ -859,6 +859,7 @@ img.object-cover {
     padding: var(--iw-embed-consent-padding, 1.5rem);
     text-align: center;
     background-color: var(--iw-embed-consent-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, var(--color-surface, #f3f4f6))));
+    background-image: var(--iw-embed-consent-bg-image, var(--iw-variant-paragraph-bg-image, none));
     color: var(--iw-embed-consent-text, var(--iw-variant-paragraph-color, inherit));
 }
 
@@ -1093,6 +1094,7 @@ img.object-cover {
    once a row has a fill of its own - a coloured header, for instance. */
 .iw-block-accordion--list {
     background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-surface-bg-image, var(--iw-variant-paragraph-bg-image, none));
     overflow: hidden;
 }
 
@@ -1167,12 +1169,14 @@ img.object-cover {
 .iw-block-accordion .iw-accordion__panel--filled {
     padding-bottom: var(--iw-accordion-panel-filled-padding-bottom, 1rem);
     background-color: var(--iw-accordion-panel-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-panel-bg-image, var(--iw-variant-paragraph-bg-image, none));
 }
 
 /* Mode: --bordered — single box, inner rules between items */
 .iw-block-accordion--bordered {
     border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
     background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-surface-bg-image, var(--iw-variant-paragraph-bg-image, none));
 }
 
 .iw-block-accordion--bordered .iw-accordion__item {
@@ -3826,6 +3830,7 @@ section.block:has([data-slider-fullbleed-value]) {
    this one panel to differ. */
 .iw-block-form--split .iw-block-form__info {
     background-color: var(--iw-block-form-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-block-form-info-bg-image, var(--iw-variant-paragraph-bg-image, none));
     border: var(--iw-variant-paragraph-border-width, 0) solid
         var(--iw-block-form-info-border, var(--iw-variant-paragraph-border, transparent));
     color: var(--iw-block-form-info-color, var(--iw-variant-paragraph-color, inherit));
@@ -3947,6 +3952,7 @@ section.block:has([data-slider-fullbleed-value]) {
     border: var(--iw-variant-paragraph-border-width, 0) solid
         var(--iw-block-location-info-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-block-location-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-block-location-info-bg-image, var(--iw-variant-paragraph-bg-image, none));
     color: var(--iw-block-location-info-color, var(--iw-variant-paragraph-color, inherit));
 }
 

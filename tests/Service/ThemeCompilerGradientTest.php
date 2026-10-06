@@ -233,4 +233,25 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringNotContainsString('--iw-menu-surface-image', $css);
         self::assertStringNotContainsString('--iw-menu-second-bg-image', $css);
     }
+
+    #[Test]
+    public function theParagraphAndTableHeadBackgroundsPaintTheGradient(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'paragraphBg' => 'gradient:bleu-leger', 'tableHeadBg' => 'gradient:bleu-leger']],
+        ]));
+
+        self::assertStringContainsString("  --iw-variant-paragraph-bg: var(--gradient-bleu-leger-fallback);\n  --iw-variant-paragraph-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  background-color: var(--iw-variant-paragraph-bg);\n  background-image: var(--iw-variant-paragraph-bg-image);", $css);
+        self::assertStringContainsString("  background-color: var(--iw-variant-table-head-bg, var(--iw-variant-subtle-bg));\n  background-image: var(--iw-variant-table-head-bg-image, none);", $css);
+    }
+
+    #[Test]
+    public function aTableHeadPaintedWithAColorGetsNoImageLayer(): void
+    {
+        $css = $this->compileCss(['blockVariants' => [['slug' => 'plain', 'label' => 'Plain', 'tableHeadBg' => '#eeeeee', 'paragraphBg' => '#ffffff']]]);
+
+        self::assertStringNotContainsString('table-head-bg-image', $css);
+        self::assertStringNotContainsString('paragraph-bg-image', $css);
+    }
 }

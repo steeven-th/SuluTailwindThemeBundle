@@ -5442,6 +5442,9 @@ class ThemeCompiler
             $css .= "  font-weight: 600;\n";
             $css .= "  color: var(--iw-variant-table-head-text, var(--iw-variant-title-color, inherit));\n";
             $css .= "  background-color: var(--iw-variant-table-head-bg, var(--iw-variant-subtle-bg));\n";
+            if (str_starts_with(trim((string) ($props['tableHeadBg'] ?? '')), GradientSet::REF_PREFIX)) {
+                $css .= "  background-image: var(--iw-variant-table-head-bg-image, none);\n";
+            }
             $css .= "}\n";
 
             // Inline code (<code> not inside <pre>)
@@ -5516,13 +5519,17 @@ class ThemeCompiler
             // A border belongs to the same surface as the background, and needs
             // the same padding: drawn on its own, it would sit against the text.
             // So either one opens the rule, and the padding comes with both.
-            $pgBg = $this->resolveColorValue(trim($props['paragraphBg'] ?? ''));
+            $pgPaint = $this->resolvePaint(trim($props['paragraphBg'] ?? ''));
+            $pgBg = $pgPaint['color'];
             $pgBorder = trim($this->resolveColorValue((string) ($props['paragraphBorder'] ?? '')));
-            $hasPgBg = $pgBg !== '' && strtolower($pgBg) !== 'transparent';
+            $hasPgBg = null !== $pgPaint['image'] || ($pgBg !== '' && strtolower($pgBg) !== 'transparent');
             if ($hasPgBg || '' !== $pgBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__text {\n";
                 if ($hasPgBg) {
                     $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
+                    if (null !== $pgPaint['image']) {
+                        $css .= "  background-image: var(--iw-variant-paragraph-bg-image);\n";
+                    }
                 }
                 if ('' !== $pgBorder) {
                     $css .= "  border: var(--iw-variant-paragraph-border-width, 1px) solid {$pgBorder};\n";

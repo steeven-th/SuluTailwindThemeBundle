@@ -191,7 +191,7 @@ function widthKeyFor(key) {
  *
  * Mirrors VariantZones::GRADIENT_KEYS, guarded by VariantZonesParityTest.
  */
-const GRADIENT_KEYS = ['blockBg', 'contentBg', 'cardBg', 'accentBg'];
+const GRADIENT_KEYS = ['blockBg', 'contentBg', 'paragraphBg', 'cardBg', 'accentBg', 'tableHeadBg'];
 
 /** Every field, flattened, in zone order. */
 const FIELDS = ZONES.reduce((all, zone) => all.concat(zone.fields), []);

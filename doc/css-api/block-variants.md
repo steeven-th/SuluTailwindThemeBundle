@@ -44,6 +44,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
+| `--iw-variant-paragraph-bg-image` | `paragraphBg` | The gradient of the paragraph background, when `paragraphBg` is one |
 | `--iw-variant-card-bg` | `cardBg` | Background of every card. Nothing is drawn until it is set |
 | `--iw-variant-card-bg-image` | `cardBg` | The gradient of the card background, when `cardBg` is one (see [Gradient surfaces](#gradient-surfaces)) |
 | `--iw-variant-card-title-color` | `cardTitle` | Heading colour inside a card. Falls back to `--iw-variant-title-color` |
@@ -68,6 +69,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-table-head-bg` | `tableHeadBg` | Header row background. Empty keeps the computed tint |
+| `--iw-variant-table-head-bg-image` | `tableHeadBg` | The gradient of the header row, when `tableHeadBg` is one |
 | `--iw-variant-table-head-text` | `tableHeadText` | Header row text. Empty keeps the title colour |
 | `--iw-variant-table-cell-bg` | `tableCellBg` | Cell background. Empty is transparent |
 | `--iw-variant-table-cell-text` | `tableCellText` | Cell text. Empty keeps the paragraph colour |
@@ -430,31 +432,7 @@ background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transpare
 
 The first level is what a theme overrides for that component alone, the second
 is the variant. There is deliberately no third: a card the variant does not
-fill is not filled.
-
-### Gradient surfaces
-
-Four backgrounds accept a [gradient](../gradients.md) as well as a color: the
-block, the content, the cards and the accent surface. A surface given a
-gradient publishes two properties instead of one:
-
-- `--iw-variant-<surface>-bg` holds the gradient's fallback color, or
-  `transparent` when the gradient is translucent, since a color under it would
-  show through;
-- `--iw-variant-<surface>-bg-image` holds the gradient itself.
-
-A component painting a surface reads both, with the same two-level cascade:
-
-```css
-background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
-background-image: var(--iw-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
-```
-
-Overriding a component's background with a color while its variant paints a
-gradient takes both lines: set `--iw-timeline-card-bg-image: none` next to
-`--iw-timeline-card-bg`, or the gradient stays on top of the color. The block
-background (`[data-has-bg]`) and the content background (`[data-content-bg]`)
-are painted by the compiled stylesheet itself, image included. `SurfaceUsageContractTest` refuses a rule that paints
+fill is not filled. `SurfaceUsageContractTest` refuses a rule that paints
 `.iw-block__content` with the paragraph background, and
 `CardSurfaceParityContractTest` refuses a card framing itself differently from
 the others.
@@ -464,9 +442,36 @@ card, the accent surface the one singled out - and it is the only surface
 owning the colour of the text on it, which is what makes a highlighted element
 legible whatever the editor picked.
 
+### Gradient surfaces
+
+Six backgrounds accept a [gradient](../gradients.md) as well as a color: the
+block, the content, the paragraph, the cards, the accent surface and the table
+header. Table cells, stripes and hover stay solid: they stack over one another
+on the data. A surface given a gradient publishes two properties instead of
+one:
+
+- `--iw-variant-<surface>-bg` holds the gradient's fallback color, or
+  `transparent` when the gradient is translucent, since a color under it would
+  show through;
+- `--iw-variant-<surface>-bg-image` holds the gradient itself.
+
+A component painting a surface reads both, with the same cascade as its color:
+
+```css
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+background-image: var(--iw-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
+```
+
+Overriding a component's background with a color while its variant paints a
+gradient takes both lines: set `--iw-timeline-card-bg-image: none` next to
+`--iw-timeline-card-bg`, or the gradient stays on top of the color. The block
+background (`[data-has-bg]`), the content background (`[data-content-bg]`),
+`.iw-block__text` and the table header are painted by the compiled stylesheet
+itself, image included.
+
 ## Paragraph background (`.iw-block__text`)
 
-When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`), the `.iw-block__text` element inside that variant gets:
+When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`) or to a gradient, the `.iw-block__text` element inside that variant gets the following, plus `background-image: var(--iw-variant-paragraph-bg-image)` for a gradient:
 
 ```css
 .iw-variant--dark .iw-block__text {

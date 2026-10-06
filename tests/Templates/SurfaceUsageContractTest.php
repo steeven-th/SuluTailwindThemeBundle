@@ -160,8 +160,11 @@ final class SurfaceUsageContractTest extends TestCase
         ));
 
         $found = [];
+        // The name alone, not a longer one starting with it: the image layer
+        // of a surface (`--iw-variant-paragraph-bg-image`) is another property.
+        $pattern = '/' . preg_quote($property, '/') . '(?![\w-])/';
         foreach ($lines as $index => $line) {
-            if (!str_contains($line, $property)) {
+            if (1 !== preg_match($pattern, $line)) {
                 continue;
             }
 

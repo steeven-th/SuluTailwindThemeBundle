@@ -164,13 +164,14 @@ final class VariantZones
     /**
      * The backgrounds that accept a gradient as well as a color.
      *
-     * The surfaces a variant fills, nothing that colors text, a border or a
-     * shadow: those need a solid color to stay legible. Mirrored by
-     * GRADIENT_KEYS in zones.js.
+     * The surfaces a variant fills and the band of a table header, nothing
+     * that colors text, a border or a shadow: those need a solid color to stay
+     * legible. Table cells, stripes and hover stay solid too, they stack on
+     * one another over the data. Mirrored by GRADIENT_KEYS in zones.js.
      *
      * @var list<string>
      */
-    public const GRADIENT_KEYS = ['blockBg', 'contentBg', 'cardBg', 'accentBg'];
+    public const GRADIENT_KEYS = ['blockBg', 'contentBg', 'paragraphBg', 'cardBg', 'accentBg', 'tableHeadBg'];
 
     /**
      * Widths a border can take, in pixels.
