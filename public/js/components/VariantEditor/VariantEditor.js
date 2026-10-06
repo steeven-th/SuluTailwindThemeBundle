@@ -8,7 +8,8 @@ import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
 import {buttonBorderStyle} from '../../utils/buttonBorder';
 import buttonStyleExtras from '../../utils/buttonStyleExtras';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
-import {WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {availableGradients, gradientSlug, isGradientRef, paletteColorResolver} from '../../utils/gradient';
 
 const STYLE_ID = 'iw-variant-editor-styles';
 
@@ -272,6 +273,19 @@ export default class VariantEditor extends React.Component {
     }
 
     /**
+     * The theme's gradients, painted with the palette being edited.
+     *
+     * @returns {Array<Object>} [{slug, label, image, fallback}]
+     */
+    get gradients() {
+        return availableGradients(
+            this.props.formInspector,
+            paletteColorResolver(paletteFor(this.props.formInspector, this.state.palette)),
+            themeConfigStore.gradients,
+        );
+    }
+
+    /**
      * The button style this variant points at, if any.
      *
      * It is a sibling property, not part of the colors, so it is read from the
@@ -343,6 +357,17 @@ export default class VariantEditor extends React.Component {
             // length to suffix nor a colour to resolve.
             if ('lineStyle' === kind) {
                 style['--ve-' + key] = held;
+
+                return;
+            }
+
+            // The preview paints its surfaces with the `background`
+            // shorthand, which takes an image as readily as a color.
+            if (isGradientRef(held)) {
+                const gradient = this.gradients.find((candidate) => candidate.slug === gradientSlug(held));
+                if (gradient) {
+                    style['--ve-' + key] = gradient.image;
+                }
 
                 return;
             }
@@ -694,6 +719,7 @@ export default class VariantEditor extends React.Component {
             <div className="iw-ve__setting" key={key}>
                 <span className="iw-ve__setting-label">{translate(field.label)}</span>
                 <ColorTokenEditor
+                    allowGradient={GRADIENT_KEYS.includes(key)}
                     disabled={this.props.disabled}
                     formInspector={this.props.formInspector}
                     onChange={(next) => this.commit(key, next)}

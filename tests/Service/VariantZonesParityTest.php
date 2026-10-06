@@ -43,6 +43,26 @@ final class VariantZonesParityTest extends TestCase
     }
 
     /**
+     * The backgrounds offering a gradient match, or the editor stores one the compiler paints flat.
+     */
+    #[Test]
+    public function bothCopiesAcceptGradientsOnTheSameBackgrounds(): void
+    {
+        self::assertSame(
+            1,
+            preg_match('/const GRADIENT_KEYS = \[([^\]]*)\]/', self::javascriptSource(), $matches),
+            'zones.js must declare GRADIENT_KEYS.',
+        );
+
+        $javascript = array_map(
+            static fn (string $value): string => trim($value, " '\n"),
+            explode(',', $matches[1]),
+        );
+
+        self::assertSame(VariantZones::GRADIENT_KEYS, $javascript);
+    }
+
+    /**
      * The widths offered match too, or the editor writes one the compiler drops.
      */
     #[Test]

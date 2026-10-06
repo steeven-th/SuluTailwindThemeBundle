@@ -127,4 +127,66 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringContainsString('--gradient-loop: linear-gradient(180deg, transparent 0%, #ffffff 100%);', $css);
         self::assertStringContainsString('--gradient-loop-fallback: #ffffff80;', $css);
     }
+
+    #[Test]
+    public function aVariantSurfacePublishesTheGradientBesideItsFallback(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'cardBg' => 'gradient:bleu-leger', 'accentBg' => 'gradient:bleu-leger']],
+        ]));
+
+        self::assertStringContainsString("  --iw-variant-card-bg: var(--gradient-bleu-leger-fallback);\n  --iw-variant-card-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  --iw-variant-accent-bg-image: var(--gradient-bleu-leger);", $css);
+    }
+
+    #[Test]
+    public function theBlockAndContentBackgroundsPaintTheGradient(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'blockBg' => 'gradient:bleu-leger', 'contentBg' => 'gradient:bleu-leger']],
+        ]));
+
+        self::assertStringContainsString(
+            ".iw-variant--night[data-has-bg=\"true\"] {\n  background-color: var(--gradient-bleu-leger-fallback);\n  --iw-variant-block-bg: var(--gradient-bleu-leger-fallback);\n  background-image: var(--gradient-bleu-leger);\n  --iw-variant-block-bg-image: var(--gradient-bleu-leger);\n}",
+            $css,
+        );
+        self::assertStringContainsString(
+            ".iw-variant--night .iw-block__content[data-content-bg=\"true\"] {\n  background-color: var(--gradient-bleu-leger-fallback);\n  background-image: var(--gradient-bleu-leger);",
+            $css,
+        );
+    }
+
+    #[Test]
+    public function aTranslucentGradientGetsNoColorUnderneath(): void
+    {
+        $css = $this->compileCss([
+            'gradients' => [['slug' => 'fade', 'stops' => [['color' => '#000000', 'opacity' => 80], ['color' => '#000000', 'opacity' => 0, 'position' => 100]]]],
+            'blockVariants' => [['slug' => 'veil', 'label' => 'Veil', 'cardBg' => 'gradient:fade']],
+        ]);
+
+        self::assertStringContainsString("  --iw-variant-card-bg: transparent;\n  --iw-variant-card-bg-image: var(--gradient-fade);", $css);
+    }
+
+    #[Test]
+    public function anOrphanSurfaceGradientPaintsNothing(): void
+    {
+        $css = $this->compileCss([
+            'blockVariants' => [['slug' => 'lost', 'label' => 'Lost', 'cardBg' => 'gradient:deleted']],
+        ]);
+
+        self::assertStringContainsString('  --iw-variant-card-bg: transparent;', $css);
+        self::assertStringNotContainsString('--iw-variant-card-bg-image', $css);
+    }
+
+    #[Test]
+    public function aTextColorNeverTakesTheGradient(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'paragraph' => 'gradient:bleu-leger']],
+        ]));
+
+        self::assertSame(1, preg_match('/--gradient-bleu-leger-fallback: (#[0-9a-f]{6});/', $css, $fallback));
+        self::assertStringContainsString("--iw-variant-paragraph-color: {$fallback[1]};", $css);
+        self::assertStringNotContainsString('--iw-variant-paragraph-color-image', $css);
+    }
 }

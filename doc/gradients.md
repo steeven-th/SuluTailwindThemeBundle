@@ -37,6 +37,19 @@ at the bottom.
 
 A gradient fading to transparent has a translucent fallback (an 8-digit hex).
 
+## Where a gradient can be used
+
+A gradient is offered only by the fields that can paint one. Text, borders,
+shadows, focus rings and form fields keep a solid color: legibility and
+accessibility need one.
+
+| Where | Fields |
+|-------|--------|
+| Block variants | Block background, content background, card background, accent surface background |
+
+A field that only takes a color and is handed a `gradient:` value anyway paints
+the gradient's fallback.
+
 ## How it is stored
 
 Gradients live in `tokens.gradients`, a list:

@@ -162,6 +162,17 @@ final class VariantZones
     ];
 
     /**
+     * The backgrounds that accept a gradient as well as a color.
+     *
+     * The surfaces a variant fills, nothing that colors text, a border or a
+     * shadow: those need a solid color to stay legible. Mirrored by
+     * GRADIENT_KEYS in zones.js.
+     *
+     * @var list<string>
+     */
+    public const GRADIENT_KEYS = ['blockBg', 'contentBg', 'cardBg', 'accentBg'];
+
+    /**
      * Widths a border can take, in pixels.
      *
      * @var list<int>

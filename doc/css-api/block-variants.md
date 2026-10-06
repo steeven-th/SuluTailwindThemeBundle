@@ -45,6 +45,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
 | `--iw-variant-card-bg` | `cardBg` | Background of every card. Nothing is drawn until it is set |
+| `--iw-variant-card-bg-image` | `cardBg` | The gradient of the card background, when `cardBg` is one (see [Gradient surfaces](#gradient-surfaces)) |
 | `--iw-variant-card-title-color` | `cardTitle` | Heading colour inside a card. Falls back to `--iw-variant-title-color` |
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
 | `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
@@ -55,11 +56,13 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
 | `--iw-variant-content-bg` | `contentBg` | Background behind the whole content, title included (`.iw-block__content`) |
+| `--iw-variant-content-bg-image` | `contentBg` | The gradient of the content background, when `contentBg` is one |
 | `--iw-variant-content-border` | `contentBorder` | Border color of the content surface |
 | `--iw-variant-content-border-width` | `contentBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
 | `--iw-variant-paragraph-border-width` | `paragraphBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-accent-bg` | `accentBg` | Background of an element put forward |
+| `--iw-variant-accent-bg-image` | `accentBg` | The gradient of the accent background, when `accentBg` is one |
 | `--iw-variant-accent-title-color` | `accentTitle` | Heading colour on the accent surface. Falls back to `--iw-variant-accent-text` |
 | `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
@@ -427,7 +430,31 @@ background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transpare
 
 The first level is what a theme overrides for that component alone, the second
 is the variant. There is deliberately no third: a card the variant does not
-fill is not filled. `SurfaceUsageContractTest` refuses a rule that paints
+fill is not filled.
+
+### Gradient surfaces
+
+Four backgrounds accept a [gradient](../gradients.md) as well as a color: the
+block, the content, the cards and the accent surface. A surface given a
+gradient publishes two properties instead of one:
+
+- `--iw-variant-<surface>-bg` holds the gradient's fallback color, or
+  `transparent` when the gradient is translucent, since a color under it would
+  show through;
+- `--iw-variant-<surface>-bg-image` holds the gradient itself.
+
+A component painting a surface reads both, with the same two-level cascade:
+
+```css
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+background-image: var(--iw-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
+```
+
+Overriding a component's background with a color while its variant paints a
+gradient takes both lines: set `--iw-timeline-card-bg-image: none` next to
+`--iw-timeline-card-bg`, or the gradient stays on top of the color. The block
+background (`[data-has-bg]`) and the content background (`[data-content-bg]`)
+are painted by the compiled stylesheet itself, image included. `SurfaceUsageContractTest` refuses a rule that paints
 `.iw-block__content` with the paragraph background, and
 `CardSurfaceParityContractTest` refuses a card framing itself differently from
 the others.

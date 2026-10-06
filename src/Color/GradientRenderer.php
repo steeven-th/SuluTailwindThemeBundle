@@ -103,6 +103,30 @@ final class GradientRenderer
     }
 
     /**
+     * Tell whether nothing shows through the gradient.
+     *
+     * A translucent gradient must not get its fallback painted underneath:
+     * the fallback would show through and change the rendering. The overlay
+     * plays no part, it is painted over the stops.
+     *
+     * @param Gradient $gradient The gradient
+     *
+     * @return bool True when every stop is fully opaque
+     */
+    public function isOpaque(Gradient $gradient): bool
+    {
+        foreach ($gradient->getStops() as $stop) {
+            $rgba = $this->rgba($stop['color'], $stop['opacity']);
+            $alpha = null !== $rgba ? $rgba[3] : ($stop['opacity'] / 100);
+            if ($alpha < 1.0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Average the stops in OKLab, weighted by their opacity.
      *
      * The resulting alpha is the mean opacity of the stops: a color fading to

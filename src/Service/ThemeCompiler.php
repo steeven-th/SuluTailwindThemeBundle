@@ -1212,6 +1212,37 @@ class ThemeCompiler
     }
 
     /**
+     * Resolve a value for a slot that can paint a gradient.
+     *
+     * A color comes back as the color and no image. A gradient comes back as
+     * its variable for the image, and its fallback for the color painted
+     * under it, but only when the gradient is opaque: under a translucent
+     * one the fallback would show through, so the color is transparent. An
+     * unknown gradient paints nothing.
+     *
+     * @param string $value The stored value (hex, ref:..., gradient:...)
+     *
+     * @return array{color: string, image: string|null} The CSS color, and the CSS image when there is one
+     */
+    private function resolvePaint(string $value): array
+    {
+        if (!str_starts_with($value, GradientSet::REF_PREFIX)) {
+            return ['color' => $this->resolveColorValue($value), 'image' => null];
+        }
+
+        $slug = GradientSet::parseRef($value);
+        $gradient = null !== $slug ? $this->gradientSet?->get($slug) : null;
+        if (null === $gradient) {
+            return ['color' => 'transparent', 'image' => null];
+        }
+
+        return [
+            'color' => $this->gradientRenderer()->isOpaque($gradient) ? "var(--gradient-{$slug}-fallback)" : 'transparent',
+            'image' => "var(--gradient-{$slug})",
+        ];
+    }
+
+    /**
      * Build the renderer that writes gradients with this compile's palette.
      *
      * Stops resolve like any color field. A stop pointing at a gradient is
@@ -4944,11 +4975,20 @@ class ThemeCompiler
                 // whole declaration and, worse, makes the fallback in
                 // `var(--iw-variant-x, …)` unreachable: the property IS set, to
                 // nothing. Leaving it out keeps the fallback working.
-                $resolved = trim($this->resolveColorValue((string) $props[$tokenKey]));
+                //
+                // A surface painted with a gradient publishes the image beside
+                // the color, as `<property>-image`, for the blocks to lay on top.
+                $paint = \in_array($tokenKey, VariantZones::GRADIENT_KEYS, true)
+                    ? $this->resolvePaint(trim((string) $props[$tokenKey]))
+                    : ['color' => $this->resolveColorValue((string) $props[$tokenKey]), 'image' => null];
+                $resolved = trim($paint['color']);
                 if ('' === $resolved) {
                     continue;
                 }
                 $css .= "  {$cssProperty}: {$resolved};\n";
+                if (null !== $paint['image']) {
+                    $css .= "  {$cssProperty}-image: {$paint['image']};\n";
+                }
             }
 
             foreach ($widthMap as $tokenKey => $cssProperty) {
@@ -5016,10 +5056,14 @@ class ThemeCompiler
             // components (e.g. fullbleed banners, hero sections) can mirror the variant
             // background without re-implementing the resolution logic.
             if (!empty($props['blockBg'])) {
-                $resolvedBlockBg = $this->resolveColorValue((string) $props['blockBg']);
+                $blockPaint = $this->resolvePaint((string) $props['blockBg']);
                 $css .= ".iw-variant--{$index}[data-has-bg=\"true\"] {\n";
-                $css .= "  background-color: {$resolvedBlockBg};\n";
-                $css .= "  --iw-variant-block-bg: {$resolvedBlockBg};\n";
+                $css .= "  background-color: {$blockPaint['color']};\n";
+                $css .= "  --iw-variant-block-bg: {$blockPaint['color']};\n";
+                if (null !== $blockPaint['image']) {
+                    $css .= "  background-image: {$blockPaint['image']};\n";
+                    $css .= "  --iw-variant-block-bg-image: {$blockPaint['image']};\n";
+                }
                 $css .= "}\n";
             }
 
@@ -5055,7 +5099,8 @@ class ThemeCompiler
             // same declaration, so an overlap costs nothing. Written once in a
             // rule of its own it would either survive both halves being off, or
             // need a third selector to say what these two already say.
-            $contentBg = trim($this->resolveColorValue((string) ($props['contentBg'] ?? '')));
+            $contentPaint = $this->resolvePaint(trim((string) ($props['contentBg'] ?? '')));
+            $contentBg = trim($contentPaint['color']);
             $contentBorder = trim($this->resolveColorValue((string) ($props['contentBorder'] ?? '')));
             // Inside these rules, so padding only applies where the surface
             // paints something. Unconditional, it would move every block of
@@ -5064,6 +5109,9 @@ class ThemeCompiler
             if ('' !== $contentBg) {
                 $css .= ".iw-variant--{$index} .iw-block__content[data-content-bg=\"true\"] {\n";
                 $css .= "  background-color: {$contentBg};\n";
+                if (null !== $contentPaint['image']) {
+                    $css .= "  background-image: {$contentPaint['image']};\n";
+                }
                 $css .= $contentPadding;
                 $css .= "}\n";
             }

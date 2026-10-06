@@ -186,6 +186,13 @@ function widthKeyFor(key) {
     return FIELDS.some((field) => field.key === candidate) ? candidate : null;
 }
 
+/**
+ * The backgrounds that accept a gradient as well as a color.
+ *
+ * Mirrors VariantZones::GRADIENT_KEYS, guarded by VariantZonesParityTest.
+ */
+const GRADIENT_KEYS = ['blockBg', 'contentBg', 'cardBg', 'accentBg'];
+
 /** Every field, flattened, in zone order. */
 const FIELDS = ZONES.reduce((all, zone) => all.concat(zone.fields), []);
 
@@ -194,4 +201,4 @@ function fieldOf(key) {
     return FIELDS.find((field) => field.key === key) || null;
 }
 
-export {ZONES, WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
+export {ZONES, WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
