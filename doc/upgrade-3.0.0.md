@@ -2374,3 +2374,88 @@ old key, and the first save of any tab moves it.
 **CSS:** the theme writes `--iw-button-icon-default-size` when a size is set. It
 sits below the size picked on the button, so `--iw-button-icon-size` keeps
 overriding both.
+
+## The footer has colors of its own (breaking, migration provided)
+
+The footer was colored by a block variant (**Theme > Footer > Color variant**,
+`footerConfig.variant`). A variant is made for content blocks, and the footer only
+read a few of its colors, so any combination it did not hold (white links with an
+orange hover over a navy background) took a variant created for the footer alone,
+offered afterwards in the variant picker of every block.
+
+**Theme > Footer > Colors** replaces it, like the menu colors: background, text,
+column titles, links, links on hover, accent, divider, social icons and their
+hover, each stored in `footerConfig.colors` and published as an `--iw-footer-*`
+custom property. A new **Mute secondary text** setting, on by default, keeps the
+opacity the footer always dimmed its secondary text with. See [footer.md](footer.md#colors).
+
+### Nothing has to run before deploying
+
+A theme still holding `footerConfig.variant` renders with the colors that variant
+painted: the compiler and the admin form read them through it, an empty variant
+meaning the first one as before, and a color already set wins. Saving the footer
+form writes them down.
+
+The variant mapped onto the footer colors as follows:
+
+| Variant color | Footer color |
+|---------------|--------------|
+| `blockBg` | `bg` |
+| `paragraph` | `text` |
+| `title` | `title` |
+| `link` / `linkHover` | `link` / `linkHover` |
+| `hr` | `divider` |
+| `highlight` | `accent` |
+
+### Writing the colors down
+
+```bash
+php bin/adminconsole iw-sulu:theme:migrate-footer-colors --dry-run
+php bin/adminconsole iw-sulu:theme:migrate-footer-colors
+php bin/adminconsole iw-sulu:theme:compile
+```
+
+It writes the colors of each footer variant into `footerConfig.colors`, keeping any
+color already set, then removes `footerConfig.variant`. Safe to run twice. As long
+as the variant is stored, an empty footer color keeps following it, so clearing a
+color in the admin only means "transparent" or "inherited" once the command has run.
+`iw:tailwind-theme:check` lists the themes still waiting for it.
+
+Production entrypoints do not run the `iw-sulu:theme:migrate-*` commands. Run this
+one by hand on each environment.
+
+### What no longer follows the variant (breaking, visual)
+
+Two things the variant drew on the footer have no footer setting, and are gone as
+soon as the bundle is deployed. The command names the themes concerned and the CSS
+bringing them back:
+
+- **The separator settings.** The variant `hr` rules outranked `.iw-footer__divider`,
+  so a variant with *No separator* or *Image* hid the footer divider, and a dashed,
+  dotted or wavy separator drew it that way. The divider is now a plain rule in the
+  divider color.
+- **The block border.** The `<footer>` carried `data-has-border`, so a variant with a
+  block border framed the whole footer. It no longer does.
+
+```css
+/* Hide the divider, as a variant without separator did */
+.iw-footer__divider { display: none; }
+
+/* Frame the footer again */
+.iw-footer { border: 1px solid var(--color-border); }
+```
+
+### Template overrides (breaking)
+
+The `<footer>` of `_columns`, `_centered` and `_minimal` no longer carries
+`.iw-variant--<slug>`, `data-has-bg` or `data-has-border`. `_footer_social` lost its
+inline `<style>`: the icons are recolored by the compiled stylesheet, from
+`--iw-footer-social` then the link color.
+
+The footer therefore publishes no `--iw-variant-*` property to what it holds. The
+bundle puts nothing there that reads them, but a project template adding a form or
+a button following its variant inside the footer should put `.iw-variant--<slug>` on
+the zone holding it.
+
+The site name next to the footer logo sits inside the brand link, and keeps taking
+the link color, as it did under the variant.

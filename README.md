@@ -47,7 +47,7 @@
 * **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
 * **Block variants**: Slug-named per-block color schemes applied via CSS custom properties. Each block keeps four switches over what its variant actually paints - block background, block border, content background, content border - so one block can drop the outline or the fill without a variant of its own
 * **Menu configuration**: Configurable menu type, colors, animation, and display options, plus the bar chrome — bottom rule, drop shadow, background opacity and backdrop blur — and a transparent-mode logo variant that cross-fades with the background on scroll
-* **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) colored by a theme variant
+* **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) with colors of their own, like the menu
 * **Twig integration**: Helper functions for including theme CSS, fonts, block styles, and menu config
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
 * **Accordion / FAQ block**: built on native `<details>`/`<summary>` — keyboard operation, the expanded state announced to screen readers and "one item open at a time" all work **without JavaScript**. Optional schema.org `FAQPage` markup and deep links to a single answer
@@ -816,7 +816,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |
 | [Articles on several sites](doc/multi-site-articles.md) | Picking a colour variant per site on an article published on more than one, how it is stored, and what a slug missing from the other theme falls back to |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
-| [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), variant coloring, social snippet |
+| [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), footer colors, social snippet, adding a project zone |
 | [Moving a theme between installations](doc/theme-transfer.md) | Export/import a theme as a JSON file: admin buttons, console commands, the API, and why images do not travel |
 
 ## Architecture

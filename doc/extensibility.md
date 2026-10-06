@@ -255,6 +255,77 @@ style is reported instead of silently detaching the rule. The complete example,
 with the per-style `--iw-button-accent` hook, is in
 [Project-specific ornaments](css-api/buttons.md#project-specific-ornaments).
 
+### A color setting for a project zone
+
+A color picked with `iw_theme_color_token_editor` is stored as a palette
+reference (`ref:primary-900`) or a literal color. A reference is not CSS: point
+it at the palette custom property the theme already compiles, so the zone
+follows the palette when it changes.
+
+The example adds a light band under the bundle footer (see
+[Adding a zone in the project](footer.md#adding-a-zone-in-the-project)), with two
+fields on the footer form, `footerConfig_custom_asideBg` and
+`footerConfig_custom_asideLink`:
+
+```php
+namespace App\EventSubscriber;
+
+use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Event\ThemeCompileEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class FooterAsideSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [ThemeCompileEvent::class => 'onCompile'];
+    }
+
+    public function onCompile(ThemeCompileEvent $event): void
+    {
+        $custom = $event->getFooterCustom();
+        $declarations = '';
+
+        $bg = $this->toCss($custom['asideBg'] ?? null);
+        if (null !== $bg) {
+            $declarations .= " background-color: {$bg};";
+        }
+
+        // The partials inside the band read the footer properties, so
+        // redefining them on the band is all it takes.
+        $link = $this->toCss($custom['asideLink'] ?? null);
+        if (null !== $link) {
+            $declarations .= " --iw-footer-link: {$link}; --iw-footer-social: {$link};";
+        }
+
+        if ('' !== $declarations) {
+            $event->addRule(".app-footer-aside {{$declarations} }");
+        }
+    }
+
+    /**
+     * A stored color as CSS: a palette reference becomes its custom property.
+     */
+    private function toCss(mixed $value): ?string
+    {
+        if (!\is_string($value) || '' === trim($value)) {
+            return null;
+        }
+
+        $ref = ColorSet::parseRef($value);
+        if (null === $ref) {
+            return $value;
+        }
+
+        return 'var(--color-' . $ref['name'] . (null === $ref['shade'] ? '' : '-' . $ref['shade']) . ')';
+    }
+}
+```
+
+Only the settings that are filled are written. An empty link setting leaves the
+band on the footer link color, where `--iw-footer-link: ;` would have made every
+fallback reading it unreachable.
+
 ## Cache busting
 
 Compiled filenames carry a hash (`theme-12-9bd4ff32.css`) built from the theme's
