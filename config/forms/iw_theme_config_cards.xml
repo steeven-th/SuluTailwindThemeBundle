@@ -68,7 +68,7 @@
 
                 <property name="cardSurface" type="iw_theme_color_token_editor" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_surface</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
                 <property name="cardImagePadded" type="checkbox" colspan="12">
@@ -141,7 +141,7 @@
             <properties>
                 <property name="cardBorder" type="iw_theme_color_token_editor" colspan="4">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_border</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
                 <property name="cardBorderWidth" type="single_select" colspan="4"
@@ -237,7 +237,7 @@
                 <property name="cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
                           visibleCondition="cardBorder != 'none'">
                     <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
-                    <params><param name="show_palette" value="true"/></params>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
                 <property name="cardShadowHoverColor" type="iw_theme_color_token_editor" colspan="6">

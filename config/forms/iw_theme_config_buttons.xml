@@ -141,6 +141,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="hoverBg" type="iw_theme_color_token_editor" colspan="4">
@@ -166,6 +167,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="accent" type="iw_theme_color_token_editor" colspan="6">

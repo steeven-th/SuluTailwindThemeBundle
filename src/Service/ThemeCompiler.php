@@ -376,6 +376,7 @@ class ThemeCompiler
 
         // Article card classes (base + BEM modifiers for hover effects)
         $css .= $this->generateArticleCardClasses();
+        $css .= $this->generateArticleCardGradients($tokens);
 
         // Block variant classes
         $css .= $this->generateBlockVariantClasses(
@@ -769,6 +770,41 @@ class ThemeCompiler
 
 
     /**
+     * Paint the gradients of the article cards (Components > Cards).
+     *
+     * The surface becomes an image layer over its fallback color, the border
+     * a ring (see gradientRingRule()), and the hover border recolors the
+     * ring. Nothing is written for cards painted with colors.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS rules
+     */
+    private function generateArticleCardGradients(array $tokens): string
+    {
+        $css = '';
+
+        $surfaceImage = $this->paintImage($tokens['cardSurface'] ?? null);
+        if (null !== $surfaceImage) {
+            $css .= ".iw-article-card { background-image: {$surfaceImage}; }\n";
+        }
+
+        $border = (string) ($tokens['cardBorder'] ?? 'none');
+        $hoverBorder = (string) ($tokens['cardHoverBorder'] ?? 'none');
+        if ('none' !== $border && '' !== trim($border)
+            && (null !== $this->paintImage($border) || null !== $this->paintImage($hoverBorder))) {
+            $width = (string) ($tokens['cardBorderWidth'] ?? '1px');
+            $css .= ".iw-article-card { border: none; }\n";
+            $css .= self::gradientRingRule('.iw-article-card', $this->ringPaint($border), $width);
+            if ('none' !== $hoverBorder && '' !== trim($hoverBorder)) {
+                $css .= '.iw-article-card--hover-border:hover::after { background: ' . $this->ringPaint($hoverBorder) . "; }\n";
+            }
+        }
+
+        return '' === $css ? '' : "/* Article card - gradients */\n{$css}\n";
+    }
+
+    /**
      * Generate CSS custom properties for the Leaflet location maps.
      *
      * Emits --iw-location-map-* from the admin config (marker, popup and
@@ -810,7 +846,7 @@ class ThemeCompiler
         $hoverDuration = ButtonEffectCatalog::resolveDuration((string) ($tokens['cardHoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $hoverEasing = ButtonEffectCatalog::resolveEasing((string) ($tokens['cardHoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
 
-        $surfaceValue = ('none' === $surface) ? 'transparent' : $this->resolveColorValue($surface);
+        $surfaceValue = ('none' === $surface) ? 'transparent' : $this->resolvePaint(trim($surface))['color'];
         $borderValue = ('none' === $border)
             ? 'none'
             : "{$borderWidth} {$borderStyle} " . $this->resolveColorValue($border);
@@ -1274,6 +1310,57 @@ class ThemeCompiler
             'color' => $this->gradientRenderer()->isOpaque($gradient) ? "var(--gradient-{$slug}-fallback)" : 'transparent',
             'image' => "var(--gradient-{$slug})",
         ];
+    }
+
+    /**
+     * Draw a gradient border on an element, as a ring on its ::after.
+     *
+     * `border-image` drops the border-radius, and painting the gradient on the
+     * border box under an opaque padding box needs an opaque inside, which an
+     * outlined button does not have. The ring is a layer covering the
+     * element, as thick as the border, whose middle a mask cuts out.
+     *
+     * It is drawn inside the box: the element gives up its real border and
+     * the ring takes its place, so the size does not move and an element
+     * clipping its overflow (a card rounding its picture, a button sliding
+     * its background) does not clip the ring away.
+     *
+     * @param string $selector The element
+     * @param string $paint    What the ring is painted with (a gradient, or a color for a hover state)
+     * @param string $widths   The ring thickness, as a padding value (one to four lengths)
+     *
+     * @return string The ::after rule
+     */
+    private static function gradientRingRule(string $selector, string $paint, string $widths): string
+    {
+        return "{$selector}::after {\n"
+            . "  content: \"\";\n"
+            . "  position: absolute;\n"
+            . "  inset: 0;\n"
+            . "  z-index: 1;\n"
+            . "  pointer-events: none;\n"
+            . "  border-radius: inherit;\n"
+            . "  padding: {$widths};\n"
+            . "  background: {$paint};\n"
+            . "  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);\n"
+            . "  -webkit-mask-composite: xor;\n"
+            . "  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);\n"
+            . "  mask-composite: exclude;\n"
+            . "}\n";
+    }
+
+    /**
+     * A stored value as the paint of a ring or a layer: the gradient, or the color.
+     *
+     * @param string $value The stored value
+     *
+     * @return string The CSS paint
+     */
+    private function ringPaint(string $value): string
+    {
+        $paint = $this->resolvePaint(trim($value));
+
+        return $paint['image'] ?? $paint['color'];
     }
 
     /**
@@ -2755,6 +2842,9 @@ class ThemeCompiler
             $css .= "  position: relative;\n";
             $css .= "  overflow: hidden;\n";
             $css .= "  isolation: isolate;\n";
+        } elseif (null !== $border['ring']) {
+            // Anchors the ring of a gradient border.
+            $css .= "  position: relative;\n";
         }
         $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
         $css .= "}\n";
@@ -2762,6 +2852,15 @@ class ThemeCompiler
         // Overlay pseudo-element for slide-* / gradient-shift effects, and for
         // the fade a gradient background needs (see buttonBgEffect()).
         $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
+
+        // Gradient border, drawn as a ring
+        if (null !== $border['ring']) {
+            $ringWidths = implode(' ', $border['widths']);
+            $css .= self::gradientRingRule($selector, $border['ring']['rest'], $ringWidths);
+            if (null !== $border['ring']['hover']) {
+                $css .= "{$selector}:hover::after {\n  background: {$border['ring']['hover']};\n}\n";
+            }
+        }
 
         // Hover state
         $css .= $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
@@ -2848,28 +2947,55 @@ class ThemeCompiler
      * elsewhere, never as `border: none` plus one side: the hover rule only
      * changes `border-color`, which then recolours the drawn sides alone.
      *
-     * @param array<string, mixed> $props The button definition
+     * A gradient border, at rest or on hover, is drawn as a ring instead (see
+     * gradientRingRule()): the declaration drops the real border, the widths
+     * still come back for the padding, and `ring` carries what to paint.
+     * Where no pseudo-element can be drawn (the native file button), pass
+     * `$ring = false` and the gradient falls back to its color.
      *
-     * @return array{css: string, widths: array{top: string, right: string, bottom: string, left: string}}
+     * @param array<string, mixed> $props The button definition
+     * @param bool                 $ring  Whether a gradient border may become a ring
+     *
+     * @return array{css: string, widths: array{top: string, right: string, bottom: string, left: string}, ring: array{rest: string, hover: string|null}|null}
      */
-    private function resolveButtonBorder(array $props): array
+    private function resolveButtonBorder(array $props, bool $ring = true): array
     {
         $none = ['top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0'];
 
         $color = isset($props['border']) ? (string) $props['border'] : '';
         if ('' === $color || 'none' === $color) {
-            return ['css' => "  border: none;\n", 'widths' => $none];
+            return ['css' => "  border: none;\n", 'widths' => $none, 'ring' => null];
         }
 
         $width = self::buttonBorderWidth($props['borderWidth'] ?? null);
         $style = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
-        $color = $this->resolveColorValue($color);
         $sides = self::BUTTON_BORDER_SIDES[(string) ($props['borderSides'] ?? 'all')] ?? self::BUTTON_BORDER_SIDES['all'];
+
+        $hoverBorder = isset($props['hoverBorder']) && 'none' !== $props['hoverBorder'] ? (string) $props['hoverBorder'] : '';
+        if ($ring && (null !== $this->paintImage($color) || null !== $this->paintImage($hoverBorder))) {
+            $widths = $none;
+            foreach ($sides as $side) {
+                $widths[$side] = $width;
+            }
+
+            // The line style has no ring to apply to: a gradient border is solid.
+            return [
+                'css' => "  border: none;\n",
+                'widths' => $widths,
+                'ring' => [
+                    'rest' => $this->ringPaint($color),
+                    'hover' => '' !== $hoverBorder ? $this->ringPaint($hoverBorder) : null,
+                ],
+            ];
+        }
+
+        $color = $this->resolveColorValue($color);
 
         if (4 === \count($sides)) {
             return [
                 'css' => "  border: {$width} {$style} {$color};\n",
                 'widths' => ['top' => $width, 'right' => $width, 'bottom' => $width, 'left' => $width],
+                'ring' => null,
             ];
         }
 
@@ -2883,6 +3009,7 @@ class ThemeCompiler
                 . "  border-color: {$color};\n"
                 . '  border-width: ' . implode(' ', $widths) . ";\n",
             'widths' => $widths,
+            'ring' => null,
         ];
     }
 
@@ -5513,6 +5640,18 @@ class ThemeCompiler
                 $css .= $contentPadding;
                 $css .= "}\n";
             }
+            // A gradient card border, drawn as a ring on every card of the
+            // variant. They all carry the card marker, so one rule reaches
+            // the ten blocks drawing cards. The class is doubled to outrank
+            // the block rules drawing the real border, which the ring
+            // replaces at the same thickness.
+            $cardBorderImage = $this->paintImage($props['cardBorder'] ?? null);
+            if (null !== $cardBorderImage) {
+                $card = ".iw-variant--{$index} .iw-surface--card.iw-surface--card";
+                $css .= "{$card} {\n  position: relative;\n  border-width: 0;\n}\n";
+                $css .= self::gradientRingRule($card, $cardBorderImage, 'var(--iw-variant-card-border-width, 1px)');
+            }
+
             if ('' !== $contentBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__content[data-content-border=\"true\"] {\n";
                 $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
@@ -6004,7 +6143,9 @@ class ThemeCompiler
         $duration = ButtonEffectCatalog::resolveDuration((string) ($btnData['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($btnData['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
         $opacityKey = (string) ($btnData['hoverOpacity'] ?? ButtonEffectCatalog::DEFAULT_OPACITY);
-        $border = $this->resolveButtonBorder($btnData);
+        // No pseudo-element on the native file button: a gradient border falls
+        // back to its color there.
+        $border = $this->resolveButtonBorder($btnData, false);
 
         $css .= ".iw-variant--{$variantName} .iw-form__file::file-selector-button {\n";
         if (isset($btnData['bg'])) {

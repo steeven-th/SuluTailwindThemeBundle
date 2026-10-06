@@ -24,6 +24,17 @@ use PHPUnit\Framework\TestCase;
  */
 final class GradientFieldsReachTheStylesheetTest extends TestCase
 {
+    /**
+     * Fields that only show once another one is set: a hover border has
+     * nothing to recolor on an element with no border at rest.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private const COMPANIONS = [
+        'hoverBorder' => ['border' => '#000000'],
+        'cardHoverBorder' => ['cardBorder' => '#000000'],
+    ];
+
     private const GRADIENT = [
         'slug' => 'probe',
         'stops' => [['color' => '#112233', 'position' => 0], ['color' => '#445566', 'position' => 100]],
@@ -49,7 +60,7 @@ final class GradientFieldsReachTheStylesheetTest extends TestCase
             }
         }
 
-        foreach (VariantZones::GRADIENT_KEYS as $key) {
+        foreach ([...VariantZones::GRADIENT_KEYS, ...VariantZones::GRADIENT_BORDER_KEYS] as $key) {
             $found['variant / ' . $key] = ['variant', $key];
         }
 
@@ -112,9 +123,9 @@ final class GradientFieldsReachTheStylesheetTest extends TestCase
         } elseif (str_starts_with($field, 'footerConfig_colors_')) {
             $footer['colors'][substr($field, \strlen('footerConfig_colors_'))] = 'gradient:probe';
         } elseif ('iw_theme_config_buttons' === $form) {
-            $tokens['buttons'] = [['slug' => 'probe', 'label' => 'Probe', $field => 'gradient:probe']];
+            $tokens['buttons'] = [['slug' => 'probe', 'label' => 'Probe', $field => 'gradient:probe'] + (self::COMPANIONS[$field] ?? [])];
         } else {
-            $tokens[$field] = 'gradient:probe';
+            $tokens = [$field => 'gradient:probe'] + (self::COMPANIONS[$field] ?? []) + $tokens;
         }
 
         $compiler = new ThemeCompiler(sys_get_temp_dir(), new GoogleFontsResolver(), new OklchPaletteGenerator());

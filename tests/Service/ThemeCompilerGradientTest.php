@@ -361,4 +361,74 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringContainsString('.iw-tag:hover { background: var(--iw-tag-bg-image, none), var(--iw-tag-bg, transparent); }', $css);
         self::assertStringNotContainsString('.iw-tag::before', $plain);
     }
+
+    #[Test]
+    public function aGradientButtonBorderBecomesARingInsideTheSameBox(): void
+    {
+        $css = $this->compileButton(['bg' => 'transparent', 'border' => 'gradient:bleu-leger', 'borderWidth' => '2px']);
+
+        self::assertSame(1, preg_match('/\.iw-button--cta \{(.*?)\n\}/s', $css, $rule));
+        self::assertStringContainsString('  border: none;', $rule[1]);
+        self::assertStringContainsString('  padding: max(0px, calc(var(--iw-button-padding-y, 0.75rem) - 2px))', $rule[1], 'The padding still gives the border width back.');
+        self::assertStringContainsString('  position: relative;', $rule[1]);
+        self::assertStringContainsString(".iw-button--cta::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;", $css);
+        self::assertStringContainsString("  padding: 2px 2px 2px 2px;\n  background: var(--gradient-bleu-leger);\n  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);", $css);
+        self::assertStringContainsString('  mask-composite: exclude;', $css);
+    }
+
+    #[Test]
+    public function theRingKeepsToTheSidesOfAPartialBorder(): void
+    {
+        $css = $this->compileButton(['border' => 'gradient:bleu-leger', 'borderWidth' => '3px', 'borderSides' => 'bottom']);
+
+        self::assertStringContainsString("  padding: 0 0 3px 0;\n  background: var(--gradient-bleu-leger);", $css);
+    }
+
+    #[Test]
+    public function aGradientHoverBorderRecolorsTheRing(): void
+    {
+        $css = $this->compileButton(['border' => '#ffffff', 'hoverBorder' => 'gradient:bleu-leger']);
+
+        self::assertStringContainsString("  background: #ffffff;\n  -webkit-mask", $css);
+        self::assertStringContainsString(".iw-button--cta:hover::after {\n  background: var(--gradient-bleu-leger);\n}", $css);
+    }
+
+    #[Test]
+    public function theNativeFileButtonKeepsASolidBorder(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'buttons' => [['slug' => 'cta', 'label' => 'CTA', 'border' => 'gradient:bleu-leger']],
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'buttonStyle' => 'cta']],
+        ]));
+
+        self::assertSame(1, preg_match('/\.iw-variant--night \.iw-form__file::file-selector-button \{(.*?)\}/s', $css, $rule));
+        self::assertMatchesRegularExpression('/border: 1px solid #[0-9a-f]{6};/', $rule[1]);
+    }
+
+    #[Test]
+    public function aGradientCardBorderRingsEveryCardOfTheVariant(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'cardBorder' => 'gradient:bleu-leger', 'cardBorderWidth' => '2']],
+        ]));
+
+        self::assertStringContainsString(".iw-variant--night .iw-surface--card.iw-surface--card {\n  position: relative;\n  border-width: 0;\n}", $css);
+        self::assertStringContainsString("  padding: var(--iw-variant-card-border-width, 1px);\n  background: var(--gradient-bleu-leger);", $css);
+    }
+
+    #[Test]
+    public function articleCardsTakeAGradientSurfaceAndBorder(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'cardSurface' => 'gradient:bleu-leger',
+            'cardBorder' => 'gradient:bleu-leger',
+            'cardBorderWidth' => '2px',
+            'cardHoverBorder' => '#ffffff',
+        ]));
+
+        self::assertStringContainsString('  --iw-article-card-surface: var(--gradient-bleu-leger-fallback);', $css);
+        self::assertStringContainsString('.iw-article-card { background-image: var(--gradient-bleu-leger); }', $css);
+        self::assertStringContainsString('.iw-article-card { border: none; }', $css);
+        self::assertStringContainsString('.iw-article-card--hover-border:hover::after { background: #ffffff; }', $css);
+    }
 }

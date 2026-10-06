@@ -8,7 +8,7 @@ import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
 import {buttonBorderStyle} from '../../utils/buttonBorder';
 import buttonStyleExtras from '../../utils/buttonStyleExtras';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
-import {WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, GRADIENT_BORDER_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
 import {availableGradients, gradientSlug, isGradientRef, paletteColorResolver} from '../../utils/gradient';
 
 const STYLE_ID = 'iw-variant-editor-styles';
@@ -366,7 +366,9 @@ export default class VariantEditor extends React.Component {
             if (isGradientRef(held)) {
                 const gradient = this.gradients.find((candidate) => candidate.slug === gradientSlug(held));
                 if (gradient) {
-                    style['--ve-' + key] = gradient.image;
+                    // A border is drawn with a color: the preview shows the
+                    // fallback there, the page draws the ring.
+                    style['--ve-' + key] = GRADIENT_BORDER_KEYS.includes(key) ? gradient.fallback : gradient.image;
                 }
 
                 return;
@@ -719,7 +721,7 @@ export default class VariantEditor extends React.Component {
             <div className="iw-ve__setting" key={key}>
                 <span className="iw-ve__setting-label">{translate(field.label)}</span>
                 <ColorTokenEditor
-                    allowGradient={GRADIENT_KEYS.includes(key)}
+                    allowGradient={GRADIENT_KEYS.includes(key) || GRADIENT_BORDER_KEYS.includes(key)}
                     disabled={this.props.disabled}
                     formInspector={this.props.formInspector}
                     onChange={(next) => this.commit(key, next)}

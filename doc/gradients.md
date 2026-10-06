@@ -59,6 +59,8 @@ tints, and the table cells, stripes and hover, which stack over the data.
 | Articles > Reading | Reading progress bar | in `--iw-reading-progress-color` itself, see below |
 | Buttons | Background, hover background | `--iw-button-<slug>-bg-image`, `--iw-button-<slug>-hover-bg-image` (see [Button hover effects](button-effects.md#with-a-gradient-background)) |
 | Hover backgrounds | Tags, back-to-top button, controls over media | `--iw-tag-hover-bg-image`, `--iw-back-to-top-hover-bg-image`, in `--iw-gallery-nav-bg-hover` itself |
+| Borders | Button border and hover border, variant card border, article card border and hover border | drawn as a ring, see [Borders](#borders) |
+| Article cards | Surface (Components > Cards) | `background-image` on `.iw-article-card` |
 
 Each background keeps its color variable, set to the gradient's fallback (or
 `transparent` for a translucent gradient), and gets an `-image` variable
@@ -88,6 +90,21 @@ The rules are written only for what has a gradient.
 
 The pagination and the share buttons offer no hover background of their own:
 over a gradient they show their hover color, without fading.
+
+## Borders
+
+A border cannot take an image through `border-color`, and the two usual
+workarounds fail here: `border-image` ignores `border-radius`, and painting the
+gradient under an opaque inside does not suit an outlined button, whose inside
+is transparent. So a gradient border is drawn as a ring on the element's
+`::after`, a layer as thick as the border whose middle is cut out by a mask
+(`mask-composite: exclude`).
+
+The ring sits inside the box, in place of the real border, which goes to zero.
+The element keeps its size, a button keeps its padding, and an element clipping
+its overflow (a card rounding its picture, a button sliding its background)
+does not clip the ring away. On a button it follows `borderSides`. The line
+style does not apply: a gradient border is solid.
 
 ## How it is stored
 

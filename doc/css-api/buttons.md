@@ -80,6 +80,8 @@ Beyond colours, radius and hover effects, each style in the **Buttons** tab take
 | Label weight (`fontWeight`) | inherited *(default)*, normal, medium, semi-bold, bold | `font-weight: 400` to `700` |
 | Label case (`textTransform`) | inherited *(default)*, as typed, uppercase | `text-transform` |
 
+**Gradient border.** The border and the hover border accept a [gradient](../gradients.md). A gradient border is drawn as a ring on the `::after` of the button: the real border goes, the ring takes its place inside the box at the same thickness, on the sides `borderSides` keeps, so the button keeps its size and its padding. `border-image` would drop the radius, and painting the gradient under an opaque inside is impossible for an outlined button whose inside is transparent. The line style does not apply to a ring: a gradient border is solid. The hover border recolors the ring, color or gradient. The native file button of the forms has no pseudo-element and keeps a solid border in the gradient's fallback color. The ring takes `::after`, the pseudo-element the [ornaments](#project-specific-ornaments) below use, and `::before` belongs to the hover effects: a style carrying an ornament keeps a solid border.
+
 A field left on its default writes nothing, so a style that never opens them compiles exactly as before. There is no font size per style: the size belongs to the context (a block, the menu), not to the style.
 
 A border on one side keeps the corners of the button: with a large radius the rule curves up at its ends. A bottom rule reads best with a small radius or none.

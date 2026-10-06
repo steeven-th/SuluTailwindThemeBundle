@@ -49,7 +49,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-card-bg-image` | `cardBg` | The gradient of the card background, when `cardBg` is one (see [Gradient surfaces](#gradient-surfaces)) |
 | `--iw-variant-card-title-color` | `cardTitle` | Heading colour inside a card. Falls back to `--iw-variant-title-color` |
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
-| `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
+| `--iw-variant-card-border` | `cardBorder` | Border colour of a card. A [gradient](../gradients.md) is drawn as a ring instead, see [Gradient surfaces](#gradient-surfaces) |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-card-shadow` | `cardShadowColor` | The shadow the cards of this block cast, shape from **Components > Cards** and colour from here. `none` when the variant names no colour |
 | `--iw-variant-card-shadow-hover` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
@@ -468,6 +468,14 @@ gradient takes both lines: set `--iw-timeline-card-bg-image: none` next to
 background (`[data-has-bg]`), the content background (`[data-content-bg]`),
 `.iw-block__text` and the table header are painted by the compiled stylesheet
 itself, image included.
+
+The card border accepts a gradient too. It cannot be a `border-color`, so it is
+drawn as a ring on the `::after` of every element carrying `iw-surface--card`:
+the card loses its real border and the ring takes its place inside the box, at
+`--iw-variant-card-border-width`, under the card's rounded corners and over
+anything clipped to them. A card component using its own `::after` would
+compete with it. The card put forward keeps the accent border, in the
+gradient's fallback color when it falls back on the card one.
 
 ## Paragraph background (`.iw-block__text`)
 

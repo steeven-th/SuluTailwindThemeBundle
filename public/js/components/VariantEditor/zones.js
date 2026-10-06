@@ -193,6 +193,13 @@ function widthKeyFor(key) {
  */
 const GRADIENT_KEYS = ['blockBg', 'contentBg', 'paragraphBg', 'cardBg', 'accentBg', 'tableHeadBg'];
 
+/**
+ * The borders that accept a gradient, drawn as a ring.
+ *
+ * Mirrors VariantZones::GRADIENT_BORDER_KEYS, guarded by VariantZonesParityTest.
+ */
+const GRADIENT_BORDER_KEYS = ['cardBorder'];
+
 /** Every field, flattened, in zone order. */
 const FIELDS = ZONES.reduce((all, zone) => all.concat(zone.fields), []);
 
@@ -201,4 +208,4 @@ function fieldOf(key) {
     return FIELDS.find((field) => field.key === key) || null;
 }
 
-export {ZONES, WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
+export {ZONES, WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, GRADIENT_BORDER_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
