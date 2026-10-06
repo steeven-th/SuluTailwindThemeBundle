@@ -62,7 +62,7 @@ final class ThemeFormKeyCoverageTest extends TestCase
      *
      * @var list<string>
      */
-    private const RECORD_FIELDS = ['name', 'label', 'palette', 'blockStyles'];
+    private const RECORD_FIELDS = ['name', 'label', 'palette', 'gradients', 'blockStyles'];
 
     /**
      * Every theme config form, found rather than listed.

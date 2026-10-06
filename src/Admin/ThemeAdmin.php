@@ -393,6 +393,21 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
             );
 
+            // ── Edit form: colors, gradients tab ───────────────────
+            // Defined once here, then picked like a palette color by the
+            // fields that accept a gradient.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(
+                    static::EDIT_FORM_VIEW . '.colors_gradients',
+                    '/gradients',
+                )
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_colors_gradients')
+                    ->setTabTitle('iw_sulu_tailwind_theme.gradients')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.colors_group')
+            );
+
             // ── Edit form: colors, surfaces tab ────────────────────
             // These six were a section of the components tab. They name colours
             // every transverse component shares, which makes them a palette.

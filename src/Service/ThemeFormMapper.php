@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Color\Gradient;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
@@ -300,6 +302,11 @@ class ThemeFormMapper
         $data['palette'] = $colorSet->getColors();
         // Text colors stay as flat colors_* fields, sourced from tokens.textColors.
         $this->flattenDepth1($data, self::PREFIX_COLORS, $colorSet->getTextColors());
+        // Gradients: ordered list for the GradientEditor field, normalized.
+        $data['gradients'] = array_map(
+            static fn (Gradient $gradient): array => $gradient->toArray(),
+            GradientSet::fromTokens($tokens)->all(),
+        );
 
         // Flatten borders (depth 1): tokens.borders.cardRadius → borders_cardRadius.
         // The legacy `radius` key (pre-3.0.0) pre-fills the new cardRadius field
@@ -678,6 +685,20 @@ class ThemeFormMapper
         $normalizedColors = ColorSet::fromTokens(['colors' => $paletteInput])->getColors();
         $this->slugValidator->validate($normalizedColors);
         $tokens['colors'] = $normalizedColors;
+        // Gradients: the GradientEditor field sends the whole list. Slugs are
+        // validated as typed, before normalizing could quietly rename one. An
+        // older export without the key keeps the gradients already stored.
+        if (\array_key_exists('gradients', $data)) {
+            $gradientInput = \is_array($data['gradients']) ? array_values($data['gradients']) : [];
+            $this->slugValidator->validateSlugs(array_map(
+                static fn (mixed $gradient): mixed => \is_array($gradient) ? ($gradient['slug'] ?? null) : null,
+                $gradientInput,
+            ));
+            $tokens['gradients'] = array_map(
+                static fn (Gradient $gradient): array => $gradient->toArray(),
+                GradientSet::fromTokens(['gradients' => $gradientInput])->all(),
+            );
+        }
         // Text colors are stored separately from the palette (no shades).
         $tokens['textColors'] = $this->unflattenDepth1($data, self::PREFIX_COLORS, $tokens['textColors'] ?? []);
         $tokens['borders'] = $this->unflattenDepth1($data, self::PREFIX_BORDERS, $tokens['borders'] ?? []);

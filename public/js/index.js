@@ -19,6 +19,7 @@ import StylePicker from './components/StylePicker/StylePicker';
 import MarginSelector from './components/MarginSelector/MarginSelector';
 import ColorTokenEditor from './components/ColorTokenEditor/ColorTokenEditor';
 import PaletteEditor from './components/PaletteEditor/PaletteEditor';
+import GradientEditor from './components/GradientEditor/GradientEditor';
 import FontPicker from './components/FontPicker/FontPicker';
 import RadiusSelector from './components/RadiusSelector/RadiusSelector';
 import ShadowEditor from './components/ShadowEditor/ShadowEditor';
@@ -115,6 +116,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_margin_selector', MarginSelector);
     fieldRegistry.add('iw_theme_color_token_editor', ColorTokenEditor);
     fieldRegistry.add('iw_theme_palette_editor', PaletteEditor);
+    fieldRegistry.add('iw_theme_gradient_editor', GradientEditor);
     fieldRegistry.add('iw_theme_font_picker', FontPicker);
     fieldRegistry.add('iw_theme_radius_selector', RadiusSelector);
     fieldRegistry.add('iw_theme_shadow_editor', ShadowEditor);

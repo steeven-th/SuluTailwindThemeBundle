@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
+use ItechWorld\SuluTailwindThemeBundle\Exception\SlugValidationException;
 use ItechWorld\SuluTailwindThemeBundle\Service\CustomFieldSanitizer;
 use ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeFormMapper;
@@ -346,6 +347,61 @@ class ThemeFormMapperTest extends TestCase
         $this->assertSame(['text', 'gallery:grid'], $target->getTokens()['defaults']['blockMaxWidthScope']);
     }
 
+    public function testGradientsAreStoredNormalized(): void
+    {
+        $theme = new ThemeConfig();
+        $data = $this->mapper->serializeTheme($theme);
+        $data['gradients'] = [[
+            'slug' => 'dawn',
+            'label' => 'Dawn',
+            'angle' => 450,
+            'stops' => [
+                ['color' => '#ffffff', 'opacity' => '80', 'position' => '100'],
+                ['color' => 'ref:primary', 'position' => 0],
+            ],
+        ]];
+
+        $this->mapper->mapDataToEntity($data, $theme);
+        $stored = $theme->getTokens()['gradients'];
+
+        $this->assertCount(1, $stored);
+        $this->assertSame(90, $stored[0]['angle']);
+        $this->assertSame(['ref:primary', '#ffffff'], array_column($stored[0]['stops'], 'color'));
+        $this->assertSame(80, $stored[0]['stops'][1]['opacity']);
+    }
+
+    public function testAMalformedGradientSlugIsRejected(): void
+    {
+        $theme = new ThemeConfig();
+        $data = $this->mapper->serializeTheme($theme);
+        $data['gradients'] = [['slug' => 'Dawn Light', 'stops' => [['color' => '#000'], ['color' => '#fff']]]];
+
+        $this->expectException(SlugValidationException::class);
+        $this->mapper->mapDataToEntity($data, $theme);
+    }
+
+    public function testADuplicatedGradientSlugIsRejected(): void
+    {
+        $theme = new ThemeConfig();
+        $data = $this->mapper->serializeTheme($theme);
+        $gradient = ['slug' => 'dawn', 'stops' => [['color' => '#000'], ['color' => '#fff']]];
+        $data['gradients'] = [$gradient, $gradient];
+
+        $this->expectException(SlugValidationException::class);
+        $this->mapper->mapDataToEntity($data, $theme);
+    }
+
+    public function testDataWithoutGradientsKeepsTheStoredOnes(): void
+    {
+        $theme = $this->buildTheme();
+        $data = $this->mapper->serializeTheme($theme);
+        unset($data['gradients']);
+
+        $this->mapper->mapDataToEntity($data, $theme);
+
+        $this->assertSame('night', $theme->getTokens()['gradients'][0]['slug']);
+    }
+
     private function buildTheme(): ThemeConfig
     {
         $theme = new ThemeConfig();
@@ -355,6 +411,19 @@ class ThemeFormMapperTest extends TestCase
             'colors' => [
                 ['role' => 'primary', 'slug' => 'primary', 'value' => '#3366ff'],
                 ['role' => 'secondary', 'slug' => 'secondary', 'value' => '#22aa88'],
+            ],
+            'gradients' => [
+                [
+                    'slug' => 'night',
+                    'label' => 'Night',
+                    'type' => 'linear',
+                    'angle' => 135,
+                    'stops' => [
+                        ['color' => '#3a4b8f', 'opacity' => 100, 'position' => 0],
+                        ['color' => 'ref:secondary', 'opacity' => 60, 'position' => 100],
+                    ],
+                    'overlay' => ['color' => '#000000', 'opacity' => 20],
+                ],
             ],
             'borders' => ['radius' => '0.5rem', 'cardRadius' => '1rem'],
             'defaults' => ['blockGap' => '2rem', 'titleGap' => '1.5rem', 'imageGap' => '1rem', 'componentGap' => '2rem', 'blockMaxWidth' => '3xl', 'blockMaxWidthScope' => ['text', 'gallery:grid']],
