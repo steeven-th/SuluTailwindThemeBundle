@@ -583,6 +583,10 @@ class ThemeCompiler
         [$button, $icon] = self::BACK_TO_TOP_SIZES[$size] ?? self::BACK_TO_TOP_SIZES['md'];
 
         $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
+        $bgImage = $this->paintImage($tokens['components_backToTopBg'] ?? '');
+        if (null !== $bgImage) {
+            $bg = $this->resolvePaint(trim((string) $tokens['components_backToTopBg']))['color'];
+        }
         $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
 
         // The hover state has to follow the background it hovers. Its default
@@ -598,6 +602,9 @@ class ThemeCompiler
         $css .= "  --iw-back-to-top-size: {$button};\n";
         $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
         $css .= "  --iw-back-to-top-bg: {$bg};\n";
+        if (null !== $bgImage) {
+            $css .= "  --iw-back-to-top-bg-image: {$bgImage};\n";
+        }
         $css .= "  --iw-back-to-top-color: {$color};\n";
         $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
 
@@ -656,8 +663,10 @@ class ThemeCompiler
 
         $onMediaBg = (string) ($tokens['components_controlsOnMediaBg'] ?? '');
         if ('' !== $onMediaBg) {
-            $resolved = $this->resolveColorValue($onMediaBg);
-            $css .= "  --iw-gallery-nav-bg: {$resolved};\n";
+            // The arrows paint with the `background` shorthand: a gradient
+            // goes in whole, and the hover mixes from its color.
+            $resolved = $this->resolvePaint(trim($onMediaBg))['color'];
+            $css .= '  --iw-gallery-nav-bg: ' . $this->paintShorthand($onMediaBg) . ";\n";
 
             // The hover state has to follow the background it hovers, or a veil
             // set to dark would brighten back to white under the pointer. It
@@ -735,6 +744,10 @@ class ThemeCompiler
         $height = self::READING_PROGRESS_SIZES[$size] ?? self::READING_PROGRESS_SIZES['md'];
 
         $color = $this->surfaceValue($tokens['articles_readingProgressColor'] ?? '', 'var(--color-surface-accent)');
+        // Painted with the `background` shorthand, so a gradient goes in whole.
+        if (null !== $this->paintImage($tokens['articles_readingProgressColor'] ?? '')) {
+            $color = $this->paintShorthand((string) $tokens['articles_readingProgressColor']);
+        }
 
         $css = "  /* Reading progress bar (article pages) */\n";
         $css .= "  --iw-reading-progress-height: {$height};\n";
@@ -804,6 +817,10 @@ class ThemeCompiler
             $tokens['cardBadgeBg'] ?? '',
             $this->surfaceValue($this->settingValue($tokens, 'components_badgeBg'), 'var(--color-primary-100)'),
         );
+        $badgePaint = $this->resolvePaint(trim((string) ($tokens['cardBadgeBg'] ?? '')) ?: $this->settingValue($tokens, 'components_badgeBg'));
+        if (null !== $badgePaint['image']) {
+            $badgeBg = $badgePaint['color'];
+        }
         $badgeText = $this->surfaceValue(
             $tokens['cardBadgeText'] ?? '',
             $this->surfaceValue($this->settingValue($tokens, 'components_badgeText'), 'var(--color-primary-700)'),
@@ -890,6 +907,12 @@ class ThemeCompiler
         $css .= "  --iw-article-card-title-color: {$titleColor};\n";
         $css .= "  --iw-article-card-text-color: {$textColor};\n";
         $css .= "  --iw-article-card-badge-bg: {$badgeBg};\n";
+        // The badge follows the site-wide one when left empty, image included.
+        $badgeStored = trim((string) ($tokens['cardBadgeBg'] ?? ''));
+        $badgeImage = $this->paintImage('' !== $badgeStored ? $badgeStored : $this->settingValue($tokens, 'components_badgeBg'));
+        if (null !== $badgeImage) {
+            $css .= "  --iw-article-card-badge-bg-image: {$badgeImage};\n";
+        }
         $css .= "  --iw-article-card-badge-text: {$badgeText};\n";
 
         return $css . "\n";
@@ -1243,6 +1266,36 @@ class ThemeCompiler
     }
 
     /**
+     * The image of a stored value, when it points at a known gradient.
+     *
+     * @param mixed $value The stored value
+     *
+     * @return string|null The CSS image, or null for a color or an empty value
+     */
+    private function paintImage(mixed $value): ?string
+    {
+        return \is_string($value) ? $this->resolvePaint(trim($value))['image'] : null;
+    }
+
+    /**
+     * A stored value written for the `background` shorthand.
+     *
+     * A component painting itself with `background: var(--x)` takes a gradient
+     * and its color in one value, the color as the last layer: no second
+     * variable, no change to its stylesheet.
+     *
+     * @param string $value The stored value
+     *
+     * @return string The CSS value, `<image>, <color>` for a gradient
+     */
+    private function paintShorthand(string $value): string
+    {
+        $paint = $this->resolvePaint(trim($value));
+
+        return null !== $paint['image'] ? "{$paint['image']}, {$paint['color']}" : $paint['color'];
+    }
+
+    /**
      * Build the renderer that writes gradients with this compile's palette.
      *
      * Stops resolve like any color field. A stop pointing at a gradient is
@@ -1334,6 +1387,12 @@ class ThemeCompiler
             $tokens['components_surfaceBg'] ?? '',
             'color-mix(in srgb, var(--color-background), var(--color-text) 6%)',
         );
+        // A panel given a gradient keeps a color for everything mixed from
+        // it, and publishes the image beside it for the panels to paint.
+        $surfaceImage = $this->paintImage($tokens['components_surfaceBg'] ?? '');
+        if (null !== $surfaceImage) {
+            $surface = $this->resolvePaint(trim((string) $tokens['components_surfaceBg']))['color'];
+        }
         $foreground = $this->surfaceValue(
             $tokens['components_surfaceText'] ?? '',
             'var(--color-text)',
@@ -1359,6 +1418,9 @@ class ThemeCompiler
 
         $css = "  /* Semantic surfaces (transverse components) */\n";
         $css .= "  --color-surface: {$surface};\n";
+        if (null !== $surfaceImage) {
+            $css .= "  --color-surface-image: {$surfaceImage};\n";
+        }
         $css .= "  --color-surface-foreground: {$foreground};\n";
         $css .= "  --color-surface-muted: {$muted};\n";
         $css .= "  --color-surface-border: {$border};\n";
@@ -1400,6 +1462,20 @@ class ThemeCompiler
             'components_breadcrumbAccent' => '--color-surface-accent',
         ],
     ];
+
+    /**
+     * Surface tokens of COMPONENT_SURFACE_OVERRIDES that a gradient can paint.
+     *
+     * @var list<string>
+     */
+    private const GRADIENT_SURFACE_TOKENS = ['--color-surface', '--iw-pagination-item-bg'];
+
+    /**
+     * Settings of COMPONENT_OWN_COLOR_VARIABLES that a gradient can paint.
+     *
+     * @var list<string>
+     */
+    private const GRADIENT_OWN_COLOR_KEYS = ['components_tagBg', 'components_badgeBg'];
 
     /**
      * Components whose colours are written as their own variables rather than
@@ -1702,7 +1778,18 @@ class ThemeCompiler
                 if ('' === $value || 'none' === $value) {
                     continue;
                 }
-                $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+                if (!\in_array($token, self::GRADIENT_SURFACE_TOKENS, true)) {
+                    $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+                    continue;
+                }
+                // A panel set to a color under a site-wide gradient surface
+                // has to say `none`, or the gradient reaches it through the
+                // cascade and covers its color.
+                $paint = $this->resolvePaint($value);
+                $declarations .= "  {$token}: {$paint['color']};\n";
+                if (null !== $paint['image'] || ('--color-surface' === $token && null !== $this->paintImage($tokens['components_surfaceBg'] ?? ''))) {
+                    $declarations .= "  {$token}-image: " . ($paint['image'] ?? 'none') . ";\n";
+                }
             }
             if ('.iw-pagination' === $selector && str_contains($declarations, '--iw-pagination-item-border:')) {
                 $declarations .= "  --iw-pagination-item-border-width: 1px;\n";
@@ -1765,9 +1852,14 @@ class ThemeCompiler
                     continue;
                 }
 
-                $color = $this->resolveColorValue($value);
+                $paint = \in_array($key, self::GRADIENT_OWN_COLOR_KEYS, true)
+                    ? $this->resolvePaint($value)
+                    : ['color' => $this->resolveColorValue($value), 'image' => null];
                 foreach ($variables as $variable) {
-                    $declarations .= "  {$variable}: {$color};\n";
+                    $declarations .= "  {$variable}: {$paint['color']};\n";
+                    if (null !== $paint['image']) {
+                        $declarations .= "  {$variable}-image: {$paint['image']};\n";
+                    }
                 }
             }
             if ('' !== $declarations) {
@@ -4432,8 +4524,16 @@ class ThemeCompiler
         $declarations = '';
         foreach (self::FOOTER_COLOR_VAR_SUFFIX as $key => $suffix) {
             $resolved = $this->menuColorOrNull($colors[$key] ?? null);
-            if (null !== $resolved) {
-                $declarations .= "  --iw-footer-{$suffix}: {$resolved};\n";
+            if (null === $resolved) {
+                continue;
+            }
+            $image = 'bg' === $key ? $this->paintImage($colors[$key]) : null;
+            if (null !== $image) {
+                $resolved = $this->resolvePaint(trim((string) $colors[$key]))['color'];
+            }
+            $declarations .= "  --iw-footer-{$suffix}: {$resolved};\n";
+            if (null !== $image) {
+                $declarations .= "  --iw-footer-{$suffix}-image: {$image};\n";
             }
         }
 
@@ -4477,6 +4577,9 @@ class ThemeCompiler
 
         // Surface and running text. Paragraphs and list items inherit it.
         $css .= ".iw-footer { background-color: var(--iw-footer-bg, transparent); color: var(--iw-footer-text, inherit); }\n";
+        if (null !== $this->paintImage($colors['bg'] ?? null)) {
+            $css .= ".iw-footer { background-image: var(--iw-footer-bg-image); }\n";
+        }
 
         // Brand — logo capped by a configurable max-height (keeps aspect ratio,
         // never upscales a small logo). Width auto + max-width guard for narrow columns.

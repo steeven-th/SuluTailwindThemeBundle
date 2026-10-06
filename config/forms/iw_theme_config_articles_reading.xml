@@ -96,7 +96,7 @@
             <property name="articles_readingProgressColor" type="iw_theme_color_token_editor" colspan="6"
                       visibleCondition="articles_readingProgressEnabled == true">
                 <meta><title>iw_sulu_tailwind_theme.articles_reading_progress_color</title></meta>
-                <params><param name="show_palette" value="true"/></params>
+                <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
             </property>
     </properties>
 </form>

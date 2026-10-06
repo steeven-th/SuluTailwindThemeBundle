@@ -5019,6 +5019,7 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
     background-color: var(--iw-pagination-item-bg, transparent);
+    background-image: var(--iw-pagination-item-bg-image, none);
     border: var(--iw-pagination-item-border-width, 0) solid var(--iw-pagination-item-border, transparent);
     box-shadow: var(--iw-pagination-item-shadow, none);
     font-size: 0.875rem;
@@ -5030,6 +5031,7 @@ span.iw-breadcrumbs__separator {
 .iw-pagination__link:hover,
 .iw-pagination__arrow:hover {
     background-color: var(--iw-pagination-hover-bg, color-mix(in srgb, var(--color-surface-accent) 12%, transparent));
+    background-image: var(--iw-pagination-hover-bg-image, none);
     color: var(--iw-pagination-hover-color, var(--color-surface-accent));
 }
 
@@ -5037,6 +5039,7 @@ span.iw-breadcrumbs__separator {
 .iw-pagination__link--current:hover {
     font-weight: 600;
     background-color: var(--iw-pagination-current-bg, var(--color-surface-accent));
+    background-image: none;
     color: var(--iw-pagination-current-color, var(--color-surface-on-accent, #fff));
 }
 
@@ -5073,6 +5076,7 @@ span.iw-breadcrumbs__separator {
     border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
     background-color: var(--iw-tag-bg, transparent);
+    background-image: var(--iw-tag-bg-image, none);
     box-shadow: var(--iw-tag-shadow, none);
     color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -5085,6 +5089,7 @@ span.iw-breadcrumbs__separator {
    alone is enough, the other two only refine it. */
 .iw-tag:hover {
     background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 12%, var(--iw-tag-bg, transparent)));
+    background-image: var(--iw-tag-hover-bg-image, none);
     color: var(--iw-tag-hover-text, var(--color-surface-accent));
     border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 40%, var(--iw-tag-border, var(--color-surface-border))));
 }
@@ -5129,6 +5134,7 @@ span.iw-breadcrumbs__separator {
     font-weight: var(--iw-category-badge-font-weight, 600);
     border-radius: var(--iw-category-badge-radius, var(--border-radius));
     background-color: var(--iw-category-badge-bg, var(--color-primary-100));
+    background-image: var(--iw-category-badge-bg-image, none);
     color: var(--iw-category-badge-text, var(--color-primary-700));
 }
 
@@ -5138,6 +5144,7 @@ span.iw-breadcrumbs__separator {
     margin-bottom: 0.5rem;
     --iw-category-badge-padding: 0.125rem 0.5rem;
     --iw-category-badge-bg: var(--iw-article-card-badge-bg, var(--color-primary-100));
+    --iw-category-badge-bg-image: var(--iw-article-card-badge-bg-image, none);
     --iw-category-badge-text: var(--iw-article-card-badge-text, var(--color-primary-700));
 }
 
@@ -5292,6 +5299,7 @@ span.iw-breadcrumbs__separator {
     gap: var(--iw-article-filters-group-gap, 1.5rem);
     padding: var(--iw-article-filters-padding, 1.25rem);
     background-color: var(--iw-article-filters-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-bg-image, var(--color-surface-image, none));
     border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
     border-radius: var(--iw-article-filters-radius, var(--border-radius));
     box-shadow: var(--iw-article-filters-shadow, none);
@@ -5468,6 +5476,7 @@ span.iw-breadcrumbs__separator {
 .iw-article-layout--drawer-armed .iw-article-filters__toggle:not([class*="iw-button--"]) {
     color: var(--iw-article-filters-toggle-color, var(--color-surface-foreground));
     background-color: var(--iw-article-filters-toggle-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-toggle-bg-image, var(--color-surface-image, none));
     border: 1px solid var(--iw-article-filters-toggle-border, var(--color-surface-border));
 }
 
@@ -5505,6 +5514,7 @@ span.iw-breadcrumbs__separator {
     overflow-y: auto;
     padding: var(--iw-article-filters-drawer-padding, 1.25rem);
     background-color: var(--iw-article-filters-drawer-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-drawer-bg-image, var(--color-surface-image, none));
     box-shadow: var(--iw-article-filters-drawer-shadow, 0 0 2.5rem rgba(0, 0, 0, 0.25));
     transform: translateX(-100%);
     transition: transform var(--iw-article-filters-drawer-transition, 0.3s ease);
@@ -5594,6 +5604,7 @@ span.iw-breadcrumbs__separator {
     height: var(--iw-back-to-top-size, 2.75rem);
     color: var(--iw-back-to-top-color, var(--color-surface-on-accent, #fff));
     background-color: var(--iw-back-to-top-bg, var(--color-surface-accent));
+    background-image: var(--iw-back-to-top-bg-image, none);
     border: 0;
     border-radius: var(--iw-back-to-top-radius, 999px);
     box-shadow: var(--iw-back-to-top-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
@@ -5615,6 +5626,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-back-to-top:hover {
     background-color: var(--iw-back-to-top-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+    background-image: var(--iw-back-to-top-hover-bg-image, none);
 }
 
 .iw-back-to-top__icon {
@@ -5645,6 +5657,7 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-toc-padding, 1rem 1.25rem);
     color: var(--iw-toc-color, var(--color-surface-foreground));
     background-color: var(--iw-toc-bg, var(--color-surface));
+    background-image: var(--iw-toc-bg-image, var(--color-surface-image, none));
     border: var(--iw-toc-border, 1px solid var(--color-surface-border));
     border-radius: var(--iw-toc-radius, var(--border-radius));
     box-shadow: var(--iw-toc-shadow, none);
@@ -5729,6 +5742,7 @@ span.iw-breadcrumbs__separator {
         height: var(--iw-toc-toggle-size, 2.5rem);
         color: var(--iw-toc-toggle-color, var(--iw-toc-color, var(--color-surface-foreground)));
         background-color: var(--iw-toc-toggle-bg, var(--iw-toc-bg, var(--color-surface)));
+        background-image: var(--iw-toc-toggle-bg-image, var(--iw-toc-bg-image, var(--color-surface-image, none)));
         border: var(--iw-toc-toggle-border, var(--iw-toc-border, 1px solid var(--color-surface-border)));
         border-right: 0;
         border-radius: var(--iw-toc-toggle-radius, 999px) 0 0 var(--iw-toc-toggle-radius, 999px);
@@ -5847,11 +5861,13 @@ aside .iw-toc {
 .iw-share__button:not([class*="iw-button--"]) {
     color: var(--iw-share-color, var(--color-surface-foreground));
     background-color: var(--iw-share-bg, var(--color-surface));
+    background-image: var(--iw-share-bg-image, var(--color-surface-image, none));
     border: var(--iw-share-border, 1px solid var(--color-surface-border));
 }
 
 .iw-share__button:not([class*="iw-button--"]):hover {
     background-color: var(--iw-share-hover-bg, color-mix(in srgb, var(--iw-share-bg, var(--color-surface)), var(--color-text) 8%));
+    background-image: var(--iw-share-hover-bg-image, none);
 }
 
 .iw-share__button[hidden] {

@@ -39,14 +39,40 @@ A gradient fading to transparent has a translucent fallback (an 8-digit hex).
 
 ## Where a gradient can be used
 
-A gradient is offered only by the fields that can paint one. Text, borders,
-shadows, focus rings and form fields keep a solid color: legibility and
-accessibility need one.
+A gradient is offered only by the fields whose value paints a background and
+nothing else. Text, borders, shadows, focus rings and form fields keep a solid
+color: legibility and accessibility need one. So do the accent colors, which
+the components also use for text, focus rings, checkboxes and `color-mix()`
+tints, and the table cells, stripes and hover, which stack over the data.
 
-| Where | Fields |
-|-------|--------|
-| Block variants | Block, content, paragraph, card and accent surface backgrounds, table header |
-| Menu | Bar and panel background, level 2, 3 and 4 backgrounds (see [Menus](menus.md)) |
+| Where | Fields | Published as |
+|-------|--------|--------------|
+| Block variants | Block, content, paragraph, card and accent surface backgrounds, table header | `--iw-variant-<surface>-bg-image` (see [Block variants](css-api/block-variants.md#gradient-surfaces)) |
+| Menu | Bar and panel background, level 2, 3 and 4 backgrounds | `--iw-menu-<level>-bg-image`, `--iw-menu-surface-image` (see [Menus](menus.md)) |
+| Footer | Background | `--iw-footer-bg-image` |
+| Colors > Surfaces | Panel background (filters sidebar, table of contents, share buttons) | `--color-surface-image` |
+| Articles > Filters | Sidebar background | `--color-surface-image`, scoped to the sidebar |
+| Navigation | Pagination items, back-to-top button | `--iw-pagination-item-bg-image`, `--iw-back-to-top-bg-image` |
+| Navigation | Controls over media (gallery arrows) | in `--iw-gallery-nav-bg` itself, see below |
+| Tags | Tag and category badge backgrounds | `--iw-tag-bg-image`, `--iw-category-badge-bg-image` |
+| Cards | Badge background | `--iw-article-card-badge-bg-image` |
+| Articles > Reading | Reading progress bar | in `--iw-reading-progress-color` itself, see below |
+
+Each background keeps its color variable, set to the gradient's fallback (or
+`transparent` for a translucent gradient), and gets an `-image` variable
+beside it. Rules read both, so a stylesheet that only knows the color still
+renders the fallback.
+
+Two components paint with the `background` shorthand. For them the variable
+holds the whole value, the gradient then its fallback as the last layer:
+`--iw-gallery-nav-bg: var(--gradient-x), var(--gradient-x-fallback)`. Their
+own CSS does not change.
+
+The map popups and controls (Leaflet) take the panel color, not its
+gradient: the tip of a popup is drawn separately and would not line up.
+
+Hover states drop the gradient for now and show their own color. A smooth
+transition between a gradient and a hover color comes with the button work.
 
 A field that only takes a color and is handed a `gradient:` value anyway paints
 the gradient's fallback.

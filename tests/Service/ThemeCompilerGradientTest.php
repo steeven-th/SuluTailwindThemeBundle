@@ -254,4 +254,36 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringNotContainsString('table-head-bg-image', $css);
         self::assertStringNotContainsString('paragraph-bg-image', $css);
     }
+
+    #[Test]
+    public function aPanelSetToAColorStopsTheSiteWideSurfaceGradient(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', ['components_surfaceBg' => 'gradient:bleu-leger', 'components_sidebarBg' => '#ffffff']));
+
+        self::assertStringContainsString("  --color-surface: var(--gradient-bleu-leger-fallback);\n  --color-surface-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  --color-surface: #ffffff;\n  --color-surface-image: none;", $css);
+    }
+
+    #[Test]
+    public function aShorthandPainterTakesTheGradientAndItsColorInOneValue(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'articles_readingProgressColor' => 'gradient:bleu-leger',
+            'components_controlsOnMediaBg' => 'gradient:bleu-leger',
+        ]));
+
+        self::assertStringContainsString('  --iw-reading-progress-color: var(--gradient-bleu-leger), var(--gradient-bleu-leger-fallback);', $css);
+        self::assertStringContainsString('  --iw-gallery-nav-bg: var(--gradient-bleu-leger), var(--gradient-bleu-leger-fallback);', $css);
+        self::assertStringContainsString('  --iw-gallery-nav-bg-hover: color-mix(in srgb, var(--gradient-bleu-leger-fallback), #fff 15%);', $css);
+    }
+
+    #[Test]
+    public function aBadgeFollowsTheGradientOfTheTags(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', ['components_tagBg' => 'gradient:bleu-leger']));
+
+        self::assertStringContainsString("  --iw-tag-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  --iw-category-badge-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  --iw-article-card-badge-bg-image: var(--gradient-bleu-leger);", $css);
+    }
 }
