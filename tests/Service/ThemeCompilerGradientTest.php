@@ -39,14 +39,15 @@ final class ThemeCompilerGradientTest extends TestCase
 
     /**
      * @param array<string, mixed> $tokens
+     * @param array<string, mixed> $menuConfig
      */
-    private function compileCss(array $tokens): string
+    private function compileCss(array $tokens, array $menuConfig = []): string
     {
         $compiler = new ThemeCompiler(sys_get_temp_dir(), new GoogleFontsResolver(), new OklchPaletteGenerator());
 
         $ref = new \ReflectionClass(ThemeConfig::class);
         $theme = $ref->newInstanceWithoutConstructor();
-        foreach (['tokens' => $tokens, 'menuConfig' => [], 'blockStyles' => [], 'label' => 'Test'] as $property => $value) {
+        foreach (['tokens' => $tokens, 'menuConfig' => $menuConfig, 'blockStyles' => [], 'label' => 'Test'] as $property => $value) {
             if ($ref->hasProperty($property)) {
                 $ref->getProperty($property)->setValue($theme, $value);
             }
@@ -188,5 +189,48 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertSame(1, preg_match('/--gradient-bleu-leger-fallback: (#[0-9a-f]{6});/', $css, $fallback));
         self::assertStringContainsString("--iw-variant-paragraph-color: {$fallback[1]};", $css);
         self::assertStringNotContainsString('--iw-variant-paragraph-color-image', $css);
+    }
+
+    #[Test]
+    public function aMenuLevelSetToAColorStopsTheGradientOfTheLevelAbove(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57'), ['colors' => ['bg' => 'gradient:bleu-leger', 'secondBg' => '#ffffff']]);
+
+        self::assertStringContainsString("  --iw-menu-bg: var(--gradient-bleu-leger-fallback);\n  --iw-menu-bg-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString("  --iw-menu-second-bg: #ffffff;\n  --iw-menu-second-bg-image: none;", $css);
+        self::assertStringContainsString('  --iw-menu-surface-image: var(--gradient-bleu-leger);', $css);
+        self::assertStringContainsString("  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n  background-image: var(--iw-menu-surface-image, none);", $css);
+        self::assertStringContainsString('.iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); background-image: var(--iw-menu-third-bg-image, var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none)));', $css);
+        self::assertStringContainsString("  background-color: var(--iw-menu-bg);\n  background-image: var(--iw-menu-bg-image, none);", $css);
+    }
+
+    #[Test]
+    public function theTransparentBarDropsTheGradientToo(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57'), ['colors' => ['bg' => 'gradient:bleu-leger']]);
+
+        self::assertStringContainsString('background-color: transparent; border-bottom-color: transparent; box-shadow: none; background-image: none;', $css);
+    }
+
+    #[Test]
+    public function aTranslucentBarThinsItsGradientStopByStop(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57'), ['colors' => ['bg' => 'gradient:bleu-leger'], 'bgOpacity' => 50]);
+
+        self::assertStringContainsString('  --iw-menu-surface: transparent;', $css);
+        self::assertStringContainsString(
+            '  --iw-menu-surface-image: linear-gradient(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.1)), linear-gradient(180deg, rgb(58 75 143 / 0.5) 0%, rgb(23 47 87 / 0.5) 100%);',
+            $css,
+        );
+    }
+
+    #[Test]
+    public function aMenuWithoutGradientWritesNoImageLayer(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57'), ['colors' => ['bg' => '#ffffff', 'secondBg' => '#eeeeee']]);
+
+        self::assertStringNotContainsString('--iw-menu-bg-image', $css);
+        self::assertStringNotContainsString('--iw-menu-surface-image', $css);
+        self::assertStringNotContainsString('--iw-menu-second-bg-image', $css);
     }
 }

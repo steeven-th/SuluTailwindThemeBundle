@@ -46,6 +46,7 @@ accessibility need one.
 | Where | Fields |
 |-------|--------|
 | Block variants | Block background, content background, card background, accent surface background |
+| Menu | Bar and panel background, level 2, 3 and 4 backgrounds (see [Menus](menus.md)) |
 
 A field that only takes a color and is handed a `gradient:` value anyway paints
 the gradient's fallback.

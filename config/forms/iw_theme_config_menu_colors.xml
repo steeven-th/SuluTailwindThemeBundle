@@ -18,6 +18,7 @@
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>
+                    <param name="allow_gradient" value="true"/>
                 </params>
             </property>
 
@@ -45,6 +46,7 @@
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>
+                    <param name="allow_gradient" value="true"/>
                 </params>
             </property>
 
@@ -73,6 +75,7 @@
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>
+                    <param name="allow_gradient" value="true"/>
                 </params>
             </property>
 
@@ -104,6 +107,7 @@
                 </meta>
                 <params>
                     <param name="show_palette" value="true"/>
+                    <param name="allow_gradient" value="true"/>
                 </params>
             </property>
 

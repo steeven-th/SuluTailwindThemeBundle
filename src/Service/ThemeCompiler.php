@@ -3192,6 +3192,11 @@ class ThemeCompiler
 
         $colors = $menuConfig['colors'] ?? [];
         $resolvedBg = null;
+        // Once one level paints a gradient, every level set publishes an
+        // image, `none` for a color: the levels fall back on one another, and
+        // a level set to a color must stop the image of the level above from
+        // reaching it.
+        $hasGradient = self::menuHasGradient($menuConfig);
         foreach ($colors as $key => $value) {
             if (is_array($value)) {
                 continue;
@@ -3203,11 +3208,17 @@ class ThemeCompiler
             if (null === $suffix || null === $value || '' === trim((string) $value)) {
                 continue;
             }
-            $resolved = $this->resolveColorValue((string) $value);
+            $paint = \in_array($key, self::MENU_GRADIENT_KEYS, true)
+                ? $this->resolvePaint(trim((string) $value))
+                : ['color' => $this->resolveColorValue((string) $value), 'image' => null];
+            $resolved = $paint['color'];
             if ('bg' === $key) {
                 $resolvedBg = $resolved;
             }
             $css .= "  --iw-menu-{$suffix}: {$resolved};\n";
+            if ($hasGradient && \in_array($key, self::MENU_GRADIENT_KEYS, true)) {
+                $css .= "  --iw-menu-{$suffix}-image: " . ($paint['image'] ?? 'none') . ";\n";
+            }
         }
 
         // Colors of the bar while it sits transparent over a hero. Always
@@ -3227,9 +3238,18 @@ class ThemeCompiler
         // --iw-menu-bg (a see-through dropdown is unreadable).
         $opacity = $this->normalizeMenuOpacity($menuConfig['bgOpacity'] ?? null);
         $bgExpression = $resolvedBg ?? 'var(--iw-menu-bg)';
-        $css .= 100 === $opacity
+        // Under a thinned gradient the thinned fallback would show through.
+        if (100 !== $opacity && $hasGradient && 'none' !== $this->menuSurfaceImage((string) ($colors['bg'] ?? ''), 100)) {
+            $bgExpression = 'transparent';
+        }
+        $css .= 100 === $opacity || 'transparent' === $bgExpression
             ? "  --iw-menu-surface: {$bgExpression};\n"
             : "  --iw-menu-surface: color-mix(in srgb, {$bgExpression} {$opacity}%, transparent);\n";
+        // A gradient bar is thinned the same way, stop by stop: an image has
+        // no opacity a color-mix() could reach.
+        if ($hasGradient) {
+            $css .= '  --iw-menu-surface-image: ' . $this->menuSurfaceImage((string) ($colors['bg'] ?? ''), $opacity) . ";\n";
+        }
 
         $borderWidth = self::MENU_BORDER_WIDTHS[(string) ($menuConfig['borderWidth'] ?? 'none')]
             ?? self::MENU_BORDER_WIDTHS['none'];
@@ -3316,6 +3336,61 @@ class ThemeCompiler
         }
 
         return $css . "\n";
+    }
+
+    /**
+     * The menu backgrounds that accept a gradient: the bar and its panel, and
+     * the three levels below it.
+     *
+     * @var list<string>
+     */
+    private const MENU_GRADIENT_KEYS = ['bg', 'secondBg', 'thirdBg', 'fourthBg'];
+
+    /**
+     * Tell whether one of the menu backgrounds points at a gradient.
+     *
+     * The image layers of the menu are written only then, so a menu painted
+     * with colors compiles to exactly the stylesheet it always had.
+     *
+     * @param array<string, mixed> $menuConfig The menu configuration
+     *
+     * @return bool True when a menu background is a gradient
+     */
+    private static function menuHasGradient(array $menuConfig): bool
+    {
+        $colors = \is_array($menuConfig['colors'] ?? null) ? $menuConfig['colors'] : [];
+        foreach (self::MENU_GRADIENT_KEYS as $key) {
+            if (\is_string($colors[$key] ?? null) && str_starts_with(trim($colors[$key]), GradientSet::REF_PREFIX)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The image painted on the bar, thinned by the bar opacity.
+     *
+     * At full opacity it is the gradient's variable. Below, the gradient is
+     * written out with every stop thinned, which is what the color-mix() of
+     * the surface does to a color.
+     *
+     * @param string $value   The stored bar background
+     * @param int    $opacity The bar opacity, 0-100
+     *
+     * @return string The CSS image, `none` when the bar is not a gradient
+     */
+    private function menuSurfaceImage(string $value, int $opacity): string
+    {
+        $slug = GradientSet::parseRef(trim($value));
+        $gradient = null !== $slug ? $this->gradientSet?->get($slug) : null;
+        if (null === $gradient) {
+            return 'none';
+        }
+
+        return 100 === $opacity
+            ? "var(--gradient-{$slug})"
+            : $this->gradientRenderer()->image($gradient->withOpacity($opacity));
     }
 
     /**
@@ -3445,6 +3520,16 @@ class ThemeCompiler
      */
     private function generateMenuClasses(array $menuConfig = []): string
     {
+        // Image layer of each menu background, written only when one of them
+        // is a gradient (see generateMenuVariables()). The chains mirror the
+        // color ones: a level left unset takes the level above.
+        $hasGradient = self::menuHasGradient($menuConfig);
+        $image = static fn (string $chain): string => $hasGradient ? " background-image: {$chain};" : '';
+        $bgImage = 'var(--iw-menu-bg-image, none)';
+        $secondImage = 'var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none))';
+        $thirdImage = 'var(--iw-menu-third-bg-image, var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none)))';
+        $fourthImage = 'var(--iw-menu-fourth-bg-image, var(--iw-menu-third-bg-image, var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none))))';
+
         $css = "/* Menu component */\n";
 
         // Base: navbar header + overlay background/text.
@@ -3469,6 +3554,9 @@ class ThemeCompiler
         $css .= ".iw-menu::before { content: \"\"; position: absolute; z-index: 40; pointer-events: none;\n";
         $css .= "  inset: 0 0 calc(-1 * var(--iw-menu-border-width, 0px)) 0;\n";
         $css .= "  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
+        if ($hasGradient) {
+            $css .= "  background-image: var(--iw-menu-surface-image, none);\n";
+        }
         $css .= "  border-bottom: var(--iw-menu-border-width, 0px) solid var(--iw-menu-border-color, transparent);\n";
         $css .= "  box-shadow: var(--iw-menu-shadow, none);\n";
         $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
@@ -3497,7 +3585,7 @@ class ThemeCompiler
         // matching and the regular bar fades back in. With a panel open it
         // comes back at once: the panel slides behind it.
         $css .= "{$overHero}::before {\n";
-        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none;\n";
+        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none;" . $image('none') . "\n";
         $css .= "  -webkit-backdrop-filter: none; backdrop-filter: none; }\n";
         // Colors chosen for the picture under the bar, the regular ones when
         // unset (see generateMenuVariables()). Scoped to the frame: the panel
@@ -3556,9 +3644,9 @@ class ThemeCompiler
         $css .= ".iw-menu__item--current { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }\n";
 
         // Dropdown backgrounds per level
-        $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
-        $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
-        $css .= ".iw-menu__dropdown--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));" . $image($secondImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))));" . $image($fourthImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
         // The sub-lists of the panels are part of the panel, not dropdowns:
         // no radius.
         $css .= ".iw-menu [role=\"dialog\"] :is(.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3, .iw-menu__dropdown--level-4) { border-radius: 0; }\n";
@@ -3593,6 +3681,9 @@ class ThemeCompiler
         // Painted with the second-level background, so written with the
         // second-level text: the text of the panel could be the same color.
         $css .= "  background-color: var(--iw-menu-second-bg, transparent);\n";
+        if ($hasGradient) {
+            $css .= "  background-image: var(--iw-menu-second-bg-image, none);\n";
+        }
         $css .= "  color: var(--iw-menu-second-text, inherit);\n";
         $css .= "}\n";
         // A language the current page has no translation for still links out,
@@ -3678,6 +3769,9 @@ class ThemeCompiler
         // on mobile). Its motion is below.
         $css .= ".iw-menu__overlay {\n";
         $css .= "  background-color: var(--iw-menu-bg);\n";
+        if ($hasGradient) {
+            $css .= "  background-image: {$bgImage};\n";
+        }
         $css .= "  color: var(--iw-menu-text);\n";
         $css .= "}\n";
         $css .= ".iw-menu__overlay-nav { height: 100%; padding-inline: var(--iw-menu-panel-pad-start) var(--iw-menu-panel-pad-end); }\n";
@@ -3823,13 +3917,16 @@ class ThemeCompiler
         $css .= "  position: absolute; inset: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem)) 0 0 0;\n";
         $css .= "  display: flex; flex-direction: column;\n";
         $css .= "  background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));\n";
+        if ($hasGradient) {
+            $css .= "  background-image: {$secondImage};\n";
+        }
         $css .= "  transition: transform 0.3s ease, opacity 0.3s ease;\n";
         $css .= "}\n";
         // Each sub-panel paints its level and writes in its text color, the
         // non-linked title included (links carry their level class).
         $css .= ".iw-menu__subpanel--level-2 { color: var(--iw-menu-second-text, var(--iw-menu-text)); }\n";
-        $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
-        $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
+        $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . " color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
+        $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))));" . $image($fourthImage) . " color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
         $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--iw-menu-panel-pad-end) 1rem var(--iw-menu-panel-pad-start); }\n";
         // Motion — enter side matches the menu slide direction; --active rests at 0.
         $css .= ".iw-menu__panels--from-right .iw-menu__subpanel { transform: translateX(100%); }\n";
@@ -4046,13 +4143,13 @@ class ThemeCompiler
 
         // ─── Mega menu (sub-namespace iw-mega-menu) ──────────────────────────
         // Dropdown panel
-        $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); ";
+        $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));" . $image($secondImage) . ' ';
         $css .= "border-top: 1px solid var(--iw-menu-divider, rgba(0,0,0,0.1)); }\n";
         // Featured column
         // Fourth level under its link in a column: the rule ties it to its
         // parent, in the text color of the panel at 25%.
         $css .= ".iw-mega-menu__sublist { border-left: 1px solid var(--iw-mega-menu-rule, color-mix(in srgb, var(--iw-menu-second-text, var(--iw-menu-text)) 25%, transparent)); }\n";
-        $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
+        $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . ' ';
         $css .= "border-radius: var(--border-radius); padding: 1.5rem; }\n";
         // Image card (radius by default for consistent hover shadow)
         $css .= ".iw-mega-menu__card { border-radius: var(--border-radius); overflow: hidden; ";
@@ -4062,7 +4159,7 @@ class ThemeCompiler
         $css .= ".iw-mega-menu__card img { width: 100%; height: auto; object-fit: cover; ";
         $css .= "border-radius: var(--border-imageRadius, var(--border-radius)); }\n";
         // Card with background modifier: radius on card, overflow clips image, no image radius
-        $css .= ".iw-mega-menu__card--bg { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
+        $css .= ".iw-mega-menu__card--bg { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . ' ';
         $css .= "border-radius: var(--border-radius); overflow: hidden; }\n";
         $css .= ".iw-mega-menu__card--bg img { border-radius: 0; }\n";
         // Featured image (uses theme image radius)

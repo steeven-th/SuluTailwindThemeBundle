@@ -208,6 +208,42 @@ final class Gradient
     }
 
     /**
+     * Get a copy of the gradient seen through a given opacity.
+     *
+     * What `color-mix(..., transparent)` does to a color, done to a gradient:
+     * every stop and the overlay keep their color and lose the same share of
+     * their opacity. A translucent menu bar uses it, an image having no
+     * opacity of its own to thin.
+     *
+     * @param int $percent The opacity to apply, 0-100
+     *
+     * @return self The thinned copy (the same gradient at 100)
+     */
+    public function withOpacity(int $percent): self
+    {
+        $percent = max(0, min(100, $percent));
+        if (100 === $percent) {
+            return $this;
+        }
+
+        $scale = static fn (int $opacity): int => (int) round($opacity * $percent / 100);
+
+        return new self(
+            $this->slug,
+            $this->label,
+            $this->type,
+            $this->angle,
+            $this->position,
+            array_map(
+                static fn (array $stop): array => ['opacity' => $scale($stop['opacity'])] + $stop,
+                $this->stops,
+            ),
+            null !== $this->overlay ? ['opacity' => $scale($this->overlay['opacity'])] + $this->overlay : null,
+            $this->fallback,
+        );
+    }
+
+    /**
      * Get the normalized storage shape.
      *
      * @return array{slug: string, label: string, type: string, angle: int, position: string, stops: list<array{color: string, opacity: int, position: int}>, overlay: array{color: string, opacity: int}|null, fallback: string|null}

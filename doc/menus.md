@@ -464,6 +464,8 @@ All menu colors are configurable from the admin panel and compiled into CSS cust
 | Transparent bar burger | `--iw-menu-transparent-burger` | Burger icon over a hero. Falls back to the transparent bar text color. |
 | Chevrons, first to fourth level | `--iw-menu-chevron-color` / `--iw-menu-second-chevron-color` / `--iw-menu-third-chevron-color` / `--iw-menu-fourth-chevron-color` | Chevron of each level. Falls back to the text color of the level. |
 
+**Gradients.** The four backgrounds (bar and panel, levels 2, 3 and 4) also accept a [gradient](gradients.md). Once one of them does, each background that is set publishes a `-image` variable next to its color (`--iw-menu-bg-image`, `--iw-menu-second-bg-image`...), `none` for a background left on a color: the levels fall back on one another, and a level set to a color has to stop the gradient of the level above. The bar reads `--iw-menu-surface-image`. Below 100% background opacity the bar gradient is written out with every stop thinned by that opacity, the way the color is mixed with transparent, and the transparent bar over a hero drops it like the rest of its background. A menu painted with colors only compiles exactly as before, without any of these variables.
+
 **One rule for every menu: a text takes the colors of the level whose background it sits on**, and a chevron with no color of its own takes the color of that text.
 
 | Where | Background | Text |
