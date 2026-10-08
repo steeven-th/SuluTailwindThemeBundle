@@ -87,9 +87,9 @@
 {% set imageRadiusClass = iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')) %}
 
 {# Mosaic uses two different formats: 16:9 for the hero image, user-selected for the rest #}
-{# Fix: XML stores values with underscores (16_9, 4_3…), not colons #}
-{% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_1_1'} %}
-{% set baseFormat = formatMap[imageFilter|default('original')]|default('iw_theme_1_1') %}
+{# Image format and box ratio from the shared catalogue, see ImageRatioCatalog #}
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageFilter|default(''), '1_1') %}
+{% set baseFormat = pickedRatio.format %}
 
 {# ── Section ──────────────────────────────────────────────────────────────── #}
 <section

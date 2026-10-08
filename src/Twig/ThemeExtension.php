@@ -6,6 +6,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Form\FormSubmissionHandler;
 use ItechWorld\SuluTailwindThemeBundle\ItechWorldSuluTailwindThemeBundle;
+use ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Admin\ThemeAdmin;
 use ItechWorld\SuluTailwindThemeBundle\Service\BlockTemplateResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\CodeBlockPolicy;
@@ -143,6 +144,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_max_width_class', $this->getMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_image_max_width_class', $this->getImageMaxWidthClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_media_ratio_class', $this->getMediaRatioClass(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_image_ratio', $this->getImageRatio(...)),
             new TwigFunction('iw_sulu_tailwind_theme_progress_percent', $this->getProgressPercent(...)),
             new TwigFunction('iw_sulu_tailwind_theme_zones_align_class', $this->getZonesAlignClass(...)),
             new TwigFunction('iw_sulu_tailwind_theme_focus_class', $this->getFocusClass(...)),
@@ -1125,6 +1127,24 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         }
 
         return max(0, min(100, (int) round((float) $percent)));
+    }
+
+    /**
+     * The image format, CSS ratio and box class of a picked image ratio.
+     *
+     * One catalogue for every template cropping an image to a ratio, see
+     * ImageRatioCatalog. The fallback is the calling style's usual ratio, used
+     * for an empty value and for `original`. A null fallback returns null for
+     * those, to a style that keeps the natural ratio then.
+     *
+     * @param string|null $value    The stored ratio (`3_4`, `3:4`, `3/4`, `a`...)
+     * @param string|null $fallback The ratio used when the value is empty or unknown, null for none
+     *
+     * @return array{key: string, format: string, css: string, token: string, portrait: bool}|null
+     */
+    public function getImageRatio(?string $value = null, ?string $fallback = '16_9'): ?array
+    {
+        return ImageRatioCatalog::resolve($value, $fallback);
     }
 
     /**

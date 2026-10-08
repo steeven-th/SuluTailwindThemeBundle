@@ -39,6 +39,16 @@
         <scale x="600" y="800" mode="outbound"/>
     </format>
 
+    <!-- A series portrait format (A4, A5 posters: 1:√2). Printed posters lose
+         about 6% of their height in 3:4, which crops their header and footer. -->
+    <format key="iw_theme_a_series">
+        <meta>
+            <title lang="en">Theme A series (poster)</title>
+            <title lang="fr">Thème série A (affiche)</title>
+        </meta>
+        <scale x="600" y="849" mode="outbound"/>
+    </format>
+
     <!-- Avatar (small square for profile pictures) -->
     <!--
         Small square icons: timeline markers, and any pictogram the theme sizes

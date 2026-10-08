@@ -35,36 +35,21 @@ final class ArticleCardSettingsTest extends TestCase
     }
 
     /**
-     * Every ratio the Cards tab offers fetches an image cut to it.
+     * The card takes its image format from the ratio catalogue.
      *
-     * The ratios are read from the form and the formats from the bundle, so a
-     * ratio added on one side without the other fails here.
+     * Which ratios the Cards tab offers, and that each one has a format and a
+     * box, is guarded once for every form by ImageRatioContractTest. What is
+     * left to check here is that the card asks the catalogue rather than a
+     * table of its own, the one that sent every ratio a 16:9 crop.
      */
     #[Test]
-    public function everyOfferedRatioFetchesItsOwnFormat(): void
+    public function theCardResolvesItsRatioThroughTheCatalogue(): void
     {
-        $root = \dirname(__DIR__, 2);
-        $form = (string) file_get_contents($root . '/config/forms/iw_theme_config_cards.xml');
-        $card = (string) file_get_contents($root . '/templates/articles/common/_article_card.html.twig');
-        $formats = (string) file_get_contents($root . '/config/image-formats.xml');
+        $card = (string) file_get_contents(\dirname(__DIR__, 2) . '/templates/articles/common/_article_card.html.twig');
 
-        self::assertSame(1, preg_match('/name="cardImageRatio".*?<\/property>/s', $form, $property));
-        preg_match_all('/<param name="(\d+:\d+)">/', $property[0], $ratios);
-        self::assertNotEmpty($ratios[1]);
-
-        foreach ($ratios[1] as $ratio) {
-            $key = str_replace(':', '/', $ratio);
-            self::assertSame(
-                1,
-                preg_match("#'" . preg_quote($key, '#') . "': '(iw_theme_[a-z0-9_]+)'#", $card, $match),
-                \sprintf('The article card has no image format for the %s ratio, it falls back to a 16:9 crop.', $ratio),
-            );
-            self::assertStringContainsString(
-                '<format key="' . $match[1] . '">',
-                $formats,
-                \sprintf('The %s ratio asks for the format %s, which the bundle does not declare.', $ratio, $match[1]),
-            );
-        }
+        self::assertStringContainsString('iw_sulu_tailwind_theme_image_ratio(imageRatio', $card);
+        self::assertStringContainsString('format: pickedRatio.format', $card);
+        self::assertStringNotContainsString("format: 'iw_theme_", $card);
     }
 
     /**

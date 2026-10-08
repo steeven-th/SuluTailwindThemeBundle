@@ -610,6 +610,8 @@ img.object-cover {
 .iw-ratio--2-3  { aspect-ratio: 2 / 3; }
 .iw-ratio--9-16 { aspect-ratio: 9 / 16; }
 .iw-ratio--21-9 { aspect-ratio: 21 / 9; }
+/* A series posters (A4, A5): 1:√2, in the pixels of iw_theme_a_series. */
+.iw-ratio--a    { aspect-ratio: 600 / 849; }
 
 /* ─── Focus point ───────────────────────────────────────────────────────────
    Client-side safety net for the media focus point. Sulu already applies the

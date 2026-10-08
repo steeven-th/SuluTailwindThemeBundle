@@ -283,6 +283,7 @@
                             <param name="4_3"><meta><title>4:3</title></meta></param>
                             <param name="1_1"><meta><title>1:1</title></meta></param>
                             <param name="3_4"><meta><title>3:4</title></meta></param>
+                            <param name="a"><meta><title>iw_sulu_tailwind_theme.ratio_a_series</title></meta></param>
                             <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
                         </param>
                     </params>

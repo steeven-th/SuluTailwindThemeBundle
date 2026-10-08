@@ -31,12 +31,20 @@ set of values.
 | `.iw-ratio--2-3` | `2 / 3` |
 | `.iw-ratio--9-16` | `9 / 16` |
 | `.iw-ratio--21-9` | `21 / 9` |
+| `.iw-ratio--a` | `600 / 849`, the A series (A4, A5 posters, 1:√2) in the pixels of `iw_theme_a_series` |
 
 The partial normalises the `ratio` param, so `'16/9'`, `'16:9'` and `'16-9'` all
 resolve to `.iw-ratio--16-9`.
 
 To add a ratio, declare a new `.iw-ratio--X-Y` rule in your own stylesheet — no
 Twig change required.
+
+The ratios an editor can pick in the admin (galleries, text and images, page
+hero, Cards tab) are listed once in `ImageRatioCatalog`, which ties each one to
+its image format and its box, and is read in Twig through
+`iw_sulu_tailwind_theme_image_ratio()`. Offering a new one there takes the
+three together: the catalogue entry, a format in `config/image-formats.xml`
+and its `.iw-ratio--*` rule. `ImageRatioContractTest` fails when one is missing.
 
 ---
 

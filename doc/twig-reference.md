@@ -321,6 +321,43 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_image_ratio(value, fallback)`
+
+Resolves an image ratio picked in the admin into the Sulu image format cut to
+it, the CSS ratio and the `.iw-ratio--*` box suffix. Every template cropping an
+image to a picked ratio goes through it (galleries, text and images, page hero,
+article card), so a ratio is declared once, in `ImageRatioCatalog`, instead of
+in a table per template.
+
+The value is read in any spelling the forms store: `3_4` (blocks, page hero),
+`3:4` (Cards tab), `3/4` or `3-4` (template parameters). `a` is the A series
+poster ratio (A4, A5: 1:√2).
+
+```twig
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageFilter|default(''), '4_3') %}
+{% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+    media: media,
+    format: pickedRatio.format,
+    ratio: pickedRatio.token,
+} only %}
+```
+
+**Parameters:**
+- `value` (`string|null`) - The stored ratio
+- `fallback` (`string|null`) - The ratio used when the value is empty, `original` or unknown: the calling style's usual one. `null` returns `null` instead, for a style that keeps the natural ratio then (the page hero)
+
+**Returns:** `array|null` - `key` (`3_4`), `format` (`iw_theme_3_4`), `css` (`3 / 4`, for an `aspect-ratio` declaration), `token` (`3-4`, the `.iw-ratio--*` suffix) and `portrait` (`bool`).
+
+| Key | Format | Box |
+|---|---|---|
+| `16_9` | `iw_theme_16_9` | `.iw-ratio--16-9` |
+| `4_3` | `iw_theme_4_3` | `.iw-ratio--4-3` |
+| `1_1` | `iw_theme_1_1` | `.iw-ratio--1-1` |
+| `3_4` | `iw_theme_3_4` | `.iw-ratio--3-4` |
+| `a` | `iw_theme_a_series` | `.iw-ratio--a` |
+
+---
+
 ### `iw_sulu_tailwind_theme_button_slug(stored)`
 
 Resolves a stored button style to a slug the theme actually defines, falling
@@ -996,6 +1033,7 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_4_3` | 1200×900 | outbound | 4:3 cards and galleries |
 | `iw_theme_1_1` | 800×800 | outbound | Square cards and galleries |
 | `iw_theme_3_4` | 600×800 | outbound | Portrait cards and galleries |
+| `iw_theme_a_series` | 600×849 | outbound | A series posters (A4, A5: 1:√2) in cards and galleries |
 | `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
@@ -1034,7 +1072,7 @@ appearance and visibility toggles.
 | `eventStyle` | string | `card_info` | Page layout for event articles |
 | `blogStyle` | string | `classic` | Page layout for blog articles |
 | `listingStyle` | string | `grid` | Listing layout (`grid`, `list`, `cards`) |
-| `cardImageRatio` | string | `16:9` | Aspect ratio for card images (`16:9`, `4:3`, `1:1`, `3:4`) — ignored by the `list` style which always uses `16:9` |
+| `cardImageRatio` | string | `16:9` | Aspect ratio for card images (`16:9`, `4:3`, `1:1`, `3:4`, `a` for A series posters) - ignored by the `list` style which always uses `16:9` |
 | `cardOrientation` | string | `landscape` | Computed from `cardImageRatio`: `portrait` when width < height, `landscape` otherwise. Used by the listing templates to apply the `iw-article-listing--portrait` modifier. |
 | `cardSurface` | string | `none` | Card background color (color token or `none`) |
 | `cardPadding` | string | `1rem` | Inner padding (`0`, `0.5rem`, `1rem`, `1.5rem`, `2rem`) |

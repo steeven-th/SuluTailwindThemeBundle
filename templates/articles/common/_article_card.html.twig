@@ -7,8 +7,9 @@
     Parameters:
     - article: resolved article content object
     - layout: 'vertical' (default) | 'horizontal' (used by the list style)
-    - imageRatio: aspect ratio string (default '16/9'). Also picks the image
-      format: '16/9', '4/3', '1/1' and '3/4' each fetch their own iw_theme_* crop
+    - imageRatio: aspect ratio (default '16/9'), any spelling the ratio
+      catalogue reads ('3/4', '3:4', '3_4', 'a' for A series posters). Also
+      picks the image format, each ratio fetching its own iw_theme_* crop
     - showImage / showDate / showExcerpt / showCategory: bool toggles
     - cardSurface, cardBorder, cardHoverTransform, cardHoverImage,
       cardHoverBorder: tokens from the theme config; used to build BEM
@@ -38,12 +39,7 @@
 {# The source has to be cut to the same ratio. A 16:9 thumbnail cropped to 3:4
    keeps a sliver of the middle of the picture, so each ratio fetches its own
    format and only an unknown one falls back to 16:9. #}
-{% set imageFormat = {
-    '16/9': 'iw_theme_16_9',
-    '4/3': 'iw_theme_4_3',
-    '1/1': 'iw_theme_1_1',
-    '3/4': 'iw_theme_3_4',
-}[imageRatio|replace({' ': ''})]|default('iw_theme_16_9') %}
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio, '16_9') %}
 
 {% set articleTitle = article.title|default('') %}
 {% set articleUrl = article.routePath|default(article.url|default('#')) %}
@@ -70,8 +66,8 @@
             <a href="{{ articleUrl }}" class="iw-article-card__image">
                 {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
                     media: imgMedia,
-                    format: imageFormat,
-                    ratio: imageRatio,
+                    format: pickedRatio.format,
+                    ratio: pickedRatio.token,
                     alt: imgMedia.title|default(articleTitle),
                 }) }}
             </a>

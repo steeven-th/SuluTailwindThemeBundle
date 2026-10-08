@@ -96,9 +96,9 @@
 {% set pgBg = variantConfig.paragraphBg|default('') %}
 {% set hasParagraphBg = pgBg is not empty and pgBg|lower != 'transparent' %}
 
-{# Fix: XML stores values with underscores (16_9, 4_3…), not colons #}
-{% set formatMap = {'16_9': 'iw_theme_16_9', '4_3': 'iw_theme_4_3', '1_1': 'iw_theme_1_1', '3_4': 'iw_theme_3_4', 'original': 'iw_theme_16_9'} %}
-{% set format = formatMap[imageFilter|default('original')]|default('iw_theme_16_9') %}
+{# Image format and box ratio from the shared catalogue, see ImageRatioCatalog #}
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageFilter|default(''), '16_9') %}
+{% set format = pickedRatio.format %}
 
 {# Resolve background image — single media (overlay) or first from collection (backward compat) #}
 {% set bgMediaId = null %}
