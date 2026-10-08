@@ -337,6 +337,24 @@ The `topbar` layout flows the options on a single wrapping row. When the list ac
 }
 ```
 
+### Text size
+
+The panel sets one size and everything inside it is sized in `em` of it: labels and the clear link at 12/14, fields and the apply button at 1, the title at 16/14. The **Text size** setting (Articles > Filters and contents) writes that one size, so it scales the whole panel and keeps its proportions. The "Filters" toggle opening the drawer reads it too, and the table of contents has its own variable fed by the same setting.
+
+| Variable | Default | Role |
+|----------|---------|------|
+| `--iw-article-filters-font-size` | `0.875rem` | Base size of the panel and its toggle |
+| `--iw-article-filters-title-size` | `calc(16em / 14)` | "Filters" title, relative to the base |
+| `--iw-toc-font-size` | `0.875rem` | Base size of the table of contents |
+
+```css
+/* Larger panel, title kept at a fixed size */
+.iw-article-filters {
+    --iw-article-filters-font-size: 1rem;
+    --iw-article-filters-title-size: 1.25rem;
+}
+```
+
 ---
 
 ## Event info

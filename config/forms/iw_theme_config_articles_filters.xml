@@ -118,8 +118,11 @@
             <!-- Auto-submit the filter form on change (JS enhancement). When on,
                  the controller submits on checkbox/sort change and after a
                  short search debounce, and hides the "Apply" button. Without
-                 JS the button stays and the form works as usual. -->
-            <property name="components_filtersAutoSubmit" type="checkbox" colspan="6">
+                 JS the button stays and the form works as usual.
+                 Full width, like the layout select below: a field carrying an
+                 info text is taller than its neighbour, and a half-width one
+                 pushes the next row out of line. -->
+            <property name="components_filtersAutoSubmit" type="checkbox" colspan="12">
                 <meta>
                     <info_text>iw_sulu_tailwind_theme.components_filters_auto_submit_info</info_text>
                 </meta>
@@ -137,8 +140,11 @@
             <!-- Sidebar layout: left/right column, or a permanent offcanvas
                  drawer (behind a "Filters" button at every screen size). On
                  small screens left/right collapse to the drawer anyway. -->
-            <property name="components_sidebarStyle" type="single_select" colspan="6">
-                <meta><title>iw_sulu_tailwind_theme.components_sidebar_style</title></meta>
+            <property name="components_sidebarStyle" type="single_select" colspan="12">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_sidebar_style</title>
+                    <info_text>iw_sulu_tailwind_theme.components_sidebar_style_info</info_text>
+                </meta>
                 <params>
                     <param name="default_value" value="left"/>
                     <param name="values" type="collection">
@@ -191,6 +197,9 @@
             <!-- Table of contents: built client-side from the article's
                  h2/h3 headings, with anchors and scroll-spy. -->
             <property name="articles_tocEnabled" type="checkbox" colspan="12">
+                <meta>
+                    <info_text>iw_sulu_tailwind_theme.articles_toc_enabled_info</info_text>
+                </meta>
                 <params>
                     <param name="type" value="toggler"/>
                     <param name="default_value" value="false"/>
@@ -200,7 +209,10 @@
 
             <property name="articles_tocPosition" type="single_select" colspan="6"
                       visibleCondition="articles_tocEnabled == true">
-                <meta><title>iw_sulu_tailwind_theme.articles_toc_position</title></meta>
+                <meta>
+                    <title>iw_sulu_tailwind_theme.articles_toc_position</title>
+                    <info_text>iw_sulu_tailwind_theme.articles_toc_position_info</info_text>
+                </meta>
                 <params>
                     <param name="default_value" value="inline"/>
                     <param name="values" type="collection">
@@ -230,11 +242,17 @@
             </property>
 
             <property name="components_sidebarPadding" type="iw_theme_margin_selector" colspan="6">
-                <meta><title>iw_sulu_tailwind_theme.components_label_padding</title></meta>
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_label_padding</title>
+                    <info_text>iw_sulu_tailwind_theme.components_sidebar_padding_info</info_text>
+                </meta>
             </property>
 
             <property name="components_sidebarGap" type="iw_theme_margin_selector" colspan="6">
-                <meta><title>iw_sulu_tailwind_theme.components_label_gap</title></meta>
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_label_gap</title>
+                    <info_text>iw_sulu_tailwind_theme.components_sidebar_gap_info</info_text>
+                </meta>
             </property>
     </properties>
 </form>

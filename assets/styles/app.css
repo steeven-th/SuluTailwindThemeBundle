@@ -5290,7 +5290,10 @@ span.iw-breadcrumbs__separator {
 }
 
 /* Filters sidebar. All visual properties are routed through --iw-article-filters-*
-   custom properties so the whole component can be restyled without touching Twig. */
+   custom properties so the whole component can be restyled without touching Twig.
+   Text sizes inside the panel are in em of this one, written as "px at the 14px
+   default" (calc(12em / 14) = 12px), so the text size setting scales the whole
+   panel. A rem there would ignore it. */
 .iw-article-filters {
     font-size: var(--iw-article-filters-font-size, 0.875rem);
 }
@@ -5317,14 +5320,14 @@ span.iw-breadcrumbs__separator {
 }
 
 .iw-article-filters__title {
-    font-size: var(--iw-article-filters-title-size, 1rem);
+    font-size: var(--iw-article-filters-title-size, calc(16em / 14));
     font-weight: var(--iw-article-filters-title-weight, 600);
     color: var(--iw-article-filters-title-color, var(--color-surface-foreground));
     margin: 0;
 }
 
 .iw-article-filters__clear {
-    font-size: 0.75rem;
+    font-size: calc(12em / 14);
     color: var(--iw-article-filters-clear-color, var(--color-surface-muted));
     text-decoration: underline;
 }
@@ -5355,7 +5358,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-article-filters__label,
 .iw-article-filters__legend {
-    font-size: 0.75rem;
+    font-size: calc(12em / 14);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -5367,7 +5370,7 @@ span.iw-breadcrumbs__separator {
 .iw-article-filters__select {
     width: 100%;
     padding: var(--iw-article-filters-control-padding, 0.5rem 0.75rem);
-    font-size: 0.875rem;
+    font-size: 1em;
     color: var(--iw-article-filters-control-color, var(--color-surface-foreground));
     background-color: var(--iw-article-filters-control-bg, var(--color-background));
     border: 1px solid var(--iw-article-filters-control-border, var(--color-surface-border));
@@ -5419,7 +5422,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-article-filters__apply {
     padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
-    font-size: 0.875rem;
+    font-size: 1em;
     font-weight: 600;
     color: var(--iw-article-filters-apply-color, var(--color-surface-on-accent, #fff));
     background-color: var(--iw-article-filters-apply-bg, var(--color-surface-accent));
@@ -5439,7 +5442,7 @@ span.iw-breadcrumbs__separator {
     display: inline-flex;
     justify-content: center;
     padding: var(--iw-article-filters-apply-padding, 0.5rem 1rem);
-    font-size: 0.875rem;
+    font-size: 1em;
     font-weight: 600;
     border-radius: var(--iw-article-filters-apply-radius, var(--border-radius));
     text-decoration: none;
@@ -5469,7 +5472,7 @@ span.iw-breadcrumbs__separator {
     gap: 0.5rem;
     justify-self: start;
     padding: var(--iw-article-filters-toggle-padding, 0.5rem 1rem);
-    font-size: 0.875rem;
+    font-size: var(--iw-article-filters-font-size, 0.875rem);
     font-weight: 600;
     border-radius: var(--iw-article-filters-toggle-radius, var(--border-radius));
     cursor: pointer;
@@ -5492,7 +5495,7 @@ span.iw-breadcrumbs__separator {
     min-width: 1.25rem;
     height: 1.25rem;
     padding: 0 0.375rem;
-    font-size: 0.75rem;
+    font-size: calc(12em / 14);
     line-height: 1;
     color: var(--iw-article-filters-toggle-count-color, var(--color-surface-on-accent, #fff));
     background-color: var(--iw-article-filters-toggle-count-bg, var(--color-surface-accent));
