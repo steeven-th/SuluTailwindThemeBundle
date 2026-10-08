@@ -143,6 +143,21 @@ its overflow (a card rounding its picture, a button sliding its background)
 does not clip the ring away. On a button it follows `borderSides`. The line
 style does not apply: a gradient border is solid.
 
+## Renaming or deleting a gradient
+
+A field points at a gradient by its slug, so renaming or deleting one breaks
+the fields using it, the way it does for a palette color. Nothing fails: a
+background pointing at a missing gradient renders transparent, a word of a
+title its surrounding color. `iw:tailwind-theme:check` lists them, the theme
+settings and the title words of pages, snippets and articles alike:
+
+```bash
+php bin/console iw:tailwind-theme:check
+```
+
+A project field offering gradients is covered in
+[Extending the theme configuration](extensibility.md#a-gradient-on-a-project-field).
+
 ## How it is stored
 
 Gradients live in `tokens.gradients`, a list:

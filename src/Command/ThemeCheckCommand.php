@@ -10,6 +10,7 @@ use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonStyleAudit;
+use ItechWorld\SuluTailwindThemeBundle\Service\GradientReferenceAudit;
 use ItechWorld\SuluTailwindThemeBundle\Service\RequiredButtonStyles;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceThemeRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
@@ -58,6 +59,7 @@ class ThemeCheckCommand extends Command
         private readonly AppearanceOverrideAudit $appearanceAudit,
         private readonly ButtonFieldAudit $buttonFieldAudit,
         private readonly ButtonStyleAudit $buttonStyleAudit,
+        private readonly GradientReferenceAudit $gradientAudit,
         private readonly RequiredButtonStyles $requiredButtonStyles,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
@@ -95,6 +97,8 @@ class ThemeCheckCommand extends Command
         $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
         // Webspace key => the button styles of its theme, for the style check.
         $buttonSlugsBySite = [];
+        // Webspace key => the gradients of its theme, for the gradient check.
+        $gradientSlugsBySite = [];
         // Theme id => theme, for the themes a site shows.
         $assignedThemes = [];
         foreach ($webspaces as $webspace) {
@@ -106,6 +110,7 @@ class ThemeCheckCommand extends Command
             } else {
                 $checks[] = ['<fg=green>✓</>', 'Webspace "' . $wsKey . '"', 'Theme: ' . $wsTheme->getLabel()];
                 $buttonSlugsBySite[$wsKey] = array_column(ButtonResolver::normalizeButtons($wsTheme->getTokens()['buttons'] ?? []), 'slug');
+                $gradientSlugsBySite[$wsKey] = GradientReferenceAudit::slugs($wsTheme->getTokens());
                 $assignedThemes[$wsTheme->getId()] = $wsTheme;
             }
         }
@@ -222,6 +227,28 @@ class ThemeCheckCommand extends Command
             ];
         }
 
+        // ── Check: references to gradients that do not exist ──
+        // A background pointing at a deleted gradient renders transparent, a
+        // word of a title its inherited color: nothing to notice, so a check.
+        $gradientOrphans = [];
+        foreach ($themes as $theme) {
+            foreach ($this->gradientAudit->orphansInTheme($theme) as $orphan) {
+                $gradientOrphans[] = [$theme->getLabel(), $orphan['path'], $orphan['slug']];
+            }
+        }
+        $gradientWords = $this->gradientAudit->orphansInContent($gradientSlugsBySite);
+
+        if ([] === $gradientOrphans && [] === $gradientWords) {
+            $checks[] = ['<fg=green>✓</>', 'Gradients', 'Every reference names a gradient of its theme'];
+        } else {
+            $checks[] = [
+                '<fg=yellow>!</>',
+                'Gradients',
+                \count($gradientOrphans) . ' theme setting(s) and '
+                . \count(array_unique(array_column($gradientWords, 'id'))) . ' content(s) name a gradient their theme does not define',
+            ];
+        }
+
         // ── Check: button styles the project CSS depends on ──
         // Only the themes a site shows: a spare theme lacking them breaks
         // nothing until it is assigned, and would be flagged forever.
@@ -328,6 +355,34 @@ class ThemeCheckCommand extends Command
                     ],
                     ButtonStyleAudit::byContent($unknownStyles),
                 ),
+            );
+        }
+
+        if ([] !== $gradientOrphans) {
+            $io->section('Theme settings naming a gradient the theme does not define');
+            $io->text(
+                'Each row is a setting pointing at a gradient that was renamed or deleted. It renders transparent. '
+                . 'Pick a gradient or a color for it in the theme, or create the gradient again under its name.',
+            );
+            $io->table(['Theme', 'Setting', 'Gradient'], $gradientOrphans);
+        }
+
+        if ([] !== $gradientWords) {
+            $io->section('Title words naming a gradient their theme does not define');
+            $io->text(
+                'Each row is a content holding a word colored with a gradient its site\'s theme lacks. '
+                . 'The word shows in the color around it. Open the content and pick another color for it. '
+                . 'Site "' . ButtonStyleAudit::ANY_SITE . '" means a snippet no area assigns, which no theme defines the gradient for.',
+            );
+            $groups = [];
+            foreach ($gradientWords as $word) {
+                $key = implode("\0", [$word['kind'], $word['id'], $word['site'], $word['slug']]);
+                $groups[$key] ??= [$word['kind'], $word['title'], $word['id'], $word['site'], $word['slug'], []];
+                $groups[$key][5][$word['locale'] . ' ' . $word['stage']] = true;
+            }
+            $io->table(
+                ['Content', 'Title', 'Id', 'Site', 'Gradient', 'Found in'],
+                array_map(static fn (array $group): array => [...\array_slice($group, 0, 5), implode(', ', array_keys($group[5]))], array_values($groups)),
             );
         }
 
