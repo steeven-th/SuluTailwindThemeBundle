@@ -60,6 +60,10 @@
 
         <property name="components_tagRadius" type="iw_theme_radius_selector" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+            <params>
+                <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+                <param name="inherit_value" value="rounded-none"/>
+            </params>
         </property>
         <property name="components_tagFontSize" type="single_select" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_font_size</title></meta>
@@ -146,6 +150,10 @@
 
         <property name="components_badgeRadius" type="iw_theme_radius_selector" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+            <params>
+                <param name="inherit_fields" value="components_tagRadius,borders_cardRadius,borders_radius"/>
+                <param name="inherit_value" value="rounded-none"/>
+            </params>
         </property>
         <property name="components_badgeFontSize" type="single_select" colspan="6">
             <meta><title>iw_sulu_tailwind_theme.components_label_font_size</title></meta>

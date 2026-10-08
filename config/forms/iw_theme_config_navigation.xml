@@ -166,6 +166,10 @@
 
                 <property name="components_paginationRadius" type="iw_theme_radius_selector" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+                    <params>
+                        <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+                        <param name="inherit_value" value="rounded-none"/>
+                    </params>
                 </property>
             </properties>
         </section>
@@ -509,6 +513,9 @@
                         <title>iw_sulu_tailwind_theme.components_controls_shape</title>
                         <info_text>iw_sulu_tailwind_theme.components_controls_shape_info</info_text>
                     </meta>
+                    <params>
+                        <param name="inherit_value" value="rounded-full"/>
+                    </params>
                 </property>
 
                 <property name="components_controlsShadow" type="single_select" colspan="6">

@@ -417,6 +417,28 @@ explicit `default_value` behavior. Custom XML using this type:
 </property>
 ```
 
+A component setting of the theme forms that can stay empty follows another
+setting of the same theme instead. `inherit_fields` lists the fields to read,
+in order, from the theme being edited, and `inherit_value` covers the case
+where they are all empty. The list mirrors the stylesheet fallback, so the
+preview shows the radius the site renders:
+
+```xml
+<!-- Theme form: empty follows the card radius, as var(--border-radius) does -->
+<property name="components_sidebarRadius" type="iw_theme_radius_selector" colspan="6">
+    <meta><title>iw_sulu_tailwind_theme.components_label_radius</title></meta>
+    <params>
+        <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+        <param name="inherit_value" value="rounded-none"/>
+    </params>
+</property>
+```
+
+Without one of these params, an empty field previews "none" while storing
+nothing: picking "none" saves nothing and the fallback keeps rounding the
+component. `RadiusSelectorEmptyValueContractTest` rejects such a field in the
+theme forms.
+
 ### Twig
 
 Custom templates embedding `_block_wrapper.html.twig` must pass

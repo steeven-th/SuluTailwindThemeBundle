@@ -53,6 +53,10 @@
                     <title>iw_sulu_tailwind_theme.components_label_radius</title>
                     <info_text>iw_sulu_tailwind_theme.components_sidebar_radius_info</info_text>
                 </meta>
+                <params>
+                    <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+                    <param name="inherit_value" value="rounded-none"/>
+                </params>
             </property>
 
 <property name="components_sidebarShadow" type="single_select" colspan="6">

@@ -71,20 +71,32 @@ const radiusCssForKey = (key) => {
  * block" button) and lets it flip above the trigger / scroll internally when
  * there is no room below - same behavior as Sulu's native selects.
  *
- * Two modes, depending on schemaOptions:
+ * Three modes, depending on schemaOptions:
  * - `theme_key` (block forms): adaptive mode. A "Theme default" option is
  *   prepended, mapped to an empty stored value. The previewed radius for
  *   that option is read live from the theme borders config via the shared
  *   themeConfigStore (key: "paragraphRadius" | "cardRadius" | "imageRadius").
  *   Nothing is written while the field stays empty, so blocks follow the
  *   theme until the editor explicitly overrides.
+ * - `inherit_fields` (theme config forms): adaptive mode too, for a component
+ *   setting whose empty value falls back to another setting of the same theme.
+ *   The comma-separated fields are read in order from the form being edited,
+ *   which is not always the theme of the current webspace, and
+ *   `inherit_value` covers the case where they are all empty, and can stand
+ *   alone for a setting whose fallback is a fixed shape. The list mirrors
+ *   the stylesheet fallback: a mismatch previews one radius and renders another.
  * - `default_value` (theme borders form): the default is written into the
  *   data on mount when the field is empty (legacy behavior).
+ *
+ * Without either adaptive param, an empty field previews "none" while storing
+ * nothing, so picking "none" saves nothing and the stylesheet fallback wins.
+ * Every setting that can stay empty needs one of the two.
  *
  * @param {Object} props - Component props from Sulu form field
  * @param {string} props.value - Currently selected radius value
  * @param {Function} props.onChange - Callback when a value is selected
- * @param {Object} props.schemaOptions - XML params (theme_key / default_value)
+ * @param {Object} props.formInspector - Sulu form inspector, used to read the inherited fields
+ * @param {Object} props.schemaOptions - XML params (theme_key / inherit_fields / inherit_value / default_value)
  */
 @observer
 export default class RadiusSelector extends React.Component {
@@ -105,7 +117,7 @@ export default class RadiusSelector extends React.Component {
     componentDidMount() {
         themeConfigStore.ensureCurrentWebspace(this.props.formInspector);
 
-        if (this.getThemeKey()) {
+        if (this.isAdaptive()) {
             return;
         }
 
@@ -133,6 +145,53 @@ export default class RadiusSelector extends React.Component {
         const {schemaOptions} = this.props;
 
         return (schemaOptions && schemaOptions.theme_key && schemaOptions.theme_key.value) || null;
+    }
+
+    /**
+     * Read the inheritance chain from schemaOptions, if configured.
+     *
+     * @returns {Array<string>} Form field names, in fallback order
+     */
+    getInheritFields() {
+        const {schemaOptions} = this.props;
+        const raw = schemaOptions && schemaOptions.inherit_fields && schemaOptions.inherit_fields.value;
+
+        return raw ? String(raw).split(',').map((field) => field.trim()).filter(Boolean) : [];
+    }
+
+    /**
+     * Whether an empty value means "follow something else" rather than "none".
+     *
+     * @returns {boolean} True in theme_key or inherit_fields / inherit_value mode
+     */
+    isAdaptive() {
+        const {schemaOptions} = this.props;
+
+        return Boolean(this.getThemeKey())
+            || this.getInheritFields().length > 0
+            || Boolean(schemaOptions && schemaOptions.inherit_value);
+    }
+
+    /**
+     * Resolve the value an empty field stands for.
+     *
+     * @returns {string|null} A Tailwind radius class (e.g. "rounded-md"), or null
+     */
+    resolveDefaultValue() {
+        const themeKey = this.getThemeKey();
+        if (themeKey) {
+            return themeConfigStore.borders[themeKey] || null;
+        }
+
+        const {formInspector, schemaOptions} = this.props;
+        for (const field of this.getInheritFields()) {
+            const inherited = formInspector ? formInspector.getValueByPath('/' + field) : null;
+            if (inherited) {
+                return inherited;
+            }
+        }
+
+        return (schemaOptions && schemaOptions.inherit_value && schemaOptions.inherit_value.value) || null;
     }
 
     @action setButtonRef = (ref) => {
@@ -173,13 +232,11 @@ export default class RadiusSelector extends React.Component {
     buildOptions() {
         const options = RADIUS_OPTIONS.map((option) => ({...option, themeDefault: false}));
 
-        const themeKey = this.getThemeKey();
-        if (!themeKey) {
+        if (!this.isAdaptive()) {
             return options;
         }
 
-        const themeValue = themeConfigStore.borders[themeKey];
-        const themeRadiusKey = parseRadiusKey(themeValue);
+        const themeRadiusKey = parseRadiusKey(this.resolveDefaultValue());
         const themeLabel = translate('iw_sulu_tailwind_theme.radius_theme_default')
             + (themeRadiusKey ? ` · ${themeRadiusKey}` : '');
 
@@ -301,7 +358,7 @@ export default class RadiusSelector extends React.Component {
         const options = this.buildOptions();
         const currentRadiusKey = parseRadiusKey(value);
         const isEmpty = value === null || value === undefined || value === '';
-        const selectedKey = (isEmpty && this.getThemeKey()) ? THEME_DEFAULT_KEY : currentRadiusKey;
+        const selectedKey = (isEmpty && this.isAdaptive()) ? THEME_DEFAULT_KEY : currentRadiusKey;
         const selected = options.find((option) => option.key === selectedKey) || options[0];
 
         const buttonStyle = {

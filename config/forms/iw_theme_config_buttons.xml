@@ -227,6 +227,10 @@
                             <meta>
                                 <title>iw_sulu_tailwind_theme.buttons_radius</title>
                             </meta>
+                            <params>
+                                <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+                                <param name="inherit_value" value="rounded-md"/>
+                            </params>
                         </property>
                         <property name="borderWidth" type="single_select" colspan="3"
                                   visibleCondition="__parent.border != 'none'">

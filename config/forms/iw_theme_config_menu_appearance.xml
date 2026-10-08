@@ -104,6 +104,10 @@
                     <title>iw_sulu_tailwind_theme.menu_dropdownRadius</title>
                     <info_text>iw_sulu_tailwind_theme.menu_dropdownRadius_info</info_text>
                 </meta>
+                <params>
+                    <param name="inherit_fields" value="borders_cardRadius,borders_radius"/>
+                    <param name="inherit_value" value="rounded-none"/>
+                </params>
             </property>
 
             <property name="menuConfig_dropdownRadiusTop" type="checkbox" colspan="6">
