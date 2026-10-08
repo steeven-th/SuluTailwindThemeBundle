@@ -2299,8 +2299,11 @@ fallback chain of the templates always went one step further, to `heroImage`.
 ### What you get back
 
 The parameter is renamed along with its value, because a plural name for a single
-image is what put the wrong path there in the first place. The dead
-`article.excerpt.images` fallback is gone from the chain.
+image is what put the wrong path there in the first place. The nested fallback
+stays, singular as well: `article.excerpt.image`. The listing page and the
+upcoming and past events sources build their items with `ArticleItemResolver`,
+which keeps the excerpt under `excerpt` and declares no alias, so a chain going
+from `excerptImage` straight to `heroImage` serves the banner on all of them.
 
 ### Overriding templates (breaking)
 
@@ -2310,7 +2313,7 @@ A template of yours reading `article.excerptImages` now reads `null`. Rename it:
 {# before #}
 {% set articleImage = article.excerptImages|default(article.excerpt.images|default(article.heroImage|default(null))) %}
 {# after #}
-{% set articleImage = article.excerptImage|default(article.heroImage|default(null)) %}
+{% set articleImage = article.excerptImage|default(article.excerpt.image|default(article.heroImage|default(null))) %}
 ```
 
 The value is a resolved `Sulu\Bundle\MediaBundle\Api\Media`, not an id and not a

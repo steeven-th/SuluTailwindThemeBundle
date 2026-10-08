@@ -88,6 +88,38 @@ final class ExcerptPropertyPathContractTest extends TestCase
     }
 
     /**
+     * Every chain that reads the excerpt image also reads it nested.
+     *
+     * The listing page and the event sources hand the cards items built by
+     * `ArticleItemResolver`, where the excerpt sits under `excerpt` and no alias
+     * exists. A chain going from `excerptImage` straight to `heroImage` serves the
+     * banner on all of them, which is what happened once the 2.x fallback was
+     * dropped along with its plural name.
+     */
+    #[Test]
+    public function everyExcerptImageChainReadsTheNestedExcerpt(): void
+    {
+        foreach (self::templateFiles(self::root() . '/templates') as $path) {
+            $source = (string) \file_get_contents($path);
+            \preg_match_all('/(\w+)\.excerptImage\|default\(([^\n]*)/', $source, $matches, \PREG_SET_ORDER);
+
+            foreach ($matches as [$chain, $item, $rest]) {
+                self::assertStringStartsWith(
+                    $item . '.excerpt.image|default(',
+                    $rest,
+                    \sprintf(
+                        '%s falls back from "%s.excerptImage" without trying "%s.excerpt.image". '
+                        . 'Items from ArticleItemResolver only carry the nested one, so they get the hero image.',
+                        self::relative($path),
+                        $item,
+                        $item,
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
      * A card prefers the excerpt image over the hero image, everywhere.
      *
      * The order is the whole point of the excerpt image: an editor sets one

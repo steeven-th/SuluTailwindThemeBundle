@@ -30,7 +30,7 @@
             {% endif %}
             {% set articleExcerpt = mainArticle.excerptDescription|default(mainArticle.excerpt.description|default('')) %}
             {% set articleDate = mainArticle.authored|default(null) %}
-            {% set articleImage = mainArticle.excerptImage|default(mainArticle.heroImage|default(null)) %}
+            {% set articleImage = mainArticle.excerptImage|default(mainArticle.excerpt.image|default(mainArticle.heroImage|default(null))) %}
             {% set articleCategories = mainArticle.excerptCategories|default(mainArticle.excerpt.categories|default([])) %}
 
             <a href="{{ articleUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--main iw-featured-article-card--lg {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
@@ -91,7 +91,7 @@
                         {% endif %}
                         {% set secExcerpt = article.excerptDescription|default(article.excerpt.description|default('')) %}
                         {% set secDate = article.authored|default(null) %}
-                        {% set secImage = article.excerptImage|default(article.heroImage|default(null)) %}
+                        {% set secImage = article.excerptImage|default(article.excerpt.image|default(article.heroImage|default(null))) %}
                         {% set secCategories = article.excerptCategories|default(article.excerpt.categories|default([])) %}
 
                         <a href="{{ secUrl }}" class="iw-featured-article-card iw-surface--card iw-featured-article-card--horizontal {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
