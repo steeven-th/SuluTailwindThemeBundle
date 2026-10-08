@@ -1578,6 +1578,7 @@
     "iw_sulu_tailwind_theme.components_label_current": "Current item",
     "iw_sulu_tailwind_theme.components_section_cards": "Cards",
     "iw_sulu_tailwind_theme.card_title_color": "Title color (empty = auto)",
+    "iw_sulu_tailwind_theme.card_title_hover_color": "Title color on hover (empty = primary)",
     "iw_sulu_tailwind_theme.card_text_color": "Text color (empty = auto)",
     "iw_sulu_tailwind_theme.card_badge_bg": "Badge background (empty = auto)",
     "iw_sulu_tailwind_theme.card_badge_text": "Badge text (empty = auto)",

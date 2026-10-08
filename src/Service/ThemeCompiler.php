@@ -862,6 +862,7 @@ class ThemeCompiler
         // Content colors (empty = page-level defaults, which already adapt to the theme).
         $titleColor = $this->surfaceValue($tokens['cardTitleColor'] ?? '', 'var(--color-text)');
         $textColor = $this->surfaceValue($tokens['cardTextColor'] ?? '', 'var(--color-secondary-600)');
+        $titleHoverColor = $this->surfaceValue($tokens['cardTitleHoverColor'] ?? '', 'var(--color-primary)');
         // The badge of a card is the same badge the rest of the site wears, so
         // an unset card badge follows the site-wide one (itself following the
         // tags) instead of jumping back to a primary tint.
@@ -957,6 +958,7 @@ class ThemeCompiler
         $css .= "  --iw-cards-hover-duration: {$hoverDuration};\n";
         $css .= "  --iw-cards-hover-easing: {$hoverEasing};\n";
         $css .= "  --iw-article-card-title-color: {$titleColor};\n";
+        $css .= "  --iw-article-card-title-hover-color: {$titleHoverColor};\n";
         $css .= "  --iw-article-card-text-color: {$textColor};\n";
         $css .= "  --iw-article-card-badge-bg: {$badgeBg};\n";
         // The badge follows the site-wide one when left empty, image included.

@@ -1572,6 +1572,7 @@
     "iw_sulu_tailwind_theme.components_label_current": "Aktuelles Element",
     "iw_sulu_tailwind_theme.components_section_cards": "Karten",
     "iw_sulu_tailwind_theme.card_title_color": "Titelfarbe (leer = automatisch)",
+    "iw_sulu_tailwind_theme.card_title_hover_color": "Titelfarbe beim Hover (leer = Primärfarbe)",
     "iw_sulu_tailwind_theme.card_text_color": "Textfarbe (leer = automatisch)",
     "iw_sulu_tailwind_theme.card_badge_bg": "Badge-Hintergrund (leer = automatisch)",
     "iw_sulu_tailwind_theme.card_badge_text": "Badge-Text (leer = automatisch)",

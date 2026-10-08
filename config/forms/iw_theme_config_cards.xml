@@ -234,15 +234,22 @@
                     </params>
                 </property>
 
-                <property name="cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
-                          visibleCondition="cardBorder != 'none'">
-                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
-                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
+                <property name="cardTitleHoverColor" type="iw_theme_color_token_editor" colspan="6">
+                    <meta><title>iw_sulu_tailwind_theme.card_title_hover_color</title></meta>
+                    <params><param name="show_palette" value="true"/></params>
                 </property>
 
                 <property name="cardShadowHoverColor" type="iw_theme_color_token_editor" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.variant_card_shadow_hover_color</title></meta>
                     <params><param name="show_palette" value="true"/></params>
+                </property>
+
+                <!-- Last of the pairs: it only shows with a border, so a half
+                     width before them would shift every pair below. -->
+                <property name="cardHoverBorder" type="iw_theme_color_token_editor" colspan="6"
+                          visibleCondition="cardBorder != 'none'">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_border</title></meta>
+                    <params><param name="show_palette" value="true"/><param name="allow_gradient" value="true"/></params>
                 </property>
 
                 <property name="cardShadow" type="iw_theme_shadow_editor" colspan="12">

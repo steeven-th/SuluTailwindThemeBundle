@@ -1670,6 +1670,7 @@
     "iw_sulu_tailwind_theme.components_label_current": "Élément courant",
     "iw_sulu_tailwind_theme.components_section_cards": "Cartes",
     "iw_sulu_tailwind_theme.card_title_color": "Couleur du titre (vide = auto)",
+    "iw_sulu_tailwind_theme.card_title_hover_color": "Couleur du titre au survol (vide = primaire)",
     "iw_sulu_tailwind_theme.card_text_color": "Couleur du texte (vide = auto)",
     "iw_sulu_tailwind_theme.card_badge_bg": "Fond du badge (vide = auto)",
     "iw_sulu_tailwind_theme.card_badge_text": "Texte du badge (vide = auto)",

@@ -18,6 +18,7 @@ All values are exposed as `--iw-article-*` custom properties so a user-land proj
 | `--iw-article-card-padding` | Inner padding shorthand |
 | `--iw-article-card-border` | Border shorthand (`width style color`) ready to drop into `border:` |
 | `--iw-article-card-hover-border-color` | Border color applied on hover when `cardHoverBorder` is configured |
+| `--iw-article-card-title-hover-color` | Title link color on hover (`cardTitleHoverColor`, defaults to `--color-primary`) |
 | `--iw-article-card-hover-duration` | Shared hover transition duration |
 | `--iw-article-card-hover-easing` | Shared hover transition timing function |
 

@@ -207,7 +207,7 @@ class ThemeFormMapper
         'cardShadow', 'cardShadowColor', 'cardShadowHoverColor',
         'cardHoverTransform', 'cardHoverImage', 'cardHoverBorder',
         'cardHoverDuration', 'cardHoverEasing',
-        'cardTitleColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
+        'cardTitleColor', 'cardTitleHoverColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         'cardTitleSize', 'cardTextSize',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
