@@ -2484,3 +2484,33 @@ the zone holding it.
 
 The site name next to the footer logo sits inside the brand link, and keeps taking
 the link color, as it did under the variant.
+
+## Side panels draw no border by default (visual)
+
+The filter sidebar and the table of contents always drew a 1px border, even with
+no border color set anywhere. The surface border color resolves to an auto tint
+when it is empty, so "nothing set" still meant a grey frame, while the cards
+beside them had none.
+
+Both panels now follow the cards: no border color, no border. Setting **Border**
+on the sidebar (Articles > Filters and contents), or **Border color** in the theme
+surfaces, brings it back. The panels keep their auto background, which is what
+sets them apart from the page.
+
+Fields, tags, share buttons and the "Filters" toggle are untouched. They keep a
+border whatever happens, since they would vanish without one.
+
+### Overriding CSS (breaking)
+
+A stylesheet setting `--iw-article-filters-border` to a color now gets no border
+either, as the width defaults to `0`. Set the width beside it:
+
+```css
+.iw-article-filters__form {
+    --iw-article-filters-border: #d4d4d8;
+    --iw-article-filters-border-width: 1px;
+}
+```
+
+The table of contents reads `--iw-toc-border-width` the same way. A full
+`--iw-toc-border` shorthand keeps working as before.

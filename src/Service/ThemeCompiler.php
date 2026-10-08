@@ -1595,6 +1595,12 @@ class ThemeCompiler
         $css .= "  --color-surface-foreground: {$foreground};\n";
         $css .= "  --color-surface-muted: {$muted};\n";
         $css .= "  --color-surface-border: {$border};\n";
+        // The border color always has a value, the auto one included, so it
+        // cannot tell a panel whether to draw a border. This width can: it
+        // only exists once a color is set, and panels default to none.
+        if ('' !== trim((string) ($tokens['components_surfaceBorder'] ?? ''))) {
+            $css .= "  --iw-surface-border-width: 1px;\n";
+        }
         $css .= "  --color-surface-accent: {$accent};\n";
         $css .= "  --color-surface-on-accent: {$onAccent};\n";
 
@@ -1965,6 +1971,11 @@ class ThemeCompiler
             }
             if ('.iw-pagination' === $selector && str_contains($declarations, '--iw-pagination-item-border:')) {
                 $declarations .= "  --iw-pagination-item-border-width: 1px;\n";
+            }
+            // A border color set on a component draws its panel border, see
+            // generateSurfaceVariables().
+            if (str_contains($declarations, '--color-surface-border:')) {
+                $declarations .= "  --iw-surface-border-width: 1px;\n";
             }
 
             if ('' !== $declarations) {

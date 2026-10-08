@@ -186,6 +186,7 @@ Collapsible panel filled by the `toc` Stimulus controller from the article headi
 | `--iw-toc-max-width` | Panel width in inline mode (default `28rem`) |
 | `--iw-toc-bg` / `--iw-toc-color` / `--iw-toc-border` | Panel skin (defaults derive from the surface tokens; the **Articles > Filter sidebar & table of contents** colors apply to both side panels) |
 | `--iw-toc-link-color` / `-hover` / `-active` | Link colors (active defaults to the surface accent) |
+| `--iw-toc-border-width` | Panel border width. Defaults to `--iw-surface-border-width`, which the compiler writes only once a border color is set, so no color means no border |
 | `--iw-toc-indent` | Sub-heading indentation (default `1rem`) |
 | `--iw-toc-sticky-top` / `-right` / `-width` / `-z` | Pinned panel geometry (sticky mode, xl and up) |
 | `--iw-toc-toggle-top` / `-size` / `-bg` / `-color` / `-border` / `-radius` / `-shadow` | Floating edge button (sticky mode below xl) — colors default to the panel skin |
@@ -334,6 +335,23 @@ The `topbar` layout flows the options on a single wrapping row. When the list ac
 .iw-article-filters__option--depth-1 {
     --iw-article-filters-indent: 1.5rem;
     border-inline-start: 1px solid var(--color-surface-border);
+}
+```
+
+### Border
+
+The panel draws a border only once a border color is set, in the theme surfaces or on the sidebar itself. The surface border color always resolves, an auto tint included, so the compiler signals a set color with `--iw-surface-border-width: 1px` instead, and the panel defaults to `0`. Fields inside the panel keep their own border whatever happens, they would vanish without it.
+
+| Variable | Default | Role |
+|----------|---------|------|
+| `--iw-article-filters-border` | `var(--color-surface-border)` | Border color |
+| `--iw-article-filters-border-width` | `var(--iw-surface-border-width, 0)` | Border width, set it beside a color given in CSS |
+
+```css
+/* A border from CSS alone, without any admin setting */
+.iw-article-filters__form {
+    --iw-article-filters-border: #d4d4d8;
+    --iw-article-filters-border-width: 1px;
 }
 ```
 

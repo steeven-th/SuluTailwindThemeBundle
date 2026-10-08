@@ -5307,7 +5307,11 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-article-filters-padding, 1.25rem);
     background-color: var(--iw-article-filters-bg, var(--color-surface));
     background-image: var(--iw-article-filters-bg-image, var(--color-surface-image, none));
-    border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
+    /* No border color set, no border: the surface border always has an auto
+       value, so the compiler writes --iw-surface-border-width only when a
+       color is actually set, globally or on the sidebar. Setting
+       --iw-article-filters-border by hand needs a width beside it. */
+    border: var(--iw-article-filters-border-width, var(--iw-surface-border-width, 0)) solid var(--iw-article-filters-border, var(--color-surface-border));
     border-radius: var(--iw-article-filters-radius, var(--border-radius));
     box-shadow: var(--iw-article-filters-shadow, none);
 }
@@ -5665,7 +5669,8 @@ span.iw-breadcrumbs__separator {
     color: var(--iw-toc-color, var(--color-surface-foreground));
     background-color: var(--iw-toc-bg, var(--color-surface));
     background-image: var(--iw-toc-bg-image, var(--color-surface-image, none));
-    border: var(--iw-toc-border, 1px solid var(--color-surface-border));
+    /* Same rule as the filters panel: a border only once a color is set. */
+    border: var(--iw-toc-border, var(--iw-toc-border-width, var(--iw-surface-border-width, 0)) solid var(--color-surface-border));
     border-radius: var(--iw-toc-radius, var(--border-radius));
     box-shadow: var(--iw-toc-shadow, none);
 }

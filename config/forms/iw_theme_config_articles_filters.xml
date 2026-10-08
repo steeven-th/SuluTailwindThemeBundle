@@ -40,7 +40,10 @@
                 <params><param name="show_palette" value="true"/></params>
             </property>
             <property name="components_sidebarBorder" type="iw_theme_color_token_editor" colspan="6">
-                <meta><title>iw_sulu_tailwind_theme.components_label_border</title></meta>
+                <meta>
+                    <title>iw_sulu_tailwind_theme.components_label_border</title>
+                    <info_text>iw_sulu_tailwind_theme.components_sidebar_border_info</info_text>
+                </meta>
                 <params><param name="show_palette" value="true"/></params>
             </property>
             <property name="components_sidebarAccent" type="iw_theme_color_token_editor" colspan="6">
