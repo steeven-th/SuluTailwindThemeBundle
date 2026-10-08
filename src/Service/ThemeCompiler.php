@@ -1022,7 +1022,10 @@ class ThemeCompiler
         // from a modifier class picked per theme, which is why an article card
         // and a cards block on the same page could cast different shadows from
         // one setting.
-        $css .= "  box-shadow: var(--iw-card-shadow, none);\n";
+        // The full chain every other card family reads: a listing page has no
+        // variant, so the site-wide --iw-cards-shadow is the one that counts.
+        // With the per-card variable alone, no shadow setting reached it.
+        $css .= "  box-shadow: var(--iw-card-shadow, var(--iw-variant-card-shadow, var(--iw-cards-shadow, none)));\n";
         $css .= "  transition: background-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
         $css .= "    border-color var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
         $css .= "    box-shadow var(--iw-article-card-hover-duration, 300ms) var(--iw-article-card-hover-easing, ease-out),\n";
@@ -1126,7 +1129,7 @@ class ThemeCompiler
         // setting, so article cards answered to one control and the rest of the
         // bundle to another - two shadows on one page from one intent.
         $css .= "/* Article card — hover shadow */\n";
-        $css .= ".iw-article-card:hover { box-shadow: var(--iw-card-shadow-hover, none); }\n\n";
+        $css .= ".iw-article-card:hover { box-shadow: var(--iw-card-shadow-hover, var(--iw-variant-card-shadow-hover, var(--iw-cards-shadow-hover, none))); }\n\n";
 
         // Hover border color modifier (only meaningful when border is configured)
         $css .= "/* Article card — hover border color modifier */\n";

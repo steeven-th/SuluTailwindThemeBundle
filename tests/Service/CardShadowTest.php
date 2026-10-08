@@ -195,6 +195,21 @@ final class CardShadowTest extends TestCase
     }
 
     /**
+     * The article card of a listing page reads the site-wide shadow.
+     *
+     * It read its per-card variable alone, which nothing sets, so neither the
+     * shadow at rest nor the hover one ever reached a listing.
+     */
+    #[Test]
+    public function theArticleCardReadsTheSiteWideShadow(): void
+    {
+        $css = $this->compileCss(['cardShadowColor' => '#1e293b']);
+
+        self::assertStringContainsString('var(--iw-cards-shadow, none)', $this->ruleFor($css, '.iw-article-card'));
+        self::assertStringContainsString('var(--iw-cards-shadow-hover, none)', $this->ruleFor($css, '.iw-article-card:hover'));
+    }
+
+    /**
      * A variant colours the shadow of the cards in its own block.
      *
      * The variable cannot be inherited from `:root` with the variant behind it:
