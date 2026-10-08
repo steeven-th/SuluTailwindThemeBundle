@@ -118,6 +118,16 @@ the clip is undone and the text shows in that color, or it would vanish.
   Paragraphs, links and form fields are left out: running text needs a solid
   color to stay readable.
 
+## In the admin
+
+Everything that previews a color previews a gradient: the swatch of a color
+field (the picker icon is painted with it), the variant editor (backgrounds,
+the title and highlight clipped to the text, the card border as a ring, the
+variant's button), the variant picker of the blocks, the button style picker
+(background, hover, label, border) and the live preview of the buttons form,
+which renders the compiled stylesheet. Inside the theme form a gradient is
+previewed as it is being edited, before it is saved.
+
 ## Borders
 
 A border cannot take an image through `border-color`, and the two usual

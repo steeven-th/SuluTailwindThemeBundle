@@ -385,3 +385,78 @@ export function paletteColorResolver(palette) {
         return typeof resolved === 'string' && resolved.startsWith('ref:') ? '#000000' : resolved;
     };
 }
+
+/**
+ * Split the gradient references of an object for an inline preview.
+ *
+ * Every `gradient:<slug>` value is replaced by the gradient's fallback, which
+ * any color property accepts, and its image is returned apart, keyed the
+ * same, for the preview to paint where it can (a background, a ring, a text
+ * clip). A gradient the theme no longer has becomes transparent.
+ *
+ * @param {Object} object The object holding stored values (a button, a variant)
+ * @param {Array<Object>} gradients The available gradients, from availableGradients()
+ * @returns {{values: Object, images: Object}} The values with fallbacks, and the images by key
+ */
+export function splitGradientRefs(object, gradients) {
+    const values = {...object};
+    const images = {};
+    Object.keys(values).forEach((key) => {
+        const slug = gradientSlug(values[key]);
+        if (!slug) {
+            return;
+        }
+        const gradient = (gradients || []).find((candidate) => candidate.slug === slug);
+        values[key] = gradient ? gradient.fallback : 'transparent';
+        if (gradient) {
+            images[key] = gradient.image;
+        }
+    });
+
+    return {values, images};
+}
+
+/**
+ * Inline style of a span drawing a gradient border as a ring over its parent.
+ *
+ * The parent must be positioned and keep its border transparent. Same mask as
+ * the compiled ring (see ThemeCompiler::gradientRingRule()).
+ *
+ * @param {string} image The gradient
+ * @param {string} widths The border widths, as a padding value
+ * @returns {Object} The style
+ */
+export function gradientRingStyle(image, widths) {
+    // A bare 0 would make `calc(-1 * 0)` a number, which inset refuses.
+    const inset = widths.split(/\s+/)
+        .map((width) => `calc(-1 * ${'0' === width ? '0px' : width})`)
+        .join(' ');
+
+    return {
+        position: 'absolute',
+        inset,
+        padding: widths,
+        borderRadius: 'inherit',
+        background: image,
+        WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+        WebkitMaskComposite: 'xor',
+        mask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
+        maskComposite: 'exclude',
+        pointerEvents: 'none',
+    };
+}
+
+/**
+ * Inline style clipping a gradient to the text of an element.
+ *
+ * @param {string} image The gradient
+ * @returns {Object} The style
+ */
+export function gradientTextStyle(image) {
+    return {
+        backgroundImage: image,
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+    };
+}

@@ -184,6 +184,8 @@ What it does not show: the CSS of the project. A rule of your own stylesheet on 
 
 The button style picker shows each style on the checkerboard of the Sulu media library, so a white or transparent button stays visible. The card under the pointer, or the one holding the keyboard focus, shows its button hovered, with the duration and easing of the style.
 
+A style using [gradients](gradients.md) shows them too: the background and the hover background, the label clipped to its gradient, and a gradient border drawn as the same ring as on the site. The buttons form preview needs nothing for that, it renders the compiled stylesheet.
+
 The hover colours, shadow, transform and opacity are the ones the site draws. Animated effects show their end state, since an inline style cannot carry a `@keyframes` rule:
 
 | Setting | Preview |

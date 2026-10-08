@@ -4,6 +4,7 @@ import {observer} from 'mobx-react';
 import themeConfigStore from '../../stores/themeConfigStore';
 import loadFormPalette from '../../utils/formPalette';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
+import {availableGradients, paletteColorResolver, splitGradientRefs} from '../../utils/gradient';
 import {valueFor, withValue} from '../../utils/scopedValue';
 import AppearanceSiteNotice from '../AppearanceSiteNotice/AppearanceSiteNotice';
 import {getSuluPrimaryColor, getSuluPrimaryAlpha} from '../../utils/suluColors';
@@ -124,12 +125,35 @@ export default class VariantPicker extends React.Component {
                     const flat = {...variant, ...(variant.colors || {})};
                     delete flat.colors;
 
-                    return this.state.palette ? resolveAllRefs(flat, this.state.palette) : flat;
+                    return this.withGradients(this.state.palette ? resolveAllRefs(flat, this.state.palette) : flat);
                 });
             }
         }
 
-        return Array.from(themeConfigStore.variants || []);
+        return Array.from(themeConfigStore.variants || []).map((variant) => this.withGradients(variant));
+    }
+
+    /**
+     * Paint the gradient colors of a variant in the wireframe.
+     *
+     * Every bar and swatch is painted with the `background` shorthand, so a
+     * gradient goes in whole, its fallback as the last layer.
+     *
+     * @param {Object} variant The variant, refs resolved
+     * @returns {Object} The variant, gradient refs turned into paints
+     */
+    withGradients(variant) {
+        const gradients = availableGradients(
+            this.props.formInspector,
+            paletteColorResolver(this.state.palette),
+            themeConfigStore.gradients,
+        );
+        const {values, images} = splitGradientRefs(variant, gradients);
+        Object.keys(images).forEach((key) => {
+            values[key] = `${images[key]}, ${values[key]}`;
+        });
+
+        return values;
     }
 
     /**
@@ -183,14 +207,14 @@ export default class VariantPicker extends React.Component {
         };
 
         const previewStyle = {
-            backgroundColor: blockBg,
+            background: blockBg,
             padding: '16px',
             minHeight: '120px',
         };
 
         // Wireframe bars representing text elements
         const barStyle = (color, height, width, marginBottom = '6px') => ({
-            backgroundColor: color,
+            background: color,
             height: height,
             width: width,
             borderRadius: '2px',
@@ -220,7 +244,7 @@ export default class VariantPicker extends React.Component {
             width: '14px',
             height: '14px',
             borderRadius: '50%',
-            backgroundColor: color,
+            background: color,
             border: '1px solid #ddd',
         });
 
