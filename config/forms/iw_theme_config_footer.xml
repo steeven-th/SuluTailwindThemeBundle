@@ -57,6 +57,7 @@
                     </meta>
                     <params>
                         <param name="show_palette" value="true"/>
+                        <param name="allow_gradient" value="true"/>
                     </params>
                 </property>
 

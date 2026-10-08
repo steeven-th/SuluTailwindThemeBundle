@@ -65,6 +65,19 @@ Drives a richer background animation on hover. Slide and gradient effects rely o
 
 > When any bg-effect is active, the standalone `:hover { background-color: hoverBg }` declaration is suppressed: the overlay (`slide-*` / `gradient-shift`) or the animation (`pulse-bg`) is solely responsible for the bg color change at hover. Without that, the bg under the overlay would tint to `hoverBg` mid-slide, merging with the overlay color and visually breaking the effect.
 > When both `pulse-bg` and an animated shadow (`glow-pulse-*`) are active on the same variant, the compiler emits a composite `animation` rule with both keyframes running simultaneously.
+
+#### With a gradient background
+
+A `background-image` cannot be transitioned or animated, so a button whose background or hover background is a [gradient](gradients.md) would change at once on hover while a plain one fades. The compiler handles it, with no setting to turn on:
+
+| Configured effect | With a gradient on `bg` or `hoverBg` |
+|-------------------|--------------------------------------|
+| `none` | **Fade**: the hover background (color or gradient) is painted on the `::before` layer, whose opacity goes from 0 to 1 over `hoverDuration` / `hoverEasing`. The button keeps its resting background, the label stays above the layer. |
+| `slide-*` | Unchanged: the sliding layer paints the hover gradient (`--iw-button-{variant}-hover-bg-image`). |
+| `gradient-shift` | Unchanged: its own gradient starts from the hover background's fallback color. |
+| `pulse-bg` | Moved onto the layer: the layer pulses its opacity (`@keyframes iw-button-layer-pulse`) instead of swapping two background colors under an image that would hide them. |
+
+The layer, like the slides, forces `position: relative; overflow: hidden; isolation: isolate;` on the button. Nothing changes for a button without a gradient, and a gradient button with no hover background has nothing to fade. `prefers-reduced-motion` gets the same treatment as every other button transition.
 > The `slide-*` overlay always uses `ease-out` regardless of the configured easing — a `bounce` easing would make the overlay overshoot the button boundaries (the curve goes outside `[0, 1]`), breaking the illusion of a clean fill. The configured easing still applies to the button's own transform/box-shadow/etc. transitions.
 
 ### `hoverOpacity`
@@ -170,6 +183,8 @@ What it does not show: the CSS of the project. A rule of your own stylesheet on 
 ### In the button style picker
 
 The button style picker shows each style on the checkerboard of the Sulu media library, so a white or transparent button stays visible. The card under the pointer, or the one holding the keyboard focus, shows its button hovered, with the duration and easing of the style.
+
+A style using [gradients](gradients.md) shows them too: the background and the hover background, the label clipped to its gradient, and a gradient border drawn as the same ring as on the site. The buttons form preview needs nothing for that, it renders the compiled stylesheet.
 
 The hover colours, shadow, transform and opacity are the ones the site draws. Animated effects show their end state, since an inline style cannot carry a `@keyframes` rule:
 

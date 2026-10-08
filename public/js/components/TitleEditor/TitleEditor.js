@@ -50,6 +50,21 @@ function ensureStyles() {
         /* Sulu's Popover only positions its child; the background is ours to
            paint, otherwise the form shows through the swatches. Matches the
            color field's own popover so both read as the same control. */
+        .iw-title-editor__gradients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .iw-title-editor__gradient {
+            width: 56px;
+            height: 24px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            padding: 0;
+        }
         .iw-title-editor__palette {
             background: #fff;
             border: 1px solid #c0c0c0;
@@ -407,6 +422,17 @@ class TitleEditor extends React.Component<*> {
         this.applyMarker(null === shade || undefined === shade ? colorKey : colorKey + '-' + String(shade));
     };
 
+    /**
+     * Color the selection with one of the theme's gradients.
+     *
+     * Stored by name like a palette color, `[[gradient-<slug>:word]]`, which
+     * the renderer turns into `.iw-text--gradient-<slug>`.
+     */
+    handleGradientSelect = (slug: string) => {
+        this.setState({colorOpen: false});
+        this.applyMarker('gradient-' + slug);
+    };
+
     handleColorRemove = () => {
         this.setState({colorOpen: false});
         this.removeMarker();
@@ -512,6 +538,21 @@ class TitleEditor extends React.Component<*> {
                                     isSelected={this.isSwatchSelected}
                                     onSelect={this.handleColorSelect}
                                 />
+                                {themeConfigStore.gradients.length > 0 &&
+                                    <div className="iw-title-editor__gradients">
+                                        {themeConfigStore.gradients.map((gradient) => (
+                                            <button
+                                                aria-label={gradient.label}
+                                                className="iw-title-editor__gradient"
+                                                key={gradient.slug}
+                                                onClick={() => this.handleGradientSelect(gradient.slug)}
+                                                style={{backgroundImage: gradient.image}}
+                                                title={gradient.label}
+                                                type="button"
+                                            />
+                                        ))}
+                                    </div>
+                                }
                                 {'inside' === state && marker && marker.color &&
                                     <div className="iw-title-editor__palette-footer">
                                         <Button onClick={this.handleColorRemove} size="small" skin="link">

@@ -8,6 +8,8 @@ use ItechWorld\SuluTailwindThemeBundle\Color\ColorRoles;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\CardShadow;
 use ItechWorld\SuluTailwindThemeBundle\Color\FooterVariantColors;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientRenderer;
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
 use ItechWorld\SuluTailwindThemeBundle\Color\VariantZones;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorShades;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
@@ -41,6 +43,18 @@ class ThemeCompiler
      * @var array<string, array<int, string>>
      */
     private array $resolvedPalettes = [];
+
+    /**
+     * Gradients of the theme being compiled, null outside compile().
+     */
+    private ?GradientSet $gradientSet = null;
+
+    /**
+     * Gradient fallbacks already computed, cached per compile() call.
+     *
+     * @var array<string, string>
+     */
+    private array $gradientFallbacks = [];
 
     /**
      * Global button padding (paddingX/paddingY) for the current compile() call.
@@ -286,6 +300,8 @@ class ThemeCompiler
         // Initialize class-level state for ref: resolution
         $this->colorSet = ColorSet::fromTokens($tokens);
         $this->resolvedPalettes = [];
+        $this->gradientSet = GradientSet::fromTokens($tokens);
+        $this->gradientFallbacks = [];
         // Buttons are a slug-keyed list; the shared padding is separate.
         $buttonList = ButtonResolver::normalizeButtons($tokens['buttons'] ?? []);
         $this->buttonsGlobal = $tokens['buttonsGlobal'] ?? ButtonResolver::extractLegacyGlobal($tokens['buttons'] ?? []);
@@ -305,6 +321,7 @@ class ThemeCompiler
         $css .= ":root {\n";
         $css .= $this->generateColorVariables();
         $css .= $this->generatePaletteVariables();
+        $css .= $this->generateGradientVariables();
         $css .= $this->generateSurfaceVariables($tokens);
         $css .= $this->generateControlVariables($tokens);
         $css .= $this->generateTypographyVariables($typography);
@@ -359,6 +376,7 @@ class ThemeCompiler
 
         // Article card classes (base + BEM modifiers for hover effects)
         $css .= $this->generateArticleCardClasses();
+        $css .= $this->generateArticleCardGradients($tokens);
 
         // Block variant classes
         $css .= $this->generateBlockVariantClasses(
@@ -371,6 +389,11 @@ class ThemeCompiler
         // color the editor picked explicitly must win over `.iw-highlight`,
         // and both sit at the same specificity.
         $css .= $this->generateTextColorClasses();
+
+        // Gradient words of the title editor (`[[gradient-<slug>:word]]`),
+        // after the colors so a palette slug that happens to read the same
+        // never wins over the gradient the editor picked.
+        $css .= $this->generateTextGradientClasses();
 
         // Utility classes for the colours Tailwind never saw. After the
         // variant classes for the same reason as the text colours: a class
@@ -386,6 +409,9 @@ class ThemeCompiler
         // exception: buildFilename() reads it after generateCss() has returned.
         $this->colorSet = null;
         $this->resolvedPalettes = [];
+        $this->gradientSet = null;
+        $this->gradientFallbacks = [];
+        $this->buttonHoverImages = [];
         $this->buttonsGlobal = [];
 
         return $css;
@@ -564,6 +590,10 @@ class ThemeCompiler
         [$button, $icon] = self::BACK_TO_TOP_SIZES[$size] ?? self::BACK_TO_TOP_SIZES['md'];
 
         $bg = $this->surfaceValue($tokens['components_backToTopBg'] ?? '', 'var(--color-surface-accent)');
+        $bgImage = $this->paintImage($tokens['components_backToTopBg'] ?? '');
+        if (null !== $bgImage) {
+            $bg = $this->resolvePaint(trim((string) $tokens['components_backToTopBg']))['color'];
+        }
         $color = $this->surfaceValue($tokens['components_backToTopIconColor'] ?? '', 'var(--color-surface-on-accent, #fff)');
 
         // The hover state has to follow the background it hovers. Its default
@@ -579,8 +609,18 @@ class ThemeCompiler
         $css .= "  --iw-back-to-top-size: {$button};\n";
         $css .= "  --iw-back-to-top-icon-size: {$icon};\n";
         $css .= "  --iw-back-to-top-bg: {$bg};\n";
+        if (null !== $bgImage) {
+            $css .= "  --iw-back-to-top-bg-image: {$bgImage};\n";
+        }
         $css .= "  --iw-back-to-top-color: {$color};\n";
+        $hoverImage = $this->paintImage($tokens['components_backToTopHoverBg'] ?? '');
+        if (null !== $hoverImage) {
+            $hoverBg = $this->resolvePaint(trim((string) $tokens['components_backToTopHoverBg']))['color'];
+        }
         $css .= "  --iw-back-to-top-hover-bg: {$hoverBg};\n";
+        if (null !== $hoverImage) {
+            $css .= "  --iw-back-to-top-hover-bg-image: {$hoverImage};\n";
+        }
 
         $shadow = trim((string) ($tokens['components_backToTopShadow'] ?? ''));
         if (isset(self::SHADOWS[$shadow])) {
@@ -637,8 +677,10 @@ class ThemeCompiler
 
         $onMediaBg = (string) ($tokens['components_controlsOnMediaBg'] ?? '');
         if ('' !== $onMediaBg) {
-            $resolved = $this->resolveColorValue($onMediaBg);
-            $css .= "  --iw-gallery-nav-bg: {$resolved};\n";
+            // The arrows paint with the `background` shorthand: a gradient
+            // goes in whole, and the hover mixes from its color.
+            $resolved = $this->resolvePaint(trim($onMediaBg))['color'];
+            $css .= '  --iw-gallery-nav-bg: ' . $this->paintShorthand($onMediaBg) . ";\n";
 
             // The hover state has to follow the background it hovers, or a veil
             // set to dark would brighten back to white under the pointer. It
@@ -650,11 +692,14 @@ class ThemeCompiler
                 $tokens['components_controlsOnMediaBgHover'] ?? '',
                 "color-mix(in srgb, {$resolved}, {$towards} 15%)",
             );
+            if (null !== $this->paintImage($tokens['components_controlsOnMediaBgHover'] ?? '')) {
+                $hover = $this->paintShorthand((string) $tokens['components_controlsOnMediaBgHover']);
+            }
             $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
         } elseif ('' !== (string) ($tokens['components_controlsOnMediaBgHover'] ?? '')) {
             // A hover colour with no background of its own still applies, over
             // the white veil the stylesheet draws at rest.
-            $hover = $this->resolveColorValue((string) $tokens['components_controlsOnMediaBgHover']);
+            $hover = $this->paintShorthand((string) $tokens['components_controlsOnMediaBgHover']);
             $css .= "  --iw-gallery-nav-bg-hover: {$hover};\n";
         }
 
@@ -716,6 +761,10 @@ class ThemeCompiler
         $height = self::READING_PROGRESS_SIZES[$size] ?? self::READING_PROGRESS_SIZES['md'];
 
         $color = $this->surfaceValue($tokens['articles_readingProgressColor'] ?? '', 'var(--color-surface-accent)');
+        // Painted with the `background` shorthand, so a gradient goes in whole.
+        if (null !== $this->paintImage($tokens['articles_readingProgressColor'] ?? '')) {
+            $color = $this->paintShorthand((string) $tokens['articles_readingProgressColor']);
+        }
 
         $css = "  /* Reading progress bar (article pages) */\n";
         $css .= "  --iw-reading-progress-height: {$height};\n";
@@ -724,6 +773,41 @@ class ThemeCompiler
         return $css . "\n";
     }
 
+
+    /**
+     * Paint the gradients of the article cards (Components > Cards).
+     *
+     * The surface becomes an image layer over its fallback color, the border
+     * a ring (see gradientRingRule()), and the hover border recolors the
+     * ring. Nothing is written for cards painted with colors.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS rules
+     */
+    private function generateArticleCardGradients(array $tokens): string
+    {
+        $css = '';
+
+        $surfaceImage = $this->paintImage($tokens['cardSurface'] ?? null);
+        if (null !== $surfaceImage) {
+            $css .= ".iw-article-card { background-image: {$surfaceImage}; }\n";
+        }
+
+        $border = (string) ($tokens['cardBorder'] ?? 'none');
+        $hoverBorder = (string) ($tokens['cardHoverBorder'] ?? 'none');
+        if ('none' !== $border && '' !== trim($border)
+            && (null !== $this->paintImage($border) || null !== $this->paintImage($hoverBorder))) {
+            $width = (string) ($tokens['cardBorderWidth'] ?? '1px');
+            $css .= ".iw-article-card { border: none; }\n";
+            $css .= self::gradientRingRule('.iw-article-card', $this->ringPaint($border), $width);
+            if ('none' !== $hoverBorder && '' !== trim($hoverBorder)) {
+                $css .= '.iw-article-card--hover-border:hover::after { background: ' . $this->ringPaint($hoverBorder) . "; }\n";
+            }
+        }
+
+        return '' === $css ? '' : "/* Article card - gradients */\n{$css}\n";
+    }
 
     /**
      * Generate CSS custom properties for the Leaflet location maps.
@@ -767,7 +851,7 @@ class ThemeCompiler
         $hoverDuration = ButtonEffectCatalog::resolveDuration((string) ($tokens['cardHoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $hoverEasing = ButtonEffectCatalog::resolveEasing((string) ($tokens['cardHoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
 
-        $surfaceValue = ('none' === $surface) ? 'transparent' : $this->resolveColorValue($surface);
+        $surfaceValue = ('none' === $surface) ? 'transparent' : $this->resolvePaint(trim($surface))['color'];
         $borderValue = ('none' === $border)
             ? 'none'
             : "{$borderWidth} {$borderStyle} " . $this->resolveColorValue($border);
@@ -785,6 +869,10 @@ class ThemeCompiler
             $tokens['cardBadgeBg'] ?? '',
             $this->surfaceValue($this->settingValue($tokens, 'components_badgeBg'), 'var(--color-primary-100)'),
         );
+        $badgePaint = $this->resolvePaint(trim((string) ($tokens['cardBadgeBg'] ?? '')) ?: $this->settingValue($tokens, 'components_badgeBg'));
+        if (null !== $badgePaint['image']) {
+            $badgeBg = $badgePaint['color'];
+        }
         $badgeText = $this->surfaceValue(
             $tokens['cardBadgeText'] ?? '',
             $this->surfaceValue($this->settingValue($tokens, 'components_badgeText'), 'var(--color-primary-700)'),
@@ -871,6 +959,12 @@ class ThemeCompiler
         $css .= "  --iw-article-card-title-color: {$titleColor};\n";
         $css .= "  --iw-article-card-text-color: {$textColor};\n";
         $css .= "  --iw-article-card-badge-bg: {$badgeBg};\n";
+        // The badge follows the site-wide one when left empty, image included.
+        $badgeStored = trim((string) ($tokens['cardBadgeBg'] ?? ''));
+        $badgeImage = $this->paintImage('' !== $badgeStored ? $badgeStored : $this->settingValue($tokens, 'components_badgeBg'));
+        if (null !== $badgeImage) {
+            $css .= "  --iw-article-card-badge-bg-image: {$badgeImage};\n";
+        }
         $css .= "  --iw-article-card-badge-text: {$badgeText};\n";
 
         return $css . "\n";
@@ -1132,12 +1226,21 @@ class ThemeCompiler
      * Returns the value unchanged if it is not a ref.
      * Returns #000000 as a safe CSS fallback for invalid/unresolvable refs.
      *
-     * @param string $value The color value (hex, transparent, rgba, or ref:...)
+     * A `gradient:` reference resolves to the gradient's solid fallback: a
+     * slot that can only take a color still gets the one standing in for the
+     * gradient. An unknown gradient resolves to transparent.
+     *
+     * @param string $value The color value (hex, transparent, rgba, ref:... or gradient:...)
      *
      * @return string The resolved hex color or the original value
      */
     private function resolveColorValue(string $value): string
     {
+        $gradientSlug = GradientSet::parseRef($value);
+        if (null !== $gradientSlug || str_starts_with($value, GradientSet::REF_PREFIX)) {
+            return null !== $gradientSlug ? $this->gradientFallback($gradientSlug) : 'transparent';
+        }
+
         $parsed = ColorSet::parseRef($value);
         if (null === $parsed) {
             return $value;
@@ -1161,6 +1264,250 @@ class ThemeCompiler
         }
 
         return $this->paletteFor($baseHex)[$parsed['shade']] ?? '#000000';
+    }
+
+    /**
+     * Get the solid fallback of a gradient, cached per compile() call.
+     *
+     * @param string $slug The gradient slug
+     *
+     * @return string The fallback color, `transparent` when the theme has no such gradient
+     */
+    private function gradientFallback(string $slug): string
+    {
+        if (isset($this->gradientFallbacks[$slug])) {
+            return $this->gradientFallbacks[$slug];
+        }
+
+        $gradient = $this->gradientSet?->get($slug);
+
+        return $this->gradientFallbacks[$slug] = null !== $gradient
+            ? $this->gradientRenderer()->fallback($gradient)
+            : 'transparent';
+    }
+
+    /**
+     * Resolve a value for a slot that can paint a gradient.
+     *
+     * A color comes back as the color and no image. A gradient comes back as
+     * its variable for the image, and its fallback for the color painted
+     * under it, but only when the gradient is opaque: under a translucent
+     * one the fallback would show through, so the color is transparent. An
+     * unknown gradient paints nothing.
+     *
+     * @param string $value The stored value (hex, ref:..., gradient:...)
+     *
+     * @return array{color: string, image: string|null} The CSS color, and the CSS image when there is one
+     */
+    private function resolvePaint(string $value): array
+    {
+        if (!str_starts_with($value, GradientSet::REF_PREFIX)) {
+            return ['color' => $this->resolveColorValue($value), 'image' => null];
+        }
+
+        $slug = GradientSet::parseRef($value);
+        $gradient = null !== $slug ? $this->gradientSet?->get($slug) : null;
+        if (null === $gradient) {
+            return ['color' => 'transparent', 'image' => null];
+        }
+
+        return [
+            'color' => $this->gradientRenderer()->isOpaque($gradient) ? "var(--gradient-{$slug}-fallback)" : 'transparent',
+            'image' => "var(--gradient-{$slug})",
+        ];
+    }
+
+    /**
+     * Draw a gradient border on an element, as a ring on its ::after.
+     *
+     * `border-image` drops the border-radius, and painting the gradient on the
+     * border box under an opaque padding box needs an opaque inside, which an
+     * outlined button does not have. The ring is a layer covering the
+     * element, as thick as the border, whose middle a mask cuts out.
+     *
+     * It is drawn inside the box: the element gives up its real border and
+     * the ring takes its place, so the size does not move and an element
+     * clipping its overflow (a card rounding its picture, a button sliding
+     * its background) does not clip the ring away.
+     *
+     * @param string $selector The element
+     * @param string $paint    What the ring is painted with (a gradient, or a color for a hover state)
+     * @param string $widths   The ring thickness, as a padding value (one to four lengths)
+     *
+     * @return string The ::after rule
+     */
+    private static function gradientRingRule(string $selector, string $paint, string $widths): string
+    {
+        return "{$selector}::after {\n"
+            . "  content: \"\";\n"
+            . "  position: absolute;\n"
+            . "  inset: 0;\n"
+            . "  z-index: 1;\n"
+            . "  pointer-events: none;\n"
+            . "  border-radius: inherit;\n"
+            . "  padding: {$widths};\n"
+            . "  background: {$paint};\n"
+            . "  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);\n"
+            . "  -webkit-mask-composite: xor;\n"
+            . "  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);\n"
+            . "  mask-composite: exclude;\n"
+            . "}\n";
+    }
+
+    /**
+     * Paint the headings of a variant with its gradient title color.
+     *
+     * The clip is inherited by everything inside a heading, so what keeps a
+     * color of its own there gets its fill back: the words highlighted or
+     * colored in the title editor (unless they carry a gradient themselves),
+     * the titles of the cards when the variant names a color for them, and
+     * the titles on the accent surface, which owns its text.
+     *
+     * @param string $index             The variant slug
+     * @param bool   $highlightGradient Whether the highlight is a gradient too
+     * @param bool   $cardTitleSet      Whether the cards name their own title color
+     *
+     * @return string The rules
+     */
+    private function variantTitleGradient(string $index, bool $highlightGradient, bool $cardTitleSet): string
+    {
+        $scope = ".iw-variant--{$index}";
+        $headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        $within = static fn (string $prefix, string $suffix = ''): string => implode(', ', array_map(
+            static fn (string $heading): string => "{$prefix} {$heading}{$suffix}",
+            $headings,
+        ));
+
+        $css = self::textGradientRule($within($scope), 'var(--iw-variant-title-color-image)');
+
+        $ownColors = [$within($scope, ' [class*="iw-text--"]:not([class*="iw-text--gradient-"])')];
+        if (!$highlightGradient) {
+            $ownColors[] = $within($scope, ' .iw-highlight');
+        }
+        if ($cardTitleSet) {
+            $ownColors[] = $within("{$scope} .iw-surface--card") . ", {$scope} .iw-surface--card .iw-card__title";
+        }
+        $ownColors[] = $within("{$scope} .iw-surface--accent") . ", {$scope} .iw-surface--accent .iw-card__title";
+        $css .= implode(",\n", $ownColors) . " {\n  background-image: none;\n  -webkit-text-fill-color: currentColor;\n}\n";
+
+        return $css;
+    }
+
+    /**
+     * Paint the text of an element with a gradient.
+     *
+     * The gradient is clipped to the glyphs, which are made transparent to let
+     * it through. `color` is left alone and keeps the fallback: screen readers,
+     * copy and paste and browsers without background-clip read it, and the
+     * underline is drawn with it rather than vanishing with the transparent
+     * fill. In forced-colors mode and in print the clip is undone, or the
+     * text would disappear.
+     *
+     * @param string $selector The text element
+     * @param string $image    The CSS image
+     *
+     * @return string The rules
+     */
+    private static function textGradientRule(string $selector, string $image): string
+    {
+        return "{$selector} {\n"
+            . "  background-image: {$image};\n"
+            . "  -webkit-background-clip: text;\n"
+            . "  background-clip: text;\n"
+            . "  -webkit-text-fill-color: transparent;\n"
+            . "  text-decoration-color: currentColor;\n"
+            . "}\n"
+            . "@media (forced-colors: active), print {\n"
+            . "  {$selector} { background-image: none; -webkit-text-fill-color: currentColor; }\n"
+            . "}\n";
+    }
+
+    /**
+     * A stored value as the paint of a ring or a layer: the gradient, or the color.
+     *
+     * @param string $value The stored value
+     *
+     * @return string The CSS paint
+     */
+    private function ringPaint(string $value): string
+    {
+        $paint = $this->resolvePaint(trim($value));
+
+        return $paint['image'] ?? $paint['color'];
+    }
+
+    /**
+     * The image of a stored value, when it points at a known gradient.
+     *
+     * @param mixed $value The stored value
+     *
+     * @return string|null The CSS image, or null for a color or an empty value
+     */
+    private function paintImage(mixed $value): ?string
+    {
+        return \is_string($value) ? $this->resolvePaint(trim($value))['image'] : null;
+    }
+
+    /**
+     * A stored value written for the `background` shorthand.
+     *
+     * A component painting itself with `background: var(--x)` takes a gradient
+     * and its color in one value, the color as the last layer: no second
+     * variable, no change to its stylesheet.
+     *
+     * @param string $value The stored value
+     *
+     * @return string The CSS value, `<image>, <color>` for a gradient
+     */
+    private function paintShorthand(string $value): string
+    {
+        $paint = $this->resolvePaint(trim($value));
+
+        return null !== $paint['image'] ? "{$paint['image']}, {$paint['color']}" : $paint['color'];
+    }
+
+    /**
+     * Build the renderer that writes gradients with this compile's palette.
+     *
+     * Stops resolve like any color field. A stop pointing at a gradient is
+     * refused, a gradient cannot nest another one.
+     *
+     * @return GradientRenderer The renderer
+     */
+    private function gradientRenderer(): GradientRenderer
+    {
+        return new GradientRenderer(
+            fn (string $value): ?string => str_starts_with($value, GradientSet::REF_PREFIX)
+                ? null
+                : $this->resolveColorValue($value),
+        );
+    }
+
+    /**
+     * Generate the custom properties of the theme's gradients.
+     *
+     * Two per gradient: `--gradient-<slug>` holds the image (overlay first),
+     * `--gradient-<slug>-fallback` the solid color painted under it and used
+     * wherever a gradient cannot be. A theme without gradients emits nothing,
+     * so its stylesheet stays byte for byte what it was.
+     *
+     * @return string CSS variable declarations
+     */
+    private function generateGradientVariables(): string
+    {
+        if (null === $this->gradientSet || $this->gradientSet->isEmpty()) {
+            return '';
+        }
+
+        $renderer = $this->gradientRenderer();
+        $css = "  /* Gradients */\n";
+        foreach ($this->gradientSet->all() as $gradient) {
+            $slug = $gradient->getSlug();
+            $css .= "  --gradient-{$slug}: {$renderer->image($gradient)};\n";
+            $css .= "  --gradient-{$slug}-fallback: {$this->gradientFallback($slug)};\n";
+        }
+
+        return $css . "\n";
     }
 
     /**
@@ -1211,6 +1558,12 @@ class ThemeCompiler
             $tokens['components_surfaceBg'] ?? '',
             'color-mix(in srgb, var(--color-background), var(--color-text) 6%)',
         );
+        // A panel given a gradient keeps a color for everything mixed from
+        // it, and publishes the image beside it for the panels to paint.
+        $surfaceImage = $this->paintImage($tokens['components_surfaceBg'] ?? '');
+        if (null !== $surfaceImage) {
+            $surface = $this->resolvePaint(trim((string) $tokens['components_surfaceBg']))['color'];
+        }
         $foreground = $this->surfaceValue(
             $tokens['components_surfaceText'] ?? '',
             'var(--color-text)',
@@ -1236,6 +1589,9 @@ class ThemeCompiler
 
         $css = "  /* Semantic surfaces (transverse components) */\n";
         $css .= "  --color-surface: {$surface};\n";
+        if (null !== $surfaceImage) {
+            $css .= "  --color-surface-image: {$surfaceImage};\n";
+        }
         $css .= "  --color-surface-foreground: {$foreground};\n";
         $css .= "  --color-surface-muted: {$muted};\n";
         $css .= "  --color-surface-border: {$border};\n";
@@ -1277,6 +1633,20 @@ class ThemeCompiler
             'components_breadcrumbAccent' => '--color-surface-accent',
         ],
     ];
+
+    /**
+     * Surface tokens of COMPONENT_SURFACE_OVERRIDES that a gradient can paint.
+     *
+     * @var list<string>
+     */
+    private const GRADIENT_SURFACE_TOKENS = ['--color-surface', '--iw-pagination-item-bg'];
+
+    /**
+     * Settings of COMPONENT_OWN_COLOR_VARIABLES that a gradient can paint.
+     *
+     * @var list<string>
+     */
+    private const GRADIENT_OWN_COLOR_KEYS = ['components_tagBg', 'components_tagHoverBg', 'components_badgeBg'];
 
     /**
      * Components whose colours are written as their own variables rather than
@@ -1571,7 +1941,8 @@ class ThemeCompiler
             . $this->generateComponentShadows($tokens)
             . $this->generateComponentSpacing($tokens)
             . $this->generateComponentTextSizes($tokens)
-            . $this->generateComponentOwnColors($tokens);
+            . $this->generateComponentOwnColors($tokens)
+            . $this->generateHoverFadeLayers($tokens);
         foreach (self::COMPONENT_SURFACE_OVERRIDES as $selector => $map) {
             $declarations = '';
             foreach ($map as $key => $token) {
@@ -1579,7 +1950,18 @@ class ThemeCompiler
                 if ('' === $value || 'none' === $value) {
                     continue;
                 }
-                $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+                if (!\in_array($token, self::GRADIENT_SURFACE_TOKENS, true)) {
+                    $declarations .= "  {$token}: " . $this->resolveColorValue($value) . ";\n";
+                    continue;
+                }
+                // A panel set to a color under a site-wide gradient surface
+                // has to say `none`, or the gradient reaches it through the
+                // cascade and covers its color.
+                $paint = $this->resolvePaint($value);
+                $declarations .= "  {$token}: {$paint['color']};\n";
+                if (null !== $paint['image'] || ('--color-surface' === $token && null !== $this->paintImage($tokens['components_surfaceBg'] ?? ''))) {
+                    $declarations .= "  {$token}-image: " . ($paint['image'] ?? 'none') . ";\n";
+                }
             }
             if ('.iw-pagination' === $selector && str_contains($declarations, '--iw-pagination-item-border:')) {
                 $declarations .= "  --iw-pagination-item-border-width: 1px;\n";
@@ -1588,6 +1970,75 @@ class ThemeCompiler
             if ('' !== $declarations) {
                 $css .= "{$selector} {\n{$declarations}}\n\n";
             }
+        }
+
+        return $css;
+    }
+
+    /**
+     * Components whose hover background can be a gradient, and how they paint.
+     *
+     * selector => [rest setting, hover setting, rest background, hover
+     * background, transition, whether the stylesheet already positions it].
+     * The backgrounds are the shorthand values each component paints with,
+     * fallbacks included, so the layer shows exactly what the hover showed.
+     *
+     * @var array<string, array{0: string, 1: string, 2: string, 3: string, 4: string, 5: bool}>
+     */
+    private const HOVER_FADE_LAYERS = [
+        '.iw-tag' => [
+            'components_tagBg',
+            'components_tagHoverBg',
+            'var(--iw-tag-bg-image, none), var(--iw-tag-bg, transparent)',
+            'var(--iw-tag-hover-bg-image, none), var(--iw-tag-hover-bg, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 12%, var(--iw-tag-bg, transparent)))',
+            '0.2s ease',
+            false,
+        ],
+        '.iw-back-to-top' => [
+            'components_backToTopBg',
+            'components_backToTopHoverBg',
+            'var(--iw-back-to-top-bg-image, none), var(--iw-back-to-top-bg, var(--color-surface-accent))',
+            'var(--iw-back-to-top-hover-bg-image, none), var(--iw-back-to-top-hover-bg, var(--color-surface-accent))',
+            'var(--iw-back-to-top-transition, 0.25s ease)',
+            true,
+        ],
+        '.iw-gallery-nav' => [
+            'components_controlsOnMediaBg',
+            'components_controlsOnMediaBgHover',
+            'var(--_bg)',
+            'var(--_bg-hover)',
+            '0.2s ease',
+            false,
+        ],
+    ];
+
+    /**
+     * Fade the hover background of a component in on a layer.
+     *
+     * A background-image cannot be transitioned, so a gradient at rest or on
+     * hover would swap at once where a color fades. Where one is involved,
+     * the hover background is painted on a ::before layer whose opacity
+     * moves, and the component keeps its resting background under it.
+     * Nothing is written for a component painted with colors.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string Scoped CSS rules (outside :root)
+     */
+    private function generateHoverFadeLayers(array $tokens): string
+    {
+        $css = '';
+        foreach (self::HOVER_FADE_LAYERS as $selector => [$restKey, $hoverKey, $rest, $hover, $transition, $positioned]) {
+            if (null === $this->paintImage($this->settingValue($tokens, $restKey))
+                && null === $this->paintImage($this->settingValue($tokens, $hoverKey))) {
+                continue;
+            }
+
+            $css .= "{$selector} {" . ($positioned ? '' : ' position: relative;') . " isolation: isolate; overflow: hidden; }\n";
+            $css .= "{$selector}::before { content: \"\"; position: absolute; inset: 0; z-index: -1; pointer-events: none;\n";
+            $css .= "  border-radius: inherit; background: {$hover}; opacity: 0; transition: opacity {$transition}; }\n";
+            $css .= "{$selector}:hover { background: {$rest}; }\n";
+            $css .= "{$selector}:hover::before { opacity: 1; }\n\n";
         }
 
         return $css;
@@ -1642,9 +2093,14 @@ class ThemeCompiler
                     continue;
                 }
 
-                $color = $this->resolveColorValue($value);
+                $paint = \in_array($key, self::GRADIENT_OWN_COLOR_KEYS, true)
+                    ? $this->resolvePaint($value)
+                    : ['color' => $this->resolveColorValue($value), 'image' => null];
                 foreach ($variables as $variable) {
-                    $declarations .= "  {$variable}: {$color};\n";
+                    $declarations .= "  {$variable}: {$paint['color']};\n";
+                    if (null !== $paint['image']) {
+                        $declarations .= "  {$variable}-image: {$paint['image']};\n";
+                    }
                 }
             }
             if ('' !== $declarations) {
@@ -1869,6 +2325,31 @@ class ThemeCompiler
      *
      * @return string CSS class declarations (e.g. `.iw-text--primary-500 { ... }`)
      */
+    /**
+     * Generate one text class per gradient, for the title editor.
+     *
+     * The editor stores the gradient by name, `[[gradient-<slug>:word]]`, which
+     * the renderer turns into `.iw-text--gradient-<slug>`: renaming nothing in
+     * the content, a gradient changed in the admin changes every title using it.
+     *
+     * @return string CSS rules, empty without gradients
+     */
+    private function generateTextGradientClasses(): string
+    {
+        if (null === $this->gradientSet || $this->gradientSet->isEmpty()) {
+            return '';
+        }
+
+        $css = "/* Gradient text classes (title editor) */\n";
+        foreach ($this->gradientSet->all() as $gradient) {
+            $slug = $gradient->getSlug();
+            $css .= ".iw-text--gradient-{$slug} {\n  color: var(--gradient-{$slug}-fallback);\n}\n";
+            $css .= self::textGradientRule(".iw-text--gradient-{$slug}", "var(--gradient-{$slug})");
+        }
+
+        return $css . "\n";
+    }
+
     /**
      * Generate the utility classes the rich-text editor applies.
      *
@@ -2430,12 +2911,16 @@ class ThemeCompiler
 
         $duration = ButtonEffectCatalog::resolveDuration((string) ($props['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($props['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
-        $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
-        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey);
+        $bgEffectKey = $this->buttonBgEffect($props);
+        $hasBgEffect = ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || \in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true);
 
         $css = "{$selector} {\n";
         if (isset($props['bg'])) {
-            $css .= "  background-color: {$this->resolveColorValue((string) $props['bg'])};\n";
+            $bgPaint = $this->resolvePaint(trim((string) $props['bg']));
+            $css .= "  background-color: {$bgPaint['color']};\n";
+            if (null !== $bgPaint['image']) {
+                $css .= "  background-image: {$bgPaint['image']};\n";
+            }
         }
         if (isset($props['text'])) {
             $css .= "  color: {$this->resolveColorValue((string) $props['text'])};\n";
@@ -2444,6 +2929,7 @@ class ThemeCompiler
             $css .= "  border-radius: {$this->resolveRadius((string) $props['radius'])};\n";
         }
         $css .= $border['css'];
+        $labelGradient = $this->buttonLabelGradient($selector, $props);
         $css .= '  padding: ' . self::buttonPadding($border['widths'], $paddingX, $paddingY) . ";\n";
         $css .= $this->generateButtonStyleExtras($props);
         $css .= "  cursor: pointer;\n";
@@ -2455,12 +2941,27 @@ class ThemeCompiler
             $css .= "  position: relative;\n";
             $css .= "  overflow: hidden;\n";
             $css .= "  isolation: isolate;\n";
+        } elseif (null !== $border['ring']) {
+            // Anchors the ring of a gradient border.
+            $css .= "  position: relative;\n";
         }
         $css .= '  transition: ' . ButtonEffectCatalog::buildTransition($duration, $easing) . ";\n";
         $css .= "}\n";
 
-        // Overlay pseudo-element for slide-* / gradient-shift effects
+        // Overlay pseudo-element for slide-* / gradient-shift effects, and for
+        // the fade a gradient background needs (see buttonBgEffect()).
         $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
+
+        $css .= $labelGradient;
+
+        // Gradient border, drawn as a ring
+        if (null !== $border['ring']) {
+            $ringWidths = implode(' ', $border['widths']);
+            $css .= self::gradientRingRule($selector, $border['ring']['rest'], $ringWidths);
+            if (null !== $border['ring']['hover']) {
+                $css .= "{$selector}:hover::after {\n  background: {$border['ring']['hover']};\n}\n";
+            }
+        }
 
         // Hover state
         $css .= $this->generateButtonHoverRules($selector, $variant, $props, $bgEffectKey);
@@ -2547,28 +3048,55 @@ class ThemeCompiler
      * elsewhere, never as `border: none` plus one side: the hover rule only
      * changes `border-color`, which then recolours the drawn sides alone.
      *
-     * @param array<string, mixed> $props The button definition
+     * A gradient border, at rest or on hover, is drawn as a ring instead (see
+     * gradientRingRule()): the declaration drops the real border, the widths
+     * still come back for the padding, and `ring` carries what to paint.
+     * Where no pseudo-element can be drawn (the native file button), pass
+     * `$ring = false` and the gradient falls back to its color.
      *
-     * @return array{css: string, widths: array{top: string, right: string, bottom: string, left: string}}
+     * @param array<string, mixed> $props The button definition
+     * @param bool                 $ring  Whether a gradient border may become a ring
+     *
+     * @return array{css: string, widths: array{top: string, right: string, bottom: string, left: string}, ring: array{rest: string, hover: string|null}|null}
      */
-    private function resolveButtonBorder(array $props): array
+    private function resolveButtonBorder(array $props, bool $ring = true): array
     {
         $none = ['top' => '0', 'right' => '0', 'bottom' => '0', 'left' => '0'];
 
         $color = isset($props['border']) ? (string) $props['border'] : '';
         if ('' === $color || 'none' === $color) {
-            return ['css' => "  border: none;\n", 'widths' => $none];
+            return ['css' => "  border: none;\n", 'widths' => $none, 'ring' => null];
         }
 
         $width = self::buttonBorderWidth($props['borderWidth'] ?? null);
         $style = isset($props['borderStyle']) ? (string) $props['borderStyle'] : 'solid';
-        $color = $this->resolveColorValue($color);
         $sides = self::BUTTON_BORDER_SIDES[(string) ($props['borderSides'] ?? 'all')] ?? self::BUTTON_BORDER_SIDES['all'];
+
+        $hoverBorder = isset($props['hoverBorder']) && 'none' !== $props['hoverBorder'] ? (string) $props['hoverBorder'] : '';
+        if ($ring && (null !== $this->paintImage($color) || null !== $this->paintImage($hoverBorder))) {
+            $widths = $none;
+            foreach ($sides as $side) {
+                $widths[$side] = $width;
+            }
+
+            // The line style has no ring to apply to: a gradient border is solid.
+            return [
+                'css' => "  border: none;\n",
+                'widths' => $widths,
+                'ring' => [
+                    'rest' => $this->ringPaint($color),
+                    'hover' => '' !== $hoverBorder ? $this->ringPaint($hoverBorder) : null,
+                ],
+            ];
+        }
+
+        $color = $this->resolveColorValue($color);
 
         if (4 === \count($sides)) {
             return [
                 'css' => "  border: {$width} {$style} {$color};\n",
                 'widths' => ['top' => $width, 'right' => $width, 'bottom' => $width, 'left' => $width],
+                'ring' => null,
             ];
         }
 
@@ -2582,6 +3110,7 @@ class ThemeCompiler
                 . "  border-color: {$color};\n"
                 . '  border-width: ' . implode(' ', $widths) . ";\n",
             'widths' => $widths,
+            'ring' => null,
         ];
     }
 
@@ -2868,6 +3397,7 @@ class ThemeCompiler
                 if (null === $suffix) {
                     continue;
                 }
+                $image = null;
                 // The accent is optional: a cleared field publishes nothing,
                 // so a project rule can fall back with var(..., fallback).
                 if ('accent' === $prop && \in_array($value, [null, '', 'none'], true)) {
@@ -2876,6 +3406,10 @@ class ThemeCompiler
 
                 if ('radius' === $prop) {
                     $value = $this->resolveRadius((string) $value);
+                } elseif ('bg' === $prop || 'hoverBg' === $prop) {
+                    $paint = $this->resolvePaint(trim((string) $value));
+                    $value = $paint['color'];
+                    $image = $paint['image'];
                 } elseif ('border' === $prop || 'hoverBorder' === $prop) {
                     // Border vars must hold a full shorthand (width style color),
                     // otherwise consumers using `border: var(--iw-button-X-border, ...)`
@@ -2887,6 +3421,9 @@ class ThemeCompiler
                     $value = $this->resolveColorValue((string) $value);
                 }
                 $css .= "  --iw-button-{$variant}-{$suffix}: {$value};\n";
+                if (null !== $image) {
+                    $css .= "  --iw-button-{$variant}-{$suffix}-image: {$image};\n";
+                }
             }
         }
 
@@ -3069,6 +3606,11 @@ class ThemeCompiler
 
         $colors = $menuConfig['colors'] ?? [];
         $resolvedBg = null;
+        // Once one level paints a gradient, every level set publishes an
+        // image, `none` for a color: the levels fall back on one another, and
+        // a level set to a color must stop the image of the level above from
+        // reaching it.
+        $hasGradient = self::menuHasGradient($menuConfig);
         foreach ($colors as $key => $value) {
             if (is_array($value)) {
                 continue;
@@ -3080,11 +3622,17 @@ class ThemeCompiler
             if (null === $suffix || null === $value || '' === trim((string) $value)) {
                 continue;
             }
-            $resolved = $this->resolveColorValue((string) $value);
+            $paint = \in_array($key, self::MENU_GRADIENT_KEYS, true)
+                ? $this->resolvePaint(trim((string) $value))
+                : ['color' => $this->resolveColorValue((string) $value), 'image' => null];
+            $resolved = $paint['color'];
             if ('bg' === $key) {
                 $resolvedBg = $resolved;
             }
             $css .= "  --iw-menu-{$suffix}: {$resolved};\n";
+            if ($hasGradient && \in_array($key, self::MENU_GRADIENT_KEYS, true)) {
+                $css .= "  --iw-menu-{$suffix}-image: " . ($paint['image'] ?? 'none') . ";\n";
+            }
         }
 
         // Colors of the bar while it sits transparent over a hero. Always
@@ -3104,9 +3652,18 @@ class ThemeCompiler
         // --iw-menu-bg (a see-through dropdown is unreadable).
         $opacity = $this->normalizeMenuOpacity($menuConfig['bgOpacity'] ?? null);
         $bgExpression = $resolvedBg ?? 'var(--iw-menu-bg)';
-        $css .= 100 === $opacity
+        // Under a thinned gradient the thinned fallback would show through.
+        if (100 !== $opacity && $hasGradient && 'none' !== $this->menuSurfaceImage((string) ($colors['bg'] ?? ''), 100)) {
+            $bgExpression = 'transparent';
+        }
+        $css .= 100 === $opacity || 'transparent' === $bgExpression
             ? "  --iw-menu-surface: {$bgExpression};\n"
             : "  --iw-menu-surface: color-mix(in srgb, {$bgExpression} {$opacity}%, transparent);\n";
+        // A gradient bar is thinned the same way, stop by stop: an image has
+        // no opacity a color-mix() could reach.
+        if ($hasGradient) {
+            $css .= '  --iw-menu-surface-image: ' . $this->menuSurfaceImage((string) ($colors['bg'] ?? ''), $opacity) . ";\n";
+        }
 
         $borderWidth = self::MENU_BORDER_WIDTHS[(string) ($menuConfig['borderWidth'] ?? 'none')]
             ?? self::MENU_BORDER_WIDTHS['none'];
@@ -3193,6 +3750,61 @@ class ThemeCompiler
         }
 
         return $css . "\n";
+    }
+
+    /**
+     * The menu backgrounds that accept a gradient: the bar and its panel, and
+     * the three levels below it.
+     *
+     * @var list<string>
+     */
+    private const MENU_GRADIENT_KEYS = ['bg', 'secondBg', 'thirdBg', 'fourthBg'];
+
+    /**
+     * Tell whether one of the menu backgrounds points at a gradient.
+     *
+     * The image layers of the menu are written only then, so a menu painted
+     * with colors compiles to exactly the stylesheet it always had.
+     *
+     * @param array<string, mixed> $menuConfig The menu configuration
+     *
+     * @return bool True when a menu background is a gradient
+     */
+    private static function menuHasGradient(array $menuConfig): bool
+    {
+        $colors = \is_array($menuConfig['colors'] ?? null) ? $menuConfig['colors'] : [];
+        foreach (self::MENU_GRADIENT_KEYS as $key) {
+            if (\is_string($colors[$key] ?? null) && str_starts_with(trim($colors[$key]), GradientSet::REF_PREFIX)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The image painted on the bar, thinned by the bar opacity.
+     *
+     * At full opacity it is the gradient's variable. Below, the gradient is
+     * written out with every stop thinned, which is what the color-mix() of
+     * the surface does to a color.
+     *
+     * @param string $value   The stored bar background
+     * @param int    $opacity The bar opacity, 0-100
+     *
+     * @return string The CSS image, `none` when the bar is not a gradient
+     */
+    private function menuSurfaceImage(string $value, int $opacity): string
+    {
+        $slug = GradientSet::parseRef(trim($value));
+        $gradient = null !== $slug ? $this->gradientSet?->get($slug) : null;
+        if (null === $gradient) {
+            return 'none';
+        }
+
+        return 100 === $opacity
+            ? "var(--gradient-{$slug})"
+            : $this->gradientRenderer()->image($gradient->withOpacity($opacity));
     }
 
     /**
@@ -3322,6 +3934,16 @@ class ThemeCompiler
      */
     private function generateMenuClasses(array $menuConfig = []): string
     {
+        // Image layer of each menu background, written only when one of them
+        // is a gradient (see generateMenuVariables()). The chains mirror the
+        // color ones: a level left unset takes the level above.
+        $hasGradient = self::menuHasGradient($menuConfig);
+        $image = static fn (string $chain): string => $hasGradient ? " background-image: {$chain};" : '';
+        $bgImage = 'var(--iw-menu-bg-image, none)';
+        $secondImage = 'var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none))';
+        $thirdImage = 'var(--iw-menu-third-bg-image, var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none)))';
+        $fourthImage = 'var(--iw-menu-fourth-bg-image, var(--iw-menu-third-bg-image, var(--iw-menu-second-bg-image, var(--iw-menu-bg-image, none))))';
+
         $css = "/* Menu component */\n";
 
         // Base: navbar header + overlay background/text.
@@ -3346,6 +3968,9 @@ class ThemeCompiler
         $css .= ".iw-menu::before { content: \"\"; position: absolute; z-index: 40; pointer-events: none;\n";
         $css .= "  inset: 0 0 calc(-1 * var(--iw-menu-border-width, 0px)) 0;\n";
         $css .= "  background-color: var(--iw-menu-surface, var(--iw-menu-bg));\n";
+        if ($hasGradient) {
+            $css .= "  background-image: var(--iw-menu-surface-image, none);\n";
+        }
         $css .= "  border-bottom: var(--iw-menu-border-width, 0px) solid var(--iw-menu-border-color, transparent);\n";
         $css .= "  box-shadow: var(--iw-menu-shadow, none);\n";
         $css .= "  -webkit-backdrop-filter: var(--iw-menu-backdrop, none);\n";
@@ -3374,7 +3999,7 @@ class ThemeCompiler
         // matching and the regular bar fades back in. With a panel open it
         // comes back at once: the panel slides behind it.
         $css .= "{$overHero}::before {\n";
-        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none;\n";
+        $css .= "  background-color: transparent; border-bottom-color: transparent; box-shadow: none;" . $image('none') . "\n";
         $css .= "  -webkit-backdrop-filter: none; backdrop-filter: none; }\n";
         // Colors chosen for the picture under the bar, the regular ones when
         // unset (see generateMenuVariables()). Scoped to the frame: the panel
@@ -3433,9 +4058,9 @@ class ThemeCompiler
         $css .= ".iw-menu__item--current { text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }\n";
 
         // Dropdown backgrounds per level
-        $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
-        $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
-        $css .= ".iw-menu__dropdown--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-2 { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));" . $image($secondImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
+        $css .= ".iw-menu__dropdown--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))));" . $image($fourthImage) . " border-radius: var(--iw-menu-dropdown-radius, var(--border-radius)); }\n";
         // The sub-lists of the panels are part of the panel, not dropdowns:
         // no radius.
         $css .= ".iw-menu [role=\"dialog\"] :is(.iw-menu__dropdown--level-2, .iw-menu__dropdown--level-3, .iw-menu__dropdown--level-4) { border-radius: 0; }\n";
@@ -3470,6 +4095,9 @@ class ThemeCompiler
         // Painted with the second-level background, so written with the
         // second-level text: the text of the panel could be the same color.
         $css .= "  background-color: var(--iw-menu-second-bg, transparent);\n";
+        if ($hasGradient) {
+            $css .= "  background-image: var(--iw-menu-second-bg-image, none);\n";
+        }
         $css .= "  color: var(--iw-menu-second-text, inherit);\n";
         $css .= "}\n";
         // A language the current page has no translation for still links out,
@@ -3555,6 +4183,9 @@ class ThemeCompiler
         // on mobile). Its motion is below.
         $css .= ".iw-menu__overlay {\n";
         $css .= "  background-color: var(--iw-menu-bg);\n";
+        if ($hasGradient) {
+            $css .= "  background-image: {$bgImage};\n";
+        }
         $css .= "  color: var(--iw-menu-text);\n";
         $css .= "}\n";
         $css .= ".iw-menu__overlay-nav { height: 100%; padding-inline: var(--iw-menu-panel-pad-start) var(--iw-menu-panel-pad-end); }\n";
@@ -3700,13 +4331,16 @@ class ThemeCompiler
         $css .= "  position: absolute; inset: var(--iw-menu-panels-offset, var(--iw-menu-bar-height, 4rem)) 0 0 0;\n";
         $css .= "  display: flex; flex-direction: column;\n";
         $css .= "  background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));\n";
+        if ($hasGradient) {
+            $css .= "  background-image: {$secondImage};\n";
+        }
         $css .= "  transition: transform 0.3s ease, opacity 0.3s ease;\n";
         $css .= "}\n";
         // Each sub-panel paints its level and writes in its text color, the
         // non-linked title included (links carry their level class).
         $css .= ".iw-menu__subpanel--level-2 { color: var(--iw-menu-second-text, var(--iw-menu-text)); }\n";
-        $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
-        $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)))); color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
+        $css .= ".iw-menu__subpanel--level-3 { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . " color: var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text))); }\n";
+        $css .= ".iw-menu__subpanel--level-4 { background-color: var(--iw-menu-fourth-bg, var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))));" . $image($fourthImage) . " color: var(--iw-menu-fourth-text, var(--iw-menu-third-text, var(--iw-menu-second-text, var(--iw-menu-text)))); }\n";
         $css .= ".iw-menu__subpanel .iw-menu__panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 var(--iw-menu-panel-pad-end) 1rem var(--iw-menu-panel-pad-start); }\n";
         // Motion — enter side matches the menu slide direction; --active rests at 0.
         $css .= ".iw-menu__panels--from-right .iw-menu__subpanel { transform: translateX(100%); }\n";
@@ -3923,13 +4557,13 @@ class ThemeCompiler
 
         // ─── Mega menu (sub-namespace iw-mega-menu) ──────────────────────────
         // Dropdown panel
-        $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg)); ";
+        $css .= ".iw-mega-menu__dropdown { background-color: var(--iw-menu-second-bg, var(--iw-menu-bg));" . $image($secondImage) . ' ';
         $css .= "border-top: 1px solid var(--iw-menu-divider, rgba(0,0,0,0.1)); }\n";
         // Featured column
         // Fourth level under its link in a column: the rule ties it to its
         // parent, in the text color of the panel at 25%.
         $css .= ".iw-mega-menu__sublist { border-left: 1px solid var(--iw-mega-menu-rule, color-mix(in srgb, var(--iw-menu-second-text, var(--iw-menu-text)) 25%, transparent)); }\n";
-        $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
+        $css .= ".iw-mega-menu__featured { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . ' ';
         $css .= "border-radius: var(--border-radius); padding: 1.5rem; }\n";
         // Image card (radius by default for consistent hover shadow)
         $css .= ".iw-mega-menu__card { border-radius: var(--border-radius); overflow: hidden; ";
@@ -3939,7 +4573,7 @@ class ThemeCompiler
         $css .= ".iw-mega-menu__card img { width: 100%; height: auto; object-fit: cover; ";
         $css .= "border-radius: var(--border-imageRadius, var(--border-radius)); }\n";
         // Card with background modifier: radius on card, overflow clips image, no image radius
-        $css .= ".iw-mega-menu__card--bg { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg))); ";
+        $css .= ".iw-mega-menu__card--bg { background-color: var(--iw-menu-third-bg, var(--iw-menu-second-bg, var(--iw-menu-bg)));" . $image($thirdImage) . ' ';
         $css .= "border-radius: var(--border-radius); overflow: hidden; }\n";
         $css .= ".iw-mega-menu__card--bg img { border-radius: 0; }\n";
         // Featured image (uses theme image radius)
@@ -4005,15 +4639,20 @@ class ThemeCompiler
         $css .= ButtonEffectCatalog::buildSharedKeyframes();
 
         // Per-button @keyframes emitted only when bg-pulse is configured.
+        $layerPulse = false;
         foreach ($buttons as $props) {
             if (!is_array($props) || !isset($props['slug'])) {
                 continue;
             }
             $variant = $props['slug'];
-            $bgEffectKey = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
+            $bgEffectKey = $this->buttonBgEffect($props);
             if (ButtonEffectCatalog::bgEffectNeedsKeyframes($bgEffectKey)) {
                 $css .= ButtonEffectCatalog::buildBgPulseKeyframes($variant);
             }
+            $layerPulse = $layerPulse || self::BG_EFFECT_LAYER_PULSE === $bgEffectKey;
+        }
+        if ($layerPulse) {
+            $css .= "@keyframes iw-button-layer-pulse {\n  0%, 100% { opacity: 0; }\n  50% { opacity: 1; }\n}\n";
         }
         $css .= "\n";
 
@@ -4076,7 +4715,8 @@ class ThemeCompiler
      */
     private function generateButtonBgEffectBefore(string $baseSelector, string $variant, string $bgEffectKey, string $duration, string $easing): string
     {
-        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || 'pulse-bg' === $bgEffectKey) {
+        $layer = \in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true);
+        if (!$layer && (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) || 'pulse-bg' === $bgEffectKey)) {
             return '';
         }
 
@@ -4085,6 +4725,29 @@ class ThemeCompiler
         $css .= "  position: absolute;\n";
         $css .= "  inset: 0;\n";
         $css .= "  z-index: -1;\n";
+
+        if ($layer) {
+            // The hover background, gradient or color, painted on a layer
+            // whose opacity moves: a background-image cannot be transitioned,
+            // its layer can. Same duration and easing as every other button,
+            // so a gradient button fades like a plain one.
+            $css .= "  background-color: var(--iw-button-{$variant}-hover-bg);\n";
+            $css .= "  background-image: var(--iw-button-{$variant}-hover-bg-image, none);\n";
+            $css .= "  opacity: 0;\n";
+            if (self::BG_EFFECT_FADE === $bgEffectKey) {
+                $css .= "  transition: opacity {$duration} {$easing};\n";
+                $css .= "}\n";
+                $css .= "{$baseSelector}:hover::before {\n";
+                $css .= "  opacity: 1;\n";
+            } else {
+                $css .= "}\n";
+                $css .= "{$baseSelector}:hover::before {\n";
+                $css .= "  animation: iw-button-layer-pulse 2s ease-in-out infinite;\n";
+            }
+            $css .= "}\n";
+
+            return $css;
+        }
 
         if ('gradient-shift' === $bgEffectKey) {
             // Gradient overlay that fades in on hover for a smooth color transition.
@@ -4106,6 +4769,9 @@ class ThemeCompiler
         // breaking the illusion of a clean fill. The bounce easing remains in
         // effect for the button's own transform (.iw-button-- transition).
         $css .= "  background-color: var(--iw-button-{$variant}-hover-bg);\n";
+        if (null !== $this->buttonHoverImage($variant)) {
+            $css .= "  background-image: var(--iw-button-{$variant}-hover-bg-image, none);\n";
+        }
         $initial = match ($bgEffectKey) {
             'slide-right' => 'translateX(-100%)',
             'slide-left' => 'translateX(100%)',
@@ -4120,6 +4786,109 @@ class ThemeCompiler
         $css .= "}\n";
 
         return $css;
+    }
+
+    /**
+     * Paint the label of a button with a gradient text color.
+     *
+     * Clipped to the label rather than the button, whose own background the
+     * clip would take away. The button keeps the fallback as its color, which
+     * its pictogram follows. The hover text color takes over on hover, as a
+     * gradient or with the fill given back.
+     *
+     * @param string               $selector The button selector
+     * @param array<string, mixed> $props    The button definition
+     *
+     * @return string The rules, empty when neither text color is a gradient
+     */
+    private function buttonLabelGradient(string $selector, array $props): string
+    {
+        $text = $this->paintImage($props['text'] ?? null);
+        $hover = $this->paintImage($props['hoverText'] ?? null);
+        if (null === $text && null === $hover) {
+            return '';
+        }
+
+        $css = null !== $text ? self::textGradientRule("{$selector} .iw-button__label", $text) : '';
+        if (null !== $hover) {
+            $css .= self::textGradientRule("{$selector}:hover .iw-button__label", $hover);
+        } elseif (isset($props['hoverText'])) {
+            $css .= "{$selector}:hover .iw-button__label {\n  background-image: none;\n  -webkit-text-fill-color: currentColor;\n}\n";
+        }
+
+        return $css;
+    }
+
+    /**
+     * Background effect a gradient button falls back on when it has none.
+     */
+    private const BG_EFFECT_FADE = 'fade';
+
+    /**
+     * The pulse effect, moved onto a layer when a gradient is involved.
+     */
+    private const BG_EFFECT_LAYER_PULSE = 'pulse-layer';
+
+    /**
+     * Effects painting the hover background on the ::before layer.
+     *
+     * @var list<string>
+     */
+    private const BG_LAYER_EFFECTS = [self::BG_EFFECT_FADE, self::BG_EFFECT_LAYER_PULSE];
+
+    /**
+     * Button slugs whose hover background is a gradient, for this compile.
+     *
+     * @var array<string, string>
+     */
+    private array $buttonHoverImages = [];
+
+    /**
+     * The background effect a button actually renders with.
+     *
+     * The configured one, except where a gradient is involved: a
+     * background-image cannot be transitioned or animated, so a gradient
+     * button with no effect would change at once on hover while a plain one
+     * fades. It gets a fade instead, on a layer, with no setting to turn on.
+     * The pulse moves onto the same layer for the same reason. The slides
+     * already paint a layer and keep their effect.
+     *
+     * @param array<string, mixed> $props The button definition
+     *
+     * @return string The effect key
+     */
+    private function buttonBgEffect(array $props): string
+    {
+        $configured = (string) ($props['hoverBgEffect'] ?? ButtonEffectCatalog::DEFAULT_BG_EFFECT);
+        $bgImage = isset($props['bg']) ? $this->paintImage($props['bg']) : null;
+        $hoverImage = isset($props['hoverBg']) ? $this->paintImage($props['hoverBg']) : null;
+        if (null !== $hoverImage && isset($props['slug'])) {
+            $this->buttonHoverImages[(string) $props['slug']] = $hoverImage;
+        }
+        if (null === $bgImage && null === $hoverImage) {
+            return $configured;
+        }
+
+        if (!isset($props['hoverBg'])) {
+            return $configured;
+        }
+        if ('pulse-bg' === $configured) {
+            return self::BG_EFFECT_LAYER_PULSE;
+        }
+
+        return ButtonEffectCatalog::isActiveBgEffect($configured) ? $configured : self::BG_EFFECT_FADE;
+    }
+
+    /**
+     * The hover gradient of a button, when it has one.
+     *
+     * @param string $slug The button slug
+     *
+     * @return string|null The CSS image, or null for a color
+     */
+    private function buttonHoverImage(string $slug): ?string
+    {
+        return $this->buttonHoverImages[$slug] ?? null;
     }
 
     /**
@@ -4163,7 +4932,7 @@ class ThemeCompiler
         // underlying button while the overlay is mid-slide, masking the effect
         // (the overlay and the now-tinted bg merge into a single flat color
         // before the slide finishes). Only emit it when no bg-effect is active.
-        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) && isset($props['hoverBg'])) {
+        if (!ButtonEffectCatalog::isActiveBgEffect($bgEffectKey) && !\in_array($bgEffectKey, self::BG_LAYER_EFFECTS, true) && isset($props['hoverBg'])) {
             $css .= "  background-color: {$this->resolveColorValue((string) $props['hoverBg'])};\n";
         }
         if (isset($props['hoverText'])) {
@@ -4212,8 +4981,16 @@ class ThemeCompiler
         $declarations = '';
         foreach (self::FOOTER_COLOR_VAR_SUFFIX as $key => $suffix) {
             $resolved = $this->menuColorOrNull($colors[$key] ?? null);
-            if (null !== $resolved) {
-                $declarations .= "  --iw-footer-{$suffix}: {$resolved};\n";
+            if (null === $resolved) {
+                continue;
+            }
+            $image = 'bg' === $key ? $this->paintImage($colors[$key]) : null;
+            if (null !== $image) {
+                $resolved = $this->resolvePaint(trim((string) $colors[$key]))['color'];
+            }
+            $declarations .= "  --iw-footer-{$suffix}: {$resolved};\n";
+            if (null !== $image) {
+                $declarations .= "  --iw-footer-{$suffix}-image: {$image};\n";
             }
         }
 
@@ -4257,6 +5034,9 @@ class ThemeCompiler
 
         // Surface and running text. Paragraphs and list items inherit it.
         $css .= ".iw-footer { background-color: var(--iw-footer-bg, transparent); color: var(--iw-footer-text, inherit); }\n";
+        if (null !== $this->paintImage($colors['bg'] ?? null)) {
+            $css .= ".iw-footer { background-image: var(--iw-footer-bg-image); }\n";
+        }
 
         // Brand — logo capped by a configurable max-height (keeps aspect ratio,
         // never upscales a small logo). Width auto + max-width guard for narrow columns.
@@ -4852,11 +5632,28 @@ class ThemeCompiler
                 // whole declaration and, worse, makes the fallback in
                 // `var(--iw-variant-x, …)` unreachable: the property IS set, to
                 // nothing. Leaving it out keeps the fallback working.
-                $resolved = trim($this->resolveColorValue((string) $props[$tokenKey]));
+                //
+                // A surface painted with a gradient publishes the image beside
+                // the color, as `<property>-image`, for the blocks to lay on top.
+                // A text color keeps its fallback as the color, even for a
+                // translucent gradient: it is what reads where the gradient
+                // cannot be clipped to the glyphs.
+                $paint = match (true) {
+                    \in_array($tokenKey, VariantZones::GRADIENT_KEYS, true) => $this->resolvePaint(trim((string) $props[$tokenKey])),
+                    \in_array($tokenKey, VariantZones::GRADIENT_TEXT_KEYS, true) => [
+                        'color' => $this->resolveColorValue((string) $props[$tokenKey]),
+                        'image' => $this->paintImage($props[$tokenKey]),
+                    ],
+                    default => ['color' => $this->resolveColorValue((string) $props[$tokenKey]), 'image' => null],
+                };
+                $resolved = trim($paint['color']);
                 if ('' === $resolved) {
                     continue;
                 }
                 $css .= "  {$cssProperty}: {$resolved};\n";
+                if (null !== $paint['image']) {
+                    $css .= "  {$cssProperty}-image: {$paint['image']};\n";
+                }
             }
 
             foreach ($widthMap as $tokenKey => $cssProperty) {
@@ -4924,10 +5721,14 @@ class ThemeCompiler
             // components (e.g. fullbleed banners, hero sections) can mirror the variant
             // background without re-implementing the resolution logic.
             if (!empty($props['blockBg'])) {
-                $resolvedBlockBg = $this->resolveColorValue((string) $props['blockBg']);
+                $blockPaint = $this->resolvePaint((string) $props['blockBg']);
                 $css .= ".iw-variant--{$index}[data-has-bg=\"true\"] {\n";
-                $css .= "  background-color: {$resolvedBlockBg};\n";
-                $css .= "  --iw-variant-block-bg: {$resolvedBlockBg};\n";
+                $css .= "  background-color: {$blockPaint['color']};\n";
+                $css .= "  --iw-variant-block-bg: {$blockPaint['color']};\n";
+                if (null !== $blockPaint['image']) {
+                    $css .= "  background-image: {$blockPaint['image']};\n";
+                    $css .= "  --iw-variant-block-bg-image: {$blockPaint['image']};\n";
+                }
                 $css .= "}\n";
             }
 
@@ -4963,7 +5764,8 @@ class ThemeCompiler
             // same declaration, so an overlap costs nothing. Written once in a
             // rule of its own it would either survive both halves being off, or
             // need a third selector to say what these two already say.
-            $contentBg = trim($this->resolveColorValue((string) ($props['contentBg'] ?? '')));
+            $contentPaint = $this->resolvePaint(trim((string) ($props['contentBg'] ?? '')));
+            $contentBg = trim($contentPaint['color']);
             $contentBorder = trim($this->resolveColorValue((string) ($props['contentBorder'] ?? '')));
             // Inside these rules, so padding only applies where the surface
             // paints something. Unconditional, it would move every block of
@@ -4972,9 +5774,37 @@ class ThemeCompiler
             if ('' !== $contentBg) {
                 $css .= ".iw-variant--{$index} .iw-block__content[data-content-bg=\"true\"] {\n";
                 $css .= "  background-color: {$contentBg};\n";
+                if (null !== $contentPaint['image']) {
+                    $css .= "  background-image: {$contentPaint['image']};\n";
+                }
                 $css .= $contentPadding;
                 $css .= "}\n";
             }
+            // A gradient highlight paints the highlighted words with it. The
+            // pictograms taking the highlight color read the image published
+            // with it (`--iw-variant-highlight-image`) through `--iw-icon-image`.
+            $highlightImage = $this->paintImage($props['highlight'] ?? null);
+            if (null !== $highlightImage) {
+                $css .= self::textGradientRule(".iw-variant--{$index} .iw-highlight", 'var(--iw-variant-highlight-image)');
+            }
+
+            // A gradient title color paints the headings of the variant.
+            if (null !== $this->paintImage($props['title'] ?? null)) {
+                $css .= $this->variantTitleGradient((string) $index, null !== $highlightImage, '' !== trim((string) ($props['cardTitle'] ?? '')));
+            }
+
+            // A gradient card border, drawn as a ring on every card of the
+            // variant. They all carry the card marker, so one rule reaches
+            // the ten blocks drawing cards. The class is doubled to outrank
+            // the block rules drawing the real border, which the ring
+            // replaces at the same thickness.
+            $cardBorderImage = $this->paintImage($props['cardBorder'] ?? null);
+            if (null !== $cardBorderImage) {
+                $card = ".iw-variant--{$index} .iw-surface--card.iw-surface--card";
+                $css .= "{$card} {\n  position: relative;\n  border-width: 0;\n}\n";
+                $css .= self::gradientRingRule($card, $cardBorderImage, 'var(--iw-variant-card-border-width, 1px)');
+            }
+
             if ('' !== $contentBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__content[data-content-border=\"true\"] {\n";
                 $css .= "  border: var(--iw-variant-content-border-width, 1px) solid {$contentBorder};\n";
@@ -5205,6 +6035,9 @@ class ThemeCompiler
             $css .= "  font-weight: 600;\n";
             $css .= "  color: var(--iw-variant-table-head-text, var(--iw-variant-title-color, inherit));\n";
             $css .= "  background-color: var(--iw-variant-table-head-bg, var(--iw-variant-subtle-bg));\n";
+            if (str_starts_with(trim((string) ($props['tableHeadBg'] ?? '')), GradientSet::REF_PREFIX)) {
+                $css .= "  background-image: var(--iw-variant-table-head-bg-image, none);\n";
+            }
             $css .= "}\n";
 
             // Inline code (<code> not inside <pre>)
@@ -5279,13 +6112,17 @@ class ThemeCompiler
             // A border belongs to the same surface as the background, and needs
             // the same padding: drawn on its own, it would sit against the text.
             // So either one opens the rule, and the padding comes with both.
-            $pgBg = $this->resolveColorValue(trim($props['paragraphBg'] ?? ''));
+            $pgPaint = $this->resolvePaint(trim($props['paragraphBg'] ?? ''));
+            $pgBg = $pgPaint['color'];
             $pgBorder = trim($this->resolveColorValue((string) ($props['paragraphBorder'] ?? '')));
-            $hasPgBg = $pgBg !== '' && strtolower($pgBg) !== 'transparent';
+            $hasPgBg = null !== $pgPaint['image'] || ($pgBg !== '' && strtolower($pgBg) !== 'transparent');
             if ($hasPgBg || '' !== $pgBorder) {
                 $css .= ".iw-variant--{$index} .iw-block__text {\n";
                 if ($hasPgBg) {
                     $css .= "  background-color: var(--iw-variant-paragraph-bg);\n";
+                    if (null !== $pgPaint['image']) {
+                        $css .= "  background-image: var(--iw-variant-paragraph-bg-image);\n";
+                    }
                 }
                 if ('' !== $pgBorder) {
                     $css .= "  border: var(--iw-variant-paragraph-border-width, 1px) solid {$pgBorder};\n";
@@ -5459,7 +6296,9 @@ class ThemeCompiler
         $duration = ButtonEffectCatalog::resolveDuration((string) ($btnData['hoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
         $easing = ButtonEffectCatalog::resolveEasing((string) ($btnData['hoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
         $opacityKey = (string) ($btnData['hoverOpacity'] ?? ButtonEffectCatalog::DEFAULT_OPACITY);
-        $border = $this->resolveButtonBorder($btnData);
+        // No pseudo-element on the native file button: a gradient border falls
+        // back to its color there.
+        $border = $this->resolveButtonBorder($btnData, false);
 
         $css .= ".iw-variant--{$variantName} .iw-form__file::file-selector-button {\n";
         if (isset($btnData['bg'])) {

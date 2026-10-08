@@ -612,7 +612,7 @@ The share row is a reusable partial — include it in your own templates to shar
 Navigate to **Settings > Themes** in the Sulu admin panel. From there you can:
 
 1. **Create a theme**: Click "Add", fill in the name and label
-2. **Configure the palette**: Rename the 10 base color roles (primary, secondary, accent, background, black, white, neutral, error, warning, success) and add unlimited brand colors — each named by a unique slug and expanded to 11 OKLCH shades. Text/link/link-hover colors are set alongside.
+2. **Configure the palette**: Rename the 10 base color roles (primary, secondary, accent, background, black, white, neutral, error, warning, success) and add unlimited brand colors — each named by a unique slug and expanded to 11 OKLCH shades. Text/link/link-hover colors are set alongside, and named gradients under Colors > Gradients (see [Gradients](doc/gradients.md)).
 3. **Configure typography**: Select fonts for headings/body/accent via the Font Picker (Google Fonts autocomplete, system fonts, or free text)
 4. **Configure buttons**: Define unlimited button styles (named by slug) plus shared padding — colors, hover states, radius, border width/style, and five composable hover effects (shadow, transform, opacity, duration, easing). See [Button hover effects](doc/button-effects.md) for the full catalog.
 5. **Configure defaults**: Set the three radius values (cards, images, paragraphs) - blocks follow them by default and can override each one individually - plus four site-wide block spacings: between the two content zones of split blocks, between a block's titles and its content, inside image grids (mosaic, gallery) and inside the other component grids (accordion, documents, linked pages, testimonials, key figures), and the maximum width of a block's content, so a short paragraph does not stretch across the whole page - a modal picks which blocks and which styles it applies to, and each block can still override it
@@ -744,8 +744,9 @@ php bin/adminconsole iw-sulu:theme:sync-fonts
 php bin/adminconsole iw-sulu:theme:migrate-webspaces
 
 # Run integration diagnostics (theme, CSS, assets, article bundle,
-# per-site appearance choices naming a site their article left, and buttons
-# naming a style their site's theme does not define)
+# per-site appearance choices naming a site their article left, buttons
+# naming a style their site's theme does not define, and settings or title
+# words naming a gradient their theme does not define)
 php bin/adminconsole iw:tailwind-theme:check
 
 # Create a set of demo pages showing every block and its variants
@@ -803,6 +804,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Events and agendas](doc/events.md) | The `iw_events` smart content provider, the Twig functions, and the listing page in agenda mode |
 | [CSS Variables Reference](doc/css-variables.md) | All CSS custom properties: colors, palettes, typography, borders, buttons, menu |
 | [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
+| [Gradients](doc/gradients.md) | Named gradients used like colors: stops, overlay, the solid fallback, how they are stored and compiled |
 | [Button Hover Effects](doc/button-effects.md) | Catalog of composable hover effects (shadow, transform, opacity, duration, easing) |
 | [Twig Reference](doc/twig-reference.md) | All Twig functions, global variable `iw_sulu_tailwind_theme`, token structure |
 | [Title editor](doc/title-editor.md) | Multi-line titles with highlighted words: the `iw_theme_title_editor` field type, its stored syntax, and the classes behind it |

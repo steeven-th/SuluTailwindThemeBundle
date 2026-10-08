@@ -184,4 +184,12 @@ final class TitleMarkupRendererTest extends TestCase
         self::assertTrue($this->renderer->hasMarkup('[[accent:Notre]] expertise'));
         self::assertTrue($this->renderer->hasMarkup("Notre\nexpertise"));
     }
+
+    public function testAGradientMarkerBecomesItsTextClass(): void
+    {
+        self::assertSame(
+            'Notre <span class="iw-text--gradient-bleu-leger">expertise</span>',
+            (new \ItechWorld\SuluTailwindThemeBundle\Service\TitleMarkupRenderer())->render('Notre [[gradient-bleu-leger:expertise]]'),
+        );
+    }
 }

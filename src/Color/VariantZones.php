@@ -162,6 +162,39 @@ final class VariantZones
     ];
 
     /**
+     * The backgrounds that accept a gradient as well as a color.
+     *
+     * The surfaces a variant fills and the band of a table header, nothing
+     * that colors text, a border or a shadow: those need a solid color to stay
+     * legible. Table cells, stripes and hover stay solid too, they stack on
+     * one another over the data. Mirrored by GRADIENT_KEYS in zones.js.
+     *
+     * @var list<string>
+     */
+    public const GRADIENT_KEYS = ['blockBg', 'contentBg', 'paragraphBg', 'cardBg', 'accentBg', 'tableHeadBg'];
+
+    /**
+     * The borders that accept a gradient, drawn as a ring.
+     *
+     * The card border only: the other surfaces have no marker class a ring
+     * could hang from. Mirrored by GRADIENT_BORDER_KEYS in zones.js.
+     *
+     * @var list<string>
+     */
+    public const GRADIENT_BORDER_KEYS = ['cardBorder'];
+
+    /**
+     * The text colors that accept a gradient, clipped to the glyphs.
+     *
+     * The title paints the headings. The highlight paints the highlighted
+     * words, and the pictograms of the cards, key figures and timelines. Mirrored by GRADIENT_TEXT_KEYS in
+     * zones.js.
+     *
+     * @var list<string>
+     */
+    public const GRADIENT_TEXT_KEYS = ['title', 'highlight'];
+
+    /**
      * Widths a border can take, in pixels.
      *
      * @var list<int>

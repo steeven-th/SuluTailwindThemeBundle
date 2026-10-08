@@ -326,6 +326,39 @@ Only the settings that are filled are written. An empty link setting leaves the
 band on the footer link color, where `--iw-footer-link: ;` would have made every
 fallback reading it unreachable.
 
+### A gradient on a project field
+
+A color field of the project can offer the theme's [gradients](gradients.md)
+too, with one more param:
+
+```xml
+<params>
+    <param name="show_palette" value="true"/>
+    <param name="allow_gradient" value="true"/>
+</params>
+```
+
+The picker then shows a Gradients tab and stores `gradient:<slug>`. The bundle
+paints its own fields only, so a project field offering a gradient has to paint
+it: the theme compiles every gradient to `--gradient-<slug>` (the image) and
+`--gradient-<slug>-fallback` (a solid color), which the subscriber points at.
+Extending `toCss()` above:
+
+```php
+use ItechWorld\SuluTailwindThemeBundle\Color\GradientSet;
+
+$slug = GradientSet::parseRef($value);
+if (null !== $slug) {
+    // A background: the image over its fallback color.
+    return "var(--gradient-{$slug}), var(--gradient-{$slug}-fallback)";
+}
+```
+
+That value suits the `background` shorthand. Where only a color fits (a text, a
+border, a `color-mix()`), use `var(--gradient-<slug>-fallback)` alone. Offer the
+param only where the field paints a background: everywhere else the gradient
+shows as its fallback, which reads as a setting doing nothing.
+
 ## Cache busting
 
 Compiled filenames carry a hash (`theme-12-9bd4ff32.css`) built from the theme's

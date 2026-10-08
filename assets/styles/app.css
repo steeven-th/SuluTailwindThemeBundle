@@ -316,6 +316,8 @@ a:hover {
 .iw-icon--mask {
     display: inline-block;
     background-color: currentColor;
+    /* A slot painting its pictograms with a gradient hands it down here. */
+    background-image: var(--iw-icon-image, none);
     -webkit-mask-image: var(--iw-icon-media);
     mask-image: var(--iw-icon-media);
     -webkit-mask-repeat: no-repeat;
@@ -859,6 +861,7 @@ img.object-cover {
     padding: var(--iw-embed-consent-padding, 1.5rem);
     text-align: center;
     background-color: var(--iw-embed-consent-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, var(--color-surface, #f3f4f6))));
+    background-image: var(--iw-embed-consent-bg-image, var(--iw-variant-paragraph-bg-image, none));
     color: var(--iw-embed-consent-text, var(--iw-variant-paragraph-color, inherit));
 }
 
@@ -1093,6 +1096,7 @@ img.object-cover {
    once a row has a fill of its own - a coloured header, for instance. */
 .iw-block-accordion--list {
     background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-surface-bg-image, var(--iw-variant-paragraph-bg-image, none));
     overflow: hidden;
 }
 
@@ -1114,6 +1118,7 @@ img.object-cover {
 .iw-block-accordion--cards .iw-accordion__item {
     padding-inline: var(--iw-accordion-card-padding-x, 1.25rem);
     background-color: var(--iw-accordion-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-accordion-card-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-variant-card-border, transparent);
 }
@@ -1154,6 +1159,7 @@ img.object-cover {
 
 .iw-block-accordion .iw-accordion__summary--accent {
     background-color: var(--iw-accordion-summary-bg, var(--iw-variant-accent-bg, var(--color-accent)));
+    background-image: var(--iw-accordion-summary-bg-image, var(--iw-variant-accent-bg-image, none));
 }
 
 /* Hovering a coloured bar must not swap its text for a colour chosen against
@@ -1165,12 +1171,14 @@ img.object-cover {
 .iw-block-accordion .iw-accordion__panel--filled {
     padding-bottom: var(--iw-accordion-panel-filled-padding-bottom, 1rem);
     background-color: var(--iw-accordion-panel-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-panel-bg-image, var(--iw-variant-paragraph-bg-image, none));
 }
 
 /* Mode: --bordered — single box, inner rules between items */
 .iw-block-accordion--bordered {
     border: var(--iw-accordion-rule-width, 1px) solid var(--iw-accordion-rule-color, var(--iw-variant-hr-color, var(--color-border, #e5e7eb)));
     background-color: var(--iw-accordion-surface-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-accordion-surface-bg-image, var(--iw-variant-paragraph-bg-image, none));
 }
 
 .iw-block-accordion--bordered .iw-accordion__item {
@@ -1295,6 +1303,7 @@ img.object-cover {
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-document-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-document-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-document-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-document-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
     text-decoration: none;
     transition: box-shadow var(--iw-document-card-transition-duration, 0.2s) ease;
@@ -1431,6 +1440,7 @@ img.object-cover {
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-linked-page-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-linked-page-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-linked-page-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
     transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1683,6 +1693,7 @@ img.object-cover {
 .iw-block-testimonial--cards .iw-testimonial {
     padding: var(--iw-testimonial-padding, 1.5rem);
     background-color: var(--iw-testimonial-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-testimonial-card-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-testimonial-border, var(--iw-variant-card-border, transparent));
     /* The hover comes from Components > Cards, like every other card family.
@@ -2026,6 +2037,7 @@ img.object-cover {
    nowhere, so an editor picking one saw nothing happen. */
 .iw-block-key-figures .iw-key-figure__icon {
     --iw-icon-color: var(--iw-key-figure-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-key-figure-icon-image, var(--iw-variant-highlight-image, none));
     /* Same rule as the card slot: the icon carries the size, the slot follows,
        so a larger one takes the room it needs. */
     --iw-icon-size: var(--iw-key-figure-icon-size, 3rem);
@@ -2100,6 +2112,7 @@ img.object-cover {
 .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
     padding: var(--iw-key-figure-card-padding, 1.5rem);
     background-color: var(--iw-key-figure-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-key-figure-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-key-figure-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
     /* The width comes from the surface and defaults to zero, so a variant
        asking for no border gets none. The hairline that used to be written
@@ -2279,6 +2292,7 @@ img.object-cover {
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-block-key-figures-timeline-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-block-key-figures-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-block-key-figures-timeline-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
 }
 
@@ -2381,6 +2395,7 @@ img.object-cover {
     display: flex;
     margin-bottom: 0.75rem;
     --iw-icon-color: var(--iw-timeline-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-timeline-icon-image, var(--iw-variant-highlight-image, none));
 }
 
 .iw-timeline-step__icon-img {
@@ -2410,6 +2425,7 @@ img.object-cover {
     border: var(--iw-timeline-card-border-width, var(--iw-variant-card-border-width, 0)) solid
         var(--iw-timeline-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-timeline-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
 }
 
@@ -2674,6 +2690,7 @@ img.object-cover {
     height: 100%;
     overflow: hidden;
     background-color: var(--iw-block-article-item-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-block-article-item-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-block-article-item-border, var(--iw-variant-card-border-width, 0) solid
         var(--iw-variant-card-border, transparent));
 }
@@ -2868,6 +2885,7 @@ img.object-cover {
 .iw-block-article-featured .iw-featured-article-card {
     display: block;
     background-color: var(--iw-featured-article-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-featured-article-card-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-featured-article-card-border, var(--iw-variant-card-border-width, 0) solid
         var(--iw-variant-card-border, transparent));
     /* The shadow follows the theme like the fill and the border above it. It
@@ -3816,6 +3834,7 @@ section.block:has([data-slider-fullbleed-value]) {
    this one panel to differ. */
 .iw-block-form--split .iw-block-form__info {
     background-color: var(--iw-block-form-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-block-form-info-bg-image, var(--iw-variant-paragraph-bg-image, none));
     border: var(--iw-variant-paragraph-border-width, 0) solid
         var(--iw-block-form-info-border, var(--iw-variant-paragraph-border, transparent));
     color: var(--iw-block-form-info-color, var(--iw-variant-paragraph-color, inherit));
@@ -3846,6 +3865,7 @@ section.block:has([data-slider-fullbleed-value]) {
    follows the theme tokens automatically. */
 .iw-block-form--card {
     background-color: var(--iw-block-form-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-block-form-card-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-block-form-card-border, var(--iw-variant-card-border, transparent));
 }
@@ -3936,6 +3956,7 @@ section.block:has([data-slider-fullbleed-value]) {
     border: var(--iw-variant-paragraph-border-width, 0) solid
         var(--iw-block-location-info-border, var(--iw-variant-paragraph-border, transparent));
     background-color: var(--iw-block-location-info-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg)));
+    background-image: var(--iw-block-location-info-bg-image, var(--iw-variant-paragraph-bg-image, none));
     color: var(--iw-block-location-info-color, var(--iw-variant-paragraph-color, inherit));
 }
 
@@ -5002,6 +5023,7 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-pagination-item-padding, 0.5rem 0.75rem);
     border-radius: var(--iw-pagination-item-radius, var(--border-radius));
     background-color: var(--iw-pagination-item-bg, transparent);
+    background-image: var(--iw-pagination-item-bg-image, none);
     border: var(--iw-pagination-item-border-width, 0) solid var(--iw-pagination-item-border, transparent);
     box-shadow: var(--iw-pagination-item-shadow, none);
     font-size: 0.875rem;
@@ -5013,6 +5035,7 @@ span.iw-breadcrumbs__separator {
 .iw-pagination__link:hover,
 .iw-pagination__arrow:hover {
     background-color: var(--iw-pagination-hover-bg, color-mix(in srgb, var(--color-surface-accent) 12%, transparent));
+    background-image: var(--iw-pagination-hover-bg-image, none);
     color: var(--iw-pagination-hover-color, var(--color-surface-accent));
 }
 
@@ -5020,6 +5043,7 @@ span.iw-breadcrumbs__separator {
 .iw-pagination__link--current:hover {
     font-weight: 600;
     background-color: var(--iw-pagination-current-bg, var(--color-surface-accent));
+    background-image: none;
     color: var(--iw-pagination-current-color, var(--color-surface-on-accent, #fff));
 }
 
@@ -5056,6 +5080,7 @@ span.iw-breadcrumbs__separator {
     border: 1px solid var(--iw-tag-border, var(--color-surface-border));
     border-radius: var(--iw-tag-radius, var(--border-radius));
     background-color: var(--iw-tag-bg, transparent);
+    background-image: var(--iw-tag-bg-image, none);
     box-shadow: var(--iw-tag-shadow, none);
     color: var(--iw-tag-text, var(--color-surface-muted));
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -5068,6 +5093,7 @@ span.iw-breadcrumbs__separator {
    alone is enough, the other two only refine it. */
 .iw-tag:hover {
     background-color: var(--iw-tag-hover-bg, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 12%, var(--iw-tag-bg, transparent)));
+    background-image: var(--iw-tag-hover-bg-image, none);
     color: var(--iw-tag-hover-text, var(--color-surface-accent));
     border-color: var(--iw-tag-hover-border, color-mix(in srgb, var(--iw-tag-hover-text, var(--color-surface-accent)) 40%, var(--iw-tag-border, var(--color-surface-border))));
 }
@@ -5112,6 +5138,7 @@ span.iw-breadcrumbs__separator {
     font-weight: var(--iw-category-badge-font-weight, 600);
     border-radius: var(--iw-category-badge-radius, var(--border-radius));
     background-color: var(--iw-category-badge-bg, var(--color-primary-100));
+    background-image: var(--iw-category-badge-bg-image, none);
     color: var(--iw-category-badge-text, var(--color-primary-700));
 }
 
@@ -5121,6 +5148,7 @@ span.iw-breadcrumbs__separator {
     margin-bottom: 0.5rem;
     --iw-category-badge-padding: 0.125rem 0.5rem;
     --iw-category-badge-bg: var(--iw-article-card-badge-bg, var(--color-primary-100));
+    --iw-category-badge-bg-image: var(--iw-article-card-badge-bg-image, none);
     --iw-category-badge-text: var(--iw-article-card-badge-text, var(--color-primary-700));
 }
 
@@ -5275,6 +5303,7 @@ span.iw-breadcrumbs__separator {
     gap: var(--iw-article-filters-group-gap, 1.5rem);
     padding: var(--iw-article-filters-padding, 1.25rem);
     background-color: var(--iw-article-filters-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-bg-image, var(--color-surface-image, none));
     border: 1px solid var(--iw-article-filters-border, var(--color-surface-border));
     border-radius: var(--iw-article-filters-radius, var(--border-radius));
     box-shadow: var(--iw-article-filters-shadow, none);
@@ -5451,6 +5480,7 @@ span.iw-breadcrumbs__separator {
 .iw-article-layout--drawer-armed .iw-article-filters__toggle:not([class*="iw-button--"]) {
     color: var(--iw-article-filters-toggle-color, var(--color-surface-foreground));
     background-color: var(--iw-article-filters-toggle-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-toggle-bg-image, var(--color-surface-image, none));
     border: 1px solid var(--iw-article-filters-toggle-border, var(--color-surface-border));
 }
 
@@ -5488,6 +5518,7 @@ span.iw-breadcrumbs__separator {
     overflow-y: auto;
     padding: var(--iw-article-filters-drawer-padding, 1.25rem);
     background-color: var(--iw-article-filters-drawer-bg, var(--color-surface));
+    background-image: var(--iw-article-filters-drawer-bg-image, var(--color-surface-image, none));
     box-shadow: var(--iw-article-filters-drawer-shadow, 0 0 2.5rem rgba(0, 0, 0, 0.25));
     transform: translateX(-100%);
     transition: transform var(--iw-article-filters-drawer-transition, 0.3s ease);
@@ -5577,6 +5608,7 @@ span.iw-breadcrumbs__separator {
     height: var(--iw-back-to-top-size, 2.75rem);
     color: var(--iw-back-to-top-color, var(--color-surface-on-accent, #fff));
     background-color: var(--iw-back-to-top-bg, var(--color-surface-accent));
+    background-image: var(--iw-back-to-top-bg-image, none);
     border: 0;
     border-radius: var(--iw-back-to-top-radius, 999px);
     box-shadow: var(--iw-back-to-top-shadow, 0 0.25rem 1rem rgba(0, 0, 0, 0.2));
@@ -5598,6 +5630,7 @@ span.iw-breadcrumbs__separator {
 
 .iw-back-to-top:hover {
     background-color: var(--iw-back-to-top-hover-bg, color-mix(in srgb, var(--color-surface-accent), var(--color-text) 15%));
+    background-image: var(--iw-back-to-top-hover-bg-image, none);
 }
 
 .iw-back-to-top__icon {
@@ -5628,6 +5661,7 @@ span.iw-breadcrumbs__separator {
     padding: var(--iw-toc-padding, 1rem 1.25rem);
     color: var(--iw-toc-color, var(--color-surface-foreground));
     background-color: var(--iw-toc-bg, var(--color-surface));
+    background-image: var(--iw-toc-bg-image, var(--color-surface-image, none));
     border: var(--iw-toc-border, 1px solid var(--color-surface-border));
     border-radius: var(--iw-toc-radius, var(--border-radius));
     box-shadow: var(--iw-toc-shadow, none);
@@ -5712,6 +5746,7 @@ span.iw-breadcrumbs__separator {
         height: var(--iw-toc-toggle-size, 2.5rem);
         color: var(--iw-toc-toggle-color, var(--iw-toc-color, var(--color-surface-foreground)));
         background-color: var(--iw-toc-toggle-bg, var(--iw-toc-bg, var(--color-surface)));
+        background-image: var(--iw-toc-toggle-bg-image, var(--iw-toc-bg-image, var(--color-surface-image, none)));
         border: var(--iw-toc-toggle-border, var(--iw-toc-border, 1px solid var(--color-surface-border)));
         border-right: 0;
         border-radius: var(--iw-toc-toggle-radius, 999px) 0 0 var(--iw-toc-toggle-radius, 999px);
@@ -5830,11 +5865,13 @@ aside .iw-toc {
 .iw-share__button:not([class*="iw-button--"]) {
     color: var(--iw-share-color, var(--color-surface-foreground));
     background-color: var(--iw-share-bg, var(--color-surface));
+    background-image: var(--iw-share-bg-image, var(--color-surface-image, none));
     border: var(--iw-share-border, 1px solid var(--color-surface-border));
 }
 
 .iw-share__button:not([class*="iw-button--"]):hover {
     background-color: var(--iw-share-hover-bg, color-mix(in srgb, var(--iw-share-bg, var(--color-surface)), var(--color-text) 8%));
+    background-image: var(--iw-share-hover-bg-image, none);
 }
 
 .iw-share__button[hidden] {
@@ -6229,6 +6266,7 @@ aside .iw-toc {
     /* The frame comes from the variant. A variant that sets neither background
        nor border leaves the cards bare, held together by the grid alone. */
     background-color: var(--iw-card-bg, var(--iw-variant-card-bg, transparent));
+    background-image: var(--iw-card-bg-image, var(--iw-variant-card-bg-image, none));
 }
 
 /* The border only draws when the variant gives it a colour, so a bare variant
@@ -6279,6 +6317,7 @@ aside .iw-toc {
 .iw-card__icon {
     flex: 0 0 auto;
     --iw-icon-color: var(--iw-card-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-card-icon-image, var(--iw-variant-highlight-image, none));
     display: block;
     /* The slot takes the width of the icon in it, rather than setting one of
        its own: a size picked on the card lands on the icon, and a slot holding
@@ -6450,6 +6489,7 @@ aside .iw-toc {
    grid by one. */
 .iw-card--highlighted {
     background-color: var(--iw-variant-accent-bg, var(--color-accent));
+    background-image: var(--iw-variant-accent-bg-image, none);
     border-color: var(--iw-variant-accent-border, var(--iw-variant-card-border, transparent));
     border-width: var(--iw-variant-accent-border-width, var(--iw-variant-card-border-width, 0));
     color: var(--iw-variant-accent-text, var(--color-surface-on-accent, #fff));

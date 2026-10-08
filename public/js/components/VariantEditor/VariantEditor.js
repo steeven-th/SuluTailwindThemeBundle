@@ -8,7 +8,8 @@ import {resolveAllRefs, resolveRef} from '../../utils/colorRefResolver';
 import {buttonBorderStyle} from '../../utils/buttonBorder';
 import buttonStyleExtras from '../../utils/buttonStyleExtras';
 import loadFormPalette, {paletteFor} from '../../utils/formPalette';
-import {WIDTHS, LINE_STYLES, FIELDS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, GRADIENT_BORDER_KEYS, GRADIENT_TEXT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor} from './zones';
+import {availableGradients, gradientRingStyle, gradientSlug, gradientTextStyle, isGradientRef, paletteColorResolver, splitGradientRefs} from '../../utils/gradient';
 
 const STYLE_ID = 'iw-variant-editor-styles';
 
@@ -54,8 +55,14 @@ function ensureVariantEditorStyles() {
         '  padding: 14px; border-radius: 3px;',
         '}',
         '.iw-ve__title { color: var(--ve-title, #1a1a1a); font-size: 19px; font-weight: 700; margin: 0 0 4px; }',
+        // A gradient title or highlight, clipped to the text as the site does.
+        '.iw-ve__title, .iw-ve__highlight {',
+        '  -webkit-background-clip: text; background-clip: text;',
+        '}',
+        '.iw-ve__title { background-image: var(--ve-title-image, none); -webkit-text-fill-color: var(--ve-title-fill, currentColor); }',
         '.iw-ve__subtitle { color: var(--ve-subtitle, #666666); font-size: 14px; margin: 0 0 10px; }',
-        '.iw-ve__highlight { color: var(--ve-highlight, #d97706); }',
+        '.iw-ve__highlight { color: var(--ve-highlight, #d97706); background-image: var(--ve-highlight-image, none);',
+        '  -webkit-text-fill-color: var(--ve-highlight-fill, currentColor); }',
         '.iw-ve__text {',
         '  background: var(--ve-paragraphBg, transparent);',
         '  border: var(--ve-paragraphBorderWidth, 0px) solid var(--ve-paragraphBorder, transparent);',
@@ -77,6 +84,15 @@ function ensureVariantEditorStyles() {
         '  background: var(--ve-cardBg, transparent);',
         '  border: var(--ve-cardBorderWidth, 0px) solid var(--ve-cardBorder, transparent);',
         '  padding: 10px 12px; border-radius: 3px; margin: 0 0 10px;',
+        '  position: relative;',
+        '}',
+        // A gradient card border, drawn as the same ring as on the site.
+        '.iw-ve__card::after {',
+        '  content: ""; position: absolute; pointer-events: none;',
+        '  inset: calc(-1 * var(--ve-cardBorderWidth, 0px)); padding: var(--ve-cardBorderWidth, 0px);',
+        '  border-radius: inherit; background: var(--ve-cardBorder-image, none);',
+        '  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;',
+        '  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;',
         '}',
         '.iw-ve__card-title {',
         '  color: var(--ve-cardTitle, var(--ve-title, #1a1a1a));',
@@ -272,6 +288,19 @@ export default class VariantEditor extends React.Component {
     }
 
     /**
+     * The theme's gradients, painted with the palette being edited.
+     *
+     * @returns {Array<Object>} [{slug, label, image, fallback}]
+     */
+    get gradients() {
+        return availableGradients(
+            this.props.formInspector,
+            paletteColorResolver(paletteFor(this.props.formInspector, this.state.palette)),
+            themeConfigStore.gradients,
+        );
+    }
+
+    /**
      * The button style this variant points at, if any.
      *
      * It is a sibling property, not part of the colors, so it is read from the
@@ -343,6 +372,26 @@ export default class VariantEditor extends React.Component {
             // length to suffix nor a colour to resolve.
             if ('lineStyle' === kind) {
                 style['--ve-' + key] = held;
+
+                return;
+            }
+
+            // The preview paints its surfaces with the `background`
+            // shorthand, which takes an image as readily as a color.
+            if (isGradientRef(held)) {
+                const gradient = this.gradients.find((candidate) => candidate.slug === gradientSlug(held));
+                if (gradient && GRADIENT_KEYS.includes(key)) {
+                    style['--ve-' + key] = gradient.image;
+                } else if (gradient && GRADIENT_BORDER_KEYS.includes(key)) {
+                    // The ring paints the gradient, the border keeps its room.
+                    style['--ve-' + key] = 'transparent';
+                    style['--ve-' + key + '-image'] = gradient.image;
+                } else if (gradient) {
+                    // A text: its fallback as the color, the gradient clipped to it.
+                    style['--ve-' + key] = gradient.fallback;
+                    style['--ve-' + key + '-image'] = gradient.image;
+                    style['--ve-' + key + '-fill'] = 'transparent';
+                }
 
                 return;
             }
@@ -587,17 +636,24 @@ export default class VariantEditor extends React.Component {
             return null;
         }
 
+        const {values: paint, images} = splitGradientRefs(button, this.gradients);
         const style = {
-            background: button.bg || 'transparent',
-            color: button.text || 'inherit',
-            ...buttonBorderStyle(button),
-            ...buttonStyleExtras(button),
+            position: 'relative',
+            background: images.bg ? `${images.bg}, ${paint.bg}` : (paint.bg || 'transparent'),
+            color: paint.text || 'inherit',
+            ...buttonBorderStyle(paint),
+            ...(images.border ? {borderColor: 'transparent'} : {}),
+            ...buttonStyleExtras(paint),
         };
+        const text = button.label || translate('iw_sulu_tailwind_theme.variant_preview_button');
 
         return (
             <div className="iw-ve__button-wrap">
                 <span className="iw-ve__button" style={style}>
-                    {button.label || translate('iw_sulu_tailwind_theme.variant_preview_button')}
+                    {images.text ? <span style={gradientTextStyle(images.text)}>{text}</span> : text}
+                    {images.border &&
+                        <span style={gradientRingStyle(images.border, buttonBorderStyle(paint).borderWidth || '1px')} />
+                    }
                 </span>
             </div>
         );
@@ -694,6 +750,7 @@ export default class VariantEditor extends React.Component {
             <div className="iw-ve__setting" key={key}>
                 <span className="iw-ve__setting-label">{translate(field.label)}</span>
                 <ColorTokenEditor
+                    allowGradient={[...GRADIENT_KEYS, ...GRADIENT_BORDER_KEYS, ...GRADIENT_TEXT_KEYS].includes(key)}
                     disabled={this.props.disabled}
                     formInspector={this.props.formInspector}
                     onChange={(next) => this.commit(key, next)}

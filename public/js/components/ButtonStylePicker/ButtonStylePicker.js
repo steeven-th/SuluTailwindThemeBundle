@@ -5,6 +5,7 @@ import {Requester} from 'sulu-admin-bundle/services';
 import themeConfigStore from '../../stores/themeConfigStore';
 import {getSuluPrimaryColor, getSuluPrimaryTint} from '../../utils/suluColors';
 import {resolveAllRefs} from '../../utils/colorRefResolver';
+import {availableGradients, gradientRingStyle, gradientTextStyle, paletteColorResolver, splitGradientRefs} from '../../utils/gradient';
 import {paletteFor} from '../../utils/formPalette';
 import {buttonBorderStyle} from '../../utils/buttonBorder';
 import buttonStyleExtras from '../../utils/buttonStyleExtras';
@@ -162,6 +163,11 @@ export default class ButtonStylePicker extends React.Component {
         const editingWebspace = themeConfigStore.editingWebspace;
         const selected = valueFor(value, editingWebspace);
         const buttons = this._getButtons();
+        const gradients = availableGradients(
+            this.props.formInspector && this.props.formInspector.resourceKey === THEME_RESOURCE_KEY ? this.props.formInspector : null,
+            paletteColorResolver(paletteFor(this.props.formInspector, this._palette)),
+            themeConfigStore.gradients,
+        );
         const primary = getSuluPrimaryColor();
         const tint = getSuluPrimaryTint();
         // The glows of the site read the palette roles.
@@ -193,6 +199,9 @@ export default class ButtonStylePicker extends React.Component {
                 {buttons.map((btnData) => {
                     const slug = btnData.slug;
                     const label = btnData.label || slug;
+                    // Gradients go apart: their fallback where a color is
+                    // painted, their image where the preview can draw one.
+                    const {values: paint, images} = splitGradientRefs(btnData, gradients);
                     const isSelected = selected === slug;
                     const hasData = btnData && typeof btnData === 'object';
                     const isHovered = hasData && this.state.hovered === slug;
@@ -230,12 +239,14 @@ export default class ButtonStylePicker extends React.Component {
                     const btnPreviewStyle = hasData ? {
                         display: 'inline-block',
                         padding: '6px 20px',
-                        backgroundColor: btnData.bg || '#ccc',
-                        color: btnData.text || '#fff',
-                        borderRadius: btnData.radius || '8px',
+                        position: 'relative',
+                        background: images.bg ? `${images.bg}, ${paint.bg}` : (paint.bg || '#ccc'),
+                        color: paint.text || '#fff',
+                        borderRadius: paint.radius || '8px',
                         // Transparent rather than absent when the button draws
                         // none, so the preview keeps the same size either way.
-                        ...buttonBorderStyle(btnData, '1px solid transparent'),
+                        ...buttonBorderStyle(paint, '1px solid transparent'),
+                        ...(images.border || images.hoverBorder ? {borderColor: 'transparent'} : {}),
                         fontSize: '11px',
                         fontWeight: '600',
                         lineHeight: '1.4',
@@ -246,7 +257,8 @@ export default class ButtonStylePicker extends React.Component {
                         ...buttonStyleExtras(btnData),
                         ...roleProperties,
                         transition: buttonTransition(btnData),
-                        ...(isHovered ? buttonHoverStyle(btnData) : {}),
+                        ...(isHovered ? buttonHoverStyle(paint) : {}),
+                        ...(isHovered && images.hoverBg ? {background: `${images.hoverBg}, ${paint.hoverBg}`} : {}),
                     } : {
                         display: 'inline-block',
                         padding: '6px 20px',
@@ -284,7 +296,15 @@ export default class ButtonStylePicker extends React.Component {
                         >
                             <span style={stageStyle}>
                                 <span style={btnPreviewStyle}>
-                                    {hasData ? 'Button' : '—'}
+                                    {hasData && (isHovered ? images.hoverText || images.text : images.text)
+                                        ? <span style={gradientTextStyle(isHovered ? images.hoverText || images.text : images.text)}>Button</span>
+                                        : (hasData ? 'Button' : '—')}
+                                    {hasData && (images.border || images.hoverBorder) &&
+                                        <span style={gradientRingStyle(
+                                            (isHovered && images.hoverBorder) || images.border || paint.border,
+                                            buttonBorderStyle(paint).borderWidth || '1px',
+                                        )} />
+                                    }
                                 </span>
                             </span>
                             <span style={labelStyle}>{label}</span>

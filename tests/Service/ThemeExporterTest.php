@@ -157,6 +157,19 @@ final class ThemeExporterTest extends TestCase
                 ['role' => 'primary', 'slug' => 'primary', 'value' => '#3366ff'],
                 ['role' => 'secondary', 'slug' => 'secondary', 'value' => '#22aa88'],
             ],
+            'gradients' => [
+                [
+                    'slug' => 'night',
+                    'label' => 'Night',
+                    'type' => 'linear',
+                    'angle' => 135,
+                    'stops' => [
+                        ['color' => '#3a4b8f', 'opacity' => 100, 'position' => 0],
+                        ['color' => 'ref:secondary', 'opacity' => 60, 'position' => 100],
+                    ],
+                    'overlay' => ['color' => '#000000', 'opacity' => 20],
+                ],
+            ],
             'borders' => ['cardRadius' => '1rem'],
             'defaults' => ['blockGap' => '2rem'],
             'buttons' => [

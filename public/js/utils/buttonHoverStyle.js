@@ -134,11 +134,12 @@ export default function buttonHoverStyle(button: ?Button): {[string]: string} {
         // The overlay of the site, a gradient from the hover background to the
         // accent, painted over the button background.
         const from = filled(button.hoverBg) ? button.hoverBg : 'var(--color-primary)';
-        style.backgroundImage = `linear-gradient(135deg, ${String(from)}, var(--color-accent))`;
+        style.background = `linear-gradient(135deg, ${String(from)}, var(--color-accent))`;
     } else if (filled(button.hoverBg)) {
         // No effect, a slide fully in, or a pulse at its peak: all three end
-        // on the hover background.
-        style.backgroundColor = String(button.hoverBg);
+        // on the hover background. The shorthand, so a preview can hand a
+        // gradient in the same value (see splitGradientRefs()).
+        style.background = String(button.hoverBg);
     }
 
     if (filled(button.hoverText)) {

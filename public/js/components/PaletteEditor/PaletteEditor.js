@@ -245,10 +245,14 @@ export default class PaletteEditor extends React.Component {
         const roleLabel = meta && meta.labelKey ? translate(meta.labelKey) : null;
         const slugError = this.validateSlug(color.slug, index);
 
-        const vars = color.role
-            ? '--color-' + color.role + ' / --color-' + color.slug
-            : '--color-' + color.slug;
-        const info = roleLabel ? roleLabel + ' : ' + vars : vars;
+        // The compiler emits the role alias, plus the slug alias when the slug
+        // differs, so a role keeping its default name has a single variable.
+        const vars = color.role && color.role !== color.slug
+            ? ['--color-' + color.role, '--color-' + color.slug]
+            : ['--color-' + (color.role || color.slug)];
+        const cssInfo = translate('iw_sulu_tailwind_theme.css_variables', {count: vars.length})
+            + ' : ' + vars.join(', ');
+        const info = roleLabel ? roleLabel + ' - ' + cssInfo : cssInfo;
 
         return (
             <div key={color.role || 'brand-' + index} className="iw-palette-editor__row">

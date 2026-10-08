@@ -124,6 +124,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="text" type="iw_theme_color_token_editor" colspan="4">
@@ -132,6 +133,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="border" type="iw_theme_color_token_editor" colspan="4">
@@ -140,6 +142,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="hoverBg" type="iw_theme_color_token_editor" colspan="4">
@@ -148,6 +151,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="hoverText" type="iw_theme_color_token_editor" colspan="4">
@@ -156,6 +160,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="hoverBorder" type="iw_theme_color_token_editor" colspan="4">
@@ -164,6 +169,7 @@
                             </meta>
                             <params>
                                 <param name="show_palette" value="true"/>
+                                <param name="allow_gradient" value="true"/>
                             </params>
                         </property>
                         <property name="accent" type="iw_theme_color_token_editor" colspan="6">
@@ -343,6 +349,7 @@
                         <property name="hoverBgEffect" type="single_select" colspan="6">
                             <meta>
                                 <title>iw_sulu_tailwind_theme.buttons_hoverBgEffect</title>
+                                <info_text>iw_sulu_tailwind_theme.buttons_hoverBgEffect_info</info_text>
                             </meta>
                             <params>
                                 <param name="default_value" value="none"/>

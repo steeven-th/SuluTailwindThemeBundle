@@ -41,7 +41,7 @@ colors at all simply takes the colors of the page around it.
 
 | Setting | Paints | Custom property | Empty |
 |---------|--------|-----------------|-------|
-| **Background** | The `<footer>` | `--iw-footer-bg` | transparent |
+| **Background** | The `<footer>` | `--iw-footer-bg` | transparent. Also accepts a [gradient](gradients.md), published as `--iw-footer-bg-image` |
 | **Text** | Running text: tagline, copyright | `--iw-footer-text` | the text color of the page |
 | **Column titles** | `.iw-footer__col-title` | `--iw-footer-title` | the text color |
 | **Links** | Every link, buttons aside, including the site name next to the logo | `--iw-footer-link` | the text color |

@@ -36,18 +36,22 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | Variable | Token key | Purpose |
 |----------|-----------|---------|
 | `--iw-variant-title-color` | `title` | Color for `h1`–`h6` |
+| `--iw-variant-title-color-image` | `title` | The gradient of the headings, when the title color is one |
 | `--iw-variant-subtitle-color` | `subtitle` | Color for `.iw-block__subtitle` / blockquote text |
 | `--iw-variant-highlight` | `highlight` | Color for words highlighted inside a title or subtitle (`.iw-highlight`). Falls back to `--color-accent` when the variant leaves it empty |
+| `--iw-variant-highlight-image` | `highlight` | The gradient of the highlight, when it is one: clipped to the highlighted words, and handed to the masked pictograms (see [Gradients](../gradients.md#text-and-pictograms)) |
 | `--iw-variant-paragraph-color` | `paragraph` | Color for every text-bearing element of the content: `<p>`, list items, definition lists, figure and table captions, table cells |
 | `--iw-variant-link-color` | `link` | Color for links (excluding `.iw-button--*`) |
 | `--iw-variant-link-hover` | `linkHover` | Link hover color |
 | `--iw-variant-list-color` | `list` | Color of list **markers** (bullets and numbers), not the item text |
 | `--iw-variant-hr-color` | `hr` | Color for `<hr>` separators and card borders |
 | `--iw-variant-paragraph-bg` | `paragraphBg` | Background for `.iw-block__text` content |
+| `--iw-variant-paragraph-bg-image` | `paragraphBg` | The gradient of the paragraph background, when `paragraphBg` is one |
 | `--iw-variant-card-bg` | `cardBg` | Background of every card. Nothing is drawn until it is set |
+| `--iw-variant-card-bg-image` | `cardBg` | The gradient of the card background, when `cardBg` is one (see [Gradient surfaces](#gradient-surfaces)) |
 | `--iw-variant-card-title-color` | `cardTitle` | Heading colour inside a card. Falls back to `--iw-variant-title-color` |
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
-| `--iw-variant-card-border` | `cardBorder` | Border colour of a card |
+| `--iw-variant-card-border` | `cardBorder` | Border colour of a card. A [gradient](../gradients.md) is drawn as a ring instead, see [Gradient surfaces](#gradient-surfaces) |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-card-shadow` | `cardShadowColor` | The shadow the cards of this block cast, shape from **Components > Cards** and colour from here. `none` when the variant names no colour |
 | `--iw-variant-card-shadow-hover` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
@@ -55,16 +59,19 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
 | `--iw-variant-block-border-width` | `blockBorderWidth` | `1px`, `2px` or `3px`. Emitted only inside that range |
 | `--iw-variant-content-bg` | `contentBg` | Background behind the whole content, title included (`.iw-block__content`) |
+| `--iw-variant-content-bg-image` | `contentBg` | The gradient of the content background, when `contentBg` is one |
 | `--iw-variant-content-border` | `contentBorder` | Border color of the content surface |
 | `--iw-variant-content-border-width` | `contentBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-paragraph-border` | `paragraphBorder` | Border color of `.iw-block__text` |
 | `--iw-variant-paragraph-border-width` | `paragraphBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-accent-bg` | `accentBg` | Background of an element put forward |
+| `--iw-variant-accent-bg-image` | `accentBg` | The gradient of the accent background, when `accentBg` is one |
 | `--iw-variant-accent-title-color` | `accentTitle` | Heading colour on the accent surface. Falls back to `--iw-variant-accent-text` |
 | `--iw-variant-accent-text` | `accentText` | Text color on the accent surface |
 | `--iw-variant-accent-border` | `accentBorder` | Border color of the accent surface |
 | `--iw-variant-accent-border-width` | `accentBorderWidth` | `1px`, `2px` or `3px` |
 | `--iw-variant-table-head-bg` | `tableHeadBg` | Header row background. Empty keeps the computed tint |
+| `--iw-variant-table-head-bg-image` | `tableHeadBg` | The gradient of the header row, when `tableHeadBg` is one |
 | `--iw-variant-table-head-text` | `tableHeadText` | Header row text. Empty keeps the title colour |
 | `--iw-variant-table-cell-bg` | `tableCellBg` | Cell background. Empty is transparent |
 | `--iw-variant-table-cell-text` | `tableCellText` | Cell text. Empty keeps the paragraph colour |
@@ -437,9 +444,44 @@ card, the accent surface the one singled out - and it is the only surface
 owning the colour of the text on it, which is what makes a highlighted element
 legible whatever the editor picked.
 
+### Gradient surfaces
+
+Six backgrounds accept a [gradient](../gradients.md) as well as a color: the
+block, the content, the paragraph, the cards, the accent surface and the table
+header. Table cells, stripes and hover stay solid: they stack over one another
+on the data. A surface given a gradient publishes two properties instead of
+one:
+
+- `--iw-variant-<surface>-bg` holds the gradient's fallback color, or
+  `transparent` when the gradient is translucent, since a color under it would
+  show through;
+- `--iw-variant-<surface>-bg-image` holds the gradient itself.
+
+A component painting a surface reads both, with the same cascade as its color:
+
+```css
+background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
+background-image: var(--iw-timeline-card-bg-image, var(--iw-variant-card-bg-image, none));
+```
+
+Overriding a component's background with a color while its variant paints a
+gradient takes both lines: set `--iw-timeline-card-bg-image: none` next to
+`--iw-timeline-card-bg`, or the gradient stays on top of the color. The block
+background (`[data-has-bg]`), the content background (`[data-content-bg]`),
+`.iw-block__text` and the table header are painted by the compiled stylesheet
+itself, image included.
+
+The card border accepts a gradient too. It cannot be a `border-color`, so it is
+drawn as a ring on the `::after` of every element carrying `iw-surface--card`:
+the card loses its real border and the ring takes its place inside the box, at
+`--iw-variant-card-border-width`, under the card's rounded corners and over
+anything clipped to them. A card component using its own `::after` would
+compete with it. The card put forward keeps the accent border, in the
+gradient's fallback color when it falls back on the card one.
+
 ## Paragraph background (`.iw-block__text`)
 
-When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`), the `.iw-block__text` element inside that variant gets:
+When a variant's `paragraphBg` is set to a visible color (not empty, not `transparent`) or to a gradient, the `.iw-block__text` element inside that variant gets the following, plus `background-image: var(--iw-variant-paragraph-bg-image)` for a gradient:
 
 ```css
 .iw-variant--dark .iw-block__text {

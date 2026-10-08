@@ -23,11 +23,13 @@ Shared by every variant.
 
 | Variable pattern | Description |
 |-----------------|-------------|
-| `--iw-button-{variant}-bg` | Background color |
+| `--iw-button-{variant}-bg` | Background color (the fallback color of a [gradient](../gradients.md), `transparent` for a translucent one) |
+| `--iw-button-{variant}-bg-image` | The background gradient, when there is one |
 | `--iw-button-{variant}-text` | Text color |
 | `--iw-button-{variant}-border` | Full border shorthand (`{width} {style} {color}`) or `none` |
 | `--iw-button-{variant}-radius` | Border radius |
 | `--iw-button-{variant}-hover-bg` | Background on hover |
+| `--iw-button-{variant}-hover-bg-image` | The hover gradient, when there is one. Painted on the `::before` layer, see [Button hover effects](../button-effects.md#with-a-gradient-background) |
 | `--iw-button-{variant}-hover-text` | Text color on hover |
 | `--iw-button-{variant}-hover-border` | Border shorthand on hover (or `none`) |
 | `--iw-button-{variant}-accent` | Accent colour of the style, only when set |
@@ -77,6 +79,10 @@ Beyond colours, radius and hover effects, each style in the **Buttons** tab take
 | Shadow at rest (`shadow`) | `none` *(default)*, `sm`, `md`, `lg` | `box-shadow`, replaced by the hover shadow while hovered, see [`button-effects.md`](../button-effects.md) |
 | Label weight (`fontWeight`) | inherited *(default)*, normal, medium, semi-bold, bold | `font-weight: 400` to `700` |
 | Label case (`textTransform`) | inherited *(default)*, as typed, uppercase | `text-transform` |
+
+**Gradient label.** The text color and the hover text color accept a [gradient](../gradients.md#text-and-pictograms), clipped to `.iw-button__label` rather than to the button, whose background the clip would take away. The button keeps the fallback color, which its pictogram follows.
+
+**Gradient border.** The border and the hover border accept a [gradient](../gradients.md). A gradient border is drawn as a ring on the `::after` of the button: the real border goes, the ring takes its place inside the box at the same thickness, on the sides `borderSides` keeps, so the button keeps its size and its padding. `border-image` would drop the radius, and painting the gradient under an opaque inside is impossible for an outlined button whose inside is transparent. The line style does not apply to a ring: a gradient border is solid. The hover border recolors the ring, color or gradient. The native file button of the forms has no pseudo-element and keeps a solid border in the gradient's fallback color. The ring takes `::after`, the pseudo-element the [ornaments](#project-specific-ornaments) below use, and `::before` belongs to the hover effects: a style carrying an ornament keeps a solid border.
 
 A field left on its default writes nothing, so a style that never opens them compiles exactly as before. There is no font size per style: the size belongs to the context (a block, the menu), not to the style.
 
