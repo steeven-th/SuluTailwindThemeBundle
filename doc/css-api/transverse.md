@@ -956,7 +956,11 @@ A size chosen in the admin wins over the utility classes a caller passes: the
 partial drops their `w-*` and `h-*` when one is set, since both weigh the same
 in the cascade and the outcome would otherwise depend on stylesheet order.
 
-Left empty, the chevron these templates have always drawn is used.
+Left empty, the chevron these templates have always drawn is used. The same
+chevron stands in when the setting no longer draws anything - a media deleted
+from the library, a library pictogram that is not shipped any more - so a
+control never goes blank. It then keeps the size its caller asked for, the
+admin size having belonged to the missing pictogram.
 
 ---
 

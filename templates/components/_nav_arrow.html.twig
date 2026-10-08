@@ -33,8 +33,10 @@
    agree with each other, and a pictogram with no direction of its own - a dot,
    a cross - still works, it simply turns.
 
-   With nothing set, the chevron below is the one these templates already drew,
-   so a site that never opens the setting does not move. #}
+   With nothing set, or with a setting that no longer draws anything (a media
+   deleted from the library), the chevron below is the one these templates
+   already drew, so a site that never opens the setting does not move and a
+   control never goes blank. #}
 
 {%- set direction = direction|default('next') -%}
 
@@ -75,12 +77,15 @@
 {%- endif -%}
 {%- set arrowClass = ('iw-nav-arrow iw-nav-arrow--' ~ direction ~ ' ' ~ callerClass)|trim -%}
 
-{%- set hasArrow = arrowCustom ? (arrowMedia is not null) : (arrowIcon is not empty) -%}
-
-{%- if hasArrow %}
+{#- Asking `_icon.html.twig` and reading its answer, rather than guessing from
+    the settings: a media deleted from the library, or a library pictogram
+    since renamed, still leaves a value behind, and the control would lose its
+    only visible sign. `_icon.html.twig` renders nothing when it has nothing to
+    draw, which is the one test that covers every case. -#}
+{%- set arrowHtml -%}
     {#- An arrow is a sign, not a picture of the project: a custom SVG takes the
         colour around it like a library one does, hence `recolor`. -#}
-    {% include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
+    {%- include '@ItechWorldSuluTailwindTheme/blocks/common/_icon.html.twig' with {
         'item': {
             'iconCustom': arrowCustom,
             'icon': arrowIcon,
@@ -89,9 +94,15 @@
         },
         'class': arrowClass,
         'recolor': true,
-    } only %}
+    } only -%}
+{%- endset -%}
+
+{%- if arrowHtml|trim is not empty %}
+    {{ arrowHtml }}
 {%- else %}
-    <svg class="{{ arrowClass }}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    {#- The size set in the admin belonged to the pictogram that is missing:
+        the fallback keeps the size its caller asked for. -#}
+    <svg class="{{ ('iw-nav-arrow iw-nav-arrow--' ~ direction ~ ' ' ~ class|default(''))|trim }}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M9 5l7 7-7 7"/>
     </svg>
