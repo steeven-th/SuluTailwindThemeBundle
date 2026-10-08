@@ -60,7 +60,7 @@ final class GradientFieldsReachTheStylesheetTest extends TestCase
             }
         }
 
-        foreach ([...VariantZones::GRADIENT_KEYS, ...VariantZones::GRADIENT_BORDER_KEYS] as $key) {
+        foreach ([...VariantZones::GRADIENT_KEYS, ...VariantZones::GRADIENT_BORDER_KEYS, ...VariantZones::GRADIENT_TEXT_KEYS] as $key) {
             $found['variant / ' . $key] = ['variant', $key];
         }
 

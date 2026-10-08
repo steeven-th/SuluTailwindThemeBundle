@@ -293,7 +293,7 @@ final class ThemeCompilerGradientTest extends TestCase
     private function compileButton(array $button): string
     {
         return $this->compileCss($this->tokens('#172F57', [
-            'buttons' => [['slug' => 'cta', 'label' => 'CTA', 'text' => '#ffffff', 'hoverDuration' => '500ms'] + $button],
+            'buttons' => [$button + ['slug' => 'cta', 'label' => 'CTA', 'text' => '#ffffff', 'hoverDuration' => '500ms']],
         ]));
     }
 
@@ -430,5 +430,64 @@ final class ThemeCompilerGradientTest extends TestCase
         self::assertStringContainsString('.iw-article-card { background-image: var(--gradient-bleu-leger); }', $css);
         self::assertStringContainsString('.iw-article-card { border: none; }', $css);
         self::assertStringContainsString('.iw-article-card--hover-border:hover::after { background: #ffffff; }', $css);
+    }
+
+    #[Test]
+    public function aGradientHighlightPaintsTheWordsAndHandsTheImageToThePictograms(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'highlight' => 'gradient:bleu-leger']],
+        ]));
+
+        self::assertMatchesRegularExpression('/--iw-variant-highlight: #[0-9a-f]{6};\n  --iw-variant-highlight-image: var\(--gradient-bleu-leger\);/', $css);
+        self::assertStringContainsString(
+            ".iw-variant--night .iw-highlight {\n  background-image: var(--iw-variant-highlight-image);\n  -webkit-background-clip: text;\n  background-clip: text;\n  -webkit-text-fill-color: transparent;",
+            $css,
+        );
+        self::assertStringContainsString("@media (forced-colors: active), print {\n  .iw-variant--night .iw-highlight { background-image: none; -webkit-text-fill-color: currentColor; }", $css);
+    }
+
+    #[Test]
+    public function aGradientTitleLeavesTheWordsWithAColorOfTheirOwn(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'title' => 'gradient:bleu-leger', 'highlight' => '#ff0000']],
+        ]));
+
+        self::assertStringContainsString(".iw-variant--night h1, .iw-variant--night h2, .iw-variant--night h3, .iw-variant--night h4, .iw-variant--night h5, .iw-variant--night h6 {\n  background-image: var(--iw-variant-title-color-image);", $css);
+        self::assertStringContainsString('.iw-variant--night h2 .iw-highlight', $css);
+        self::assertStringContainsString('.iw-variant--night h2 [class*="iw-text--"]:not([class*="iw-text--gradient-"])', $css);
+        self::assertStringContainsString('.iw-variant--night .iw-surface--accent h2', $css);
+        self::assertStringNotContainsString('.iw-variant--night .iw-surface--card h2,', preg_replace('/\.iw-variant--night \.iw-surface--card h1,\n.*?\{/s', '', $css) ?? '');
+    }
+
+    #[Test]
+    public function aGradientHighlightInsideAGradientTitleKeepsItsOwnGradient(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57', [
+            'blockVariants' => [['slug' => 'night', 'label' => 'Night', 'title' => 'gradient:bleu-leger', 'highlight' => 'gradient:bleu-leger', 'cardTitle' => '#ffffff']],
+        ]));
+
+        self::assertStringNotContainsString('.iw-variant--night h2 .iw-highlight', $css);
+        self::assertStringContainsString('.iw-variant--night .iw-surface--card h2, ', $css);
+    }
+
+    #[Test]
+    public function everyGradientGetsATextClassForTheTitleEditor(): void
+    {
+        $css = $this->compileCss($this->tokens('#172F57'));
+
+        self::assertStringContainsString(".iw-text--gradient-bleu-leger {\n  color: var(--gradient-bleu-leger-fallback);\n}", $css);
+        self::assertStringContainsString(".iw-text--gradient-bleu-leger {\n  background-image: var(--gradient-bleu-leger);", $css);
+    }
+
+    #[Test]
+    public function aGradientButtonLabelIsClippedToTheLabel(): void
+    {
+        $css = $this->compileButton(['text' => 'gradient:bleu-leger', 'hoverText' => '#ffffff']);
+
+        self::assertMatchesRegularExpression('/\.iw-button--cta \{\n  color: #[0-9a-f]{6};/', $css);
+        self::assertStringContainsString(".iw-button--cta .iw-button__label {\n  background-image: var(--gradient-bleu-leger);", $css);
+        self::assertStringContainsString(".iw-button--cta:hover .iw-button__label {\n  background-image: none;\n  -webkit-text-fill-color: currentColor;\n}", $css);
     }
 }

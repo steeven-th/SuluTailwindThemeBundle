@@ -59,6 +59,7 @@ tints, and the table cells, stripes and hover, which stack over the data.
 | Articles > Reading | Reading progress bar | in `--iw-reading-progress-color` itself, see below |
 | Buttons | Background, hover background | `--iw-button-<slug>-bg-image`, `--iw-button-<slug>-hover-bg-image` (see [Button hover effects](button-effects.md#with-a-gradient-background)) |
 | Hover backgrounds | Tags, back-to-top button, controls over media | `--iw-tag-hover-bg-image`, `--iw-back-to-top-hover-bg-image`, in `--iw-gallery-nav-bg-hover` itself |
+| Text | Variant title and highlight colors, button label and hover label, title editor words | clipped to the glyphs, see [Text and pictograms](#text-and-pictograms) |
 | Borders | Button border and hover border, variant card border, article card border and hover border | drawn as a ring, see [Borders](#borders) |
 | Article cards | Surface (Components > Cards) | `background-image` on `.iw-article-card` |
 
@@ -90,6 +91,32 @@ The rules are written only for what has a gradient.
 
 The pagination and the share buttons offer no hover background of their own:
 over a gradient they show their hover color, without fading.
+
+## Text and pictograms
+
+A gradient text is the gradient clipped to the glyphs (`background-clip: text`)
+with a transparent fill. `color` keeps the fallback: screen readers, copy and
+paste, older browsers and underlines use it. In forced-colors mode and in print
+the clip is undone and the text shows in that color, or it would vanish.
+
+- **Variant highlight** paints the highlighted words (`.iw-highlight`) and
+  publishes `--iw-variant-highlight-image`. The pictograms of the cards, key
+  figures and timelines, which take the highlight color, take it through
+  `--iw-icon-image`, but only the masked ones: a media SVG drawn with
+  `iw-icon--mask`. A library pictogram is an inline SVG stroked with
+  `currentColor`, which a CSS gradient cannot reach, and keeps the fallback.
+- **Variant title** paints the headings of the variant. What keeps a color of
+  its own inside a heading gets its fill back: words highlighted or colored in
+  the title editor (unless they carry a gradient too), the card titles when the
+  variant names a card title color, and the titles on the accent surface.
+- **Button label** is clipped to `.iw-button__label`, not to the button whose
+  background the clip would take away. The button keeps the fallback color,
+  which its pictogram follows. A button rendered without that span (written by
+  hand in a template) shows the fallback.
+- **Title editor** stores a gradient by name, `[[gradient-<slug>:word]]`,
+  rendered as `.iw-text--gradient-<slug>` (see [Title editor](title-editor.md)).
+  Paragraphs, links and form fields are left out: running text needs a solid
+  color to stay readable.
 
 ## Borders
 

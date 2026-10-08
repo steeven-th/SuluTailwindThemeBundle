@@ -390,6 +390,11 @@ class ThemeCompiler
         // and both sit at the same specificity.
         $css .= $this->generateTextColorClasses();
 
+        // Gradient words of the title editor (`[[gradient-<slug>:word]]`),
+        // after the colors so a palette slug that happens to read the same
+        // never wins over the gradient the editor picked.
+        $css .= $this->generateTextGradientClasses();
+
         // Utility classes for the colours Tailwind never saw. After the
         // variant classes for the same reason as the text colours: a class
         // written by hand in a template says more than the variant painting
@@ -1350,6 +1355,74 @@ class ThemeCompiler
     }
 
     /**
+     * Paint the headings of a variant with its gradient title color.
+     *
+     * The clip is inherited by everything inside a heading, so what keeps a
+     * color of its own there gets its fill back: the words highlighted or
+     * colored in the title editor (unless they carry a gradient themselves),
+     * the titles of the cards when the variant names a color for them, and
+     * the titles on the accent surface, which owns its text.
+     *
+     * @param string $index             The variant slug
+     * @param bool   $highlightGradient Whether the highlight is a gradient too
+     * @param bool   $cardTitleSet      Whether the cards name their own title color
+     *
+     * @return string The rules
+     */
+    private function variantTitleGradient(string $index, bool $highlightGradient, bool $cardTitleSet): string
+    {
+        $scope = ".iw-variant--{$index}";
+        $headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        $within = static fn (string $prefix, string $suffix = ''): string => implode(', ', array_map(
+            static fn (string $heading): string => "{$prefix} {$heading}{$suffix}",
+            $headings,
+        ));
+
+        $css = self::textGradientRule($within($scope), 'var(--iw-variant-title-color-image)');
+
+        $ownColors = [$within($scope, ' [class*="iw-text--"]:not([class*="iw-text--gradient-"])')];
+        if (!$highlightGradient) {
+            $ownColors[] = $within($scope, ' .iw-highlight');
+        }
+        if ($cardTitleSet) {
+            $ownColors[] = $within("{$scope} .iw-surface--card") . ", {$scope} .iw-surface--card .iw-card__title";
+        }
+        $ownColors[] = $within("{$scope} .iw-surface--accent") . ", {$scope} .iw-surface--accent .iw-card__title";
+        $css .= implode(",\n", $ownColors) . " {\n  background-image: none;\n  -webkit-text-fill-color: currentColor;\n}\n";
+
+        return $css;
+    }
+
+    /**
+     * Paint the text of an element with a gradient.
+     *
+     * The gradient is clipped to the glyphs, which are made transparent to let
+     * it through. `color` is left alone and keeps the fallback: screen readers,
+     * copy and paste and browsers without background-clip read it, and the
+     * underline is drawn with it rather than vanishing with the transparent
+     * fill. In forced-colors mode and in print the clip is undone, or the
+     * text would disappear.
+     *
+     * @param string $selector The text element
+     * @param string $image    The CSS image
+     *
+     * @return string The rules
+     */
+    private static function textGradientRule(string $selector, string $image): string
+    {
+        return "{$selector} {\n"
+            . "  background-image: {$image};\n"
+            . "  -webkit-background-clip: text;\n"
+            . "  background-clip: text;\n"
+            . "  -webkit-text-fill-color: transparent;\n"
+            . "  text-decoration-color: currentColor;\n"
+            . "}\n"
+            . "@media (forced-colors: active), print {\n"
+            . "  {$selector} { background-image: none; -webkit-text-fill-color: currentColor; }\n"
+            . "}\n";
+    }
+
+    /**
      * A stored value as the paint of a ring or a layer: the gradient, or the color.
      *
      * @param string $value The stored value
@@ -2253,6 +2326,31 @@ class ThemeCompiler
      * @return string CSS class declarations (e.g. `.iw-text--primary-500 { ... }`)
      */
     /**
+     * Generate one text class per gradient, for the title editor.
+     *
+     * The editor stores the gradient by name, `[[gradient-<slug>:word]]`, which
+     * the renderer turns into `.iw-text--gradient-<slug>`: renaming nothing in
+     * the content, a gradient changed in the admin changes every title using it.
+     *
+     * @return string CSS rules, empty without gradients
+     */
+    private function generateTextGradientClasses(): string
+    {
+        if (null === $this->gradientSet || $this->gradientSet->isEmpty()) {
+            return '';
+        }
+
+        $css = "/* Gradient text classes (title editor) */\n";
+        foreach ($this->gradientSet->all() as $gradient) {
+            $slug = $gradient->getSlug();
+            $css .= ".iw-text--gradient-{$slug} {\n  color: var(--gradient-{$slug}-fallback);\n}\n";
+            $css .= self::textGradientRule(".iw-text--gradient-{$slug}", "var(--gradient-{$slug})");
+        }
+
+        return $css . "\n";
+    }
+
+    /**
      * Generate the utility classes the rich-text editor applies.
      *
      * The editor offers a size and a capitals toggle. Both travel as classes
@@ -2831,6 +2929,7 @@ class ThemeCompiler
             $css .= "  border-radius: {$this->resolveRadius((string) $props['radius'])};\n";
         }
         $css .= $border['css'];
+        $labelGradient = $this->buttonLabelGradient($selector, $props);
         $css .= '  padding: ' . self::buttonPadding($border['widths'], $paddingX, $paddingY) . ";\n";
         $css .= $this->generateButtonStyleExtras($props);
         $css .= "  cursor: pointer;\n";
@@ -2852,6 +2951,8 @@ class ThemeCompiler
         // Overlay pseudo-element for slide-* / gradient-shift effects, and for
         // the fade a gradient background needs (see buttonBgEffect()).
         $css .= $this->generateButtonBgEffectBefore($selector, $variant, $bgEffectKey, $duration, $easing);
+
+        $css .= $labelGradient;
 
         // Gradient border, drawn as a ring
         if (null !== $border['ring']) {
@@ -4688,6 +4789,37 @@ class ThemeCompiler
     }
 
     /**
+     * Paint the label of a button with a gradient text color.
+     *
+     * Clipped to the label rather than the button, whose own background the
+     * clip would take away. The button keeps the fallback as its color, which
+     * its pictogram follows. The hover text color takes over on hover, as a
+     * gradient or with the fill given back.
+     *
+     * @param string               $selector The button selector
+     * @param array<string, mixed> $props    The button definition
+     *
+     * @return string The rules, empty when neither text color is a gradient
+     */
+    private function buttonLabelGradient(string $selector, array $props): string
+    {
+        $text = $this->paintImage($props['text'] ?? null);
+        $hover = $this->paintImage($props['hoverText'] ?? null);
+        if (null === $text && null === $hover) {
+            return '';
+        }
+
+        $css = null !== $text ? self::textGradientRule("{$selector} .iw-button__label", $text) : '';
+        if (null !== $hover) {
+            $css .= self::textGradientRule("{$selector}:hover .iw-button__label", $hover);
+        } elseif (isset($props['hoverText'])) {
+            $css .= "{$selector}:hover .iw-button__label {\n  background-image: none;\n  -webkit-text-fill-color: currentColor;\n}\n";
+        }
+
+        return $css;
+    }
+
+    /**
      * Background effect a gradient button falls back on when it has none.
      */
     private const BG_EFFECT_FADE = 'fade';
@@ -5503,9 +5635,17 @@ class ThemeCompiler
                 //
                 // A surface painted with a gradient publishes the image beside
                 // the color, as `<property>-image`, for the blocks to lay on top.
-                $paint = \in_array($tokenKey, VariantZones::GRADIENT_KEYS, true)
-                    ? $this->resolvePaint(trim((string) $props[$tokenKey]))
-                    : ['color' => $this->resolveColorValue((string) $props[$tokenKey]), 'image' => null];
+                // A text color keeps its fallback as the color, even for a
+                // translucent gradient: it is what reads where the gradient
+                // cannot be clipped to the glyphs.
+                $paint = match (true) {
+                    \in_array($tokenKey, VariantZones::GRADIENT_KEYS, true) => $this->resolvePaint(trim((string) $props[$tokenKey])),
+                    \in_array($tokenKey, VariantZones::GRADIENT_TEXT_KEYS, true) => [
+                        'color' => $this->resolveColorValue((string) $props[$tokenKey]),
+                        'image' => $this->paintImage($props[$tokenKey]),
+                    ],
+                    default => ['color' => $this->resolveColorValue((string) $props[$tokenKey]), 'image' => null],
+                };
                 $resolved = trim($paint['color']);
                 if ('' === $resolved) {
                     continue;
@@ -5640,6 +5780,19 @@ class ThemeCompiler
                 $css .= $contentPadding;
                 $css .= "}\n";
             }
+            // A gradient highlight paints the highlighted words with it. The
+            // pictograms taking the highlight color read the image published
+            // with it (`--iw-variant-highlight-image`) through `--iw-icon-image`.
+            $highlightImage = $this->paintImage($props['highlight'] ?? null);
+            if (null !== $highlightImage) {
+                $css .= self::textGradientRule(".iw-variant--{$index} .iw-highlight", 'var(--iw-variant-highlight-image)');
+            }
+
+            // A gradient title color paints the headings of the variant.
+            if (null !== $this->paintImage($props['title'] ?? null)) {
+                $css .= $this->variantTitleGradient((string) $index, null !== $highlightImage, '' !== trim((string) ($props['cardTitle'] ?? '')));
+            }
+
             // A gradient card border, drawn as a ring on every card of the
             // variant. They all carry the card marker, so one rule reaches
             // the ten blocks drawing cards. The class is doubled to outrank

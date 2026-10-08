@@ -70,6 +70,12 @@ final class VariantZonesParityTest extends TestCase
             VariantZones::GRADIENT_BORDER_KEYS,
             array_map(static fn (string $value): string => trim($value, " '\n"), explode(',', $matches[1])),
         );
+
+        self::assertSame(1, preg_match('/const GRADIENT_TEXT_KEYS = \[([^\]]*)\]/', self::javascriptSource(), $matches));
+        self::assertSame(
+            VariantZones::GRADIENT_TEXT_KEYS,
+            array_map(static fn (string $value): string => trim($value, " '\n"), explode(',', $matches[1])),
+        );
     }
 
     /**

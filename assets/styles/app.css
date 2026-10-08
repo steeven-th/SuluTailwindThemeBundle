@@ -316,6 +316,8 @@ a:hover {
 .iw-icon--mask {
     display: inline-block;
     background-color: currentColor;
+    /* A slot painting its pictograms with a gradient hands it down here. */
+    background-image: var(--iw-icon-image, none);
     -webkit-mask-image: var(--iw-icon-media);
     mask-image: var(--iw-icon-media);
     -webkit-mask-repeat: no-repeat;
@@ -2035,6 +2037,7 @@ img.object-cover {
    nowhere, so an editor picking one saw nothing happen. */
 .iw-block-key-figures .iw-key-figure__icon {
     --iw-icon-color: var(--iw-key-figure-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-key-figure-icon-image, var(--iw-variant-highlight-image, none));
     /* Same rule as the card slot: the icon carries the size, the slot follows,
        so a larger one takes the room it needs. */
     --iw-icon-size: var(--iw-key-figure-icon-size, 3rem);
@@ -2392,6 +2395,7 @@ img.object-cover {
     display: flex;
     margin-bottom: 0.75rem;
     --iw-icon-color: var(--iw-timeline-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-timeline-icon-image, var(--iw-variant-highlight-image, none));
 }
 
 .iw-timeline-step__icon-img {
@@ -6313,6 +6317,7 @@ aside .iw-toc {
 .iw-card__icon {
     flex: 0 0 auto;
     --iw-icon-color: var(--iw-card-icon-color, var(--iw-variant-highlight, var(--color-accent)));
+    --iw-icon-image: var(--iw-card-icon-image, var(--iw-variant-highlight-image, none));
     display: block;
     /* The slot takes the width of the icon in it, rather than setting one of
        its own: a size picked on the card lands on the icon, and a slot holding

@@ -200,6 +200,13 @@ const GRADIENT_KEYS = ['blockBg', 'contentBg', 'paragraphBg', 'cardBg', 'accentB
  */
 const GRADIENT_BORDER_KEYS = ['cardBorder'];
 
+/**
+ * The text colors that accept a gradient, clipped to the glyphs.
+ *
+ * Mirrors VariantZones::GRADIENT_TEXT_KEYS, guarded by VariantZonesParityTest.
+ */
+const GRADIENT_TEXT_KEYS = ['title', 'highlight'];
+
 /** Every field, flattened, in zone order. */
 const FIELDS = ZONES.reduce((all, zone) => all.concat(zone.fields), []);
 
@@ -208,4 +215,4 @@ function fieldOf(key) {
     return FIELDS.find((field) => field.key === key) || null;
 }
 
-export {ZONES, WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, GRADIENT_BORDER_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};
+export {ZONES, WIDTHS, LINE_STYLES, FIELDS, GRADIENT_KEYS, GRADIENT_BORDER_KEYS, GRADIENT_TEXT_KEYS, PREVIEW_GROUPS, fieldOf, groupOf, widthKeyFor};

@@ -184,6 +184,17 @@ final class VariantZones
     public const GRADIENT_BORDER_KEYS = ['cardBorder'];
 
     /**
+     * The text colors that accept a gradient, clipped to the glyphs.
+     *
+     * The title paints the headings. The highlight paints the highlighted
+     * words, and the pictograms of the cards, key figures and timelines. Mirrored by GRADIENT_TEXT_KEYS in
+     * zones.js.
+     *
+     * @var list<string>
+     */
+    public const GRADIENT_TEXT_KEYS = ['title', 'highlight'];
+
+    /**
      * Widths a border can take, in pixels.
      *
      * @var list<int>
