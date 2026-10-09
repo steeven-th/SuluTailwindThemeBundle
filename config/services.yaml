@@ -285,6 +285,14 @@ services:
             - '%itech_world_sulu_tailwind_theme.settings_by_webspace%'
             - '@?sulu_core.webspace.request_analyzer'
 
+    # The search page of the site being served, for the 404 page. Null when
+    # the project did not wire Sulu's website search.
+    itech_world.sulu_tailwind_theme.site_search_url_resolver:
+        class: ItechWorld\SuluTailwindThemeBundle\Service\SiteSearchUrlResolver
+        arguments:
+            - '@router'
+            - '@?sulu_core.webspace.request_analyzer'
+
     itech_world.sulu_tailwind_theme.embed_url_validator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\EmbedUrlValidator
         arguments:
@@ -367,6 +375,7 @@ services:
             # logged there rather than rendered on the page.
             - '@logger'
             - '%kernel.debug%'
+            - '@itech_world.sulu_tailwind_theme.site_search_url_resolver'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and

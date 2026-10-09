@@ -19,6 +19,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
+use ItechWorld\SuluTailwindThemeBundle\Service\SiteSearchUrlResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider;
@@ -113,6 +114,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly ?RequestStack $requestStack = null,
         private readonly ?LoggerInterface $logger = null,
         private readonly bool $debug = false,
+        private readonly ?SiteSearchUrlResolver $siteSearchUrlResolver = null,
     ) {
     }
 
@@ -178,6 +180,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_next_form_index', $this->getNextFormIndex(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_consent_mode', $this->getConsentMode(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_search_url', $this->getSearchUrl(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
             new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
@@ -440,6 +443,16 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getEmbedUrl(?string $url): ?string
     {
         return $this->embedUrlValidator->validate($url);
+    }
+
+    /**
+     * The search page of the current site, when the project wired one.
+     *
+     * @return string|null The URL, or null when the site offers no search
+     */
+    public function getSearchUrl(): ?string
+    {
+        return $this->siteSearchUrlResolver?->resolve();
     }
 
     /**

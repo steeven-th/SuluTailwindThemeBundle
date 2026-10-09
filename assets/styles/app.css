@@ -4470,6 +4470,116 @@ section.block:has([data-slider-fullbleed-value]) {
     --iw-article-hero-max-height: 720px;
 }
 
+/* ─── Error page ────────────────────────────────────────────────────────── */
+/* templates/error/error.html.twig, rendered by Sulu for 404, 403, 500…
+   Colors and type come from the theme tokens, so the page follows the site in
+   light and dark alike. Each length and color sits behind an --iw-error-*
+   variable, the same way as every other component.
+
+   Spacing is a rhythm rather than one gap: the code belongs to the title, the
+   message reads after a breath, and the way out stands apart from both. The
+   search is a second way out, set off by a rule and its own label. */
+
+.iw-error-page {
+    display: flex;
+    justify-content: center;
+    padding: var(--iw-error-padding-y, clamp(4rem, 12vw, 8rem)) var(--iw-error-padding-x, 1.5rem);
+}
+
+.iw-error-page__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: var(--iw-error-max-width, 48rem);
+    text-align: center;
+}
+
+/* Visible but secondary: the title says what happened, the code is for the
+   visitor who reports it. */
+.iw-error-page__code {
+    margin: 0 0 var(--iw-error-code-gap, 1rem);
+    font-size: var(--iw-error-code-size, 0.875rem);
+    font-weight: var(--iw-error-code-weight, 600);
+    letter-spacing: var(--iw-error-code-tracking, 0.12em);
+    text-transform: uppercase;
+    color: var(--iw-error-code-color, var(--color-surface-muted, currentColor));
+}
+
+.iw-error-page__title {
+    margin: 0;
+    color: var(--iw-error-title-color, inherit);
+    text-wrap: balance;
+}
+
+.iw-error-page__message {
+    max-width: var(--iw-error-message-max-width, 32rem);
+    margin: var(--iw-error-message-gap, 1.5rem) 0 0;
+    font-size: var(--iw-error-message-size, 1.125rem);
+    line-height: var(--iw-error-message-line-height, 1.6);
+    color: var(--iw-error-message-color, inherit);
+    text-wrap: pretty;
+}
+
+.iw-error-page__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--iw-error-actions-gap, 0.75rem);
+    margin-top: var(--iw-error-actions-gap-top, 2.5rem);
+}
+
+.iw-error-page__search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--iw-error-search-label-gap, 1rem);
+    width: 100%;
+    max-width: var(--iw-error-search-max-width, 30rem);
+    margin-top: var(--iw-error-search-gap-top, 3rem);
+    padding-top: var(--iw-error-search-padding-top, 2.5rem);
+    border-top: 1px solid var(--iw-error-search-rule, var(--color-border, currentColor));
+}
+
+.iw-error-page__search-label {
+    font-size: var(--iw-error-search-label-size, 0.9375rem);
+    color: var(--iw-error-search-label-color, var(--color-surface-muted, inherit));
+}
+
+.iw-error-page__search-row {
+    display: flex;
+    gap: var(--iw-error-search-row-gap, 0.5rem);
+    width: 100%;
+}
+
+.iw-error-page__search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--iw-error-search-padding, 0.625rem 0.875rem);
+    font: inherit;
+    color: var(--iw-error-search-color, var(--color-text, inherit));
+    background-color: var(--iw-error-search-bg, var(--color-background, transparent));
+    border: 1px solid var(--iw-error-search-border, var(--color-border, currentColor));
+    border-radius: var(--iw-error-search-radius, var(--border-radius, 0.375rem));
+}
+
+.iw-error-page__search-input:focus-visible {
+    outline: var(--iw-error-search-focus-width, 2px) solid var(--iw-error-search-focus-color, var(--color-primary, currentColor));
+    outline-offset: var(--iw-error-search-focus-offset, 2px);
+}
+
+.iw-error-page__search-submit {
+    flex: 0 0 auto;
+}
+
+/* A phone has no room for the field and the button side by side at a
+   readable size: the button goes under the field, full width. */
+@media (max-width: 30rem) {
+    .iw-error-page__search-row {
+        flex-direction: column;
+    }
+}
+
 /* ─── Page hero ─────────────────────────────────────────────────────────── */
 /* Full-width banner at the top of a page. The header (title + subtitle +
    breadcrumb) can be overlaid on the image (with a readability veil and

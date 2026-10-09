@@ -1,0 +1,79 @@
+{# Website error page, in the site's layout and the theme's colors.
+
+   Sulu's ErrorController renders the webspace's `error` template outside
+   debug mode, with `status_code`, `status_text`, `exception` and the usual
+   page attributes. Wire it in the webspace:
+
+       <template type="error">@ItechWorldSuluTailwindTheme/error/error</template>
+
+   Nothing technical reaches the page. `exception` carries the message, the
+   class and the trace, and is never read here. `status_text` is not either:
+   it is the English HTTP phrase, which the translated title replaces.
+
+   Override a block rather than copying the file: extend this template and
+   redefine `error_illustration`, `error_title`, `error_message` or
+   `error_actions`. Texts come from the `messages` catalogue and can be
+   overridden by the project's own translations. See doc/error-page.md. #}
+{% extends 'base.html.twig' %}
+
+{% set errorCode = status_code|default(500) %}
+{% set errorKind = errorCode in [403, 404] ? errorCode : 'generic' %}
+{% set errorTitle = ('iw_sulu_tailwind_theme.error.' ~ errorKind ~ '.title')|trans %}
+
+{# Read by the head of the layout: the SEO partial falls back to content.title
+   for the <title>, and an error page has no business in a search index. #}
+{% set content = {title: errorTitle} %}
+{% set extension = {seo: {title: errorTitle, noIndex: true}} %}
+
+{% block content %}
+    {% set errorButtonStyle = iw_sulu_tailwind_theme_button_slug() %}
+    {% set errorSearchUrl = errorCode == 404 ? iw_sulu_tailwind_theme_search_url() : null %}
+
+    <section class="iw-error-page iw-error-page--{{ errorKind }}" aria-labelledby="iw-error-page-title">
+        <div class="iw-error-page__inner">
+            {% block error_illustration %}{% endblock %}
+
+            <p class="iw-error-page__code">
+                {{ 'iw_sulu_tailwind_theme.error.code'|trans({'%code%': errorCode}) }}
+            </p>
+
+            <h1 id="iw-error-page-title" class="iw-error-page__title">
+                {% block error_title %}{{ errorTitle }}{% endblock %}
+            </h1>
+
+            <p class="iw-error-page__message">
+                {% block error_message %}{{ ('iw_sulu_tailwind_theme.error.' ~ errorKind ~ '.message')|trans }}{% endblock %}
+            </p>
+
+            {% block error_actions %}
+                <div class="iw-error-page__actions">
+                    {# The root of the current localization, so a visitor lost on
+                       /de/... goes back to the German home page. #}
+                    <a href="{{ sulu_content_root_path() }}"
+                       class="iw-error-page__home{% if errorButtonStyle %} iw-button--{{ errorButtonStyle }}{% endif %}">
+                        {{ 'iw_sulu_tailwind_theme.error.home'|trans }}
+                    </a>
+                </div>
+
+                {% if errorSearchUrl %}
+                    <form class="iw-error-page__search" role="search" method="get" action="{{ errorSearchUrl }}">
+                        <label for="iw-error-page-search" class="iw-error-page__search-label">
+                            {{ 'iw_sulu_tailwind_theme.error.search_label'|trans }}
+                        </label>
+                        <div class="iw-error-page__search-row">
+                            <input id="iw-error-page-search"
+                                   class="iw-error-page__search-input"
+                                   type="search"
+                                   name="q"
+                                   placeholder="{{ 'iw_sulu_tailwind_theme.error.search_placeholder'|trans }}">
+                            <button type="submit"
+                                    class="iw-error-page__search-submit{% if errorButtonStyle %} iw-button--{{ errorButtonStyle }}{% endif %}">
+                                {{ 'iw_sulu_tailwind_theme.error.search_submit'|trans }}
+                            </button>
+                        </div>
+                    </form>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </section>
+{% endblock %}

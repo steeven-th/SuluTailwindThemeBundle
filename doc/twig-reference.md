@@ -822,6 +822,41 @@ See [Keys in production](turnstile.md#keys-in-production-and-the-two-ways-it-goe
 
 ---
 
+### `iw_sulu_tailwind_theme_consent_mode()`
+
+How the current site hands consent to the embeds that wait for it: `placeholder`,
+`delegated` or `none`, read from the `consent.mode` setting for the webspace being
+served. An unknown value reads as `placeholder`. The embed frame calls it itself,
+so a block only says whether its content waits. See [Consent](consent.md).
+
+```twig
+{% if iw_sulu_tailwind_theme_consent_mode() == 'delegated' %}
+    {# the cookie manager decides #}
+{% endif %}
+```
+
+**Returns:** `string`
+
+---
+
+### `iw_sulu_tailwind_theme_search_url()`
+
+The search page URL of the current site, or `null` when the project did not wire
+Sulu's website search (the `sulu_search.website_search` route **and** a `search`
+template in the webspace). Used by the [error page](error-page.md) to offer a
+search field on a 404 only where it leads somewhere.
+
+```twig
+{% set searchUrl = iw_sulu_tailwind_theme_search_url() %}
+{% if searchUrl %}
+    <form role="search" action="{{ searchUrl }}"><input type="search" name="q"></form>
+{% endif %}
+```
+
+**Returns:** `string|null`
+
+---
+
 ### `iw_sulu_tailwind_theme_embed_url(url)`
 
 Validates the URL of an embedded frame **before it reaches an `src` attribute**.

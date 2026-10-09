@@ -58,6 +58,7 @@
 * **Site-wide cards**: configure surface, title/text/badge colors, title and text sizes, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
 * **Adaptive component surfaces**: transverse components (filter sidebar, pagination, breadcrumb, badges, cards) derive their neutral colors from semantic `--color-surface*` tokens that adapt to light/dark themes automatically, and are overridable globally or per-component in **Components → Surfaces**
 * **Interactive maps (Leaflet)**: every Sulu `location` field (location block, CTA accessory, form widget) renders an interactive Leaflet map with cooperative scroll-zoom (Ctrl + wheel, two-finger touch), a themed SVG marker (or a custom image from the media library), a POI popup (title, address, "open in maps" link) and configurable tile providers (OpenStreetMap, Carto, or custom URL) from **Components → Maps**
+* **Error page**: 404, 403 and 500 in the site's layout and the theme's colors, with a way back home and the site search on a 404, wired with one line in the webspace. No exception detail ever reaches the page
 * **Theme export / import**: move a configured theme between installations as a JSON file - pull the production design into a local install, commit the theme next to the code, or reuse a palette on the next project. Buttons in the admin, `iw-sulu:theme:export` / `iw-sulu:theme:import` on the console
 * **CLI commands**: Install preset themes, assign to webspaces, recompile CSS, export/import a theme, and run integration diagnostics from the command line
 * **Auto-recompile**: Doctrine listener recompiles CSS on theme save
@@ -819,6 +820,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |
 | [Articles on several sites](doc/multi-site-articles.md) | Picking a colour variant per site on an article published on more than one, how it is stored, and what a slug missing from the other theme falls back to |
 | [Menus](doc/menus.md) | Menu types, configuration, and customization |
+| [Error page](doc/error-page.md) | Styled 404, 403 and 500 pages in the site's layout: one line in the webspace, block and text overrides, local testing |
 | [Footer](doc/footer.md) | Footer layouts (columns/centered/minimal), footer colors, social snippet, adding a project zone |
 | [Moving a theme between installations](doc/theme-transfer.md) | Export/import a theme as a JSON file: admin buttons, console commands, the API, and why images do not travel |
 
