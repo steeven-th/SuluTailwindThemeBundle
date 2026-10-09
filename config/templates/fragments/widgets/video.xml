@@ -6,12 +6,12 @@
     type: one level, on a sibling, rather than the three-level chain it took
     when the whole thing hung off a select in the block.
 
-    The preview image is offered whatever the provider, and does more than
-    decorate. On a hosted file it is the `poster` of the player. On YouTube or
-    Vimeo it turns the embed into a facade: the image shows, and the iframe is
-    only requested once a visitor clicks it. Nothing reaches the platform until
-    then, no request, no cookie, no IP, which is the same reason the iframe
-    block offers a consent placeholder.
+    YouTube and Vimeo are contacted as soon as the frame loads, so an embedded
+    video always waits for consent, the way the project's `consent.mode`
+    setting says (doc/consent.md). There is no field for it here: an editor
+    cannot know whether a cookie manager is wired, the developer does. The
+    preview image is the `poster` of a hosted file, and the backdrop of the
+    consent placeholder otherwise. It is never what protects.
 -->
 <types xmlns="http://schemas.sulu.io/template/template">
     <type name="video">

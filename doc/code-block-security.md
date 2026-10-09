@@ -90,7 +90,7 @@ A setting that grants "anyone who can edit a page is effectively an administrato
 
 - **The field is a `text_area`, never a `text_editor`.** A rich-text editor would reformat and strip the pasted markup, silently corrupting widget code.
 - **Length limit** (`CodeBlockPolicy::MAX_LENGTH`, 20 000 characters). A mis-paste — a whole page, a base64 blob — is dropped rather than shipped on every render. In `dev` a notice explains the drop; in production nothing is rendered.
-- **Consent** — the code block supports the same consent modes as the iframe block. With consent required, neither `src` nor `srcdoc` is written into the DOM, so the pasted markup does not run and does not call its third party until the visitor agrees. See [`consent.md`](./consent.md).
+- **Consent** — the code block waits for consent like the iframe block, unless **Load without waiting for consent** is ticked, and the site's `consent.mode` decides how. While it waits, neither `src` nor `srcdoc` is written into the DOM, so the pasted markup does not run and does not call its third party until the visitor agrees. See [`consent.md`](./consent.md).
 - **CSP** — if your site sends a Content-Security-Policy, inline scripts in raw mode are blocked unless you allow them. That is a feature, not a bug: it is a second line of defence you control.
 
 ---

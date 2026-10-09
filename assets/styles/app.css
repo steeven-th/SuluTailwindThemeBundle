@@ -814,7 +814,8 @@ img.object-cover {
 }
 
 /* ─── Block: iframe / embed ────────────────────────────────────────────── */
-/* Shared by the iframe block and the sandboxed mode of the code block.
+/* Shared by the iframe block, the sandboxed mode of the code block and the
+   YouTube or Vimeo video widget.
    Sizing is either an `iw-ratio--*` class (aspect ratio) or an
    `iw-embed--h-*` class (fixed height); the free-height variant reads
    `--iw-embed-height`, set by a <style> block scoped to the embed id. */

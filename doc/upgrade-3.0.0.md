@@ -700,6 +700,21 @@ no IP disclosed. Any cookie manager drives it through a neutral
 `window.iwConsent` API; adapters for Axeptio, Tarteaucitron, Klaro, Cookiebot and
 Didomi are in [consent.md](consent.md).
 
+**How** an embed gets consent is one project setting, `consent.mode`
+(`placeholder` by default, `delegated`, `none`), overridable per webspace. The
+blocks no longer choose it: the iframe and code blocks lost their *Consent
+before loading* select for a **Load without waiting for consent** checkbox,
+unchecked by default. A block saved with the old select now waits for consent
+the way the site is configured, whatever value it stored. Tick the box on the
+embeds that set no tracker.
+
+The YouTube and Vimeo videos of the widget zone go through the same mechanism
+and **always wait for consent**, with no field to skip it. Until now a video
+only waited when it had a preview image, and a video without one called the
+platform on page load. The service keys are `youtube` and `vimeo`. The preview
+image stays optional and dresses the placeholder. A hosted video file is not
+affected.
+
 **New Stimulus controllers**: `consent` — register it with **`"fetch": "eager"`**,
 unlike every other controller in the bundle, because it installs the API your
 cookie manager calls; and `embed_resize` (lazy) for self-sizing code embeds.

@@ -1,5 +1,5 @@
-{# Embedded frame — shared by the iframe block and (in sandboxed mode) the code
-   block.
+{# Embedded frame - shared by the iframe block, the code block (in sandboxed
+   mode) and the YouTube or Vimeo video widget.
 
    Security model, in short:
      - The URL is validated server-side before it ever reaches `src`
@@ -23,11 +23,19 @@
      - sandboxMode: 'standard' | 'isolated' | 'strict' | 'none'
      - lazyLoad, allowFullscreen, allowMedia, allowGeolocation: booleans
      - allowTopNavigation: allow the embed to navigate the page on a user gesture
-     - consentMode: 'none' | 'placeholder' | 'delegated'
+     - allowList: optional list of permission-policy features, replaces the
+       one built from the allow* booleans
+     - consentRequired: whether this embed waits for consent. How it gets it
+       is the site's `consent.mode` setting, not the caller's choice
      - consentService, consentText, consentImage: placeholder configuration
+     - consentServiceLabel: name shown to the visitor in the default text,
+       the service key when omitted
      - frameClass: extra classes (radius…)
 #}
-{% set consentMode = consentMode|default('none') %}
+{# The block only says whether the embed waits. The mechanism belongs to the
+   site: a placeholder asking the visitor, a cookie manager deciding, or
+   nothing at all on a site with no consent requirement. #}
+{% set consentMode = consentRequired|default(false) ? iw_sulu_tailwind_theme_consent_mode() : 'none' %}
 {% set needsConsent = consentMode != 'none' %}
 {% set service = consentService|default('') is not empty ? consentService : 'embed' %}
 
@@ -97,6 +105,10 @@
 {% if allowFullscreen|default(true) %}{% set allowFeatures = allowFeatures|merge(['fullscreen']) %}{% endif %}
 {% if allowMedia|default(false) %}{% set allowFeatures = allowFeatures|merge(['camera', 'microphone', 'autoplay']) %}{% endif %}
 {% if allowGeolocation|default(false) %}{% set allowFeatures = allowFeatures|merge(['geolocation']) %}{% endif %}
+{# A caller that knows its embed exactly (the video widget) passes the whole
+   policy instead: a player needs encrypted-media, and has no use for the
+   camera that allowMedia would grant. #}
+{% if allowList is defined and allowList is iterable %}{% set allowFeatures = allowList %}{% endif %}
 
 {# A single data-controller attribute may list several controllers, so consent
    and self-sizing compose on the same element. #}
@@ -152,7 +164,7 @@
                 <p class="iw-embed__consent-text">
                     {{ consentText|default('') is not empty
                         ? consentText
-                        : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': service}) }}
+                        : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': consentServiceLabel|default(service)}) }}
                 </p>
                 {# Reuses the theme's button style so the placeholder matches
                    every other button on the site, variant included. #}

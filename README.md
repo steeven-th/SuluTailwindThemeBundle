@@ -220,7 +220,7 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
 }
 ```
 
-> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is only required if you use the consent options of the iframe or code blocks; see **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
+> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is required as soon as one embed waits for consent, which YouTube and Vimeo videos always do, unless the site is set to `consent.mode: none`. See **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
 
 > The `accordion` controller is **optional**. The accordion block is built on native `<details>`/`<summary>` and is fully functional without JavaScript — including "one item open at a time". The controller only backfills that grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130, and opens the panel targeted by the URL fragment.
 
@@ -428,6 +428,7 @@ What can be overridden:
 | `blocks.iframe.allowed_hosts` | yes | Read when the page renders, so each site answers for itself |
 | `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
 | `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
+| `consent.mode` | yes | One site may run a cookie manager, its neighbour not. See [Consent](doc/consent.md#choosing-the-mechanism-one-setting-for-the-site) |
 | `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
 | `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
 | `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |

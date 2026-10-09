@@ -177,6 +177,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
             new TwigFunction('iw_sulu_tailwind_theme_unique_id', $this->getUniqueId(...)),
             new TwigFunction('iw_sulu_tailwind_theme_next_form_index', $this->getNextFormIndex(...)),
             new TwigFunction('iw_sulu_tailwind_theme_embed_url', $this->getEmbedUrl(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_consent_mode', $this->getConsentMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_mode', $this->getCodeMode(...)),
             new TwigFunction('iw_sulu_tailwind_theme_code_srcdoc', $this->getCodeSrcdoc(...)),
             new TwigFunction('iw_sulu_tailwind_theme_has_form_bundle', $this->hasFormBundle(...)),
@@ -439,6 +440,24 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     public function getEmbedUrl(?string $url): ?string
     {
         return $this->embedUrlValidator->validate($url);
+    }
+
+    /**
+     * How the current site hands consent to the embeds that wait for it.
+     *
+     * Read from the `consent.mode` setting, per webspace. Anything else than a
+     * known mode falls back to the placeholder, which keeps the third party
+     * out and still lets the visitor load it: an unreadable setting must not
+     * open the page to trackers, nor lock every embed behind a manager that
+     * may not be there.
+     *
+     * @return string 'placeholder', 'delegated' or 'none'
+     */
+    public function getConsentMode(): string
+    {
+        $mode = $this->webspaceSettings?->get('consent.mode');
+
+        return \in_array($mode, ItechWorldSuluTailwindThemeBundle::CONSENT_MODES, true) ? $mode : 'placeholder';
     }
 
     /**

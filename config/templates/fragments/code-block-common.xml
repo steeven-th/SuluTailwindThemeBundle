@@ -91,23 +91,18 @@
         </params>
     </property>
 
-    <property name="consentMode" type="single_select">
+    <property name="loadWithoutConsent" type="checkbox">
         <meta>
-            <title>iw_sulu_tailwind_theme.consent_mode</title>
-            <info_text>iw_sulu_tailwind_theme.consent_mode_info</info_text>
+            <title>iw_sulu_tailwind_theme.load_without_consent</title>
+            <info_text>iw_sulu_tailwind_theme.load_without_consent_info</info_text>
         </meta>
         <params>
-            <param name="default_value" value="none"/>
-            <param name="values" type="collection">
-                <param name="none"><meta><title>iw_sulu_tailwind_theme.consent_mode_none</title></meta></param>
-                <param name="placeholder"><meta><title>iw_sulu_tailwind_theme.consent_mode_placeholder</title></meta></param>
-                <param name="delegated"><meta><title>iw_sulu_tailwind_theme.consent_mode_delegated</title></meta></param>
-            </param>
+            <param name="default_value" value="false"/>
         </params>
     </property>
 
     <property name="consentService" type="text_line" colspan="6"
-              visibleCondition="__parent.consentMode != 'none'">
+              visibleCondition="__parent.loadWithoutConsent != true">
         <meta>
             <title>iw_sulu_tailwind_theme.consent_service</title>
             <info_text>iw_sulu_tailwind_theme.consent_service_info</info_text>
@@ -115,7 +110,7 @@
     </property>
 
     <property name="consentText" type="text_area"
-              visibleCondition="__parent.consentMode != 'none'">
+              visibleCondition="__parent.loadWithoutConsent != true">
         <meta>
             <title>iw_sulu_tailwind_theme.consent_text</title>
             <info_text>iw_sulu_tailwind_theme.consent_text_info</info_text>

@@ -107,6 +107,39 @@ final class PerWebspaceConfigTest extends TestCase
     }
 
     /**
+     * Without configuration the bundle asks the visitor itself: it keeps
+     * third parties out and works with no cookie manager at all.
+     */
+    #[Test]
+    public function consentDefaultsToTheBundlePlaceholder(): void
+    {
+        $this->assertSame(['mode' => 'placeholder'], $this->processConfig([[]])['consent']);
+    }
+
+    /**
+     * One site of a project may have its cookie manager wired while another
+     * does not.
+     */
+    #[Test]
+    public function aSiteOverridesItsConsentMode(): void
+    {
+        $config = $this->processConfig([[
+            'webspaces' => ['client-a' => ['consent' => ['mode' => 'delegated']]],
+        ]]);
+
+        $this->assertSame('placeholder', $config['consent']['mode']);
+        $this->assertSame(['consent' => ['mode' => 'delegated']], $config['webspaces']['client-a']);
+    }
+
+    #[Test]
+    public function itRefusesAnUnknownConsentMode(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([['consent' => ['mode' => 'click']]]);
+    }
+
+    /**
      * Run raw config through the bundle's own definition.
      *
      * @param array<int, array<string, mixed>> $configs Raw config arrays, as a project writes them

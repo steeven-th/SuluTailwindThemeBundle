@@ -45,7 +45,7 @@ Every other controller in this bundle is registered `lazy`, and for good reason:
 
 ### When you can skip the controller
 
-It is only needed if you actually use the consent options of the iframe or code blocks. If every embed on your site is set to **Consent before loading → None**, you can leave the controller out of `controllers.json` altogether.
+It is needed as soon as one embed waits for consent: a YouTube or Vimeo video always does, and an iframe or code block does unless **Load without waiting for consent** is ticked. Only a site set to `consent.mode: none` (see below) can leave the controller out of `controllers.json`. Leave it out anywhere else and the placeholder button does nothing.
 
 ---
 
@@ -94,18 +94,64 @@ document.addEventListener('iw:consent-request', (event) => {
 
 ---
 
-## Configuring a block
+## Choosing the mechanism: one setting for the site
+
+Whether an embed waits is decided per embed, by whoever knows what it calls. **How** it gets consent is decided once for the site, in the bundle configuration:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    consent:
+        mode: placeholder   # placeholder | delegated | none
+```
+
+| Mode | What a waiting embed does |
+|------|------|
+| `placeholder` (default) | The bundle's placeholder asks the visitor, and its button loads the embed. Works with no cookie manager at all. |
+| `delegated` | Your cookie manager decides through `grant()`, and the placeholder button only opens its preferences panel. Requires an adapter (see below). |
+| `none` | Everything loads straight away. For a site outside any consent requirement (intranet, outside the EU). |
+
+### Why a project setting and not a block field
+
+`delegated` works only once someone wrote the adapter that calls `window.iwConsent`. Chosen in a block, by an editor who cannot see that code, it would leave embeds that no click can ever load on a site without one. The developer who wires the cookie manager is the one who sets the mode, in the same commit.
+
+On a multi-site project, each site can set its own mode, for instance when only one of them runs a cookie manager:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    webspaces:
+        client-a:
+            consent:
+                mode: delegated
+```
+
+See [Per-site settings](../README.md#per-site-settings-multi-site-projects).
+
+## Configuring an iframe or code block
 
 In the block's **Settings** section:
 
 | Field | Role |
 |-------|------|
-| **Consent before loading** | `None` (load immediately), `Click to load` (bundle placeholder), `Driven by the cookie manager` (wait for `grant()`) |
-| **Service name** | The key tying this embed to your manager (`youtube`, `calendly`, `maps`…). Free text — use the same value your adapter passes to `grant()`. |
+| **Load without waiting for consent** | Unchecked (the default), the embed waits for consent the way the site is configured. Tick it only for content that sets no tracker, such as a page of your own site. |
+| **Service name** | The key tying this embed to your manager (`youtube`, `calendly`, `maps`…). Free text - use the same value your adapter passes to `grant()`. |
 | **Waiting message** | Text shown in place of the content. A sensible default is used when empty. |
 | **Waiting image** | Optional background visual for the placeholder. |
 
-Pick **Click to load** when the bundle should handle everything, and **Driven by the cookie manager** when your manager owns the decision and the placeholder should only offer to open its preferences panel.
+The box is an opt-out on purpose. A block saved before the field existed has no value, which reads as "waits", in the page and in the admin alike: the protection cannot be dropped by re-saving an old block without looking.
+
+## Video widgets
+
+A video widget embedding YouTube or Vimeo always waits for consent, and has no field for it. A video embed sets cookies whatever the video, so there is nothing for an editor to decide. The site's `consent.mode` alone applies, `none` included.
+
+The placeholder settings are derived:
+
+| Placeholder setting | On a video widget |
+|-------|------|
+| **Service name** | The provider, `youtube` or `vimeo`. Use these keys in your adapter. |
+| **Waiting message** | The default one, naming the platform. |
+| **Waiting image** | The widget's **Preview image**, when one is set. The protection does not depend on it. |
+
+A hosted video file is served by the site itself, contacts no third party, and plays without any placeholder.
 
 ---
 

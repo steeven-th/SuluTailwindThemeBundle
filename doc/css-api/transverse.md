@@ -1,6 +1,6 @@
 # Transverse components — CSS API
 
-Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), the **location map** (interactive Leaflet map shared by the location block, the CTA accessory and the form widget), the shared **gallery navigation arrows** (slider/carousel previous/next buttons), and the **embed frame** (shared by the iframe and code blocks).
+Components used across multiple blocks, templates or pages — not tied to a single block. Site-wide navigation helpers (**breadcrumbs**, **pagination**), the **3D carousel** (gallery slider), the **location card** (overlay on the location block map), the **location map** (interactive Leaflet map shared by the location block, the CTA accessory and the form widget), the shared **gallery navigation arrows** (slider/carousel previous/next buttons), and the **embed frame** (shared by the iframe and code blocks and the YouTube or Vimeo video widget).
 
 > See [`css-conventions.md`](../css-conventions.md) for the BEM naming policy.
 >

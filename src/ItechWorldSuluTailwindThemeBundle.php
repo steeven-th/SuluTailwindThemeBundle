@@ -33,12 +33,17 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * offered there has to be readable through WebspaceSettings, and nothing
      * else should travel to it.
      */
-    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks', 'turnstile'];
+    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks', 'turnstile', 'consent'];
 
     /**
      * Extension alias of pixelopen/cloudflare-turnstile-bundle.
      */
     private const TURNSTILE_EXTENSION = 'pixel_open_cloudflare_turnstile';
+
+    /**
+     * How a site hands consent to its embeds, see consentNode().
+     */
+    public const CONSENT_MODES = ['placeholder', 'delegated', 'none'];
 
     /**
      * Cloudflare's "always passes" test keys.
@@ -105,6 +110,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             ->append($this->titleEditorNode(true))
             ->append($this->blocksNode(true))
             ->append($this->turnstileNode(true))
+            ->append($this->consentNode(true))
             ->append($this->webspacesNode());
     }
 
@@ -144,6 +150,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                 ->append($this->titleEditorNode(false))
                 ->append($this->blocksNode(false))
                 ->append($this->turnstileNode(false))
+                ->append($this->consentNode(false))
             ->end();
 
         return $node;
@@ -289,6 +296,43 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
 
         if ($withDefaults) {
             $allowedHosts->defaultValue([]);
+        }
+
+        return $node;
+    }
+
+    /**
+     * The `consent` node, as a project default or as a site override.
+     *
+     * How an embed that waits for consent gets it is a fact about the site,
+     * not about the block: either the bundle's placeholder asks the visitor,
+     * or a cookie manager decides and the placeholder only opens its panel.
+     * `delegated` works only once the project wired an adapter to
+     * `window.iwConsent` (doc/consent.md), which is why it is chosen here, by
+     * whoever wrote that adapter, rather than by an editor in a block.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `consent` node
+     */
+    private function consentNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('consent'))->getRootNode();
+
+        $node->info('How third-party embeds that wait for consent get it (YouTube and Vimeo videos, iframe and code blocks set to wait)');
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $mode = $node->children()
+            ->enumNode('mode')
+            ->values(self::CONSENT_MODES)
+            ->info('placeholder: the bundle asks the visitor. delegated: your cookie manager decides, through an adapter to window.iwConsent. none: everything loads straight away, for a site outside any consent requirement.');
+
+        if ($withDefaults) {
+            $mode->defaultValue('placeholder');
         }
 
         return $node;
