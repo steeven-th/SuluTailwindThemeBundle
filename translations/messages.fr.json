@@ -62,6 +62,8 @@
     "iw_sulu_tailwind_theme.error.code": "Erreur %code%",
     "iw_sulu_tailwind_theme.error.404.title": "Page introuvable",
     "iw_sulu_tailwind_theme.error.404.message": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "iw_sulu_tailwind_theme.error.410.title": "Cette page n'existe plus",
+    "iw_sulu_tailwind_theme.error.410.message": "Ce contenu a été supprimé et n'est plus disponible.",
     "iw_sulu_tailwind_theme.error.403.title": "Accès refusé",
     "iw_sulu_tailwind_theme.error.403.message": "Vous n'avez pas l'autorisation de consulter cette page.",
     "iw_sulu_tailwind_theme.error.generic.title": "Une erreur est survenue",

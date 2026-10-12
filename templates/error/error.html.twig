@@ -17,7 +17,10 @@
 {% extends 'base.html.twig' %}
 
 {% set errorCode = status_code|default(500) %}
-{% set errorKind = errorCode in [403, 404] ? errorCode : 'generic' %}
+{# A 410 is content removed on purpose, not a failure: it gets its own words
+   and the way out of a 404, never the generic "something went wrong". #}
+{% set errorKind = errorCode in [403, 404, 410] ? errorCode : 'generic' %}
+{% set errorContentMissing = errorCode in [404, 410] %}
 {% set errorTitle = ('iw_sulu_tailwind_theme.error.' ~ errorKind ~ '.title')|trans %}
 
 {# Read by the head of the layout: the SEO partial falls back to content.title
@@ -27,7 +30,7 @@
 
 {% block content %}
     {% set errorButtonStyle = iw_sulu_tailwind_theme_button_slug() %}
-    {% set errorSearchUrl = errorCode == 404 ? iw_sulu_tailwind_theme_search_url() : null %}
+    {% set errorSearchUrl = errorContentMissing ? iw_sulu_tailwind_theme_search_url() : null %}
 
     <section class="iw-error-page iw-error-page--{{ errorKind }}" aria-labelledby="iw-error-page-title">
         <div class="iw-error-page__inner">

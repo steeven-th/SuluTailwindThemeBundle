@@ -62,6 +62,8 @@
     "iw_sulu_tailwind_theme.error.code": "Fehler %code%",
     "iw_sulu_tailwind_theme.error.404.title": "Seite nicht gefunden",
     "iw_sulu_tailwind_theme.error.404.message": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "iw_sulu_tailwind_theme.error.410.title": "Diese Seite existiert nicht mehr",
+    "iw_sulu_tailwind_theme.error.410.message": "Dieser Inhalt wurde entfernt und ist nicht mehr verfügbar.",
     "iw_sulu_tailwind_theme.error.403.title": "Zugriff verweigert",
     "iw_sulu_tailwind_theme.error.403.message": "Sie haben keine Berechtigung, diese Seite aufzurufen.",
     "iw_sulu_tailwind_theme.error.generic.title": "Ein Fehler ist aufgetreten",

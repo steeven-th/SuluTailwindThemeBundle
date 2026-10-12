@@ -26,6 +26,7 @@ A webspace may also declare a template per code (`<template type="error-404">…
 | Code | Title | Extra |
 |------|-------|-------|
 | 404 | Page not found | A search field, when the site has a search page (see below) |
+| 410 | This page no longer exists | Content removed on purpose, not a failure: the same search field as a 404 |
 | 403 | Access denied | |
 | Any other (500, 503…) | Something went wrong | |
 
@@ -39,7 +40,7 @@ Sulu passes the exception to the template. The bundle's template never reads it:
 
 ### The search field
 
-The 404 page offers a search field when the site has a search page, that is when **both** halves of Sulu's website search are wired:
+The 404 and 410 pages offer a search field when the site has a search page, that is when **both** halves of Sulu's website search are wired:
 
 - the route `sulu_search.website_search`, imported from the search package in the website routes;
 - a `search` template declared in the webspace.
@@ -79,9 +80,9 @@ Then point the webspace at your template (`<template type="error">error/error</t
 | `error_illustration` | Empty, above the code |
 | `error_title` | The translated title |
 | `error_message` | The translated message |
-| `error_actions` | The home button and, on a 404, the search form |
+| `error_actions` | The home button and, on a 404 or a 410, the search form |
 
-The variables `errorCode` (the status) and `errorKind` (`404`, `403` or `generic`) are available inside the blocks.
+The variables `errorCode` (the status), `errorKind` (`404`, `410`, `403` or `generic`) and `errorContentMissing` (true on a 404 or a 410) are available inside the blocks.
 
 To replace the whole template instead, the standard Symfony override applies: `templates/bundles/ItechWorldSuluTailwindThemeBundle/error/error.html.twig`.
 

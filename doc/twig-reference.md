@@ -844,7 +844,7 @@ so a block only says whether its content waits. See [Consent](consent.md).
 The search page URL of the current site, or `null` when the project did not wire
 Sulu's website search (the `sulu_search.website_search` route **and** a `search`
 template in the webspace). Used by the [error page](error-page.md) to offer a
-search field on a 404 only where it leads somewhere.
+search field on a 404 or a 410 only where it leads somewhere.
 
 ```twig
 {% set searchUrl = iw_sulu_tailwind_theme_search_url() %}

@@ -62,6 +62,8 @@
     "iw_sulu_tailwind_theme.error.code": "Error %code%",
     "iw_sulu_tailwind_theme.error.404.title": "Page not found",
     "iw_sulu_tailwind_theme.error.404.message": "The page you are looking for does not exist or has moved.",
+    "iw_sulu_tailwind_theme.error.410.title": "This page no longer exists",
+    "iw_sulu_tailwind_theme.error.410.message": "This content has been removed and is no longer available.",
     "iw_sulu_tailwind_theme.error.403.title": "Access denied",
     "iw_sulu_tailwind_theme.error.403.message": "You are not allowed to view this page.",
     "iw_sulu_tailwind_theme.error.generic.title": "Something went wrong",

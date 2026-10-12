@@ -30,6 +30,7 @@ final class ErrorPageRenderTest extends TestCase
     public static function codes(): iterable
     {
         yield 'not found' => [404, '404'];
+        yield 'gone' => [410, '410'];
         yield 'forbidden' => [403, '403'];
         yield 'server error' => [500, 'generic'];
         yield 'a code with no text of its own' => [418, 'generic'];
@@ -98,6 +99,20 @@ final class ErrorPageRenderTest extends TestCase
     public function noSearchFormWithoutASearchPage(): void
     {
         self::assertStringNotContainsString('<form', self::render(['status_code' => 404], searchUrl: null));
+    }
+
+    /**
+     * A removed page is content missing, like a 404: the visitor gets the
+     * same way to look for something else.
+     */
+    #[Test]
+    public function aRemovedPageOffersTheSiteSearchToo(): void
+    {
+        $html = self::render(['status_code' => 410], searchUrl: '/de/search');
+
+        self::assertStringContainsString('action="/de/search"', $html);
+        self::assertStringContainsString('iw-error-page__home', $html);
+        self::assertStringNotContainsString('error.generic', $html);
     }
 
     /**
