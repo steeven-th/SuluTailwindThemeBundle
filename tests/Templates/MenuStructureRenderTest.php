@@ -329,8 +329,8 @@ final class MenuStructureRenderTest extends TestCase
 
     /**
      * In the list position, the back button carries a visible label instead of
-     * an aria-label, the header has no title, and the parent page heads the
-     * list of every sub-panel.
+     * an aria-label and spans the header row, the header has no title, and the
+     * parent page heads the list of every sub-panel.
      */
     #[Test]
     public function parentLinkInListLabelsTheBackButton(): void
@@ -346,6 +346,7 @@ final class MenuStructureRenderTest extends TestCase
             $back = $xpath->query('.//button[contains(@class, "iw-menu__panel-back")]', $panel)?->item(0);
             self::assertInstanceOf(\DOMElement::class, $back);
             self::assertFalse($back->hasAttribute('aria-label'));
+            self::assertStringContainsString('iw-menu__panel-back--full', $back->getAttribute('class'));
             self::assertNotSame('', trim((string) $xpath->query('.//*[contains(@class, "iw-menu__panel-back-label")]', $back)?->item(0)?->textContent));
 
             $first = $xpath->query('.//ul[contains(@class, "iw-menu__list")]/li[1]/a', $panel)?->item(0);

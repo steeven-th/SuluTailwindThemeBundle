@@ -36,6 +36,7 @@
     - .iw-menu__panel / .iw-menu__subpanel (+ --active) — a level / an overlay level
     - .iw-menu__panel-header / __panel-back / __panel-title — the sub-panel header
     - .iw-menu__panel-back-label - the visible "Back" label ('list' position)
+    - .iw-menu__panel-back--full - the back button spanning the header row ('list' position)
     - .iw-menu__panel-body / __panel-item - the scrollable level / a row
     - .iw-menu__panel-parent - the parent page row ('list' position)
 #}
@@ -60,7 +61,7 @@
             {# The label is visible in 'list' mode, an aria-label otherwise. #}
             <button type="button"
                     data-action="menu#closePanel"
-                    class="iw-menu__panel-back {{ levelText }}"
+                    class="iw-menu__panel-back {{ levelText }}{{ parentInList ? ' iw-menu__panel-back--full' }}"
                     {%- if not parentInList %} aria-label="{{ 'iw_sulu_tailwind_theme.menu_panel_back'|trans({}, 'messages') }}"{% endif %}>
                 {% include '@ItechWorldSuluTailwindTheme/components/_nav_arrow.html.twig' with {'role': 'menu', 'direction': 'prev', 'class': 'w-5 h-5'} only %}
                 {% if parentInList %}

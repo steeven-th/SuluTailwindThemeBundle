@@ -4374,9 +4374,14 @@ class ThemeCompiler
         $css .= ".iw-menu__panels--none .iw-menu__subpanel { transition: none; transform: translateX(100%); }\n";
         $css .= ".iw-menu__panels--none .iw-menu__subpanel--active { transform: translate(0, 0); }\n";
         // Header: back button + (optionally linked) section title, one size up.
-        $css .= ".iw-menu__panel-header { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; padding: 0.75rem var(--iw-menu-panel-pad-end) 0.75rem var(--iw-menu-panel-pad-start); border-bottom: 1px solid var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
-        // Its padding is given back, so the arrow lines up with the rows.
-        $css .= ".iw-menu__panel-back { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0.25rem; margin-inline-start: -0.25rem; cursor: pointer; }\n";
+        // The header has no vertical padding: the back button carries it, so
+        // its tap target spans the full height of the header.
+        $css .= ".iw-menu__panel-header { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; padding: 0 var(--iw-menu-panel-pad-end) 0 var(--iw-menu-panel-pad-start); border-bottom: 1px solid var(--iw-menu-divider, rgba(255,255,255,0.1)); }\n";
+        // Its inline padding is given back, so the arrow lines up with the rows.
+        $css .= ".iw-menu__panel-back { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 1rem 0.5rem; margin-inline-start: -0.5rem; cursor: pointer; }\n";
+        // With the parent link in the list, it spans the full row like the
+        // entries below, an easy target for a thumb.
+        $css .= ".iw-menu__panel-back--full { flex: 1 1 auto; justify-content: flex-start; margin-inline-end: -0.5rem; }\n";
         // The color of its sub-panel level, without hover. A linkable title
         // also carries the level text class, whose :hover signals the link.
         $css .= ".iw-menu__panel-title { color: inherit; font-size: 1.25rem; font-weight: 700; line-height: 1.2; }\n";
