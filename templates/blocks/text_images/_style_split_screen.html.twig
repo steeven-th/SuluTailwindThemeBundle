@@ -136,6 +136,7 @@
         {% if widgetKind != 'image' %}
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                 widget: widget|default([]),
+                imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
                 imageFormat: format|default('iw_theme_16_9'),
                 aspectRatio: '16/9',
                 imageRadius: imageRadiusClass|default(''),
@@ -155,6 +156,7 @@
                         cover: true,
                         classes: 'cursor-pointer',
                         pictureClasses: 'absolute inset-0 w-full h-full',
+                        sizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
                     }) }}
                 </a>
 
@@ -176,6 +178,7 @@
                                 cover: true,
                                 classes: 'cursor-pointer',
                                 pictureClasses: 'absolute inset-0 w-full h-full',
+                                sizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
                             }) }}
                         </a>
                     </div>

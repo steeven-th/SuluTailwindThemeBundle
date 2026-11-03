@@ -2663,3 +2663,23 @@ now JSON-LD in the `<head>`, filled by `pages/default.html.twig`,
   instead of the fixed English "Breadcrumb".
 - A project page template of its own adds the `seo_structured_data` block shown
   in [Structured data](structured-data.md#breadcrumb-trail) to keep the trail.
+
+## Images get a srcset (new)
+
+The content formats (`iw_theme_16_9`, `iw_theme_4_3`, `iw_theme_1_1`,
+`iw_theme_3_4`, `iw_theme_a_series`, `iw_theme_hero`) gain smaller versions of the
+same ratio, named `<format>_w<width>`. `blocks/common/_image.html.twig` offers them
+in a `srcset` with a `sizes`, and the bundle's blocks, article cards and galleries
+pass the share of the container they take, so a card no longer downloads a file
+two or three times wider than itself.
+
+- Nothing to do: an image a project template renders through the partial gets the
+  `srcset` too, with `sizes="100vw"`, which is never worse than before. Passing a
+  real `sizes` is what saves the bytes, see
+  [Width variants and srcset](twig-reference.md#width-variants-and-srcset).
+- A format of the project named `<format>_w<width>` is picked up as a variant of
+  `<format>`. It must keep that format's ratio.
+- A media cropped by hand in a format keeps its single size there, its crop
+  always shown. The variants are `internal`, out of the crop tool.
+- Sulu generates a variant the first time it is asked for, so the media cache
+  grows by a few smaller files per picture.

@@ -25,6 +25,13 @@
                         (a ratio already implies cover).
      - lightbox       : bool (default false) — wrap in a glightbox link
      - showName       : bool (default false) — use the media title as lightbox caption
+     - sizes          : the width the image takes in the layout, as an HTML
+                        `sizes` value (default '100vw'). Only read when the
+                        format has width variants (config/image-formats.xml,
+                        `<format>_w<width>`): the browser then picks the
+                        smallest file covering that width. A grid of three
+                        cards passes '(min-width: 1024px) 33vw, (min-width:
+                        640px) 50vw, 100vw' and downloads a third of the bytes.
      - loading        : 'lazy' (default) | 'eager' (heroes / LCP images)
      - fetchpriority  : 'high' | 'low' | 'auto' (default: attribute omitted).
                         'high' only on the image likely to be the LCP (page
@@ -72,6 +79,14 @@
     {% set avifUrl = (avifEnabled and not isVector) ? media.thumbnails[format ~ '.avif']|default(null) : null %}
     {% set webpUrl = isVector ? null : media.thumbnails[format ~ '.webp']|default(null) %}
 
+    {# Width candidates, when the format has `_w<width>` variants. A vector has
+       none to offer, and a media cropped by hand in this format keeps its
+       single size (the function returns null), the crop being per format. #}
+    {% set baseSrcset = isVector ? null : iw_sulu_tailwind_theme_image_srcset(media, format) %}
+    {% set avifSrcset = avifUrl ? iw_sulu_tailwind_theme_image_srcset(media, format, 'avif') : null %}
+    {% set webpSrcset = webpUrl ? iw_sulu_tailwind_theme_image_srcset(media, format, 'webp') : null %}
+    {% set imageSizes = (baseSrcset or avifSrcset or webpSrcset) ? (sizes|default('100vw')) : null %}
+
     {% if raw|default(false) %}
         {# Component-owned image: the <picture> is transparent (display:contents)
            so the caller's own CSS classes on the <img> fully drive the layout;
@@ -96,10 +111,11 @@
     {% endif %}
 
     <picture class="{{ pictureClass }}">
-        {% if avifUrl %}<source srcset="{{ avifUrl }}" type="image/avif">{% endif %}
-        {% if webpUrl %}<source srcset="{{ webpUrl }}" type="image/webp">{% endif %}
+        {% if avifUrl %}<source srcset="{{ avifSrcset ?: avifUrl }}"{% if avifSrcset %} sizes="{{ imageSizes }}"{% endif %} type="image/avif">{% endif %}
+        {% if webpUrl %}<source srcset="{{ webpSrcset ?: webpUrl }}"{% if webpSrcset %} sizes="{{ imageSizes }}"{% endif %} type="image/webp">{% endif %}
         <img
             src="{{ baseUrl }}"
+            {%- if baseSrcset %} srcset="{{ baseSrcset }}" sizes="{{ imageSizes }}"{% endif %}
             alt="{{ alt is defined ? alt : media.title|default('') }}"
             loading="{{ loading|default('lazy') }}"
             {%- if fetchpriority|default(null) in ['high', 'low', 'auto'] %} fetchpriority="{{ fetchpriority }}"{% endif %}

@@ -28,6 +28,7 @@
      - align         : the text alignment of the grid, used when the buttons
                        follow the title
      - numbered      : bool, shows the position of the card
+     - imageSizes    : the `sizes` of the card image, from the column count
      - imageMaxWidth : cap on the image width, from the block settings
      - cardRadius    : radius class for the card
      - imageRadius   : radius class for the image
@@ -83,7 +84,8 @@
             {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                 media: image,
                 format: 'iw_theme_16_9',
-                ratio: '16-9'
+                ratio: '16-9',
+                sizes: imageSizes|default(null)
             } only %}
         </div>
     {% endif %}
@@ -116,7 +118,8 @@
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                     media: image,
                     format: 'iw_theme_16_9',
-                    radiusClass: imageRadius|default('')
+                    radiusClass: imageRadius|default(''),
+                    sizes: imageSizes|default(null)
                 } only %}
             </div>
         {% endif %}
