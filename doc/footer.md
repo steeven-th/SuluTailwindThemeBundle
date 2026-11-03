@@ -28,7 +28,7 @@ To disable the bundle footer entirely, simply leave the footer block out of your
 | **Mute secondary text** | Dims the tagline, the copyright, the column titles, the links at rest and the divider (see [Muting](#muting)). On by default. |
 | **Show logo** / **Footer logo** | Optional footer-specific logo, independent from the menu logo. Shown in all three layouts. |
 | **Logo max height** | Caps the logo height (in px) while keeping its aspect ratio; never upscales a small logo. Applied via the compiled `.iw-footer__logo` rule. A raw SVG logo (served without an image format) also gets `.iw-footer__logo--vector`, which turns that cap into a firm height so a `viewBox`-only file cannot collapse to `0x0`. |
-| **Show site name** | Display the webspace name alongside the logo. |
+| **Show site name** | Display the webspace name alongside the logo. With the name hidden, the logo link is named by an `aria-label` ("Home page of {site name}"), like the menu logo, so it is never announced as a bare URL. |
 | **Name position** | (when both logo and name are shown) Place the site name **beside** or **below** the logo. |
 | **Tagline** | (`columns` / `centered`) Short description shown under the brand. |
 | **Show social media** | Show social icons, loaded from the `iw_theme_footer_social_media_links` snippet area. |
