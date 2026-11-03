@@ -2596,3 +2596,29 @@ The currency defaults to `EUR`. A site selling in another one sets
 `articles/common/_event_info_card.html.twig` takes three new variables:
 `isPaid`, `priceLabel` (from `iw_sulu_tailwind_theme_event_price(content)`) and
 `ticketUrl`. An override that does not pass them shows every event as free.
+
+## Events get speakers, and Sulu contacts are named again (new, fixed)
+
+An `iw_event` article gains a **Speakers** section (schema.org `performer`), up to
+ten entries of the same three kinds as the organizer: a free name, a Sulu contact
+or a Sulu organization. The page shows them in a "With" row, and the structured
+data carries them with the website of their card.
+
+The organizer and the speakers share one fragment,
+`config/templates/fragments/event-party-types.xml`. A project template that
+copied the organizer block can include it instead.
+
+### Sulu contacts and organizations had no name (fixed)
+
+An organizer, or an additional article author, picked as a **Sulu contact** or a
+**Sulu organization** showed no name on the page and was missing from the
+structured data. Sulu 3 resolves those selections into API objects, and the name
+was only read from an array. Both shapes are read now, nothing to do on existing
+content.
+
+### Translations
+
+The admin keys `article.organizer_name`, `article.organizer_url`,
+`article.organizer_contact_select` and `article.organizer_organization_select` are
+replaced by the `article.event_party_*` keys of the shared fragment. A project
+overriding them in its own translation files renames them.

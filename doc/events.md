@@ -10,6 +10,7 @@ This bundle adds that missing question - *what is coming up, and in what order* 
 - [Timezone](#timezone)
 - [Venue](#venue)
 - [Price and registration](#price-and-registration)
+- [Organizer and performers](#organizer-and-performers)
 - [In the blocks of the bundle](#in-the-blocks-of-the-bundle)
 - [In a block or a page of your own](#in-a-block-or-a-page-of-your-own)
 - [In a template of your own](#in-a-template-of-your-own)
@@ -135,6 +136,32 @@ itech_world_sulu_tailwind_theme:
             events:
                 currency: CHF
 ```
+
+---
+
+## Organizer and performers
+
+An event has one **Organizer** and up to ten **Speakers** (schema.org `performer`): who leads it, a speaker, a trainer or a host, as opposed to who puts it on. Both offer the same three kinds of entry:
+
+| Kind | Name | `url` in the structured data |
+|---|---|---|
+| Free name | as typed | the URL typed next to it (https or http) |
+| Sulu contact | first and last name, always in full | the **Website** of the contact card |
+| Sulu organization | its name | the **Website** of the organization card |
+
+A website typed without a scheme on a contact card (`www.example.com`) is completed with `https://`. Anything that is not a web address, a mail address or a phone number typed in the wrong field, is left out.
+
+The event page shows "Organized by" and "With", followed by the names, as plain text: the websites only go to the structured data, where they help search engines tell who is who. In the structured data, each entry is a `Person`, or an `Organization` for a Sulu organization:
+
+```json
+"organizer": { "@type": "Organization", "name": "CCI de Tarbes", "url": "https://www.tarbes.cci.fr" },
+"performer": [
+    { "@type": "Person", "name": "Jeanne Martin", "url": "https://jeanne.example.com" },
+    { "@type": "Person", "name": "Paul Durand" }
+]
+```
+
+One speaker gives an object, several give a list, none gives no `performer` key at all.
 
 ---
 

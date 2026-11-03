@@ -397,6 +397,7 @@ Floating card with date, location and organizer — designed to sit on top of an
 | `.iw-event-info__register-link` | Registration or ticketing link |
 | `.iw-event-info__organizer-label` | "Organized by" small caps label |
 | `.iw-event-info__organizer-name` | Organizer display name |
+| `.iw-event-info__performers` | Names of the performers, in the "With" row |
 
 | Variable | Purpose |
 |----------|---------|

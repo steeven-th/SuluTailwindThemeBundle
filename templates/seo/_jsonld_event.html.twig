@@ -1,6 +1,6 @@
 {#
     JSON-LD structured data for Event articles.
-    Generates Event schema.org markup with location, offer and organizer.
+    Generates Event schema.org markup with location, offer, organizer and performers.
 #}
 
 {# Resolve image URL #}
@@ -74,18 +74,21 @@
     {% endif %}
 {% endif %}
 
-{# Organizer #}
+{# Organizer and performers: a Person or an Organization each, with the
+   website of the Sulu contact card or the URL typed for a free name. #}
 {% set organizerData = null %}
 {% if content.organizer is defined and content.organizer is iterable and content.organizer|length > 0 %}
-    {% set org = content.organizer|first %}
-    {% set orgName = iw_sulu_tailwind_theme_author_name(org) %}
-    {% if orgName is not empty %}
-        {% set orgType = org.type|default('custom') == 'organization' ? 'Organization' : 'Person' %}
-        {% set organizerData = {'@type': orgType, 'name': orgName} %}
-        {% if org.url is defined and org.url is not empty %}
-            {% set organizerData = organizerData|merge({'url': org.url}) %}
+    {% set organizerData = iw_sulu_tailwind_theme_schema_party(content.organizer|first) %}
+{% endif %}
+
+{% set performersList = [] %}
+{% if content.performers is defined and content.performers is iterable %}
+    {% for performer in content.performers %}
+        {% set party = performer is iterable ? iw_sulu_tailwind_theme_schema_party(performer) : null %}
+        {% if party is not null %}
+            {% set performersList = performersList|merge([party]) %}
         {% endif %}
-    {% endif %}
+    {% endfor %}
 {% endif %}
 
 <script type="application/ld+json">
@@ -101,6 +104,7 @@
     'image': imageUrl,
     'description': description is not empty ? description|slice(0, 300) : null,
     'organizer': organizerData,
+    'performer': performersList|length == 1 ? performersList|first : (performersList|length > 1 ? performersList : null),
     'offers': iw_sulu_tailwind_theme_event_offer(content, app.request.schemeAndHttpHost ~ app.request.baseUrl ~ app.request.pathInfo),
 }|filter(v => v is not null)|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_PRETTY_PRINT'))|raw }}
 </script>

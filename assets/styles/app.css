@@ -5080,7 +5080,8 @@ section.block:has([data-slider-fullbleed-value]) {
     letter-spacing: 0.05em;
 }
 
-.iw-event-info__organizer-name {
+.iw-event-info__organizer-name,
+.iw-event-info__performers {
     display: block;
     font-weight: 500;
     color: var(--color-text);

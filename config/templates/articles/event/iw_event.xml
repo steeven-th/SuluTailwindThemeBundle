@@ -2,7 +2,7 @@
 <!--
     Article template: Event.
     Provides an event article structure with start/end dates, location,
-    pricing, organizer, hero, and content blocks. Categories, tags, description,
+    pricing, organizer, performers, hero, and content blocks. Categories, tags, description,
     and SEO are handled by Sulu's native Excerpt tab.
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
@@ -137,42 +137,26 @@
                 <block name="organizer" default-type="custom" minOccurs="0" maxOccurs="1">
                     <meta><title>iw_sulu_tailwind_theme.article.organizer</title></meta>
                     <types>
-                        <type name="custom">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_custom</title></meta>
-                            <properties>
-                                <property name="name" type="text_line" mandatory="true" colspan="6">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_name</title></meta>
-                                </property>
-                                <property name="url" type="url" colspan="6">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_url</title></meta>
-                                    <params>
-                                        <param name="defaults" type="collection">
-                                            <param name="scheme" value="https://"/>
-                                        </param>
-                                        <param name="schemes" type="collection">
-                                            <param name="https://"/>
-                                            <param name="http://"/>
-                                        </param>
-                                    </params>
-                                </property>
-                            </properties>
-                        </type>
-                        <type name="contact">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_contact</title></meta>
-                            <properties>
-                                <property name="contact" type="single_contact_selection" mandatory="true" colspan="12">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_contact_select</title></meta>
-                                </property>
-                            </properties>
-                        </type>
-                        <type name="organization">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_organization</title></meta>
-                            <properties>
-                                <property name="organization" type="single_account_selection" mandatory="true" colspan="12">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_organization_select</title></meta>
-                                </property>
-                            </properties>
-                        </type>
+                        <xi:include href="../../fragments/event-party-types.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                    </types>
+                </block>
+            </properties>
+        </section>
+
+        <!-- Performers section: who leads the event (speaker, trainer, host),
+             schema.org `performer`, distinct from the organizer -->
+        <section name="performers">
+            <meta><title>iw_sulu_tailwind_theme.article.section_performers</title></meta>
+            <properties>
+                <block name="performers" default-type="custom" minOccurs="0" maxOccurs="10">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.performer</title>
+                        <info_text>iw_sulu_tailwind_theme.article.performer_info</info_text>
+                    </meta>
+                    <types>
+                        <xi:include href="../../fragments/event-party-types.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
                     </types>
                 </block>
             </properties>
