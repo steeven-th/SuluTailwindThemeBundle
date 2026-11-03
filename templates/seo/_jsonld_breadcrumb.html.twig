@@ -4,16 +4,20 @@
 
     Parameters:
     - items: array of {title, url} objects (breadcrumb trail)
+
+    An item without a name is dropped: Google rejects the whole list over a
+    single empty "name". Positions stay consecutive.
 #}
-{% if items is defined and items is iterable and items|length > 0 %}
+{% set named = (items is defined and items is iterable ? items : [])|filter(item => item.title|default('')|trim is not empty) %}
+{% if named|length > 0 %}
 {% set listItems = [] %}
-{% for item in items %}
+{% for item in named %}
     {% set listItem = {
         '@type': 'ListItem',
         'position': loop.index,
-        'name': item.title|default(''),
+        'name': item.title|trim,
     } %}
-    {% if not loop.last and item.url is defined %}
+    {% if not loop.last and item.url|default('') is not empty %}
         {% set listItem = listItem|merge({'item': absolute_url(item.url)}) %}
     {% endif %}
     {% set listItems = listItems|merge([listItem]) %}

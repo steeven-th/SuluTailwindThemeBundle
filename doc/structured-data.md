@@ -1,6 +1,6 @@
-# Structured data of articles
+# Structured data of articles and pages
 
-Every article template fills the `seo_structured_data` block of the base template with schema.org JSON-LD: `NewsArticle` for a news item, `BlogPosting` for a blog post, `Event` for an event. This page covers news items and blog posts. Events have their own fields and are described in [Events and agendas](events.md).
+Every article template fills the `seo_structured_data` block of the base template with schema.org JSON-LD: `NewsArticle` for a news item, `BlogPosting` for a blog post, `Event` for an event. This page covers news items and blog posts, and the [breadcrumb trail](#breadcrumb-trail) of every page and article. Events have their own fields and are described in [Events and agendas](events.md).
 
 ## What an article carries
 
@@ -53,4 +53,37 @@ Sulu's `ContentController` hands templates `lastModified`, which is empty unless
 
 ```xml
 <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController::indexAction</controller>
+```
+
+## Breadcrumb trail
+
+Pages and articles also carry a `BreadcrumbList`, rendered in the `<head>` by `components/_breadcrumb_auto.html.twig` with `output: 'jsonld'`. It is filled from the same Sulu page trail as the visible breadcrumb, with three differences:
+
+- **It does not depend on the display settings.** Search engines get the trail even when the breadcrumb is turned off for pages or articles, and the trail always starts at the home page, whatever the **Home link** setting says.
+- **No item comes out without a name.** Google rejects the whole list over a single empty `name`. A page without a title in the current locale is skipped, and an untitled home page falls back to the **Home label** of the theme, then to the translated "Home".
+- **The home page alone emits nothing.** A trail of a single item tells nothing.
+
+```json
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://example.com/fr" },
+        { "@type": "ListItem", "position": 2, "name": "Nos outils", "item": "https://example.com/fr/nos-outils" },
+        { "@type": "ListItem", "position": 3, "name": "Les ordonnances de prévention" }
+    ]
+}
+```
+
+The current page, last of the list, has no `item`, as Google recommends. The visible component, `components/_breadcrumbs.html.twig`, carries no microdata, so a page has a single list. A project page template wanting the trail fills the block the same way:
+
+```twig
+{% block seo_structured_data %}
+    {{ parent() }}
+    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+        output: 'jsonld',
+        context: 'page',
+        pageUuid: resource.uuid|default(null),
+    } only %}
+{% endblock %}
 ```

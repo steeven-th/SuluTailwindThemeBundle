@@ -2644,3 +2644,22 @@ The three article templates are now rendered by
 extension of Sulu's `ContentController` that adds `iwContentChanged`. A project
 that copied an article template keeps Sulu's controller and therefore gets no
 fallback date: switch its `<controller>` to the bundle's.
+
+## Breadcrumb structured data in JSON-LD (changed)
+
+The schema.org `BreadcrumbList` used to be microdata on the visible trail. It is
+now JSON-LD in the `<head>`, filled by `pages/default.html.twig`,
+`pages/article_listing.html.twig` and the article base template.
+
+- It comes out even when the breadcrumb is not displayed, and always starts at
+  the home page.
+- An item without a name is skipped, instead of producing an empty `name` that
+  makes Google reject the whole list. The home page alone emits nothing.
+- `components/_breadcrumbs.html.twig` loses its `itemscope` / `itemprop`
+  attributes, and the link text is no longer wrapped in a `<span>`. A project CSS
+  rule written against `.iw-breadcrumbs__link span` must target
+  `.iw-breadcrumbs__link` instead. The current item gains `aria-current="page"`.
+- The `<nav>` label is translated (`iw_sulu_tailwind_theme.breadcrumbs_label`)
+  instead of the fixed English "Breadcrumb".
+- A project page template of its own adds the `seo_structured_data` block shown
+  in [Structured data](structured-data.md#breadcrumb-trail) to keep the trail.

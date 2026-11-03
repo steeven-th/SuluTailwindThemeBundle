@@ -1,5 +1,8 @@
 {#
-    Breadcrumbs component with schema.org BreadcrumbList microdata.
+    Breadcrumbs component (visible trail only). Its structured data is the
+    JSON-LD BreadcrumbList rendered in the <head> by _breadcrumb_auto with
+    output 'jsonld', so it carries no microdata: two BreadcrumbList for one
+    page would be reported twice.
 
     Parameters:
     - items: array of {title, url} objects (breadcrumb trail). The last item is
@@ -10,17 +13,12 @@
 {% set separator = separator|default('chevron') %}
 {% set align = align|default('left') %}
 {% if items is defined and items is iterable and items|length > 0 %}
-    <nav aria-label="Breadcrumb" class="iw-breadcrumbs{{ align != 'left' ? ' iw-breadcrumbs--align-' ~ align }}">
-        <ol class="iw-breadcrumbs__list"
-            itemscope itemtype="https://schema.org/BreadcrumbList">
+    <nav aria-label="{{ 'iw_sulu_tailwind_theme.breadcrumbs_label'|trans({}, 'messages') }}" class="iw-breadcrumbs{{ align != 'left' ? ' iw-breadcrumbs--align-' ~ align }}">
+        <ol class="iw-breadcrumbs__list">
             {% for item in items %}
-                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"
-                    class="iw-breadcrumbs__item">
+                <li class="iw-breadcrumbs__item">
                     {% if not loop.last %}
-                        <a href="{{ item.url }}" itemprop="item" class="iw-breadcrumbs__link">
-                            <span itemprop="name">{{ item.title }}</span>
-                        </a>
-                        <meta itemprop="position" content="{{ loop.index }}">
+                        <a href="{{ item.url }}" class="iw-breadcrumbs__link">{{ item.title }}</a>
                         {% if separator == 'slash' %}
                             <span class="iw-breadcrumbs__separator" aria-hidden="true">/</span>
                         {% elseif separator == 'dot' %}
@@ -35,8 +33,7 @@
                             </svg>
                         {% endif %}
                     {% else %}
-                        <span itemprop="name" class="iw-breadcrumbs__current">{{ item.title }}</span>
-                        <meta itemprop="position" content="{{ loop.index }}">
+                        <span class="iw-breadcrumbs__current" aria-current="page">{{ item.title }}</span>
                     {% endif %}
                 </li>
             {% endfor %}
