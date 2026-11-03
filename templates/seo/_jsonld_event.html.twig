@@ -43,11 +43,35 @@
         '@type': 'VirtualLocation',
         'url': content.locationUrl,
     } %}
-{% elseif not isOnline and content.location is defined and content.location is not empty %}
-    {% set locationData = {
-        '@type': 'Place',
-        'name': content.location,
-    } %}
+{% elseif not isOnline and content.location is defined and content.location is iterable %}
+    {% set place = content.location %}
+    {% set placeName = place.title|default('')|trim %}
+    {% set street = [place.number|default('')|trim, place.street|default('')|trim]|filter(v => v is not empty)|join(' ') %}
+    {% set postalAddress = {
+        '@type': 'PostalAddress',
+        'streetAddress': street,
+        'postalCode': place.code|default('')|trim,
+        'addressLocality': place.town|default('')|trim,
+        'addressCountry': place.country|default('')|trim,
+    }|filter(v => v is not empty) %}
+    {# Google expects an address on every Place. A location carried over from
+       the former free-text field has a name and nothing else, and the name is
+       then the best address there is. #}
+    {% set address = postalAddress|length > 1 ? postalAddress : (placeName is not empty ? placeName : null) %}
+    {% if placeName is not empty or address is not null %}
+        {% set locationData = {
+            '@type': 'Place',
+            'name': placeName is not empty ? placeName : iw_sulu_tailwind_theme_location_address(place)|split("\n")|first,
+            'address': address,
+        }|filter(v => v is not null) %}
+        {% if place.lat|default(null) is not null and place.long|default(null) is not null %}
+            {% set locationData = locationData|merge({'geo': {
+                '@type': 'GeoCoordinates',
+                'latitude': place.lat,
+                'longitude': place.long,
+            }}) %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 {# Organizer #}

@@ -460,6 +460,12 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\EventLocationMigrateCommand:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\BlockStylesMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'

@@ -53,9 +53,20 @@
                     </meta>
                 </property>
 
-                <property name="location" type="text_line" colspan="12"
+                <property name="location" type="location" colspan="12"
                           visibleCondition="isOnline == false OR isOnline == null">
-                    <meta><title>iw_sulu_tailwind_theme.article.event_location</title></meta>
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_location</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_location_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="showMapLink" type="checkbox" colspan="12"
+                          visibleCondition="isOnline == false OR isOnline == null">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_show_map_link</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_show_map_link_info</info_text>
+                    </meta>
                 </property>
 
                 <property name="locationUrl" type="url" colspan="12"

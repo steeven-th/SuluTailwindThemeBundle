@@ -1347,6 +1347,9 @@
     "iw_sulu_tailwind_theme.article.event_is_online": "Online event",
     "iw_sulu_tailwind_theme.article.event_is_online_info": "Check if this event takes place online (hides physical location)",
     "iw_sulu_tailwind_theme.article.event_location": "Location",
+    "iw_sulu_tailwind_theme.article.event_location_info": "Search the address so the event page shows it and search engines can place the event.",
+    "iw_sulu_tailwind_theme.article.event_show_map_link": "Show a link to the map",
+    "iw_sulu_tailwind_theme.article.event_show_map_link_info": "Adds a \"View on the map\" link under the address. Only shown when the location has coordinates.",
     "iw_sulu_tailwind_theme.article.event_location_url": "Event URL",
     "iw_sulu_tailwind_theme.article.event_location_url_info": "Link to the online event platform (Zoom, Teams, etc.)",
 

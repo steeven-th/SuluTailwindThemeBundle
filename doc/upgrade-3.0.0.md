@@ -2529,3 +2529,48 @@ either, as the width defaults to `0`. Set the width beside it:
 
 The table of contents reads `--iw-toc-border-width` the same way. A full
 `--iw-toc-border` shorthand keeps working as before.
+
+## Event venue becomes a Sulu location (breaking, content)
+
+The **Location** of an `iw_event` article was a free-text line, which gave search
+engines a name and no address. It is now Sulu's `location` field: an address
+search with a map, storing the street, postal code, town, country and
+coordinates. The event page shows the address under the venue name, and the
+structured data carries a `PostalAddress` and `GeoCoordinates`.
+
+A ticked **Show a link to the map** adds a "View on the map" link (OpenStreetMap)
+under the address, when the location has coordinates. It is off by default.
+
+### Existing content
+
+Sulu does not read the former text as a location: an event not migrated shows no
+venue. Run once, on every environment holding events:
+
+```bash
+php bin/console iw-sulu:theme:migrate-event-location --dry-run
+php bin/console iw-sulu:theme:migrate-event-location
+php bin/console cache:pool:clear cache.app
+```
+
+The former text becomes the title of the location, on draft and live rows, in
+every locale. It can be run twice. The command is not run by any deployment
+hook, on purpose: it rewrites content.
+
+The structured data then reads the title as both the name and the address, which
+is enough to clear the Search Console warning. To show a real address and
+coordinates, open each event and search its address in the field. The address
+search fills the title with the full address it found: put the venue name back
+there ("CCI de Tarbes"), it is what the page and search engines show as the name.
+
+A project whose own event template copied the `location` text field names it:
+
+```bash
+php bin/console iw-sulu:theme:migrate-event-location --template=iw_event --template=app_event
+```
+
+### Template overrides (breaking)
+
+`articles/common/_event_info_card.html.twig` now receives `location` as a Sulu
+location value rather than a string, and a new `showMapLink` flag. An override
+printing `{{ location }}` prints an array: read `location.title`, and
+`iw_sulu_tailwind_theme_location_address(location)` for the address.

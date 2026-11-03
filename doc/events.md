@@ -8,6 +8,7 @@ This bundle adds that missing question - *what is coming up, and in what order* 
 
 - [What counts as upcoming](#what-counts-as-upcoming)
 - [Timezone](#timezone)
+- [Venue](#venue)
 - [In the blocks of the bundle](#in-the-blocks-of-the-bundle)
 - [In a block or a page of your own](#in-a-block-or-a-page-of-your-own)
 - [In a template of your own](#in-a-template-of-your-own)
@@ -66,6 +67,35 @@ itech_world_sulu_tailwind_theme:
 ```
 
 In a template of your own, print an event date for machines with [`iw_sulu_tailwind_theme_event_datetime()`](twig-reference.md#iw_sulu_tailwind_theme_event_datetimedate) rather than `|date('c')`.
+
+---
+
+## Venue
+
+The **Location** of an event is Sulu's `location` field: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. The title of the location is the venue name ("CCI de Tarbes"). The address search fills it with the full address it found, so it is worth putting the name back.
+
+The event page shows the name, then the address. **Show a link to the map** adds a "View on the map" link to OpenStreetMap under it, when the location has coordinates.
+
+In the structured data, the venue is a `Place`:
+
+```json
+"location": {
+    "@type": "Place",
+    "name": "CCI de Tarbes",
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "8 Rue Jean Baylet",
+        "postalCode": "65000",
+        "addressLocality": "Tarbes",
+        "addressCountry": "France"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": 43.2328, "longitude": 0.0781 }
+}
+```
+
+With a name and no address, the name is used as the address, which Google accepts. An online event keeps its `VirtualLocation`, built from **Event URL**.
+
+Events written before the field became a location are carried over by `iw-sulu:theme:migrate-event-location`, see the [upgrade guide](upgrade-3.0.0.md#event-venue-becomes-a-sulu-location-breaking-content).
 
 ---
 
