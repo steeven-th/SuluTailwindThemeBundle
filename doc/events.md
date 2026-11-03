@@ -7,6 +7,7 @@ This bundle adds that missing question - *what is coming up, and in what order* 
 ## Table of contents
 
 - [What counts as upcoming](#what-counts-as-upcoming)
+- [Timezone](#timezone)
 - [In the blocks of the bundle](#in-the-blocks-of-the-bundle)
 - [In a block or a page of your own](#in-a-block-or-a-page-of-your-own)
 - [In a template of your own](#in-a-template-of-your-own)
@@ -28,7 +29,43 @@ An event is upcoming **until it is over**, not until it has begun: the end date 
 
 An article with no start date - a news item - never appears in an agenda, whatever its template. Nothing has to be configured for that: the comparison simply never matches.
 
-Dates are compared as they were typed, without a timezone, which is also how an editor reads them.
+Dates are compared as they were typed, in the site's event timezone (see below), which is also how an editor reads them.
+
+---
+
+## Timezone
+
+An editor types an event time as it reads on a poster, "12 November, 9:00", and Sulu stores exactly that, with no timezone. Tell the bundle which zone those times are meant in:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        timezone: Europe/Paris
+```
+
+It is used in two places:
+
+- **Structured data**: the JSON-LD of an event carries `2026-11-12T09:00:00+01:00`, with the offset of that date (`+01:00` in winter, `+02:00` in summer for Paris). Without it, the offset is PHP's, `+00:00` in most containers, and Google may show the event an hour or two off.
+- **The agenda**: an event leaves the upcoming list when it ends in that zone, not when it ends in UTC.
+
+The page itself always shows the time as typed, whatever the setting.
+
+Left out, PHP's own zone (`date.timezone`) applies, so a project that already sets it has nothing to do. An unknown zone name is refused when the container compiles.
+
+This is a deployment setting, not an editorial one, and it deliberately has no field in the admin: changing it shifts the offset of every published event at once. A multi-site project can still set it per site:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        timezone: Europe/Paris
+    webspaces:
+        quebec:
+            events:
+                timezone: America/Montreal
+```
+
+In a template of your own, print an event date for machines with [`iw_sulu_tailwind_theme_event_datetime()`](twig-reference.md#iw_sulu_tailwind_theme_event_datetimedate) rather than `|date('c')`.
 
 ---
 

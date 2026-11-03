@@ -430,6 +430,7 @@ What can be overridden:
 | `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
 | `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
 | `consent.mode` | yes | One site may run a cookie manager, its neighbour not. See [Consent](doc/consent.md#choosing-the-mechanism-one-setting-for-the-site) |
+| `events.timezone` | yes | Sites of one project may sit in different zones. See [Events](doc/events.md#timezone) |
 | `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
 | `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
 | `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |

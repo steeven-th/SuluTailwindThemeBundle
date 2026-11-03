@@ -28,6 +28,10 @@
     {% set description = iw_sulu_tailwind_theme_title_text(content.subtitle)|striptags|trim %}
 {% endif %}
 
+{# Event times are wall-clock readings: iw_sulu_tailwind_theme_event_datetime()
+   attaches the site's events.timezone without converting them, where the
+   `date` filter would print them in PHP's zone. #}
+
 {# Attendance mode #}
 {% set isOnline = content.isOnline|default(false) %}
 {% set attendanceMode = isOnline ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode' %}
@@ -65,8 +69,8 @@
     '@context': 'https://schema.org',
     '@type': 'Event',
     'name': content.title|default(''),
-    'startDate': content.startDate is defined and content.startDate is not empty ? content.startDate|date('c') : null,
-    'endDate': content.endDate is defined and content.endDate is not empty ? content.endDate|date('c') : null,
+    'startDate': iw_sulu_tailwind_theme_event_datetime(content.startDate|default(null))|default(null),
+    'endDate': iw_sulu_tailwind_theme_event_datetime(content.endDate|default(null))|default(null),
     'eventAttendanceMode': attendanceMode,
     'eventStatus': 'https://schema.org/EventScheduled',
     'location': locationData,

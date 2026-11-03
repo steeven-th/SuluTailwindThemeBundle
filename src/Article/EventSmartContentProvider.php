@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Article;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sulu\Article\Infrastructure\Sulu\Content\ArticleSmartContentProvider;
+use Sulu\Bundle\AdminBundle\Metadata\GroupProviderInterface;
 use Sulu\Bundle\AdminBundle\SmartContent\Configuration\BuilderInterface;
+use Sulu\Bundle\AdminBundle\SmartContent\SmartContentQueryEnhancer;
+use Sulu\Content\Infrastructure\Doctrine\DimensionContentQueryEnhancer;
 
 /**
  * Smart content over the events of the site, an agenda rather than a list.
@@ -69,6 +73,26 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
     private const DIMENSION_CONTENT_ALIAS = 'filterDimensionContent';
 
     /**
+     * Tells when "now" is, in the zone the events are typed in.
+     */
+    private EventClock $clock;
+
+    /**
+     * @param EventClock|null $clock Null outside the container, where PHP's zone applies
+     */
+    public function __construct(
+        DimensionContentQueryEnhancer $dimensionContentQueryEnhancer,
+        SmartContentQueryEnhancer $smartContentQueryEnhancer,
+        EntityManagerInterface $entityManager,
+        GroupProviderInterface $groupProvider,
+        ?EventClock $clock = null,
+    ) {
+        parent::__construct($dimensionContentQueryEnhancer, $smartContentQueryEnhancer, $entityManager, $groupProvider);
+
+        $this->clock = $clock ?? new EventClock();
+    }
+
+    /**
      * Offer everything the article provider offers, except a choice of order.
      *
      * An agenda has one order that means anything - by date, away from today -
@@ -123,7 +147,7 @@ readonly class EventSmartContentProvider extends ArticleSmartContentProvider
     {
         parent::addInternalFilters($queryBuilder, $filters, $alias);
 
-        $scope = EventDateScope::fromDirection($filters[self::FILTER_DIRECTION] ?? null);
+        $scope = EventDateScope::fromDirection($filters[self::FILTER_DIRECTION] ?? null, $this->clock->now());
         if (null === $scope) {
             return;
         }

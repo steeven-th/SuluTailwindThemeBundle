@@ -139,6 +139,34 @@ final class PerWebspaceConfigTest extends TestCase
         $this->processConfig([['consent' => ['mode' => 'click']]]);
     }
 
+    #[Test]
+    public function eventTimezoneDefaultsToPhpsOwn(): void
+    {
+        // Null, resolved at runtime by EventClock: a default frozen at compile
+        // time would be the zone of whatever machine built the cache.
+        $this->assertNull($this->processConfig([[]])['events']['timezone']);
+    }
+
+    #[Test]
+    public function aSiteOverridesItsEventTimezone(): void
+    {
+        $config = $this->processConfig([[
+            'events' => ['timezone' => 'Europe/Paris'],
+            'webspaces' => ['client-a' => ['events' => ['timezone' => 'America/Montreal']]],
+        ]]);
+
+        $this->assertSame('Europe/Paris', $config['events']['timezone']);
+        $this->assertSame(['events' => ['timezone' => 'America/Montreal']], $config['webspaces']['client-a']);
+    }
+
+    #[Test]
+    public function itRefusesAnUnknownEventTimezone(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([['events' => ['timezone' => 'Europe/Tarbes']]]);
+    }
+
     /**
      * Run raw config through the bundle's own definition.
      *

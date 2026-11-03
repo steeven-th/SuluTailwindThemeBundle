@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Article\EventClock;
 use ItechWorld\SuluTailwindThemeBundle\Article\EventDateScope;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository;
 use Sulu\Article\Domain\Repository\ArticleRepositoryInterface;
@@ -53,6 +54,7 @@ final class ArticleListingResolver
         private readonly ArticleSearchService $articleSearchService,
         private readonly WebspaceArticleRepository $webspaceArticleRepository,
         private readonly ArticleItemResolver $itemResolver,
+        private readonly EventClock $clock = new EventClock(),
     ) {
     }
 
@@ -95,7 +97,7 @@ final class ArticleListingResolver
 
         // An agenda is a listing whose order is the calendar's rather than the
         // editor's, so the scope carries the clause and the order together.
-        $dateScope = EventDateScope::fromDirection($request['eventMode'] ?? null);
+        $dateScope = $this->dateScope($request);
 
         // Stage 1 — materialise the admin editorial scope as ordered UUIDs.
         $scopeUuids = $this->resolveScopeUuids($request, $locale);
@@ -236,7 +238,26 @@ final class ArticleListingResolver
             $filters,
             $baseSort,
             \is_string($webspaceKey) ? $webspaceKey : null,
-            EventDateScope::fromDirection($request['eventMode'] ?? null),
+            $this->dateScope($request),
+        );
+    }
+
+    /**
+     * The half of the agenda the request asks for, if any.
+     *
+     * "Now" is taken in the site's event zone, the one the dates were typed in.
+     *
+     * @param array<string, mixed> $request The listing request
+     *
+     * @return EventDateScope|null Null when the listing is not an agenda
+     */
+    private function dateScope(array $request): ?EventDateScope
+    {
+        $webspaceKey = $request['webspaceKey'] ?? null;
+
+        return EventDateScope::fromDirection(
+            $request['eventMode'] ?? null,
+            $this->clock->now(\is_string($webspaceKey) ? $webspaceKey : null),
         );
     }
 

@@ -33,7 +33,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * offered there has to be readable through WebspaceSettings, and nothing
      * else should travel to it.
      */
-    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks', 'turnstile', 'consent'];
+    private const OVERRIDABLE_SECTIONS = ['title_editor', 'blocks', 'turnstile', 'consent', 'events'];
 
     /**
      * Extension alias of pixelopen/cloudflare-turnstile-bundle.
@@ -111,6 +111,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
             ->append($this->blocksNode(true))
             ->append($this->turnstileNode(true))
             ->append($this->consentNode(true))
+            ->append($this->eventsNode(true))
             ->append($this->webspacesNode());
     }
 
@@ -151,6 +152,7 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                 ->append($this->blocksNode(false))
                 ->append($this->turnstileNode(false))
                 ->append($this->consentNode(false))
+                ->append($this->eventsNode(false))
             ->end();
 
         return $node;
@@ -333,6 +335,48 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
 
         if ($withDefaults) {
             $mode->defaultValue('placeholder');
+        }
+
+        return $node;
+    }
+
+    /**
+     * The `events` node, as a project default or as a site override.
+     *
+     * An editor types an event time as a wall-clock time, with no timezone,
+     * and Sulu stores it that way. This names the zone that time is meant in,
+     * so the structured data can carry the right offset and the agenda can
+     * tell when an event is over. It belongs to whoever deploys the site, not
+     * to an editor: changing it shifts every published event at once.
+     *
+     * Left empty, PHP's own timezone applies (date.timezone), which keeps the
+     * bundle neutral for a project that already sets it.
+     *
+     * @param bool $withDefaults True for the project-wide node, false for an override
+     *
+     * @return ArrayNodeDefinition The `events` node
+     */
+    private function eventsNode(bool $withDefaults): ArrayNodeDefinition
+    {
+        /** @var ArrayNodeDefinition $node */
+        $node = (new TreeBuilder('events'))->getRootNode();
+
+        $node->info('How event articles are dated');
+
+        if ($withDefaults) {
+            $node->addDefaultsIfNotSet();
+        }
+
+        $timezone = $node->children()
+            ->scalarNode('timezone')
+            ->info('IANA timezone the event times are typed in, e.g. Europe/Paris. Empty means PHP\'s date.timezone.')
+            ->validate()
+                ->ifTrue(static fn (mixed $value): bool => null !== $value && !\in_array($value, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC), true))
+                ->thenInvalid('%s is not a known IANA timezone identifier.')
+            ->end();
+
+        if ($withDefaults) {
+            $timezone->defaultNull();
         }
 
         return $node;
