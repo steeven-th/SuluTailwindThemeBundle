@@ -393,6 +393,8 @@ Floating card with date, location and organizer — designed to sit on top of an
 | `.iw-event-info__location` | Name of the physical location |
 | `.iw-event-info__address` | Postal address under the name (an `<address>`) |
 | `.iw-event-info__map-link` | "View on the map" link, when the editor ticked it and the location has coordinates |
+| `.iw-event-info__price` | Price of a paid event, or "Free" |
+| `.iw-event-info__register-link` | Registration or ticketing link |
 | `.iw-event-info__organizer-label` | "Organized by" small caps label |
 | `.iw-event-info__organizer-name` | Organizer display name |
 

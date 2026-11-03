@@ -579,6 +579,14 @@ An event date as ISO 8601, with the offset of the site's `events.timezone`, for 
 
 Use it instead of `|date('c')` on `startDate` and `endDate`: the `date` filter prints the time in PHP's zone, UTC in most containers, and the offset is then wrong. Returns an empty string when there is no date. See [Events and agendas](events.md#timezone).
 
+### `iw_sulu_tailwind_theme_event_offer(content, pageUrl)`
+
+The schema.org `Offer` of an event, ready to be put under `offers` in its JSON-LD: the price (0 for a free event, none for a paid event with no amount), the site's `events.currency`, the registration link or `pageUrl` when there is none, and `availability: InStock`. See [Events and agendas](events.md#price-and-registration).
+
+### `iw_sulu_tailwind_theme_event_price(content)`
+
+The price of a paid event as the visitor reads it, in the locale of the page and the site's currency ("15,00 €" in French). Returns an empty string for a free event or a paid event with no amount: print "Free" yourself, from `content.isPaid`.
+
 ### `iw_sulu_tailwind_theme_color_scheme(variant, hasBackground)`
 
 Tells whether a block variant renders on a **light** or a **dark** surface. Meant

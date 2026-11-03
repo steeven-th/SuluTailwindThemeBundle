@@ -160,6 +160,25 @@ final class PerWebspaceConfigTest extends TestCase
     }
 
     #[Test]
+    public function eventPricesAreInEurosUnlessTheSiteSaysOtherwise(): void
+    {
+        $config = $this->processConfig([[
+            'webspaces' => ['geneve' => ['events' => ['currency' => 'CHF']]],
+        ]]);
+
+        $this->assertSame('EUR', $config['events']['currency']);
+        $this->assertSame(['events' => ['currency' => 'CHF']], $config['webspaces']['geneve']);
+    }
+
+    #[Test]
+    public function itRefusesACurrencyThatIsNotAnIsoCode(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([['events' => ['currency' => '€']]]);
+    }
+
+    #[Test]
     public function itRefusesAnUnknownEventTimezone(): void
     {
         $this->expectException(InvalidConfigurationException::class);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Article\EventClock;
+use ItechWorld\SuluTailwindThemeBundle\Article\EventOffer;
 use ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\EventFinder;
 use Sulu\Component\Security\Authentication\UserRepositoryInterface;
@@ -96,6 +97,7 @@ class ArticleExtension extends AbstractExtension
         private readonly ?UserRepositoryInterface $userRepository = null,
         private readonly ?EventFinder $eventFinder = null,
         private readonly EventClock $eventClock = new EventClock(),
+        private readonly EventOffer $eventOffer = new EventOffer(),
     ) {
     }
 
@@ -117,6 +119,8 @@ class ArticleExtension extends AbstractExtension
         return [
             new TwigFunction('iw_sulu_tailwind_theme_format_date', $this->formatDate(...)),
             new TwigFunction('iw_sulu_tailwind_theme_event_datetime', $this->eventClock->toIso8601(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_event_offer', $this->eventOffer->toSchema(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_event_price', $this->eventOffer->formattedPrice(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reading_time', $this->readingTime(...)),
             new TwigFunction('iw_sulu_tailwind_theme_author_name', $this->authorName(...)),
             new TwigFunction('iw_sulu_tailwind_theme_article_style', $this->articleStyle(...)),

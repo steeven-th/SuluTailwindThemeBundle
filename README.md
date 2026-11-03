@@ -431,6 +431,7 @@ What can be overridden:
 | `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
 | `consent.mode` | yes | One site may run a cookie manager, its neighbour not. See [Consent](doc/consent.md#choosing-the-mechanism-one-setting-for-the-site) |
 | `events.timezone` | yes | Sites of one project may sit in different zones. See [Events](doc/events.md#timezone) |
+| `events.currency` | yes | Sites of one project may sell in different currencies. See [Events](doc/events.md#price-and-registration) |
 | `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
 | `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
 | `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |

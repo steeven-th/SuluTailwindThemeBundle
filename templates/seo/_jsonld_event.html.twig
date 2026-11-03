@@ -1,6 +1,6 @@
 {#
     JSON-LD structured data for Event articles.
-    Generates Event schema.org markup with location/organizer.
+    Generates Event schema.org markup with location, offer and organizer.
 #}
 
 {# Resolve image URL #}
@@ -101,5 +101,6 @@
     'image': imageUrl,
     'description': description is not empty ? description|slice(0, 300) : null,
     'organizer': organizerData,
+    'offers': iw_sulu_tailwind_theme_event_offer(content, app.request.schemeAndHttpHost ~ app.request.baseUrl ~ app.request.pathInfo),
 }|filter(v => v is not null)|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_PRETTY_PRINT'))|raw }}
 </script>

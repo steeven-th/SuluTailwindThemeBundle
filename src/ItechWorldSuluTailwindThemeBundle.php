@@ -352,6 +352,9 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
      * Left empty, PHP's own timezone applies (date.timezone), which keeps the
      * bundle neutral for a project that already sets it.
      *
+     * The currency of event prices sits here for the same reason: it is a fact
+     * about the site, and an editor typing a price only types the amount.
+     *
      * @param bool $withDefaults True for the project-wide node, false for an override
      *
      * @return ArrayNodeDefinition The `events` node
@@ -377,6 +380,18 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
 
         if ($withDefaults) {
             $timezone->defaultNull();
+        }
+
+        $currency = $node->children()
+            ->scalarNode('currency')
+            ->info('ISO 4217 currency of event prices, e.g. EUR, CHF, CAD')
+            ->validate()
+                ->ifTrue(static fn (mixed $value): bool => !\is_string($value) || 1 !== \preg_match('/^[A-Z]{3}$/', $value))
+                ->thenInvalid('%s is not an ISO 4217 currency code (three capital letters).')
+            ->end();
+
+        if ($withDefaults) {
+            $currency->defaultValue('EUR');
         }
 
         return $node;

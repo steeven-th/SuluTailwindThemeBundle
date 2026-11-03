@@ -5054,6 +5054,24 @@ section.block:has([data-slider-fullbleed-value]) {
     text-decoration: underline;
 }
 
+.iw-event-info__price {
+    display: block;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.iw-event-info__register-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+}
+
+.iw-event-info__register-link:hover {
+    text-decoration: underline;
+}
+
 .iw-event-info__organizer-label {
     display: block;
     font-size: 0.75rem;

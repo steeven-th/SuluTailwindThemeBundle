@@ -9,6 +9,7 @@ This bundle adds that missing question - *what is coming up, and in what order* 
 - [What counts as upcoming](#what-counts-as-upcoming)
 - [Timezone](#timezone)
 - [Venue](#venue)
+- [Price and registration](#price-and-registration)
 - [In the blocks of the bundle](#in-the-blocks-of-the-bundle)
 - [In a block or a page of your own](#in-a-block-or-a-page-of-your-own)
 - [In a template of your own](#in-a-template-of-your-own)
@@ -96,6 +97,44 @@ In the structured data, the venue is a `Place`:
 With a name and no address, the name is used as the address, which Google accepts. An online event keeps its `VirtualLocation`, built from **Event URL**.
 
 Events written before the field became a location are carried over by `iw-sulu:theme:migrate-event-location`, see the [upgrade guide](upgrade-3.0.0.md#event-venue-becomes-a-sulu-location-breaking-content).
+
+---
+
+## Price and registration
+
+The **Pricing and registration** section of an event holds three fields:
+
+- **Paid**, unticked by default. Unticked, the event is free.
+- **Price**, shown once **Paid** is ticked. The amount only, the currency is the site's.
+- **Registration or ticketing link**, optional, for free and paid events alike.
+
+The event page shows "Free" or the price in the locale of the page ("15,00 €" in French), and a "Register" link when there is one. A paid event with no amount typed shows no price rather than a misleading "Free".
+
+The structured data always carries an `Offer`, since Google flags an event without one:
+
+```json
+"offers": {
+    "@type": "Offer",
+    "url": "https://tickets.example.com/42",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock",
+    "price": 15
+}
+```
+
+A free event gets `"price": 0`. `url` is the registration link, or the event page when there is none. A paid event with no amount carries no `price` at all, so Search Console reports what is missing instead of a false 0.
+
+The currency is a deployment setting, `EUR` by default, overridable per site:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        currency: EUR
+    webspaces:
+        geneve:
+            events:
+                currency: CHF
+```
 
 ---
 

@@ -2574,3 +2574,25 @@ php bin/console iw-sulu:theme:migrate-event-location --template=iw_event --templ
 location value rather than a string, and a new `showMapLink` flag. An override
 printing `{{ location }}` prints an array: read `location.title`, and
 `iw_sulu_tailwind_theme_location_address(location)` for the address.
+
+## Events get a price and a registration link (new)
+
+An `iw_event` article gains a **Pricing and registration** section: **Paid**, a
+**Price** shown once it is ticked, and an optional **Registration or ticketing
+link**. The page shows "Free" or the price, and the structured data always
+carries an `Offer`, which clears the Search Console warning about `offers`.
+
+### Existing content
+
+Events written before have the box unticked, so they now read as **free**, on the
+page and for search engines. Open the paid ones, tick **Paid** and type the
+amount. No command can do it, the price was never stored.
+
+The currency defaults to `EUR`. A site selling in another one sets
+`events.currency` (see [Events](events.md#price-and-registration)).
+
+### Template overrides
+
+`articles/common/_event_info_card.html.twig` takes three new variables:
+`isPaid`, `priceLabel` (from `iw_sulu_tailwind_theme_event_price(content)`) and
+`ticketUrl`. An override that does not pass them shows every event as free.

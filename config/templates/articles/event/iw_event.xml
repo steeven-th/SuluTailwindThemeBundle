@@ -2,7 +2,7 @@
 <!--
     Article template: Event.
     Provides an event article structure with start/end dates, location,
-    organizer, hero, and content blocks. Categories, tags, description,
+    pricing, organizer, hero, and content blocks. Categories, tags, description,
     and SEO are handled by Sulu's native Excerpt tab.
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
@@ -75,6 +75,57 @@
                         <title>iw_sulu_tailwind_theme.article.event_location_url</title>
                         <info_text>iw_sulu_tailwind_theme.article.event_location_url_info</info_text>
                     </meta>
+                    <params>
+                        <param name="defaults" type="collection">
+                            <param name="scheme" value="https://"/>
+                        </param>
+                        <param name="schemes" type="collection">
+                            <param name="https://"/>
+                            <param name="http://"/>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Pricing section: always produces a schema.org Offer, free events included -->
+        <section name="pricing">
+            <meta><title>iw_sulu_tailwind_theme.article.section_pricing</title></meta>
+            <properties>
+                <property name="isPaid" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_is_paid</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_is_paid_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="price" type="number" colspan="6" visibleCondition="isPaid == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_price</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_price_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0"/>
+                        <param name="step" value="0.01"/>
+                    </params>
+                </property>
+
+                <property name="ticketUrl" type="url" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_ticket_url</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_ticket_url_info</info_text>
+                    </meta>
+                    <!-- Web links only: a mailto: or tel: here would be served to search
+                         engines as the URL of the event, and ftp:// has no place in it. -->
+                    <params>
+                        <param name="defaults" type="collection">
+                            <param name="scheme" value="https://"/>
+                        </param>
+                        <param name="schemes" type="collection">
+                            <param name="https://"/>
+                            <param name="http://"/>
+                        </param>
+                    </params>
                 </property>
             </properties>
         </section>
@@ -94,6 +145,15 @@
                                 </property>
                                 <property name="url" type="url" colspan="6">
                                     <meta><title>iw_sulu_tailwind_theme.article.organizer_url</title></meta>
+                                    <params>
+                                        <param name="defaults" type="collection">
+                                            <param name="scheme" value="https://"/>
+                                        </param>
+                                        <param name="schemes" type="collection">
+                                            <param name="https://"/>
+                                            <param name="http://"/>
+                                        </param>
+                                    </params>
                                 </property>
                             </properties>
                         </type>

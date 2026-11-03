@@ -520,6 +520,7 @@ services:
             - '@?sulu.repository.user'
             - '@ItechWorld\SuluTailwindThemeBundle\Service\EventFinder'
             - '@ItechWorld\SuluTailwindThemeBundle\Article\EventClock'
+            - '@ItechWorld\SuluTailwindThemeBundle\Article\EventOffer'
         tags:
             - { name: 'twig.extension' }
 
@@ -549,6 +550,10 @@ services:
     # The zone event times are typed in (events.timezone), for the structured
     # data and for the agenda's notion of "now".
     ItechWorld\SuluTailwindThemeBundle\Article\EventClock: ~
+
+    # The price of an event and its schema.org Offer, in the site's currency
+    # (events.currency).
+    ItechWorld\SuluTailwindThemeBundle\Article\EventOffer: ~
 
     # Events for a template that asks for them directly, rather than through a
     # smart content property an editor fills.

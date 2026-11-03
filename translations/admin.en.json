@@ -1325,6 +1325,7 @@
     "iw_sulu_tailwind_theme.article.section_meta": "Meta",
     "iw_sulu_tailwind_theme.article.section_content": "Content",
     "iw_sulu_tailwind_theme.article.section_event_details": "Event details",
+    "iw_sulu_tailwind_theme.article.section_pricing": "Pricing and registration",
     "iw_sulu_tailwind_theme.article.section_organizer": "Organizer",
 
     "iw_sulu_tailwind_theme.article.hero_image": "Hero image",
@@ -1350,6 +1351,12 @@
     "iw_sulu_tailwind_theme.article.event_location_info": "Search the address so the event page shows it and search engines can place the event.",
     "iw_sulu_tailwind_theme.article.event_show_map_link": "Show a link to the map",
     "iw_sulu_tailwind_theme.article.event_show_map_link_info": "Adds a \"View on the map\" link under the address. Only shown when the location has coordinates.",
+    "iw_sulu_tailwind_theme.article.event_is_paid": "Paid",
+    "iw_sulu_tailwind_theme.article.event_is_paid_info": "Unticked, the event is shown as free. Search engines get a price of 0 either way, an event without an offer is flagged.",
+    "iw_sulu_tailwind_theme.article.event_price": "Price",
+    "iw_sulu_tailwind_theme.article.event_price_info": "Amount only. The currency is set for the site by the developer.",
+    "iw_sulu_tailwind_theme.article.event_ticket_url": "Registration or ticketing link",
+    "iw_sulu_tailwind_theme.article.event_ticket_url_info": "Optional, for free and paid events alike. Shown as a button on the event page.",
     "iw_sulu_tailwind_theme.article.event_location_url": "Event URL",
     "iw_sulu_tailwind_theme.article.event_location_url_info": "Link to the online event platform (Zoom, Teams, etc.)",
 
