@@ -26,6 +26,11 @@
      - lightbox       : bool (default false) — wrap in a glightbox link
      - showName       : bool (default false) — use the media title as lightbox caption
      - loading        : 'lazy' (default) | 'eager' (heroes / LCP images)
+     - fetchpriority  : 'high' | 'low' | 'auto' (default: attribute omitted).
+                        'high' only on the image likely to be the LCP (page
+                        and article heroes). Not derived from 'eager': several
+                        images per page are eager, and a priority given to
+                        all of them is given to none.
      - focusMode      : 'img' (default) | 'none' — apply the focus-point class on
                         the <img> (object-position). Background callers use the
                         iw_sulu_tailwind_theme_focus_class(..., 'bg') function directly.
@@ -97,6 +102,7 @@
             src="{{ baseUrl }}"
             alt="{{ alt is defined ? alt : media.title|default('') }}"
             loading="{{ loading|default('lazy') }}"
+            {%- if fetchpriority|default(null) in ['high', 'low', 'auto'] %} fetchpriority="{{ fetchpriority }}"{% endif %}
             class="{{ imgClasses }}"
             {%- if itemprop is defined and itemprop %} itemprop="{{ itemprop }}"{% endif %}
         >

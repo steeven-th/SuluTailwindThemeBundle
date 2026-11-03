@@ -1066,6 +1066,7 @@ format — no broken URLs. The focus point is applied automatically from the med
     mediaId: heroImageId,
     format: 'iw_theme_hero',
     loading: 'eager',
+    fetchpriority: 'high',
 }) %}
 ```
 
@@ -1079,6 +1080,7 @@ format — no broken URLs. The focus point is applied automatically from the med
 - `lightbox` (`bool`, default `false`) — Wrap in a glightbox link.
 - `showName` (`bool`, default `false`) — Use the media title as the lightbox caption.
 - `loading` (`string`, default `lazy`) — `lazy` or `eager` (heroes / LCP images).
+- `fetchpriority` (`string`, omitted by default) - `high`, `low` or `auto`. Give `high` to the image likely to be the LCP only (the bundle does it on page and article heroes). It is not derived from `eager`: galleries, carousels and the menu load eagerly too, and a high priority on every one of them ranks none above the others.
 - `focusMode` (`string`, default `img`) — `img` applies the focus class on the `<img>`; `none` disables it.
 - `raw` (`bool`, default `false`) — Component-owned mode: the `<picture>` is transparent (`display:contents`) and the `<img>` gets **no** sizing utilities, so the caller's own CSS classes fully control layout. Only the avif/webp sources and the focus class are injected. Use for heroes / components that already have dedicated CSS (and JS) targeting the `<img>`. Ignores `ratio`/`cover`.
 - `itemprop` (`string`) — Schema.org `itemprop` emitted on the `<img>` (e.g. `image` for article heroes).
