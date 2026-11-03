@@ -268,7 +268,7 @@ class ThemeFormMapper
     public const FOOTER_SCALAR_KEYS = [
         'type', 'mutedText',
         'displayLogo', 'logo', 'logoHeight', 'displaySiteName', 'siteNamePosition', 'tagline',
-        'displaySocialMedia', 'copyright',
+        'displaySocialMedia', 'copyright', 'displayConsentLink',
     ];
 
     /**

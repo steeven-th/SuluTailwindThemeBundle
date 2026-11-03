@@ -63,6 +63,23 @@ async function page(storedServices = [], queue = undefined) {
 
             return embed;
         },
+        button(mode) {
+            const notice = { textContent: '' };
+            const button = Object.assign(new Embed(), {
+                serviceValue: '',
+                modeValue: mode,
+                unavailableValue: 'unavailable',
+                clearedValue: 'cleared',
+                hasFrameTarget: false,
+                hasPlaceholderTarget: false,
+                hasNoticeTarget: true,
+                noticeTarget: notice,
+            });
+            button.connect();
+            button.notice = () => notice.textContent;
+
+            return button;
+        },
     };
 }
 
@@ -154,6 +171,30 @@ await scenario('the services of the page are listed once', async () => {
     p.mount('vimeo', 'delegated');
     p.mount('youtube', 'delegated');
     expect(JSON.stringify(window.iwConsent.services()) === '["vimeo","youtube"]', JSON.stringify(window.iwConsent.services()));
+});
+
+await scenario('the manage button opens a manager that answers, silently', async () => {
+    const p = await page();
+    const button = p.button('delegated');
+    document.addEventListener('iw:consent-preferences', (event) => event.preventDefault());
+    button.preferences();
+    expect(button.notice() === '', `said "${button.notice()}"`);
+    expect(window.iwConsent.services().length === 0, 'the button counted as a service');
+});
+
+await scenario('the manage button explains a blocked manager', async () => {
+    const p = await page();
+    const button = p.button('delegated');
+    button.preferences();
+    expect(button.notice() === 'unavailable', `said "${button.notice()}"`);
+});
+
+await scenario('the manage button forgets placeholder choices without a manager', async () => {
+    const p = await page(['youtube']);
+    const embed = p.mount('youtube', 'placeholder');
+    expect(embed.loaded(), 'setup');
+    p.button('placeholder').preferences();
+    expect(!embed.loaded() && p.stored().length === 0, 'the choice survived');
 });
 
 process.exit(failures ? 1 : 0);

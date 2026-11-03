@@ -102,6 +102,20 @@ document.addEventListener('iw:consent-request', (event) => {
 
 Cancel only when the manager is actually there. When nobody cancels, because no adapter listens or a content blocker kept the manager from loading, the bundle takes the click itself as the visitor's consent for that content and loads it, for the page view only. Without that fallback the button would do nothing at all for visitors running an ad blocker, with no manager either to ask them.
 
+### The "Manage cookies" button
+
+A visitor has to be able to change their mind, and every site ends up with a "Manage cookies" link in its footer. The theme ships it: tick **“Manage cookies” link** in **Footer > Display options** of the theme. The button dispatches a cancelable `iw:consent-preferences` event on `document`, which the adapter takes the same way as the placeholder request, opening the manager and cancelling the event.
+
+When nobody cancels it:
+
+| `consent.mode` | What the visitor gets |
+|---|---|
+| `delegated` | A message saying the cookie manager could not open, and that a browser extension may be blocking it. A content blocker removing Google Tag Manager removes the manager with it, and the button used to do nothing at all. |
+| `placeholder` | The choices made on the placeholders are forgotten, and the placeholders ask again. With no manager, that is the whole of "changing one's mind". |
+| `none` | No button: there is no choice to manage. |
+
+The message is written in a live region next to the button, so a screen reader announces it.
+
 ## Choosing the mechanism: one setting for the site
 
 Whether an embed waits is decided per embed, by whoever knows what it calls. **How** it gets consent is decided once for the site, in the bundle configuration:
@@ -169,13 +183,15 @@ Every adapter below does the same four things:
 
 1. Relays the manager's state on every page, grant or revoke for each service, through the initialised queue.
 2. Uses the manager's own service names as the bundle's service keys, so a block's **Service name** must match the name declared in the manager exactly (`youtube`, `vimeo`, `openstreetmap`...).
-3. Opens the manager from `iw:consent-request`, and cancels the event only when the manager is loaded.
+3. Opens the manager when the visitor asks, from a placeholder (`iw:consent-request`) or from the footer's **Manage cookies** button (`iw:consent-preferences`), and cancels the event only when the manager is loaded.
 4. Lives in the project's JavaScript, versioned with the site, even when the manager itself is loaded by a tag manager.
 
 ```js
 // The skeleton every adapter follows
 const queue = () => (window.iwConsentQueue = window.iwConsentQueue || []);
 const relay = (service, allowed) => queue().push([allowed ? 'grant' : 'revoke', service]);
+const onAsk = (open) => ['iw:consent-request', 'iw:consent-preferences']
+    .forEach((name) => document.addEventListener(name, open));
 ```
 
 ### Axeptio
@@ -189,7 +205,7 @@ const relay = (service, allowed) => queue().push([allowed ? 'grant' : 'revoke', 
     });
 });
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     if (window.axeptioSDK) {
         event.preventDefault();
         window.axeptioSDK.openCookies();
@@ -218,7 +234,7 @@ CookieConsent.run({
     onChange: sync,
 });
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     event.preventDefault();
     CookieConsent.showPreferences();
 });
@@ -234,7 +250,7 @@ Bundled by your build, the library cannot be blocked apart from the page, so the
     document.addEventListener(`${service}_disallowed`, () => relay(service, false));
 });
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     if (window.tarteaucitron) {
         event.preventDefault();
         window.tarteaucitron.userInterface.openPanel();
@@ -248,7 +264,7 @@ document.addEventListener('iw:consent-request', (event) => {
 window.klaroConfig = window.klaroConfig || {};
 window.klaroConfig.callback = (consent, service) => relay(service.name, consent);
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     if (window.klaro) {
         event.preventDefault();
         window.klaro.show();
@@ -265,7 +281,7 @@ const sync = () => relay('*', Boolean(window.Cookiebot?.consent?.marketing));
 window.addEventListener('CookiebotOnAccept', sync);
 window.addEventListener('CookiebotOnDecline', sync);
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     if (window.Cookiebot) {
         event.preventDefault();
         window.Cookiebot.renew();
@@ -287,7 +303,7 @@ document.addEventListener('iw:consent-request', (event) => {
     Didomi.on('consent.changed', sync);
 });
 
-document.addEventListener('iw:consent-request', (event) => {
+onAsk((event) => {
     if (window.Didomi) {
         event.preventDefault();
         window.Didomi.preferences.show();

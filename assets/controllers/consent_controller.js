@@ -27,6 +27,11 @@ import { Controller } from '@hotwired/stimulus';
  * does, because no manager is wired or a blocker kept it from loading, the
  * click itself is the visitor's consent and the embed loads for the page view.
  *
+ * The same controller drives the footer's "Manage cookies" button, through
+ * its `preferences` action: a cancelable `iw:consent-preferences` event the
+ * adapter takes to open its manager. Uncancelled, the button says the manager
+ * could not open, or forgets the placeholder choices on a site without one.
+ *
  * Register this controller with `"fetch": "eager"` — unlike every other
  * controller in the bundle. It installs `window.iwConsent` on evaluation, so a
  * lazily-fetched module would leave the API undefined when an early cookie
@@ -220,12 +225,21 @@ export default class extends Controller {
         // the element, and it is usually the pasted markup that calls out.
         srcdoc: String,
         remember: { type: Boolean, default: true },
+        // Messages of the "Manage cookies" button, translated server-side.
+        unavailable: String,
+        cleared: String,
     };
 
-    static targets = ['placeholder', 'frame'];
+    static targets = ['placeholder', 'frame', 'notice'];
 
     connect() {
         ensureApi();
+
+        // The "Manage cookies" button waits on no service: it only asks.
+        if (!this.serviceValue) {
+            return;
+        }
+
         instances.add(this);
 
         if ('none' === this.modeValue || window.iwConsent.isGranted(this.serviceValue) || this.wasAcceptedBefore()) {
@@ -287,6 +301,51 @@ export default class extends Controller {
         window.iwConsent.grant(this.serviceValue, {
             remember: 'placeholder' === this.modeValue && this.rememberValue,
         });
+    }
+
+    /**
+     * Open the cookie manager, from the footer's "Manage cookies" button.
+     *
+     * An adapter cancels `iw:consent-preferences` when it opens its manager.
+     * Uncancelled under a manager, the manager failed to load, which is what
+     * a content blocker does to a tag manager: the visitor reads why instead
+     * of pressing a button that does nothing. Without a manager, there is
+     * nothing to open, and the button forgets the choices made on the
+     * placeholders, which will ask again.
+     *
+     * @param {Event} [event]
+     */
+    preferences(event) {
+        event?.preventDefault();
+
+        const request = new CustomEvent('iw:consent-preferences', { bubbles: true, cancelable: true });
+        document.dispatchEvent(request);
+
+        if (request.defaultPrevented) {
+            this.notify('');
+
+            return;
+        }
+
+        if ('placeholder' === this.modeValue) {
+            window.iwConsent.revoke('*');
+            this.notify(this.clearedValue);
+
+            return;
+        }
+
+        this.notify(this.unavailableValue);
+    }
+
+    /**
+     * Write a message in the live region next to the button.
+     *
+     * @param {string} message - Empty to clear it
+     */
+    notify(message) {
+        if (this.hasNoticeTarget) {
+            this.noticeTarget.textContent = message;
+        }
     }
 
     /**

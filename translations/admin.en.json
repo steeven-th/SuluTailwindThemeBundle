@@ -766,6 +766,8 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Loads links from the \"Social media (footer)\" snippet",
     "iw_sulu_tailwind_theme.footer_copyright": "Copyright text",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Use {year} to insert the current year. Empty = generated from the site name",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink": "“Manage cookies” link",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink_info": "Adds a link after the copyright to reopen the cookie manager. If a browser extension blocks it, the visitor sees a message instead of a button that does nothing.",
 
     "iw_sulu_tailwind_theme.menu_panelLayout": "Panel",
     "iw_sulu_tailwind_theme.menu_panelLayout_info": "Full screen, or on a side at a set width with the page dimmed behind it",

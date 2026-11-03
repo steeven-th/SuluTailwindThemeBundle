@@ -1,6 +1,14 @@
 {# Footer copyright line. Expects `config` (footerConfig) in scope.
    The `{year}` placeholder is replaced with the current year; when no copyright
-   text is set, a sensible default is generated from the site name. #}
+   text is set, a sensible default is generated from the site name.
+
+   With "Manage cookies" on, a button follows it. It asks the cookie manager to
+   open through a cancelable `iw:consent-preferences` event, see
+   doc/consent.md. Nobody taking it means the manager is blocked (a content
+   blocker, typically): the visitor reads why, rather than pressing a button
+   that does nothing. Without a manager (`placeholder` mode) it forgets the
+   choices made on the placeholders. A site with `consent.mode: none` has no
+   choice to manage, and no button. #}
 
 {% set copyrightText = config.copyright|default('') %}
 {% if copyrightText is empty %}
@@ -8,4 +16,20 @@
 {% endif %}
 {% set copyrightText = copyrightText|replace({'{year}': 'now'|date('Y')}) %}
 
-<p class="iw-footer__copyright">{{ copyrightText }}</p>
+{% set consentMode = config.displayConsentLink|default(false) ? iw_sulu_tailwind_theme_consent_mode() : 'none' %}
+
+<p class="iw-footer__copyright">
+    {{- copyrightText -}}
+    {%- if consentMode != 'none' %}
+        <span class="iw-footer__consent"
+              data-controller="consent"
+              data-consent-mode-value="{{ consentMode }}"
+              data-consent-unavailable-value="{{ 'iw_sulu_tailwind_theme.consent_manager_unavailable'|trans({}, 'messages') }}"
+              data-consent-cleared-value="{{ 'iw_sulu_tailwind_theme.consent_choices_cleared'|trans({}, 'messages') }}">
+            <button type="button" class="iw-footer__consent-link" data-action="consent#preferences">
+                {{- 'iw_sulu_tailwind_theme.consent_manage'|trans({}, 'messages') -}}
+            </button>
+            <span class="iw-footer__consent-notice" data-consent-target="notice" role="status"></span>
+        </span>
+    {%- endif -%}
+</p>

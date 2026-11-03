@@ -2705,6 +2705,12 @@ around the same two defaults. They change.
   `preventDefault()`, only when the manager is loaded.
 - `revoke('*')` now unloads every embed and forgets every stored click, and
   `window.iwConsent.services()` lists the services the page waits on.
+- **A "Manage cookies" button** can be turned on in **Footer > Display options**
+  of the theme, replacing the one each project wired by hand. It dispatches a
+  cancelable `iw:consent-preferences` event: add it to the events your adapter
+  opens the manager on. Left uncancelled, the visitor reads that the manager
+  could not open (a browser extension blocking it) instead of pressing a button
+  that does nothing.
 
 The adapters of [Consent](consent.md#adapters) are updated, and gain
 vanilla-cookieconsent and Axeptio loaded by Google Tag Manager.

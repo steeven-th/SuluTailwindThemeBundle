@@ -766,6 +766,8 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Charge les liens depuis le snippet « Réseaux sociaux (pied de page) »",
     "iw_sulu_tailwind_theme.footer_copyright": "Texte de copyright",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Utilisez {year} pour insérer l'année courante. Vide = généré depuis le nom du site",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink": "Lien « Gérer mes cookies »",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink_info": "Ajoute un lien après le copyright pour rouvrir le gestionnaire de cookies. Si une extension du navigateur le bloque, le visiteur voit un message au lieu d'un bouton qui ne fait rien.",
 
     "iw_sulu_tailwind_theme.menu_panelLayout": "Panneau",
     "iw_sulu_tailwind_theme.menu_panelLayout_info": "Plein écran, ou sur un côté avec une largeur fixe et la page assombrie derrière",

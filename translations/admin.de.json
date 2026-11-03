@@ -766,6 +766,8 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Lädt Links aus dem Snippet „Soziale Medien (Fußzeile)“",
     "iw_sulu_tailwind_theme.footer_copyright": "Copyright-Text",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Verwenden Sie {year} für das aktuelle Jahr. Leer = aus dem Seitennamen generiert",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink": "Link „Cookies verwalten“",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink_info": "Fügt nach dem Copyright einen Link hinzu, der den Cookie-Manager wieder öffnet. Blockiert eine Browsererweiterung ihn, sieht der Besucher eine Meldung statt einer Schaltfläche ohne Wirkung.",
 
     "iw_sulu_tailwind_theme.menu_panelLayout": "Panel",
     "iw_sulu_tailwind_theme.menu_panelLayout_info": "Vollbild, oder seitlich mit fester Breite und abgedunkelter Seite dahinter",
