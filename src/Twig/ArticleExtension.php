@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
+use ItechWorld\SuluTailwindThemeBundle\Article\EventClock;
+use ItechWorld\SuluTailwindThemeBundle\Article\EventOffer;
 use ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\EventFinder;
 use Sulu\Component\Security\Authentication\UserRepositoryInterface;
@@ -94,6 +96,8 @@ class ArticleExtension extends AbstractExtension
         private readonly ThemeExtension $themeExtension,
         private readonly ?UserRepositoryInterface $userRepository = null,
         private readonly ?EventFinder $eventFinder = null,
+        private readonly EventClock $eventClock = new EventClock(),
+        private readonly EventOffer $eventOffer = new EventOffer(),
     ) {
     }
 
@@ -114,8 +118,13 @@ class ArticleExtension extends AbstractExtension
     {
         return [
             new TwigFunction('iw_sulu_tailwind_theme_format_date', $this->formatDate(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_event_datetime', $this->eventClock->toIso8601(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_event_offer', $this->eventOffer->toSchema(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_event_price', $this->eventOffer->formattedPrice(...)),
             new TwigFunction('iw_sulu_tailwind_theme_reading_time', $this->readingTime(...)),
             new TwigFunction('iw_sulu_tailwind_theme_author_name', $this->authorName(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_author_url', $this->authorUrl(...)),
+            new TwigFunction('iw_sulu_tailwind_theme_schema_party', $this->schemaParty(...)),
             new TwigFunction('iw_sulu_tailwind_theme_article_style', $this->articleStyle(...)),
             new TwigFunction('iw_sulu_tailwind_theme_listing_style', $this->listingStyle(...)),
             new TwigFunction('iw_sulu_tailwind_theme_article_config', $this->articleConfig(...)),
@@ -184,6 +193,9 @@ class ArticleExtension extends AbstractExtension
             }
         }
 
+        // The date is formatted in its own zone rather than PHP's: an event
+        // time is a wall-clock reading, and converting it would print another
+        // hour than the one the editor typed.
         $dateType = match ($format) {
             'full' => \IntlDateFormatter::FULL,
             'long' => \IntlDateFormatter::LONG,
@@ -198,6 +210,7 @@ class ArticleExtension extends AbstractExtension
                 \Locale::getDefault(),
                 $dateType,
                 \IntlDateFormatter::NONE,
+                $date->getTimezone(),
             );
 
             return $formatter->format($date) ?: '';
@@ -208,6 +221,7 @@ class ArticleExtension extends AbstractExtension
             \Locale::getDefault(),
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::FULL,
+            $date->getTimezone(),
         );
         $formatter->setPattern($format);
 
@@ -267,6 +281,129 @@ class ArticleExtension extends AbstractExtension
             'sulu_user' => $this->resolveSuluUserName($authorBlock, $format),
             default => '',
         };
+    }
+
+    /**
+     * The web address of an author, organizer or performer, when there is one.
+     *
+     * A free name carries the URL the editor typed. A Sulu contact, an
+     * organization or the primary author (a Sulu user) carries the "Website"
+     * of its contact card, Sulu having no public page of its own for a contact.
+     *
+     * @param array<string, mixed> $block A single author, organizer or performer block entry
+     *
+     * @return string An http(s) URL, or an empty string
+     */
+    public function authorUrl(array $block): string
+    {
+        $url = match ($block['type'] ?? '') {
+            'custom' => $block['url'] ?? null,
+            'contact' => self::selectionFields($block['contact'] ?? null)['mainUrl'] ?? null,
+            'organization' => self::selectionFields($block['organization'] ?? null)['mainUrl'] ?? null,
+            'sulu_user' => $this->resolveSuluUserUrl($block),
+            default => null,
+        };
+
+        return \is_string($url) ? self::normalizeWebUrl($url) : '';
+    }
+
+    /**
+     * An author, organizer or performer as a schema.org Person or Organization.
+     *
+     * Always the full name, whatever the display format: shortening a name in
+     * the markup search engines read would downgrade the metadata over a
+     * purely visual choice.
+     *
+     * @param array<string, mixed> $block A single author, organizer or performer block entry
+     *
+     * @return array{'@type': string, name: string, url?: string}|null The party, or null when it has no name
+     */
+    public function schemaParty(array $block): ?array
+    {
+        $name = $block['fullName'] ?? null;
+        if (!\is_string($name) || '' === $name) {
+            unset($block['displayName']);
+            $name = $this->authorName($block, self::AUTHOR_NAME_FORMAT_FULL);
+        }
+
+        $name = \trim($name);
+        if ('' === $name) {
+            return null;
+        }
+
+        $party = [
+            '@type' => 'organization' === ($block['type'] ?? '') ? 'Organization' : 'Person',
+            'name' => $name,
+        ];
+
+        $url = $this->authorUrl($block);
+        if ('' !== $url) {
+            $party['url'] = $url;
+        }
+
+        return $party;
+    }
+
+    /**
+     * The fields of a selected Sulu contact or organization, whatever its shape.
+     *
+     * Sulu 3 resolves a contact or account selection into its API object
+     * (`Sulu\Bundle\ContactBundle\Api\Contact` or `Account`), not an array.
+     * Twig reads both alike, which is why the page looked right in templates
+     * reading `.name`, while the PHP here, testing for an array, resolved every
+     * Sulu contact and organization to an empty name. An array is still
+     * accepted, for data normalized elsewhere.
+     *
+     * @param mixed $selection The resolved selection
+     *
+     * @return array{firstName?: mixed, lastName?: mixed, name?: mixed, mainUrl?: mixed, avatar?: mixed}|null The fields, or null when nothing is selected
+     */
+    private static function selectionFields(mixed $selection): ?array
+    {
+        if (\is_array($selection)) {
+            return $selection;
+        }
+
+        if (!\is_object($selection)) {
+            return null;
+        }
+
+        $fields = [];
+        foreach (['firstName', 'lastName', 'name', 'mainUrl', 'avatar'] as $field) {
+            $getter = 'get' . \ucfirst($field);
+            if (\method_exists($selection, $getter)) {
+                $fields[$field] = $selection->{$getter}();
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Keep a typed web address only if it is one.
+     *
+     * The website of a contact card is free text: "www.example.com" is
+     * completed with https, a mail address or a phone number is dropped
+     * rather than served as a URL.
+     *
+     * @param string $url The address as stored
+     *
+     * @return string An http(s) URL, or an empty string
+     */
+    private static function normalizeWebUrl(string $url): string
+    {
+        $url = \trim($url);
+
+        if (1 === \preg_match('#^https?://\S+$#i', $url)) {
+            return $url;
+        }
+
+        // A bare host, as people type it into a contact card.
+        if (1 === \preg_match('#^[a-z0-9-]+(\.[a-z0-9-]+)+(/\S*)?$#i', $url)) {
+            return 'https://' . $url;
+        }
+
+        return '';
     }
 
     /**
@@ -500,9 +637,9 @@ class ArticleExtension extends AbstractExtension
         }
 
         if ('contact' === $type) {
-            $contact = $authorBlock['contact'] ?? null;
+            $contact = self::selectionFields($authorBlock['contact'] ?? null);
 
-            return \is_array($contact) ? $this->avatarIdFromArray($contact) : null;
+            return null !== $contact ? $this->avatarIdFromArray($contact) : null;
         }
 
         if ('sulu_user' !== $type || null === $this->userRepository) {
@@ -606,9 +743,9 @@ class ArticleExtension extends AbstractExtension
      */
     private function resolveContactName(array $authorBlock, string $format = self::AUTHOR_NAME_FORMAT_FULL): string
     {
-        $contact = $authorBlock['contact'] ?? null;
+        $contact = self::selectionFields($authorBlock['contact'] ?? null);
 
-        if (\is_array($contact)) {
+        if (null !== $contact) {
             return $this->formatPersonName(
                 (string) ($contact['firstName'] ?? ''),
                 (string) ($contact['lastName'] ?? ''),
@@ -628,9 +765,9 @@ class ArticleExtension extends AbstractExtension
      */
     private function resolveOrganizationName(array $authorBlock): string
     {
-        $organization = $authorBlock['organization'] ?? null;
+        $organization = self::selectionFields($authorBlock['organization'] ?? null);
 
-        if (\is_array($organization)) {
+        if (null !== $organization) {
             return (string) ($organization['name'] ?? '');
         }
 
@@ -665,6 +802,26 @@ class ArticleExtension extends AbstractExtension
             $contact->getLastName() ?? '',
             $format,
         );
+    }
+
+    /**
+     * The website of the contact behind a Sulu user (primary article author).
+     *
+     * @param array<string, mixed> $authorBlock The author block data with 'authorId'
+     *
+     * @return string|null The website as stored, or null
+     */
+    private function resolveSuluUserUrl(array $authorBlock): ?string
+    {
+        $authorId = $authorBlock['authorId'] ?? null;
+
+        if (null === $authorId || null === $this->userRepository) {
+            return null;
+        }
+
+        $url = $this->findUser((int) $authorId)?->getContact()?->getMainUrl();
+
+        return \is_string($url) ? $url : null;
     }
 
     /**

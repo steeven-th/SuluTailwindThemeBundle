@@ -69,9 +69,14 @@
                     startDate: content.startDate|default(null),
                     endDate: content.endDate|default(null),
                     isOnline: content.isOnline|default(false),
-                    location: content.location|default(''),
+                    location: content.location|default(null),
+                    showMapLink: content.showMapLink|default(false),
+                    isPaid: content.isPaid|default(false),
+                    priceLabel: iw_sulu_tailwind_theme_event_price(content),
+                    ticketUrl: content.ticketUrl|default(''),
                     locationUrl: content.locationUrl|default(''),
                     organizer: content.organizer|default([]),
+                    performers: content.performers|default([]),
                 } only %}
 
                 {# Table of contents — the "sticky" position materializes here,

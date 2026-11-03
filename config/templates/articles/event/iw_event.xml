@@ -2,7 +2,7 @@
 <!--
     Article template: Event.
     Provides an event article structure with start/end dates, location,
-    organizer, hero, and content blocks. Categories, tags, description,
+    pricing, organizer, performers, hero, and content blocks. Categories, tags, description,
     and SEO are handled by Sulu's native Excerpt tab.
 -->
 <template xmlns="http://schemas.sulu.io/template/template"
@@ -13,7 +13,7 @@
     <key>iw_event</key>
     <group>events</group>
     <view>@ItechWorldSuluTailwindTheme/articles/event</view>
-    <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 
     <meta>
@@ -53,9 +53,20 @@
                     </meta>
                 </property>
 
-                <property name="location" type="text_line" colspan="12"
+                <property name="location" type="location" colspan="12"
                           visibleCondition="isOnline == false OR isOnline == null">
-                    <meta><title>iw_sulu_tailwind_theme.article.event_location</title></meta>
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_location</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_location_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="showMapLink" type="checkbox" colspan="12"
+                          visibleCondition="isOnline == false OR isOnline == null">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_show_map_link</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_show_map_link_info</info_text>
+                    </meta>
                 </property>
 
                 <property name="locationUrl" type="url" colspan="12"
@@ -64,6 +75,57 @@
                         <title>iw_sulu_tailwind_theme.article.event_location_url</title>
                         <info_text>iw_sulu_tailwind_theme.article.event_location_url_info</info_text>
                     </meta>
+                    <params>
+                        <param name="defaults" type="collection">
+                            <param name="scheme" value="https://"/>
+                        </param>
+                        <param name="schemes" type="collection">
+                            <param name="https://"/>
+                            <param name="http://"/>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Pricing section: always produces a schema.org Offer, free events included -->
+        <section name="pricing">
+            <meta><title>iw_sulu_tailwind_theme.article.section_pricing</title></meta>
+            <properties>
+                <property name="isPaid" type="checkbox" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_is_paid</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_is_paid_info</info_text>
+                    </meta>
+                </property>
+
+                <property name="price" type="number" colspan="6" visibleCondition="isPaid == true">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_price</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_price_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0"/>
+                        <param name="step" value="0.01"/>
+                    </params>
+                </property>
+
+                <property name="ticketUrl" type="url" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_ticket_url</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_ticket_url_info</info_text>
+                    </meta>
+                    <!-- Web links only: a mailto: or tel: here would be served to search
+                         engines as the URL of the event, and ftp:// has no place in it. -->
+                    <params>
+                        <param name="defaults" type="collection">
+                            <param name="scheme" value="https://"/>
+                        </param>
+                        <param name="schemes" type="collection">
+                            <param name="https://"/>
+                            <param name="http://"/>
+                        </param>
+                    </params>
                 </property>
             </properties>
         </section>
@@ -75,33 +137,26 @@
                 <block name="organizer" default-type="custom" minOccurs="0" maxOccurs="1">
                     <meta><title>iw_sulu_tailwind_theme.article.organizer</title></meta>
                     <types>
-                        <type name="custom">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_custom</title></meta>
-                            <properties>
-                                <property name="name" type="text_line" mandatory="true" colspan="6">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_name</title></meta>
-                                </property>
-                                <property name="url" type="url" colspan="6">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_url</title></meta>
-                                </property>
-                            </properties>
-                        </type>
-                        <type name="contact">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_contact</title></meta>
-                            <properties>
-                                <property name="contact" type="single_contact_selection" mandatory="true" colspan="12">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_contact_select</title></meta>
-                                </property>
-                            </properties>
-                        </type>
-                        <type name="organization">
-                            <meta><title>iw_sulu_tailwind_theme.article.author_organization</title></meta>
-                            <properties>
-                                <property name="organization" type="single_account_selection" mandatory="true" colspan="12">
-                                    <meta><title>iw_sulu_tailwind_theme.article.organizer_organization_select</title></meta>
-                                </property>
-                            </properties>
-                        </type>
+                        <xi:include href="../../fragments/event-party-types.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
+                    </types>
+                </block>
+            </properties>
+        </section>
+
+        <!-- Performers section: who leads the event (speaker, trainer, host),
+             schema.org `performer`, distinct from the organizer -->
+        <section name="performers">
+            <meta><title>iw_sulu_tailwind_theme.article.section_performers</title></meta>
+            <properties>
+                <block name="performers" default-type="custom" minOccurs="0" maxOccurs="10">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.performer</title>
+                        <info_text>iw_sulu_tailwind_theme.article.performer_info</info_text>
+                    </meta>
+                    <types>
+                        <xi:include href="../../fragments/event-party-types.xml"
+                                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:types/sulu:type)"/>
                     </types>
                 </block>
             </properties>

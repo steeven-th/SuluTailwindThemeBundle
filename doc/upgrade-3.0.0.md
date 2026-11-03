@@ -2529,3 +2529,118 @@ either, as the width defaults to `0`. Set the width beside it:
 
 The table of contents reads `--iw-toc-border-width` the same way. A full
 `--iw-toc-border` shorthand keeps working as before.
+
+## Event venue becomes a Sulu location (breaking, content)
+
+The **Location** of an `iw_event` article was a free-text line, which gave search
+engines a name and no address. It is now Sulu's `location` field: an address
+search with a map, storing the street, postal code, town, country and
+coordinates. The event page shows the address under the venue name, and the
+structured data carries a `PostalAddress` and `GeoCoordinates`.
+
+A ticked **Show a link to the map** adds a "View on the map" link (OpenStreetMap)
+under the address, when the location has coordinates. It is off by default.
+
+### Existing content
+
+Sulu does not read the former text as a location: an event not migrated shows no
+venue. Run once, on every environment holding events:
+
+```bash
+php bin/console iw-sulu:theme:migrate-event-location --dry-run
+php bin/console iw-sulu:theme:migrate-event-location
+php bin/console cache:pool:clear cache.app
+```
+
+The former text becomes the title of the location, on draft and live rows, in
+every locale. It can be run twice. The command is not run by any deployment
+hook, on purpose: it rewrites content.
+
+The structured data then reads the title as both the name and the address, which
+is enough to clear the Search Console warning. To show a real address and
+coordinates, open each event and search its address in the field. The address
+search fills the title with the full address it found: put the venue name back
+there ("CCI de Tarbes"), it is what the page and search engines show as the name.
+
+A project whose own event template copied the `location` text field names it:
+
+```bash
+php bin/console iw-sulu:theme:migrate-event-location --template=iw_event --template=app_event
+```
+
+### Template overrides (breaking)
+
+`articles/common/_event_info_card.html.twig` now receives `location` as a Sulu
+location value rather than a string, and a new `showMapLink` flag. An override
+printing `{{ location }}` prints an array: read `location.title`, and
+`iw_sulu_tailwind_theme_location_address(location)` for the address.
+
+## Events get a price and a registration link (new)
+
+An `iw_event` article gains a **Pricing and registration** section: **Paid**, a
+**Price** shown once it is ticked, and an optional **Registration or ticketing
+link**. The page shows "Free" or the price, and the structured data always
+carries an `Offer`, which clears the Search Console warning about `offers`.
+
+### Existing content
+
+Events written before have the box unticked, so they now read as **free**, on the
+page and for search engines. Open the paid ones, tick **Paid** and type the
+amount. No command can do it, the price was never stored.
+
+The currency defaults to `EUR`. A site selling in another one sets
+`events.currency` (see [Events](events.md#price-and-registration)).
+
+### Template overrides
+
+`articles/common/_event_info_card.html.twig` takes three new variables:
+`isPaid`, `priceLabel` (from `iw_sulu_tailwind_theme_event_price(content)`) and
+`ticketUrl`. An override that does not pass them shows every event as free.
+
+## Events get speakers, and Sulu contacts are named again (new, fixed)
+
+An `iw_event` article gains a **Speakers** section (schema.org `performer`), up to
+ten entries of the same three kinds as the organizer: a free name, a Sulu contact
+or a Sulu organization. The page shows them in a "With" row, and the structured
+data carries them with the website of their card.
+
+The organizer and the speakers share one fragment,
+`config/templates/fragments/event-party-types.xml`. A project template that
+copied the organizer block can include it instead.
+
+### Sulu contacts and organizations had no name (fixed)
+
+An organizer, or an additional article author, picked as a **Sulu contact** or a
+**Sulu organization** showed no name on the page and was missing from the
+structured data. Sulu 3 resolves those selections into API objects, and the name
+was only read from an array. Both shapes are read now, nothing to do on existing
+content.
+
+### Translations
+
+The admin keys `article.organizer_name`, `article.organizer_url`,
+`article.organizer_contact_select` and `article.organizer_organization_select` are
+replaced by the `article.event_party_*` keys of the shared fragment. A project
+overriding them in its own translation files renames them.
+
+## Article structured data: dateModified, author links, publisher (new)
+
+The JSON-LD of news items and blog posts gains:
+
+- **`dateModified`**: the **Last modified** date of the Settings tab when an editor
+  set it, otherwise the date of the last publication. It used to come out only in
+  the first case.
+- **`url` on authors**: the **Website** of the Sulu contact or organization card,
+  or of the contact behind the primary author. A free-name author gets a new
+  **Website** field.
+- **`publisher`**: the site name and desktop logo of the theme menu.
+
+See [Structured data of articles](structured-data.md).
+
+### Controller (breaking for template overrides)
+
+The three article templates are now rendered by
+`ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController`, an
+extension of Sulu's `ContentController` that adds `iwContentChanged`. A project
+that copied an article template keeps Sulu's controller and therefore gets no
+fallback date: switch its `<controller>` to the bundle's.

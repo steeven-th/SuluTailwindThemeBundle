@@ -13,7 +13,7 @@
     <key>iw_news</key>
     <group>news</group>
     <view>@ItechWorldSuluTailwindTheme/articles/news</view>
-    <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 
     <meta>

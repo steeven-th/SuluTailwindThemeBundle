@@ -569,6 +569,36 @@ An editor who should pick the events gets a smart content property instead, on t
 
 The other half of the calendar, most recent first, for an archive page. Same arguments and same return as above.
 
+### `iw_sulu_tailwind_theme_event_datetime(date)`
+
+An event date as ISO 8601, with the offset of the site's `events.timezone`, for structured data. The time is kept as the editor typed it, only the offset is added: 9:00 on 12 November in `Europe/Paris` gives `2026-11-12T09:00:00+01:00`, and 9:00 on 2 July gives `+02:00`.
+
+```twig
+<time datetime="{{ iw_sulu_tailwind_theme_event_datetime(content.startDate) }}">
+```
+
+Use it instead of `|date('c')` on `startDate` and `endDate`: the `date` filter prints the time in PHP's zone, UTC in most containers, and the offset is then wrong. Returns an empty string when there is no date. See [Events and agendas](events.md#timezone).
+
+### `iw_sulu_tailwind_theme_event_offer(content, pageUrl)`
+
+The schema.org `Offer` of an event, ready to be put under `offers` in its JSON-LD: the price (0 for a free event, none for a paid event with no amount), the site's `events.currency`, the registration link or `pageUrl` when there is none, and `availability: InStock`. See [Events and agendas](events.md#price-and-registration).
+
+### `iw_sulu_tailwind_theme_event_price(content)`
+
+The price of a paid event as the visitor reads it, in the locale of the page and the site's currency ("15,00 €" in French). Returns an empty string for a free event or a paid event with no amount: print "Free" yourself, from `content.isPaid`.
+
+### `iw_sulu_tailwind_theme_schema_party(entry)`
+
+An author, organizer or performer block entry as a schema.org `Person`, or `Organization` for a Sulu organization, with its full name and its `url` when there is one. Returns `null` for an entry without a name. Used by the JSON-LD of events and articles.
+
+```twig
+{% set organizer = iw_sulu_tailwind_theme_schema_party(content.organizer|first) %}
+```
+
+### `iw_sulu_tailwind_theme_author_url(entry)`
+
+The web address of an author, organizer or performer: the URL typed for a free name, or the **Website** of the Sulu contact or organization card. A bare host is completed with `https://`, anything else that is not an http(s) address gives an empty string.
+
 ### `iw_sulu_tailwind_theme_color_scheme(variant, hasBackground)`
 
 Tells whether a block variant renders on a **light** or a **dark** surface. Meant

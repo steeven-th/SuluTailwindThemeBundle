@@ -32,19 +32,43 @@
     {% set description = iw_sulu_tailwind_theme_title_text(content.subtitle)|striptags|trim %}
 {% endif %}
 
-{# Build authors array.
-   Always the full name, never the display format: shortening "Adam Ministrator"
-   to "Adam" in the markup search engines read would downgrade the article's
-   metadata over what is only a visual choice. #}
+{# Build authors array: a Person or an Organization each, with the full name
+   whatever the display format, and the website of the Sulu contact card or
+   the URL typed for a free name. #}
 {% set authorsList = [] %}
 {% if articleAuthors is defined and articleAuthors is iterable %}
     {% for author in articleAuthors %}
-        {% set authorName = author.fullName|default(iw_sulu_tailwind_theme_author_name(author)) %}
-        {% if authorName is not empty %}
-            {% set authorType = author.type|default('custom') == 'organization' ? 'Organization' : 'Person' %}
-            {% set authorsList = authorsList|merge([{'@type': authorType, 'name': authorName}]) %}
+        {% set party = iw_sulu_tailwind_theme_schema_party(author) %}
+        {% if party is not null %}
+            {% set authorsList = authorsList|merge([party]) %}
         {% endif %}
     {% endfor %}
+{% endif %}
+
+{# Modification date: the one an editor set in the Settings tab first, then the
+   last publication passed by ArticleController. Left out when it does not
+   come after the publication date, which would read as a contradiction. #}
+{% set modifiedDate = lastModified|default(null) ?: iwContentChanged|default(null) %}
+{% if modifiedDate is not null and authored is defined and authored is not empty and modifiedDate < authored %}
+    {% set modifiedDate = null %}
+{% endif %}
+
+{# Publisher: the site, named and with its logo as set in the theme menu.
+   Without a site name there is no Organization to describe. #}
+{% set publisherData = null %}
+{% set siteConfig = iw_sulu_tailwind_theme_menu_config() %}
+{% set siteName = siteConfig.siteName|default('')|trim %}
+{% if siteName is not empty %}
+    {% set publisherData = {'@type': 'Organization', 'name': siteName, 'url': absolute_url(sulu_content_path('/'))} %}
+    {% if siteConfig.logoDesktop.id|default(null) is not null %}
+        {% set logoMedia = sulu_resolve_media(siteConfig.logoDesktop.id, app.request.locale) %}
+        {% if logoMedia is not null %}
+            {% set publisherData = publisherData|merge({'logo': {
+                '@type': 'ImageObject',
+                'url': absolute_url(logoMedia.thumbnails['iw_theme_logo_desktop']|default(logoMedia.url)),
+            }}) %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
 {# Build categories/tags #}
@@ -67,8 +91,9 @@
     '@type': schemaType,
     'headline': content.title|default(''),
     'datePublished': authored is defined and authored is not empty ? authored|date('c') : null,
-    'dateModified': lastModified is defined and lastModified is not null ? lastModified|date('c') : null,
+    'dateModified': modifiedDate is not null ? modifiedDate|date('c') : null,
     'author': authorsList|length == 1 ? authorsList|first : (authorsList|length > 1 ? authorsList : null),
+    'publisher': publisherData,
     'image': imageUrl,
     'description': description is not empty ? description|slice(0, 300) : null,
     'mainEntityOfPage': {

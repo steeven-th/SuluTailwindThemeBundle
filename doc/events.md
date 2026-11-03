@@ -7,6 +7,10 @@ This bundle adds that missing question - *what is coming up, and in what order* 
 ## Table of contents
 
 - [What counts as upcoming](#what-counts-as-upcoming)
+- [Timezone](#timezone)
+- [Venue](#venue)
+- [Price and registration](#price-and-registration)
+- [Organizer and performers](#organizer-and-performers)
 - [In the blocks of the bundle](#in-the-blocks-of-the-bundle)
 - [In a block or a page of your own](#in-a-block-or-a-page-of-your-own)
 - [In a template of your own](#in-a-template-of-your-own)
@@ -28,7 +32,136 @@ An event is upcoming **until it is over**, not until it has begun: the end date 
 
 An article with no start date - a news item - never appears in an agenda, whatever its template. Nothing has to be configured for that: the comparison simply never matches.
 
-Dates are compared as they were typed, without a timezone, which is also how an editor reads them.
+Dates are compared as they were typed, in the site's event timezone (see below), which is also how an editor reads them.
+
+---
+
+## Timezone
+
+An editor types an event time as it reads on a poster, "12 November, 9:00", and Sulu stores exactly that, with no timezone. Tell the bundle which zone those times are meant in:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        timezone: Europe/Paris
+```
+
+It is used in two places:
+
+- **Structured data**: the JSON-LD of an event carries `2026-11-12T09:00:00+01:00`, with the offset of that date (`+01:00` in winter, `+02:00` in summer for Paris). Without it, the offset is PHP's, `+00:00` in most containers, and Google may show the event an hour or two off.
+- **The agenda**: an event leaves the upcoming list when it ends in that zone, not when it ends in UTC.
+
+The page itself always shows the time as typed, whatever the setting.
+
+Left out, PHP's own zone (`date.timezone`) applies, so a project that already sets it has nothing to do. An unknown zone name is refused when the container compiles.
+
+This is a deployment setting, not an editorial one, and it deliberately has no field in the admin: changing it shifts the offset of every published event at once. A multi-site project can still set it per site:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        timezone: Europe/Paris
+    webspaces:
+        quebec:
+            events:
+                timezone: America/Montreal
+```
+
+In a template of your own, print an event date for machines with [`iw_sulu_tailwind_theme_event_datetime()`](twig-reference.md#iw_sulu_tailwind_theme_event_datetimedate) rather than `|date('c')`.
+
+---
+
+## Venue
+
+The **Location** of an event is Sulu's `location` field: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. The title of the location is the venue name ("CCI de Tarbes"). The address search fills it with the full address it found, so it is worth putting the name back.
+
+The event page shows the name, then the address. **Show a link to the map** adds a "View on the map" link to OpenStreetMap under it, when the location has coordinates.
+
+In the structured data, the venue is a `Place`:
+
+```json
+"location": {
+    "@type": "Place",
+    "name": "CCI de Tarbes",
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "8 Rue Jean Baylet",
+        "postalCode": "65000",
+        "addressLocality": "Tarbes",
+        "addressCountry": "France"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": 43.2328, "longitude": 0.0781 }
+}
+```
+
+With a name and no address, the name is used as the address, which Google accepts. An online event keeps its `VirtualLocation`, built from **Event URL**.
+
+Events written before the field became a location are carried over by `iw-sulu:theme:migrate-event-location`, see the [upgrade guide](upgrade-3.0.0.md#event-venue-becomes-a-sulu-location-breaking-content).
+
+---
+
+## Price and registration
+
+The **Pricing and registration** section of an event holds three fields:
+
+- **Paid**, unticked by default. Unticked, the event is free.
+- **Price**, shown once **Paid** is ticked. The amount only, the currency is the site's.
+- **Registration or ticketing link**, optional, for free and paid events alike.
+
+The event page shows "Free" or the price in the locale of the page ("15,00 €" in French), and a "Register" link when there is one. A paid event with no amount typed shows no price rather than a misleading "Free".
+
+The structured data always carries an `Offer`, since Google flags an event without one:
+
+```json
+"offers": {
+    "@type": "Offer",
+    "url": "https://tickets.example.com/42",
+    "priceCurrency": "EUR",
+    "availability": "https://schema.org/InStock",
+    "price": 15
+}
+```
+
+A free event gets `"price": 0`. `url` is the registration link, or the event page when there is none. A paid event with no amount carries no `price` at all, so Search Console reports what is missing instead of a false 0.
+
+The currency is a deployment setting, `EUR` by default, overridable per site:
+
+```yaml
+itech_world_sulu_tailwind_theme:
+    events:
+        currency: EUR
+    webspaces:
+        geneve:
+            events:
+                currency: CHF
+```
+
+---
+
+## Organizer and performers
+
+An event has one **Organizer** and up to ten **Speakers** (schema.org `performer`): who leads it, a speaker, a trainer or a host, as opposed to who puts it on. Both offer the same three kinds of entry:
+
+| Kind | Name | `url` in the structured data |
+|---|---|---|
+| Free name | as typed | the URL typed next to it (https or http) |
+| Sulu contact | first and last name, always in full | the **Website** of the contact card |
+| Sulu organization | its name | the **Website** of the organization card |
+
+A website typed without a scheme on a contact card (`www.example.com`) is completed with `https://`. Anything that is not a web address, a mail address or a phone number typed in the wrong field, is left out.
+
+The event page shows "Organized by" and "With", followed by the names, as plain text: the websites only go to the structured data, where they help search engines tell who is who. In the structured data, each entry is a `Person`, or an `Organization` for a Sulu organization:
+
+```json
+"organizer": { "@type": "Organization", "name": "CCI de Tarbes", "url": "https://www.tarbes.cci.fr" },
+"performer": [
+    { "@type": "Person", "name": "Jeanne Martin", "url": "https://jeanne.example.com" },
+    { "@type": "Person", "name": "Paul Durand" }
+]
+```
+
+One speaker gives an object, several give a list, none gives no `performer` key at all.
 
 ---
 

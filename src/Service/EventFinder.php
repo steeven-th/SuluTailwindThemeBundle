@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Service;
 
+use ItechWorld\SuluTailwindThemeBundle\Article\EventClock;
 use ItechWorld\SuluTailwindThemeBundle\Article\EventDateScope;
 use ItechWorld\SuluTailwindThemeBundle\Repository\WebspaceArticleRepository;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
@@ -37,6 +38,7 @@ final class EventFinder
         private readonly ArticleItemResolver $itemResolver,
         private readonly ArticleFacetsService $facetsService,
         private readonly ?RequestAnalyzerInterface $requestAnalyzer = null,
+        private readonly EventClock $clock = new EventClock(),
     ) {
     }
 
@@ -50,7 +52,7 @@ final class EventFinder
      */
     public function upcoming(int $limit = self::DEFAULT_LIMIT, array $options = []): array
     {
-        return $this->find(EventDateScope::upcoming(), $limit, $options);
+        return $this->find(EventDateScope::upcoming($this->clock->now($this->webspaceKey($options))), $limit, $options);
     }
 
     /**
@@ -63,7 +65,7 @@ final class EventFinder
      */
     public function past(int $limit = self::DEFAULT_LIMIT, array $options = []): array
     {
-        return $this->find(EventDateScope::past(), $limit, $options);
+        return $this->find(EventDateScope::past($this->clock->now($this->webspaceKey($options))), $limit, $options);
     }
 
     /**

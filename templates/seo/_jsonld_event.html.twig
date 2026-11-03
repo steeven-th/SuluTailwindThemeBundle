@@ -1,6 +1,6 @@
 {#
     JSON-LD structured data for Event articles.
-    Generates Event schema.org markup with location/organizer.
+    Generates Event schema.org markup with location, offer, organizer and performers.
 #}
 
 {# Resolve image URL #}
@@ -28,6 +28,10 @@
     {% set description = iw_sulu_tailwind_theme_title_text(content.subtitle)|striptags|trim %}
 {% endif %}
 
+{# Event times are wall-clock readings: iw_sulu_tailwind_theme_event_datetime()
+   attaches the site's events.timezone without converting them, where the
+   `date` filter would print them in PHP's zone. #}
+
 {# Attendance mode #}
 {% set isOnline = content.isOnline|default(false) %}
 {% set attendanceMode = isOnline ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode' %}
@@ -39,25 +43,52 @@
         '@type': 'VirtualLocation',
         'url': content.locationUrl,
     } %}
-{% elseif not isOnline and content.location is defined and content.location is not empty %}
-    {% set locationData = {
-        '@type': 'Place',
-        'name': content.location,
-    } %}
-{% endif %}
-
-{# Organizer #}
-{% set organizerData = null %}
-{% if content.organizer is defined and content.organizer is iterable and content.organizer|length > 0 %}
-    {% set org = content.organizer|first %}
-    {% set orgName = iw_sulu_tailwind_theme_author_name(org) %}
-    {% if orgName is not empty %}
-        {% set orgType = org.type|default('custom') == 'organization' ? 'Organization' : 'Person' %}
-        {% set organizerData = {'@type': orgType, 'name': orgName} %}
-        {% if org.url is defined and org.url is not empty %}
-            {% set organizerData = organizerData|merge({'url': org.url}) %}
+{% elseif not isOnline and content.location is defined and content.location is iterable %}
+    {% set place = content.location %}
+    {% set placeName = place.title|default('')|trim %}
+    {% set street = [place.number|default('')|trim, place.street|default('')|trim]|filter(v => v is not empty)|join(' ') %}
+    {% set postalAddress = {
+        '@type': 'PostalAddress',
+        'streetAddress': street,
+        'postalCode': place.code|default('')|trim,
+        'addressLocality': place.town|default('')|trim,
+        'addressCountry': place.country|default('')|trim,
+    }|filter(v => v is not empty) %}
+    {# Google expects an address on every Place. A location carried over from
+       the former free-text field has a name and nothing else, and the name is
+       then the best address there is. #}
+    {% set address = postalAddress|length > 1 ? postalAddress : (placeName is not empty ? placeName : null) %}
+    {% if placeName is not empty or address is not null %}
+        {% set locationData = {
+            '@type': 'Place',
+            'name': placeName is not empty ? placeName : iw_sulu_tailwind_theme_location_address(place)|split("\n")|first,
+            'address': address,
+        }|filter(v => v is not null) %}
+        {% if place.lat|default(null) is not null and place.long|default(null) is not null %}
+            {% set locationData = locationData|merge({'geo': {
+                '@type': 'GeoCoordinates',
+                'latitude': place.lat,
+                'longitude': place.long,
+            }}) %}
         {% endif %}
     {% endif %}
+{% endif %}
+
+{# Organizer and performers: a Person or an Organization each, with the
+   website of the Sulu contact card or the URL typed for a free name. #}
+{% set organizerData = null %}
+{% if content.organizer is defined and content.organizer is iterable and content.organizer|length > 0 %}
+    {% set organizerData = iw_sulu_tailwind_theme_schema_party(content.organizer|first) %}
+{% endif %}
+
+{% set performersList = [] %}
+{% if content.performers is defined and content.performers is iterable %}
+    {% for performer in content.performers %}
+        {% set party = performer is iterable ? iw_sulu_tailwind_theme_schema_party(performer) : null %}
+        {% if party is not null %}
+            {% set performersList = performersList|merge([party]) %}
+        {% endif %}
+    {% endfor %}
 {% endif %}
 
 <script type="application/ld+json">
@@ -65,13 +96,15 @@
     '@context': 'https://schema.org',
     '@type': 'Event',
     'name': content.title|default(''),
-    'startDate': content.startDate is defined and content.startDate is not empty ? content.startDate|date('c') : null,
-    'endDate': content.endDate is defined and content.endDate is not empty ? content.endDate|date('c') : null,
+    'startDate': iw_sulu_tailwind_theme_event_datetime(content.startDate|default(null))|default(null),
+    'endDate': iw_sulu_tailwind_theme_event_datetime(content.endDate|default(null))|default(null),
     'eventAttendanceMode': attendanceMode,
     'eventStatus': 'https://schema.org/EventScheduled',
     'location': locationData,
     'image': imageUrl,
     'description': description is not empty ? description|slice(0, 300) : null,
     'organizer': organizerData,
+    'performer': performersList|length == 1 ? performersList|first : (performersList|length > 1 ? performersList : null),
+    'offers': iw_sulu_tailwind_theme_event_offer(content, app.request.schemeAndHttpHost ~ app.request.baseUrl ~ app.request.pathInfo),
 }|filter(v => v is not null)|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_PRETTY_PRINT'))|raw }}
 </script>

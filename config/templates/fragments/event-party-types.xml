@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<!--
+    Who organizes or leads an event: a free name, a Sulu contact or a Sulu
+    organization. Shared by the organizer and performers blocks of `iw_event`,
+    so both read the same and resolve through the same author functions.
+    The type keys match those of `article-authors.xml` on purpose.
+-->
+<types xmlns="http://schemas.sulu.io/template/template">
+    <type name="custom">
+        <meta><title>iw_sulu_tailwind_theme.article.event_party_custom</title></meta>
+        <properties>
+            <property name="name" type="text_line" mandatory="true" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.article.event_party_name</title></meta>
+            </property>
+            <property name="url" type="url" colspan="6">
+                <meta><title>iw_sulu_tailwind_theme.article.event_party_url</title></meta>
+                <params>
+                    <param name="defaults" type="collection">
+                        <param name="scheme" value="https://"/>
+                    </param>
+                    <param name="schemes" type="collection">
+                        <param name="https://"/>
+                        <param name="http://"/>
+                    </param>
+                </params>
+            </property>
+        </properties>
+    </type>
+    <type name="contact">
+        <meta><title>iw_sulu_tailwind_theme.article.event_party_contact</title></meta>
+        <properties>
+            <property name="contact" type="single_contact_selection" mandatory="true" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.article.event_party_contact_select</title></meta>
+            </property>
+        </properties>
+    </type>
+    <type name="organization">
+        <meta><title>iw_sulu_tailwind_theme.article.event_party_organization</title></meta>
+        <properties>
+            <property name="organization" type="single_account_selection" mandatory="true" colspan="12">
+                <meta><title>iw_sulu_tailwind_theme.article.event_party_organization_select</title></meta>
+            </property>
+        </properties>
+    </type>
+</types>

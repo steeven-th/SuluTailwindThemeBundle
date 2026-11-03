@@ -430,6 +430,8 @@ What can be overridden:
 | `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
 | `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
 | `consent.mode` | yes | One site may run a cookie manager, its neighbour not. See [Consent](doc/consent.md#choosing-the-mechanism-one-setting-for-the-site) |
+| `events.timezone` | yes | Sites of one project may sit in different zones. See [Events](doc/events.md#timezone) |
+| `events.currency` | yes | Sites of one project may sell in different currencies. See [Events](doc/events.md#price-and-registration) |
 | `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
 | `blocks.code.allow_unsandboxed` | no | See the warning above: it decides which block template the whole admin gets |
 | `article_templates` | no | An article is attached to a site in its own settings, long after it was created from a type. Use the per-group security contexts instead |
@@ -804,6 +806,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Screenshots](doc/screenshots.md) | Visual overview of the admin interface (colors, typography, buttons, blocks, menu) |
 | [Page Templates](doc/page-templates.md) | Modular architecture, creating custom templates, block types, XInclude fragments |
 | [Events and agendas](doc/events.md) | The `iw_events` smart content provider, the Twig functions, and the listing page in agenda mode |
+| [Structured data of articles](doc/structured-data.md) | The JSON-LD of news items and blog posts: dates, authors and their links, publisher |
 | [CSS Variables Reference](doc/css-variables.md) | All CSS custom properties: colors, palettes, typography, borders, buttons, menu |
 | [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
 | [Gradients](doc/gradients.md) | Named gradients used like colors: stops, overlay, the solid fallback, how they are stored and compiled |

@@ -13,7 +13,7 @@
     <key>iw_blog_post</key>
     <group>publications</group>
     <view>@ItechWorldSuluTailwindTheme/articles/blog_post</view>
-    <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 
     <meta>

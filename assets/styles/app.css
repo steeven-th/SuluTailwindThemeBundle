@@ -5032,7 +5032,44 @@ section.block:has([data-slider-fullbleed-value]) {
 }
 
 .iw-event-info__location {
+    display: block;
+    font-weight: 500;
     color: var(--color-text);
+}
+
+.iw-event-info__address {
+    font-size: 0.875rem;
+    font-style: normal;
+    color: var(--color-secondary-500);
+}
+
+.iw-event-info__map-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+}
+
+.iw-event-info__map-link:hover {
+    text-decoration: underline;
+}
+
+.iw-event-info__price {
+    display: block;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.iw-event-info__register-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+}
+
+.iw-event-info__register-link:hover {
+    text-decoration: underline;
 }
 
 .iw-event-info__organizer-label {
@@ -5043,7 +5080,8 @@ section.block:has([data-slider-fullbleed-value]) {
     letter-spacing: 0.05em;
 }
 
-.iw-event-info__organizer-name {
+.iw-event-info__organizer-name,
+.iw-event-info__performers {
     display: block;
     font-weight: 500;
     color: var(--color-text);
