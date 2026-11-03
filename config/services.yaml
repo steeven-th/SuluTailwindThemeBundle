@@ -330,6 +330,21 @@ services:
     itech_world.sulu_tailwind_theme.demo_image_generator:
         class: ItechWorld\SuluTailwindThemeBundle\Service\DemoImageGenerator
 
+    # Google fonts served from the site (fonts.self_host). The HTTP client is
+    # optional: without one the Google stylesheet keeps being used.
+    ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts:
+        arguments:
+            $directory: '%itech_world_sulu_tailwind_theme.css_output_dir%/fonts'
+            $enabled: '%itech_world_sulu_tailwind_theme.fonts.self_host%'
+            $httpClient: '@?http_client'
+            $logger: '@?logger'
+
+    ItechWorld\SuluTailwindThemeBundle\Controller\Website\FontController:
+        arguments:
+            - '@ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts'
+        tags: ['controller.service_arguments']
+        public: true
+
     itech_world.sulu_tailwind_theme.google_fonts_catalog:
         class: ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsCatalog
         arguments:
@@ -383,6 +398,7 @@ services:
             - '@logger'
             - '%kernel.debug%'
             - '@itech_world.sulu_tailwind_theme.site_search_url_resolver'
+            - '@ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and
@@ -436,6 +452,12 @@ services:
             - '@itech_world.sulu_tailwind_theme.typography_weight_validator'
         tags:
             - { name: 'console.command' }
+
+    ItechWorld\SuluTailwindThemeBundle\Command\FontsDownloadCommand:
+        arguments:
+            $fontsResolver: '@itech_world.sulu_tailwind_theme.google_fonts_resolver'
+            $enabled: '%itech_world_sulu_tailwind_theme.fonts.self_host%'
+        tags: ['console.command']
 
     ItechWorld\SuluTailwindThemeBundle\Command\ThemeCompileCommand:
         arguments:

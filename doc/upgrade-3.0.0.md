@@ -2731,3 +2731,18 @@ or `maps` for a custom tile URL.
 - The placeholder markup moved to `components/_consent_placeholder.html.twig`,
   shared by embeds and maps. Its classes are unchanged.
 
+## Google fonts served by the site (new)
+
+`iw_sulu_tailwind_theme_fonts_link()` now points at a copy of the theme's Google
+fonts served by the site, under `/iw-theme/fonts/`, instead of
+`fonts.googleapis.com`. No visitor IP address reaches Google any more.
+
+- Nothing to change in a template. Add `php bin/console iw-sulu:theme:fonts-download`
+  to the deploy steps so the first visitor does not wait for the download.
+- The route comes with the bundle's controller import
+  (`@ItechWorldSuluTailwindThemeBundle/src/Controller/`). A project serving
+  `/iw-theme/` from its web server directly must let `/iw-theme/fonts/` through.
+- A server that cannot reach Google keeps the Google stylesheet, with a logged
+  warning. `fonts.self_host: false` keeps it on purpose.
+- A cookie manager listing Google Fonts as a third party can drop it.
+

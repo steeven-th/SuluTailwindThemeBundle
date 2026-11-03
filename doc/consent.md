@@ -333,5 +333,5 @@ A manager loaded late, typically by Google Tag Manager, relays the visitor's cho
 ## What this does not cover
 
 - **Cookies already set.** Revoking unloads the frame and stops further requests; deleting what the third party already stored is your manager's job.
-- **Google Fonts.** A font is not a consent matter: blocking it would break the page. The bundle serves the fonts itself instead, see the fonts settings.
+- **Google Fonts.** A font is not a consent matter: blocking it would break the page. The bundle serves the fonts itself instead, see [Google fonts served by the site](../README.md#google-fonts-served-by-the-site).
 - **The rest of your site.** The contract is public: any custom embed can use `data-controller="consent"` with the same values and benefit from the same plumbing.
