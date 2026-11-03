@@ -7,12 +7,17 @@
      - serviceLabel: name shown to the visitor, the service key when omitted
      - consentMode: 'placeholder' or 'delegated', picks the button label
      - consentText: editor text replacing the default one
-     - consentImage: optional media `{id}`, a decorative background
+     - consentImage: optional media `{id}`, a decorative background. Falls
+       back to the picture set for the whole site in the theme (Default
+       settings > Blocks), then to none
      - consentButtonStyle: theme button style, the variant one by default
      - details: optional line under the text (the address of a map)
 #}
+{% set consentImage = consentImage.id|default(null) is not null
+    ? consentImage
+    : iw_sulu_tailwind_theme.components_consentImage|default(null) %}
 <div class="iw-embed__consent" data-consent-target="placeholder">
-    {% if consentImage|default(null) is not null and consentImage.id is defined %}
+    {% if consentImage|default(null) is not null and consentImage.id|default(null) is not null %}
         {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
         {# A media deleted from the library resolves to null: the consent
            panel stays, it just loses its illustration. #}

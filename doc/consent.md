@@ -157,7 +157,7 @@ In the block's **Settings** section:
 | **Load without waiting for consent** | Unchecked (the default), the embed waits for consent the way the site is configured. Tick it only for content that sets no tracker, such as a page of your own site. |
 | **Service name** | The key tying this embed to your manager (`youtube`, `calendly`, `maps`…). Free text - use the same value your adapter passes to `grant()`. |
 | **Waiting message** | Text shown in place of the content. A sensible default is used when empty. |
-| **Waiting image** | Optional background visual for the placeholder. |
+| **Waiting image** | Optional background visual for the placeholder. Empty, the site-wide picture applies (see below). |
 
 The box is an opt-out on purpose. A block saved before the field existed has no value, which reads as "waits", in the page and in the admin alike: the protection cannot be dropped by re-saving an old block without looking.
 
@@ -171,7 +171,7 @@ The placeholder settings are derived:
 |-------|------|
 | **Service name** | The provider, `youtube` or `vimeo`. Use these keys in your adapter. |
 | **Waiting message** | The default one, naming the platform. |
-| **Waiting image** | The widget's **Preview image**, when one is set. The protection does not depend on it. |
+| **Waiting image** | The widget's **Preview image**, when one is set, otherwise the site-wide picture. The protection does not depend on it. |
 
 A hosted video file is served by the site itself, contacts no third party, and plays without any placeholder.
 
@@ -183,10 +183,30 @@ Every tile of a Leaflet map is a request to the tile server, with the visitor's 
 |-------|------|
 | **Service name** | The tile server actually contacted, from **Components > Maps** of the theme: `openstreetmap`, `carto` (Voyager, Positron and Dark Matter), or `maps` for a custom tile URL. Declare that key in your manager. Changing the provider changes the key, so the manager asks again for the new third party. |
 | **Waiting message** | The default one, naming the provider. The address of the place stays readable under it: it is content, not a third party. |
+| **Waiting image** | The site-wide picture, when one is set. |
 
 A custom tile server of your own contacts no third party either, but the bundle cannot tell it from Mapbox or MapTiler, so it waits as `maps`. On a site whose only third party is such a server, grant `maps` from your adapter at startup.
 
 The same `controller` value lets any third-party script wait the same way: put it on an element with `data-controller="consent"`, and the controller you name is attached to the `frame` target on consent.
+
+## The placeholder for the whole site
+
+**Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's preview image, that picks its own keeps it.
+
+**Texts.** The waiting message and the button labels are translations, so they follow the language of the page. A project rewords them in its own translation files, which win over the bundle's:
+
+```json
+// translations/messages.fr.json of the project
+{
+    "iw_sulu_tailwind_theme.consent_default_text": "Ce contenu vient de %service%. L'afficher le laisse déposer des cookies.",
+    "iw_sulu_tailwind_theme.consent_load": "Afficher",
+    "iw_sulu_tailwind_theme.consent_open_preferences": "Choisir mes cookies"
+}
+```
+
+`%service%` is the provider's name. A message typed in the theme admin would read the same in every language of the site, which is why the theme only offers the picture. An editor can still write a block's own **Waiting message**, in the language of the page being edited.
+
+**Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
 
 ---
 

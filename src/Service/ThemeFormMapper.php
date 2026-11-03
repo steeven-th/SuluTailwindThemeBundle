@@ -199,6 +199,8 @@ class ThemeFormMapper
         'components_mapsTileProvider', 'components_mapsCustomTileUrl', 'components_mapsCustomAttribution',
         'components_mapsScrollZoom', 'components_mapsMarkerColor', 'components_mapsMarkerIcon',
         'components_mapsMarkerMedia',
+        // Picture of the consent placeholders (embeds, videos, maps).
+        'components_consentImage',
         'components_mapsPopupBg', 'components_mapsPopupText',
         'components_mapsControlsBg', 'components_mapsControlsText',
         // Site-wide card appearance (moved from the Articles tab in 3.0).

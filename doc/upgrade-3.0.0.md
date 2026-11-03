@@ -2746,3 +2746,12 @@ fonts served by the site, under `/iw-theme/fonts/`, instead of
   warning. `fonts.self_host: false` keeps it on purpose.
 - A cookie manager listing Google Fonts as a third party can drop it.
 
+
+## A picture for every consent placeholder (new)
+
+**Default settings > Blocks > Consent** of the theme sets the picture shown
+behind the waiting message of iframes, code blocks, videos and maps. A block or
+a video preview image picking its own keeps it. The texts stay translations, so
+they follow the page language: reword them in the project's
+`translations/messages.<locale>.json`, see
+[Consent](consent.md#the-placeholder-for-the-whole-site).
