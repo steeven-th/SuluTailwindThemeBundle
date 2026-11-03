@@ -13,6 +13,17 @@
 #}
 {% extends 'base.html.twig' %}
 
+{# Breadcrumb structured data, in the <head> and whatever the display
+   settings: search engines get the trail even when it is not shown. #}
+{% block seo_structured_data %}
+    {{ parent() }}
+    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+        output: 'jsonld',
+        context: 'page',
+        pageUuid: resource.uuid|default(null),
+    } only %}
+{% endblock %}
+
 {% block content %}
     {# A listing IS a page, so it wears the same banner as one — same hero data
        (image, title, subtitle) and the same site-wide appearance from

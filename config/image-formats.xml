@@ -3,6 +3,15 @@
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://schemas.sulu.io/media/formats http://schemas.sulu.io/media/formats-1.1.xsd">
 
+    <!--
+        Width variants. A format key followed by `_w` and a width is a smaller
+        version of that format, same ratio: `_image.html.twig` offers them in a
+        srcset (see ImageSrcset) so a card 384px wide does not download the
+        800px square. They are internal: hidden from the crop tool, as a crop
+        is stored per format key. A media cropped by hand in the main format
+        keeps its single size instead.
+    -->
+
     <!-- 16:9 widescreen format (hero images, banners) -->
     <format key="iw_theme_16_9">
         <meta>
@@ -10,6 +19,22 @@
             <title lang="fr">Thème 16:9</title>
         </meta>
         <scale x="1920" y="1080" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_16_9_w640" internal="true">
+        <meta>
+            <title lang="en">Theme 16:9, 640px wide</title>
+            <title lang="fr">Thème 16:9, 640 px de large</title>
+        </meta>
+        <scale x="640" y="360" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_16_9_w1280" internal="true">
+        <meta>
+            <title lang="en">Theme 16:9, 1280px wide</title>
+            <title lang="fr">Thème 16:9, 1280 px de large</title>
+        </meta>
+        <scale x="1280" y="720" mode="outbound"/>
     </format>
 
     <!-- 4:3 standard format -->
@@ -21,6 +46,14 @@
         <scale x="1200" y="900" mode="outbound"/>
     </format>
 
+    <format key="iw_theme_4_3_w600" internal="true">
+        <meta>
+            <title lang="en">Theme 4:3, 600px wide</title>
+            <title lang="fr">Thème 4:3, 600 px de large</title>
+        </meta>
+        <scale x="600" y="450" mode="outbound"/>
+    </format>
+
     <!-- 1:1 square format (icons, avatars, thumbnails) -->
     <format key="iw_theme_1_1">
         <meta>
@@ -28,6 +61,14 @@
             <title lang="fr">Thème 1:1</title>
         </meta>
         <scale x="800" y="800" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_1_1_w400" internal="true">
+        <meta>
+            <title lang="en">Theme 1:1, 400px wide</title>
+            <title lang="fr">Thème 1:1, 400 px de large</title>
+        </meta>
+        <scale x="400" y="400" mode="outbound"/>
     </format>
 
     <!-- 3:4 portrait format -->
@@ -39,6 +80,14 @@
         <scale x="600" y="800" mode="outbound"/>
     </format>
 
+    <format key="iw_theme_3_4_w300" internal="true">
+        <meta>
+            <title lang="en">Theme 3:4, 300px wide</title>
+            <title lang="fr">Thème 3:4, 300 px de large</title>
+        </meta>
+        <scale x="300" y="400" mode="outbound"/>
+    </format>
+
     <!-- A series portrait format (A4, A5 posters: 1:√2). Printed posters lose
          about 6% of their height in 3:4, which crops their header and footer. -->
     <format key="iw_theme_a_series">
@@ -47,6 +96,14 @@
             <title lang="fr">Thème série A (affiche)</title>
         </meta>
         <scale x="600" y="849" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_a_series_w300" internal="true">
+        <meta>
+            <title lang="en">Theme A series (poster), 300px wide</title>
+            <title lang="fr">Thème série A (affiche), 300 px de large</title>
+        </meta>
+        <scale x="300" y="424" mode="outbound"/>
     </format>
 
     <!-- Avatar (small square for profile pictures) -->
@@ -118,6 +175,22 @@
             <title lang="fr">Thème Bannière Hero</title>
         </meta>
         <scale x="1920" y="800" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_hero_w768" internal="true">
+        <meta>
+            <title lang="en">Theme Hero Banner, 768px wide</title>
+            <title lang="fr">Thème Bannière Hero, 768 px de large</title>
+        </meta>
+        <scale x="768" y="320" mode="outbound"/>
+    </format>
+
+    <format key="iw_theme_hero_w1280" internal="true">
+        <meta>
+            <title lang="en">Theme Hero Banner, 1280px wide</title>
+            <title lang="fr">Thème Bannière Hero, 1280 px de large</title>
+        </meta>
+        <scale x="1280" y="533" mode="outbound"/>
     </format>
 
     <!-- Picture of the full-screen burger panel, beside the links (a part of the screen, portrait) -->

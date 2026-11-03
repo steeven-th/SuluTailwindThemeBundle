@@ -26,13 +26,20 @@
 {% endif %}
 {% set showName = config.displaySiteName|default(false) and config.siteName|default('') is not empty %}
 
+{# The logo has an empty alt: with the site name hidden, the link is named
+   by an aria-label, the same one as the menu logo. #}
+{% if logoUrl and not showName %}
+    {% set homeLabel = config.siteName|default('')|trim is not empty
+        ? 'iw_sulu_tailwind_theme.menu_home'|trans({'%site%': config.siteName|trim}, 'messages')
+        : 'iw_sulu_tailwind_theme.menu_home_untitled'|trans({}, 'messages') %}
+{% endif %}
 <footer class="iw-footer iw-footer--minimal">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
         {# Left: brand (optional) + copyright #}
         <div class="iw-footer__left flex flex-wrap items-center gap-x-4 gap-y-2">
             {% if logoUrl or showName %}
-                <a href="{{ sulu_content_path('/') }}" class="iw-footer__brand-link inline-flex items-center gap-2 no-underline">
+                <a href="{{ sulu_content_path('/') }}"{% if homeLabel is defined %} aria-label="{{ homeLabel }}"{% endif %} class="iw-footer__brand-link inline-flex items-center gap-2 no-underline">
                     {% if logoUrl %}
                         <img src="{{ logoUrl }}" alt="" class="iw-footer__logo{{ logoVector ? ' iw-footer__logo--vector' }}">
                     {% endif %}

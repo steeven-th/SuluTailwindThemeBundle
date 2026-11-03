@@ -2644,3 +2644,42 @@ The three article templates are now rendered by
 extension of Sulu's `ContentController` that adds `iwContentChanged`. A project
 that copied an article template keeps Sulu's controller and therefore gets no
 fallback date: switch its `<controller>` to the bundle's.
+
+## Breadcrumb structured data in JSON-LD (changed)
+
+The schema.org `BreadcrumbList` used to be microdata on the visible trail. It is
+now JSON-LD in the `<head>`, filled by `pages/default.html.twig`,
+`pages/article_listing.html.twig` and the article base template.
+
+- It comes out even when the breadcrumb is not displayed, and always starts at
+  the home page.
+- An item without a name is skipped, instead of producing an empty `name` that
+  makes Google reject the whole list. The home page alone emits nothing.
+- `components/_breadcrumbs.html.twig` loses its `itemscope` / `itemprop`
+  attributes, and the link text is no longer wrapped in a `<span>`. A project CSS
+  rule written against `.iw-breadcrumbs__link span` must target
+  `.iw-breadcrumbs__link` instead. The current item gains `aria-current="page"`.
+- The `<nav>` label is translated (`iw_sulu_tailwind_theme.breadcrumbs_label`)
+  instead of the fixed English "Breadcrumb".
+- A project page template of its own adds the `seo_structured_data` block shown
+  in [Structured data](structured-data.md#breadcrumb-trail) to keep the trail.
+
+## Images get a srcset (new)
+
+The content formats (`iw_theme_16_9`, `iw_theme_4_3`, `iw_theme_1_1`,
+`iw_theme_3_4`, `iw_theme_a_series`, `iw_theme_hero`) gain smaller versions of the
+same ratio, named `<format>_w<width>`. `blocks/common/_image.html.twig` offers them
+in a `srcset` with a `sizes`, and the bundle's blocks, article cards and galleries
+pass the share of the container they take, so a card no longer downloads a file
+two or three times wider than itself.
+
+- Nothing to do: an image a project template renders through the partial gets the
+  `srcset` too, with `sizes="100vw"`, which is never worse than before. Passing a
+  real `sizes` is what saves the bytes, see
+  [Width variants and srcset](twig-reference.md#width-variants-and-srcset).
+- A format of the project named `<format>_w<width>` is picked up as a variant of
+  `<format>`. It must keep that format's ratio.
+- A media cropped by hand in a format keeps its single size there, its crop
+  always shown. The variants are `internal`, out of the crop tool.
+- Sulu generates a variant the first time it is asked for, so the media cache
+  grows by a few smaller files per picture.

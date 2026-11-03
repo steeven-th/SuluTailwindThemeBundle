@@ -16,6 +16,8 @@
       modifier classes on the root element. The shadow is not among them:
       it is drawn entirely by the compiled stylesheet, from the geometry
       set under Components > Cards.
+    - imageSizes: the `sizes` of the card image, set by the listing from its
+      column count (default: the full viewport width)
     - cardImagePadded (bool): when false, the image touches the card edges
       (image-bleed mode); when true (default), the image keeps its own
       padding/radius inside the card.
@@ -69,6 +71,7 @@
                     format: pickedRatio.format,
                     ratio: pickedRatio.token,
                     alt: imgMedia.title|default(articleTitle),
+                    sizes: imageSizes|default(null),
                 }) }}
             </a>
         {% endif %}

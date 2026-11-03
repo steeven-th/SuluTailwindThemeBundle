@@ -25,12 +25,19 @@
 {% endif %}
 
 {% set showName = config.displaySiteName|default(false) and config.siteName|default('') is not empty %}
+{# The logo has an empty alt: with the site name hidden, the link is named
+   by an aria-label, the same one as the menu logo. #}
+{% if logoUrl and not showName %}
+    {% set homeLabel = config.siteName|default('')|trim is not empty
+        ? 'iw_sulu_tailwind_theme.menu_home'|trans({'%site%': config.siteName|trim}, 'messages')
+        : 'iw_sulu_tailwind_theme.menu_home_untitled'|trans({}, 'messages') %}
+{% endif %}
 {% set stacked = namePosition == 'below' or not logoUrl %}
 
 {% if logoUrl or showName or config.tagline|default('') is not empty %}
     <div class="iw-footer__brand flex flex-col gap-4 {{ align == 'center' ? 'items-center text-center' : 'items-start' }}">
         {% if logoUrl or showName %}
-            <a href="{{ sulu_content_path('/') }}"
+            <a href="{{ sulu_content_path('/') }}"{% if homeLabel is defined %} aria-label="{{ homeLabel }}"{% endif %}
                class="iw-footer__brand-link inline-flex no-underline {{ stacked
                     ? 'flex-col gap-2 ' ~ (align == 'center' ? 'items-center' : 'items-start')
                     : 'items-center gap-2.5' }}">

@@ -140,6 +140,7 @@
                 <div class="iw-block-text-images__image-wrap {{ imageRadiusClass }} overflow-hidden">
                     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                         widget: widget|default([]),
+                        imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '2-5', false),
                         imageFormat: format,
                         aspectRatio: ratio,
                         imageRadius: imageRadiusClass|default(''),

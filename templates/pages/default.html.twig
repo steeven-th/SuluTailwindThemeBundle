@@ -1,6 +1,17 @@
 {# Default page template — renders content blocks using the block dispatcher pattern #}
 {% extends 'base.html.twig' %}
 
+{# Breadcrumb structured data, in the <head> and whatever the display
+   settings: search engines get the trail even when it is not shown. #}
+{% block seo_structured_data %}
+    {{ parent() }}
+    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumb_auto.html.twig' with {
+        output: 'jsonld',
+        context: 'page',
+        pageUuid: resource.uuid|default(null),
+    } only %}
+{% endblock %}
+
 {% block content %}
     {# Per-page hero DATA (image, title, subtitle). The banner appearance is
        configured site-wide in the theme admin (Components → Page hero), read

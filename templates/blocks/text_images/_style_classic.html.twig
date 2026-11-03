@@ -312,6 +312,7 @@
             <div class="{{ imageMobileOrder }} {{ position == 'left' ? 'md:order-1' : 'md:order-2' }} {{ imageRadiusClass }} {{ widgetKind == 'image' ? iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) : '' }} overflow-hidden">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                     widget: widget|default([]),
+                    imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', false),
                     imageFormat: format,
                     aspectRatio: ratio,
                     imageRadius: imageRadiusClass|default(''),

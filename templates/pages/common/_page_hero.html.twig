@@ -163,6 +163,7 @@
                     ratio: pickedRatio ? pickedRatio.token : null,
                     alt: media.title|default(''),
                     loading: 'eager',
+                    fetchpriority: 'high',
                     radiusClass: iw_sulu_tailwind_theme_radius_class('image', '')
                 } only %}
             </div>
@@ -187,6 +188,7 @@
                 alt: media.title|default(''),
                 raw: true,
                 loading: 'eager',
+                fetchpriority: 'high',
                 itemprop: 'image',
                 classes: imgClasses,
             }) }}

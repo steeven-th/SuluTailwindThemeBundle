@@ -626,7 +626,7 @@ it is an SVG, through the mask.
 
 ## Breadcrumbs
 
-Generic breadcrumb trail with schema.org `BreadcrumbList` microdata. Reusable on any page, not article-specific.
+Generic breadcrumb trail. Reusable on any page, not article-specific. It carries no microdata: the schema.org `BreadcrumbList` is JSON-LD in the `<head>`, see [Structured data](../structured-data.md#breadcrumb-trail). The link text sits directly in `.iw-breadcrumbs__link` and the current item has `aria-current="page"`.
 
 **Auto rendering (recommended).** `templates/components/_breadcrumb_auto.html.twig` reads the theme **Navigation** config and builds the trail from Sulu's native `sulu_page_breadcrumb` (pages → `resource.uuid`, page-tree articles → `view.url.page.uuid` + the article title). It is wired into `pages/default.html.twig` (pages) and the article header templates. Admin settings (**Settings > Themes > Default settings > Navigation**): enable (off / pages / articles / both), Home link + label, separator (chevron / slash / dot). No host-app code required.
 

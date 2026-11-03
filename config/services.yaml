@@ -520,6 +520,16 @@ services:
             - { name: 'console.command' }
 
     # ─── Article Twig Extension (loaded when article_templates.enabled) ─
+    ItechWorld\SuluTailwindThemeBundle\Media\ImageSrcset:
+        arguments:
+            - '%sulu_media.image.formats%'
+
+    ItechWorld\SuluTailwindThemeBundle\Twig\MediaExtension:
+        arguments:
+            - '@ItechWorld\SuluTailwindThemeBundle\Media\ImageSrcset'
+        tags:
+            - { name: 'twig.extension' }
+
     itech_world.sulu_tailwind_theme.article_twig_extension:
         class: ItechWorld\SuluTailwindThemeBundle\Twig\ArticleExtension
         arguments:

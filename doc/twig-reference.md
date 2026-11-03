@@ -321,6 +321,40 @@ baked into the rendered HTML at render time.
 
 ---
 
+### `iw_sulu_tailwind_theme_image_sizes(shares)`
+
+Writes the `sizes` of an image laid out in the page container, from the share of the container it takes per breakpoint. Above the widest container (1536px) the share becomes a fixed number of pixels. Gutters and gaps are ignored, so the value errs on the large side: a slightly larger file, never a blurry one.
+
+```twig
+{# A grid of three cards: one per row, two from 640px, three from 1024px #}
+{% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
+    media: media,
+    format: 'iw_theme_16_9',
+    sizes: iw_sulu_tailwind_theme_image_sizes({640: 1/2, 1024: 1/3}),
+} only %}
+{# → (min-width: 1536px) 512px, (min-width: 1024px) 34vw, (min-width: 640px) 50vw, 100vw #}
+```
+
+**Parameters:**
+- `shares` (`array`) - Share of the container (0 to 1) keyed by the minimum viewport width it applies from. Key `0` is the share on the smallest screens, the full width when absent.
+
+**Returns:** `string` - The `sizes` value.
+
+### `iw_sulu_tailwind_theme_split_image_sizes(mediaRatio, fallback, fromLg)`
+
+The same for the media zone of a two-zone block (text and images, form, accordion), from its **Media ratio** setting: `1-3` is a third of the row, `auto` at most 40%. The zones split at 768px, or at 1024px with `fromLg` (`iw-split-cols--from-lg`). The value is handed down through `_widget.html.twig` and `_image_slider.html.twig` as `imageSizes`.
+
+```twig
+{% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
+    widget: widget,
+    imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
+} only %}
+```
+
+### `iw_sulu_tailwind_theme_image_srcset(media, format, extension)`
+
+The `srcset` of a media in a format, for one output extension (`avif`, `webp`, or empty for the original one), from the [width variants](#width-variants-and-srcset) of the format. Returns `null` when the format has none, when a thumbnail is missing, or when the media was cropped by hand in that format. The image partial calls it, a template rarely needs to.
+
 ### `iw_sulu_tailwind_theme_image_ratio(value, fallback)`
 
 Resolves an image ratio picked in the admin into the Sulu image format cut to
@@ -1066,6 +1100,7 @@ format — no broken URLs. The focus point is applied automatically from the med
     mediaId: heroImageId,
     format: 'iw_theme_hero',
     loading: 'eager',
+    fetchpriority: 'high',
 }) %}
 ```
 
@@ -1078,7 +1113,9 @@ format — no broken URLs. The focus point is applied automatically from the med
 - `cover` (`bool`, default `false`) — Fill the parent with `object-cover` instead of natural height (backgrounds, carousel slides). Pass the sizing via `pictureClasses` (e.g. `absolute inset-0 w-full h-full`). Ignored when `ratio` is set.
 - `lightbox` (`bool`, default `false`) — Wrap in a glightbox link.
 - `showName` (`bool`, default `false`) — Use the media title as the lightbox caption.
+- `sizes` (`string`, default `100vw`) - The width the image takes in the layout, as an HTML `sizes` value. Only emitted when the format has [width variants](#width-variants-and-srcset). Build it with [`iw_sulu_tailwind_theme_image_sizes`](#iw_sulu_tailwind_theme_image_sizesshares) rather than by hand.
 - `loading` (`string`, default `lazy`) — `lazy` or `eager` (heroes / LCP images).
+- `fetchpriority` (`string`, omitted by default) - `high`, `low` or `auto`. Give `high` to the image likely to be the LCP only (the bundle does it on page and article heroes). It is not derived from `eager`: galleries, carousels and the menu load eagerly too, and a high priority on every one of them ranks none above the others.
 - `focusMode` (`string`, default `img`) — `img` applies the focus class on the `<img>`; `none` disables it.
 - `raw` (`bool`, default `false`) — Component-owned mode: the `<picture>` is transparent (`display:contents`) and the `<img>` gets **no** sizing utilities, so the caller's own CSS classes fully control layout. Only the avif/webp sources and the focus class are injected. Use for heroes / components that already have dedicated CSS (and JS) targeting the `<img>`. Ignores `ratio`/`cover`.
 - `itemprop` (`string`) — Schema.org `itemprop` emitted on the `<img>` (e.g. `image` for article heroes).
@@ -1094,12 +1131,12 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 
 | Format key | Size | Mode | Used by |
 |---|---|---|---|
-| `iw_theme_16_9` | 1920×1080 | outbound | Default format, banners, cards |
-| `iw_theme_4_3` | 1200×900 | outbound | 4:3 cards and galleries |
-| `iw_theme_1_1` | 800×800 | outbound | Square cards and galleries |
-| `iw_theme_3_4` | 600×800 | outbound | Portrait cards and galleries |
-| `iw_theme_a_series` | 600×849 | outbound | A series posters (A4, A5: 1:√2) in cards and galleries |
-| `iw_theme_hero` | 1920×800 | outbound | Article and page heroes |
+| `iw_theme_16_9` | 1920×1080, also 640 and 1280 wide | outbound | Default format, banners, cards |
+| `iw_theme_4_3` | 1200×900, also 600 wide | outbound | 4:3 cards and galleries |
+| `iw_theme_1_1` | 800×800, also 400 wide | outbound | Square cards and galleries |
+| `iw_theme_3_4` | 600×800, also 300 wide | outbound | Portrait cards and galleries |
+| `iw_theme_a_series` | 600×849, also 300 wide | outbound | A series posters (A4, A5: 1:√2) in cards and galleries |
+| `iw_theme_hero` | 1920×800, also 768 and 1280 wide | outbound | Article and page heroes |
 | `iw_theme_gallery_thumb` | 400×300 | outbound | Gallery thumbnails |
 | `iw_theme_mega_card` | 400×250 | outbound | Mega-menu image cards |
 | `iw_theme_menu_curtain` | 1200×1400 | outbound | Picture of the full-screen burger panel (a part of the screen, portrait) |
@@ -1113,6 +1150,15 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 > The partial falls back to the original file when a format key is unknown (`media.thumbnails[format]|default(media.url)`). That degrades silently — the page still renders, but with the full-size uncropped file and no WebP/AVIF. If images look oversized, check that the format key exists.
 
 **Do not redeclare these keys** in your project's `config/image-formats.xml`: Sulu throws `Media format with key "…" already exists!` at compile time when the same key is defined twice with different settings. To use other dimensions, declare your own key and pass it through the partial's `format` parameter.
+
+#### Width variants and srcset
+
+A Sulu format has a single size, so a square card displayed 384 pixels wide would still download the 800 pixel file. The content formats therefore come with smaller versions of the same ratio, declared as formats of their own: the key of the format followed by `_w` and the width (`iw_theme_1_1_w400`). The partial finds them on its own and emits a `srcset` with width descriptors on the `<img>` and on each `avif` / `webp` `<source>`, plus a `sizes`. The browser downloads the smallest file covering the displayed width.
+
+- **Variants are discovered, not listed.** A project adds one in its own `config/image-formats.xml`, for instance `iw_theme_16_9_w960` at 960×540, and every image in `iw_theme_16_9` offers it. A variant must keep the ratio of its format (`ImageSrcsetTest` checks the bundle's).
+- **They are `internal="true"`,** out of the crop tool of the media library: a crop is stored per format key and a variant would not follow it. For the same reason a media **cropped by hand** in a format keeps its single size there, its crop always shown.
+- **Sulu never enlarges a picture.** A variant wider than the original file comes out at the original size, which only costs a duplicate URL.
+- **The `sizes` decides the file.** Without one the partial says `100vw`, never worse than a single size. The bundle's blocks pass the share of the container they take, see [`iw_sulu_tailwind_theme_image_sizes`](#iw_sulu_tailwind_theme_image_sizesshares).
 
 ---
 

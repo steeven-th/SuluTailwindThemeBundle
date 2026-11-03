@@ -27,6 +27,7 @@
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)]">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                     widget: widget|default([]),
+                    imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
                     imageFormat: 'iw_theme_4_3',
                     aspectRatio: '4/3',
                     imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
@@ -56,6 +57,7 @@
             <div class="iw-block-form__info flex flex-col justify-center p-8 rounded-[var(--border-radius,8px)]">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_widget.html.twig' with {
                     widget: widget|default([]),
+                    imageSizes: iw_sulu_tailwind_theme_split_image_sizes(mediaRatio|default(''), '1-2', true),
                     imageFormat: 'iw_theme_4_3',
                     aspectRatio: '4/3',
                     imageRadius: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),

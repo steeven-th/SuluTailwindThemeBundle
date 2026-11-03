@@ -24,6 +24,7 @@
     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
         images: imageList,
         imageFormat: imageFormat|default('iw_theme_16_9'),
+        imageSizes: imageSizes|default(null),
         showName: showName|default(false),
         autoplay: true,
         aspectRatio: aspectRatio|default('16/9'),

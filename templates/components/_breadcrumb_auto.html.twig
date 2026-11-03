@@ -11,6 +11,12 @@
         whose own title is not part of the page trail.
     - align: override the global horizontal alignment (left | center | right).
         Defaults to the theme config; used by the page hero to follow the title.
+    - output: 'html' (default) renders the visible trail, 'jsonld' renders the
+        schema.org BreadcrumbList for the <head>. Search engines get the trail
+        whatever the display settings say: 'jsonld' ignores breadcrumbs_enabled
+        and always starts from the home page. An item without a name is
+        skipped (Google rejects an empty "name"), and a trail of a single item,
+        the home page itself, emits nothing.
 
     Config (theme tokens, Components tab):
     - breadcrumbs_enabled: off | pages | articles | both (default both)
@@ -20,46 +26,55 @@
     - breadcrumbs_align: left | center | right (default left)
 #}
 {% set cfg = iw_sulu_tailwind_theme|default({}) %}
+{% set jsonld = output|default('html') == 'jsonld' %}
 {% set enabled = cfg.breadcrumbs_enabled|default('both') %}
 {% set ctx = context|default('page') %}
-{% set show = enabled == 'both' or enabled == (ctx == 'article' ? 'articles' : 'pages') %}
+{% set show = jsonld or enabled == 'both' or enabled == (ctx == 'article' ? 'articles' : 'pages') %}
 
 {% set hasUuid = pageUuid is defined and pageUuid %}
-{% set hasTitle = currentTitle is defined and currentTitle %}
+{% set hasTitle = currentTitle is defined and currentTitle|trim is not empty %}
 
 {% if show and (hasUuid or (ctx == 'article' and hasTitle)) %}
     {% set items = [] %}
-    {% set homeLink = cfg.breadcrumbs_homeLink|default(true) %}
-    {% set homeLabel = cfg.breadcrumbs_homeLabel|default('') %}
+    {% set homeLink = jsonld or cfg.breadcrumbs_homeLink|default(true) %}
+    {% set homeLabel = cfg.breadcrumbs_homeLabel|default('')|trim %}
+    {% set homeFallback = 'iw_sulu_tailwind_theme.breadcrumbs_home'|trans({}, 'messages') %}
 
     {% if hasUuid %}
         {# Native Sulu trail (homepage → … → current page). The FIRST item is the
            webspace homepage: the Home toggle keeps/hides it, the label renames it. #}
         {% for item in sulu_page_breadcrumb(pageUuid) %}
+            {% set itemTitle = item.title|default('')|trim %}
             {% if loop.first %}
                 {% if homeLink %}
-                    {% set items = items|merge([{ title: homeLabel ?: item.title, url: sulu_content_path(item.url) }]) %}
+                    {% set items = items|merge([{ title: homeLabel ?: (itemTitle ?: homeFallback), url: sulu_content_path(item.url) }]) %}
                 {% endif %}
-            {% else %}
-                {% set items = items|merge([{ title: item.title, url: sulu_content_path(item.url) }]) %}
+            {% elseif itemTitle is not empty %}
+                {% set items = items|merge([{ title: itemTitle, url: sulu_content_path(item.url) }]) %}
             {% endif %}
         {% endfor %}
     {% elseif homeLink %}
         {# Article without a page trail → a single manual Home item #}
         {% set items = items|merge([{
-            title: homeLabel ?: 'iw_sulu_tailwind_theme.breadcrumbs_home'|trans({}, 'messages'),
+            title: homeLabel ?: homeFallback,
             url: sulu_content_root_path(),
         }]) %}
     {% endif %}
 
     {# Article: append its own title as the current item #}
     {% if ctx == 'article' and hasTitle %}
-        {% set items = items|merge([{ title: currentTitle, url: '' }]) %}
+        {% set items = items|merge([{ title: currentTitle|trim, url: '' }]) %}
     {% endif %}
 
-    {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
-        items: items,
-        separator: cfg.breadcrumbs_separator|default('chevron'),
-        align: align|default(cfg.breadcrumbs_align|default('left')),
-    } only %}
+    {% if jsonld %}
+        {% if items|length > 1 %}
+            {% include '@ItechWorldSuluTailwindTheme/seo/_jsonld_breadcrumb.html.twig' with { items: items } only %}
+        {% endif %}
+    {% else %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_breadcrumbs.html.twig' with {
+            items: items,
+            separator: cfg.breadcrumbs_separator|default('chevron'),
+            align: align|default(cfg.breadcrumbs_align|default('left')),
+        } only %}
+    {% endif %}
 {% endif %}

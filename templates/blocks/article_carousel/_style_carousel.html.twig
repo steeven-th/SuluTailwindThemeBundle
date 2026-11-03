@@ -69,6 +69,8 @@
                 {% for article in displayedArticles %}
                     <div class="iw-block-article-carousel__slide">
                         <div class="iw-block-article-carousel__item iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                            {#- The column count is a CSS variable a project may lower: the image
+                                share stops at a half rather than risk a blurry picture. -#}
                             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                                 article: article,
                                 imageRatio: '16/9',
@@ -76,6 +78,7 @@
                                 showExcerpt: true,
                                 showCategory: true,
                                 cardImagePadded: hasCardRadius,
+                                imageSizes: iw_sulu_tailwind_theme_image_sizes({640: 1/2}),
                             } only %}
                         </div>
                     </div>

@@ -96,11 +96,14 @@
                                             class="glightbox block w-full h-full"
                                             data-title="{{ showNames and media.title is defined ? media.title : '' }}"
                                         >
+                                            {#- A slide is at most 300px wide (--slide-width) and the
+                                                current one is scaled 1.2: 360px covers every slide. -#}
                                             {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
                                                 media: media,
                                                 format: format,
                                                 cover: true,
                                                 pictureClasses: 'w-full h-full',
+                                                sizes: '360px',
                                             }) }}
                                         </a>
                                     </div>
