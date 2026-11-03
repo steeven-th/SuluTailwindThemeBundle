@@ -1,6 +1,6 @@
 # Consent for third-party embeds
 
-Embedding a YouTube video, a Google Map or a scheduling widget makes the visitor's browser contact that third party **as soon as the page renders** — before any banner is shown, and regardless of what your cookie manager thinks. That request carries the visitor's IP address and usually sets cookies.
+Embedding a YouTube video, a Google Map or a scheduling widget makes the visitor's browser contact that third party **as soon as the page renders**, before any banner is shown and regardless of what your cookie manager thinks. That request carries the visitor's IP address and usually sets cookies.
 
 This bundle ships a small, manager-agnostic mechanism to prevent it.
 
@@ -14,7 +14,7 @@ No `src` means no request, no cookie, no IP disclosed. Hiding an already-loaded 
 
 ---
 
-## Installation — the controller must be `eager`
+## Installation: the controller must be `eager`
 
 Register the `consent` controller in your `assets/controllers.json` with **`"fetch": "eager"`**:
 
@@ -35,13 +35,13 @@ Register the `consent` controller in your `assets/controllers.json` with **`"fet
 
 Every other controller in this bundle is registered `lazy`, and for good reason: a lazily-fetched controller is downloaded only when a matching element appears, which keeps the initial bundle small. That trade-off is wrong here, for two distinct reasons.
 
-**1. The API must exist before anyone calls it.** This controller does more than drive its own element: on evaluation it installs `window.iwConsent`, the entry point your cookie manager calls. With `lazy`, the module is fetched asynchronously after the page parses — so a manager firing its callback early would hit an undefined `window.iwConsent`. The failure is intermittent by nature: fine on a warm cache, broken on a cold one or a slow connection. Exactly the kind of bug that does not reproduce on the developer's machine.
+**1. The API must exist before anyone calls it.** This controller does more than drive its own element: on evaluation it installs `window.iwConsent`, the entry point your cookie manager calls. With `lazy`, the module is fetched asynchronously after the page parses, so a manager firing its callback early would hit an undefined `window.iwConsent`. The failure is intermittent by nature: fine on a warm cache, broken on a cold one or a slow connection. Exactly the kind of bug that does not reproduce on the developer's machine.
 
-**2. The page must not flash.** Consent-gated embeds render their placeholder in the markup and only reveal the frame once allowed. A late controller means an already-granted embed shows its placeholder for a moment before swapping — a visible flicker on every page load.
+**2. The page must not flash.** Consent-gated embeds render their placeholder in the markup and only reveal the frame once allowed. A late controller means an already-granted embed shows its placeholder for a moment before swapping, a visible flicker on every page load.
 
 `eager` puts the module in the main bundle, so `window.iwConsent` exists as soon as the bundle is evaluated.
 
-> **Belt and braces:** even with `eager`, a manager running from an inline `<script>` in `<head>` can still execute before the bundle. That is what the queue below is for — use it in every adapter and the ordering stops mattering entirely.
+> **Belt and braces:** even with `eager`, a manager running from an inline `<script>` in `<head>` can still execute before the bundle. That is what the queue below is for: use it in every adapter and the ordering stops mattering entirely.
 
 ### When you can skip the controller
 
@@ -65,34 +65,42 @@ Instead the bundle exposes **one neutral entry point** and lets you connect whic
 window.iwConsent.grant('youtube');     // load every embed waiting on "youtube"
 window.iwConsent.revoke('youtube');    // unload them, restore the placeholders
 window.iwConsent.grantAll();
+window.iwConsent.revoke('*');          // unload everything, forget every stored click
 window.iwConsent.isGranted('youtube'); // → boolean
+window.iwConsent.services();           // → ['vimeo', 'youtube'], what this page waits on
 ```
 
-`grant()` persists the choice in `localStorage` by default, so it survives navigation. Pass `{ remember: false }` to keep it to the page view — useful when your manager is the sole source of truth and re-emits its state on every page.
+**A grant lasts for the page view.** Your manager is the memory: it keeps the visitor's choice in its own cookie and calls `grant()` again on the next page. The bundle storing a copy would give two memories that drift apart, the day the manager's consent expires or a new cookie policy version asks again, while the copy still opens YouTube. Pass `{ remember: true }` only if you really want the bundle to keep a grant across visits.
+
+The one choice the bundle does store is a click on its own placeholder in `placeholder` mode, where no manager exists to remember it. Those stored clicks are never read in `delegated` mode, so a site that adds a manager later starts from its manager's state, not from old clicks.
+
+`services()` lists the services the embeds of the page wait on. An adapter can relay exactly those, or warn about one its manager does not declare, typically `embed`, the key of an iframe or code block whose **Service name** was left empty.
 
 ### Ordering: use the queue
 
-Cookie managers usually run from an inline script in `<head>`, before the bundle's JavaScript is parsed — so `window.iwConsent` may not exist yet when your adapter fires. Push calls onto the queue instead and they are replayed as soon as the API installs (and executed immediately afterwards):
+Cookie managers usually run from an inline script in `<head>`, or from Google Tag Manager, before or after the bundle's JavaScript, with no guarantee either way. Push calls onto the queue instead and they are replayed as soon as the API installs, and executed immediately afterwards:
 
 ```js
 (window.iwConsentQueue = window.iwConsentQueue || []).push(['grant', 'youtube']);
 ```
 
-This is the recommended form for every adapter below: it behaves identically whether the bundle loaded first or not.
+Always use this initialised form. `window.iwConsentQueue.push(...)` alone throws when the manager answers first, the consent is lost for the page, and the bug only shows on a cold cache or a slow connection.
 
-### Telling your manager the visitor accepted
+### When the visitor clicks a placeholder
 
-When the visitor clicks the bundle's own placeholder, an `iw:consent-request` event is dispatched on `document`:
+The click dispatches a cancelable `iw:consent-request` event on `document`, with the service in `event.detail.service`. Your adapter opens the manager and **cancels the event**, which tells the bundle the manager decides:
 
 ```js
 document.addEventListener('iw:consent-request', (event) => {
-    myCookieManager.openPreferences(); // or: myCookieManager.accept(event.detail.service)
+    if (!window.myCookieManager) {
+        return; // not loaded: let the bundle fall back
+    }
+    event.preventDefault();
+    window.myCookieManager.openPreferences();
 });
 ```
 
-**Do not skip this.** Without it the visitor accepts on the placeholder while your manager still records a refusal — two sources of truth that disagree, which is exactly what an audit looks for.
-
----
+Cancel only when the manager is actually there. When nobody cancels, because no adapter listens or a content blocker kept the manager from loading, the bundle takes the click itself as the visitor's consent for that content and loads it, for the page view only. Without that fallback the button would do nothing at all for visitors running an ad blocker, with no manager either to ask them.
 
 ## Choosing the mechanism: one setting for the site
 
@@ -157,65 +165,121 @@ A hosted video file is served by the site itself, contacts no third party, and p
 
 ## Adapters
 
+Every adapter below does the same four things:
+
+1. Relays the manager's state on every page, grant or revoke for each service, through the initialised queue.
+2. Uses the manager's own service names as the bundle's service keys, so a block's **Service name** must match the name declared in the manager exactly (`youtube`, `vimeo`, `openstreetmap`...).
+3. Opens the manager from `iw:consent-request`, and cancels the event only when the manager is loaded.
+4. Lives in the project's JavaScript, versioned with the site, even when the manager itself is loaded by a tag manager.
+
+```js
+// The skeleton every adapter follows
+const queue = () => (window.iwConsentQueue = window.iwConsentQueue || []);
+const relay = (service, allowed) => queue().push([allowed ? 'grant' : 'revoke', service]);
+```
+
 ### Axeptio
 
 ```js
-window._axcb = window._axcb || [];
-window._axcb.push((sdk) => {
+(window._axcb = window._axcb || []).push((sdk) => {
     sdk.on('cookies:complete', (choices) => {
-        ['youtube', 'calendly'].forEach((service) => {
-            window.iwConsentQueue.push([choices[service] ? 'grant' : 'revoke', service]);
-        });
+        Object.entries(choices)
+            .filter(([service]) => !service.startsWith('$$'))
+            .forEach(([service, allowed]) => relay(service, allowed));
     });
 });
 
-document.addEventListener('iw:consent-request', () => window.axeptioSDK?.openCookies());
+document.addEventListener('iw:consent-request', (event) => {
+    if (window.axeptioSDK) {
+        event.preventDefault();
+        window.axeptioSDK.openCookies();
+    }
+});
 ```
+
+`cookies:complete` fires on every page once the visitor has chosen, so the embeds of a visitor who accepted load on their own. The keys of `choices` are the vendor names of the Axeptio project. Those starting with `$$` are Axeptio's own bookkeeping.
+
+**Loaded by Google Tag Manager.** Axeptio recommends its "Axeptio CMP" GTM template, which loads the SDK at Consent Initialization and handles Google Consent Mode v2 (enable the Consent Mode screen in the Axeptio widget). The `_axcb` queue works whoever loads the SDK, so keep the adapter above in the site's JavaScript rather than in a custom HTML tag of GTM: it stays versioned, and runs even before GTM.
+
+### vanilla-cookieconsent (orestbida)
+
+```js
+import * as CookieConsent from 'vanilla-cookieconsent';
+
+const services = ['youtube', 'vimeo', 'openstreetmap']; // the services of your "thirdparty" category
+const sync = () => {
+    const accepted = CookieConsent.getUserPreferences().acceptedServices.thirdparty ?? [];
+    services.forEach((service) => relay(service, accepted.includes(service)));
+};
+
+CookieConsent.run({
+    // ...your categories, with the services above under "thirdparty"
+    onConsent: sync,
+    onChange: sync,
+});
+
+document.addEventListener('iw:consent-request', (event) => {
+    event.preventDefault();
+    CookieConsent.showPreferences();
+});
+```
+
+Bundled by your build, the library cannot be blocked apart from the page, so the event is always cancelled.
 
 ### Tarteaucitron
 
 ```js
-['youtube', 'calendly'].forEach((service) => {
-    document.addEventListener(`${service}_allowed`, () => window.iwConsentQueue.push(['grant', service]));
-    document.addEventListener(`${service}_disallowed`, () => window.iwConsentQueue.push(['revoke', service]));
+['youtube', 'vimeo'].forEach((service) => {
+    document.addEventListener(`${service}_allowed`, () => relay(service, true));
+    document.addEventListener(`${service}_disallowed`, () => relay(service, false));
 });
 
-document.addEventListener('iw:consent-request', () => window.tarteaucitron?.userInterface.openPanel());
+document.addEventListener('iw:consent-request', (event) => {
+    if (window.tarteaucitron) {
+        event.preventDefault();
+        window.tarteaucitron.userInterface.openPanel();
+    }
+});
 ```
 
 ### Klaro
 
 ```js
 window.klaroConfig = window.klaroConfig || {};
-window.klaroConfig.callback = (consent, service) => {
-    window.iwConsentQueue.push([consent ? 'grant' : 'revoke', service.name]);
-};
+window.klaroConfig.callback = (consent, service) => relay(service.name, consent);
 
-document.addEventListener('iw:consent-request', () => window.klaro?.show());
+document.addEventListener('iw:consent-request', (event) => {
+    if (window.klaro) {
+        event.preventDefault();
+        window.klaro.show();
+    }
+});
 ```
 
 ### Cookiebot
 
+Cookiebot works with categories, not services. Map the category your embeds belong to, here `marketing`:
+
 ```js
-window.addEventListener('CookiebotOnAccept', () => {
-    if (window.Cookiebot.consent.marketing) {
-        window.iwConsentQueue.push(['grantAll']);
+const sync = () => relay('*', Boolean(window.Cookiebot?.consent?.marketing));
+window.addEventListener('CookiebotOnAccept', sync);
+window.addEventListener('CookiebotOnDecline', sync);
+
+document.addEventListener('iw:consent-request', (event) => {
+    if (window.Cookiebot) {
+        event.preventDefault();
+        window.Cookiebot.renew();
     }
 });
-window.addEventListener('CookiebotOnDecline', () => window.iwConsentQueue.push(['revoke', '*']));
-
-document.addEventListener('iw:consent-request', () => window.Cookiebot?.renew());
 ```
 
 ### Didomi
 
 ```js
-window.didomiOnReady = window.didomiOnReady || [];
-window.didomiOnReady.push((Didomi) => {
+(window.didomiOnReady = window.didomiOnReady || []).push((Didomi) => {
     const sync = () => {
-        ['youtube', 'calendly'].forEach((service) => {
-            const allowed = Didomi.isConsentRequired() ? Didomi.getUserConsentStatusForVendor(service) : true;
-            window.iwConsentQueue.push([allowed ? 'grant' : 'revoke', service]);
+        window.iwConsent?.services().forEach((service) => {
+            relay(service, !Didomi.isConsentRequired() || Didomi.getUserConsentStatusForVendor(service));
         });
     };
 
@@ -223,15 +287,22 @@ window.didomiOnReady.push((Didomi) => {
     Didomi.on('consent.changed', sync);
 });
 
-document.addEventListener('iw:consent-request', () => window.Didomi?.preferences.show());
+document.addEventListener('iw:consent-request', (event) => {
+    if (window.Didomi) {
+        event.preventDefault();
+        window.Didomi.preferences.show();
+    }
+});
 ```
 
-> **TCF (`window.__tcfapi`)** — managers implementing the IAB framework can be driven the same way from a `__tcfapi('addEventListener', …)` callback. The bundle ships no built-in TCF adapter: the framework is advertising-oriented and its purpose IDs rarely map cleanly onto "this specific embed", which makes a generic adapter more misleading than helpful on a typical content site.
+> **TCF (`window.__tcfapi`)** - managers implementing the IAB framework can be driven the same way from a `__tcfapi('addEventListener', ...)` callback. The bundle ships no built-in TCF adapter: the framework is advertising-oriented and its purpose IDs rarely map cleanly onto "this specific embed", which makes a generic adapter more misleading than helpful on a typical content site.
 
----
+### Placeholders shown a moment to visitors who accepted
+
+A manager loaded late, typically by Google Tag Manager, relays the visitor's choice a second or two after the page shows, and placeholders stay visible until then. To shorten it, an adapter can read the manager's own cookie as soon as it runs and relay it straight away, then let the manager's event confirm or correct it. Axeptio keeps the accepted vendors in the `axeptio_authorized_vendors` cookie, vanilla-cookieconsent its state in `cc_cookie`. This reads a format the manager may change, which is why the bundle leaves it to the project.
 
 ## What this does not cover
 
 - **Cookies already set.** Revoking unloads the frame and stops further requests; deleting what the third party already stored is your manager's job.
-- **Other third-party calls from the bundle.** Leaflet map tiles and Google Fonts are not wired to this mechanism yet — see the dedicated backlog items.
+- **Other third-party calls from the bundle.** Leaflet map tiles and Google Fonts are not wired to this mechanism yet.
 - **The rest of your site.** The contract is public: any custom embed can use `data-controller="consent"` with the same values and benefit from the same plumbing.

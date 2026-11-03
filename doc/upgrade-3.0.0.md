@@ -2683,3 +2683,28 @@ two or three times wider than itself.
   always shown. The variants are `internal`, out of the crop tool.
 - Sulu generates a variant the first time it is asked for, so the media cache
   grows by a few smaller files per picture.
+
+## Consent: grants last for the page view, the placeholder click is cancelable (changed)
+
+Two projects wiring a cookie manager ended up with the same adapter, working
+around the same two defaults. They change.
+
+- **`grant()` no longer stores anything by default.** A cookie manager is the
+  memory and re-emits its state on every page, so the `{ remember: false }` every
+  adapter passed is now the default and can go. Only a click on the bundle's own
+  placeholder in `placeholder` mode is stored, and those stored clicks are not
+  read in `delegated` mode: a stale one can no longer load an embed past a
+  refusal made in the manager. Pass `{ remember: true }` to keep the old
+  behaviour for a grant of your own.
+- **`iw:consent-request` is cancelable, and adapters must cancel it.** An adapter
+  that opens its manager now calls `event.preventDefault()`. Left uncancelled,
+  the bundle takes the click as the visitor's consent and loads the content for
+  the page view. That is the fallback for a manager blocked by a content
+  blocker, where the button used to do nothing. An adapter written for the
+  previous version opens its manager **and** loads the content: add the
+  `preventDefault()`, only when the manager is loaded.
+- `revoke('*')` now unloads every embed and forgets every stored click, and
+  `window.iwConsent.services()` lists the services the page waits on.
+
+The adapters of [Consent](consent.md#adapters) are updated, and gain
+vanilla-cookieconsent and Axeptio loaded by Google Tag Manager.
