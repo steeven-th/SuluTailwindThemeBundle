@@ -83,6 +83,13 @@ services:
         tags:
             - { name: 'controller.service_arguments' }
 
+    # Article templates controller: Sulu's ContentController plus the date the
+    # article was last published (iwContentChanged), for dateModified.
+    ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController:
+        public: true
+        tags:
+            - { name: 'controller.service_arguments' }
+
     # Article listing page controller (F2): extends Sulu's ContentController to
     # inject the server-side filtered/paginated article list and filter facets.
     ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleListingController:

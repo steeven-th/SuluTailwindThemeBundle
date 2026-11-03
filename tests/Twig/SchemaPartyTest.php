@@ -6,6 +6,8 @@ namespace ItechWorld\SuluTailwindThemeBundle\Tests\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Twig\ArticleExtension;
 use ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension;
+use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
+use Sulu\Component\Security\Authentication\UserRepositoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -81,6 +83,35 @@ final class SchemaPartyTest extends TestCase
             ['@type' => 'Person', 'name' => 'Adam Ministrator', 'url' => 'https://adam.example.com'],
             $this->extension()->schemaParty($block),
         );
+    }
+
+    /**
+     * The primary author is a Sulu user: its link is the website of the
+     * contact behind the account.
+     */
+    #[Test]
+    public function thePrimaryAuthorCarriesTheWebsiteOfItsContact(): void
+    {
+        $contact = $this->createStub(ContactInterface::class);
+        $contact->method('getMainUrl')->willReturn('adam.example.com');
+
+        $user = new class($contact) {
+            public function __construct(private readonly ContactInterface $contact)
+            {
+            }
+
+            public function getContact(): ContactInterface
+            {
+                return $this->contact;
+            }
+        };
+
+        $users = $this->createStub(UserRepositoryInterface::class);
+        $users->method('findUserById')->willReturn($user);
+
+        $extension = new ArticleExtension($this->createStub(ThemeExtension::class), $users);
+
+        self::assertSame('https://adam.example.com', $extension->authorUrl(['type' => 'sulu_user', 'authorId' => 1]));
     }
 
     #[Test]

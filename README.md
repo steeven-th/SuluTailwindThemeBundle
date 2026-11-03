@@ -806,6 +806,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Screenshots](doc/screenshots.md) | Visual overview of the admin interface (colors, typography, buttons, blocks, menu) |
 | [Page Templates](doc/page-templates.md) | Modular architecture, creating custom templates, block types, XInclude fragments |
 | [Events and agendas](doc/events.md) | The `iw_events` smart content provider, the Twig functions, and the listing page in agenda mode |
+| [Structured data of articles](doc/structured-data.md) | The JSON-LD of news items and blog posts: dates, authors and their links, publisher |
 | [CSS Variables Reference](doc/css-variables.md) | All CSS custom properties: colors, palettes, typography, borders, buttons, menu |
 | [Block Variants](doc/css-api/block-variants.md) | `.iw-variant--N` classes, `--iw-variant-*` variables, auto-styled elements, separator styles, `.iw-button--variant` |
 | [Gradients](doc/gradients.md) | Named gradients used like colors: stops, overlay, the solid fallback, how they are stored and compiled |

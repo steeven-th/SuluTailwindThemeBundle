@@ -13,7 +13,7 @@
     <key>iw_event</key>
     <group>events</group>
     <view>@ItechWorldSuluTailwindTheme/articles/event</view>
-    <controller>Sulu\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
+    <controller>ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 
     <meta>

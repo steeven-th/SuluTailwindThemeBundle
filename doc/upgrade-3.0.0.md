@@ -2622,3 +2622,25 @@ The admin keys `article.organizer_name`, `article.organizer_url`,
 `article.organizer_contact_select` and `article.organizer_organization_select` are
 replaced by the `article.event_party_*` keys of the shared fragment. A project
 overriding them in its own translation files renames them.
+
+## Article structured data: dateModified, author links, publisher (new)
+
+The JSON-LD of news items and blog posts gains:
+
+- **`dateModified`**: the **Last modified** date of the Settings tab when an editor
+  set it, otherwise the date of the last publication. It used to come out only in
+  the first case.
+- **`url` on authors**: the **Website** of the Sulu contact or organization card,
+  or of the contact behind the primary author. A free-name author gets a new
+  **Website** field.
+- **`publisher`**: the site name and desktop logo of the theme menu.
+
+See [Structured data of articles](structured-data.md).
+
+### Controller (breaking for template overrides)
+
+The three article templates are now rendered by
+`ItechWorld\SuluTailwindThemeBundle\Controller\Website\ArticleController`, an
+extension of Sulu's `ContentController` that adds `iwContentChanged`. A project
+that copied an article template keeps Sulu's controller and therefore gets no
+fallback date: switch its `<controller>` to the bundle's.
