@@ -2683,3 +2683,75 @@ two or three times wider than itself.
   always shown. The variants are `internal`, out of the crop tool.
 - Sulu generates a variant the first time it is asked for, so the media cache
   grows by a few smaller files per picture.
+
+## Consent: grants last for the page view, the placeholder click is cancelable (changed)
+
+Two projects wiring a cookie manager ended up with the same adapter, working
+around the same two defaults. They change.
+
+- **`grant()` no longer stores anything by default.** A cookie manager is the
+  memory and re-emits its state on every page, so the `{ remember: false }` every
+  adapter passed is now the default and can go. Only a click on the bundle's own
+  placeholder in `placeholder` mode is stored, and those stored clicks are not
+  read in `delegated` mode: a stale one can no longer load an embed past a
+  refusal made in the manager. Pass `{ remember: true }` to keep the old
+  behaviour for a grant of your own.
+- **`iw:consent-request` is cancelable, and adapters must cancel it.** An adapter
+  that opens its manager now calls `event.preventDefault()`. Left uncancelled,
+  the bundle takes the click as the visitor's consent and loads the content for
+  the page view. That is the fallback for a manager blocked by a content
+  blocker, where the button used to do nothing. An adapter written for the
+  previous version opens its manager **and** loads the content: add the
+  `preventDefault()`, only when the manager is loaded.
+- `revoke('*')` now unloads every embed and forgets every stored click, and
+  `window.iwConsent.services()` lists the services the page waits on.
+- **A "Manage cookies" button** can be turned on in **Footer > Display options**
+  of the theme, replacing the one each project wired by hand. It dispatches a
+  cancelable `iw:consent-preferences` event: add it to the events your adapter
+  opens the manager on. Left uncancelled, the visitor reads that the manager
+  could not open (a browser extension blocking it) instead of pressing a button
+  that does nothing.
+
+The adapters of [Consent](consent.md#adapters) are updated, and gain
+vanilla-cookieconsent and Axeptio loaded by Google Tag Manager.
+
+## Maps wait for consent (new)
+
+A Leaflet map no longer requests tiles as the page shows. Unless the site's
+`consent.mode` is `none`, it shows the consent placeholder, with the address
+under it, and starts once its tile server is granted: `openstreetmap`, `carto`,
+or `maps` for a custom tile URL.
+
+- A site with a cookie manager declares that key in it, as it does `youtube`.
+  Until then, its maps stay on the placeholder (the click loads them for the
+  page view when the manager does not take it).
+- The wrapper `.iw-location-map-consent` takes the sizing classes of the map
+  while it waits. A project CSS rule sizing `.iw-location-map` from outside
+  should size the wrapper too.
+- The placeholder markup moved to `components/_consent_placeholder.html.twig`,
+  shared by embeds and maps. Its classes are unchanged.
+
+## Google fonts served by the site (new)
+
+`iw_sulu_tailwind_theme_fonts_link()` now points at a copy of the theme's Google
+fonts served by the site, under `/iw-theme/fonts/`, instead of
+`fonts.googleapis.com`. No visitor IP address reaches Google any more.
+
+- Nothing to change in a template. Add `php bin/console iw-sulu:theme:fonts-download`
+  to the deploy steps so the first visitor does not wait for the download.
+- The route comes with the bundle's controller import
+  (`@ItechWorldSuluTailwindThemeBundle/src/Controller/`). A project serving
+  `/iw-theme/` from its web server directly must let `/iw-theme/fonts/` through.
+- A server that cannot reach Google keeps the Google stylesheet, with a logged
+  warning. `fonts.self_host: false` keeps it on purpose.
+- A cookie manager listing Google Fonts as a third party can drop it.
+
+
+## A picture for every consent placeholder (new)
+
+**Default settings > Blocks > Consent** of the theme sets the picture shown
+behind the waiting message of iframes, code blocks, videos and maps. A block or
+a video preview image picking its own keeps it. The texts stay translations, so
+they follow the page language: reword them in the project's
+`translations/messages.<locale>.json`, see
+[Consent](consent.md#the-placeholder-for-the-whole-site).

@@ -15,11 +15,22 @@ import { Controller } from '@hotwired/stimulus';
  *     window.iwConsent.revoke('youtube');   // unload them, restore placeholders
  *     window.iwConsent.grantAll();
  *     window.iwConsent.isGranted('youtube');
+ *     window.iwConsent.services();          // services waiting on this page
  *
- * In the other direction, clicking the bundle's own placeholder dispatches an
- * `iw:consent-request` event on `document`. Wire it to your manager's "open
- * preferences" call: without it the visitor would have accepted here while the
- * manager still records a refusal, leaving two contradicting sources of truth.
+ * A grant from the API lasts for the page view: the manager is the memory,
+ * and re-emits its state on every page. Only a click on the bundle's own
+ * placeholder, on a site without a manager (`placeholder` mode), is stored.
+ *
+ * In the other direction, clicking the bundle's own placeholder dispatches a
+ * cancelable `iw:consent-request` event on `document`. An adapter that opens
+ * its manager calls `preventDefault()`: the manager then decides. When nobody
+ * does, because no manager is wired or a blocker kept it from loading, the
+ * click itself is the visitor's consent and the embed loads for the page view.
+ *
+ * The same controller drives the footer's "Manage cookies" button, through
+ * its `preferences` action: a cancelable `iw:consent-preferences` event the
+ * adapter takes to open its manager. Uncancelled, the button says the manager
+ * could not open, or forgets the placeholder choices on a site without one.
  *
  * Register this controller with `"fetch": "eager"` — unlike every other
  * controller in the bundle. It installs `window.iwConsent` on evaluation, so a
@@ -48,6 +59,13 @@ const instances = new Set();
 
 /** @type {Set<string>} Services granted for this page view. */
 const granted = new Set();
+
+/**
+ * @type {Set<string>} Services the visitor accepted on the bundle's own
+ * placeholder in an earlier visit. Only `placeholder` embeds read it: under a
+ * cookie manager, an old click must not outlive a refusal made there.
+ */
+const stored = new Set();
 
 /**
  * Read persisted consents.
@@ -93,17 +111,20 @@ function ensureApi() {
         /**
          * Allow a service and load every embed waiting on it.
          *
+         * The grant lasts for the page view: a cookie manager calling this is
+         * the memory, and calls it again on the next page. Pass
+         * `{ remember: true }` to keep it across visits, as the bundle's own
+         * placeholder does on a site without a manager.
+         *
          * @param {string} service - Service key, or '*' for all
          * @param {{remember?: boolean}} [options]
          */
         grant(service, options = {}) {
             granted.add(service);
 
-            if (options.remember !== false) {
-                const stored = readStored();
-                if (!stored.includes(service)) {
-                    writeStored([...stored, service]);
-                }
+            if (true === options.remember && !stored.has(service)) {
+                stored.add(service);
+                writeStored([...stored]);
             }
 
             instances.forEach((instance) => {
@@ -119,8 +140,14 @@ function ensureApi() {
          * @param {string} service - Service key, or '*' for all
          */
         revoke(service) {
-            granted.delete(service);
-            writeStored(readStored().filter((entry) => entry !== service));
+            if ('*' === service) {
+                granted.clear();
+                stored.clear();
+            } else {
+                granted.delete(service);
+                stored.delete(service);
+            }
+            writeStored([...stored]);
 
             instances.forEach((instance) => {
                 if (instance.matchesService(service)) {
@@ -139,15 +166,27 @@ function ensureApi() {
         },
 
         /**
+         * Whether a service is allowed for this page view.
+         *
          * @param {string} service
          * @returns {boolean}
          */
         isGranted(service) {
             return granted.has('*') || granted.has(service);
         },
+
+        /**
+         * The services the embeds of this page wait on, so an adapter can
+         * relay exactly those, or warn about one its manager does not know.
+         *
+         * @returns {string[]}
+         */
+        services() {
+            return [...new Set([...instances].map((instance) => instance.serviceValue))].sort();
+        },
     };
 
-    readStored().forEach((service) => granted.add(service));
+    readStored().forEach((service) => stored.add(service));
 
     // Replay calls queued before this module was parsed.
     const queue = window.iwConsentQueue;
@@ -185,18 +224,42 @@ export default class extends Controller {
         // same reason as `src`: an inline document runs the moment it lands on
         // the element, and it is usually the pasted markup that calls out.
         srcdoc: String,
+        // A Stimulus controller attached to the frame on consent, for a
+        // third party that is not a URL to load but code to start: the map
+        // gets `location-map` here, so Leaflet asks for no tile before.
+        controller: String,
         remember: { type: Boolean, default: true },
+        // Messages of the "Manage cookies" button, translated server-side.
+        unavailable: String,
+        cleared: String,
     };
 
-    static targets = ['placeholder', 'frame'];
+    static targets = ['placeholder', 'frame', 'notice'];
 
     connect() {
         ensureApi();
+
+        // The "Manage cookies" button waits on no service: it only asks.
+        if (!this.serviceValue) {
+            return;
+        }
+
         instances.add(this);
 
-        if ('none' === this.modeValue || window.iwConsent.isGranted(this.serviceValue)) {
+        if ('none' === this.modeValue || window.iwConsent.isGranted(this.serviceValue) || this.wasAcceptedBefore()) {
             this.load();
         }
+    }
+
+    /**
+     * Whether the visitor accepted this service on a placeholder in an earlier
+     * visit. Only read without a cookie manager: under one, the manager is the
+     * memory, and a stored click would load the embed past a later refusal.
+     *
+     * @returns {boolean}
+     */
+    wasAcceptedBefore() {
+        return 'placeholder' === this.modeValue && (stored.has('*') || stored.has(this.serviceValue));
     }
 
     disconnect() {
@@ -216,27 +279,77 @@ export default class extends Controller {
     /**
      * Accept from the bundle's own placeholder.
      *
-     * Loads the embed and tells the host page, so a cookie manager can record
-     * the choice rather than silently disagreeing with what the visitor sees.
+     * Tells the host page first. An adapter that opens its cookie manager
+     * cancels the event, and the manager records the choice and grants: the
+     * visitor sees one decision, not two that disagree. Uncancelled, nobody is
+     * there to ask, a blocker may have kept the manager from loading, and the
+     * click itself is the consent for this content.
      *
      * @param {Event} [event]
      */
     accept(event) {
         event?.preventDefault();
 
-        document.dispatchEvent(
-            new CustomEvent('iw:consent-request', {
-                detail: { service: this.serviceValue },
-                bubbles: true,
-            })
-        );
+        const request = new CustomEvent('iw:consent-request', {
+            detail: { service: this.serviceValue },
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(request);
 
-        // In delegated mode the manager owns the decision: we only asked for it.
-        if ('delegated' === this.modeValue) {
+        if (request.defaultPrevented) {
             return;
         }
 
-        window.iwConsent.grant(this.serviceValue, { remember: this.rememberValue });
+        // Stored only without a manager: with one, the next page asks it again.
+        window.iwConsent.grant(this.serviceValue, {
+            remember: 'placeholder' === this.modeValue && this.rememberValue,
+        });
+    }
+
+    /**
+     * Open the cookie manager, from the footer's "Manage cookies" button.
+     *
+     * An adapter cancels `iw:consent-preferences` when it opens its manager.
+     * Uncancelled under a manager, the manager failed to load, which is what
+     * a content blocker does to a tag manager: the visitor reads why instead
+     * of pressing a button that does nothing. Without a manager, there is
+     * nothing to open, and the button forgets the choices made on the
+     * placeholders, which will ask again.
+     *
+     * @param {Event} [event]
+     */
+    preferences(event) {
+        event?.preventDefault();
+
+        const request = new CustomEvent('iw:consent-preferences', { bubbles: true, cancelable: true });
+        document.dispatchEvent(request);
+
+        if (request.defaultPrevented) {
+            this.notify('');
+
+            return;
+        }
+
+        if ('placeholder' === this.modeValue) {
+            window.iwConsent.revoke('*');
+            this.notify(this.clearedValue);
+
+            return;
+        }
+
+        this.notify(this.unavailableValue);
+    }
+
+    /**
+     * Write a message in the live region next to the button.
+     *
+     * @param {string} message - Empty to clear it
+     */
+    notify(message) {
+        if (this.hasNoticeTarget) {
+            this.noticeTarget.textContent = message;
+        }
     }
 
     /**
@@ -255,6 +368,13 @@ export default class extends Controller {
 
         if (this.srcdocValue && frame.getAttribute('srcdoc') !== this.srcdocValue) {
             frame.setAttribute('srcdoc', this.srcdocValue);
+        }
+
+        if (this.controllerValue) {
+            const attached = (frame.dataset.controller || '').split(' ').filter(Boolean);
+            if (!attached.includes(this.controllerValue)) {
+                frame.dataset.controller = [...attached, this.controllerValue].join(' ');
+            }
         }
 
         frame.hidden = false;
@@ -279,6 +399,17 @@ export default class extends Controller {
 
         frame.removeAttribute('src');
         frame.removeAttribute('srcdoc');
+
+        // Detaching the controller disconnects it, which tears the map down.
+        if (this.controllerValue) {
+            const remaining = (frame.dataset.controller || '').split(' ').filter((name) => name && name !== this.controllerValue);
+            if (remaining.length) {
+                frame.dataset.controller = remaining.join(' ');
+            } else {
+                delete frame.dataset.controller;
+            }
+        }
+
         frame.hidden = true;
 
         if (this.hasPlaceholderTarget) {

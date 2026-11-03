@@ -19,6 +19,7 @@ use ItechWorld\SuluTailwindThemeBundle\Service\LanguageLabelResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonReader;
 use ItechWorld\SuluTailwindThemeBundle\Service\LinkResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\NavigationState;
+use ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts;
 use ItechWorld\SuluTailwindThemeBundle\Service\SiteSearchUrlResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
@@ -115,6 +116,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly ?LoggerInterface $logger = null,
         private readonly bool $debug = false,
         private readonly ?SiteSearchUrlResolver $siteSearchUrlResolver = null,
+        private readonly ?SelfHostedFonts $selfHostedFonts = null,
     ) {
     }
 
@@ -1328,10 +1330,12 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
     }
 
     /**
-     * Get a <link> HTML tag for loading Google Fonts.
+     * Get the <link> tags loading the Google fonts of the theme.
      *
-     * Returns a preconnect hint and the Google Fonts stylesheet link
-     * for optimal font loading performance.
+     * Served from the site when `fonts.self_host` is on and the files could be
+     * fetched (SelfHostedFonts): no request reaches Google, so no visitor IP
+     * either, and no preconnect is needed. Otherwise the Google stylesheet,
+     * with its two preconnects.
      *
      * @return string The HTML link tags, or empty string if no fonts are configured
      */
@@ -1343,6 +1347,11 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
 
         if (null === $fontsUrl) {
             return '';
+        }
+
+        $localUrl = $this->selfHostedFonts?->stylesheetFor($fontsUrl);
+        if (null !== $localUrl) {
+            return '<link rel="stylesheet" href="' . htmlspecialchars($localUrl, \ENT_QUOTES | \ENT_HTML5, 'UTF-8') . '">';
         }
 
         $escapedUrl = htmlspecialchars($fontsUrl, \ENT_QUOTES | \ENT_HTML5, 'UTF-8');

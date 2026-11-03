@@ -1027,7 +1027,7 @@ Interactive Leaflet map rendered by the `location-map` Stimulus controller for e
 
 Behavior (configured in **Settings > Themes > Default settings > Cartography**):
 
-- **Tile provider**: OpenStreetMap (default), Carto Voyager / Positron / Dark Matter, or a custom tile URL template + attribution. The provider attribution is always displayed (OSM/Carto tile usage policies).
+- **Tile provider**: OpenStreetMap (default), Carto Voyager / Positron / Dark Matter, or a custom tile URL template + attribution. The provider attribution is always displayed (OSM/Carto tile usage policies). Unless `consent.mode` is `none`, the map waits for consent under the provider's key (`openstreetmap`, `carto` or `maps`), see [Consent](../consent.md#maps). The waiting box is `.iw-location-map-consent`, sized like the map, with a `--iw-location-map-consent-min-height` (`16rem`).
 - **Scroll zoom**: cooperative by default — the page keeps scrolling over the map unless `Ctrl`/`Cmd` is held; on touch devices one finger scrolls the page and two fingers pan/zoom. A translated hint overlay appears when a blocked gesture is attempted. Can be switched to "always on" or "disabled".
 - **POI popup**: clicking the marker opens a popup with the block title, the formatted address and an "open in maps" external link.
 - **Themed marker**: an inline SVG pin (DivIcon) colored through `--iw-location-map-marker-color` (defaults to the primary color), or a custom image from the media library (**Components > Maps > Custom marker** — same 36px box, bottom-center anchor; the marker color is ignored in that case).

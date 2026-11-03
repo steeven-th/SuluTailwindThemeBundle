@@ -5100,6 +5100,13 @@ class ThemeCompiler
 
         // Copyright + divider
         $css .= '.iw-footer__copyright { font-size: 0.8125rem;' . $opacity('copyright', '0.55') . " }\n";
+        // "Manage cookies": a button reading as a link of the footer, and the
+        // message shown below it when the cookie manager does not answer.
+        $css .= ".iw-footer__consent { margin-inline-start: 0.75rem; }\n";
+        $css .= ".iw-footer__consent-link { appearance: none; background: none; border: 0; padding: 0; font: inherit; color: var(--iw-footer-link, inherit); text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }\n";
+        $css .= ".iw-footer__consent-link:is(:hover, :focus-visible) { color: var(--iw-footer-link-hover, var(--iw-footer-link, inherit)); }\n";
+        $css .= ".iw-footer__consent-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }\n";
+        $css .= ".iw-footer__consent-notice:not(:empty) { display: block; margin-top: 0.5rem; }\n";
         $dividerOpacity = $muted || !$hasDivider ? ' opacity: var(--iw-footer-divider-opacity, 0.12);' : '';
         $css .= ".iw-footer__divider { border: 0; height: 1px; background-color: var(--iw-footer-divider, currentColor);{$dividerOpacity} }\n";
 

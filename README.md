@@ -44,7 +44,7 @@
 * **Named palette**: 10 base color roles + unlimited brand colors, each named by slug and expanded to OKLCH shades under a stable `--color-<role>` alias and a `--color-<slug>` alias
 * **CSS compilation**: Automatic generation of `:root` variables, `.iw-variant--<slug>` classes, `.iw-button--<slug>` styles
 * **Shared CSS**: Multiple webspaces using the same theme share a single compiled CSS file
-* **Google Fonts**: Automatic resolution and inclusion of Google Fonts from typography settings
+* **Google Fonts, served by the site**: the fonts picked in the typography settings are downloaded once and served from your own domain, so no visitor IP address reaches Google (falls back to the Google stylesheet when the files cannot be fetched)
 * **Block variants**: Slug-named per-block color schemes applied via CSS custom properties. Each block keeps four switches over what its variant actually paints - block background, block border, content background, content border - so one block can drop the outline or the fill without a variant of its own
 * **Menu configuration**: Configurable menu type, colors, animation, and display options, plus the bar chrome — bottom rule, drop shadow, background opacity and backdrop blur — and a transparent-mode logo variant that cross-fades with the background on scroll
 * **Footer configuration**: Ready-made footer layouts (columns/centered/minimal) with colors of their own, like the menu
@@ -341,6 +341,26 @@ The typography tab includes a **Font Picker** with autocomplete for Google Fonts
    You can also sync from the admin UI by clicking the **sync button (↻)** in the Font Picker.
 
 > **Without an API key**, the Font Picker still works: the Google tab falls back to a free-text input, and the System tab lists 15 cross-platform fonts (Arial, Georgia, Courier New, etc.).
+
+### Google fonts served by the site
+
+Loading a stylesheet from `fonts.googleapis.com` sends the IP address of every visitor to Google, before any consent, and a font cannot wait for consent without breaking the page. German courts have fined sites for it since 2022. The bundle therefore downloads the Google fonts of each theme (CSS and `woff2` files) and serves them from your domain, under `/iw-theme/fonts/`, with a year-long immutable cache. Nothing to configure.
+
+- The first page needing a set downloads it. Run the command at deploy time to spare that first visitor the wait, and to learn right away if the server cannot reach Google:
+
+  ```bash
+  php bin/console iw-sulu:theme:fonts-download
+  ```
+
+- The files live next to the compiled theme CSS, in `var/cache/iw_sulu_tailwind_theme/fonts/`, outside the Symfony cache: `cache:clear` keeps them. A theme changing its fonts gets a new set.
+- When the files cannot be fetched (no network from the server, read-only disk), the page keeps the Google stylesheet, a warning is logged, and the download is not retried for an hour.
+- To keep loading the fonts from Google:
+
+  ```yaml
+  itech_world_sulu_tailwind_theme:
+      fonts:
+          self_host: false
+  ```
 
 ### Restricting what the iframe block may embed (optional)
 
@@ -698,7 +718,7 @@ Add the theme functions to your `templates/base.html.twig`:
 | Function | Returns |
 |----------|---------|
 | `iw_sulu_tailwind_theme_css_path()` | Web path to the compiled theme CSS |
-| `iw_sulu_tailwind_theme_fonts_link()` | `<link>` tags for Google Fonts |
+| `iw_sulu_tailwind_theme_fonts_link()` | `<link>` tag for the theme's Google fonts, served by the site |
 | `iw_sulu_tailwind_theme_menu_config()` | Menu configuration array |
 | `iw_sulu_tailwind_theme_footer_config()` | Footer configuration array |
 | `iw_sulu_tailwind_theme_tokens()` | Full design tokens array |
@@ -743,6 +763,9 @@ php bin/adminconsole iw-sulu:theme:import theme.json --replace=corporate
 
 # Sync the Google Fonts catalog (requires API key)
 php bin/adminconsole iw-sulu:theme:sync-fonts
+
+# Download the Google fonts of every theme, for the site to serve them (deploy time)
+php bin/console iw-sulu:theme:fonts-download
 
 # Migrate from isActive to multi-webspace (upgrade from previous version)
 php bin/adminconsole iw-sulu:theme:migrate-webspaces
@@ -843,7 +866,7 @@ SuluTailwindThemeBundle/
 │   └── services.yaml       # Service definitions
 ├── src/
 │   ├── Admin/              # ThemeAdmin, WebspaceThemeAdmin (navigation, views, security)
-│   ├── Command/            # CLI commands (install, compile, sync-fonts, migrate-webspaces, check)
+│   ├── Command/            # CLI commands (install, compile, sync-fonts, fonts-download, migrate-webspaces, check)
 │   ├── Controller/Admin/   # REST API controllers (themes, webspace-theme assignment)
 │   ├── DataFixtures/       # Preset theme fixtures
 │   ├── Entity/             # ThemeConfig, WebspaceTheme Doctrine entities

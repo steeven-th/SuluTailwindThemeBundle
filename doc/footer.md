@@ -33,6 +33,7 @@ To disable the bundle footer entirely, simply leave the footer block out of your
 | **Tagline** | (`columns` / `centered`) Short description shown under the brand. |
 | **Show social media** | Show social icons, loaded from the `iw_theme_footer_social_media_links` snippet area. |
 | **Copyright text** | Copyright line. Use `{year}` to insert the current year. Empty generates `© <year> <site name>`. |
+| **“Manage cookies” link** | A button after the copyright that reopens the cookie manager. When the manager does not answer (blocked by a browser extension), the visitor reads why. Without a manager it forgets the choices made on consent placeholders. Hidden when `consent.mode` is `none`. See [Consent](consent.md#the-manage-cookies-button). |
 
 ## Colors
 

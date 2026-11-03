@@ -766,6 +766,8 @@
     "iw_sulu_tailwind_theme.footer_displaySocialMedia_info": "Loads links from the \"Social media (footer)\" snippet",
     "iw_sulu_tailwind_theme.footer_copyright": "Copyright text",
     "iw_sulu_tailwind_theme.footer_copyright_info": "Use {year} to insert the current year. Empty = generated from the site name",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink": "“Manage cookies” link",
+    "iw_sulu_tailwind_theme.footer_displayConsentLink_info": "Adds a link after the copyright to reopen the cookie manager. If a browser extension blocks it, the visitor sees a message instead of a button that does nothing.",
 
     "iw_sulu_tailwind_theme.menu_panelLayout": "Panel",
     "iw_sulu_tailwind_theme.menu_panelLayout_info": "Full screen, or on a side at a set width with the page dimmed behind it",
@@ -1556,6 +1558,9 @@
     "iw_sulu_tailwind_theme.components_section_page_hero": "Page hero",
     "iw_sulu_tailwind_theme.components_section_page_hero_info": "Appearance of the page banner (height, title placement, veil, parallax, breadcrumb). The content - image, title, subtitle - is set per page in the page's Hero section.",
     "iw_sulu_tailwind_theme.image_avif": "Serve images as AVIF",
+    "iw_sulu_tailwind_theme.components_section_consent": "Consent",
+    "iw_sulu_tailwind_theme.components_consent_image": "Picture of waiting content",
+    "iw_sulu_tailwind_theme.components_consent_image_info": "Background shown behind the message of videos, maps and external content until the visitor agrees. A picture chosen on a block wins.",
     "iw_sulu_tailwind_theme.components_section_sharing": "Sharing",
     "iw_sulu_tailwind_theme.components_section_sharing_info": "How pages look when shared on social networks (Open Graph, Twitter Card).",
     "iw_sulu_tailwind_theme.components_share_default_image": "Default share image",

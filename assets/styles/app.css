@@ -6170,6 +6170,35 @@ aside .iw-toc {
     flex: 1 1 auto;
 }
 
+/* A map waiting for consent: this box carries the size the map would have,
+   so the page does not move when it appears, and holds the placeholder over
+   it. The min-height keeps the placeholder readable where the map takes its
+   height from a flex column. */
+.iw-location-map-consent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--iw-location-map-consent-min-height, 16rem);
+}
+
+.iw-location-map-consent > .iw-location-map {
+    flex: 1 1 auto;
+}
+
+.iw-location-map-consent > .iw-location-map[hidden] {
+    display: none;
+}
+
+.iw-block-location__map-col .iw-location-map-consent {
+    flex: 1 1 auto;
+}
+
+.iw-embed__consent-details {
+    margin: 0;
+    font-size: var(--iw-embed-consent-details-size, 0.875rem);
+    opacity: var(--iw-embed-consent-details-opacity, 0.8);
+}
+
 .iw-location-map .leaflet-container {
     font: inherit;
     background: var(--iw-location-map-tile-bg, #e8e8e8);

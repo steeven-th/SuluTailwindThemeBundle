@@ -81,9 +81,10 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `--iw-embed-consent-padding` | `1.5rem` | Inner padding. |
 | `--iw-embed-consent-gap` | `1rem` | Space between message and button. |
 | `--iw-embed-consent-max-width` | `36rem` | Max width of the message column. |
-| `--iw-embed-consent-image-opacity` | `0.35` | Opacity of the background visual. |
+| `--iw-embed-consent-image-opacity` | `0.35` | Opacity of the background visual, the block's or the one set for the site in **Default settings > Blocks > Consent**. |
 | `--iw-embed-consent-text-size` | `0.9375rem` | Message font size. |
 | `--iw-embed-consent-text-line-height` | `1.5` | Message line height. |
+| `--iw-embed-consent-details-size` / `-opacity` | `0.875rem` / `0.8` | Line under the message, the address of a waiting map. |
 | `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring. |
 
 > **The button has no colors of its own.** It carries the theme's `.iw-button--primary`, so it inherits the configured background, text color, radius, padding and hover effect — and stays consistent with every other button on the site. Restyle it through the theme's button settings, or by overriding `.iw-button--primary`.

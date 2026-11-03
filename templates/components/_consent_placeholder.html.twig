@@ -1,0 +1,46 @@
+{# Consent placeholder - what a third-party embed shows until it is allowed.
+   Shared by the embedded frame (iframe and code blocks, video widget) and the
+   location map. Must sit inside an element carrying the `consent` controller.
+
+   Expected variables:
+     - service: the service key, `embed` when empty
+     - serviceLabel: name shown to the visitor, the service key when omitted
+     - consentMode: 'placeholder' or 'delegated', picks the button label
+     - consentText: editor text replacing the default one
+     - consentImage: optional media `{id}`, a decorative background. Falls
+       back to the picture set for the whole site in the theme (Default
+       settings > Blocks), then to none
+     - consentButtonStyle: theme button style, the variant one by default
+     - details: optional line under the text (the address of a map)
+#}
+{% set consentImage = consentImage.id|default(null) is not null
+    ? consentImage
+    : iw_sulu_tailwind_theme.components_consentImage|default(null) %}
+<div class="iw-embed__consent" data-consent-target="placeholder">
+    {% if consentImage|default(null) is not null and consentImage.id|default(null) is not null %}
+        {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
+        {# A media deleted from the library resolves to null: the consent
+           panel stays, it just loses its illustration. #}
+        {% if consentMedia is not null %}
+            <img src="{{ consentMedia.url }}" alt="" loading="lazy" class="iw-embed__consent-image">
+        {% endif %}
+    {% endif %}
+
+    <div class="iw-embed__consent-body">
+        <p class="iw-embed__consent-text">
+            {{ consentText|default('') is not empty
+                ? consentText
+                : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': serviceLabel|default(service|default('embed'))}) }}
+        </p>
+        {% if details|default('') is not empty %}
+            <p class="iw-embed__consent-details">{{ details|nl2br }}</p>
+        {% endif %}
+        {# Reuses the theme's button style so the placeholder matches
+           every other button on the site, variant included. #}
+        <button type="button" class="iw-embed__consent-button {{ consentButtonStyle|default('') ? 'iw-button--' ~ consentButtonStyle : 'iw-button--variant' }}" data-action="consent#accept">
+            {{ (consentMode|default('placeholder') == 'delegated'
+                ? 'iw_sulu_tailwind_theme.consent_open_preferences'
+                : 'iw_sulu_tailwind_theme.consent_load')|trans }}
+        </button>
+    </div>
+</div>

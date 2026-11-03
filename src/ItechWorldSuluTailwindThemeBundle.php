@@ -106,6 +106,15 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
                     ->defaultValue([])
                     ->info('Button style slugs the project CSS depends on. Reported by iw-sulu:theme:compile and iw:tailwind-theme:check when a theme lacks one')
                 ->end()
+                ->arrayNode('fonts')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('self_host')
+                            ->defaultTrue()
+                            ->info('Serve the Google fonts of the theme from the site instead of fonts.googleapis.com, which receives the IP address of every visitor. Falls back to Google when the files cannot be fetched. Run iw-sulu:theme:fonts-download at deploy time to fetch them ahead of the first page')
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
             ->append($this->titleEditorNode(true))
             ->append($this->blocksNode(true))
@@ -697,6 +706,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.required_button_styles',
             $config['required_button_styles'],
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.fonts.self_host',
+            $config['fonts']['self_host'],
         );
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.title_editor',

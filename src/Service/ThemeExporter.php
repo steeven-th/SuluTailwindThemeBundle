@@ -67,6 +67,7 @@ class ThemeExporter
         'footerConfig_logo',
         'components_backToTopIconMedia',
         'components_mapsMarkerMedia',
+        'components_consentImage',
         'components_shareDefaultImage',
     ];
 

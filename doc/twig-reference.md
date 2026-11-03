@@ -72,13 +72,18 @@ around it - a gap, a wrapper - without rendering it twice.
 
 ### `iw_sulu_tailwind_theme_fonts_link()`
 
-Returns HTML `<link>` tags for Google Fonts preconnect and stylesheet.
+Returns the `<link>` tag loading the Google fonts of the theme. The site serves them itself (see [Google fonts served by the site](../README.md#google-fonts-served-by-the-site)), so no request reaches Google:
 
 ```twig
 {{ iw_sulu_tailwind_theme_fonts_link()|raw }}
 ```
 
-**Returns:** `string` (HTML safe) — e.g.:
+**Returns:** `string` (HTML safe), e.g.:
+```html
+<link rel="stylesheet" href="/iw-theme/fonts/3a8969a28eeaa4fe.css">
+```
+
+With `fonts.self_host: false`, or while the files cannot be fetched, it falls back to Google's stylesheet and its two preconnects:
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -136,5 +136,29 @@
                 </property>
             </properties>
         </section>
+
+        <!--
+            What a third-party embed or a map shows while it waits for consent.
+            Only the picture is set here: a text typed in this form would be
+            the same in every language of the site, so the waiting message
+            stays a translation, which a project overrides in its own
+            translation files (doc/consent.md).
+        -->
+        <section name="consentPlaceholder">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_consent</title>
+            </meta>
+            <properties>
+                <property name="components_consentImage" type="single_media_selection" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_consent_image</title>
+                        <info_text>iw_sulu_tailwind_theme.components_consent_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
     </properties>
 </form>
