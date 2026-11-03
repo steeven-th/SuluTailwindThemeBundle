@@ -45,7 +45,7 @@ Every other controller in this bundle is registered `lazy`, and for good reason:
 
 ### When you can skip the controller
 
-It is needed as soon as one embed waits for consent: a YouTube or Vimeo video always does, and an iframe or code block does unless **Load without waiting for consent** is ticked. Only a site set to `consent.mode: none` (see below) can leave the controller out of `controllers.json`. Leave it out anywhere else and the placeholder button does nothing.
+It is needed as soon as one embed waits for consent: a YouTube or Vimeo video and a map always do, and an iframe or code block does unless **Load without waiting for consent** is ticked. Only a site set to `consent.mode: none` (see below) can leave the controller out of `controllers.json`. Leave it out anywhere else and the placeholder button does nothing.
 
 ---
 
@@ -174,6 +174,19 @@ The placeholder settings are derived:
 | **Waiting image** | The widget's **Preview image**, when one is set. The protection does not depend on it. |
 
 A hosted video file is served by the site itself, contacts no third party, and plays without any placeholder.
+
+## Maps
+
+Every tile of a Leaflet map is a request to the tile server, with the visitor's IP address. A map therefore waits like a video, with no field for it, and the site's `consent.mode` alone applies, `none` included. While it waits, the Leaflet controller is not even attached: the `consent` controller attaches `location-map` once the service is granted, and detaches it on revoke, which tears the map down.
+
+| Placeholder setting | On a map |
+|-------|------|
+| **Service name** | The tile server actually contacted, from **Components > Maps** of the theme: `openstreetmap`, `carto` (Voyager, Positron and Dark Matter), or `maps` for a custom tile URL. Declare that key in your manager. Changing the provider changes the key, so the manager asks again for the new third party. |
+| **Waiting message** | The default one, naming the provider. The address of the place stays readable under it: it is content, not a third party. |
+
+A custom tile server of your own contacts no third party either, but the bundle cannot tell it from Mapbox or MapTiler, so it waits as `maps`. On a site whose only third party is such a server, grant `maps` from your adapter at startup.
+
+The same `controller` value lets any third-party script wait the same way: put it on an element with `data-controller="consent"`, and the controller you name is attached to the `frame` target on consent.
 
 ---
 
@@ -320,5 +333,5 @@ A manager loaded late, typically by Google Tag Manager, relays the visitor's cho
 ## What this does not cover
 
 - **Cookies already set.** Revoking unloads the frame and stops further requests; deleting what the third party already stored is your manager's job.
-- **Other third-party calls from the bundle.** Leaflet map tiles and Google Fonts are not wired to this mechanism yet.
+- **Google Fonts.** A font is not a consent matter: blocking it would break the page. The bundle serves the fonts itself instead, see the fonts settings.
 - **The rest of your site.** The contract is public: any custom embed can use `data-controller="consent"` with the same values and benefit from the same plumbing.

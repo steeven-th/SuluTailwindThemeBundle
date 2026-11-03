@@ -45,12 +45,13 @@ async function page(storedServices = [], queue = undefined) {
     return {
         store,
         stored: () => JSON.parse(store.get('iw-consent') ?? '[]'),
-        mount(service, mode, remember = true) {
-            const frame = { hidden: true, attributes: {}, setAttribute(k, v) { this.attributes[k] = v; }, getAttribute(k) { return this.attributes[k] ?? null; }, removeAttribute(k) { delete this.attributes[k]; } };
+        mount(service, mode, remember = true, controller = '') {
+            const frame = { hidden: true, dataset: {}, attributes: {}, setAttribute(k, v) { this.attributes[k] = v; }, getAttribute(k) { return this.attributes[k] ?? null; }, removeAttribute(k) { delete this.attributes[k]; } };
             const embed = Object.assign(new Embed(), {
                 serviceValue: service,
                 modeValue: mode,
-                srcValue: `https://${service}.example/embed`,
+                srcValue: controller ? '' : `https://${service}.example/embed`,
+                controllerValue: controller,
                 srcdocValue: '',
                 rememberValue: remember,
                 hasFrameTarget: true,
@@ -60,6 +61,7 @@ async function page(storedServices = [], queue = undefined) {
             });
             embed.connect();
             embed.loaded = () => frame.getAttribute('src') !== null;
+            embed.frame = frame;
 
             return embed;
         },
@@ -195,6 +197,18 @@ await scenario('the manage button forgets placeholder choices without a manager'
     expect(embed.loaded(), 'setup');
     p.button('placeholder').preferences();
     expect(!embed.loaded() && p.stored().length === 0, 'the choice survived');
+});
+
+await scenario('a map starts only once its tile server is granted, and stops on revoke', async () => {
+    const p = await page();
+    const map = p.mount('openstreetmap', 'delegated', true, 'location-map');
+    expect(map.frame.dataset.controller === undefined && map.frame.hidden, 'the map started before consent');
+    window.iwConsent.grant('openstreetmap');
+    expect(map.frame.dataset.controller === 'location-map' && !map.frame.hidden, 'the map did not start');
+    window.iwConsent.grant('openstreetmap');
+    expect(map.frame.dataset.controller === 'location-map', 'the controller was attached twice');
+    window.iwConsent.revoke('openstreetmap');
+    expect(map.frame.dataset.controller === undefined && map.frame.hidden, 'the map kept running');
 });
 
 process.exit(failures ? 1 : 0);

@@ -224,6 +224,10 @@ export default class extends Controller {
         // same reason as `src`: an inline document runs the moment it lands on
         // the element, and it is usually the pasted markup that calls out.
         srcdoc: String,
+        // A Stimulus controller attached to the frame on consent, for a
+        // third party that is not a URL to load but code to start: the map
+        // gets `location-map` here, so Leaflet asks for no tile before.
+        controller: String,
         remember: { type: Boolean, default: true },
         // Messages of the "Manage cookies" button, translated server-side.
         unavailable: String,
@@ -366,6 +370,13 @@ export default class extends Controller {
             frame.setAttribute('srcdoc', this.srcdocValue);
         }
 
+        if (this.controllerValue) {
+            const attached = (frame.dataset.controller || '').split(' ').filter(Boolean);
+            if (!attached.includes(this.controllerValue)) {
+                frame.dataset.controller = [...attached, this.controllerValue].join(' ');
+            }
+        }
+
         frame.hidden = false;
 
         if (this.hasPlaceholderTarget) {
@@ -388,6 +399,17 @@ export default class extends Controller {
 
         frame.removeAttribute('src');
         frame.removeAttribute('srcdoc');
+
+        // Detaching the controller disconnects it, which tears the map down.
+        if (this.controllerValue) {
+            const remaining = (frame.dataset.controller || '').split(' ').filter((name) => name && name !== this.controllerValue);
+            if (remaining.length) {
+                frame.dataset.controller = remaining.join(' ');
+            } else {
+                delete frame.dataset.controller;
+            }
+        }
+
         frame.hidden = true;
 
         if (this.hasPlaceholderTarget) {

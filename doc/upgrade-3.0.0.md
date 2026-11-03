@@ -2714,3 +2714,20 @@ around the same two defaults. They change.
 
 The adapters of [Consent](consent.md#adapters) are updated, and gain
 vanilla-cookieconsent and Axeptio loaded by Google Tag Manager.
+
+## Maps wait for consent (new)
+
+A Leaflet map no longer requests tiles as the page shows. Unless the site's
+`consent.mode` is `none`, it shows the consent placeholder, with the address
+under it, and starts once its tile server is granted: `openstreetmap`, `carto`,
+or `maps` for a custom tile URL.
+
+- A site with a cookie manager declares that key in it, as it does `youtube`.
+  Until then, its maps stay on the placeholder (the click loads them for the
+  page view when the manager does not take it).
+- The wrapper `.iw-location-map-consent` takes the sizing classes of the map
+  while it waits. A project CSS rule sizing `.iw-location-map` from outside
+  should size the wrapper too.
+- The placeholder markup moved to `components/_consent_placeholder.html.twig`,
+  shared by embeds and maps. Its classes are unchanged.
+

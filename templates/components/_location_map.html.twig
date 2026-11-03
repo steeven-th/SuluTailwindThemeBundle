@@ -12,6 +12,14 @@
      - address: optional formatted (multi-line) address shown in the popup
      - mapClass: optional sizing classes (height / aspect-ratio utilities)
      - popup: optional, set false to disable the POI popup (default: true)
+
+   Consent: every tile is a request to the tile server, carrying the visitor's
+   IP address. Unless the site's `consent.mode` is `none`, the map waits: the
+   Leaflet controller is only attached once the service is granted (the
+   `consent` controller adds it), so not a single tile is asked for before.
+   The service key names the third party actually contacted: `openstreetmap`,
+   `carto`, or `maps` for a custom tile server. The address stays readable
+   in the placeholder: it is content, not a third party.
 #}
 {% if location is defined and location.lat is defined and location.long is defined %}
     {# Tile presets — keyless providers only. The custom provider lets users
@@ -29,11 +37,18 @@
     {% if mapsProvider == 'custom' and iw_sulu_tailwind_theme.components_mapsCustomTileUrl|default('') is not empty %}
         {% set tileUrl = iw_sulu_tailwind_theme.components_mapsCustomTileUrl %}
         {% set tileAttribution = iw_sulu_tailwind_theme.components_mapsCustomAttribution|default(osmAttribution) %}
+        {% set consentService = 'maps' %}
+        {% set consentServiceLabel = 'iw_sulu_tailwind_theme.consent_map_provider'|trans %}
     {% else %}
-        {% set tilePreset = tilePresets[mapsProvider]|default(tilePresets.osm) %}
+        {% set mapsProvider = tilePresets[mapsProvider] is defined ? mapsProvider : 'osm' %}
+        {% set tilePreset = tilePresets[mapsProvider] %}
         {% set tileUrl = tilePreset.url %}
         {% set tileAttribution = tilePreset.attribution %}
+        {% set consentService = mapsProvider == 'osm' ? 'openstreetmap' : 'carto' %}
+        {% set consentServiceLabel = mapsProvider == 'osm' ? 'OpenStreetMap' : 'CARTO' %}
     {% endif %}
+    {% set consentMode = iw_sulu_tailwind_theme_consent_mode() %}
+    {% set needsConsent = consentMode != 'none' %}
 
     {% set zoom = location.zoom|default(15) %}
     {% set externalUrl = 'https://www.openstreetmap.org/?mlat=' ~ location.lat ~ '&mlon=' ~ location.long ~ '#map=' ~ zoom ~ '/' ~ location.lat ~ '/' ~ location.long %}
@@ -62,10 +77,24 @@
         ? iw_sulu_tailwind_theme_icon(markerIconName, 'solid', {'aria-hidden': 'true'})
         : '' %}
 
-    <div class="iw-location-map {{ mapClass|default('') }}"
+    {% if needsConsent %}
+    <div class="iw-location-map-consent {{ mapClass|default('') }}"
+         role="region"
+         aria-label="{{ mapLabel }}"
+         data-controller="consent"
+         data-consent-service-value="{{ consentService }}"
+         data-consent-mode-value="{{ consentMode }}"
+         data-consent-controller-value="location-map">
+    {% endif %}
+    <div class="iw-location-map{{ needsConsent ? '' : ' ' ~ mapClass|default('') }}"
+         {% if needsConsent %}
+         data-consent-target="frame"
+         hidden
+         {% else %}
          role="region"
          aria-label="{{ mapLabel }}"
          data-controller="location-map"
+         {% endif %}
          data-location-map-lat-value="{{ location.lat }}"
          data-location-map-lng-value="{{ location.long }}"
          data-location-map-zoom-value="{{ zoom }}"
@@ -92,4 +121,13 @@
             </a>
         </noscript>
     </div>
+    {% if needsConsent %}
+        {% include '@ItechWorldSuluTailwindTheme/components/_consent_placeholder.html.twig' with {
+            service: consentService,
+            serviceLabel: consentServiceLabel,
+            consentMode: consentMode,
+            details: address|default(''),
+        } only %}
+    </div>
+    {% endif %}
 {% endif %}
