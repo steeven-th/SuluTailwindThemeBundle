@@ -8,9 +8,11 @@ namespace ItechWorld\SuluTailwindThemeBundle\Content\Migration;
  * Moves the free-text location of an event onto the venue field.
  *
  * The `iw_event` template used to store its venue as a plain string in
- * `location`. That field is now Sulu's `location` type, and the venue name has
- * a text field of its own, `venue`. The former text becomes the venue and the
- * location is left empty: the editor then searches the address in it.
+ * `location`. That field is now Sulu's `location` type, whose title names the
+ * place. Until an address is searched, the name lives in `venue`, a text
+ * field the admin shows only while the location is empty. The former text
+ * becomes the venue and the location is left empty: the editor then searches
+ * the address and types the name in its title.
  *
  * Sulu's admin cannot open a location value without coordinates: it draws
  * the map of any value that is not null, and Leaflet throws on a missing

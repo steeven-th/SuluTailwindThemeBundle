@@ -45,7 +45,7 @@
     } %}
 {% elseif not isOnline and (content.venue|default('')|trim is not empty or content.location|default(null) is iterable) %}
     {% set place = content.location|default(null) is iterable ? content.location : {} %}
-    {% set placeName = content.venue|default('')|trim ?: place.title|default('')|trim %}
+    {% set placeName = place.title|default('')|trim ?: content.venue|default('')|trim %}
     {% set street = [place.number|default('')|trim, place.street|default('')|trim]|filter(v => v is not empty)|join(' ') %}
     {% set postalAddress = {
         '@type': 'PostalAddress',

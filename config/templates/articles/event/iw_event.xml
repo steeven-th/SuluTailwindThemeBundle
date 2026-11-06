@@ -53,8 +53,11 @@
                     </meta>
                 </property>
 
+                <!-- A stand-in for the title of the location until the address
+                     is searched: Sulu's admin cannot hold a location without
+                     coordinates, so a venue name alone has to live here. -->
                 <property name="venue" type="text_line" colspan="12"
-                          visibleCondition="isOnline == false OR isOnline == null">
+                          visibleCondition="(isOnline == false OR isOnline == null) AND location == null">
                     <meta>
                         <title>iw_sulu_tailwind_theme.article.event_venue</title>
                         <info_text>iw_sulu_tailwind_theme.article.event_venue_info</info_text>

@@ -15,10 +15,10 @@ use Twig\TwigFunction;
 /**
  * Where an event takes place, on the page and in its structured data.
  *
- * The venue name and the address are two fields: a venue whose address was
- * never searched still has a name, while its location stays empty, since
- * Sulu's admin cannot open a location without coordinates. Coordinates are
- * printed only when the address search gave some, never made up.
+ * The title of the searched address names the place. A venue whose address
+ * was never searched keeps its name in the venue field, since Sulu's admin
+ * cannot open a location without coordinates. Coordinates are printed only
+ * when the address search gave some, never made up.
  */
 final class EventVenueRenderTest extends TestCase
 {
@@ -51,13 +51,13 @@ final class EventVenueRenderTest extends TestCase
     }
 
     /**
-     * The address search fills the title of the location with the full
-     * address: the venue field keeps the name the visitor knows.
+     * Once the address is searched, its title names the place, and the venue
+     * typed before, hidden in the admin by then, no longer shows.
      */
     #[Test]
-    public function aSearchedAddressKeepsTheVenueAsItsName(): void
+    public function aSearchedAddressIsNamedByItsTitle(): void
     {
-        $content = ['venue' => 'CCI de Tarbes', 'location' => self::SEARCHED, 'showMapLink' => true];
+        $content = ['venue' => 'Former name', 'location' => ['title' => 'CCI de Tarbes'] + self::SEARCHED, 'showMapLink' => true];
 
         $place = $this->jsonLd($content)['location'];
         self::assertSame('CCI de Tarbes', $place['name']);
@@ -66,17 +66,17 @@ final class EventVenueRenderTest extends TestCase
 
         $card = $this->card($content);
         self::assertStringContainsString('<span class="iw-event-info__location">CCI de Tarbes</span>', $card);
+        self::assertStringNotContainsString('Former name', $card);
         self::assertStringContainsString('8 Rue Jean Baylet', $card);
         self::assertStringContainsString('mlat=43.2328&amp;mlon=0.0781', $card);
     }
 
     #[Test]
-    public function withoutAVenueTheTitleOfTheLocationNamesThePlace(): void
+    public function aSearchedAddressWithoutTitleFallsBackOnTheVenue(): void
     {
-        self::assertSame(
-            '8 Rue Jean Baylet, 65000 Tarbes, France',
-            $this->jsonLd(['location' => self::SEARCHED])['location']['name'],
-        );
+        $content = ['venue' => 'CCI de Tarbes', 'location' => ['title' => ''] + self::SEARCHED];
+
+        self::assertSame('CCI de Tarbes', $this->jsonLd($content)['location']['name']);
     }
 
     #[Test]

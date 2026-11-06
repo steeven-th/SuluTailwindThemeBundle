@@ -74,14 +74,15 @@ In a template of your own, print an event date for machines with [`iw_sulu_tailw
 
 ## Venue
 
-A venue is two fields:
+The venue is Sulu's `location` field, labelled **Address**: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. Its **Title** is the name of the place. The search fills it with the full address it found, so the editor replaces it with the venue name ("CCI de Tarbes").
 
-- **Venue**, a text field, is the name of the place ("CCI de Tarbes").
-- **Address** is Sulu's `location` field: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. The search fills the title of the location with the full address it found. The page reads that title as the name only when **Venue** is empty.
+**Venue**, a text field, holds the name while no address is searched. The admin shows it only then: once an address is chosen, it hides and the title of the address names the place. A cleared address brings it back. This is how a migrated event keeps its name before anyone searches its address.
 
 The event page shows the name, then the address. **Show a link to the map** adds a "View on the map" link to OpenStreetMap under it, when the location has coordinates. A venue whose address was never searched shows its name alone, with no link: the bundle never makes up coordinates.
 
 A location is either searched or empty. Sulu's admin draws the map of any location value it gets, and a value without coordinates makes Leaflet throw (`Invalid LatLng object`), which leaves the event form blank. Content written in SQL must follow the same rule: put the name in `venue` and leave `location` null.
+
+The zoom and the town are what the search returned. The search stores a zoom of 1 and sometimes no town: the editor sets them in the address window.
 
 In the structured data, the venue is a `Place`:
 

@@ -74,7 +74,8 @@ class EventLocationMigrateCommand extends Command
                 The former text becomes the venue name, and the location is left
                 empty. Open each event afterwards and search its address in the
                 Address field, so the page shows it and search engines can place
-                the event.
+                the event. Put the venue name in the Title of the address: it
+                names the place once the address is chosen.
 
                 A project migrated by an earlier version of this command has
                 locations without coordinates, which the admin cannot open. The
@@ -170,7 +171,7 @@ class EventLocationMigrateCommand extends Command
         }
 
         $io->success(\sprintf('%d event row(s) migrated.', \count($moved)));
-        $io->writeln('  Search each address in the Address field to add it and the coordinates.');
+        $io->writeln('  Search each address in the Address field, then put the venue name in its Title.');
 
         if (null !== $this->cacheManager && $this->cacheManager->supportsClear()) {
             $this->cacheManager->clear();

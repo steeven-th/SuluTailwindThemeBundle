@@ -2533,11 +2533,13 @@ The table of contents reads `--iw-toc-border-width` the same way. A full
 ## Event venue becomes a Sulu location (breaking, content)
 
 The **Location** of an `iw_event` article was a free-text line, which gave search
-engines a name and no address. It is now two fields: **Venue**, a text field
-for the name of the place (`venue`), and **Address**, Sulu's `location` field:
-an address search with a map, storing the street, postal code, town, country
-and coordinates. The event page shows the address under the venue name, and
-the structured data carries a `PostalAddress` and `GeoCoordinates`.
+engines a name and no address. It is now Sulu's `location` field, labelled
+**Address**: an address search with a map, storing the street, postal code,
+town, country and coordinates. The title of the address is the name of the
+place. **Venue** (`venue`), a text field, holds the name while no address is
+searched, and hides in the admin once one is. The event page shows the address
+under the name, and the structured data carries a `PostalAddress` and
+`GeoCoordinates`.
 
 A ticked **Show a link to the map** adds a "View on the map" link (OpenStreetMap)
 under the address, when the location has coordinates. It is off by default.
@@ -2565,7 +2567,8 @@ lives in `var/share/<env>/http_cache`, which a container restart keeps when
 The structured data then reads the venue as both the name and the address, which
 is enough to clear the Search Console warning. To show a real address and
 coordinates, open each event and search its address in the **Address** field.
-The venue name stays as it is.
+The search fills the title of the address with the full address: replace it
+with the venue name, which **Venue** stops showing once the address is chosen.
 
 #### Events migrated by an earlier version of the command
 
@@ -2596,10 +2599,9 @@ php bin/console iw-sulu:theme:migrate-event-location --template=iw_event --templ
 `articles/common/_event_info_card.html.twig` now receives `venue`, the name of
 the place, `location` as a Sulu location value or null rather than a string,
 and a new `showMapLink` flag. An override printing `{{ location }}` prints an
-array: print `venue`, falling back on `location.title`, and
+array: print `location.title`, falling back on `venue`, and
 `iw_sulu_tailwind_theme_location_address(location)` for the address. An
-override of `seo/_jsonld_event.html.twig` reads the name from `content.venue`
-the same way.
+override of `seo/_jsonld_event.html.twig` reads the name the same way.
 
 ## Events get a price and a registration link (new)
 

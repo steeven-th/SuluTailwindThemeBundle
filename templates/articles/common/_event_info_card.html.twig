@@ -5,7 +5,7 @@
     - startDate: DateTimeInterface (required)
     - endDate: DateTimeInterface or null
     - isOnline: bool
-    - venue: string, the name of the place
+    - venue: string, the name of the place while no address is searched
     - location: Sulu location value (title, street, number, code, town, country, lat, long, zoom) or null
     - locationUrl: string (online event URL)
     - showMapLink: bool, adds a "View on the map" link when the location has coordinates
@@ -36,10 +36,11 @@
     Override via --iw-event-info-{bg,blur,padding,radius,shadow,gap,icon-color,online-badge-bg,online-badge-text}.
 #}
 {% set isOnline = isOnline is defined ? isOnline : false %}
-{# The venue field names the place. The title of the location stands in for
-   it on an event typed before that field existed. #}
+{# The title of the location names the place. The venue field stands in for
+   it while no address is searched, which is how a migrated event keeps its
+   name. #}
 {% set place = location is defined and location is iterable ? location : {} %}
-{% set placeName = venue|default('')|trim ?: place.title|default('')|trim %}
+{% set placeName = place.title|default('')|trim ?: venue|default('')|trim %}
 {% set placeAddress = iw_sulu_tailwind_theme_location_address(place) %}
 {% set placeHasCoordinates = place.lat|default(null) is not null and place.long|default(null) is not null %}
 
