@@ -67,6 +67,9 @@ const granted = new Set();
  */
 const stored = new Set();
 
+/** @type {Set<string>} Undeclared services already reported on this page. */
+const reported = new Set();
+
 /**
  * Read persisted consents.
  *
@@ -245,6 +248,7 @@ export default class extends Controller {
         }
 
         instances.add(this);
+        this.reportUndeclared();
 
         if ('none' === this.modeValue || window.iwConsent.isGranted(this.serviceValue) || this.wasAcceptedBefore()) {
             this.load();
@@ -264,6 +268,30 @@ export default class extends Controller {
 
     disconnect() {
         instances.delete(this);
+    }
+
+    /**
+     * Say once per page when a cookie manager will never grant this content.
+     *
+     * The placeholder carries `data-consent-declared="false"` when the site
+     * keeps a third-party services inventory that does not list the service.
+     * A manager fed from that inventory has no switch for it, so the content
+     * stays blocked whatever the visitor accepts, and nothing on screen says
+     * why. Only `delegated` mode depends on a manager: the bundle's own
+     * placeholder loads any service it is clicked for.
+     */
+    reportUndeclared() {
+        if ('delegated' !== this.modeValue || reported.has(this.serviceValue)) {
+            return;
+        }
+
+        if (this.hasPlaceholderTarget && 'false' === this.placeholderTarget.dataset?.consentDeclared) {
+            reported.add(this.serviceValue);
+            console.warn(
+                `[iw-consent] Content waits on the service "${this.serviceValue}", which the third-party services snippet does not list. `
+                + 'A cookie manager fed from that snippet will never grant it. See doc/consent.md.',
+            );
+        }
     }
 
     /**

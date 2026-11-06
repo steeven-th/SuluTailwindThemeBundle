@@ -113,7 +113,35 @@ final class PerWebspaceConfigTest extends TestCase
     #[Test]
     public function consentDefaultsToTheBundlePlaceholder(): void
     {
-        $this->assertSame(['mode' => 'placeholder'], $this->processConfig([[]])['consent']);
+        $this->assertSame(['mode' => 'placeholder', 'services' => []], $this->processConfig([[]])['consent']);
+    }
+
+    /**
+     * A cookie manager matches the key character for character: "my-tool"
+     * must not reach it as "my_tool".
+     */
+    #[Test]
+    public function projectServicesKeepTheirKeyAsWritten(): void
+    {
+        $config = $this->processConfig([['consent' => ['services' => [
+            'my-tool' => ['label' => 'My Tool', 'company' => 'My Tool SAS', 'policy' => 'https://my-tool.example/privacy'],
+        ]]]]);
+
+        $this->assertSame(
+            ['my-tool' => ['label' => 'My Tool', 'company' => 'My Tool SAS', 'policy' => 'https://my-tool.example/privacy']],
+            $config['consent']['services'],
+        );
+    }
+
+    /**
+     * The keys are the choices of a select in the admin, which has no site.
+     */
+    #[Test]
+    public function aSiteCannotDeclareItsOwnServices(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([['webspaces' => ['client-a' => ['consent' => ['services' => ['calendly' => []]]]]]]);
     }
 
     /**

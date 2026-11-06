@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Command;
 
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
+use ItechWorld\SuluTailwindThemeBundle\Consent\ConsentServiceAudit;
 use ItechWorld\SuluTailwindThemeBundle\Content\Migration\ButtonFieldAudit;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
@@ -63,6 +64,7 @@ class ThemeCheckCommand extends Command
         private readonly RequiredButtonStyles $requiredButtonStyles,
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
+        private readonly ?ConsentServiceAudit $consentServiceAudit = null,
     ) {
         parent::__construct();
     }
@@ -211,6 +213,24 @@ class ThemeCheckCommand extends Command
                 array_sum($pendingButtons) . ' content row(s) in the old shape, not rendered. Run iw-sulu:theme:migrate-buttons.',
             ];
             $hasErrors = true;
+        }
+
+        // ── Check: service keys the admin no longer offers ──
+        // A key typed while the field was free text keeps working on the
+        // site, but the field shows empty in the admin until it is declared.
+        $unknownServices = $this->consentServiceAudit?->findUnknownKeys() ?? [];
+        if ([] === $unknownServices) {
+            $checks[] = ['<fg=green>✓</>', 'Consent services', 'Every service key in use is offered by the admin'];
+        } else {
+            $checks[] = [
+                '<fg=yellow>!</>',
+                'Consent services',
+                implode(', ', array_map(
+                    static fn (string $key, int $rows): string => \sprintf('%s (%d)', $key, $rows),
+                    array_keys($unknownServices),
+                    $unknownServices,
+                )) . ': typed into iframe or code blocks, not declared. Add them under itech_world_sulu_tailwind_theme.consent.services, or the admin shows the field empty.',
+            ];
         }
 
         // ── Check: button styles the theme of their site does not define ──

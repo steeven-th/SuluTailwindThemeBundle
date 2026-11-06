@@ -60,6 +60,9 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `.iw-embed__consent-image` | Decorative background visual. `pointer-events: none` so it never swallows the button click. |
 | `.iw-embed__consent-body` | Text + button wrapper. |
 | `.iw-embed__consent-text` | Explanatory message. |
+| `.iw-embed__consent-details` | Line under the message, the address of a waiting map. |
+| `.iw-embed__consent-provider` | Who receives the data and under which policy, from the [third-party services inventory](../../consent.md#the-third-party-services-inventory). Absent for a service nothing describes. |
+| `.iw-embed__consent-company` / `.iw-embed__consent-policy` | The company, and the link to its privacy policy (new tab). |
 | `.iw-embed__consent-button` | Accept / open-preferences button. |
 
 ---
@@ -85,6 +88,7 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `--iw-embed-consent-text-size` | `0.9375rem` | Message font size. |
 | `--iw-embed-consent-text-line-height` | `1.5` | Message line height. |
 | `--iw-embed-consent-details-size` / `-opacity` | `0.875rem` / `0.8` | Line under the message, the address of a waiting map. |
+| `--iw-embed-consent-provider-size` / `-opacity` | `0.8125rem` / `0.8` | Line naming the company and its policy. |
 | `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring. |
 
 > **The button has no colors of its own.** It carries the theme's `.iw-button--primary`, so it inherits the configured background, text color, radius, padding and hover effect — and stays consistent with every other button on the site. Restyle it through the theme's button settings, or by overriding `.iw-button--primary`.

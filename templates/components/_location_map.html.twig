@@ -38,14 +38,12 @@
         {% set tileUrl = iw_sulu_tailwind_theme.components_mapsCustomTileUrl %}
         {% set tileAttribution = iw_sulu_tailwind_theme.components_mapsCustomAttribution|default(osmAttribution) %}
         {% set consentService = 'maps' %}
-        {% set consentServiceLabel = 'iw_sulu_tailwind_theme.consent_map_provider'|trans %}
     {% else %}
         {% set mapsProvider = tilePresets[mapsProvider] is defined ? mapsProvider : 'osm' %}
         {% set tilePreset = tilePresets[mapsProvider] %}
         {% set tileUrl = tilePreset.url %}
         {% set tileAttribution = tilePreset.attribution %}
         {% set consentService = mapsProvider == 'osm' ? 'openstreetmap' : 'carto' %}
-        {% set consentServiceLabel = mapsProvider == 'osm' ? 'OpenStreetMap' : 'CARTO' %}
     {% endif %}
     {% set consentMode = iw_sulu_tailwind_theme_consent_mode() %}
     {% set needsConsent = consentMode != 'none' %}
@@ -124,7 +122,6 @@
     {% if needsConsent %}
         {% include '@ItechWorldSuluTailwindTheme/components/_consent_placeholder.html.twig' with {
             service: consentService,
-            serviceLabel: consentServiceLabel,
             consentMode: consentMode,
             details: address|default(''),
         } only %}

@@ -6199,6 +6199,24 @@ aside .iw-toc {
     opacity: var(--iw-embed-consent-details-opacity, 0.8);
 }
 
+/* Who receives the data, and under which policy. Same voice as the details
+   line, the link keeps the text colour so it reads on any variant. */
+.iw-embed__consent-provider {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
+    font-size: var(--iw-embed-consent-provider-size, 0.8125rem);
+    opacity: var(--iw-embed-consent-provider-opacity, 0.8);
+}
+
+.iw-embed__consent-policy {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
 .iw-location-map .leaflet-container {
     font: inherit;
     background: var(--iw-location-map-tile-bg, #e8e8e8);

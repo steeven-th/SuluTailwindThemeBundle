@@ -181,12 +181,16 @@
                         <param name="default_value" value="false"/>
                     </params>
                 </property>
-                <property name="consentService" type="text_line" colspan="6"
+                <property name="consentService" type="single_select" colspan="6"
                           visibleCondition="__parent.loadWithoutConsent != true">
                     <meta>
                         <title>iw_sulu_tailwind_theme.consent_service</title>
                         <info_text>iw_sulu_tailwind_theme.consent_service_info</info_text>
                     </meta>
+                    <params>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.third_party_services').getSelectValues(true)"/>
+                    </params>
                 </property>
                 <property name="consentText" type="text_area"
                           visibleCondition="__parent.loadWithoutConsent != true">

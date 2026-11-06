@@ -29,7 +29,7 @@
        is the site's `consent.mode` setting, not the caller's choice
      - consentService, consentText, consentImage: placeholder configuration
      - consentServiceLabel: name shown to the visitor in the default text,
-       the service key when omitted
+       the one of the third-party services inventory when omitted
      - frameClass: extra classes (radius…)
 #}
 {# The block only says whether the embed waits. The mechanism belongs to the
@@ -152,7 +152,7 @@
     {% if needsConsent %}
         {% include '@ItechWorldSuluTailwindTheme/components/_consent_placeholder.html.twig' with {
             service: service,
-            serviceLabel: consentServiceLabel|default(service),
+            serviceLabel: consentServiceLabel|default(''),
             consentMode: consentMode,
             consentText: consentText|default(''),
             consentImage: consentImage|default(null),

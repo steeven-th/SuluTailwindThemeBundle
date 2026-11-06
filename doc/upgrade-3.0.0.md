@@ -2759,3 +2759,32 @@ a video preview image picking its own keeps it. The texts stay translations, so
 they follow the page language: reword them in the project's
 `translations/messages.<locale>.json`, see
 [Consent](consent.md#the-placeholder-for-the-whole-site).
+
+## A third-party services inventory, and a list for the service of a block (new, changed)
+
+The consent placeholder now names the company receiving the visitor's data
+and links its privacy policy. YouTube, Vimeo, OpenStreetMap and CARTO come
+described, a project describes its own services, and editors complete them per
+locale in the new **Third-party services** snippet. See
+[Consent](consent.md#the-third-party-services-inventory).
+
+- **The Service name field of the iframe and code blocks is now a list.** It
+  offers the bundle's keys, the ones of `consent.services`, and **Other
+  third-party content** (`embed`). A key typed before keeps working on the
+  site, but shows empty in the admin until it is declared. Run
+  `php bin/console iw:tailwind-theme:check`: the **Consent services** row
+  names the undeclared keys, declare each one under
+  `itech_world_sulu_tailwind_theme.consent.services`.
+- **A custom tile server** (`maps`) is named in the placeholder as "the map
+  provider" until the project describes it under `consent.services.maps`.
+- **A generic embed** reads "provided by a third-party service" instead of
+  showing the `embed` key.
+- **A project adapter** feeding its manager a list of services written in
+  JavaScript can read it from the snippet with
+  `iw_sulu_tailwind_theme_third_party_services()`, and drop its own check of
+  undeclared services: in `delegated` mode the bundle logs one in the console.
+- **A template override** of `components/_consent_placeholder.html.twig`
+  should take the new `.iw-embed__consent-provider` line and the
+  `data-consent-declared` attribute of the placeholder. The video widget and
+  the map no longer pass a `serviceLabel`: the name comes from the inventory.
+

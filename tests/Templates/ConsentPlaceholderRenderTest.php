@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Consent\ThirdPartyServices;
+use ItechWorld\SuluTailwindThemeBundle\Twig\ConsentExtension;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
@@ -54,6 +56,7 @@ final class ConsentPlaceholderRenderTest extends TestCase
         $loader->addPath(\dirname(__DIR__, 2) . '/templates', 'ItechWorldSuluTailwindTheme');
 
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
+        $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addGlobal('iw_sulu_tailwind_theme', ['components_consentImage' => $themeImage]);
         $twig->addGlobal('app', ['request' => ['locale' => 'en']]);
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (int $id): array => ['url' => "/media/{$id}.jpg"]));

@@ -45,7 +45,7 @@ async function page(storedServices = [], queue = undefined) {
     return {
         store,
         stored: () => JSON.parse(store.get('iw-consent') ?? '[]'),
-        mount(service, mode, remember = true, controller = '') {
+        mount(service, mode, remember = true, controller = '', declared = undefined) {
             const frame = { hidden: true, dataset: {}, attributes: {}, setAttribute(k, v) { this.attributes[k] = v; }, getAttribute(k) { return this.attributes[k] ?? null; }, removeAttribute(k) { delete this.attributes[k]; } };
             const embed = Object.assign(new Embed(), {
                 serviceValue: service,
@@ -57,7 +57,7 @@ async function page(storedServices = [], queue = undefined) {
                 hasFrameTarget: true,
                 frameTarget: frame,
                 hasPlaceholderTarget: true,
-                placeholderTarget: { hidden: false },
+                placeholderTarget: { hidden: false, dataset: declared === undefined ? {} : { consentDeclared: String(declared) } },
             });
             embed.connect();
             embed.loaded = () => frame.getAttribute('src') !== null;
@@ -209,6 +209,23 @@ await scenario('a map starts only once its tile server is granted, and stops on 
     expect(map.frame.dataset.controller === 'location-map', 'the controller was attached twice');
     window.iwConsent.revoke('openstreetmap');
     expect(map.frame.dataset.controller === undefined && map.frame.hidden, 'the map kept running');
+});
+
+await scenario('content on a service the inventory lacks is reported once, under a manager only', async () => {
+    const warnings = [];
+    const warn = console.warn;
+    console.warn = (message) => warnings.push(message);
+    try {
+        const p = await page();
+        p.mount('calendly', 'delegated', true, '', false);
+        p.mount('calendly', 'delegated', true, '', false);
+        p.mount('youtube', 'delegated', true, '', true);
+        p.mount('vimeo', 'delegated');
+        p.mount('typeform', 'placeholder', true, '', false);
+        expect(warnings.length === 1 && warnings[0].includes('"calendly"'), `warned ${JSON.stringify(warnings)}`);
+    } finally {
+        console.warn = warn;
+    }
 });
 
 process.exit(failures ? 1 : 0);
