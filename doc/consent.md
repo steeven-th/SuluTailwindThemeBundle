@@ -155,7 +155,7 @@ In the block's **Settings** section:
 | Field | Role |
 |-------|------|
 | **Load without waiting for consent** | Unchecked (the default), the embed waits for consent the way the site is configured. Tick it only for content that sets no tracker, such as a page of your own site. |
-| **Service name** | The key tying this embed to your manager (`youtube`, `calendly`, `maps`…). Free text - use the same value your adapter passes to `grant()`. |
+| **Service name** | The key tying this embed to your manager, picked from a list: the keys of the bundle (`youtube`, `vimeo`, `openstreetmap`, `carto`, `maps`), the ones the project declares in `consent.services` (see [the inventory](#the-third-party-services-inventory)), and **Other third-party content** for anything else. A list rather than free text, since the manager matches the key character for character. |
 | **Waiting message** | Text shown in place of the content. A sensible default is used when empty. |
 | **Waiting image** | Optional background visual for the placeholder. Empty, the site-wide picture applies (see below). |
 
@@ -189,6 +189,63 @@ A custom tile server of your own contacts no third party either, but the bundle 
 
 The same `controller` value lets any third-party script wait the same way: put it on an element with `data-controller="consent"`, and the controller you name is attached to the `frame` target on consent.
 
+## The third-party services inventory
+
+Before agreeing, a visitor is owed the name of the company that receives their data and its privacy policy, not only "third-party content". The bundle keeps that inventory, so the placeholder can say it and an adapter can hand it to its manager.
+
+**The bundle's services** come described: YouTube (Google Ireland Limited), Vimeo (Vimeo.com, Inc.), OpenStreetMap (OpenStreetMap Foundation) and CARTO (CartoDB Inc.), each with its policy. A site filling nothing already shows them under the placeholder text:
+
+```
+Data sent to Google Ireland Limited    Privacy policy
+```
+
+**The project's services** are declared in the configuration. Each one becomes a choice of the **Service name** field of the iframe and code blocks, and of the snippet below:
+
+```yaml
+# config/packages/itech_world_sulu_tailwind_theme.yaml
+itech_world_sulu_tailwind_theme:
+    consent:
+        services:
+            calendly:
+                label: Calendly
+                company: Calendly LLC
+                policy: https://calendly.com/privacy
+            # A custom tile URL waits as "maps": name its provider here
+            maps:
+                label: Mapbox
+                company: Mapbox, Inc.
+                policy: https://www.mapbox.com/legal/privacy
+```
+
+The keys are kept as written (`my-tool` stays `my-tool`). The setting is project-wide only: the keys are the choices of a list in the admin, which has no site to read an override from.
+
+**The "Third-party services" snippet** is what editors fill, per locale, and assign to the **Third-party services (consent)** area of each site. Each entry picks a service and may set its displayed name, company, privacy policy, cookies and purpose. An empty field keeps the value of the bundle or of the project. Listing a service there also **declares** it: see the console check below.
+
+### Feeding a cookie manager from the inventory
+
+A manager that shows its own list of services in its panel (vanilla-cookieconsent, Klaro, Tarteaucitron) can take it from the snippet rather than from a copy kept in JavaScript:
+
+```twig
+{# templates/cookie-consent.html.twig of the project #}
+<div {{ stimulus_controller('cookie-consent', {
+    services: iw_sulu_tailwind_theme_third_party_services(),
+}) }}></div>
+```
+
+`iw_sulu_tailwind_theme_third_party_services()` returns the services the snippet lists, in its order, in the language of the page: `key`, `label`, `company`, `policy`, `cookies`, `purpose`. Empty when no snippet is assigned. A manager configured in its own dashboard (Axeptio, Didomi, Cookiebot) already holds this list and has no use for it.
+
+### Content on a service the inventory lacks
+
+When a site assigns the snippet, each placeholder says whether the snippet lists its service (`data-consent-declared`). In `delegated` mode, content waiting on an unlisted service logs once per page:
+
+```
+[iw-consent] Content waits on the service "calendly", which the third-party services snippet does not list.
+```
+
+A manager fed from the snippet has no switch for that service, so the content would stay blocked whatever the visitor accepts. A site without the snippet logs nothing.
+
+`iw:tailwind-theme:check` reports the other gap: a key typed into an iframe or code block while the field was free text, and not declared in `consent.services`. It keeps working on the site, but the admin shows the field empty until the key is declared.
+
 ## The placeholder for the whole site
 
 **Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's preview image, that picks its own keeps it.
@@ -204,7 +261,7 @@ The same `controller` value lets any third-party script wait the same way: put i
 }
 ```
 
-`%service%` is the provider's name. A message typed in the theme admin would read the same in every language of the site, which is why the theme only offers the picture. An editor can still write a block's own **Waiting message**, in the language of the page being edited.
+`%service%` is the provider's name, taken from [the inventory](#the-third-party-services-inventory), or "a third-party service" for a generic embed. The line naming the company and its policy uses `iw_sulu_tailwind_theme.consent_data_recipient` and `iw_sulu_tailwind_theme.consent_privacy_policy`. A message typed in the theme admin would read the same in every language of the site, which is why the theme only offers the picture. An editor can still write a block's own **Waiting message**, in the language of the page being edited.
 
 **Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
 
@@ -215,7 +272,7 @@ The same `controller` value lets any third-party script wait the same way: put i
 Every adapter below does the same four things:
 
 1. Relays the manager's state on every page, grant or revoke for each service, through the initialised queue.
-2. Uses the manager's own service names as the bundle's service keys, so a block's **Service name** must match the name declared in the manager exactly (`youtube`, `vimeo`, `openstreetmap`...).
+2. Uses the manager's own service names as the bundle's service keys, so a block's **Service name** must match the name declared in the manager exactly (`youtube`, `vimeo`, `openstreetmap`...). A key the bundle does not set is declared in `consent.services`.
 3. Opens the manager when the visitor asks, from a placeholder (`iw:consent-request`) or from the footer's **Manage cookies** button (`iw:consent-preferences`), and cancels the event only when the manager is loaded.
 4. Lives in the project's JavaScript, versioned with the site, even when the manager itself is loaded by a tag manager.
 
@@ -255,7 +312,9 @@ onAsk((event) => {
 ```js
 import * as CookieConsent from 'vanilla-cookieconsent';
 
-const services = ['youtube', 'vimeo', 'openstreetmap']; // the services of your "thirdparty" category
+// The services of your "thirdparty" category, written here or read from the
+// inventory snippet (see "Feeding a cookie manager from the inventory")
+const services = ['youtube', 'vimeo', 'openstreetmap'];
 const sync = () => {
     const accepted = CookieConsent.getUserPreferences().acceptedServices.thirdparty ?? [];
     services.forEach((service) => relay(service, accepted.includes(service)));

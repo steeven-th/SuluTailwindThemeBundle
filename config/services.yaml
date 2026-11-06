@@ -161,6 +161,14 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
 
+    # Service keys typed into iframe and code blocks that the admin no longer
+    # offers, reported by the check command.
+    itech_world.sulu_tailwind_theme.consent_service_audit:
+        class: ItechWorld\SuluTailwindThemeBundle\Consent\ConsentServiceAudit
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.third_party_services'
+
     # Buttons naming a style their site's theme does not define, reported by
     # the check command.
     itech_world.sulu_tailwind_theme.button_style_audit:
@@ -339,6 +347,23 @@ services:
             $enabled: '%itech_world_sulu_tailwind_theme.fonts.self_host%'
             $httpClient: '@?http_client'
             $logger: '@?logger'
+
+    # The third parties the embeds wait on. Public: the service fields of
+    # the admin read their choices through an expression,
+    # service('itech_world.sulu_tailwind_theme.third_party_services').
+    itech_world.sulu_tailwind_theme.third_party_services:
+        class: ItechWorld\SuluTailwindThemeBundle\Consent\ThirdPartyServices
+        public: true
+        arguments:
+            $projectServices: '%itech_world_sulu_tailwind_theme.consent.services%'
+            $translator: '@?translator'
+
+    ItechWorld\SuluTailwindThemeBundle\Consent\ThirdPartyServices: '@itech_world.sulu_tailwind_theme.third_party_services'
+
+    ItechWorld\SuluTailwindThemeBundle\Twig\ConsentExtension:
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.third_party_services'
+        tags: ['twig.extension']
 
     ItechWorld\SuluTailwindThemeBundle\Controller\Website\FontController:
         arguments:
@@ -539,6 +564,7 @@ services:
             - '@itech_world.sulu_tailwind_theme.required_button_styles'
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
+            - '@itech_world.sulu_tailwind_theme.consent_service_audit'
         tags:
             - { name: 'console.command' }
 

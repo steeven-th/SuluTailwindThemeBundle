@@ -52,7 +52,7 @@
 * **Article blocks**: 3 article-specific blocks for pages — article list (grid/list/cards), article carousel, article featured (hero/side-by-side/spotlight)
 * **Accordion / FAQ block**: built on native `<details>`/`<summary>` — keyboard operation, the expanded state announced to screen readers and "one item open at a time" all work **without JavaScript**. Optional schema.org `FAQPage` markup and deep links to a single answer
 * **External embeds**: an iframe block with server-side URL validation (https only, no credentials, optional host allowlist), a sandbox that never lets an embed redirect your page, and per-block camera/microphone/geolocation opt-in
-* **Third-party consent**: consent-gated embeds carry **no `src` at all** until allowed — no request, no cookie, no IP disclosed. Driven by a neutral `window.iwConsent` API that plugs into any cookie manager in three lines (adapters documented for Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi)
+* **Third-party consent**: consent-gated embeds carry **no `src` at all** until allowed: no request, no cookie, no IP disclosed. Driven by a neutral `window.iwConsent` API that plugs into any cookie manager in three lines (adapters documented for Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi). Each placeholder names the company receiving the data and links its privacy policy, from a third-party services inventory editors complete per locale
 * **Code / widget block**: paste a third-party widget; it runs sandboxed by default, with the theme stylesheet injected and self-sizing so it looks and behaves native. Unsandboxed execution is a project-level opt-in, never an editor decision
 * **Server-side article filtering**: the article listing page filters, sorts and paginates articles from the URL query string (`?category=&tag=&q=&sort=&page=`) — SEO-friendly, shareable URLs, works without JavaScript. A left filter sidebar (search, sort, category/tag checkboxes) lets visitors refine the list within the editorial scope defined by the admin in the smart_content.
 * **Site-wide cards**: configure surface, title/text/badge colors, title and text sizes, border (width + style), padding, image ratio and composable hover effects (card transform, image effect, shadow, border color, duration, easing) from the admin **Components → Cards** section (applies to every card)
@@ -450,6 +450,7 @@ What can be overridden:
 | `title_editor.blocks` / `title_editor.pages` | yes | Read by the admin field for the site being edited |
 | `turnstile.site_key` / `turnstile.secret_key` | yes | One project, several Cloudflare accounts |
 | `consent.mode` | yes | One site may run a cookie manager, its neighbour not. See [Consent](doc/consent.md#choosing-the-mechanism-one-setting-for-the-site) |
+| `consent.services` | no | Its keys are the choices of a list in the admin, which has no site to read an override from. See [Consent](doc/consent.md#the-third-party-services-inventory) |
 | `events.timezone` | yes | Sites of one project may sit in different zones. See [Events](doc/events.md#timezone) |
 | `events.currency` | yes | Sites of one project may sell in different currencies. See [Events](doc/events.md#price-and-registration) |
 | `turnstile.enabled` | no | It decides whether the field type is registered in the form builder, once for the whole admin |
@@ -840,7 +841,7 @@ The theme compiles design tokens into **CSS custom properties** and exposes data
 | [Tailwind Integration](doc/tailwind-integration.md) | Theme bridge setup, available tokens, custom colors, manual setup, Tailwind 4.x compatibility |
 | [Custom Integration Guide](doc/custom-integration.md) | Custom CSS, Twig components, block templates, PHP services |
 | [Extending the theme configuration](doc/extensibility.md) | Adding your own admin fields (`custom_*` namespaces) and contributing CSS through `ThemeCompileEvent` |
-| [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
+| [Consent](doc/consent.md) | Third-party embeds that load nothing until allowed: the `window.iwConsent` contract, the third-party services inventory, and ready-made adapters (Axeptio, Tarteaucitron, Klaro, Cookiebot, Didomi) |
 | [Code block security](doc/code-block-security.md) | What the sandbox protects against and what it costs, the `allow_unsandboxed` opt-in, and what you accept by enabling it |
 | [Form block](doc/form-block.md) | SuluFormBundle mode vs custom Twig template, the shipped bridge template and how to override it, handling a submission on a cached page with `FormSubmissionHandler`, dev-only diagnostics |
 | [Cloudflare Turnstile](doc/turnstile.md) | Opt-in anti-spam field for SuluFormBundle forms: install, keys, test keys, light/dark handling |

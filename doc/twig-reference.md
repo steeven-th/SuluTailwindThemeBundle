@@ -908,6 +908,41 @@ so a block only says whether its content waits. See [Consent](consent.md).
 
 ---
 
+### `iw_sulu_tailwind_theme_third_party_services()`
+
+The services the **Third-party services** snippet of the current site lists, in
+its order and in the language of the page, each described by the bundle, the
+`consent.services` setting and the snippet. For an adapter feeding a cookie
+manager that shows the list in its own panel. Empty when no snippet is assigned
+to the `iw_theme_third_party_services` area. See
+[Consent](consent.md#the-third-party-services-inventory).
+
+```twig
+<div {{ stimulus_controller('cookie-consent', {
+    services: iw_sulu_tailwind_theme_third_party_services(),
+}) }}></div>
+```
+
+**Returns:** `array` - a list of `{key, label, company, policy, cookies, purpose}`
+
+---
+
+### `iw_sulu_tailwind_theme_third_party_service(key)`
+
+What to tell a visitor about one service, as the consent placeholder does: the
+same fields, plus `declared`, which says whether the snippet lists it (`null`
+when the site assigns no snippet). A service nothing describes gets its key as
+label and empty fields.
+
+```twig
+{% set youtube = iw_sulu_tailwind_theme_third_party_service('youtube') %}
+{{ youtube.company }} {# Google Ireland Limited #}
+```
+
+**Returns:** `array` - `{key, label, company, policy, cookies, purpose, declared}`
+
+---
+
 ### `iw_sulu_tailwind_theme_search_url()`
 
 The search page URL of the current site, or `null` when the project did not wire

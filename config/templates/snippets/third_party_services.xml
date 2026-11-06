@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<!--
+    The third-party services of a site: who receives the visitor's data when a
+    video, a map or an embed loads, and under which policy.
+
+    Read by the consent placeholder, which names the company and links its
+    policy, and by a project adapter feeding a cookie manager that shows the
+    list itself (iw_sulu_tailwind_theme_third_party_services(), see
+    doc/consent.md). The texts are translated the way every snippet is, one
+    version per locale.
+
+    The service is a choice, not a typed key: the cookie manager matches it
+    character for character, and a typo would keep the content blocked for good.
+-->
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>iw_theme_third_party_services</key>
+
+    <meta>
+        <title>iw_sulu_tailwind_theme.snippet.third_party_services</title>
+    </meta>
+
+    <areas>
+        <area key="iw_theme_third_party_services">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet.third_party_services_area</title>
+            </meta>
+        </area>
+    </areas>
+
+    <properties>
+        <xi:include href="../fragments/snippet-area-notice.xml"
+                    xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
+
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title>iw_sulu_tailwind_theme.snippet_title</title>
+            </meta>
+            <tag name="sulu.node.name"/>
+        </property>
+
+        <block name="services" default-type="service" minOccurs="0">
+            <meta>
+                <title>iw_sulu_tailwind_theme.third_party_services</title>
+                <info_text>iw_sulu_tailwind_theme.third_party_services_info</info_text>
+            </meta>
+
+            <types>
+                <type name="service">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.third_party_service</title>
+                    </meta>
+                    <properties>
+                        <property name="service" type="single_select" mandatory="true" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_key</title>
+                                <info_text>iw_sulu_tailwind_theme.third_party_service_key_info</info_text>
+                            </meta>
+                            <params>
+                                <param name="values" type="expression"
+                                       value="service('itech_world.sulu_tailwind_theme.third_party_services').getSelectValues()"/>
+                            </params>
+                        </property>
+
+                        <property name="label" type="text_line" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_label</title>
+                                <info_text>iw_sulu_tailwind_theme.third_party_service_label_info</info_text>
+                            </meta>
+                        </property>
+
+                        <property name="company" type="text_line" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_company</title>
+                                <info_text>iw_sulu_tailwind_theme.third_party_service_company_info</info_text>
+                            </meta>
+                        </property>
+
+                        <property name="policy" type="url" colspan="6">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_policy</title>
+                            </meta>
+                            <params>
+                                <param name="defaults" type="collection">
+                                    <param name="scheme" value="https://"/>
+                                </param>
+                                <param name="schemes" type="collection">
+                                    <param name="https://"/>
+                                    <param name="http://"/>
+                                </param>
+                            </params>
+                        </property>
+
+                        <property name="cookies" type="text_line">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_cookies</title>
+                                <info_text>iw_sulu_tailwind_theme.third_party_service_cookies_info</info_text>
+                            </meta>
+                        </property>
+
+                        <property name="purpose" type="text_area">
+                            <meta>
+                                <title>iw_sulu_tailwind_theme.third_party_service_purpose</title>
+                                <info_text>iw_sulu_tailwind_theme.third_party_service_purpose_info</info_text>
+                            </meta>
+                        </property>
+                    </properties>
+                </type>
+            </types>
+        </block>
+    </properties>
+</template>

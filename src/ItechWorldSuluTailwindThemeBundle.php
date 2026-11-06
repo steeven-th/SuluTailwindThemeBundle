@@ -344,6 +344,24 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
 
         if ($withDefaults) {
             $mode->defaultValue('placeholder');
+
+            // Project-wide only: the keys are the choices of a select in the
+            // admin, which has no site to read an override from.
+            $node->children()
+                ->arrayNode('services')
+                    ->info('Third-party services of the project, besides the ones the bundle sets (youtube, vimeo, openstreetmap, carto, maps). Each becomes a choice of the service fields of the admin. The label, company and privacy policy are what the placeholder shows until the "Third-party services" snippet says otherwise. Name the provider of a custom tile server under "maps".')
+                    ->useAttributeAsKey('key')
+                    // A service key is matched character for character by
+                    // the cookie manager, "my-tool" must not become "my_tool".
+                    ->normalizeKeys(false)
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('label')->defaultNull()->info('Name shown to the visitor and in the admin, the key when empty')->end()
+                            ->scalarNode('company')->defaultNull()->info('Legal entity receiving the data')->end()
+                            ->scalarNode('policy')->defaultNull()->info('URL of its privacy policy')->end()
+                        ->end()
+                    ->end()
+                ->end();
         }
 
         return $node;
@@ -738,6 +756,10 @@ class ItechWorldSuluTailwindThemeBundle extends AbstractBundle
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.settings_by_webspace',
             $config['webspaces'],
+        );
+        $container->parameters()->set(
+            'itech_world_sulu_tailwind_theme.consent.services',
+            $config['consent']['services'],
         );
         $container->parameters()->set(
             'itech_world_sulu_tailwind_theme.turnstile.enabled',

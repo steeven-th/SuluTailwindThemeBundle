@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Consent\ThirdPartyServices;
+use ItechWorld\SuluTailwindThemeBundle\Twig\ConsentExtension;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
@@ -281,6 +283,7 @@ final class VideoWidgetRenderTest extends TestCase
         $loader = new FilesystemLoader();
         $loader->addPath(self::root() . '/templates', 'ItechWorldSuluTailwindTheme');
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
+        $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addFunction(new TwigFunction(
             'sulu_resolve_media',
             static fn (int $id): array => ['url' => '/media/' . $id, 'thumbnails' => []],

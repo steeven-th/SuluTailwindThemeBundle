@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Consent\ThirdPartyServices;
+use ItechWorld\SuluTailwindThemeBundle\Twig\ConsentExtension;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -134,6 +136,7 @@ final class EmbedConsentContractTest extends TestCase
         $loader = new FilesystemLoader();
         $loader->addPath(self::root() . '/templates', 'ItechWorldSuluTailwindTheme');
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
+        $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addFilter(new TwigFilter('trans', static fn (string $key): string => $key));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => $siteMode));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));

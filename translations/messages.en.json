@@ -78,6 +78,7 @@
     "iw_sulu_tailwind_theme.error.search_placeholder": "What are you looking for?",
     "iw_sulu_tailwind_theme.error.search_submit": "Search",
     "iw_sulu_tailwind_theme.consent_default_text": "This content is provided by %service%. By displaying it, you agree that this service may set cookies and collect your browsing data.",
+    "iw_sulu_tailwind_theme.consent_generic_provider": "a third-party service",
     "iw_sulu_tailwind_theme.consent_map_provider": "the map provider",
     "iw_sulu_tailwind_theme.consent_load": "Display the content",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Manage my preferences",
@@ -100,5 +101,7 @@
     "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile is enabled but no site key is configured: no widget is rendered, while the server-side check keeps running - every submission will be refused. Check the environment variable behind itech_world_sulu_tailwind_theme.turnstile.site_key.",
     "iw_sulu_tailwind_theme.timeline_state_done": "Step completed",
     "iw_sulu_tailwind_theme.timeline_state_current": "Step in progress",
-    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Upcoming step"
+    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Upcoming step",
+    "iw_sulu_tailwind_theme.consent_data_recipient": "Data sent to %company%",
+    "iw_sulu_tailwind_theme.consent_privacy_policy": "Privacy policy"
 }

@@ -4,7 +4,8 @@
 
    Expected variables:
      - service: the service key, `embed` when empty
-     - serviceLabel: name shown to the visitor, the service key when omitted
+     - serviceLabel: name shown to the visitor, the one of the third-party
+       services inventory when omitted (doc/consent.md)
      - consentMode: 'placeholder' or 'delegated', picks the button label
      - consentText: editor text replacing the default one
      - consentImage: optional media `{id}`, a decorative background. Falls
@@ -13,10 +14,20 @@
      - consentButtonStyle: theme button style, the variant one by default
      - details: optional line under the text (the address of a map)
 #}
+{# What the visitor is owed before agreeing: who receives their data, and
+   under which policy. A generic embed names no one, there is no one to name. #}
+{% set service = service|default('') is not empty ? service : 'embed' %}
+{% set serviceInfo = service != 'embed' ? iw_sulu_tailwind_theme_third_party_service(service) : null %}
+{% set serviceLabel = serviceLabel|default('') is not empty
+    ? serviceLabel
+    : (serviceInfo is not null ? serviceInfo.label : 'iw_sulu_tailwind_theme.consent_generic_provider'|trans) %}
 {% set consentImage = consentImage.id|default(null) is not null
     ? consentImage
     : iw_sulu_tailwind_theme.components_consentImage|default(null) %}
-<div class="iw-embed__consent" data-consent-target="placeholder">
+{# data-consent-declared tells the controller whether the inventory lists
+   the service, so it can report one a cookie manager will never grant. #}
+<div class="iw-embed__consent" data-consent-target="placeholder"
+     {%- if serviceInfo is not null and serviceInfo.declared is not null %} data-consent-declared="{{ serviceInfo.declared ? 'true' : 'false' }}"{% endif %}>
     {% if consentImage|default(null) is not null and consentImage.id|default(null) is not null %}
         {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
         {# A media deleted from the library resolves to null: the consent
@@ -30,10 +41,20 @@
         <p class="iw-embed__consent-text">
             {{ consentText|default('') is not empty
                 ? consentText
-                : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': serviceLabel|default(service|default('embed'))}) }}
+                : 'iw_sulu_tailwind_theme.consent_default_text'|trans({'%service%': serviceLabel}) }}
         </p>
         {% if details|default('') is not empty %}
             <p class="iw-embed__consent-details">{{ details|nl2br }}</p>
+        {% endif %}
+        {% if serviceInfo.company|default('') is not empty or serviceInfo.policy|default('') is not empty %}
+            <p class="iw-embed__consent-provider">
+                {% if serviceInfo.company is not empty %}
+                    <span class="iw-embed__consent-company">{{ 'iw_sulu_tailwind_theme.consent_data_recipient'|trans({'%company%': serviceInfo.company}) }}</span>
+                {% endif %}
+                {% if serviceInfo.policy is not empty %}
+                    <a class="iw-embed__consent-policy" href="{{ serviceInfo.policy }}" target="_blank" rel="noopener noreferrer">{{ 'iw_sulu_tailwind_theme.consent_privacy_policy'|trans }}</a>
+                {% endif %}
+            </p>
         {% endif %}
         {# Reuses the theme's button style so the placeholder matches
            every other button on the site, variant included. #}

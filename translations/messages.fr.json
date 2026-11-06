@@ -78,6 +78,7 @@
     "iw_sulu_tailwind_theme.error.search_placeholder": "Que cherchez-vous ?",
     "iw_sulu_tailwind_theme.error.search_submit": "Rechercher",
     "iw_sulu_tailwind_theme.consent_default_text": "Ce contenu est fourni par %service%. En l'affichant, vous acceptez que ce service dépose des cookies et collecte vos données de navigation.",
+    "iw_sulu_tailwind_theme.consent_generic_provider": "un service tiers",
     "iw_sulu_tailwind_theme.consent_map_provider": "le fournisseur de la carte",
     "iw_sulu_tailwind_theme.consent_load": "Afficher le contenu",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Gérer mes préférences",
@@ -100,5 +101,7 @@
     "iw_sulu_tailwind_theme.turnstile_key_missing": "Cloudflare Turnstile est activé mais aucune clé de site n'est configurée : le widget ne s'affiche pas, alors que la vérification serveur continue de tourner - tous les envois seront refusés. Vérifiez la variable d'environnement derrière itech_world_sulu_tailwind_theme.turnstile.site_key.",
     "iw_sulu_tailwind_theme.timeline_state_done": "Étape terminée",
     "iw_sulu_tailwind_theme.timeline_state_current": "Étape en cours",
-    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Étape à venir"
+    "iw_sulu_tailwind_theme.timeline_state_upcoming": "Étape à venir",
+    "iw_sulu_tailwind_theme.consent_data_recipient": "Données transmises à %company%",
+    "iw_sulu_tailwind_theme.consent_privacy_policy": "Politique de confidentialité"
 }
