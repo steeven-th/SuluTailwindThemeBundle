@@ -53,6 +53,14 @@
                     </meta>
                 </property>
 
+                <property name="venue" type="text_line" colspan="12"
+                          visibleCondition="isOnline == false OR isOnline == null">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.article.event_venue</title>
+                        <info_text>iw_sulu_tailwind_theme.article.event_venue_info</info_text>
+                    </meta>
+                </property>
+
                 <property name="location" type="location" colspan="12"
                           visibleCondition="isOnline == false OR isOnline == null">
                     <meta>

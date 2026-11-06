@@ -5,29 +5,35 @@ declare(strict_types=1);
 namespace ItechWorld\SuluTailwindThemeBundle\Content\Migration;
 
 /**
- * Moves the free-text location of an event onto a Sulu location value.
+ * Moves the free-text location of an event onto the venue field.
  *
- * The `iw_event` template used to store its venue as a plain string, which
- * gave search engines a name and no address. The field is now Sulu's
- * `location` type. The former text becomes the title of that value, with
- * every other key present and empty, the shape Sulu stores for a location
- * nobody has searched yet. The editor then opens the field and searches the
- * address to fill in the rest and the coordinates.
+ * The `iw_event` template used to store its venue as a plain string in
+ * `location`. That field is now Sulu's `location` type, and the venue name has
+ * a text field of its own, `venue`. The former text becomes the venue and the
+ * location is left empty: the editor then searches the address in it.
  *
- * A value that is already a location, or that is missing, is left alone,
- * which is what lets the command run twice.
+ * Sulu's admin cannot open a location value without coordinates: it draws
+ * the map of any value that is not null, and Leaflet throws on a missing
+ * latitude, which blanks the whole form. A location is therefore either
+ * searched, with coordinates, or null. An earlier version of this migration
+ * stored the former text as the title of a location with every other key
+ * null. Such a value is repaired the same way: its title becomes the venue
+ * and the location is emptied.
+ *
+ * A venue already typed is never overwritten. A location with coordinates, or
+ * no location at all, is left alone, which is what lets the command run twice.
  */
 final class EventLocationMigrator
 {
     /**
-     * The template field holding the venue.
+     * The template field holding the address.
      */
     public const FIELD = 'location';
 
     /**
-     * Every key Sulu's location type stores, in its own order.
+     * The template field holding the venue name.
      */
-    private const LOCATION_KEYS = ['title', 'street', 'number', 'code', 'town', 'country', 'lat', 'long', 'zoom'];
+    public const VENUE_FIELD = 'venue';
 
     /**
      * Migrate the template data of one event row.
@@ -38,19 +44,51 @@ final class EventLocationMigrator
      */
     public function migrate(array $data): ?array
     {
-        if (!\array_key_exists(self::FIELD, $data) || !\is_string($data[self::FIELD])) {
+        $location = $data[self::FIELD] ?? null;
+
+        if (\is_string($location)) {
+            $name = \trim($location);
+        } elseif (\is_array($location) && !$this->hasCoordinates($location)) {
+            $name = $this->nameOf($location);
+        } else {
             return null;
         }
 
-        $title = \trim($data[self::FIELD]);
+        $venue = $data[self::VENUE_FIELD] ?? null;
+        if ('' !== $name && (!\is_string($venue) || '' === \trim($venue))) {
+            $data[self::VENUE_FIELD] = $name;
+        }
 
-        // An empty string carried no venue: it becomes "no location" rather
-        // than a location with an empty title.
-        $data[self::FIELD] = '' === $title ? null : \array_merge(
-            \array_fill_keys(self::LOCATION_KEYS, null),
-            ['title' => $title],
-        );
+        $data[self::FIELD] = null;
 
         return $data;
+    }
+
+    /**
+     * Whether the admin can draw the map of a location value.
+     *
+     * @param array<mixed> $location The stored location value
+     */
+    private function hasCoordinates(array $location): bool
+    {
+        return \is_numeric($location['lat'] ?? null) && \is_numeric($location['long'] ?? null);
+    }
+
+    /**
+     * The best venue name a location without coordinates carries: its title,
+     * or else the first address part typed.
+     *
+     * @param array<mixed> $location The stored location value
+     */
+    private function nameOf(array $location): string
+    {
+        foreach (['title', 'street', 'town'] as $key) {
+            $value = $location[$key] ?? null;
+            if (\is_string($value) && '' !== \trim($value)) {
+                return \trim($value);
+            }
+        }
+
+        return '';
     }
 }

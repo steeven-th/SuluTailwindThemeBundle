@@ -43,9 +43,9 @@
         '@type': 'VirtualLocation',
         'url': content.locationUrl,
     } %}
-{% elseif not isOnline and content.location is defined and content.location is iterable %}
-    {% set place = content.location %}
-    {% set placeName = place.title|default('')|trim %}
+{% elseif not isOnline and (content.venue|default('')|trim is not empty or content.location|default(null) is iterable) %}
+    {% set place = content.location|default(null) is iterable ? content.location : {} %}
+    {% set placeName = content.venue|default('')|trim ?: place.title|default('')|trim %}
     {% set street = [place.number|default('')|trim, place.street|default('')|trim]|filter(v => v is not empty)|join(' ') %}
     {% set postalAddress = {
         '@type': 'PostalAddress',
@@ -54,9 +54,9 @@
         'addressLocality': place.town|default('')|trim,
         'addressCountry': place.country|default('')|trim,
     }|filter(v => v is not empty) %}
-    {# Google expects an address on every Place. A location carried over from
-       the former free-text field has a name and nothing else, and the name is
-       then the best address there is. #}
+    {# Google expects an address on every Place. A venue whose address was
+       never searched has a name and nothing else, and the name is then the
+       best address there is. #}
     {% set address = postalAddress|length > 1 ? postalAddress : (placeName is not empty ? placeName : null) %}
     {% if placeName is not empty or address is not null %}
         {% set locationData = {

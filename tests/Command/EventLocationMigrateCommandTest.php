@@ -8,9 +8,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManagerInterface;
 use ItechWorld\SuluTailwindThemeBundle\Command\EventLocationMigrateCommand;
+use ItechWorld\SuluTailwindThemeBundle\Content\Migration\EventLocationMigrator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Sulu\Bundle\HttpCacheBundle\Cache\CacheManagerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -23,6 +25,8 @@ final class EventLocationMigrateCommandTest extends TestCase
     /** @var list<array{table: string, data: array<string, mixed>, criteria: array<string, mixed>}> */
     private array $updates = [];
 
+    private int $cacheClears = 0;
+
     #[Test]
     public function itMovesTheVenueOfEveryEventRowAndNothingElse(): void
     {
@@ -30,7 +34,7 @@ final class EventLocationMigrateCommandTest extends TestCase
             $this->row(1, 'iw_event', 'draft', ['location' => 'CCI de Tarbes']),
             $this->row(2, 'iw_event', 'live', ['location' => 'CCI de Tarbes']),
             $this->row(3, 'iw_news', 'live', ['location' => 'Not an event field']),
-            $this->row(4, 'iw_event', 'live', ['location' => ['title' => 'Already moved']]),
+            $this->row(4, 'iw_event', 'live', ['location' => ['title' => 'Searched', 'lat' => 43.2, 'long' => 0.07, 'zoom' => 17]]),
         ]);
 
         $tester->execute([]);
@@ -40,7 +44,48 @@ final class EventLocationMigrateCommandTest extends TestCase
         self::assertSame('ar_article_dimension_contents', $this->updates[0]['table']);
 
         $written = json_decode((string) $this->updates[1]['data']['templateData'], true);
-        self::assertSame('CCI de Tarbes', $written['location']['title']);
+        self::assertSame(['location' => null, 'venue' => 'CCI de Tarbes'], $written);
+    }
+
+    /**
+     * A project migrated by an earlier version holds locations the admin
+     * cannot open, on every version of the row: running the command again
+     * is the repair.
+     */
+    #[Test]
+    public function itRepairsTheLocationsAnEarlierVersionLeftWithoutCoordinates(): void
+    {
+        $withoutCoordinates = ['title' => 'CCI de Tarbes', 'street' => null, 'number' => null, 'code' => null, 'town' => null, 'country' => null, 'lat' => null, 'long' => null, 'zoom' => null];
+        $tester = $this->tester([
+            $this->row(1, 'iw_event', 'draft', ['location' => $withoutCoordinates]),
+            $this->row(2, 'iw_event', 'live', ['location' => $withoutCoordinates]),
+            $this->row(3, 'iw_event', 'draft', ['location' => $withoutCoordinates], version: 1779457412),
+        ]);
+
+        $tester->execute([]);
+
+        self::assertSame([['id' => 1], ['id' => 2], ['id' => 3]], array_column($this->updates, 'criteria'));
+        foreach ($this->updates as $update) {
+            $written = json_decode((string) $update['data']['templateData'], true);
+            self::assertNull($written[EventLocationMigrator::FIELD]);
+            self::assertSame('CCI de Tarbes', $written[EventLocationMigrator::VENUE_FIELD]);
+        }
+        self::assertStringContainsString('location without coordinates', $tester->getDisplay());
+    }
+
+    /**
+     * Written in SQL, the rows never reach Sulu's HTTP cache, which would
+     * keep serving the pages as they were.
+     */
+    #[Test]
+    public function itClearsTheHttpCacheAfterWriting(): void
+    {
+        $this->tester([$this->row(1, 'iw_event', 'live', ['location' => 'CCI de Tarbes'])])->execute([]);
+        self::assertSame(1, $this->cacheClears);
+
+        $this->tester([$this->row(1, 'iw_event', 'live', ['location' => 'CCI de Tarbes'])])->execute(['--dry-run' => true]);
+        $this->tester([$this->row(1, 'iw_event', 'live', ['location' => null])])->execute([]);
+        self::assertSame(1, $this->cacheClears, 'Nothing written, nothing to clear');
     }
 
     #[Test]
@@ -83,10 +128,11 @@ final class EventLocationMigrateCommandTest extends TestCase
      *
      * @return array<string, mixed>
      */
-    private function row(int $id, string $templateKey, string $stage, array $data): array
+    private function row(int $id, string $templateKey, string $stage, array $data, int $version = 0): array
     {
         return [
             'id' => $id,
+            'version' => $version,
             'locale' => 'fr',
             'stage' => $stage,
             'template_key' => $templateKey,
@@ -123,6 +169,12 @@ final class EventLocationMigrateCommandTest extends TestCase
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManager->method('getConnection')->willReturn($connection);
 
-        return new CommandTester(new EventLocationMigrateCommand($entityManager));
+        $cacheManager = $this->createStub(CacheManagerInterface::class);
+        $cacheManager->method('supportsClear')->willReturn(true);
+        $cacheManager->method('clear')->willReturnCallback(function (): void {
+            ++$this->cacheClears;
+        });
+
+        return new CommandTester(new EventLocationMigrateCommand($entityManager, cacheManager: $cacheManager));
     }
 }

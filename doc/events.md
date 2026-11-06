@@ -74,9 +74,14 @@ In a template of your own, print an event date for machines with [`iw_sulu_tailw
 
 ## Venue
 
-The **Location** of an event is Sulu's `location` field: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. The title of the location is the venue name ("CCI de Tarbes"). The address search fills it with the full address it found, so it is worth putting the name back.
+A venue is two fields:
 
-The event page shows the name, then the address. **Show a link to the map** adds a "View on the map" link to OpenStreetMap under it, when the location has coordinates.
+- **Venue**, a text field, is the name of the place ("CCI de Tarbes").
+- **Address** is Sulu's `location` field: the editor searches an address, and the street, postal code, town, country and coordinates are stored with it. The search fills the title of the location with the full address it found. The page reads that title as the name only when **Venue** is empty.
+
+The event page shows the name, then the address. **Show a link to the map** adds a "View on the map" link to OpenStreetMap under it, when the location has coordinates. A venue whose address was never searched shows its name alone, with no link: the bundle never makes up coordinates.
+
+A location is either searched or empty. Sulu's admin draws the map of any location value it gets, and a value without coordinates makes Leaflet throw (`Invalid LatLng object`), which leaves the event form blank. Content written in SQL must follow the same rule: put the name in `venue` and leave `location` null.
 
 In the structured data, the venue is a `Place`:
 
@@ -97,7 +102,7 @@ In the structured data, the venue is a `Place`:
 
 With a name and no address, the name is used as the address, which Google accepts. An online event keeps its `VirtualLocation`, built from **Event URL**.
 
-Events written before the field became a location are carried over by `iw-sulu:theme:migrate-event-location`, see the [upgrade guide](upgrade-3.0.0.md#event-venue-becomes-a-sulu-location-breaking-content).
+Events written before the field became a location are carried over by `iw-sulu:theme:migrate-event-location`, which also repairs the locations an earlier version of it left without coordinates. See the [upgrade guide](upgrade-3.0.0.md#event-venue-becomes-a-sulu-location-breaking-content).
 
 ---
 

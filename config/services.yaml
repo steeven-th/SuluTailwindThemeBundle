@@ -517,7 +517,8 @@ services:
 
     ItechWorld\SuluTailwindThemeBundle\Command\EventLocationMigrateCommand:
         arguments:
-            - '@doctrine.orm.entity_manager'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $cacheManager: '@?sulu_http_cache.cache_manager'
         tags:
             - { name: 'console.command' }
 
