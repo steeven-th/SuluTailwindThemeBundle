@@ -117,6 +117,7 @@ services:
             $eventDispatcher: '@event_dispatcher'
             $requiredButtonStyles: '@itech_world.sulu_tailwind_theme.required_button_styles'
             $logger: '@?logger'
+            $selfHostedFonts: '@ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts'
 
     # The button styles the project CSS depends on (required_button_styles).
     itech_world.sulu_tailwind_theme.required_button_styles:

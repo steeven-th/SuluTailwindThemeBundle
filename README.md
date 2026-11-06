@@ -344,16 +344,16 @@ The typography tab includes a **Font Picker** with autocomplete for Google Fonts
 
 ### Google fonts served by the site
 
-Loading a stylesheet from `fonts.googleapis.com` sends the IP address of every visitor to Google, before any consent, and a font cannot wait for consent without breaking the page. German courts have fined sites for it since 2022. The bundle therefore downloads the Google fonts of each theme (CSS and `woff2` files) and serves them from your domain, under `/iw-theme/fonts/`, with a year-long immutable cache. Nothing to configure.
+Loading a stylesheet from `fonts.googleapis.com` sends the IP address of every visitor to Google, before any consent, and a font cannot wait for consent without breaking the page. German courts have fined sites for it since 2022. The bundle therefore downloads the Google fonts of each theme (CSS and `woff2` files) and serves them from your domain, under `/iw-theme/fonts/`, with a year-long immutable cache. Both the `<link>` of `iw_sulu_tailwind_theme_fonts_link()` and the `@import` of the compiled theme CSS point at that copy. Nothing to configure.
 
-- The first page needing a set downloads it. Run the command at deploy time to spare that first visitor the wait, and to learn right away if the server cannot reach Google:
+- Compiling a theme (`iw-sulu:theme:compile`, or saving it in the admin) downloads its set, and so does the first page needing one. Run the command at deploy time to spare that first visitor the wait, and to learn right away if the server cannot reach Google:
 
   ```bash
   php bin/console iw-sulu:theme:fonts-download
   ```
 
 - The files live next to the compiled theme CSS, in `var/cache/iw_sulu_tailwind_theme/fonts/`, outside the Symfony cache: `cache:clear` keeps them. A theme changing its fonts gets a new set.
-- When the files cannot be fetched (no network from the server, read-only disk), the page keeps the Google stylesheet, a warning is logged, and the download is not retried for an hour.
+- When the files cannot be fetched (no network from the server, read-only disk), the page keeps the Google stylesheet, a warning is logged, and the download is not retried for an hour. A theme compiled during such a failure keeps its `@import` from Google until it is compiled again.
 - To keep loading the fonts from Google:
 
   ```yaml

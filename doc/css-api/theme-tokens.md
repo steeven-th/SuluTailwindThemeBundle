@@ -176,7 +176,7 @@ Font families are selected via the **Font Picker**, which supports three sources
 - **System fonts**: 15 cross-platform fonts (Arial, Georgia, Courier New, etc.)
 - **Free text**: manual entry (fallback when no API key is configured)
 
-Only Google Fonts generate a `@import` rule in the compiled CSS. System fonts rely on the user's operating system.
+Only Google Fonts generate a `@import` rule in the compiled CSS. It points at the copy served by the site under `/iw-theme/fonts/` (see [Google fonts served by the site](../../README.md#google-fonts-served-by-the-site)), and at `fonts.googleapis.com` only when `fonts.self_host` is off or the download failed. System fonts rely on the user's operating system.
 
 ### Font families
 

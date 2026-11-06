@@ -7,10 +7,13 @@ namespace ItechWorld\SuluTailwindThemeBundle\Tests\Service;
 use ItechWorld\SuluTailwindThemeBundle\Entity\ThemeConfig;
 use ItechWorld\SuluTailwindThemeBundle\Service\GoogleFontsResolver;
 use ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator;
+use ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts;
 use ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
 #[CoversClass(ThemeCompiler::class)]
 final class ThemeCompilerTest extends TestCase
@@ -21,9 +24,9 @@ final class ThemeCompilerTest extends TestCase
      *
      * @param array<string, mixed> $tokens
      */
-    private function compileCss(array $tokens): string
+    private function compileCss(array $tokens, ?SelfHostedFonts $selfHostedFonts = null): string
     {
-        $compiler = new ThemeCompiler(sys_get_temp_dir(), new GoogleFontsResolver(), new OklchPaletteGenerator());
+        $compiler = new ThemeCompiler(sys_get_temp_dir(), new GoogleFontsResolver(), new OklchPaletteGenerator(), selfHostedFonts: $selfHostedFonts);
 
         $ref = new \ReflectionClass(ThemeConfig::class);
         $theme = $ref->newInstanceWithoutConstructor();
@@ -588,5 +591,42 @@ final class ThemeCompilerTest extends TestCase
             '/\.iw-menu \.iw-menu__button \{[^}]*--iw-button-padding-y: var\(--iw-menu-button-padding-y, [^)]+\);[^}]*--iw-button-padding-x: var\(--iw-menu-button-padding-x, [^)]+\);[^}]*font-size: var\(--iw-menu-button-font-size, [^)]+\)/',
             $css,
         );
+    }
+
+    #[Test]
+    public function theFontImportPointsAtTheServedCopyNotAtGoogle(): void
+    {
+        $directory = sys_get_temp_dir() . '/iw-fonts-' . bin2hex(random_bytes(4));
+        $fonts = new SelfHostedFonts($directory, true, new MockHttpClient(static fn (string $method, string $url): MockResponse => new MockResponse(
+            str_contains($url, 'googleapis')
+                ? "@font-face { font-family: 'Lato'; src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BM.woff2) format('woff2'); }"
+                : 'wOF2',
+        )));
+        $typography = ['typography' => ['families' => [['name' => 'Lato', 'role' => 'body', 'source' => 'google']]]];
+
+        try {
+            $css = $this->compileCss($typography, $fonts);
+        } finally {
+            exec('rm -rf ' . escapeshellarg($directory));
+        }
+
+        self::assertMatchesRegularExpression("#@import url\\('/iw-theme/fonts/[a-f0-9]{16}\\.css'\\);#", $css);
+        self::assertStringNotContainsString('googleapis', $css);
+    }
+
+    #[Test]
+    public function theFontImportKeepsGoogleWhenTheCopyCannotBeFetched(): void
+    {
+        $directory = sys_get_temp_dir() . '/iw-fonts-' . bin2hex(random_bytes(4));
+        $fonts = new SelfHostedFonts($directory, true, new MockHttpClient(new MockResponse('', ['http_code' => 503])));
+        $typography = ['typography' => ['families' => [['name' => 'Lato', 'role' => 'body', 'source' => 'google']]]];
+
+        try {
+            $css = $this->compileCss($typography, $fonts);
+        } finally {
+            exec('rm -rf ' . escapeshellarg($directory));
+        }
+
+        self::assertStringContainsString("@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');", $css);
     }
 }

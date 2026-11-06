@@ -143,6 +143,7 @@ class ThemeCompiler
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
         private readonly ?RequiredButtonStyles $requiredButtonStyles = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly ?SelfHostedFonts $selfHostedFonts = null,
     ) {
     }
 
@@ -310,10 +311,13 @@ class ThemeCompiler
         $this->buttonsGlobal['iconGap'] ??= $tokens['defaults']['buttonIconGap'] ?? null;
         $css = "/* Theme: {$theme->getLabel()} — Auto-generated, do not edit */\n\n";
 
-        // Google Fonts import
+        // Google Fonts import. It points at the same served copy as
+        // iw_sulu_tailwind_theme_fonts_link(), otherwise the browser follows it
+        // to fonts.googleapis.com and the visitor IP reaches Google anyway.
         $typography = $tokens['typography'] ?? [];
         $fontsUrl = $this->googleFontsResolver->resolve($typography);
         if (null !== $fontsUrl) {
+            $fontsUrl = $this->selfHostedFonts?->stylesheetFor($fontsUrl) ?? $fontsUrl;
             $css .= "@import url('{$fontsUrl}');\n\n";
         }
 
