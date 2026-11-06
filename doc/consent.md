@@ -155,7 +155,7 @@ In the block's **Settings** section:
 | Field | Role |
 |-------|------|
 | **Load without waiting for consent** | Unchecked (the default), the embed waits for consent the way the site is configured. Tick it only for content that sets no tracker, such as a page of your own site. |
-| **Service name** | The key tying this embed to your manager, picked from a list: the keys of the bundle (`youtube`, `vimeo`, `openstreetmap`, `carto`, `maps`), the ones the project declares in `consent.services` (see [the inventory](#the-third-party-services-inventory)), and **Other third-party content** for anything else. A list rather than free text, since the manager matches the key character for character. |
+| **Service name** | The key tying this embed to your manager, picked from a list: the keys of the bundle (`youtube`, `vimeo`, `openstreetmap`, `carto`, `maps`), the ones the project declares in `consent.services` (see [the inventory](#the-third-party-services-inventory)), and **Other third-party content** (`embed`) for anything else. A list rather than free text, since the manager matches the key character for character. Under a cookie manager, `embed` loads only once the manager grants it: prefer a named service, or declare `embed` (see [the inventory](#content-on-a-service-the-inventory-lacks)). |
 | **Waiting message** | Text shown in place of the content. A sensible default is used when empty. |
 | **Waiting image** | Optional background visual for the placeholder. Empty, the site-wide picture applies (see below). |
 
@@ -219,7 +219,7 @@ itech_world_sulu_tailwind_theme:
 
 The keys are kept as written (`my-tool` stays `my-tool`). The setting is project-wide only: the keys are the choices of a list in the admin, which has no site to read an override from.
 
-**The "Third-party services" snippet** is what editors fill, per locale, and assign to the **Third-party services (consent)** area of each site. Each entry picks a service and may set its displayed name, company, privacy policy, cookies and purpose. An empty field keeps the value of the bundle or of the project. Listing a service there also **declares** it: see the console check below.
+**The "Third-party services" snippet** is what editors fill, per locale, and assign to the **Third-party services (consent)** area of each site. Each entry picks a service and may set its displayed name, company, privacy policy, cookies and purpose. An empty field keeps the value of the bundle or of the project. **Other third-party content** (`embed`) is a choice too: declared, it gets its own switch in a manager fed from the snippet, for every block left on the generic key. Listing a service there also **declares** it: see the console check below.
 
 ### Feeding a cookie manager from the inventory
 
@@ -242,7 +242,15 @@ When a site assigns the snippet, each placeholder says whether the snippet lists
 [iw-consent] Content waits on the service "calendly", which the third-party services snippet does not list.
 ```
 
-A manager fed from the snippet has no switch for that service, so the content would stay blocked whatever the visitor accepts. A site without the snippet logs nothing.
+A manager fed from the snippet has no switch for that service, so the content would stay blocked whatever the visitor accepts.
+
+The generic key `embed` is reported **with or without the snippet**, unless the snippet declares it. It is the bundle's own key, so no manager knows it unless the site says so:
+
+```
+[iw-consent] Content waits on the generic service "embed" ("Other third-party content"), which no cookie manager grants on its own.
+```
+
+Pick the block's service instead, or declare `embed` in the snippet and in the manager. For any other key, a site without the snippet logs nothing: the bundle cannot know what its manager holds. Compare `window.iwConsent.services()` with the manager's list in the adapter if you need that check.
 
 `iw:tailwind-theme:check` reports the other gap: a key typed into an iframe or code block while the field was free text, and not declared in `consent.services`. It keeps working on the site, but the admin shows the field empty until the key is declared.
 

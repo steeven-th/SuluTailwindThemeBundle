@@ -2778,7 +2778,10 @@ locale in the new **Third-party services** snippet. See
 - **A custom tile server** (`maps`) is named in the placeholder as "the map
   provider" until the project describes it under `consent.services.maps`.
 - **A generic embed** reads "provided by a third-party service" instead of
-  showing the `embed` key.
+  showing the `embed` key. Under a cookie manager it loads only once the
+  manager grants `embed`, which none does on its own: in `delegated` mode the
+  console says so. Pick the block's service, or declare **Other third-party
+  content** in the snippet and in the manager.
 - **A project adapter** feeding its manager a list of services written in
   JavaScript can read it from the snippet with
   `iw_sulu_tailwind_theme_third_party_services()`, and drop its own check of

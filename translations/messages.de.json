@@ -78,6 +78,7 @@
     "iw_sulu_tailwind_theme.error.search_placeholder": "Wonach suchen Sie?",
     "iw_sulu_tailwind_theme.error.search_submit": "Suchen",
     "iw_sulu_tailwind_theme.consent_default_text": "Dieser Inhalt wird von %service% bereitgestellt. Mit der Anzeige stimmen Sie zu, dass dieser Dienst Cookies setzen und Ihre Nutzungsdaten erheben darf.",
+    "iw_sulu_tailwind_theme.consent_generic_service": "Anderer Drittanbieter-Inhalt",
     "iw_sulu_tailwind_theme.consent_generic_provider": "einem Drittanbieter",
     "iw_sulu_tailwind_theme.consent_map_provider": "dem Kartenanbieter",
     "iw_sulu_tailwind_theme.consent_load": "Inhalt anzeigen",

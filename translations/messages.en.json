@@ -78,6 +78,7 @@
     "iw_sulu_tailwind_theme.error.search_placeholder": "What are you looking for?",
     "iw_sulu_tailwind_theme.error.search_submit": "Search",
     "iw_sulu_tailwind_theme.consent_default_text": "This content is provided by %service%. By displaying it, you agree that this service may set cookies and collect your browsing data.",
+    "iw_sulu_tailwind_theme.consent_generic_service": "Other third-party content",
     "iw_sulu_tailwind_theme.consent_generic_provider": "a third-party service",
     "iw_sulu_tailwind_theme.consent_map_provider": "the map provider",
     "iw_sulu_tailwind_theme.consent_load": "Display the content",

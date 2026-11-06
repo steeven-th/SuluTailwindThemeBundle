@@ -228,4 +228,23 @@ await scenario('content on a service the inventory lacks is reported once, under
     }
 });
 
+await scenario('generic content is reported under a manager unless the inventory declares it', async () => {
+    const warnings = [];
+    const warn = console.warn;
+    console.warn = (message) => warnings.push(message);
+    try {
+        (await page()).mount('embed', 'delegated');
+        expect(warnings.length === 1 && warnings[0].includes('"embed"'), `without an inventory, warned ${JSON.stringify(warnings)}`);
+
+        (await page()).mount('embed', 'delegated', true, '', false);
+        expect(warnings.length === 2, `undeclared, warned ${JSON.stringify(warnings)}`);
+
+        (await page()).mount('embed', 'delegated', true, '', true);
+        (await page()).mount('embed', 'placeholder');
+        expect(warnings.length === 2, `declared or without a manager, warned ${JSON.stringify(warnings)}`);
+    } finally {
+        console.warn = warn;
+    }
+});
+
 process.exit(failures ? 1 : 0);

@@ -279,13 +279,25 @@ export default class extends Controller {
      * stays blocked whatever the visitor accepts, and nothing on screen says
      * why. Only `delegated` mode depends on a manager: the bundle's own
      * placeholder loads any service it is clicked for.
+     *
+     * The generic key `embed` is reported unless the inventory declares it,
+     * with or without an inventory: it is the bundle's own key, so no manager
+     * knows it unless the site says so.
      */
     reportUndeclared() {
-        if ('delegated' !== this.modeValue || reported.has(this.serviceValue)) {
+        if ('delegated' !== this.modeValue || reported.has(this.serviceValue) || !this.hasPlaceholderTarget) {
             return;
         }
 
-        if (this.hasPlaceholderTarget && 'false' === this.placeholderTarget.dataset?.consentDeclared) {
+        const declared = this.placeholderTarget.dataset?.consentDeclared;
+
+        if ('embed' === this.serviceValue && 'true' !== declared) {
+            reported.add(this.serviceValue);
+            console.warn(
+                '[iw-consent] Content waits on the generic service "embed" ("Other third-party content"), which no cookie manager grants on its own. '
+                + 'Pick its service in the block, or declare "embed" in the third-party services snippet and in your manager. See doc/consent.md.',
+            );
+        } else if ('false' === declared) {
             reported.add(this.serviceValue);
             console.warn(
                 `[iw-consent] Content waits on the service "${this.serviceValue}", which the third-party services snippet does not list. `

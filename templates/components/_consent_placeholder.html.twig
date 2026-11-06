@@ -15,19 +15,23 @@
      - details: optional line under the text (the address of a map)
 #}
 {# What the visitor is owed before agreeing: who receives their data, and
-   under which policy. A generic embed names no one, there is no one to name. #}
+   under which policy. A generic embed names no one, there is no one to name,
+   but it is looked up all the same: a cookie manager can only grant it once
+   the inventory declares it. #}
 {% set service = service|default('') is not empty ? service : 'embed' %}
-{% set serviceInfo = service != 'embed' ? iw_sulu_tailwind_theme_third_party_service(service) : null %}
+{% set isGeneric = service == 'embed' %}
+{% set serviceInfo = iw_sulu_tailwind_theme_third_party_service(service) %}
 {% set serviceLabel = serviceLabel|default('') is not empty
     ? serviceLabel
-    : (serviceInfo is not null ? serviceInfo.label : 'iw_sulu_tailwind_theme.consent_generic_provider'|trans) %}
+    : (isGeneric ? 'iw_sulu_tailwind_theme.consent_generic_provider'|trans : serviceInfo.label) %}
 {% set consentImage = consentImage.id|default(null) is not null
     ? consentImage
     : iw_sulu_tailwind_theme.components_consentImage|default(null) %}
 {# data-consent-declared tells the controller whether the inventory lists
-   the service, so it can report one a cookie manager will never grant. #}
+   the service, so it can report one a cookie manager will never grant.
+   Absent when the site keeps no inventory. #}
 <div class="iw-embed__consent" data-consent-target="placeholder"
-     {%- if serviceInfo is not null and serviceInfo.declared is not null %} data-consent-declared="{{ serviceInfo.declared ? 'true' : 'false' }}"{% endif %}>
+     {%- if serviceInfo.declared is not null %} data-consent-declared="{{ serviceInfo.declared ? 'true' : 'false' }}"{% endif %}>
     {% if consentImage|default(null) is not null and consentImage.id|default(null) is not null %}
         {% set consentMedia = sulu_resolve_media(consentImage.id, app.request.locale) %}
         {# A media deleted from the library resolves to null: the consent
@@ -46,7 +50,7 @@
         {% if details|default('') is not empty %}
             <p class="iw-embed__consent-details">{{ details|nl2br }}</p>
         {% endif %}
-        {% if serviceInfo.company|default('') is not empty or serviceInfo.policy|default('') is not empty %}
+        {% if not isGeneric and (serviceInfo.company is not empty or serviceInfo.policy is not empty) %}
             <p class="iw-embed__consent-provider">
                 {% if serviceInfo.company is not empty %}
                     <span class="iw-embed__consent-company">{{ 'iw_sulu_tailwind_theme.consent_data_recipient'|trans({'%company%': serviceInfo.company}) }}</span>

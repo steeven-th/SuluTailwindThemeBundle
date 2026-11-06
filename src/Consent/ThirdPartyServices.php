@@ -102,10 +102,12 @@ final class ThirdPartyServices
     /**
      * The choices of the service fields of the admin, for a `single_select`.
      *
-     * @param bool $withGeneric Offer the generic key too, for a block whose
-     *                          third party may be none of the listed ones. A
-     *                          `single_select` cannot be emptied once set, so
-     *                          "none of these" has to be a choice
+     * @param bool $withGeneric Offer the generic key too. A block needs it for
+     *                          a third party that is none of the listed ones,
+     *                          since a `single_select` cannot be emptied once
+     *                          set. The snippet needs it so a cookie manager
+     *                          fed from it gets a switch for those contents,
+     *                          which would otherwise never load
      *
      * @return list<array{name: string, title: string}>
      */
@@ -183,9 +185,12 @@ final class ThirdPartyServices
         );
 
         if ('' === $description['label']) {
-            $description['label'] = 'maps' === $key && null !== $this->translator
-                ? $this->translator->trans('iw_sulu_tailwind_theme.consent_map_provider')
-                : $key;
+            $description['label'] = match (true) {
+                null === $this->translator => $key,
+                'maps' === $key => $this->translator->trans('iw_sulu_tailwind_theme.consent_map_provider'),
+                self::GENERIC === $key => $this->translator->trans('iw_sulu_tailwind_theme.consent_generic_service'),
+                default => $key,
+            };
         }
 
         return $description;

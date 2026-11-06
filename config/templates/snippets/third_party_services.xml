@@ -61,7 +61,7 @@
                             </meta>
                             <params>
                                 <param name="values" type="expression"
-                                       value="service('itech_world.sulu_tailwind_theme.third_party_services').getSelectValues()"/>
+                                       value="service('itech_world.sulu_tailwind_theme.third_party_services').getSelectValues(true)"/>
                             </params>
                         </property>
 

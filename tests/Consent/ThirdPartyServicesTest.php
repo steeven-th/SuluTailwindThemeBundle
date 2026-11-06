@@ -101,11 +101,27 @@ final class ThirdPartyServicesTest extends TestCase
     }
 
     #[Test]
-    public function onlyTheBlocksOfferTheGenericChoice(): void
+    public function theGenericChoiceIsOfferedOnRequest(): void
     {
         $services = new ThirdPartyServices();
 
         self::assertNotContains(ThirdPartyServices::GENERIC, array_column($services->getSelectValues(), 'name'));
         self::assertSame(ThirdPartyServices::GENERIC, $services->getSelectValues(true)[0]['name']);
+    }
+
+    /**
+     * Declared in the snippet, the generic key gets a switch in a cookie
+     * manager fed from it, under a readable name.
+     */
+    #[Test]
+    public function theGenericKeyCanBeDeclaredUnderAReadableName(): void
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => 'translated:' . $id);
+
+        $declared = (new ThirdPartyServices([], $translator))->declared(['services' => [['service' => ThirdPartyServices::GENERIC]]]);
+
+        self::assertSame(ThirdPartyServices::GENERIC, $declared[0]['key']);
+        self::assertSame('translated:iw_sulu_tailwind_theme.consent_generic_service', $declared[0]['label']);
     }
 }

@@ -54,11 +54,26 @@ final class ConsentPlaceholderProviderRenderTest extends TestCase
     #[Test]
     public function aGenericEmbedNamesNoOne(): void
     {
-        $html = $this->render('', ['services' => [['service' => 'youtube']]]);
+        $html = $this->render('', null);
 
         self::assertStringNotContainsString('iw-embed__consent-provider', $html);
         self::assertStringNotContainsString('data-consent-declared', $html);
         self::assertStringContainsString('Load a third-party service content', $html, 'The visitor never reads the "embed" key');
+    }
+
+    /**
+     * A cookie manager knows the generic key only once the inventory declares
+     * it: the controller must be able to tell.
+     */
+    #[Test]
+    public function aGenericEmbedSaysWhetherTheInventoryDeclaresIt(): void
+    {
+        $html = $this->render('', ['services' => [['service' => 'embed', 'label' => 'Embedded content', 'company' => 'Someone']]]);
+
+        self::assertStringContainsString('data-consent-declared="true"', $html);
+        self::assertStringContainsString('Load a third-party service content', $html, 'The sentence stays generic');
+        self::assertStringNotContainsString('iw-embed__consent-provider', $html);
+        self::assertStringContainsString('data-consent-declared="false"', $this->render('', ['services' => [['service' => 'youtube']]]));
     }
 
     #[Test]
