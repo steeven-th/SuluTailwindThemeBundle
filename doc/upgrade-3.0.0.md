@@ -719,7 +719,13 @@ See [Credits and AI label](css-api/images.md#credits-and-ai-label).
   [Where they show](css-api/images.md#where-they-show). The mega menu
   featured column no longer puts `mb-4` on its image: the space under it is
   compiled CSS, on the image or on its wrapper. A lightbox link of your own
-  includes `components/_lightbox_description.html.twig` for its description.
+  includes `components/_lightbox_description.html.twig` for its caption.
+- **Lightbox**: its caption now shows the AI label and the credit, and the
+  media description next to the title. **Show image names** becomes **Show
+  image names and descriptions** (same field). Timeline steps, the image
+  widgets of accordions and forms, and cards that are no link open their
+  image in the lightbox too: the image widget used to link to the bare file
+  outside a text and images block.
 - **Structured data**: the `image` of articles and events becomes an
   `ImageObject` with `creditText` and `copyrightNotice` when the media is
   credited.

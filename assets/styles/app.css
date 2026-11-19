@@ -795,6 +795,27 @@ picture[class*="iw-radius--"] > img,
     }
 }
 
+/* The lightbox caption (GLightbox, `.gslide-desc`): the media description,
+   then a quieter line for the AI label and the credit. Colours of their own:
+   the lightbox sits outside every block, no variant reaches it. */
+.gslide-desc .iw-lightbox__description,
+.gslide-desc .iw-lightbox__notices {
+    display: block;
+}
+
+.gslide-desc .iw-lightbox__description {
+    color: var(--iw-lightbox-description-color, #333);
+}
+
+.gslide-desc .iw-lightbox__notices {
+    color: var(--iw-lightbox-notices-color, #666);
+    font-size: var(--iw-lightbox-notices-size, 0.8125rem);
+}
+
+.gslide-desc .iw-lightbox__description + .iw-lightbox__notices {
+    margin-top: var(--iw-lightbox-notices-gap, 0.5rem);
+}
+
 /* Credit as a caption, under an image in the flow of the page. */
 .iw-media-figure {
     display: block;

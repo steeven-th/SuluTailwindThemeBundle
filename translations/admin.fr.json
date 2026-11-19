@@ -1118,9 +1118,9 @@
     "iw_sulu_tailwind_theme.image_scrim_light": "Léger",
     "iw_sulu_tailwind_theme.image_scrim_medium": "Moyen",
     "iw_sulu_tailwind_theme.image_scrim_strong": "Fort",
-    "iw_sulu_tailwind_theme.show_images_name": "Afficher le nom des images",
-    "iw_sulu_tailwind_theme.show_images_name_info": "Le nom du média sert de légende dans la visionneuse, à l'ouverture de l'image au clic. Il ne s'affiche pas sur le bloc lui-même.",
-    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Le nom du média sert de légende dans la visionneuse, à l'ouverture de l'image au clic. Seul le style « Carrousel » l'affiche aussi sous l'image, directement dans le bloc.",
+    "iw_sulu_tailwind_theme.show_images_name": "Afficher le nom et la description des images",
+    "iw_sulu_tailwind_theme.show_images_name_info": "Le titre et la description du média s'affichent dans la visionneuse, à l'ouverture de l'image au clic. Le crédit et la mention IA y figurent toujours, que l'option soit cochée ou non.",
+    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Le titre et la description du média s'affichent dans la visionneuse, à l'ouverture de l'image au clic. Seul le style « Carrousel » affiche aussi le titre sous l'image, dans le bloc. Le crédit et la mention IA figurent toujours dans la visionneuse.",
     "iw_sulu_tailwind_theme.content_position_right": "Contenu à droite",
     "iw_sulu_tailwind_theme.image_position_bottom": "Média en bas",
 

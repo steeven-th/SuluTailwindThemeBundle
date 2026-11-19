@@ -1118,9 +1118,9 @@
     "iw_sulu_tailwind_theme.image_scrim_light": "Leicht",
     "iw_sulu_tailwind_theme.image_scrim_medium": "Mittel",
     "iw_sulu_tailwind_theme.image_scrim_strong": "Stark",
-    "iw_sulu_tailwind_theme.show_images_name": "Bildnamen anzeigen",
-    "iw_sulu_tailwind_theme.show_images_name_info": "Der Medientitel dient als Bildunterschrift in der Lightbox, wenn das Bild per Klick geöffnet wird. Im Block selbst erscheint er nicht.",
-    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Der Medientitel dient als Bildunterschrift in der Lightbox, wenn das Bild per Klick geöffnet wird. Nur der Stil „Karussell“ zeigt ihn zusätzlich unter dem Bild im Block selbst.",
+    "iw_sulu_tailwind_theme.show_images_name": "Bildnamen und Beschreibungen anzeigen",
+    "iw_sulu_tailwind_theme.show_images_name_info": "Titel und Beschreibung des Mediums erscheinen in der Lightbox, wenn das Bild per Klick geöffnet wird. Bildnachweis und KI-Hinweis stehen dort immer, ob die Option aktiviert ist oder nicht.",
+    "iw_sulu_tailwind_theme.show_images_name_gallery_info": "Titel und Beschreibung des Mediums erscheinen in der Lightbox, wenn das Bild per Klick geöffnet wird. Nur der Stil „Karussell“ zeigt den Titel zusätzlich unter dem Bild im Block. Bildnachweis und KI-Hinweis stehen immer in der Lightbox.",
     "iw_sulu_tailwind_theme.content_position_right": "Inhalt rechts",
     "iw_sulu_tailwind_theme.image_position_bottom": "Medium unten",
 

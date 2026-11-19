@@ -8,9 +8,48 @@ import 'glightbox/dist/css/glightbox.min.css';
  * Scoped to the controller's element: each block gets its own lightbox gallery.
  * Images must be wrapped in <a class="glightbox" href="full-size-url"> to be included.
  *
- * Caption is read from the data-title attribute on the <a> element.
- * Only shown when the user enables "Show image names" in the admin.
+ * The caption comes from the <a> element, plain text:
+ *   - `data-title` and `data-description`: the media title and description,
+ *     when the block shows names and descriptions
+ *   - `data-notices`: the AI label and the credit, always. The picture is
+ *     shown alone, out of the box they sit on
+ * GLightbox writes the description as HTML, so the text is escaped here.
+ *
+ * A link belongs to the nearest lightbox controller: a widget with its own,
+ * inside a block with one, is opened once, by the widget.
  */
+
+/**
+ * Plain text as HTML.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/**
+ * The description of a slide: the media description, then a quieter line
+ * with the AI label and the credit.
+ *
+ * @param {Element} link
+ * @returns {string}
+ */
+function caption(link) {
+    const description = (link.getAttribute('data-description') || '').trim();
+    const notices = (link.getAttribute('data-notices') || '').trim();
+
+    return [
+        description ? `<span class="iw-lightbox__description">${escapeHtml(description)}</span>` : '',
+        notices ? `<span class="iw-lightbox__notices">${escapeHtml(notices)}</span>` : '',
+    ].join('');
+}
+
 export default class extends Controller {
     /** @type {GLightbox|null} GLightbox instance */
     lightbox = null;
@@ -19,13 +58,15 @@ export default class extends Controller {
     _handlers = [];
 
     connect() {
-        const links = this.element.querySelectorAll('a.glightbox');
+        const links = Array.from(this.element.querySelectorAll('a.glightbox'))
+            .filter((link) => link.closest('[data-controller~="lightbox"]') === this.element);
         if (links.length === 0) return;
 
         // Build elements array scoped to this block
-        const elements = Array.from(links).map((link) => ({
+        const elements = links.map((link) => ({
             href: link.getAttribute('href'),
             title: link.getAttribute('data-title') || '',
+            description: caption(link),
             type: 'image',
         }));
 

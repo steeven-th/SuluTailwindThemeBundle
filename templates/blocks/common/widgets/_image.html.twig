@@ -20,7 +20,10 @@
     to the frame, and the slides inside are absolutely positioned. -#}
 {% set wrapRadius = imageRadius|default('') %}
 
-<div class="iw-widget__image-wrap{% if wrapRadius %} {{ wrapRadius }} overflow-hidden{% endif %}">
+{#- Its own lightbox controller: in an accordion or a form, nothing else
+    opens the images. Inside a block that has one (text and images), the
+    nearest controller takes the link, the image opens once. -#}
+<div class="iw-widget__image-wrap{% if wrapRadius %} {{ wrapRadius }} overflow-hidden{% endif %}" data-controller="lightbox">
     {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image_slider.html.twig' with {
         images: imageList,
         imageFormat: imageFormat|default('iw_theme_16_9'),

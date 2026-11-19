@@ -61,7 +61,7 @@
                     href="{{ media.url }}"
                     class="glightbox relative block w-full h-full cursor-pointer"
                     data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
-                    {{- include('@ItechWorldSuluTailwindTheme/components/_lightbox_description.html.twig', {media: media}, with_context = false) }}
+                    {{- include('@ItechWorldSuluTailwindTheme/components/_lightbox_description.html.twig', {media: media, details: showName|default(false)}, with_context = false) }}
                 >
                     {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
                         media: media,

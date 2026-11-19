@@ -77,7 +77,9 @@
     {% endif %}
 >
     {% if style == 'image_top' and hasImage %}
-        <div class="iw-card__banner">
+        {#- The image opens in the lightbox, unless the whole card is a link:
+            a click then leads to the card target. -#}
+        <div class="iw-card__banner"{% if not wholeCardIsLink %} data-controller="lightbox"{% endif %}>
             {#- No image radius here: the banner is flush against the body, so
                 rounding its bottom corners would cut a notch out of the card.
                 Its top corners follow the card, which clips them. -#}
@@ -85,7 +87,8 @@
                 media: image,
                 format: 'iw_theme_16_9',
                 ratio: '16-9',
-                sizes: imageSizes|default(null)
+                sizes: imageSizes|default(null),
+                lightbox: not wholeCardIsLink,
             } only %}
         </div>
     {% endif %}
@@ -114,12 +117,13 @@
         </div>
 
         {% if style != 'image_top' and hasImage %}
-            <div class="iw-card__image {{ imageMaxWidth|default('') }}">
+            <div class="iw-card__image {{ imageMaxWidth|default('') }}"{% if not wholeCardIsLink %} data-controller="lightbox"{% endif %}>
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                     media: image,
                     format: 'iw_theme_16_9',
                     radiusClass: imageRadius|default(''),
-                    sizes: imageSizes|default(null)
+                    sizes: imageSizes|default(null),
+                    lightbox: not wholeCardIsLink,
                 } only %}
             </div>
         {% endif %}
