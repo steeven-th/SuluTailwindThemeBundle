@@ -147,6 +147,17 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <property name="imageRatio" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.article_image_ratio</title>
+                        <info_text>iw_sulu_tailwind_theme.block.article_image_ratio_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues('_', 'iw_sulu_tailwind_theme.block.article_image_ratio_default')"/>
+                    </params>
+                </property>
                 <property name="autoplay" type="checkbox" colspan="6">
                     <meta><title>iw_sulu_tailwind_theme.block.article_carousel.autoplay</title></meta>
                 </property>

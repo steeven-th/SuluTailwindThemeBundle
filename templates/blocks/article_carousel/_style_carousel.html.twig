@@ -22,6 +22,9 @@
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}
+    {# The block's own ratio, else the theme's card ratio. #}
+    {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.cardImageRatio|default('16_9')) %}
+
     {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
     {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
 
@@ -39,7 +42,7 @@
             data-slider-mode-value="scroll"
             data-slider-autoplay-value="{{ isAutoplay ? 'true' : 'false' }}"
             data-slider-interval-value="{{ autoplayInterval }}"
-            class="iw-block-article-carousel iw-block-article-carousel--button-{{ carouselButtonStyle }}"
+            class="iw-block-article-carousel iw-block-article-carousel--button-{{ carouselButtonStyle }}{% if pickedRatio.portrait %} iw-block-article-carousel--portrait{% endif %}"
         >
             {# Navigation arrows — positioned above the track #}
             <div class="iw-block-article-carousel__nav">
@@ -73,12 +76,12 @@
                                 share stops at a half rather than risk a blurry picture. -#}
                             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                                 article: article,
-                                imageRatio: '16/9',
+                                imageRatio: pickedRatio.key,
                                 showDate: true,
                                 showExcerpt: true,
                                 showCategory: true,
                                 cardImagePadded: hasCardRadius,
-                                imageSizes: iw_sulu_tailwind_theme_image_sizes({640: 1/2}),
+                                imageSizes: iw_sulu_tailwind_theme_image_sizes(pickedRatio.portrait ? {640: 1/2, 1024: 1/4} : {640: 1/2}),
                             } only %}
                         </div>
                     </div>

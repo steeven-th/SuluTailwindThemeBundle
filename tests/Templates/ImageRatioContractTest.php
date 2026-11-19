@@ -31,6 +31,8 @@ final class ImageRatioContractTest extends TestCase
         'gallery' => ['config/templates/blocks/gallery.xml', 'imageFilter'],
         'text and images' => ['config/templates/blocks/text_images.xml', 'imageFilter'],
         'article listing page' => ['config/templates/pages/iw_article_listing.xml', 'listingImageRatio'],
+        'article list block' => ['config/templates/blocks/article_list.xml', 'imageRatio'],
+        'article carousel block' => ['config/templates/blocks/article_carousel.xml', 'imageRatio'],
     ];
 
     /**

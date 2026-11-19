@@ -2744,6 +2744,33 @@ img.object-cover {
     gap: var(--iw-block-article-list-list-gap, var(--iw-cards-gap, 1.5rem));
 }
 
+/* Portrait images: one more column, as on the article listing pages, so a
+   poster does not make every card taller than the screen. A list narrows its
+   thumbnail instead (the compiled card CSS gives it a third of the row). */
+.iw-block-article-list--portrait.iw-block-article-list--grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+    .iw-block-article-list--portrait.iw-block-article-list--grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-block-article-list--portrait.iw-block-article-list--grid {
+        grid-template-columns: repeat(var(--iw-block-article-list-grid-cols-portrait, 4), 1fr);
+    }
+
+    .iw-block-article-list--portrait.iw-block-article-list--cards {
+        grid-template-columns: repeat(var(--iw-block-article-list-cards-cols-portrait, 3), 1fr);
+    }
+}
+
+.iw-block-article-list--portrait.iw-block-article-list--list .iw-article-card--horizontal .iw-article-card__image {
+    width: var(--iw-article-list-portrait-image-width, clamp(6rem, 20%, 11rem));
+}
+
 /* Stretch the inner card to fill the row height so every card has the same
    height as the tallest one in the row. */
 .iw-block-article-list .iw-block-article-list__item > .iw-article-card {
@@ -2835,6 +2862,12 @@ img.object-cover {
 @media (min-width: 1024px) {
     .iw-block-article-carousel__slide {
         width: calc((100% - var(--iw-block-article-carousel-track-gap, var(--iw-cards-gap, 1.5rem)) * 2) / var(--iw-block-article-carousel-cols, 3));
+    }
+}
+
+@media (min-width: 1024px) {
+    .iw-block-article-carousel--portrait .iw-block-article-carousel__slide {
+        width: calc((100% - var(--iw-block-article-carousel-track-gap, var(--iw-cards-gap, 1.5rem)) * (var(--iw-block-article-carousel-cols-portrait, 4) - 1)) / var(--iw-block-article-carousel-cols-portrait, 4));
     }
 }
 

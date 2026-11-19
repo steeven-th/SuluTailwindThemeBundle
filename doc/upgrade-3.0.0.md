@@ -563,6 +563,20 @@ point had no effect. Consequence: on wide viewports heroes now crop around the
 **top** of the image. Override `--iw-article-hero-ratio` (e.g. `21 / 9`) per theme
 for a more panoramic hero.
 
+### Article blocks follow the card ratio (breaking, visual)
+
+The `article_list` (grid, cards) and `article_carousel` blocks used to crop
+every image to 16:9 whatever the theme said, which cut A4 posters down to a
+strip. They now read the theme's card ratio (**Cards** tab), and each block can
+pick its own under **Settings > Image ratio**. On a theme whose card ratio is
+16:9 nothing changes. On any other, published blocks take the theme's ratio
+after the upgrade, a portrait one with one more column. The `list` style keeps
+its 4:3 unless the block picks a ratio.
+
+Article listing pages gain the same choice per page, along with the listing
+style, and a project can add its own ratios with an `iw_ratio_*` image format.
+See [Ratios an editor can pick](css-api/images.md#ratios-an-editor-can-pick).
+
 ## Page hero banner + overriding H1 (new)
 
 Page templates gain an optional **Hero** section (`page-hero.xml` fragment) with

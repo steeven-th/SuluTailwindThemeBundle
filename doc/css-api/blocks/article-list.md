@@ -16,6 +16,7 @@ Each item is rendered via the shared `_article_card.html.twig` helper (article c
 | `.iw-block-article-list--cards` | 2-column grid (1 column on mobile). |
 | `.iw-block-article-list--grid` | Responsive grid (1/2/3 columns mobile/tablet/desktop). |
 | `.iw-block-article-list--list` | Vertical stack of full-width rows (horizontal article cards inside). |
+| `.iw-block-article-list--portrait` | Set when the block's image ratio is portrait (its own **Image ratio** setting, else the theme's card ratio, 4:3 for `--list`). One more column on `--grid` (2/3/4) and `--cards` (3 on desktop), a narrower thumbnail on `--list`. |
 | `.iw-block-article-list__item` | Surface wrapper around a single `.iw-article-card` — owns the background, border, radius (via the per-block `cardRadius` class applied in the template — empty value falls back to the theme via `iw-radius--card`) and `overflow: hidden`. Stretches to `height: 100%` so cards align to the row height. |
 | `.iw-block-article-list__empty` | Centered "no articles" message — also reused by `article_carousel` and `article_featured`. |
 
@@ -31,6 +32,9 @@ Each item is rendered via the shared `_article_card.html.twig` helper (article c
 | `--iw-block-article-list-grid-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between cards in `--grid`. |
 | `--iw-block-article-list-grid-cols` | `3` | Number of columns on `>=1024px` for `--grid`. |
 | `--iw-block-article-list-list-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between rows in `--list`. |
+| `--iw-block-article-list-grid-cols-portrait` | `4` | Columns on `>=1024px` for `--grid` with a portrait ratio. |
+| `--iw-block-article-list-cards-cols-portrait` | `3` | Columns on `>=1024px` for `--cards` with a portrait ratio. |
+| `--iw-article-list-portrait-image-width` | `clamp(6rem, 20%, 11rem)` | Thumbnail width in `--list` with a portrait ratio, shared with the article listing pages. |
 
 ### Surface
 
