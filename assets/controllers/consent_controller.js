@@ -344,14 +344,18 @@ export default class extends Controller {
             return;
         }
 
-        // The visitor clicked to see this video: playing it spares a second
-        // click on the facade. A manager answering later is no such click.
-        this.playRequested = true;
-
         // Stored only without a manager: with one, the next page asks it again.
         window.iwConsent.grant(this.serviceValue, {
             remember: 'placeholder' === this.modeValue && this.rememberValue,
         });
+
+        // Allowing is not playing, whatever answered: behind a facade the
+        // image and its play button take the placeholder's place, as after a
+        // cookie manager's grant. The button that had the focus is gone, so a
+        // keyboard visitor lands on the play button, not at the top of the page.
+        if (this.facadeValue && this.hasFacadeTarget && !this.facadeTarget.hidden) {
+            this.facadeTarget.focus?.();
+        }
     }
 
     /**

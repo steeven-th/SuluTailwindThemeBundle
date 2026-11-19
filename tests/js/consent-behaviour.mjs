@@ -60,7 +60,7 @@ async function page(storedServices = [], queue = undefined) {
                 placeholderTarget: { hidden: false, dataset: declared === undefined ? {} : { consentDeclared: String(declared) } },
                 facadeValue: facade,
                 hasFacadeTarget: facade,
-                facadeTarget: facade ? { hidden: true } : undefined,
+                facadeTarget: facade ? { hidden: true, focus() { this.focused = true; } } : undefined,
             });
             frame.focus = () => {};
             embed.connect();
@@ -251,10 +251,14 @@ await scenario('generic content is reported under a manager unless the inventory
     }
 });
 
-await scenario('behind a facade, a placeholder click both allows and plays', async () => {
+await scenario('behind a facade, a placeholder click allows, the play button plays', async () => {
     const p = await page();
     const embed = p.mount('youtube', 'placeholder', true, '', undefined, { facade: true });
     embed.accept();
+    expect(!embed.loaded() && !embed.facadeTarget.hidden && embed.placeholderTarget.hidden, 'the placeholder click played instead of showing the facade');
+    expect(embed.facadeTarget.focused === true, 'the focus did not move to the play button');
+    expect(p.stored().includes('youtube'), 'the click was not remembered');
+    embed.play();
     expect(embed.frame.getAttribute('src') === 'https://youtube.example/embed?autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
     expect(embed.facadeTarget.hidden && !embed.frame.hidden, 'the facade stayed over the player');
 });
@@ -281,6 +285,16 @@ await scenario('a manager answering a placeholder request is no click to play', 
     embed.accept();
     window.iwConsent.grant('youtube');
     expect(!embed.loaded() && !embed.facadeTarget.hidden, 'the player started on the manager\'s answer');
+});
+
+await scenario('a blocked manager allows from its button, but does not play', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'delegated', true, '', undefined, { facade: true });
+    embed.accept();
+    expect(!embed.loaded() && !embed.facadeTarget.hidden && embed.placeholderTarget.hidden, 'the fallback played instead of showing the facade');
+    expect(embed.facadeTarget.focused === true, 'the focus did not move to the play button');
+    embed.play();
+    expect(embed.frame.getAttribute('src') === 'https://youtube.example/embed?autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
 });
 
 await scenario('without a consent requirement the facade waits for the click alone', async () => {

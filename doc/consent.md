@@ -185,14 +185,17 @@ the player then loads with `autoplay`.
 
 | Site mode | Without a poster image | With one (the default) |
 |-----------|------------------------|------------------------|
-| `placeholder` | Clicking **Display the content** loads the player | The same click loads the player **playing**: one click allows and plays |
+| `placeholder` | Clicking **Display the content** loads the player | The click shows the image and a play button. The video starts on click |
 | `delegated` | The manager's grant loads the player | The grant shows the image and a play button. The video starts on click |
 | `none` | The player loads with the page | The image and a play button show with the page. The video starts on click |
 
-A manager answering the visitor's click is no click to play: under `delegated`,
-the facade always waits for its own. An editor who prefers the platform's
-preview checks **Show the YouTube or Vimeo preview** on the widget: an opt-out,
-so videos saved before the setting existed show their image too.
+Allowing is never playing, whoever answers: the placeholder's button, a
+cookie manager, or the placeholder standing in for a manager that failed to
+load. The same image and play button then take the placeholder's place,
+with the keyboard focus, and the video starts on their click alone. An editor
+who prefers the platform's preview checks **Show the YouTube or Vimeo
+preview** on the widget: an opt-out, so videos saved before the setting
+existed show their image too.
 
 The facade is a `<button>` named after the video, reachable from the keyboard,
 and the focus moves to the player once it has loaded. It needs the `consent`

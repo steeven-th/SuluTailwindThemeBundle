@@ -41,6 +41,7 @@
                 vimeoId: item.vimeoId|default(''),
                 videoFile: item.videoFile|default(null),
                 videoPoster: item.videoPoster|default(null),
+                showProviderPreview: item.showProviderPreview|default(false),
                 videoRadius: imageRadius|default('')
             } only %}
         {% elseif kind == 'location' %}

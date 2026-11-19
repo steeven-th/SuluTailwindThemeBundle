@@ -964,10 +964,11 @@ img.object-cover {
     pointer-events: none;
 }
 
+/* The path is drawn around its centroid, so the triangle looks centred
+   without any offset. */
 .iw-embed__facade-play svg {
     width: 45%;
     height: 45%;
-    margin-left: 8%;
 }
 
 .iw-embed__facade:hover .iw-embed__facade-play,
