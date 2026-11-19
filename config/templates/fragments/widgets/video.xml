@@ -10,8 +10,10 @@
     video always waits for consent, the way the project's `consent.mode`
     setting says (doc/consent.md). There is no field for it here: an editor
     cannot know whether a cookie manager is wired, the developer does. The
-    preview image is the `poster` of a hosted file, and the backdrop of the
-    consent placeholder otherwise. It is never what protects.
+    image is the `poster` of a hosted file. For YouTube and Vimeo it is the
+    backdrop of the consent placeholder, then the facade the visitor clicks to
+    play: the player only shows the thumbnail of its current video, never the
+    cover of a playlist. It is never what protects.
 -->
 <types xmlns="http://schemas.sulu.io/template/template">
     <type name="video">
@@ -79,6 +81,15 @@
                 <params>
                     <param name="types" value="image"/>
                 </params>
+            </property>
+            <!-- An opt-out: a video saved before this field has no value, and
+                 an unchecked box reads as the image, which is the default. -->
+            <property name="showProviderPreview" type="checkbox"
+                      visibleCondition="__parent.provider != 'file'">
+                <meta>
+                    <title>iw_sulu_tailwind_theme.video_show_provider_preview</title>
+                    <info_text>iw_sulu_tailwind_theme.video_show_provider_preview_info</info_text>
+                </meta>
             </property>
         </properties>
     </type>

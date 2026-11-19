@@ -82,6 +82,7 @@
     "iw_sulu_tailwind_theme.consent_generic_provider": "a third-party service",
     "iw_sulu_tailwind_theme.consent_map_provider": "the map provider",
     "iw_sulu_tailwind_theme.consent_load": "Display the content",
+    "iw_sulu_tailwind_theme.embed_play": "Play: %title%",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Manage my preferences",
     "iw_sulu_tailwind_theme.consent_manage": "Manage cookies",
     "iw_sulu_tailwind_theme.consent_manager_unavailable": "The cookie manager could not open. A browser extension may be blocking it.",

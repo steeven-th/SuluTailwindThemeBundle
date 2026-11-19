@@ -11,6 +11,8 @@ use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
+use Twig\Loader\ArrayLoader;
+use Twig\Loader\ChainLoader;
 use Twig\TwigFunction;
 
 /**
@@ -135,6 +137,61 @@ final class VideoWidgetRenderTest extends TestCase
         $html = self::render(['youtubeId' => 'dQw4w9WgXcQ', 'videoPoster' => ['id' => 7]]);
 
         self::assertStringContainsString('<img src="/media/7" alt="" loading="lazy" class="iw-embed__consent-image">', $html);
+    }
+
+    /**
+     * The player shows the thumbnail of its current video, the first of a
+     * playlist: the editor's image waits in front of it until a click.
+     */
+    #[Test]
+    public function thePosterWaitsInFrontOfThePlayer(): void
+    {
+        $html = self::render(['youtubePlaylist' => true, 'youtubePlaylistId' => 'PLCKWohU37CZY', 'videoPoster' => ['id' => 7]]);
+
+        self::assertStringContainsString('data-consent-facade-value="true"', $html);
+        self::assertMatchesRegularExpression('/<button[^>]*class="iw-embed__facade"[^>]*data-action="consent#play"[^>]*hidden>/s', $html);
+        self::assertStringContainsString('<picture data-media="/media/7">', $html);
+        self::assertDoesNotMatchRegularExpression('/<iframe[^>]*\ssrc=/', $html);
+    }
+
+    /**
+     * Unchecked, the opt-out reads as the image: a video saved before the
+     * field existed keeps its poster in front.
+     */
+    #[Test]
+    public function anEditorMayKeepThePlatformPreview(): void
+    {
+        $html = self::render(['youtubeId' => 'dQw4w9WgXcQ', 'videoPoster' => ['id' => 7], 'showProviderPreview' => true]);
+
+        self::assertStringNotContainsString('iw-embed__facade', $html);
+        self::assertStringNotContainsString('data-consent-facade-value', $html);
+        self::assertStringContainsString('class="iw-embed__consent-image"', $html, 'The poster still dresses the placeholder');
+    }
+
+    #[Test]
+    public function aDeletedPosterLeavesNoFacade(): void
+    {
+        $html = self::render(['youtubeId' => 'dQw4w9WgXcQ', 'videoPoster' => ['id' => 404]]);
+
+        self::assertStringNotContainsString('iw-embed__facade', $html);
+    }
+
+    /**
+     * Without a consent requirement there is nothing to wait for but the
+     * click: the facade shows straight away and the source is still held.
+     */
+    #[Test]
+    public function withoutConsentRequirementThePosterStillWaitsForTheClick(): void
+    {
+        self::$siteMode = 'none';
+        $html = self::render(['vimeoId' => '76979871', 'provider' => 'vimeo', 'videoPoster' => ['id' => 7]]);
+
+        self::assertStringContainsString('data-controller="consent"', $html);
+        self::assertStringContainsString('data-consent-mode-value="none"', $html);
+        self::assertMatchesRegularExpression('/<button[^>]*class="iw-embed__facade"[^>]*data-action="consent#play"[^>]*>/s', $html);
+        self::assertDoesNotMatchRegularExpression('/<button[^>]*class="iw-embed__facade"[^>]*hidden/s', $html);
+        self::assertDoesNotMatchRegularExpression('/<iframe[^>]*\ssrc=/', $html);
+        self::assertStringNotContainsString('iw-embed__consent"', $html, 'No consent text where none is asked');
     }
 
     /**
@@ -280,13 +337,20 @@ final class VideoWidgetRenderTest extends TestCase
      */
     private static function twig(): Environment
     {
-        $loader = new FilesystemLoader();
-        $loader->addPath(self::root() . '/templates', 'ItechWorldSuluTailwindTheme');
+        $files = new FilesystemLoader();
+        $files->addPath(self::root() . '/templates', 'ItechWorldSuluTailwindTheme');
+        // The image pipeline has its own tests: the facade only has to hand
+        // it the editor's media.
+        $loader = new ChainLoader([
+            new ArrayLoader(['@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' => '<picture data-media="{{ media.url }}"></picture>']),
+            $files,
+        ]);
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
         $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addFunction(new TwigFunction(
             'sulu_resolve_media',
-            static fn (int $id): array => ['url' => '/media/' . $id, 'thumbnails' => []],
+            // 404 stands for a media deleted from the library.
+            static fn (int $id): ?array => 404 === $id ? null : ['url' => '/media/' . $id, 'thumbnails' => []],
         ));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => self::$siteMode));
         // Compiled by the embed frame for its free-height modes, never called here.

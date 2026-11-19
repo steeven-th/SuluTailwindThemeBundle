@@ -7,9 +7,11 @@
      - youtubePlaylist   : true to embed a YouTube playlist instead of a video
      - youtubePlaylistId : the playlist id, the part after `list=` in its link
      - videoFile   : Sulu media object, when the video is hosted here
-     - videoPoster : Sulu media object. The `poster` of a hosted video, and
-                     the background of the consent placeholder of an
-                     embedded one.
+     - videoPoster : Sulu media object. The `poster` of a hosted video. For an
+                     embedded one, the background of the consent placeholder
+                     and the facade clicked to play
+     - showProviderPreview : true to load the player as soon as allowed and
+                     show its own thumbnail instead of the poster
      - videoRadius : optional radius class on the frame
    ───────────────────────────────────────────────────────────────────────── #}
 
@@ -56,6 +58,7 @@
         consentRequired: true,
         consentService: kind,
         consentImage: hasPoster ? videoPoster : null,
+        facadeImage: hasPoster and not showProviderPreview|default(false) ? videoPoster : null,
         frameClass: videoRadius|default('')
     } only %}
 {% elseif kind == 'file' and videoFile.id|default(null) is not null %}

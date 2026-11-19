@@ -45,12 +45,12 @@ async function page(storedServices = [], queue = undefined) {
     return {
         store,
         stored: () => JSON.parse(store.get('iw-consent') ?? '[]'),
-        mount(service, mode, remember = true, controller = '', declared = undefined) {
+        mount(service, mode, remember = true, controller = '', declared = undefined, { facade = false, src = '' } = {}) {
             const frame = { hidden: true, dataset: {}, attributes: {}, setAttribute(k, v) { this.attributes[k] = v; }, getAttribute(k) { return this.attributes[k] ?? null; }, removeAttribute(k) { delete this.attributes[k]; } };
             const embed = Object.assign(new Embed(), {
                 serviceValue: service,
                 modeValue: mode,
-                srcValue: controller ? '' : `https://${service}.example/embed`,
+                srcValue: src || (controller ? '' : `https://${service}.example/embed`),
                 controllerValue: controller,
                 srcdocValue: '',
                 rememberValue: remember,
@@ -58,7 +58,11 @@ async function page(storedServices = [], queue = undefined) {
                 frameTarget: frame,
                 hasPlaceholderTarget: true,
                 placeholderTarget: { hidden: false, dataset: declared === undefined ? {} : { consentDeclared: String(declared) } },
+                facadeValue: facade,
+                hasFacadeTarget: facade,
+                facadeTarget: facade ? { hidden: true } : undefined,
             });
+            frame.focus = () => {};
             embed.connect();
             embed.loaded = () => frame.getAttribute('src') !== null;
             embed.frame = frame;
@@ -245,6 +249,59 @@ await scenario('generic content is reported under a manager unless the inventory
     } finally {
         console.warn = warn;
     }
+});
+
+await scenario('behind a facade, a placeholder click both allows and plays', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'placeholder', true, '', undefined, { facade: true });
+    embed.accept();
+    expect(embed.frame.getAttribute('src') === 'https://youtube.example/embed?autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
+    expect(embed.facadeTarget.hidden && !embed.frame.hidden, 'the facade stayed over the player');
+});
+
+await scenario('a manager granting shows the facade, the click plays', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'delegated', true, '', undefined, { facade: true });
+    window.iwConsent.grant('youtube');
+    expect(!embed.loaded(), 'the player loaded without a click');
+    expect(!embed.facadeTarget.hidden && embed.placeholderTarget.hidden, 'the facade did not replace the placeholder');
+    embed.play();
+    expect(embed.frame.getAttribute('src') === 'https://youtube.example/embed?autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
+
+    window.iwConsent.revoke('youtube');
+    expect(!embed.loaded() && embed.facadeTarget.hidden && !embed.placeholderTarget.hidden, 'revoking left the facade or the player');
+    window.iwConsent.grant('youtube');
+    expect(!embed.loaded() && !embed.facadeTarget.hidden, 'a later grant played without a click');
+});
+
+await scenario('a manager answering a placeholder request is no click to play', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'delegated', true, '', undefined, { facade: true });
+    document.addEventListener('iw:consent-request', (event) => event.preventDefault());
+    embed.accept();
+    window.iwConsent.grant('youtube');
+    expect(!embed.loaded() && !embed.facadeTarget.hidden, 'the player started on the manager\'s answer');
+});
+
+await scenario('without a consent requirement the facade waits for the click alone', async () => {
+    const p = await page();
+    const embed = p.mount('vimeo', 'none', true, '', undefined, { facade: true });
+    expect(!embed.loaded() && !embed.facadeTarget.hidden, 'the player loaded on page load');
+    embed.play();
+    expect(embed.loaded(), 'the click did not play');
+});
+
+await scenario('a click remembered from a previous page shows the facade, not the player', async () => {
+    const p = await page(['youtube']);
+    const embed = p.mount('youtube', 'placeholder', true, '', undefined, { facade: true });
+    expect(!embed.loaded() && !embed.facadeTarget.hidden, 'the remembered click played the video');
+});
+
+await scenario('autoplay joins the playlist of the address', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'none', true, '', undefined, { facade: true, src: 'https://www.youtube.com/embed/videoseries?list=PLCKWohU37CZY' });
+    embed.play();
+    expect(embed.frame.getAttribute('src') === 'https://www.youtube.com/embed/videoseries?list=PLCKWohU37CZY&autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
 });
 
 process.exit(failures ? 1 : 0);

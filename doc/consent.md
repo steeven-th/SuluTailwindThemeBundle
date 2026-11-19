@@ -171,9 +171,33 @@ The placeholder settings are derived:
 |-------|------|
 | **Service name** | The provider, `youtube` or `vimeo`. Use these keys in your adapter. |
 | **Waiting message** | The default one, naming the platform. |
-| **Waiting image** | The widget's **Preview image**, when one is set, otherwise the site-wide picture. The protection does not depend on it. |
+| **Waiting image** | The widget's **Poster image**, when one is set, otherwise the site-wide picture. The protection does not depend on it. |
 
 A hosted video file is served by the site itself, contacts no third party, and plays without any placeholder.
+
+### The poster image as a facade
+
+A YouTube or Vimeo player only shows the thumbnail of its current video. For
+a playlist that is its first video, never the cover the channel designed for
+the list. So when the widget has a poster image, the player does not load on
+consent: the image stays, with a play button, until the visitor clicks it, and
+the player then loads with `autoplay`.
+
+| Site mode | Without a poster image | With one (the default) |
+|-----------|------------------------|------------------------|
+| `placeholder` | Clicking **Display the content** loads the player | The same click loads the player **playing**: one click allows and plays |
+| `delegated` | The manager's grant loads the player | The grant shows the image and a play button. The video starts on click |
+| `none` | The player loads with the page | The image and a play button show with the page. The video starts on click |
+
+A manager answering the visitor's click is no click to play: under `delegated`,
+the facade always waits for its own. An editor who prefers the platform's
+preview checks **Show the YouTube or Vimeo preview** on the widget: an opt-out,
+so videos saved before the setting existed show their image too.
+
+The facade is a `<button>` named after the video, reachable from the keyboard,
+and the focus moves to the player once it has loaded. It needs the `consent`
+controller even on a site set to `consent.mode: none`. Restyle it with the
+`--iw-embed-facade-*` custom properties ([iframe CSS API](css-api/blocks/iframe.md#facade)).
 
 ## Maps
 
@@ -256,7 +280,7 @@ Pick the block's service instead, or declare `embed` in the snippet and in the m
 
 ## The placeholder for the whole site
 
-**Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's preview image, that picks its own keeps it.
+**Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's poster image, that picks its own keeps it.
 
 **Texts.** The waiting message and the button labels are translations, so they follow the language of the page. A project rewords them in its own translation files, which win over the bundle's:
 

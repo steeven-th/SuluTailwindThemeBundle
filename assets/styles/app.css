@@ -922,6 +922,71 @@ img.object-cover {
     outline-offset: var(--iw-embed-consent-focus-offset, 2px);
 }
 
+/* Facade: the editor's image and a play button, in front of a video that only
+   loads on click. The whole surface is the button, so the play mark is a
+   picture of one and takes no clicks of its own. */
+.iw-embed__facade {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background-color: var(--iw-embed-facade-bg, #000);
+    cursor: pointer;
+}
+
+.iw-embed__facade[hidden] {
+    display: none;
+}
+
+.iw-embed__facade .iw-embed__facade-picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.iw-embed__facade-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: var(--iw-embed-facade-play-size, clamp(3rem, 15%, 4.5rem));
+    aspect-ratio: 1;
+    border-radius: var(--iw-embed-facade-play-radius, 50%);
+    background-color: var(--iw-embed-facade-play-bg, rgb(0 0 0 / 0.6));
+    color: var(--iw-embed-facade-play-color, #fff);
+    transform: translate(-50%, -50%);
+    transition: background-color var(--iw-embed-facade-transition-duration, 150ms) ease, transform var(--iw-embed-facade-transition-duration, 150ms) ease;
+    pointer-events: none;
+}
+
+.iw-embed__facade-play svg {
+    width: 45%;
+    height: 45%;
+    margin-left: 8%;
+}
+
+.iw-embed__facade:hover .iw-embed__facade-play,
+.iw-embed__facade:focus-visible .iw-embed__facade-play {
+    background-color: var(--iw-embed-facade-play-bg-hover, var(--color-primary));
+    transform: translate(-50%, -50%) scale(var(--iw-embed-facade-play-hover-scale, 1.06));
+}
+
+.iw-embed__facade:focus-visible {
+    outline: var(--iw-embed-consent-focus-width, 2px) solid var(--iw-embed-consent-focus-color, var(--color-primary));
+    outline-offset: calc(-1 * var(--iw-embed-consent-focus-width, 2px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-embed__facade-play {
+        transition: none;
+    }
+}
+
 /* Self-sizing embed (sandboxed code block): the frame reports its content
    height and the embed_resize controller writes --iw-embed-height. The class
    default applies until the first message arrives, so nothing collapses. */
