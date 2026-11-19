@@ -278,14 +278,8 @@
                     <meta><title>iw_sulu_tailwind_theme.image_format</title></meta>
                     <params>
                         <param name="default_value" value="original"/>
-                        <param name="values" type="collection">
-                            <param name="16_9"><meta><title>16:9</title></meta></param>
-                            <param name="4_3"><meta><title>4:3</title></meta></param>
-                            <param name="1_1"><meta><title>1:1</title></meta></param>
-                            <param name="3_4"><meta><title>3:4</title></meta></param>
-                            <param name="a"><meta><title>iw_sulu_tailwind_theme.ratio_a_series</title></meta></param>
-                            <param name="original"><meta><title>iw_sulu_tailwind_theme.format_original</title></meta></param>
-                        </param>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues('_', null, true)"/>
                     </params>
                 </property>
                 <!--

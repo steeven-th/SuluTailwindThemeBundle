@@ -13,6 +13,7 @@ The card surface reuses the same variables as `article_list` (`--iw-block-articl
 | Class | Role |
 |-------|------|
 | `.iw-block-article-carousel` | Root wrapper (relative for nav positioning). |
+| `.iw-block-article-carousel--portrait` | Set when the block's image ratio is portrait (its own **Image ratio** setting, else the theme's card ratio). Shows one more card on desktop. |
 | `.iw-block-article-carousel__nav` | Top-right row containing the prev/next buttons. |
 | `.iw-block-article-carousel__nav-button` | Round arrow button. |
 | `.iw-block-article-carousel__nav-button--prev` / `--next` | Direction modifier. |
@@ -45,6 +46,7 @@ The card surface reuses the same variables as `article_list` (`--iw-block-articl
 | `--iw-block-article-carousel-track-gap` | `var(--iw-cards-gap, 1.5rem)` | Gap between slides. |
 | `--iw-block-article-carousel-slide-width-mobile` | `85%` | Slide width below `640px`. |
 | `--iw-block-article-carousel-cols` | `3` | Number of visible cards on `>=1024px`. Tablet (`>=640px`) is always 2. |
+| `--iw-block-article-carousel-cols-portrait` | `4` | Number of visible cards on `>=1024px` with a portrait ratio. |
 
 ---
 

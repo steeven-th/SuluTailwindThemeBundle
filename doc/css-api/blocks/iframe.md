@@ -65,6 +65,17 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `.iw-embed__consent-company` / `.iw-embed__consent-policy` | The company, and the link to its privacy policy (new tab). |
 | `.iw-embed__consent-button` | Accept / open-preferences button. |
 
+### Facade
+
+The poster image of a video widget, in front of a player that only loads on
+click ([why](../../consent.md#the-poster-image-as-a-facade)).
+
+| Class | Role |
+|-------|------|
+| `.iw-embed__facade` | The `<button>` covering the box. Hidden until the content is allowed, then until it is clicked. |
+| `.iw-embed__facade-picture` | The editor's image, filling the box (`object-fit: cover`). |
+| `.iw-embed__facade-play` | The play mark, centred. Takes no clicks of its own. |
+
 ---
 
 ## CSS variables
@@ -89,7 +100,19 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `--iw-embed-consent-text-line-height` | `1.5` | Message line height. |
 | `--iw-embed-consent-details-size` / `-opacity` | `0.875rem` / `0.8` | Line under the message, the address of a waiting map. |
 | `--iw-embed-consent-provider-size` / `-opacity` | `0.8125rem` / `0.8` | Line naming the company and its policy. |
-| `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring. |
+| `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring, the facade's included. |
+
+### Facade
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `--iw-embed-facade-bg` | `#000` | Behind the image, while it loads. |
+| `--iw-embed-facade-play-size` | `clamp(3rem, 15%, 4.5rem)` | Diameter of the play mark, a share of the video width. |
+| `--iw-embed-facade-play-radius` | `50%` | Its corners, `0.75rem` for a rounded square. |
+| `--iw-embed-facade-play-bg` / `-bg-hover` | `rgb(0 0 0 / 0.6)` / `var(--color-primary)` | Its background, at rest and on hover or focus. |
+| `--iw-embed-facade-play-color` | `#fff` | The triangle. |
+| `--iw-embed-facade-play-hover-scale` | `1.06` | Growth on hover or focus. None under `prefers-reduced-motion`. |
+| `--iw-embed-facade-transition-duration` | `150ms` | Hover transition. |
 
 > **The button has no colors of its own.** It carries the theme's `.iw-button--primary`, so it inherits the configured background, text color, radius, padding and hover effect — and stays consistent with every other button on the site. Restyle it through the theme's button settings, or by overriding `.iw-button--primary`.
 >

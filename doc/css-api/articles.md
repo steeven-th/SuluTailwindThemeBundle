@@ -21,6 +21,7 @@ All values are exposed as `--iw-article-*` custom properties so a user-land proj
 | `--iw-article-card-title-hover-color` | Title link color on hover (`cardTitleHoverColor`, defaults to `--color-primary`) |
 | `--iw-article-card-hover-duration` | Shared hover transition duration |
 | `--iw-article-card-hover-easing` | Shared hover transition timing function |
+| `--iw-article-list-portrait-image-width` | Thumbnail width of the `list` style when its ratio is portrait (default `clamp(6rem, 20%, 11rem)`, against a third of the row in landscape) |
 
 All values are wired to the matching admin tokens (`articles_card*`) in `iw_theme_config_articles.xml`.
 
@@ -86,7 +87,7 @@ All values are wired to the matching admin tokens (`articles_card*`) in `iw_them
 | `.iw-article-listing--cards` | Two-column grid (single column on mobile) |
 | `.iw-article-listing--grid` | Three-column grid (two on tablet, one on mobile) |
 | `.iw-article-listing--list` | Vertical stack of horizontal cards |
-| `.iw-article-listing--portrait` | Adjusts the column count so portrait images don't blow the card height while keeping the `cards`-vs-`grid` differential (`cards-portrait`: 1/2/3 · `grid-portrait`: 2/3/4 across mobile/tablet/desktop). Applied automatically by the cards/grid templates when `cardOrientation` is `portrait`. |
+| `.iw-article-listing--portrait` | Set when the ratio in use is portrait, the one picked on the listing page or else the theme's. On `cards` and `grid` it bumps the column count so portrait images don't blow the card height while keeping the `cards`-vs-`grid` differential (`cards-portrait`: 1/2/3 · `grid-portrait`: 2/3/4 across mobile/tablet/desktop). On `list` it narrows the thumbnail (`--iw-article-list-portrait-image-width`). |
 | `.iw-article-listing__empty` | Centered "no articles" message |
 
 ### Overriding the look in your project

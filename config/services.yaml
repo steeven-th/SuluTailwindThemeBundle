@@ -425,6 +425,7 @@ services:
             - '%kernel.debug%'
             - '@itech_world.sulu_tailwind_theme.site_search_url_resolver'
             - '@ItechWorld\SuluTailwindThemeBundle\Service\SelfHostedFonts'
+            - '@itech_world.sulu_tailwind_theme.image_ratios'
         # The extension holds per-request counters (unique ids, form block
         # index) that end up in HTML served from a long-lived proxy cache, so it
         # implements ResetInterface: autoconfiguration tags it kernel.reset and
@@ -522,6 +523,13 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\ArticleHeroMigrateCommand:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $cacheManager: '@?sulu_http_cache.cache_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\BlockStylesMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'
@@ -566,8 +574,25 @@ services:
             - '@kernel'
             - '%itech_world_sulu_tailwind_theme.css_output_dir%'
             - '@itech_world.sulu_tailwind_theme.consent_service_audit'
+            - '@itech_world.sulu_tailwind_theme.image_ratios'
         tags:
             - { name: 'console.command' }
+
+    # The image ratios, the project's `iw_ratio_*` formats included. Public:
+    # the ratio selects of the forms list them through
+    # service('itech_world.sulu_tailwind_theme.image_ratios').
+    itech_world.sulu_tailwind_theme.image_ratios:
+        class: ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog
+        public: true
+        arguments:
+            - '%sulu_media.image.formats%'
+            - '@?translator'
+
+    ItechWorld\SuluTailwindThemeBundle\EventSubscriber\ImageRatioBoxSubscriber:
+        arguments:
+            - '@itech_world.sulu_tailwind_theme.image_ratios'
+        tags:
+            - { name: 'kernel.event_subscriber' }
 
     # ─── Article Twig Extension (loaded when article_templates.enabled) ─
     ItechWorld\SuluTailwindThemeBundle\Media\ImageSrcset:
@@ -636,6 +661,7 @@ services:
     # ─── FQCN Aliases ────────────────────────────────────────────────────
     ItechWorld\SuluTailwindThemeBundle\Service\OklchPaletteGenerator: '@itech_world.sulu_tailwind_theme.palette_generator'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeCompiler: '@itech_world.sulu_tailwind_theme.compiler'
+    ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog: '@itech_world.sulu_tailwind_theme.image_ratios'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeProvider: '@itech_world.sulu_tailwind_theme.provider'
     ItechWorld\SuluTailwindThemeBundle\Service\ThemeConfigResolver: '@itech_world.sulu_tailwind_theme.config_resolver'
     ItechWorld\SuluTailwindThemeBundle\Service\SlugValidator: '@itech_world.sulu_tailwind_theme.slug_validator'

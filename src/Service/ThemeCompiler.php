@@ -1214,6 +1214,11 @@ class ThemeCompiler
         $css .= "  .iw-article-listing--portrait.iw-article-listing--cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }\n";
         $css .= "  .iw-article-listing--portrait.iw-article-listing--grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }\n";
         $css .= "}\n";
+        // A list has one card per row: a portrait thumbnail at the usual third
+        // of the row would make each row taller than a screen, so it narrows.
+        $css .= ".iw-article-listing--portrait.iw-article-listing--list .iw-article-card--horizontal .iw-article-card__image {\n";
+        $css .= "  width: var(--iw-article-list-portrait-image-width, clamp(6rem, 20%, 11rem));\n";
+        $css .= "}\n";
 
         $css .= ".iw-article-listing__empty {\n";
         $css .= "  text-align: center;\n";

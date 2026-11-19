@@ -221,7 +221,7 @@ The bundle provides Stimulus controllers and CSS that need to be compiled by Web
 }
 ```
 
-> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is required as soon as one embed waits for consent, which YouTube and Vimeo videos always do, unless the site is set to `consent.mode: none`. See **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
+> ⚠️ The `consent` controller is the one entry that must **not** be `lazy` like the others. It installs the `window.iwConsent` API your cookie manager calls, so it has to exist before any embed decides whether it may load — with `lazy` it is fetched asynchronously and an early manager callback hits an undefined API, which fails intermittently (fine on a warm cache, broken on a cold one). It also prevents a placeholder flash on already-granted embeds. It is required as soon as one embed waits for consent, which YouTube and Vimeo videos always do, unless the site is set to `consent.mode: none`. A video with a poster image needs it whatever the mode: the image stays in front of the player until the visitor clicks play. See **[Consent](doc/consent.md)** for the full rationale and the ready-made adapters.
 
 > The `accordion` controller is **optional**. The accordion block is built on native `<details>`/`<summary>` and is fully functional without JavaScript — including "one item open at a time". The controller only backfills that grouping on browsers predating Chrome 120 / Safari 17.2 / Firefox 130, and opens the panel targeted by the URL fragment.
 
@@ -526,7 +526,9 @@ Three article templates will appear in the admin, each in its own tab:
 | **Event** (`iw_event`) | events | Events with start/end dates, location (physical or online), organizer |
 | **Blog Post** (`iw_blog_post`) | publications | Blog/journal articles with excerpt and reading time |
 
-All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `article-hero`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
+All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `hero-content`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
+
+An article has the **same head as a page**, from the shared `hero-content.xml` fragment: a main image, a **displayed title** that replaces the H1 (with words put forward and coloured, as on a page) and a subtitle. The `<title>` tag, Open Graph, the structured data, listings and cards keep the article title.
 
 The article body accepts the **same 17 block types as a page**, because both include the same `page-blocks.xml` fragment. The full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
 
@@ -570,6 +572,8 @@ The `iw_article_listing` page template renders a filtered, paginated article lis
 Filters combine (`/news?category=news&q=release&sort=title&page=2`) and pagination links preserve the active filters. URLs are shareable and SEO-friendly; filtering works without JavaScript.
 
 **What the page lists.** The page asks whether it lists *articles*, *upcoming events* or *past events*, and shows the selection that answers it — each one bound to the provider that can answer it, so the preview in the admin lists what the site will list. On an agenda the articles are ordered by the date an editor typed into the event, an event stays listed until it is over, and the sort dropdown disappears since the order is the calendar's. See **[Events and agendas](doc/events.md)**.
+
+**Style and image ratio per page.** The **Display** section of the page may depart from the theme for this listing alone: its **listing style** (grid, list, cards) and its **card image ratio**, A4 posters on the news and a list of publications next to it. Left on *Theme setting*, the page follows the theme. A ratio picked here applies to the `list` style too, with a narrower thumbnail when it is portrait. Projects add their own ratios with an `iw_ratio_*` image format, see [Ratios an editor can pick](doc/css-api/images.md#ratios-an-editor-can-pick).
 
 **Editorial scope vs visitor filters.** The page's smart_content defines the **editorial scope** — the admin picks the article types (news/event/blog), optional base categories/tags, default sort and a result cap. The visitor filters **refine within that scope**: the chosen type is always enforced, and the sidebar/URL filters narrow the list further (a search for "blog" on a News page returns nothing — it never escapes the news scope). The visitor sort overrides the admin default.
 

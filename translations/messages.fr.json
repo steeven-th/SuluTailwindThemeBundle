@@ -82,6 +82,7 @@
     "iw_sulu_tailwind_theme.consent_generic_provider": "un service tiers",
     "iw_sulu_tailwind_theme.consent_map_provider": "le fournisseur de la carte",
     "iw_sulu_tailwind_theme.consent_load": "Afficher le contenu",
+    "iw_sulu_tailwind_theme.embed_play": "Lancer la lecture : %title%",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Gérer mes préférences",
     "iw_sulu_tailwind_theme.consent_manage": "Gérer mes cookies",
     "iw_sulu_tailwind_theme.consent_manager_unavailable": "Le gestionnaire de cookies n'a pas pu s'afficher. Une extension de votre navigateur le bloque peut-être.",

@@ -20,17 +20,21 @@
 
     {# Image collides with the item edges when no inner radius is requested,
        otherwise the L4 card pads the image with its own radius inside. #}
+    {# 4:3 unless the block picks a ratio: the theme's card ratio is set for
+       grids, and a portrait one would make every row of the list too tall. #}
+    {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), '4_3') %}
+
     {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
     {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
-        <div class="iw-block-article-list iw-block-article-list--list">
+        <div class="iw-block-article-list iw-block-article-list--list{% if pickedRatio.portrait %} iw-block-article-list--portrait{% endif %}">
             {% for article in articleItems %}
                 <div class="iw-block-article-list__item iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
                         layout: 'horizontal',
-                        imageRatio: '4/3',
+                        imageRatio: pickedRatio.key,
                         showDate: true,
                         showExcerpt: true,
                         showCategory: true,

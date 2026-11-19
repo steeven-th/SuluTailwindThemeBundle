@@ -6,7 +6,6 @@ namespace ItechWorld\SuluTailwindThemeBundle\Twig;
 
 use ItechWorld\SuluTailwindThemeBundle\Article\EventClock;
 use ItechWorld\SuluTailwindThemeBundle\Article\EventOffer;
-use ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Service\EventFinder;
 use Sulu\Component\Security\Authentication\UserRepositoryInterface;
 use Twig\Extension\AbstractExtension;
@@ -458,7 +457,7 @@ class ArticleExtension extends AbstractExtension
         $cardImageRatio = (string) ($tokens['cardImageRatio'] ?? '16:9');
         // A portrait ratio has its width < its height (3:4, A series posters).
         // An unknown ratio resolves to 16:9, so it stays landscape.
-        $isPortrait = ImageRatioCatalog::resolve($cardImageRatio, '16_9')['portrait'];
+        $isPortrait = $this->themeExtension->getImageRatio($cardImageRatio, '16_9')['portrait'] ?? false;
 
         return [
             'newsStyle' => $tokens['articles_newsStyle'] ?? 'classic',

@@ -232,12 +232,15 @@ export default class extends Controller {
         // gets `location-map` here, so Leaflet asks for no tile before.
         controller: String,
         remember: { type: Boolean, default: true },
+        // Once allowed, wait behind the editor's image until the visitor
+        // clicks play: a player only shows the thumbnail of its own video.
+        facade: Boolean,
         // Messages of the "Manage cookies" button, translated server-side.
         unavailable: String,
         cleared: String,
     };
 
-    static targets = ['placeholder', 'frame', 'notice'];
+    static targets = ['placeholder', 'frame', 'notice', 'facade'];
 
     connect() {
         ensureApi();
@@ -341,6 +344,10 @@ export default class extends Controller {
             return;
         }
 
+        // The visitor clicked to see this video: playing it spares a second
+        // click on the facade. A manager answering later is no such click.
+        this.playRequested = true;
+
         // Stored only without a manager: with one, the next page asks it again.
         window.iwConsent.grant(this.serviceValue, {
             remember: 'placeholder' === this.modeValue && this.rememberValue,
@@ -393,7 +400,30 @@ export default class extends Controller {
     }
 
     /**
+     * Load the frame as the visitor's click on the facade.
+     *
+     * @param {Event} [event]
+     */
+    play(event) {
+        event?.preventDefault();
+        this.playRequested = true;
+
+        // The button that had the focus disappears: hand it to the player, once
+        // it exists, or a keyboard visitor lands back at the top of the page.
+        if (this.hasFrameTarget) {
+            const frame = this.frameTarget;
+            frame.addEventListener?.('load', () => frame.focus(), { once: true });
+        }
+
+        this.load();
+    }
+
+    /**
      * Insert the frame source, which is what actually triggers the request.
+     *
+     * Behind a facade, allowed is not yet playing: the facade shows until the
+     * visitor asks, and the source then carries `autoplay` so the one click
+     * starts the video.
      */
     load() {
         if (!this.hasFrameTarget) {
@@ -401,9 +431,23 @@ export default class extends Controller {
         }
 
         const frame = this.frameTarget;
+        const facade = this.facadeValue && this.hasFacadeTarget;
 
-        if (this.srcValue && frame.getAttribute('src') !== this.srcValue) {
-            frame.setAttribute('src', this.srcValue);
+        if (facade && !this.playRequested) {
+            this.facadeTarget.hidden = false;
+            frame.hidden = true;
+
+            if (this.hasPlaceholderTarget) {
+                this.placeholderTarget.hidden = true;
+            }
+
+            return;
+        }
+
+        const src = facade ? withAutoplay(this.srcValue) : this.srcValue;
+
+        if (src && frame.getAttribute('src') !== src) {
+            frame.setAttribute('src', src);
         }
 
         if (this.srcdocValue && frame.getAttribute('srcdoc') !== this.srcdocValue) {
@@ -418,6 +462,10 @@ export default class extends Controller {
         }
 
         frame.hidden = false;
+
+        if (this.hasFacadeTarget) {
+            this.facadeTarget.hidden = true;
+        }
 
         if (this.hasPlaceholderTarget) {
             this.placeholderTarget.hidden = true;
@@ -451,9 +499,34 @@ export default class extends Controller {
         }
 
         frame.hidden = true;
+        this.playRequested = false;
+
+        if (this.hasFacadeTarget) {
+            this.facadeTarget.hidden = true;
+        }
 
         if (this.hasPlaceholderTarget) {
             this.placeholderTarget.hidden = false;
         }
+    }
+}
+
+/**
+ * The source of a player asked to start on load.
+ *
+ * YouTube and Vimeo both read `autoplay=1`. A source that does not parse is
+ * left as it is: it still loads, it just waits for a second click.
+ *
+ * @param {string} src
+ * @returns {string}
+ */
+function withAutoplay(src) {
+    try {
+        const url = new URL(src);
+        url.searchParams.set('autoplay', '1');
+
+        return url.toString();
+    } catch {
+        return src;
     }
 }

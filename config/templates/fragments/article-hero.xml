@@ -1,29 +1,14 @@
 <?xml version="1.0" ?>
 <!--
     Fragment: Article hero section properties.
-    Provides hero image and subtitle for article templates.
+    Now hero-content.xml, shared with pages. Kept so the project templates
+    that include it keep working. Its former `subtitle` is `heroSubtitle`
+    there: content saved before is moved by iw-sulu:theme:migrate-article-hero.
     Summary/description, categories, tags, and SEO fields are handled
     natively by Sulu's Excerpt tab.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="heroImage" type="single_media_selection" colspan="12">
-        <meta>
-            <title>iw_sulu_tailwind_theme.article.hero_image</title>
-            <info_text>iw_sulu_tailwind_theme.article.hero_image_info</info_text>
-        </meta>
-        <params>
-            <param name="types" value="image"/>
-            <param name="formats" type="collection">
-                <param name="iw_hero_lg" />
-                <param name="iw_hero_md" />
-            </param>
-        </params>
-    </property>
-
-    <property name="subtitle" type="iw_theme_title_editor" colspan="12">
-        <meta><title>iw_sulu_tailwind_theme.article.subtitle</title></meta>
-        <params>
-            <param name="context" value="pages"/>
-        </params>
-    </property>
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="hero-content.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 </properties>

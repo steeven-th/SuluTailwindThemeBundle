@@ -139,7 +139,8 @@
             {% endif %}
 
             {% if listingArticles is iterable and listingArticles|length > 0 %}
-                {% set listingStyle = iw_sulu_tailwind_theme_listing_style() %}
+                {# The page may depart from the theme's style and card ratio. #}
+                {% set listingStyle = content.listingStyle|default('') ?: iw_sulu_tailwind_theme_listing_style() %}
                 {% set stylePath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_' ~ listingStyle ~ '.html.twig' %}
                 {% set fallbackPath = '@ItechWorldSuluTailwindTheme/articles/listing/_style_grid.html.twig' %}
 
@@ -149,6 +150,7 @@
                     totalPages: listingTotalPages,
                     baseUrl: baseUrl,
                     filterQuery: listingFilterQuery,
+                    imageRatio: content.listingImageRatio|default(''),
                 } only %}
             {% elseif isFiltered and hasActiveFilters %}
                 {# Empty because the active filters match nothing — offer a way out. #}

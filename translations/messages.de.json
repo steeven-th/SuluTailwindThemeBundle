@@ -82,6 +82,7 @@
     "iw_sulu_tailwind_theme.consent_generic_provider": "einem Drittanbieter",
     "iw_sulu_tailwind_theme.consent_map_provider": "dem Kartenanbieter",
     "iw_sulu_tailwind_theme.consent_load": "Inhalt anzeigen",
+    "iw_sulu_tailwind_theme.embed_play": "Wiedergabe starten: %title%",
     "iw_sulu_tailwind_theme.consent_open_preferences": "Einstellungen verwalten",
     "iw_sulu_tailwind_theme.consent_manage": "Cookies verwalten",
     "iw_sulu_tailwind_theme.consent_manager_unavailable": "Der Cookie-Manager konnte nicht geöffnet werden. Möglicherweise blockiert ihn eine Browsererweiterung.",

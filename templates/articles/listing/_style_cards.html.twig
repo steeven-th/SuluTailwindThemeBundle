@@ -2,10 +2,12 @@
     Listing style: Cards
     Larger cards in 2 columns with prominent images.
     Surface, border and hover effects come from the theme article config.
+    - imageRatio: the ratio picked on the listing page, empty for the theme's
 #}
 {% set config = iw_sulu_tailwind_theme_article_config() %}
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), config.cardImageRatio) %}
 {% set listingClasses = ['iw-article-listing', 'iw-article-listing--cards'] %}
-{% if config.cardOrientation == 'portrait' %}
+{% if pickedRatio.portrait %}
     {% set listingClasses = listingClasses|merge(['iw-article-listing--portrait']) %}
 {% endif %}
 
@@ -14,7 +16,7 @@
         {% for article in articles %}
             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                 article: article,
-                imageRatio: config.cardImageRatio|default('16:9')|replace({':': '/'}),
+                imageRatio: pickedRatio.key,
                 showDate: config.showDates|iw_article_visible('listing'),
                 showExcerpt: config.showExcerpts|iw_article_visible('listing'),
                 showCategory: config.showCategories|iw_article_visible('listing'),
@@ -24,7 +26,7 @@
                 cardHoverTransform: config.cardHoverTransform,
                 cardHoverImage: config.cardHoverImage,
                 cardHoverBorder: config.cardHoverBorder,
-                imageSizes: iw_sulu_tailwind_theme_image_sizes(config.cardOrientation == 'portrait' ? {768: 1/2, 1024: 1/3} : {768: 1/2}),
+                imageSizes: iw_sulu_tailwind_theme_image_sizes(pickedRatio.portrait ? {768: 1/2, 1024: 1/3} : {768: 1/2}),
             } only %}
         {% endfor %}
     </div>

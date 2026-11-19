@@ -18,8 +18,7 @@ partial (and the blocks that crop images) rely on.
 
 Applied on the `<picture>` wrapper when the `ratio` param is set. The image
 inside fills the box with `object-cover`, so the ratio is enforced without any
-inline `style="aspect-ratio"`. The admin ratio pickers only expose this fixed
-set of values.
+inline `style="aspect-ratio"`.
 
 | Class | Ratio |
 |-------|-------|
@@ -34,17 +33,51 @@ set of values.
 | `.iw-ratio--a` | `600 / 849`, the A series (A4, A5 posters, 1:√2) in the pixels of `iw_theme_a_series` |
 
 The partial normalises the `ratio` param, so `'16/9'`, `'16:9'` and `'16-9'` all
-resolve to `.iw-ratio--16-9`.
+resolve to `.iw-ratio--16-9`. A template passing a ratio of its own only needs a
+`.iw-ratio--X-Y` rule in your stylesheet, no Twig change.
 
-To add a ratio, declare a new `.iw-ratio--X-Y` rule in your own stylesheet — no
-Twig change required.
+### Ratios an editor can pick
 
-The ratios an editor can pick in the admin (galleries, text and images, page
-hero, Cards tab) are listed once in `ImageRatioCatalog`, which ties each one to
-its image format and its box, and is read in Twig through
-`iw_sulu_tailwind_theme_image_ratio()`. Offering a new one there takes the
-three together: the catalogue entry, a format in `config/image-formats.xml`
-and its `.iw-ratio--*` rule. `ImageRatioContractTest` fails when one is missing.
+The ratio selects of the admin (Cards tab, page hero, galleries, text and
+images, article listing pages, article list and carousel blocks) all list one
+catalogue, `ImageRatioCatalog`. It ties each ratio to the image format cut to
+it and to its box, and Twig reads it through
+[`iw_sulu_tailwind_theme_image_ratio()`](../twig-reference.md#iw_sulu_tailwind_theme_image_ratiovalue-fallback).
+
+**Adding a ratio from a project** takes a single format in the project's
+`config/image-formats.xml`, whose key starts with `iw_ratio_`:
+
+```xml
+<format key="iw_ratio_cinema">
+    <meta>
+        <title lang="en">Cinema 21:9</title>
+        <title lang="fr">Cinéma 21:9</title>
+    </meta>
+    <scale x="2100" y="900" mode="outbound"/>
+</format>
+```
+
+- Every ratio select offers it, labelled with the format's `<title>` in the
+  admin's language (English, then any title, then the key as fallbacks).
+- The box is `.iw-ratio--cinema` (the rest of the key, `_` turned into `-`),
+  drawing `aspect-ratio: 2100 / 900` from the `scale`. It is written into the
+  compiled theme stylesheet, so run `bin/console iw-sulu:theme:compile` once the
+  format is added, then `cache:clear` for the admin to list it.
+- [Width variants](../twig-reference.md#width-variants-and-srcset) work as for any format:
+  `iw_ratio_cinema_w700`, declared `internal="true"`.
+- The prefix is the opt-in. A cropped format without it (an avatar, a hero
+  banner) never shows up in the selects.
+
+A prefixed format that cannot draw a box is left out of the selects, and
+`bin/console iw:tailwind-theme:check` says why: a `scale` without a height, a
+scale that does not crop (`mode="inset"`), a key with characters other than
+lowercase letters, digits and underscores, or a name whose box class is already
+taken (`iw_ratio_16_9`).
+
+A **bundle** ratio is added in `ImageRatioCatalog::RATIOS`, with its format in
+the bundle's `config/image-formats.xml` and its `.iw-ratio--*` rule in
+`app.css`. `ImageRatioContractTest` fails when one of the three is missing, and
+when a select lists ratios by hand instead of the catalogue.
 
 ---
 

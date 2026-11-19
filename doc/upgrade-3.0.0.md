@@ -563,6 +563,20 @@ point had no effect. Consequence: on wide viewports heroes now crop around the
 **top** of the image. Override `--iw-article-hero-ratio` (e.g. `21 / 9`) per theme
 for a more panoramic hero.
 
+### Article blocks follow the card ratio (breaking, visual)
+
+The `article_list` (grid, cards) and `article_carousel` blocks used to crop
+every image to 16:9 whatever the theme said, which cut A4 posters down to a
+strip. They now read the theme's card ratio (**Cards** tab), and each block can
+pick its own under **Settings > Image ratio**. On a theme whose card ratio is
+16:9 nothing changes. On any other, published blocks take the theme's ratio
+after the upgrade, a portrait one with one more column. The `list` style keeps
+its 4:3 unless the block picks a ratio.
+
+Article listing pages gain the same choice per page, along with the listing
+style, and a project can add its own ratios with an `iw_ratio_*` image format.
+See [Ratios an editor can pick](css-api/images.md#ratios-an-editor-can-pick).
+
 ## Page hero banner + overriding H1 (new)
 
 Page templates gain an optional **Hero** section (`page-hero.xml` fragment) with
@@ -636,6 +650,51 @@ page template**, include the fragment via XInclude and add the `_page_hero`
 include to your Twig to opt in.
 
 ---
+
+## Articles share the page head (breaking, content)
+
+Pages and articles now take their head from one fragment, `hero-content.xml`:
+`heroImage`, `heroTitle` and `heroSubtitle`. Articles gain the **displayed
+title** pages already had, which replaces the H1 and takes words put forward
+and coloured. The `<title>` tag, Open Graph, the structured data, listings and
+cards keep the article title.
+
+### The article tagline is renamed (breaking)
+
+The article `subtitle` is now `heroSubtitle`. Sulu only resolves the fields a
+template declares, so an article not migrated yet **shows no tagline**, and
+saving it in the admin **drops the former one for good**. Run the migration on
+every environment as soon as the bundle is updated, before anyone edits an
+article:
+
+```bash
+php bin/console iw-sulu:theme:migrate-article-hero --dry-run
+php bin/console iw-sulu:theme:migrate-article-hero
+```
+
+It moves draft, live and historical rows in every locale, can run twice, and
+clears the HTTP cache. A project whose own article templates include
+`article-hero.xml` names them with `--template=app_press_release` (the
+bundle's three are migrated by default).
+
+Smart content selections of articles keep exposing the tagline as `subtitle`,
+now read from `heroSubtitle`: a card template reading `article.subtitle` is
+unchanged. A template reading `content.subtitle` on an article page reads
+`content.heroSubtitle` instead.
+
+### Article image crops (fixed)
+
+The article image offered `iw_hero_lg` and `iw_hero_md` in the crop tool, two
+formats the bundle never declared, so a crop made there was never drawn. It
+now offers `iw_theme_hero` and `iw_theme_16_9`, the formats the article styles
+display. Crop the hero again in those formats where a framing matters.
+
+### Fragments
+
+`page-hero.xml` and `article-hero.xml` are kept and include `hero-content.xml`,
+so a project template including them keeps working and gains the new fields.
+The page field labels become neutral ("Main image", "Displayed title",
+"Subtitle"), the same on pages and articles.
 
 ## New content blocks: accordion, iframe, code (new)
 

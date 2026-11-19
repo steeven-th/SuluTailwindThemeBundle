@@ -3,20 +3,22 @@
     Full-width row cards with thumbnail left + title/meta/excerpt right.
     Each row is a horizontal `iw-article-card` so it picks up the same
     surface, border and hover effects as the other listing styles.
+    - imageRatio: the ratio picked on the listing page, empty for 16:9
 #}
 {% set config = iw_sulu_tailwind_theme_article_config() %}
-{# The list style ignores the configured ratio: a portrait image inside a
-   horizontal row card would make every row prohibitively tall. We force
-   16:9 and rely on object-fit:cover for the crop. #}
-{% set cardRatio = '16/9' %}
+{# The theme's card ratio is not applied here: set for the grid, a portrait
+   ratio would make every row of every list prohibitively tall. A ratio
+   picked on the listing page is a choice made for this list, so it applies,
+   a portrait one with a narrower thumbnail. #}
+{% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), '16_9') %}
 
 {% if articles is defined and articles is iterable and articles|length > 0 %}
-    <div class="iw-article-listing iw-article-listing--list">
+    <div class="iw-article-listing iw-article-listing--list{% if pickedRatio.portrait %} iw-article-listing--portrait{% endif %}">
         {% for article in articles %}
             {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                 article: article,
                 layout: 'horizontal',
-                imageRatio: cardRatio,
+                imageRatio: pickedRatio.key,
                 showDate: config.showDates|iw_article_visible('listing'),
                 showExcerpt: config.showExcerpts|iw_article_visible('listing'),
                 showCategory: config.showCategories|iw_article_visible('listing'),

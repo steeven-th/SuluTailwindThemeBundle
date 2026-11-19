@@ -28,6 +28,10 @@
      - consentRequired: whether this embed waits for consent. How it gets it
        is the site's `consent.mode` setting, not the caller's choice
      - consentService, consentText, consentImage: placeholder configuration
+     - facadeImage: optional media `{id}`. Once allowed, the frame waits behind
+       this image and a play button, and loads playing on click. A player
+       shows the thumbnail of its own video, which is not the image an editor
+       picked for a playlist
      - consentServiceLabel: name shown to the visitor in the default text,
        the one of the third-party services inventory when omitted
      - frameClass: extra classes (radius…)
@@ -37,6 +41,13 @@
    nothing at all on a site with no consent requirement. #}
 {% set consentMode = consentRequired|default(false) ? iw_sulu_tailwind_theme_consent_mode() : 'none' %}
 {% set needsConsent = consentMode != 'none' %}
+{# A deleted image leaves no facade: the frame loads as it would without. #}
+{% set facadeMedia = facadeImage.id|default(null) is not null and src|default('') is not empty
+    ? sulu_resolve_media(facadeImage.id, app.request.locale)
+    : null %}
+{% set hasFacade = facadeMedia is not null %}
+{# The source waits for the controller whenever it must not load on its own. #}
+{% set holdsSource = needsConsent or hasFacade %}
 {% set service = consentService|default('') is not empty ? consentService : 'embed' %}
 
 {# Sizing. Ratios and presets are enumerated classes (no inline style, and no
@@ -113,22 +124,23 @@
 {# A single data-controller attribute may list several controllers, so consent
    and self-sizing compose on the same element. #}
 {% set controllers = [] %}
-{% if needsConsent %}{% set controllers = controllers|merge(['consent']) %}{% endif %}
+{% if holdsSource %}{% set controllers = controllers|merge(['consent']) %}{% endif %}
 {% if heightMode == 'auto' %}{% set controllers = controllers|merge(['embed-resize']) %}{% endif %}
 
 <div
     {% if embedId is not empty %}id="{{ embedId }}"{% endif %}
     class="iw-embed {{ sizeClass }} {{ frameClass|default('') }}"
     {% if controllers is not empty %}data-controller="{{ controllers|join(' ') }}"{% endif %}
-    {% if needsConsent %}
+    {% if holdsSource %}
         data-consent-service-value="{{ service }}"
         data-consent-mode-value="{{ consentMode }}"
+        {% if hasFacade %}data-consent-facade-value="true"{% endif %}
         {% if src|default('') is not empty %}data-consent-src-value="{{ src }}"{% endif %}
         {% if srcdoc|default('') is not empty %}data-consent-srcdoc-value="{{ srcdoc|e('html_attr') }}"{% endif %}
     {% endif %}
 >
     <iframe
-        {% if needsConsent %}
+        {% if holdsSource %}
             {# Neither src nor srcdoc is emitted: an inline document would run
                immediately, and it is usually the pasted markup itself that
                calls the third party. Both are handed to the controller and
@@ -149,6 +161,23 @@
         {% if allowFullscreen|default(true) %}allowfullscreen{% endif %}
     ></iframe>
 
+    {% if hasFacade %}
+        {# Hidden until allowed, except where nothing has to be allowed. #}
+        <button type="button" class="iw-embed__facade" data-consent-target="facade" data-action="consent#play"
+                aria-label="{{ 'iw_sulu_tailwind_theme.embed_play'|trans({'%title%': frameTitle|default('iw_sulu_tailwind_theme.embed_frame'|trans)}) }}"
+                {% if needsConsent %}hidden{% endif %}>
+            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                media: facadeMedia,
+                format: 'iw_theme_16_9',
+                alt: '',
+                cover: true,
+                pictureClasses: 'iw-embed__facade-picture',
+            }) }}
+            <span class="iw-embed__facade-play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.02-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14Z"/></svg>
+            </span>
+        </button>
+    {% endif %}
     {% if needsConsent %}
         {% include '@ItechWorldSuluTailwindTheme/components/_consent_placeholder.html.twig' with {
             service: service,

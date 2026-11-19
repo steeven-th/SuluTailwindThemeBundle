@@ -15,58 +15,59 @@ use PHPUnit\Framework\TestCase;
  * A ratio needs three things besides its option: a Sulu image format cut to
  * it, a `.iw-ratio--*` box, and an entry in ImageRatioCatalog tying the two
  * together. Missing any of them fails in silence, the image falling back to a
- * 16:9 crop that keeps a sliver of a portrait picture. The options are read
- * from the forms, so a ratio added to a select without the rest fails here.
+ * 16:9 crop that keeps a sliver of a portrait picture. The selects list the
+ * catalogue itself, so a bundle ratio only has to be added there.
  */
 final class ImageRatioContractTest extends TestCase
 {
     /**
-     * The selects offering a ratio, and the values that do not name one.
+     * The selects offering a ratio.
      *
-     * `original` keeps the style's own ratio, so it has no entry by design.
-     *
-     * @var array<string, array{0: string, 1: list<string>}>
+     * @var array<string, array{0: string, 1: string}>
      */
     private const SELECTS = [
-        'cards' => ['config/forms/iw_theme_config_cards.xml', ['cardImageRatio']],
-        'page hero' => ['config/forms/iw_theme_config_pages.xml', ['pageHero_imageFormat']],
-        'gallery' => ['config/templates/blocks/gallery.xml', ['imageFilter']],
-        'text and images' => ['config/templates/blocks/text_images.xml', ['imageFilter']],
+        'cards' => ['config/forms/iw_theme_config_cards.xml', 'cardImageRatio'],
+        'page hero' => ['config/forms/iw_theme_config_pages.xml', 'pageHero_imageFormat'],
+        'gallery' => ['config/templates/blocks/gallery.xml', 'imageFilter'],
+        'text and images' => ['config/templates/blocks/text_images.xml', 'imageFilter'],
+        'article listing page' => ['config/templates/pages/iw_article_listing.xml', 'listingImageRatio'],
+        'article list block' => ['config/templates/blocks/article_list.xml', 'imageRatio'],
+        'article carousel block' => ['config/templates/blocks/article_carousel.xml', 'imageRatio'],
     ];
 
     /**
      * @return iterable<string, array{0: string, 1: string}>
      */
-    public static function offeredRatios(): iterable
+    public static function ratioSelects(): iterable
     {
-        foreach (self::SELECTS as $label => [$file, $properties]) {
-            $source = (string) file_get_contents(self::root() . '/' . $file);
-
-            foreach ($properties as $property) {
-                self::assertSame(
-                    1,
-                    preg_match('/<property name="' . preg_quote($property, '/') . '".*?<\/property>/s', $source, $match),
-                    \sprintf('%s no longer declares %s.', $file, $property),
-                );
-                preg_match_all('/<param name="([^"]+)"><meta>/', $match[0], $values);
-
-                foreach ($values[1] as $value) {
-                    if ('original' !== $value) {
-                        yield $label . ' / ' . $value => [$file, $value];
-                    }
-                }
-            }
+        foreach (self::SELECTS as $label => [$file, $property]) {
+            yield $label => [$file, $property];
         }
     }
 
+    /**
+     * A ratio select lists the catalogue rather than its own copy of it.
+     *
+     * A list typed into the XML is how a ratio ended up offered by some
+     * selects and not others, and a project ratio could never reach it.
+     */
     #[Test]
-    #[DataProvider('offeredRatios')]
-    public function everyOfferedRatioIsInTheCatalogue(string $file, string $value): void
+    #[DataProvider('ratioSelects')]
+    public function everyRatioSelectListsTheCatalogue(string $file, string $property): void
     {
-        self::assertTrue(
-            ImageRatioCatalog::has($value),
-            \sprintf('%s offers "%s", which ImageRatioCatalog does not know: it renders as the style fallback.', $file, $value),
+        $source = (string) file_get_contents(self::root() . '/' . $file);
+
+        self::assertSame(
+            1,
+            preg_match('/<property name="' . preg_quote($property, '/') . '".*?<\/property>/s', $source, $match),
+            \sprintf('%s no longer declares %s.', $file, $property),
         );
+        self::assertStringContainsString(
+            "service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues(",
+            $match[0],
+            \sprintf('%s lists the ratios of %s by hand: a project ratio never shows up there.', $file, $property),
+        );
+        self::assertStringNotContainsString('type="collection"', $match[0], \sprintf('%s keeps a typed list of ratios in %s.', $file, $property));
     }
 
     #[Test]
