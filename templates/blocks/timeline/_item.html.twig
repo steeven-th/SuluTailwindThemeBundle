@@ -88,11 +88,13 @@
         {% endif %}
 
         {% if step.image|default(null) is not empty %}
-            <div class="iw-timeline-step__image {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}">
+            {# Opens in the lightbox, with its credit and AI label. #}
+            <div class="iw-timeline-step__image {{ iw_sulu_tailwind_theme_image_max_width_class(imageMaxWidth|default('')) }}" data-controller="lightbox">
                 {% include '@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig' with {
                     media: step.image,
                     format: 'iw_theme_4_3',
-                    radiusClass: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default(''))
+                    radiusClass: iw_sulu_tailwind_theme_radius_class('image', imageRadius|default('')),
+                    lightbox: true,
                 } only %}
             </div>
         {% endif %}

@@ -191,8 +191,8 @@ under a transparent menu bar, the top corners keep out from under the bar
 - The featured article cards, the wide gallery carousel, the inline image of
   the magazine news style, the mega menu cards and the burger menu picture.
 - The picture behind a consent placeholder.
-- Every lightbox of the bundle (galleries, text and images, `_image`), in its
-  description: the lightbox shows the picture alone, out of its box.
+- Every lightbox of the bundle, in its caption: the lightbox shows the
+  picture alone, out of its box. See [The lightbox](#the-lightbox).
 - The structured data of articles and events, as an `ImageObject` (see
   [Structured data](../structured-data.md)).
 
@@ -209,6 +209,31 @@ Its caller says how its notices reach the box:
 
 A raw image given none of them gets no notice. `MediaNoticeRenderTest`
 checks that every raw image of the bundle says where they go.
+
+### The lightbox
+
+Content images that are no link open in a lightbox on click: galleries,
+text and images, timeline steps, the image widgets of accordions and forms,
+and cards that are not a link as a whole. Banners, decorations, images that
+are a link and CSS backgrounds do not.
+
+Its caption shows, under the picture:
+
+1. the media **title** and **description**, when the block's **Show image
+   names and descriptions** is checked;
+2. a quieter line with the **AI label** and the **credit**, always.
+
+A lightbox link carries them as `data-title`, `data-description` and
+`data-notices`, plain text the `lightbox` controller escapes before
+GLightbox writes them. A link of your own includes
+`components/_lightbox_description.html.twig` (`{media, details}`) for the
+last two. A link belongs to the nearest `lightbox` controller, so a widget
+with its own inside a block with one opens once.
+
+| Class / variable | Role |
+|---|---|
+| `.iw-lightbox__description` / `--iw-lightbox-description-color` (`#333`) | The media description |
+| `.iw-lightbox__notices` / `--iw-lightbox-notices-color` (`#666`), `-size` (`0.8125rem`), `-gap` (`0.5rem`) | The AI label and the credit |
 
 ### Small boxes
 

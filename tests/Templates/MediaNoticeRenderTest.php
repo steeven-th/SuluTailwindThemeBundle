@@ -163,9 +163,19 @@ final class MediaNoticeRenderTest extends TestCase
     #[Test]
     public function theLightboxCarriesTheLabelAndTheCredit(): void
     {
-        $html = $this->render(['media' => ['credits' => 'Photo: Bot'] + self::GENERATED, 'lightbox' => true]);
+        $html = $this->render(['media' => ['credits' => 'Photo: Bot', 'description' => 'A portal'] + self::GENERATED, 'lightbox' => true]);
 
-        self::assertStringContainsString('data-description="iw_sulu_tailwind_theme.media_ai_generated · Photo: Bot"', $html);
+        self::assertStringContainsString('data-notices="iw_sulu_tailwind_theme.media_ai_generated · Photo: Bot"', $html);
+        self::assertStringNotContainsString('data-description', $html, 'The description waits for the names and descriptions option');
+    }
+
+    #[Test]
+    public function theNamesOptionAddsTheMediaDescriptionToTheLightbox(): void
+    {
+        $html = $this->render(['media' => ['description' => 'A <b>portal</b>'] + self::PLAIN, 'lightbox' => true, 'showName' => true]);
+
+        self::assertStringContainsString('data-description="A portal"', $html);
+        self::assertStringContainsString('data-title="Town"', $html);
     }
 
     /**
@@ -253,6 +263,27 @@ final class MediaNoticeRenderTest extends TestCase
         }
 
         self::assertGreaterThanOrEqual(12, $links);
+    }
+
+    /**
+     * Content images that are no link open in the lightbox, with their
+     * notices: timeline steps, widget images (accordion, form), cards. A card
+     * that is a link whole keeps its click for its target.
+     */
+    #[Test]
+    public function contentImagesThatAreNoLinkOpenInTheLightbox(): void
+    {
+        $root = \dirname(__DIR__, 2) . '/templates/';
+
+        $card = (string) file_get_contents($root . 'blocks/cards/_card.html.twig');
+        self::assertSame(2, substr_count($card, 'lightbox: not wholeCardIsLink'));
+        self::assertSame(2, substr_count($card, '{% if not wholeCardIsLink %} data-controller="lightbox"{% endif %}'));
+
+        $step = (string) file_get_contents($root . 'blocks/timeline/_item.html.twig');
+        self::assertStringContainsString('data-controller="lightbox"', $step);
+        self::assertStringContainsString('lightbox: true', $step);
+
+        self::assertStringContainsString('data-controller="lightbox"', (string) file_get_contents($root . 'blocks/common/widgets/_image.html.twig'));
     }
 
     /**

@@ -1,13 +1,20 @@
-{# The ` data-description` attribute of a lightbox link: the AI label and the
-   credit of the picture, which the lightbox shows alone, out of the box its
-   notices sit in. Nothing when there is nothing to say.
+{# The caption attributes of a lightbox link, plain text read by the
+   lightbox controller. The lightbox shows the picture alone, out of the box
+   its notices sit on:
+     - data-description: the media description, when the block shows names
+       and descriptions
+     - data-notices: the AI label and the credit, always
+   Nothing when there is nothing to say.
 
    Expected variables:
      - media: the resolved media
+     - details: true when the block shows names and descriptions
 #}
 {%- set notice = iw_sulu_tailwind_theme_media_notice(media) -%}
-{%- set parts = [
+{%- set description = details|default(false) ? (media.description|default('')|striptags|trim) : '' -%}
+{%- set notices = [
     notice.origin|default(null) is not null ? ('iw_sulu_tailwind_theme.media_' ~ notice.origin)|trans : null,
     iw_sulu_tailwind_theme.imageCredits|default('overlay') != 'none' ? notice.credit|default(null) : null,
 ]|filter(v => v is not null) -%}
-{%- if parts is not empty %} data-description="{{ parts|join(' · ') }}"{% endif -%}
+{%- if description is not empty %} data-description="{{ description }}"{% endif -%}
+{%- if notices is not empty %} data-notices="{{ notices|join(' · ') }}"{% endif -%}
