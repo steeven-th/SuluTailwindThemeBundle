@@ -78,6 +78,7 @@ final class LocationMapConsentRenderTest extends TestCase
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
         $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
         $twig->addGlobal('iw_sulu_tailwind_theme', $theme);
         $twig->addGlobal('app', ['request' => ['locale' => 'en']]);
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => $mode));

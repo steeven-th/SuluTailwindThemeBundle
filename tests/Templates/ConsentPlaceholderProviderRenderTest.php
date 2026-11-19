@@ -129,6 +129,7 @@ final class ConsentPlaceholderProviderRenderTest extends TestCase
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
         $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
         // Compiled with the placeholder picture, never called: no media here.
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (): ?array => null));
         $twig->addFunction(new TwigFunction(

@@ -283,7 +283,7 @@ Pick the block's service instead, or declare `embed` in the snippet and in the m
 
 ## The placeholder for the whole site
 
-**Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's poster image, that picks its own keeps it.
+**Picture.** Set it once in the theme, **Default settings > Images > Consent**, rather than on every iframe, video and map. A block, or a video's poster image, that picks its own keeps it.
 
 **Texts.** The waiting message and the button labels are translations, so they follow the language of the page. A project rewords them in its own translation files, which win over the bundle's:
 

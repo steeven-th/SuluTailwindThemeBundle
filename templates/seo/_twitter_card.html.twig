@@ -6,7 +6,7 @@
 {% set twitterDescription = extension.excerpt.description|default(extension.seo.description|default('')) %}
 
 {# Resolve image: same logic as OG — excerpt image → hero image → theme default
-   share image (Components > Sharing).
+   share image (Default settings > Images > Sharing).
    Keep the resolution and the card-type decision below in the SAME template:
    twitter:card is derived from twitterImageUrl, so a fallback added elsewhere
    (in a project template, after this include) would emit a second, contradictory

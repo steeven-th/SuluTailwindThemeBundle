@@ -213,6 +213,9 @@ class ThemeFormMapper
         'cardTitleSize', 'cardTextSize',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
+        // Credit and AI label of the images: how the credit shows, and the
+        // corner of the rendered box both sit in.
+        'imageCredits', 'imageNoticePosition',
         // Social sharing fallback (Open Graph / Twitter Card thumbnail).
         'components_shareDefaultImage',
         // Site-wide page hero (banner) appearance. Per-page content lives in

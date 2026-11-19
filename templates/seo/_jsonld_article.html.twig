@@ -94,7 +94,7 @@
     'dateModified': modifiedDate is not null ? modifiedDate|date('c') : null,
     'author': authorsList|length == 1 ? authorsList|first : (authorsList|length > 1 ? authorsList : null),
     'publisher': publisherData,
-    'image': imageUrl,
+    'image': iw_sulu_tailwind_theme_jsonld_image(imgMedia|default(null), imageUrl),
     'description': description is not empty ? description|slice(0, 300) : null,
     'mainEntityOfPage': {
         '@type': 'WebPage',

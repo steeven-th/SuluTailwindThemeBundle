@@ -10,7 +10,7 @@
      - consentText: editor text replacing the default one
      - consentImage: optional media `{id}`, a decorative background. Falls
        back to the picture set for the whole site in the theme (Default
-       settings > Blocks), then to none
+       settings > Images), then to none
      - consentButtonStyle: theme button style, the variant one by default
      - details: optional line under the text (the address of a map)
 #}
@@ -38,6 +38,11 @@
            panel stays, it just loses its illustration. #}
         {% if consentMedia is not null %}
             <img src="{{ consentMedia.url }}" alt="" loading="lazy" class="iw-embed__consent-image">
+            {# The picture is shown, so it carries its credit and AI label too,
+               over the whole placeholder: the box the picture fills. #}
+            {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', {
+                notice: iw_sulu_tailwind_theme_media_notice(consentMedia),
+            }, with_context = false) }}
         {% endif %}
     {% endif %}
 

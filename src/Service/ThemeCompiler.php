@@ -4634,11 +4634,21 @@ class ThemeCompiler
         // Horizontal card layout (image + text side by side)
         $css .= ".iw-mega-menu__card--horizontal { display: flex; align-items: center; }\n";
         $css .= ".iw-mega-menu__card--horizontal img { width: 40%; flex-shrink: 0; }\n";
+        // An image carrying a credit or an AI label is wrapped (`.iw-media`,
+        // see _image.html.twig): the wrapper takes the column, the image fills it.
+        $css .= ".iw-mega-menu__card--horizontal > .iw-media { width: 40%; flex-shrink: 0; }\n";
+        $css .= ".iw-mega-menu__card--horizontal > .iw-media img { width: 100%; }\n";
         $css .= ".iw-mega-menu__card--horizontal .iw-mega-menu__card-body { flex: 1; }\n";
         $css .= ".iw-mega-menu__card--img-right { flex-direction: row-reverse; }\n";
         // Horizontal featured layout (image + content side by side)
         $css .= ".iw-mega-menu__featured--horizontal { display: flex; align-items: flex-start; gap: 1.5rem; }\n";
         $css .= ".iw-mega-menu__featured--horizontal img { width: 45%; flex-shrink: 0; }\n";
+        $css .= ".iw-mega-menu__featured--horizontal > .iw-media { width: 45%; flex-shrink: 0; }\n";
+        $css .= ".iw-mega-menu__featured--horizontal > .iw-media img { width: 100%; }\n";
+        // Space under a stacked featured image, on the image or on its wrapper:
+        // on the image inside a wrapper, the notices would sit in the margin.
+        $css .= ".iw-mega-menu__featured:not(.iw-mega-menu__featured--horizontal) > picture > img, ";
+        $css .= ".iw-mega-menu__featured:not(.iw-mega-menu__featured--horizontal) > .iw-media { margin-bottom: 1rem; }\n";
         $css .= ".iw-mega-menu__featured--horizontal .iw-mega-menu__featured-body { flex: 1; }\n";
         $css .= ".iw-mega-menu__featured--img-right { flex-direction: row-reverse; }\n";
         $css .= "\n";

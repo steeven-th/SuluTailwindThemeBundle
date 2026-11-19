@@ -191,6 +191,7 @@
                 fetchpriority: 'high',
                 itemprop: 'image',
                 classes: imgClasses,
+                notice: false,
             }) }}
         {% endif %}
 
@@ -208,6 +209,13 @@
                     {% if breadcrumbPosition == 'below' %}{{ breadcrumbHtml }}{% endif %}
                 </div>
             </div>
+        {% endif %}
+
+        {# Credit and AI label, last so the title layer never covers them. #}
+        {% if hasImage %}
+            {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', {
+                notice: iw_sulu_tailwind_theme_media_notice(media),
+            }, with_context = false) }}
         {% endif %}
     </section>
 

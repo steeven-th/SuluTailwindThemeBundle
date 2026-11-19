@@ -95,6 +95,7 @@
                                             href="{{ media.url }}"
                                             class="glightbox block w-full h-full"
                                             data-title="{{ showNames and media.title is defined ? media.title : '' }}"
+                                            {{- include('@ItechWorldSuluTailwindTheme/components/_lightbox_description.html.twig', {media: media}, with_context = false) }}
                                         >
                                             {#- A slide is at most 300px wide (--slide-width) and the
                                                 current one is scaled 1.2: 360px covers every slide. -#}

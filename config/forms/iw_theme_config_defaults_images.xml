@@ -1,0 +1,126 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Default settings tab, Images sub-tab.
+
+    What applies to every image of the site, whatever renders it (blocks,
+    heroes, articles, cards): the formats it is served in, how it is
+    credited, the picture behind the consent placeholders, and the one the
+    site is shared with.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_defaults_images</key>
+
+    <properties>
+        <section name="imageDelivery">
+            <meta>
+                <title>iw_sulu_tailwind_theme.images_section_delivery</title>
+            </meta>
+            <properties>
+                <!-- AVIF <source> in the <picture> pipeline. Default on; turn it off
+                     when the server's imagine driver (GD/Imagick) cannot encode AVIF
+                     (WebP + original stay served regardless). -->
+                <property name="imageAvif" type="checkbox" colspan="6">
+                    <params>
+                        <param name="type" value="toggler"/>
+                        <param name="default_value" value="true"/>
+                        <param name="label"><meta><title>iw_sulu_tailwind_theme.image_avif</title></meta></param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <section name="imageNotices">
+            <meta>
+                <title>iw_sulu_tailwind_theme.images_section_notices</title>
+            </meta>
+            <properties>
+                <!-- The "Credits" field of the media library (or its copyright
+                     when empty). Laid over a corner of the rendered box by
+                     default: a caption adds height under every credited
+                     image, an existing layout would move. -->
+                <property name="imageCredits" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.image_credits</title>
+                        <info_text>iw_sulu_tailwind_theme.image_credits_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="overlay"/>
+                        <param name="values" type="collection">
+                            <param name="overlay"><meta><title>iw_sulu_tailwind_theme.image_credits_overlay</title></meta></param>
+                            <param name="info"><meta><title>iw_sulu_tailwind_theme.image_credits_info_mark</title></meta></param>
+                            <param name="caption"><meta><title>iw_sulu_tailwind_theme.image_credits_caption</title></meta></param>
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.image_credits_none</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- Shared by the credit and the AI label, stacked in the same
+                     corner. The AI label itself is not a theme setting: it is
+                     a legal duty, switched off in the project YAML only. -->
+                <property name="imageNoticePosition" type="single_select" colspan="6">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.image_notice_position</title>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="bottom-right"/>
+                        <param name="values" type="collection">
+                            <param name="bottom-right"><meta><title>iw_sulu_tailwind_theme.image_notice_bottom_right</title></meta></param>
+                            <param name="bottom-left"><meta><title>iw_sulu_tailwind_theme.image_notice_bottom_left</title></meta></param>
+                            <param name="top-right"><meta><title>iw_sulu_tailwind_theme.image_notice_top_right</title></meta></param>
+                            <param name="top-left"><meta><title>iw_sulu_tailwind_theme.image_notice_top_left</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!--
+            What a third-party embed or a map shows while it waits for consent.
+            Only the picture is set here: a text typed in this form would be
+            the same in every language of the site, so the waiting message
+            stays a translation, which a project overrides in its own
+            translation files (doc/consent.md).
+        -->
+        <section name="consentPlaceholder">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_consent</title>
+            </meta>
+            <properties>
+                <property name="components_consentImage" type="single_media_selection" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_consent_image</title>
+                        <info_text>iw_sulu_tailwind_theme.components_consent_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <!-- Social preview: the picture the site shares under its own name. -->
+        <section name="imageSharing">
+            <meta>
+                <title>iw_sulu_tailwind_theme.components_section_sharing</title>
+            </meta>
+            <properties>
+                <!-- Last-resort share thumbnail. Used only when the page provides
+                     neither an excerpt image nor a hero image, so that a page built
+                     out of blocks (the home page, typically) still shares with a
+                     picture. Served through the iw_og_image format (1200x630). -->
+                <property name="components_shareDefaultImage" type="single_media_selection" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_share_default_image</title>
+                        <info_text>iw_sulu_tailwind_theme.components_share_default_image_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="types" value="image"/>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>

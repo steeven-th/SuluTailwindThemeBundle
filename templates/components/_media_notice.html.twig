@@ -1,0 +1,48 @@
+{# What an image tells the visitor about itself, laid over it: the AI label
+   (AI Act, article 50) and the credit. Placed in a corner of the box the
+   image is rendered in, so a crop or a ratio never pushes it out of sight.
+   The caller provides that box, positioned.
+
+   Expected variables:
+     - notice: the result of iw_sulu_tailwind_theme_media_notice(media)
+     - creditMode: 'overlay' | 'info' | 'none' | 'caption'. The theme
+       setting when omitted, a caption becoming an overlay: this layer lies
+       over a box, it has no "under". A caller passing 'caption' renders
+       the credit under the image itself, and this layer leaves it out
+     - position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left',
+       the theme setting when omitted
+#}
+{% set themeCredits = iw_sulu_tailwind_theme.imageCredits|default('overlay') %}
+{% set creditMode = creditMode|default(themeCredits == 'caption' ? 'overlay' : themeCredits) %}
+{% set positions = ['bottom-right', 'bottom-left', 'top-right', 'top-left'] %}
+{% set position = position|default(iw_sulu_tailwind_theme.imageNoticePosition|default('bottom-right')) %}
+{% set position = position in positions ? position : 'bottom-right' %}
+{% set showCredit = notice.credit|default(null) is not null and creditMode in ['overlay', 'info'] %}
+{% set origin = notice.origin|default(null) %}
+
+{% if showCredit or origin is not null %}
+    <span class="iw-media-notice iw-media-notice--{{ position }}">
+        <span class="iw-media-notice__stack">
+            {% if origin is not null %}
+                {# Real text, read by screen readers: the alt of the image
+                   describes what it shows, not where it comes from. #}
+                <span class="iw-media-notice__ai">
+                    {{ include('@ItechWorldSuluTailwindTheme/components/_eu_ai_icon.html.twig') }}
+                    <span class="iw-media-notice__ai-text">{{ ('iw_sulu_tailwind_theme.media_' ~ origin)|trans }}</span>
+                </span>
+            {% endif %}
+            {% if showCredit %}
+                {% if creditMode == 'info' %}
+                    {# Focusable, so a keyboard visitor reads it as a mouse
+                       does on hover. The text stays in the page either way. #}
+                    <span class="iw-media-notice__credit iw-media-notice__credit--info" tabindex="0">
+                        <span class="iw-media-notice__info-mark" aria-hidden="true">i</span>
+                        <span class="iw-media-notice__credit-text"><span class="sr-only">{{ 'iw_sulu_tailwind_theme.media_credit'|trans }} </span>{{ notice.credit }}</span>
+                    </span>
+                {% else %}
+                    <span class="iw-media-notice__credit" title="{{ notice.credit }}"><span class="sr-only">{{ 'iw_sulu_tailwind_theme.media_credit'|trans }} </span>{{ notice.credit }}</span>
+                {% endif %}
+            {% endif %}
+        </span>
+    </span>
+{% endif %}

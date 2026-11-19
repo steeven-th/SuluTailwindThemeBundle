@@ -83,10 +83,18 @@
                 fetchpriority: 'high',
                 itemprop: 'image',
                 classes: imgClass,
+                notice: false,
+            } %}
+            {# Credit and AI label, in the box the image fills: the inner
+               frame when contained, the hero otherwise. After the image and
+               the breadcrumb layer, so neither covers them. #}
+            {% set heroNotice = {
+                notice: iw_sulu_tailwind_theme_media_notice(media),
             } %}
             {% if modifier == 'contained' %}
                 <div class="iw-article-hero__inner">
                     {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', heroImageParams) }}
+                    {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', heroNotice, with_context = false) }}
                 </div>
             {% else %}
                 {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', heroImageParams) }}
@@ -102,6 +110,10 @@
                         } only %}
                     </div>
                 </div>
+            {% endif %}
+
+            {% if modifier != 'contained' %}
+                {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', heroNotice, with_context = false) }}
             {% endif %}
         </div>
     {% endif %}

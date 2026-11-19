@@ -1,0 +1,13 @@
+{# The ` data-description` attribute of a lightbox link: the AI label and the
+   credit of the picture, which the lightbox shows alone, out of the box its
+   notices sit in. Nothing when there is nothing to say.
+
+   Expected variables:
+     - media: the resolved media
+#}
+{%- set notice = iw_sulu_tailwind_theme_media_notice(media) -%}
+{%- set parts = [
+    notice.origin|default(null) is not null ? ('iw_sulu_tailwind_theme.media_' ~ notice.origin)|trans : null,
+    iw_sulu_tailwind_theme.imageCredits|default('overlay') != 'none' ? notice.credit|default(null) : null,
+]|filter(v => v is not null) -%}
+{%- if parts is not empty %} data-description="{{ parts|join(' · ') }}"{% endif -%}

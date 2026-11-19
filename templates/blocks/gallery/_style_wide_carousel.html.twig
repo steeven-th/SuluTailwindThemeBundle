@@ -55,6 +55,7 @@
                         href="{{ media.url }}"
                         class="iw-block-gallery__link glightbox block w-full h-full"
                         data-title="{{ (showImagesName|default(false)) and media.title is defined ? media.title : '' }}"
+                        {{- include('@ItechWorldSuluTailwindTheme/components/_lightbox_description.html.twig', {media: media}, with_context = false) }}
                     >
                         {# Parallax: the image is taller than its box (iw-parallax--{level})
                            and the slider controller translates it on scroll. #}
@@ -67,6 +68,7 @@
                             raw: true,
                             loading: 'eager',
                             classes: wideImgClasses,
+                            notice: 'parent',
                         }) }}
                     </a>
                 </div>

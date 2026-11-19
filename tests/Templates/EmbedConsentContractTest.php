@@ -140,6 +140,7 @@ final class EmbedConsentContractTest extends TestCase
         $twig->addFilter(new TwigFilter('trans', static fn (string $key): string => $key));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => $siteMode));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (): null => null));
 
         return $twig->render(

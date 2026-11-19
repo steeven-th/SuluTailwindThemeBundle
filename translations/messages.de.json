@@ -108,5 +108,8 @@
     "iw_sulu_tailwind_theme.consent_privacy_policy": "Datenschutzerklärung",
     "iw_sulu_tailwind_theme.consent_summary": "Inhalt bereitgestellt von %service%",
     "iw_sulu_tailwind_theme.consent_more": "Mehr erfahren",
-    "iw_sulu_tailwind_theme.consent_close": "Schließen"
+    "iw_sulu_tailwind_theme.consent_close": "Schließen",
+    "iw_sulu_tailwind_theme.media_ai_generated": "KI-generiertes Bild",
+    "iw_sulu_tailwind_theme.media_ai_modified": "Mit KI bearbeitetes Bild",
+    "iw_sulu_tailwind_theme.media_credit": "Bildnachweis:"
 }

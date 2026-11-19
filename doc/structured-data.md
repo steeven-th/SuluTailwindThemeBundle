@@ -32,6 +32,7 @@ Every article template fills the `seo_structured_data` block of the base templat
 | `dateModified` | **Last modified** date when an editor set it in the Settings tab, otherwise the date the article was last published in this language. Left out when it would come before `datePublished` |
 | `author` | The primary author and the additional authors, see below. One gives an object, several a list |
 | `publisher` | The site name and the desktop logo set in the theme menu. Left out when the site has no name |
+| `image` | The excerpt image, else the hero image, in the `iw_og_image` format. An `ImageObject` with `creditText` (the **Credits** of the media) and `copyrightNotice` (its **Copyright information**) when either is filled, which Google Images shows next to the picture. A plain address otherwise. Events do the same |
 | `articleSection`, `keywords` | First category, and the tags, from the Excerpt tab |
 
 ## Authors

@@ -1725,5 +1725,25 @@
     "iw_sulu_tailwind_theme.third_party_service_purpose": "Zweck",
     "iw_sulu_tailwind_theme.third_party_service_purpose_info": "Was der Dienst tut, in einem Satz, den ein Besucher lesen kann.",
     "iw_sulu_tailwind_theme.consent_service_generic": "Anderer Drittanbieter-Inhalt",
-    "iw_sulu_tailwind_theme.consent_service_maps": "Eigene Kartenkacheln"
+    "iw_sulu_tailwind_theme.consent_service_maps": "Eigene Kartenkacheln",
+
+    "iw_sulu_tailwind_theme.media_origin_section": "Herkunft des Bildes",
+    "iw_sulu_tailwind_theme.media_origin": "Herkunft des Bildes",
+    "iw_sulu_tailwind_theme.media_origin_human": "Foto oder von Menschen erstellt",
+    "iw_sulu_tailwind_theme.media_origin_ai_modified": "Mit KI bearbeitet",
+    "iw_sulu_tailwind_theme.media_origin_ai_generated": "Von KI erzeugt",
+    "iw_sulu_tailwind_theme.media_origin_info": "Pflicht für ein realistisches, mit KI erstelltes oder bearbeitetes Bild (Personen, Orte, Situationen, die echt wirken könnten). Die Website zeigt dann überall, wo das Bild erscheint, das KI-Symbol der Europäischen Union mit dem passenden Hinweis. Eine offensichtlich künstliche Illustration (Zeichnung, Schema, Symbol) kann als „Foto oder von Menschen erstellt“ bleiben.",
+    "iw_sulu_tailwind_theme.image_credits": "Bildnachweise",
+    "iw_sulu_tailwind_theme.image_credits_info": "Das Feld „Credits“ der Medienbibliothek, oder „Copyright“, wenn es leer ist. Eine Bildunterschrift erscheint nur unter einem Bild im Textfluss: ein Bild, das einen Rahmen füllt, erhält seinen Nachweis darübergelegt.",
+    "iw_sulu_tailwind_theme.image_credits_overlay": "Über einer Ecke des Bildes",
+    "iw_sulu_tailwind_theme.image_credits_info_mark": "Ein „i“-Symbol, der Nachweis bei Hover oder Fokus",
+    "iw_sulu_tailwind_theme.image_credits_caption": "Als Bildunterschrift",
+    "iw_sulu_tailwind_theme.image_credits_none": "Nicht anzeigen",
+    "iw_sulu_tailwind_theme.image_notice_position": "Ecke von Nachweis und KI-Hinweis",
+    "iw_sulu_tailwind_theme.image_notice_bottom_right": "Unten rechts",
+    "iw_sulu_tailwind_theme.image_notice_bottom_left": "Unten links",
+    "iw_sulu_tailwind_theme.image_notice_top_right": "Oben rechts",
+    "iw_sulu_tailwind_theme.image_notice_top_left": "Oben links",
+    "iw_sulu_tailwind_theme.images_section_delivery": "Ausgelieferte Formate",
+    "iw_sulu_tailwind_theme.images_section_notices": "Bildnachweise und KI-Hinweis"
 }

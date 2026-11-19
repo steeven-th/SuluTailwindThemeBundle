@@ -361,6 +361,7 @@ final class VideoWidgetRenderTest extends TestCase
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => self::$siteMode));
         // Compiled by the embed frame for its free-height modes, never called here.
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
 
         return $twig;
     }

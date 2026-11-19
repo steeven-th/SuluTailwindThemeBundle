@@ -585,8 +585,227 @@ img {
    radius appears to do nothing. That is what made every value below the theme
    default look identical to it. */
 picture[class*="rounded-"] > img,
-picture[class*="iw-radius--"] > img {
+picture[class*="iw-radius--"] > img,
+.iw-media[class*="rounded-"] > picture > img,
+.iw-media[class*="iw-radius--"] > picture > img {
     border-radius: 0;
+}
+
+/* ─── Credit and AI label of an image ──────────────────────────────────────
+   `_image.html.twig` wraps a credited or AI image in `.iw-media`, which takes
+   the classes of its <picture> (the <picture> turns `contents`): the wrapper
+   IS the rendered box, crop and ratio included, so a corner of it is a
+   corner the visitor sees. Specificity 0 on the position, so a `absolute`
+   utility the caller put on the box still wins. */
+:where(.iw-media) {
+    position: relative;
+}
+
+/* Frames a raw image fills, which lay its notices over themselves
+   (`notice: 'parent'`): the contained article hero, the featured article
+   cards, the inline image of the magazine article style. */
+:where(.iw-article-hero__inner, .iw-featured-article-card__image-wrap, .iw-article-page__hero-inline-image) {
+    position: relative;
+}
+
+/* A raw image wrapped for its notices (`notice: 'wrap'`): a block box the
+   caller's CSS sizes in place of the <img>. */
+.iw-media--wrap {
+    display: block;
+}
+
+/* The layer the notices sit in. A size container of its own, absolutely
+   placed: the image box is never turned into a container, which would
+   collapse a box sized by its content. No padding on it: a container query
+   cannot restyle the container itself, so the distance to the corner is a
+   margin of the stack inside, which the queries below can shrink. */
+.iw-media-notice {
+    position: absolute;
+    inset: 0;
+    z-index: var(--iw-media-notice-z, 2);
+    display: flex;
+    container-type: size;
+    pointer-events: none;
+}
+
+.iw-media-notice--bottom-right { align-items: flex-end; justify-content: flex-end; }
+.iw-media-notice--bottom-left { align-items: flex-end; justify-content: flex-start; }
+.iw-media-notice--top-right { align-items: flex-start; justify-content: flex-end; }
+.iw-media-notice--top-left { align-items: flex-start; justify-content: flex-start; }
+
+.iw-media-notice__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-media-notice-gap, 0.25rem);
+    max-width: calc(100% - 2 * var(--iw-media-notice-inset, 0.5rem));
+    min-width: 0;
+    margin: var(--iw-media-notice-inset, 0.5rem);
+}
+
+/* A hero under a transparent menu bar: its top corners are covered by the
+   bar, --iw-menu-overlap keeps the notices out from under it, as it does
+   for the title. */
+[data-iw-menu-overlay] > .iw-media-notice > .iw-media-notice__stack {
+    margin-top: calc(var(--iw-media-notice-inset, 0.5rem) + var(--iw-menu-overlap, 0px));
+}
+
+.iw-media-notice--bottom-right .iw-media-notice__stack,
+.iw-media-notice--top-right .iw-media-notice__stack {
+    align-items: flex-end;
+}
+
+.iw-media-notice--bottom-left .iw-media-notice__stack,
+.iw-media-notice--top-left .iw-media-notice__stack {
+    align-items: flex-start;
+}
+
+/* The AI label: the EU icon and the site's own translated text. */
+.iw-media-notice__ai {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--iw-media-ai-gap, 0.375rem);
+    max-width: 100%;
+    padding: var(--iw-media-ai-padding, 0.1875rem 0.625rem 0.1875rem 0.1875rem);
+    border-radius: var(--iw-media-ai-radius, 999px);
+    background-color: var(--iw-media-notice-bg, rgb(0 0 0 / 0.65));
+    color: var(--iw-media-notice-text, #fff);
+    font-size: var(--iw-media-ai-size, 0.75rem);
+    font-weight: var(--iw-media-ai-weight, 600);
+    line-height: 1.2;
+}
+
+.iw-media-notice__ai-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.iw-eu-ai-icon {
+    flex: none;
+    width: var(--iw-media-ai-icon-size, 1.5rem);
+    height: var(--iw-media-ai-icon-size, 1.5rem);
+}
+
+/* The official "white" variant: the label is dark, a black disc would vanish
+   in it. Restyled together with --iw-media-notice-bg, for a light label take
+   the "black" one (#000 disc, #fff letters). */
+.iw-eu-ai-icon__disc {
+    fill: var(--iw-media-ai-icon-disc, #fff);
+    opacity: var(--iw-media-ai-icon-disc-opacity, 1);
+}
+
+.iw-eu-ai-icon__letters {
+    fill: var(--iw-media-ai-icon-letters, #1d1d1b);
+}
+
+/* The credit, on one line: the whole text stays in the page for screen
+   readers, and in the title for a mouse. */
+.iw-media-notice__credit {
+    max-width: 100%;
+    padding: var(--iw-media-credit-padding, 0.125rem 0.5rem);
+    border-radius: var(--iw-media-credit-radius, 0.25rem);
+    background-color: var(--iw-media-notice-bg, rgb(0 0 0 / 0.65));
+    color: var(--iw-media-notice-text, #fff);
+    font-size: var(--iw-media-credit-size, 0.6875rem);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* "i" mode: a mark, the credit unfolding on hover or focus. Visually hidden
+   rather than display: none, so it is read either way. */
+.iw-media-notice__credit--info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0;
+    border-radius: 999px;
+    pointer-events: auto;
+    cursor: help;
+}
+
+.iw-media-notice__info-mark {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: var(--iw-media-info-size, 1.375rem);
+    height: var(--iw-media-info-size, 1.375rem);
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+}
+
+.iw-media-notice__credit--info .iw-media-notice__credit-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.iw-media-notice__credit--info:is(:hover, :focus-visible) {
+    padding-right: 0.625rem;
+}
+
+.iw-media-notice__credit--info:is(:hover, :focus-visible) .iw-media-notice__credit-text {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: hidden;
+    clip-path: none;
+    text-overflow: ellipsis;
+}
+
+.iw-media-notice__credit--info:focus-visible {
+    outline: 2px solid var(--iw-media-notice-focus, #fff);
+    outline-offset: 2px;
+}
+
+/* A small box (thumbnail, avatar): the label keeps the EU icon and its text
+   for screen readers, the credit gets smaller. Nothing disappears. */
+@container (max-width: 14rem) {
+    .iw-media-notice__ai {
+        padding: var(--iw-media-ai-padding-small, 0.125rem);
+    }
+
+    .iw-media-notice__ai-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .iw-media-notice__credit {
+        font-size: var(--iw-media-credit-size-small, 0.625rem);
+    }
+}
+
+@container (max-width: 8rem) {
+    .iw-media-notice__stack {
+        max-width: calc(100% - 2 * var(--iw-media-notice-inset-small, 0.25rem));
+        margin: var(--iw-media-notice-inset-small, 0.25rem);
+    }
+
+    .iw-eu-ai-icon {
+        width: var(--iw-media-ai-icon-size-small, 1.125rem);
+        height: var(--iw-media-ai-icon-size-small, 1.125rem);
+    }
+}
+
+/* Credit as a caption, under an image in the flow of the page. */
+.iw-media-figure {
+    display: block;
+}
+
+.iw-media-figure__caption {
+    display: block;
+    margin-top: var(--iw-media-caption-gap, 0.375rem);
+    font-size: var(--iw-media-caption-size, 0.8125rem);
+    line-height: 1.4;
+    opacity: var(--iw-media-caption-opacity, 0.75);
 }
 
 /* Override for cover images (used as backgrounds in overlay blocks, sliders, etc.) */

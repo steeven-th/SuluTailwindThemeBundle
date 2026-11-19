@@ -45,6 +45,19 @@
                         (e.g. from iw_sulu_tailwind_theme_radius_class('image', ...))
      - classes        : extra classes on the <img>
      - pictureClasses : extra classes on the <picture>
+     - notice         : true (default) | false | 'parent' | 'wrap'.
+                        The credit and the AI label of the image
+                        (components/_media_notice). They sit in a corner of
+                        the rendered box: the <picture> is then wrapped in a
+                        `.iw-media` span that takes its classes, the <picture>
+                        itself being limited to <source> and <img>. In `raw`
+                        mode the caller owns that box and says how to reach
+                        it: 'parent' when its own positioned element is the
+                        box of the image, 'wrap' for a block span around the
+                        image (its CSS then sizes `.iw-media` where it sized
+                        the <img>). A raw image given neither gets no notice
+                        (avatars, too small to carry one). false is for an
+                        image whose notices the caller renders itself
    ───────────────────────────────────────────────────────────────────────── #}
 
 {% set media = media|default(null) %}
@@ -87,6 +100,22 @@
     {% set webpSrcset = webpUrl ? iw_sulu_tailwind_theme_image_srcset(media, format, 'webp') : null %}
     {% set imageSizes = (baseSrcset or avifSrcset or webpSrcset) ? (sizes|default('100vw')) : null %}
 
+    {# Credit and AI label. The credit mode and the corner are theme
+       settings, the label follows the `media.ai_label` project setting. #}
+    {% set noticeMode = notice is defined ? notice : true %}
+    {% set mediaNotice = noticeMode is same as(false) ? {credit: null, origin: null} : iw_sulu_tailwind_theme_media_notice(media) %}
+    {% set creditMode = iw_sulu_tailwind_theme.imageCredits|default('overlay') %}
+    {# A caption goes under an image in the flow of the page. One that fills
+       a box (ratio, cover, a raw image sized by its caller) has no "under":
+       its credit is laid over it instead. #}
+    {% if creditMode == 'caption' and (raw|default(false) or hasRatio or cover|default(false)) %}
+        {% set creditMode = 'overlay' %}
+    {% endif %}
+    {% set noticePosition = iw_sulu_tailwind_theme.imageNoticePosition|default('bottom-right') %}
+    {% set hasLayerNotice = mediaNotice.origin is not null
+        or (mediaNotice.credit is not null and creditMode in ['overlay', 'info']) %}
+    {% set noticeVars = {notice: mediaNotice, creditMode: creditMode, position: noticePosition} %}
+
     {% if raw|default(false) %}
         {# Component-owned image: the <picture> is transparent (display:contents)
            so the caller's own CSS classes on the <img> fully drive the layout;
@@ -102,14 +131,26 @@
         {% set pictureClass = ('block ' ~ ratioClass ~ ' ' ~ (radiusClass|default('')) ~ (hasRadius ? ' overflow-hidden' : '') ~ ' ' ~ (pictureClasses|default('')) ~ (enableLightbox ? ' cursor-pointer' : ''))|trim %}
     {% endif %}
 
+    {# The box the image is rendered in carries the notices. Outside raw
+       mode it is ours: a span takes over the classes of the <picture>,
+       which keeps only its sources and turns transparent to layout. #}
+    {% set wrapNotice = hasLayerNotice and not raw|default(false) %}
+    {% set parentNotice = hasLayerNotice and raw|default(false) and noticeMode is same as('parent') %}
+    {% set rawWrap = hasLayerNotice and raw|default(false) and noticeMode is same as('wrap') %}
+    {% set captionCredit = mediaNotice.credit is not null and creditMode == 'caption' %}
+
     {% if enableLightbox %}
         <a
             href="{{ media.url }}"
             class="glightbox"
             data-title="{{ (showName|default(false)) and media.title is defined ? media.title : '' }}"
+            {{- include('@ItechWorldSuluTailwindTheme/components/_lightbox_description.html.twig', {media: media}, with_context = false) }}
         >
     {% endif %}
 
+    {% if captionCredit %}<span class="iw-media-figure">{% endif %}
+    {% if wrapNotice %}<span class="iw-media {{ pictureClass }}">{% set pictureClass = 'contents' %}{% endif %}
+    {% if rawWrap %}<span class="iw-media iw-media--wrap">{% endif %}
     <picture class="{{ pictureClass }}">
         {% if avifUrl %}<source srcset="{{ avifSrcset ?: avifUrl }}"{% if avifSrcset %} sizes="{{ imageSizes }}"{% endif %} type="image/avif">{% endif %}
         {% if webpUrl %}<source srcset="{{ webpSrcset ?: webpUrl }}"{% if webpSrcset %} sizes="{{ imageSizes }}"{% endif %} type="image/webp">{% endif %}
@@ -123,6 +164,14 @@
             {%- if itemprop is defined and itemprop %} itemprop="{{ itemprop }}"{% endif %}
         >
     </picture>
+    {% if wrapNotice or parentNotice or rawWrap %}
+        {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', noticeVars, with_context = false) }}
+    {% endif %}
+    {% if wrapNotice or rawWrap %}</span>{% endif %}
+    {% if captionCredit %}
+        <span class="iw-media-figure__caption"><span class="sr-only">{{ 'iw_sulu_tailwind_theme.media_credit'|trans }} </span>{{ mediaNotice.credit }}</span>
+        </span>
+    {% endif %}
 
     {% if enableLightbox %}
         </a>

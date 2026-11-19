@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>media_details</key>
+
+    <!-- Merged into Sulu's form of the same key. The section only carries the
+         field: MediaOriginFormVisitor moves it into Sulu's "License" section,
+         beside the copyright and the credits. -->
+
+    <properties>
+        <section name="iw_media_origin" colspan="8">
+            <meta>
+                <title>iw_sulu_tailwind_theme.media_origin_section</title>
+            </meta>
+            <properties>
+                <property name="iwImageOrigin" type="single_select">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.media_origin</title>
+                        <info_text>iw_sulu_tailwind_theme.media_origin_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="human"/>
+                        <param name="values" type="collection">
+                            <param name="human">
+                                <meta><title>iw_sulu_tailwind_theme.media_origin_human</title></meta>
+                            </param>
+                            <param name="ai_modified">
+                                <meta><title>iw_sulu_tailwind_theme.media_origin_ai_modified</title></meta>
+                            </param>
+                            <param name="ai_generated">
+                                <meta><title>iw_sulu_tailwind_theme.media_origin_ai_generated</title></meta>
+                            </param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>
