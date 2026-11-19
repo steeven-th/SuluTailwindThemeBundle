@@ -117,6 +117,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
         private readonly bool $debug = false,
         private readonly ?SiteSearchUrlResolver $siteSearchUrlResolver = null,
         private readonly ?SelfHostedFonts $selfHostedFonts = null,
+        private readonly ImageRatioCatalog $imageRatios = new ImageRatioCatalog(),
     ) {
     }
 
@@ -1178,7 +1179,7 @@ class ThemeExtension extends AbstractExtension implements GlobalsInterface, Rese
      */
     public function getImageRatio(?string $value = null, ?string $fallback = '16_9'): ?array
     {
-        return ImageRatioCatalog::resolve($value, $fallback);
+        return $this->imageRatios->resolve($value, $fallback);
     }
 
     /**

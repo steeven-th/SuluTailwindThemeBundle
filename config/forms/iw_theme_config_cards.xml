@@ -15,13 +15,8 @@
                     <meta><title>iw_sulu_tailwind_theme.articles_card_image_ratio</title></meta>
                     <params>
                         <param name="default_value" value="16:9"/>
-                        <param name="values" type="collection">
-                            <param name="16:9"><meta><title>16:9</title></meta></param>
-                            <param name="4:3"><meta><title>4:3</title></meta></param>
-                            <param name="1:1"><meta><title>1:1</title></meta></param>
-                            <param name="3:4"><meta><title>3:4 (portrait)</title></meta></param>
-                            <param name="a"><meta><title>iw_sulu_tailwind_theme.ratio_a_series</title></meta></param>
-                        </param>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues(':')"/>
                     </params>
                 </property>
 

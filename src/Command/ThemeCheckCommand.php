@@ -7,6 +7,7 @@ namespace ItechWorld\SuluTailwindThemeBundle\Command;
 use ItechWorld\SuluTailwindThemeBundle\Color\ColorSet;
 use ItechWorld\SuluTailwindThemeBundle\Consent\ConsentServiceAudit;
 use ItechWorld\SuluTailwindThemeBundle\Content\Migration\ButtonFieldAudit;
+use ItechWorld\SuluTailwindThemeBundle\Media\ImageRatioCatalog;
 use ItechWorld\SuluTailwindThemeBundle\Repository\ThemeConfigRepository;
 use ItechWorld\SuluTailwindThemeBundle\Service\AppearanceOverrideAudit;
 use ItechWorld\SuluTailwindThemeBundle\Service\ButtonResolver;
@@ -65,6 +66,7 @@ class ThemeCheckCommand extends Command
         private readonly KernelInterface $kernel,
         private readonly string $cssOutputDir,
         private readonly ?ConsentServiceAudit $consentServiceAudit = null,
+        private readonly ?ImageRatioCatalog $imageRatios = null,
     ) {
         parent::__construct();
     }
@@ -230,6 +232,21 @@ class ThemeCheckCommand extends Command
                     array_keys($unknownServices),
                     $unknownServices,
                 )) . ': typed into iframe or code blocks, not declared. Add them under itech_world_sulu_tailwind_theme.consent.services, or the admin shows the field empty.',
+            ];
+        }
+
+        // ── Check: the project's image ratios ──
+        // A malformed iw_ratio_* format is left out of every select, which the
+        // admin cannot tell apart from a format nobody declared.
+        foreach ($this->imageRatios?->rejected() ?? [] as $key => $reason) {
+            $checks[] = ['<fg=yellow>!</>', 'Image ratio "' . $key . '"', 'Not offered: ' . $reason . '.'];
+        }
+        $projectRatios = $this->imageRatios?->projectRatios() ?? [];
+        if ([] !== $projectRatios) {
+            $checks[] = [
+                '<fg=green>✓</>',
+                'Project image ratios',
+                implode(', ', array_keys($projectRatios)) . '. Recompile the themes (iw-sulu:theme:compile) after adding one, its box lives in the compiled CSS.',
             ];
         }
 
