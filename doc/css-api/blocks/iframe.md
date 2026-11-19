@@ -64,6 +64,11 @@ An entry also covers its subdomains (`example.com` matches `widget.example.com`)
 | `.iw-embed__consent-provider` | Who receives the data and under which policy, from the [third-party services inventory](../../consent.md#the-third-party-services-inventory). Absent for a service nothing describes. |
 | `.iw-embed__consent-company` / `.iw-embed__consent-policy` | The company, and the link to its privacy policy (new tab). |
 | `.iw-embed__consent-button` | Accept / open-preferences button. |
+| `.iw-embed__consent--compact` | Set by the `consent` controller when the full panel overflows its box. Only the summary, the button and **Learn more** stay ([why](../../consent.md#small-media-boxes-the-compact-panel)). |
+| `.iw-embed__consent-summary` | "Content provided by …", shown in the compact panel only. |
+| `.iw-embed__consent-more` | **Learn more**, compact panel only. Opens the details dialog. |
+| `.iw-embed__consent-dialog` | Modal `<dialog>` with the whole notice and the accept button. |
+| `.iw-embed__consent-dialog-title` / `-actions` / `-close` | Its title, its button row, and its **Close** button. |
 
 ### Facade
 
@@ -95,11 +100,20 @@ click ([why](../../consent.md#the-poster-image-as-a-facade)).
 | `--iw-embed-consent-padding` | `1.5rem` | Inner padding. |
 | `--iw-embed-consent-gap` | `1rem` | Space between message and button. |
 | `--iw-embed-consent-max-width` | `36rem` | Max width of the message column. |
-| `--iw-embed-consent-image-opacity` | `0.35` | Opacity of the background visual, the block's or the one set for the site in **Default settings > Blocks > Consent**. |
+| `--iw-embed-consent-image-opacity` | `0.35` | Opacity of the background visual, the block's or the one set for the site in **Default settings > Images > Consent**. |
 | `--iw-embed-consent-text-size` | `0.9375rem` | Message font size. |
 | `--iw-embed-consent-text-line-height` | `1.5` | Message line height. |
 | `--iw-embed-consent-details-size` / `-opacity` | `0.875rem` / `0.8` | Line under the message, the address of a waiting map. |
 | `--iw-embed-consent-provider-size` / `-opacity` | `0.8125rem` / `0.8` | Line naming the company and its policy. |
+| `--iw-embed-consent-panel-bg` | the placeholder background at 88% | Panel behind the text and button, over a background picture only. |
+| `--iw-embed-consent-panel-padding` / `-radius` | `0.75rem 1rem` / `var(--border-radius, 0.5rem)` | Same panel. |
+| `--iw-embed-consent-compact-padding` / `-gap` | `0.75rem` / `0.5rem` | Compact panel spacing. |
+| `--iw-embed-consent-summary-size` / `-weight` | `0.875rem` / `600` | "Content provided by …" line. |
+| `--iw-embed-consent-more-size` | `0.8125rem` | **Learn more** link. |
+| `--iw-embed-consent-dialog-bg` / `-text` | the placeholder colours | Details dialog colours. |
+| `--iw-embed-consent-dialog-max-width` / `-padding` / `-radius` | `32rem` / `1.5rem` / `var(--border-radius, 0.5rem)` | Details dialog box. |
+| `--iw-embed-consent-dialog-shadow` / `-backdrop` | soft shadow / `rgb(0 0 0 / 0.5)` | Its shadow, and the veil over the page. |
+| `--iw-embed-consent-dialog-title-size` | `1.125rem` | Its title. |
 | `--iw-embed-consent-focus-color` / `-width` / `-offset` | `var(--color-primary)` / `2px` / `2px` | Keyboard focus ring, the facade's included. |
 
 ### Facade

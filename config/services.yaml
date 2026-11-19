@@ -594,6 +594,26 @@ services:
         tags:
             - { name: 'kernel.event_subscriber' }
 
+    # The declared origin of media (human, AI modified, AI generated): a field
+    # of the media form, kept in the bundle's own table, read in one query.
+    ItechWorld\SuluTailwindThemeBundle\Media\MediaOriginRegistry:
+        arguments:
+            - '@doctrine.dbal.default_connection'
+        tags:
+            - { name: 'kernel.reset', method: 'reset' }
+
+    ItechWorld\SuluTailwindThemeBundle\Admin\MediaOriginFormVisitor:
+        tags:
+            - { name: 'sulu_admin.form_metadata_visitor' }
+
+    ItechWorld\SuluTailwindThemeBundle\EventSubscriber\MediaOriginSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
+    ItechWorld\SuluTailwindThemeBundle\EventSubscriber\MediaOriginSerializerSubscriber:
+        tags:
+            - { name: 'jms_serializer.event_subscriber' }
+
     # ─── Article Twig Extension (loaded when article_templates.enabled) ─
     ItechWorld\SuluTailwindThemeBundle\Media\ImageSrcset:
         arguments:
@@ -602,6 +622,8 @@ services:
     ItechWorld\SuluTailwindThemeBundle\Twig\MediaExtension:
         arguments:
             - '@ItechWorld\SuluTailwindThemeBundle\Media\ImageSrcset'
+            - '@ItechWorld\SuluTailwindThemeBundle\Media\MediaOriginRegistry'
+            - '%itech_world_sulu_tailwind_theme.media.ai_label%'
         tags:
             - { name: 'twig.extension' }
 

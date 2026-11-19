@@ -120,6 +120,14 @@
             {% endif %}
         </div>
         </div>
+
+        {# Credit and AI label of the background picture, last so the text
+           layer never covers them. #}
+        {% if heroMedia is defined and heroMedia is not null and heroBgUrl %}
+            {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', {
+                notice: iw_sulu_tailwind_theme_media_notice(heroMedia),
+            }, with_context = false) }}
+        {% endif %}
     </div>
 {% endblock %}
 

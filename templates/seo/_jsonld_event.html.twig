@@ -101,7 +101,7 @@
     'eventAttendanceMode': attendanceMode,
     'eventStatus': 'https://schema.org/EventScheduled',
     'location': locationData,
-    'image': imageUrl,
+    'image': iw_sulu_tailwind_theme_jsonld_image(imgMedia|default(null), imageUrl),
     'description': description is not empty ? description|slice(0, 300) : null,
     'organizer': organizerData,
     'performer': performersList|length == 1 ? performersList|first : (performersList|length > 1 ? performersList : null),

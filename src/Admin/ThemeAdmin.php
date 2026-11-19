@@ -474,6 +474,19 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
+            // ── Edit form: defaults, images tab ────────────────────
+            // Every image of the site, whatever renders it: the formats it is
+            // served in, its credit and AI label, the picture the site is
+            // shared with. Not a block matter, hence a tab of its own.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults_images', '/images')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults_images')
+                    ->setTabTitle('iw_sulu_tailwind_theme.components_section_images')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
+            );
+
             // ── Edit form: buttons tab ─────────────────────────────
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.buttons', '/buttons')

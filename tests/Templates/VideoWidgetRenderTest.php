@@ -283,15 +283,21 @@ final class VideoWidgetRenderTest extends TestCase
     }
 
     /**
-     * The block hands the widget its fields, or the settings do nothing.
+     * The block hands the widget every field of the fragment, or a setting
+     * does nothing: the include is `only`, a field left out never arrives.
      */
     #[Test]
     public function theWidgetDispatchPassesItsFields(): void
     {
         $source = (string) file_get_contents(self::root() . '/templates/blocks/common/_widget.html.twig');
+        $xml = (string) file_get_contents(self::root() . '/config/templates/fragments/widgets/video.xml');
 
-        self::assertStringContainsString('youtubePlaylist: item.youtubePlaylist', $source);
-        self::assertStringContainsString('youtubePlaylistId: item.youtubePlaylistId', $source);
+        preg_match_all('/<property name="(\w+)"/', $xml, $matches);
+        self::assertNotEmpty($matches[1]);
+
+        foreach ($matches[1] as $field) {
+            self::assertStringContainsString(\sprintf('%1$s: item.%1$s', $field), $source, \sprintf('The widget does not pass %s to the video', $field));
+        }
     }
 
     /**
@@ -355,6 +361,7 @@ final class VideoWidgetRenderTest extends TestCase
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_consent_mode', static fn (): string => self::$siteMode));
         // Compiled by the embed frame for its free-height modes, never called here.
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
 
         return $twig;
     }

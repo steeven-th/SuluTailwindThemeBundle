@@ -528,7 +528,7 @@ Static, hand-written in `app.css` (no Tailwind safelist needed):
 ### AVIF toggle
 
 The avif `<source>` is emitted unconditionally by Sulu (it always exposes the
-`.avif` thumbnail key). A new theme setting **Components → Images → “Serve images
+`.avif` thumbnail key). A new theme setting **Default settings → Images → “Serve images
 as AVIF”** (`imageAvif`, default **on**) lets you disable it on a server whose
 imagine driver (GD/Imagick) cannot encode AVIF — otherwise the browser would
 pick an avif source that fails to load. WebP and the original stay served.
@@ -695,6 +695,42 @@ display. Crop the hero again in those formats where a framing matters.
 so a project template including them keeps working and gains the new fields.
 The page field labels become neutral ("Main image", "Displayed title",
 "Subtitle"), the same on pages and articles.
+
+## Image credits and AI label (new)
+
+The **Credits** of the media library now show on the images, laid over a
+corner by default, and an image declared as made or modified with AI carries
+the European Union "AI" icon with a translated label (AI Act, article 50).
+See [Credits and AI label](css-api/images.md#credits-and-ai-label).
+
+- **Schema**: the origin of the images lives in a table of the bundle,
+  `iw_sulu_tailwind_theme_media_origin`. Create it with
+  `php bin/adminconsole doctrine:schema:update --force` (or your
+  migrations). Until then, images render without a label, never an error.
+- **Visual**: a credited image gains its credit, every image with credits on
+  the site at once. **Default settings > Images > Image credits**
+  set to *Do not show* brings the former rendering back.
+- **Markup**: a credited or AI image is wrapped in a `span.iw-media` that
+  takes the classes of its `<picture>`, the `<picture>` turning `contents`.
+  CSS written against `picture.some-class` for such an image targets
+  `.iw-media.some-class` instead. An image with nothing to say is unchanged.
+- **Template overrides**: a raw `_image` call (the caller sizes the image)
+  passes `notice: 'parent'` or `notice: 'wrap'` to carry the notices, see
+  [Where they show](css-api/images.md#where-they-show). The mega menu
+  featured column no longer puts `mb-4` on its image: the space under it is
+  compiled CSS, on the image or on its wrapper. A lightbox link of your own
+  includes `components/_lightbox_description.html.twig` for its description.
+- **Structured data**: the `image` of articles and events becomes an
+  `ImageObject` with `creditText` and `copyrightNotice` when the media is
+  credited.
+- **Editors**: declare the origin of AI images in the media form, under
+  **License**. Images uploaded before stay *Photo or human-made* until
+  someone says otherwise.
+- **Admin**: the image settings gather in a new **Default settings > Images**
+  tab, as they apply to every image and not to blocks only: **Serve images as
+  AVIF** and the **Consent** picture (formerly under Blocks), the credits and
+  the corner, and the **Default share image** (formerly under Details). The
+  values keep their keys: nothing to migrate.
 
 ## New content blocks: accordion, iframe, code (new)
 
@@ -2840,7 +2876,7 @@ reaches Google any more.
 
 ## A picture for every consent placeholder (new)
 
-**Default settings > Blocks > Consent** of the theme sets the picture shown
+**Default settings > Images > Consent** of the theme sets the picture shown
 behind the waiting message of iframes, code blocks, videos and maps. A block or
 a video preview image picking its own keeps it. The texts stay translations, so
 they follow the page language: reword them in the project's

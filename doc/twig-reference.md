@@ -360,6 +360,28 @@ The same for the media zone of a two-zone block (text and images, form, accordio
 
 The `srcset` of a media in a format, for one output extension (`avif`, `webp`, or empty for the original one), from the [width variants](#width-variants-and-srcset) of the format. Returns `null` when the format has none, when a thumbnail is missing, or when the media was cropped by hand in that format. The image partial calls it, a template rarely needs to.
 
+### `iw_sulu_tailwind_theme_media_notice(media)`
+
+What an image tells the visitor about itself: `{credit, origin}`. `credit` is
+the **Credits** field of the media, or its **Copyright** when empty, `null`
+when both are. `origin` is `ai_generated` or `ai_modified` for an image the
+media form declares as such, `null` otherwise and whenever the `media.ai_label`
+project setting is off. The image partial calls it. A template laying an image
+of its own (a background, a component sizing it in `raw` mode) passes the
+result to `components/_media_notice.html.twig`, inside the positioned box of
+the image (see [Credits and AI label](css-api/images.md#credits-and-ai-label)).
+It reads the credit mode and the corner from the theme, `creditMode` and
+`position` override them:
+
+```twig
+<div class="my-banner"> {# position: relative #}
+    {# ... the image ... #}
+    {{ include('@ItechWorldSuluTailwindTheme/components/_media_notice.html.twig', {
+        notice: iw_sulu_tailwind_theme_media_notice(media),
+    }, with_context = false) }}
+</div>
+```
+
 ### `iw_sulu_tailwind_theme_image_ratio(value, fallback)`
 
 Resolves an image ratio picked in the admin into the Sulu image format cut to
@@ -1187,7 +1209,7 @@ The bundle registers its own Sulu image formats (`config/image-formats.xml`, pre
 | `iw_theme_logo_mobile` | 800×400 | inset | Mobile header logo |
 | `iw_og_image` | 1200×630 | outbound | `og:image`, `twitter:image`, JSON-LD |
 
-> `iw_og_image` also serves the theme-wide fallback thumbnail set in **Components > Sharing > Default share image** (`iw_sulu_tailwind_theme.components_shareDefaultImage`), used when a page carries neither an excerpt image nor a hero image.
+> `iw_og_image` also serves the theme-wide fallback thumbnail set in **Default settings > Images > Sharing > Default share image** (`iw_sulu_tailwind_theme.components_shareDefaultImage`), used when a page carries neither an excerpt image nor a hero image.
 
 > The partial falls back to the original file when a format key is unknown (`media.thumbnails[format]|default(media.url)`). That degrades silently — the page still renders, but with the full-size uncropped file and no WebP/AVIF. If images look oversized, check that the format key exists.
 

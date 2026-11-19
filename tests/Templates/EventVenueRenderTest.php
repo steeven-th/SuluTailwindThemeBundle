@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ItechWorld\SuluTailwindThemeBundle\Tests\Templates;
 
+use ItechWorld\SuluTailwindThemeBundle\Twig\MediaExtension;
 use ItechWorld\SuluTailwindThemeBundle\Twig\ThemeExtension;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -130,6 +131,7 @@ final class EventVenueRenderTest extends TestCase
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_location_address', static fn (?array $location): string => $theme->getLocationAddress($location)));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_event_datetime', static fn (): ?string => null));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_event_offer', static fn (): ?array => null));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_jsonld_image', MediaExtension::jsonLdImage(...)));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_schema_party', static fn (): ?array => null));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_title_text', static fn (mixed $value): string => (string) $value));
         $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_format_date', static fn (): string => ''));

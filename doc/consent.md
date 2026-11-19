@@ -185,14 +185,17 @@ the player then loads with `autoplay`.
 
 | Site mode | Without a poster image | With one (the default) |
 |-----------|------------------------|------------------------|
-| `placeholder` | Clicking **Display the content** loads the player | The same click loads the player **playing**: one click allows and plays |
+| `placeholder` | Clicking **Display the content** loads the player | The click shows the image and a play button. The video starts on click |
 | `delegated` | The manager's grant loads the player | The grant shows the image and a play button. The video starts on click |
 | `none` | The player loads with the page | The image and a play button show with the page. The video starts on click |
 
-A manager answering the visitor's click is no click to play: under `delegated`,
-the facade always waits for its own. An editor who prefers the platform's
-preview checks **Show the YouTube or Vimeo preview** on the widget: an opt-out,
-so videos saved before the setting existed show their image too.
+Allowing is never playing, whoever answers: the placeholder's button, a
+cookie manager, or the placeholder standing in for a manager that failed to
+load. The same image and play button then take the placeholder's place,
+with the keyboard focus, and the video starts on their click alone. An editor
+who prefers the platform's preview checks **Show the YouTube or Vimeo
+preview** on the widget: an opt-out, so videos saved before the setting
+existed show their image too.
 
 The facade is a `<button>` named after the video, reachable from the keyboard,
 and the focus moves to the player once it has loaded. It needs the `consent`
@@ -280,7 +283,7 @@ Pick the block's service instead, or declare `embed` in the snippet and in the m
 
 ## The placeholder for the whole site
 
-**Picture.** Set it once in the theme, **Default settings > Blocks > Consent**, rather than on every iframe, video and map. A block, or a video's poster image, that picks its own keeps it.
+**Picture.** Set it once in the theme, **Default settings > Images > Consent**, rather than on every iframe, video and map. A block, or a video's poster image, that picks its own keeps it.
 
 **Texts.** The waiting message and the button labels are translations, so they follow the language of the page. A project rewords them in its own translation files, which win over the bundle's:
 
@@ -295,7 +298,15 @@ Pick the block's service instead, or declare `embed` in the snippet and in the m
 
 `%service%` is the provider's name, taken from [the inventory](#the-third-party-services-inventory), or "a third-party service" for a generic embed. The line naming the company and its policy uses `iw_sulu_tailwind_theme.consent_data_recipient` and `iw_sulu_tailwind_theme.consent_privacy_policy`. A message typed in the theme admin would read the same in every language of the site, which is why the theme only offers the picture. An editor can still write a block's own **Waiting message**, in the language of the page being edited.
 
-**Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
+**Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. Over a picture, the text and button sit on a panel of that colour, so a poster full of its own lettering does not swallow them. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
+
+### Small media boxes: the compact panel
+
+A 16:9 box in the media column of a text and media block is about 200px high, too little for the message, the recipient line, the policy link and the button. When the full panel overflows its box, the `consent` controller switches it to a compact one: **Content provided by YouTube**, the button, and **Learn more**. It measures rather than guessing from breakpoints, since what overflows depends on the column, the font and the length of a message an editor typed, and it measures again whenever the box is resized.
+
+**Learn more** opens a modal dialog with the whole notice, the recipient, the policy and the accept button. The provider stays named in the compact panel, so the visitor always knows who they accept before clicking. Accepting from the dialog closes it first: a modal dialog leaves the page inert, the banner a cookie manager is about to open included.
+
+The texts are translations, `iw_sulu_tailwind_theme.consent_summary` (`%service%` as above), `iw_sulu_tailwind_theme.consent_more` and `iw_sulu_tailwind_theme.consent_close`.
 
 ---
 

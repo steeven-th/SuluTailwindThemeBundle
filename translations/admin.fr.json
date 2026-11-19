@@ -1823,5 +1823,25 @@
     "iw_sulu_tailwind_theme.third_party_service_purpose": "Finalité",
     "iw_sulu_tailwind_theme.third_party_service_purpose_info": "Ce que fait le service, en une phrase lisible par un visiteur.",
     "iw_sulu_tailwind_theme.consent_service_generic": "Autre contenu tiers",
-    "iw_sulu_tailwind_theme.consent_service_maps": "Tuiles de carte personnalisées"
+    "iw_sulu_tailwind_theme.consent_service_maps": "Tuiles de carte personnalisées",
+
+    "iw_sulu_tailwind_theme.media_origin_section": "Origine de l'image",
+    "iw_sulu_tailwind_theme.media_origin": "Origine de l'image",
+    "iw_sulu_tailwind_theme.media_origin_human": "Photo ou création humaine",
+    "iw_sulu_tailwind_theme.media_origin_ai_modified": "Modifiée par IA",
+    "iw_sulu_tailwind_theme.media_origin_ai_generated": "Générée par IA",
+    "iw_sulu_tailwind_theme.media_origin_info": "Obligatoire pour une image réaliste créée ou retouchée par IA (personnes, lieux, situations qui pourraient passer pour vraies). Le site affiche alors l'icône « AI » de l'Union européenne avec la mention correspondante, partout où l'image apparaît. Une illustration manifestement artificielle (dessin, schéma, icône) peut rester en « Photo ou création humaine ».",
+    "iw_sulu_tailwind_theme.image_credits": "Crédits des images",
+    "iw_sulu_tailwind_theme.image_credits_info": "Le champ « Crédits » de la médiathèque, ou « Informations sur les droits d'auteur » s'il est vide. Une légende ne s'affiche que sous une image dans le fil de la page : une image qui remplit un cadre reçoit son crédit en surimpression.",
+    "iw_sulu_tailwind_theme.image_credits_overlay": "En surimpression, dans un coin de l'image",
+    "iw_sulu_tailwind_theme.image_credits_info_mark": "Icône « i », le crédit au survol ou au focus",
+    "iw_sulu_tailwind_theme.image_credits_caption": "En légende, sous l'image",
+    "iw_sulu_tailwind_theme.image_credits_none": "Ne pas afficher",
+    "iw_sulu_tailwind_theme.image_notice_position": "Coin du crédit et du label IA",
+    "iw_sulu_tailwind_theme.image_notice_bottom_right": "En bas à droite",
+    "iw_sulu_tailwind_theme.image_notice_bottom_left": "En bas à gauche",
+    "iw_sulu_tailwind_theme.image_notice_top_right": "En haut à droite",
+    "iw_sulu_tailwind_theme.image_notice_top_left": "En haut à gauche",
+    "iw_sulu_tailwind_theme.images_section_delivery": "Formats servis",
+    "iw_sulu_tailwind_theme.images_section_notices": "Crédits et label IA"
 }

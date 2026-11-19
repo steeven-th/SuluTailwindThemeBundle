@@ -2,8 +2,9 @@
 <!--
     Admin form: Default settings tab, Blocks sub-tab.
 
-    The gaps a block leaves between its own parts, how wide it may grow, and
-    how its images are delivered.
+    The gaps a block leaves between its own parts and how wide it may grow.
+    How images are delivered, credited and shared has a tab of its own,
+    iw_theme_config_defaults_images.xml: it is not about blocks only.
 -->
 <form xmlns="http://schemas.sulu.io/template/template"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -110,53 +111,6 @@
                         <title>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope</title>
                         <info_text>iw_sulu_tailwind_theme.defaults_blockMaxWidthScope_info</info_text>
                     </meta>
-                </property>
-            </properties>
-        </section>
-
-        <!--
-            Image delivery, which used to be a section of its own holding a
-            single checkbox. It belongs with the block defaults: what it
-            changes is how every block serves its images.
-        -->
-        <section name="blockImages">
-            <meta>
-                <title>iw_sulu_tailwind_theme.components_section_images</title>
-            </meta>
-            <properties>
-                <!-- AVIF <source> in the <picture> pipeline. Default on; turn it off
-                     when the server's imagine driver (GD/Imagick) cannot encode AVIF
-                     (WebP + original stay served regardless). -->
-                <property name="imageAvif" type="checkbox" colspan="6">
-                    <params>
-                        <param name="type" value="toggler"/>
-                        <param name="default_value" value="true"/>
-                        <param name="label"><meta><title>iw_sulu_tailwind_theme.image_avif</title></meta></param>
-                    </params>
-                </property>
-            </properties>
-        </section>
-
-        <!--
-            What a third-party embed or a map shows while it waits for consent.
-            Only the picture is set here: a text typed in this form would be
-            the same in every language of the site, so the waiting message
-            stays a translation, which a project overrides in its own
-            translation files (doc/consent.md).
-        -->
-        <section name="consentPlaceholder">
-            <meta>
-                <title>iw_sulu_tailwind_theme.components_section_consent</title>
-            </meta>
-            <properties>
-                <property name="components_consentImage" type="single_media_selection" colspan="12">
-                    <meta>
-                        <title>iw_sulu_tailwind_theme.components_consent_image</title>
-                        <info_text>iw_sulu_tailwind_theme.components_consent_image_info</info_text>
-                    </meta>
-                    <params>
-                        <param name="types" value="image"/>
-                    </params>
                 </property>
             </properties>
         </section>

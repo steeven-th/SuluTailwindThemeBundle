@@ -93,6 +93,30 @@ final class ConsentPlaceholderProviderRenderTest extends TestCase
     }
 
     /**
+     * A small media box shows the compact panel: who the content comes from
+     * stays in sight, and the whole notice, recipient and policy included,
+     * waits in a dialog that can accept as well.
+     */
+    #[Test]
+    public function theCompactPanelKeepsTheProviderAndTheDialogTheWholeNotice(): void
+    {
+        $html = $this->render('youtube', ['services' => [['service' => 'youtube', 'label' => 'YouTube', 'company' => 'Google Ireland Limited']]]);
+
+        self::assertMatchesRegularExpression('/<p class="iw-embed__consent-summary">Provided by YouTube<\/p>/', $html);
+        self::assertStringContainsString('data-action="consent#explain"', $html);
+
+        $dialog = substr($html, (int) strpos($html, '<dialog'));
+        self::assertStringContainsString('data-consent-target="dialog"', $dialog);
+        self::assertStringContainsString('aria-labelledby="consent-title"', $dialog);
+        self::assertStringContainsString('id="consent-title"', $dialog);
+        self::assertStringContainsString('Load YouTube content', $dialog);
+        self::assertStringContainsString('Data sent to Google Ireland Limited', $dialog);
+        self::assertStringContainsString('data-action="consent#accept"', $dialog);
+        self::assertStringContainsString('data-action="consent#closeDetails"', $dialog);
+        self::assertSame(2, substr_count($html, 'data-action="consent#accept"'), 'One accept button in the panel, one in the dialog');
+    }
+
+    /**
      * @param string                    $service      The service key the content waits on
      * @param array<string, mixed>|null $snippet      The inventory snippet content, null when none is assigned
      * @param string                    $serviceLabel The label passed by the caller
@@ -104,6 +128,8 @@ final class ConsentPlaceholderProviderRenderTest extends TestCase
 
         $twig = new Environment($loader, ['strict_variables' => false, 'autoescape' => 'html']);
         $twig->addExtension(new ConsentExtension(new ThirdPartyServices()));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_unique_id', static fn (string $prefix): string => $prefix));
+        $twig->addFunction(new TwigFunction('iw_sulu_tailwind_theme_media_notice', static fn (): array => ['credit' => null, 'origin' => null]));
         // Compiled with the placeholder picture, never called: no media here.
         $twig->addFunction(new TwigFunction('sulu_resolve_media', static fn (): ?array => null));
         $twig->addFunction(new TwigFunction(
@@ -114,6 +140,7 @@ final class ConsentPlaceholderProviderRenderTest extends TestCase
             'iw_sulu_tailwind_theme.consent_default_text' => 'Load %service% content',
             'iw_sulu_tailwind_theme.consent_data_recipient' => 'Data sent to %company%',
             'iw_sulu_tailwind_theme.consent_generic_provider' => 'a third-party service',
+            'iw_sulu_tailwind_theme.consent_summary' => 'Provided by %service%',
             default => $key,
         }, $parameters)));
 

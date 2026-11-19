@@ -105,5 +105,11 @@
     "iw_sulu_tailwind_theme.timeline_state_current": "Step in progress",
     "iw_sulu_tailwind_theme.timeline_state_upcoming": "Upcoming step",
     "iw_sulu_tailwind_theme.consent_data_recipient": "Data sent to %company%",
-    "iw_sulu_tailwind_theme.consent_privacy_policy": "Privacy policy"
+    "iw_sulu_tailwind_theme.consent_privacy_policy": "Privacy policy",
+    "iw_sulu_tailwind_theme.consent_summary": "Content provided by %service%",
+    "iw_sulu_tailwind_theme.consent_more": "Learn more",
+    "iw_sulu_tailwind_theme.consent_close": "Close",
+    "iw_sulu_tailwind_theme.media_ai_generated": "AI-generated image",
+    "iw_sulu_tailwind_theme.media_ai_modified": "AI-modified image",
+    "iw_sulu_tailwind_theme.media_credit": "Credit:"
 }

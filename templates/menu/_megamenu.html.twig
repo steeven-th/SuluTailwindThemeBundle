@@ -119,6 +119,7 @@
                                                         raw: true,
                                                         loading: 'lazy',
                                                         classes: cardRatioClass,
+                                                        notice: 'wrap',
                                                     }) }}
                                                 {% endif %}
                                             {% endif %}
@@ -151,7 +152,8 @@
                                         alt: '',
                                         raw: true,
                                         loading: 'lazy',
-                                        classes: (featLayout == 'vertical' ? 'mb-4 ' : '') ~ featRatioClass,
+                                        classes: featRatioClass,
+                                        notice: 'wrap',
                                     }) }}
                                 {% endif %}
                             {% endif %}
