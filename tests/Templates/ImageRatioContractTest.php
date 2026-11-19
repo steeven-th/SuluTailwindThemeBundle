@@ -30,6 +30,7 @@ final class ImageRatioContractTest extends TestCase
         'page hero' => ['config/forms/iw_theme_config_pages.xml', 'pageHero_imageFormat'],
         'gallery' => ['config/templates/blocks/gallery.xml', 'imageFilter'],
         'text and images' => ['config/templates/blocks/text_images.xml', 'imageFilter'],
+        'article listing page' => ['config/templates/pages/iw_article_listing.xml', 'listingImageRatio'],
     ];
 
     /**

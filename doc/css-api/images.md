@@ -39,7 +39,7 @@ resolve to `.iw-ratio--16-9`. A template passing a ratio of its own only needs a
 ### Ratios an editor can pick
 
 The ratio selects of the admin (Cards tab, page hero, galleries, text and
-images) all list one
+images, article listing pages) all list one
 catalogue, `ImageRatioCatalog`. It ties each ratio to the image format cut to
 it and to its box, and Twig reads it through
 [`iw_sulu_tailwind_theme_image_ratio()`](../twig-reference.md#iw_sulu_tailwind_theme_image_ratiovalue-fallback).

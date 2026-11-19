@@ -1224,9 +1224,9 @@ appearance and visibility toggles.
 | `newsStyle` | string | `classic` | Page layout for news articles |
 | `eventStyle` | string | `card_info` | Page layout for event articles |
 | `blogStyle` | string | `classic` | Page layout for blog articles |
-| `listingStyle` | string | `grid` | Listing layout (`grid`, `list`, `cards`) |
-| `cardImageRatio` | string | `16:9` | Aspect ratio for card images (`16:9`, `4:3`, `1:1`, `3:4`, `a` for A series posters, or a project `iw_ratio_*` format) - ignored by the `list` style which always uses `16:9` |
-| `cardOrientation` | string | `landscape` | Computed from `cardImageRatio`: `portrait` when width < height, `landscape` otherwise. Used by the listing templates to apply the `iw-article-listing--portrait` modifier. |
+| `listingStyle` | string | `grid` | Listing layout (`grid`, `list`, `cards`). A listing page may override it |
+| `cardImageRatio` | string | `16:9` | Aspect ratio for card images (`16:9`, `4:3`, `1:1`, `3:4`, `a` for A series posters, or a project `iw_ratio_*` format). Not applied by the `list` style, which uses `16:9` unless the listing page picks a ratio. A listing page may override it |
+| `cardOrientation` | string | `landscape` | Computed from `cardImageRatio`: `portrait` when width < height, `landscape` otherwise. The listing templates read the orientation of the ratio they actually use instead, which a listing page may override. |
 | `cardSurface` | string | `none` | Card background color (color token or `none`) |
 | `cardPadding` | string | `1rem` | Inner padding (`0`, `0.5rem`, `1rem`, `1.5rem`, `2rem`) |
 | `cardImagePadded` | bool | `true` | When `false`, the image touches the card edges (top + sides in vertical, top + bottom + left in horizontal) and inherits the card radius via `overflow: hidden` |
