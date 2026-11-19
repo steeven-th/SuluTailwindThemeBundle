@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!--
+    Fragment: the head of a page or an article, its DATA only.
+    The image, the title shown as the H1 and the tagline under it. Pages and
+    articles carry the same three fields under the same names, so a change
+    made here reaches both. The appearance is the theme's: Components > Page
+    hero for pages, the article style for articles.
+
+    heroTitle only replaces the H1. Menus, listings, cards, the <title> tag,
+    Open Graph and the structured data keep the title of the page or article.
+
+    Included by page-hero.xml and article-hero.xml, kept for the project
+    templates that include them.
+-->
+<properties xmlns="http://schemas.sulu.io/template/template">
+    <property name="heroImage" type="single_media_selection" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.hero.image</title>
+            <info_text>iw_sulu_tailwind_theme.hero.image_info</info_text>
+        </meta>
+        <params>
+            <param name="types" value="image"/>
+            <param name="formats" type="collection">
+                <param name="iw_theme_hero"/>
+                <param name="iw_theme_16_9"/>
+            </param>
+        </params>
+    </property>
+
+    <property name="heroTitle" type="iw_theme_title_editor" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.hero.title</title>
+            <info_text>iw_sulu_tailwind_theme.hero.title_info</info_text>
+        </meta>
+        <params>
+            <param name="context" value="pages"/>
+        </params>
+    </property>
+
+    <property name="heroSubtitle" type="iw_theme_title_editor" colspan="12">
+        <meta>
+            <title>iw_sulu_tailwind_theme.hero.subtitle</title>
+            <info_text>iw_sulu_tailwind_theme.hero.subtitle_info</info_text>
+        </meta>
+        <params>
+            <param name="context" value="pages"/>
+        </params>
+    </property>
+</properties>

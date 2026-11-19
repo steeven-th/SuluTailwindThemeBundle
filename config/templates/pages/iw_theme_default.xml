@@ -30,7 +30,7 @@
         <section name="hero">
             <meta><title>iw_sulu_tailwind_theme.page.section_hero</title></meta>
             <properties>
-                <xi:include href="../fragments/page-hero.xml"
+                <xi:include href="../fragments/hero-content.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>

@@ -56,15 +56,15 @@
         {% endif %}
 
         <h1 class="font-[var(--font-h1-family)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mt-3 mb-4" itemprop="headline">
-            {{ content.title }}
+            {{ articleH1 }}
         </h1>
 
-        {% if content.subtitle is defined and content.subtitle is not empty %}
+        {% if articleSubtitle is not empty %}
             {# The public class rather than the same declarations inlined: a
                project restyling .iw-article-page__subtitle must reach this one
                too, otherwise one style out of eight silently ignores it. #}
             <p class="iw-article-page__subtitle">
-                {{ iw_sulu_tailwind_theme_title_markup(content.subtitle) }}
+                {{ iw_sulu_tailwind_theme_title_markup(articleSubtitle) }}
             </p>
         {% endif %}
 

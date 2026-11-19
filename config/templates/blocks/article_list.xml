@@ -55,7 +55,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="excerptTitle" value="excerpt.title"/>
                             <param name="excerptDescription" value="excerpt.description"/>
@@ -77,7 +77,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="startDate" value="startDate"/>
                             <param name="endDate" value="endDate"/>
@@ -101,7 +101,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="startDate" value="startDate"/>
                             <param name="endDate" value="endDate"/>

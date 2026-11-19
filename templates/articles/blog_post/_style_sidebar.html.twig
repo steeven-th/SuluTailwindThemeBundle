@@ -15,11 +15,11 @@
 {% block article_header %}
     <header class="iw-article-page__header mb-6">
         <h1 class="font-[var(--font-h1-family)] text-[var(--font-size-h1)] font-[var(--font-h1-weight)] leading-[var(--line-height-h1)] mb-4" itemprop="headline">
-            {{ content.title }}
+            {{ articleH1 }}
         </h1>
-        {% if content.subtitle is defined and content.subtitle is not empty %}
+        {% if articleSubtitle is not empty %}
             <p class="iw-article-page__subtitle">
-                {{ iw_sulu_tailwind_theme_title_markup(content.subtitle) }}
+                {{ iw_sulu_tailwind_theme_title_markup(articleSubtitle) }}
             </p>
         {% endif %}
         {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_meta.html.twig' with {

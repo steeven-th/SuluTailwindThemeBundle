@@ -43,12 +43,12 @@
                 {% endif %}
 
                 <h1 class="iw-article-page__title" itemprop="headline">
-                    {{ content.title }}
+                    {{ articleH1 }}
                 </h1>
 
-                {% if content.subtitle is defined and content.subtitle is not empty %}
+                {% if articleSubtitle is not empty %}
                     <p class="iw-article-page__subtitle iw-article-page__subtitle--sm">
-                        {{ iw_sulu_tailwind_theme_title_markup(content.subtitle) }}
+                        {{ iw_sulu_tailwind_theme_title_markup(articleSubtitle) }}
                     </p>
                 {% endif %}
 

@@ -28,8 +28,8 @@
 
 {# Resolve description #}
 {% set description = extension.excerpt.description|default('')|striptags|trim %}
-{% if description is empty and content.subtitle is defined %}
-    {% set description = iw_sulu_tailwind_theme_title_text(content.subtitle)|striptags|trim %}
+{% if description is empty and content.heroSubtitle|default('') is not empty %}
+    {% set description = iw_sulu_tailwind_theme_title_text(content.heroSubtitle)|striptags|trim %}
 {% endif %}
 
 {# Build authors array: a Person or an Organization each, with the full name

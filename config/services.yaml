@@ -523,6 +523,13 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\ArticleHeroMigrateCommand:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $cacheManager: '@?sulu_http_cache.cache_manager'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\BlockStylesMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'

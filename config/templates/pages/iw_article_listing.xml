@@ -32,7 +32,7 @@
         <section name="hero">
             <meta><title>iw_sulu_tailwind_theme.page.section_hero</title></meta>
             <properties>
-                <xi:include href="../fragments/page-hero.xml"
+                <xi:include href="../fragments/hero-content.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
             </properties>
         </section>
@@ -69,7 +69,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="readingTime" value="readingTime"/>
                             <param name="excerptTitle" value="excerpt.title"/>
@@ -93,7 +93,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="startDate" value="startDate"/>
                             <param name="endDate" value="endDate"/>
@@ -119,7 +119,7 @@
                             <param name="title" value="title"/>
                             <param name="url" value="url"/>
                             <param name="heroImage" value="heroImage"/>
-                            <param name="subtitle" value="subtitle"/>
+                            <param name="subtitle" value="heroSubtitle"/>
                             <param name="authored" value="authored"/>
                             <param name="startDate" value="startDate"/>
                             <param name="endDate" value="endDate"/>

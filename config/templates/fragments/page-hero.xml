@@ -1,43 +1,14 @@
 <?xml version="1.0" ?>
 <!--
     Fragment: Page hero section properties (per-page DATA only).
-    The banner content lives here; its appearance (height, title placement,
-    alignment, veil, parallax, breadcrumb) is configured site-wide in the theme
-    admin (Components tab → Page hero), exposed as iw_sulu_tailwind_theme.pageHero_*.
-    Included via XInclude in page templates (see iw_theme_default.xml).
+    Now hero-content.xml, shared with articles. Kept so the project templates
+    that include it keep working.
+    The banner appearance (height, title placement, alignment, veil,
+    parallax, breadcrumb) is configured site-wide in the theme admin
+    (Components tab → Page hero), exposed as iw_sulu_tailwind_theme.pageHero_*.
 -->
-<properties xmlns="http://schemas.sulu.io/template/template">
-    <property name="heroImage" type="single_media_selection" colspan="12">
-        <meta>
-            <title>iw_sulu_tailwind_theme.page.hero_image</title>
-            <info_text>iw_sulu_tailwind_theme.page.hero_image_info</info_text>
-        </meta>
-        <params>
-            <param name="types" value="image"/>
-            <param name="formats" type="collection">
-                <param name="iw_theme_hero"/>
-                <param name="iw_theme_16_9"/>
-            </param>
-        </params>
-    </property>
-
-    <property name="heroTitle" type="iw_theme_title_editor" colspan="12">
-        <meta>
-            <title>iw_sulu_tailwind_theme.page.hero_title</title>
-            <info_text>iw_sulu_tailwind_theme.page.hero_title_info</info_text>
-        </meta>
-        <params>
-            <param name="context" value="pages"/>
-        </params>
-    </property>
-
-    <property name="heroSubtitle" type="iw_theme_title_editor" colspan="12">
-        <meta>
-            <title>iw_sulu_tailwind_theme.page.hero_subtitle</title>
-            <info_text>iw_sulu_tailwind_theme.page.hero_subtitle_info</info_text>
-        </meta>
-        <params>
-            <param name="context" value="pages"/>
-        </params>
-    </property>
+<properties xmlns="http://schemas.sulu.io/template/template"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="hero-content.xml"
+                xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
 </properties>

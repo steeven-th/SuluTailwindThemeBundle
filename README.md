@@ -526,7 +526,9 @@ Three article templates will appear in the admin, each in its own tab:
 | **Event** (`iw_event`) | events | Events with start/end dates, location (physical or online), organizer |
 | **Blog Post** (`iw_blog_post`) | publications | Blog/journal articles with excerpt and reading time |
 
-All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `article-hero`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
+All templates are assembled from shared [XML fragments](config/templates/fragments/) (`article-header`, `hero-content`, `article-authors`, `page-blocks`, etc.) that you can also include in your own custom article templates via `xi:include`. The full list is in [page templates](doc/page-templates.md#available-fragments).
+
+An article has the **same head as a page**, from the shared `hero-content.xml` fragment: a main image, a **displayed title** that replaces the H1 (with words put forward and coloured, as on a page) and a subtitle. The `<title>` tag, Open Graph, the structured data, listings and cards keep the article title.
 
 The article body accepts the **same 17 block types as a page**, because both include the same `page-blocks.xml` fragment. The full list is in [Available block types](doc/page-templates.md#available-block-types). Blocks render through the shared dispatcher, so one behaves identically in an article and on a page.
 

@@ -144,7 +144,7 @@ Two contexts:
 | Context | Covers | Why that default |
 |---------|--------|------------------|
 | `blocks` | block headings and subheadings | their accent color comes from the block variant, so a per-word palette would compete with it |
-| `pages` | page hero titles and subtitles, article subtitles | they sit outside any variant, so there is no variant color to inherit and the editor picks one |
+| `pages` | the titles and subtitles of `hero-content.xml`, on pages and articles | they sit outside any variant, so there is no variant color to inherit and the editor picks one |
 
 Resolution goes from most specific to least: **an explicit XML param**, then
 **the project config for the declared context**, then **the shipped default**. A

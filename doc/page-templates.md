@@ -16,12 +16,12 @@ The hero splits into **per-page content** (what to show) and **site-wide appeara
 
 ### Per-page content — page's "Hero" section
 
-Exposed by the `page-hero.xml` fragment on the page template. Every field is optional; an empty `heroImage` leaves the page unchanged.
+Exposed by the `hero-content.xml` fragment, shared with the article templates: pages and articles carry the same three fields under the same names. Every field is optional; an empty `heroImage` leaves the page unchanged.
 
 | Field | Type | Behavior |
 |-------|------|----------|
 | `heroImage` | `single_media_selection` | Full-width banner at the top of the page. Focus-aware crop, `loading="eager"` and `fetchpriority="high"` (it is usually the LCP image), served as `<picture>` avif/webp via the shared `_image` partial (`iw_theme_hero` format, 1920×800). |
-| `heroTitle` | `iw_theme_title_editor` | Rendered as the page **H1**. When set, it **overrides the page title** as the H1, so an editor can keep a short page name (menus, breadcrumb) and a longer editorial headline here. Spans several lines and can put words forward in a palette color - see [Title editor](./title-editor.md). |
+| `heroTitle` | `iw_theme_title_editor` | Rendered as the page **H1**. When set, it **overrides the page title** as the H1, so an editor can keep a short page name (menus, breadcrumb) and a longer editorial headline here. The `<title>` tag, Open Graph and the structured data keep the page title. Spans several lines and can put words forward in a palette color - see [Title editor](./title-editor.md). |
 | `heroSubtitle` | `iw_theme_title_editor` | Optional tagline shown below the title, with the same multi-line and colored-words support. |
 
 ### Site-wide appearance — admin **Components → Page hero**
@@ -99,7 +99,7 @@ config/templates/
 │   ├── page-header.xml              ← title + url (route), for pages
 │   ├── article-header.xml           ← title + url (page_tree_route), for articles
 │   ├── page-blocks.xml              ← Block container with every block type
-│   ├── page-hero.xml                ← Banner image + overriding H1
+│   ├── hero-content.xml             ← Image + overriding H1 + tagline, pages and articles
 │   ├── block-heading.xml            ← title + subTitle + level + alignment
 │   ├── block-spacing.xml            ← margins + lateral margins + max width + paddings
 │   ├── block-radius.xml             ← Block corner radius (card, image, paragraph variants)
@@ -266,7 +266,8 @@ the fields an editor already knows from the other blocks.
 | `article-header.xml` | Same title + `url` as `page_tree_route`, for content hanging under a page |
 | `page-title.xml` | The title alone, when you write your own route field |
 | `page-blocks.xml` | `<block>` container with all 17 `<type ref="..."/>`. Use the `sulu:block` xpointer |
-| `page-hero.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) |
+| `hero-content.xml` | `heroImage` (single_media_selection) + `heroTitle` (iw_theme_title_editor, overrides the H1) + `heroSubtitle` (iw_theme_title_editor). The head of pages and articles alike |
+| `page-hero.xml`, `article-hero.xml` | Deprecated, kept for the templates that include them: both now include `hero-content.xml` |
 
 **Block level**
 
