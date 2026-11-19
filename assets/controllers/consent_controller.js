@@ -54,6 +54,9 @@ import { Controller } from '@hotwired/stimulus';
 
 const STORAGE_KEY = 'iw-consent';
 
+/** Modifier of the placeholder when its full panel does not fit. */
+const COMPACT = 'iw-embed__consent--compact';
+
 /** @type {Set<Controller>} Every mounted controller, so grant() can reach them. */
 const instances = new Set();
 
@@ -240,7 +243,7 @@ export default class extends Controller {
         cleared: String,
     };
 
-    static targets = ['placeholder', 'frame', 'notice', 'facade'];
+    static targets = ['placeholder', 'frame', 'notice', 'facade', 'dialog'];
 
     connect() {
         ensureApi();
@@ -252,6 +255,7 @@ export default class extends Controller {
 
         instances.add(this);
         this.reportUndeclared();
+        this.observeFit();
 
         if ('none' === this.modeValue || window.iwConsent.isGranted(this.serviceValue) || this.wasAcceptedBefore()) {
             this.load();
@@ -271,6 +275,69 @@ export default class extends Controller {
 
     disconnect() {
         instances.delete(this);
+        this.fitObserver?.disconnect();
+    }
+
+    /**
+     * Switch the placeholder to its compact panel whenever the full one
+     * overflows its box, and back when it fits again.
+     *
+     * Measured rather than guessed from breakpoints: what overflows depends
+     * on the column, the font, and the length of the text an editor typed.
+     */
+    observeFit() {
+        if (!this.hasPlaceholderTarget || 'undefined' === typeof ResizeObserver) {
+            return;
+        }
+
+        this.fitObserver = new ResizeObserver(() => this.fit());
+        this.fitObserver.observe(this.placeholderTarget);
+    }
+
+    /**
+     * Measure the full panel and pick the one that fits.
+     */
+    fit() {
+        const placeholder = this.placeholderTarget;
+
+        // A hidden panel measures nothing: it is measured again when shown.
+        if (placeholder.hidden || 0 === placeholder.clientHeight) {
+            return;
+        }
+
+        placeholder.classList.remove(COMPACT);
+        const overflows = placeholder.scrollHeight > placeholder.clientHeight + 1
+            || placeholder.scrollWidth > placeholder.clientWidth + 1;
+        placeholder.classList.toggle(COMPACT, overflows);
+    }
+
+    /**
+     * Open the full consent text, from the compact panel.
+     *
+     * @param {Event} [event]
+     */
+    explain(event) {
+        event?.preventDefault();
+
+        if (this.hasDialogTarget && !this.dialogTarget.open) {
+            this.dialogTarget.showModal();
+            // The browser would focus the privacy link, its first focusable
+            // element: reading starts at the title instead.
+            this.dialogTarget.focus?.();
+        }
+    }
+
+    /**
+     * Close the consent text. Focus returns to the button that opened it.
+     *
+     * @param {Event} [event]
+     */
+    closeDetails(event) {
+        event?.preventDefault();
+
+        if (this.hasDialogTarget && this.dialogTarget.open) {
+            this.dialogTarget.close();
+        }
     }
 
     /**
@@ -332,6 +399,10 @@ export default class extends Controller {
      */
     accept(event) {
         event?.preventDefault();
+
+        // Closed first: a modal dialog leaves the rest of the page inert,
+        // the banner a cookie manager is about to open included.
+        this.closeDetails();
 
         const request = new CustomEvent('iw:consent-request', {
             detail: { service: this.serviceValue },

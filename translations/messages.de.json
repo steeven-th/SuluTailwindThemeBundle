@@ -105,5 +105,8 @@
     "iw_sulu_tailwind_theme.timeline_state_current": "Schritt laufend",
     "iw_sulu_tailwind_theme.timeline_state_upcoming": "Geplanter Schritt",
     "iw_sulu_tailwind_theme.consent_data_recipient": "Daten gehen an %company%",
-    "iw_sulu_tailwind_theme.consent_privacy_policy": "Datenschutzerklärung"
+    "iw_sulu_tailwind_theme.consent_privacy_policy": "Datenschutzerklärung",
+    "iw_sulu_tailwind_theme.consent_summary": "Inhalt bereitgestellt von %service%",
+    "iw_sulu_tailwind_theme.consent_more": "Mehr erfahren",
+    "iw_sulu_tailwind_theme.consent_close": "Schließen"
 }

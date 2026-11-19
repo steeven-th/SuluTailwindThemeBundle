@@ -298,7 +298,15 @@ Pick the block's service instead, or declare `embed` in the snippet and in the m
 
 `%service%` is the provider's name, taken from [the inventory](#the-third-party-services-inventory), or "a third-party service" for a generic embed. The line naming the company and its policy uses `iw_sulu_tailwind_theme.consent_data_recipient` and `iw_sulu_tailwind_theme.consent_privacy_policy`. A message typed in the theme admin would read the same in every language of the site, which is why the theme only offers the picture. An editor can still write a block's own **Waiting message**, in the language of the page being edited.
 
-**Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
+**Colors.** The placeholder takes the paragraph surface of the block's variant, so it matches the block it sits in. Over a picture, the text and button sit on a panel of that colour, so a poster full of its own lettering does not swallow them. The `--iw-embed-consent-*` variables restyle it, see [the iframe block CSS API](css-api/blocks/iframe.md).
+
+### Small media boxes: the compact panel
+
+A 16:9 box in the media column of a text and media block is about 200px high, too little for the message, the recipient line, the policy link and the button. When the full panel overflows its box, the `consent` controller switches it to a compact one: **Content provided by YouTube**, the button, and **Learn more**. It measures rather than guessing from breakpoints, since what overflows depends on the column, the font and the length of a message an editor typed, and it measures again whenever the box is resized.
+
+**Learn more** opens a modal dialog with the whole notice, the recipient, the policy and the accept button. The provider stays named in the compact panel, so the visitor always knows who they accept before clicking. Accepting from the dialog closes it first: a modal dialog leaves the page inert, the banner a cookie manager is about to open included.
+
+The texts are translations, `iw_sulu_tailwind_theme.consent_summary` (`%service%` as above), `iw_sulu_tailwind_theme.consent_more` and `iw_sulu_tailwind_theme.consent_close`.
 
 ---
 

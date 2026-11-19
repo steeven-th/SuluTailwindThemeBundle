@@ -859,11 +859,16 @@ img.object-cover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* `safe`: content taller than the box starts at its top, so the button
+       is never the part that gets cut off. */
+    justify-content: safe center;
     gap: var(--iw-embed-consent-gap, 1rem);
     padding: var(--iw-embed-consent-padding, 1.5rem);
     text-align: center;
-    background-color: var(--iw-embed-consent-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, var(--color-surface, #f3f4f6))));
+    /* Resolved once, so the panel over a picture and the details dialog
+       paint the same colour as the placeholder. */
+    --iw-embed-consent-surface: var(--iw-embed-consent-bg, var(--iw-variant-paragraph-bg, var(--iw-variant-subtle-bg, var(--color-surface, #f3f4f6))));
+    background-color: var(--iw-embed-consent-surface);
     background-image: var(--iw-embed-consent-bg-image, var(--iw-variant-paragraph-bg-image, none));
     color: var(--iw-embed-consent-text, var(--iw-variant-paragraph-color, inherit));
 }
@@ -893,6 +898,14 @@ img.object-cover {
     max-width: var(--iw-embed-consent-max-width, 36rem);
 }
 
+/* Over a picture, the text sits on a panel of the placeholder's colour: a
+   poster full of its own lettering would otherwise swallow it. */
+.iw-embed__consent-image ~ .iw-embed__consent-body {
+    padding: var(--iw-embed-consent-panel-padding, 0.75rem 1rem);
+    border-radius: var(--iw-embed-consent-panel-radius, var(--border-radius, 0.5rem));
+    background-color: var(--iw-embed-consent-panel-bg, color-mix(in srgb, var(--iw-embed-consent-surface) 88%, transparent));
+}
+
 .iw-embed__consent-text {
     margin: 0;
     font-size: var(--iw-embed-consent-text-size, 0.9375rem);
@@ -917,6 +930,110 @@ img.object-cover {
     cursor: pointer;
 }
 
+/* Compact panel. The consent controller sets the modifier when the full
+   panel overflows its box (a small media column, a phone): only who the
+   content comes from, the button, and a way to read the rest. */
+.iw-embed__consent-summary,
+.iw-embed__consent-more {
+    display: none;
+}
+
+.iw-embed__consent--compact {
+    gap: var(--iw-embed-consent-compact-gap, 0.5rem);
+    padding: var(--iw-embed-consent-compact-padding, 0.75rem);
+}
+
+.iw-embed__consent--compact .iw-embed__consent-body {
+    gap: var(--iw-embed-consent-compact-gap, 0.5rem);
+}
+
+.iw-embed__consent--compact .iw-embed__consent-body > :is(.iw-embed__consent-text, .iw-embed__consent-details, .iw-embed__consent-provider) {
+    display: none;
+}
+
+.iw-embed__consent--compact .iw-embed__consent-summary {
+    display: block;
+    margin: 0;
+    font-size: var(--iw-embed-consent-summary-size, 0.875rem);
+    font-weight: var(--iw-embed-consent-summary-weight, 600);
+    line-height: 1.3;
+}
+
+.iw-embed__consent--compact .iw-embed__consent-more {
+    display: inline;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--iw-embed-consent-more-size, 0.8125rem);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+}
+
+/* The details, over the page. A modal dialog sits in the top layer, so the
+   size of the media box no longer matters. It keeps the panel's colours,
+   without its picture: this is text to read. */
+.iw-embed__consent-dialog {
+    /* Centred again: the base reset sets every margin to 0. */
+    margin: auto;
+    width: min(var(--iw-embed-consent-dialog-max-width, 32rem), calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding: var(--iw-embed-consent-dialog-padding, 1.5rem);
+    border: 0;
+    border-radius: var(--iw-embed-consent-dialog-radius, var(--border-radius, 0.5rem));
+    background-color: var(--iw-embed-consent-dialog-bg, var(--iw-embed-consent-surface));
+    color: var(--iw-embed-consent-dialog-text, var(--iw-embed-consent-text, var(--iw-variant-paragraph-color, inherit)));
+    box-shadow: var(--iw-embed-consent-dialog-shadow, 0 20px 50px rgb(0 0 0 / 0.25));
+    text-align: start;
+}
+
+.iw-embed__consent-dialog:focus {
+    outline: none;
+}
+
+.iw-embed__consent-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--iw-embed-consent-gap, 1rem);
+}
+
+.iw-embed__consent-dialog::backdrop {
+    background-color: var(--iw-embed-consent-dialog-backdrop, rgb(0 0 0 / 0.5));
+}
+
+.iw-embed__consent-dialog-title {
+    margin: 0;
+    font-size: var(--iw-embed-consent-dialog-title-size, 1.125rem);
+    font-weight: 600;
+}
+
+.iw-embed__consent-dialog .iw-embed__consent-provider {
+    justify-content: flex-start;
+}
+
+.iw-embed__consent-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+}
+
+.iw-embed__consent-dialog-close {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+}
+
+.iw-embed__consent-more:focus-visible,
+.iw-embed__consent-dialog-close:focus-visible,
 .iw-embed__consent-button:focus-visible {
     outline: var(--iw-embed-consent-focus-width, 2px) solid var(--iw-embed-consent-focus-color, var(--color-primary));
     outline-offset: var(--iw-embed-consent-focus-offset, 2px);

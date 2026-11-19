@@ -297,6 +297,19 @@ await scenario('a blocked manager allows from its button, but does not play', as
     expect(embed.frame.getAttribute('src') === 'https://youtube.example/embed?autoplay=1', `loaded ${embed.frame.getAttribute('src')}`);
 });
 
+await scenario('accepting from the details closes them before asking the manager', async () => {
+    const p = await page();
+    const embed = p.mount('youtube', 'delegated');
+    const dialog = { open: false, showModal() { this.open = true; }, close() { this.open = false; } };
+    Object.assign(embed, { hasDialogTarget: true, dialogTarget: dialog });
+    let openWhenAsked = null;
+    document.addEventListener('iw:consent-request', (event) => { openWhenAsked = dialog.open; event.preventDefault(); });
+    embed.explain();
+    expect(dialog.open, 'the details did not open');
+    embed.accept();
+    expect(openWhenAsked === false, 'the manager was asked behind an open modal dialog');
+});
+
 await scenario('without a consent requirement the facade waits for the click alone', async () => {
     const p = await page();
     const embed = p.mount('vimeo', 'none', true, '', undefined, { facade: true });
