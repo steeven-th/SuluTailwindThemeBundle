@@ -1831,7 +1831,7 @@ img.object-cover {
    - --list     : vertical list with divider rules
    - --minimal  : stacked plain links
 
-   The .iw-linked-page-card subcomponent is shared by --cards and --carousel.
+   The .iw-linked-page-card subcomponent belongs to --cards.
    Element rules are scoped via the block selector (specificity 0,2,0) so they
    sit on par with per-variant rules emitted by ThemeCompiler. */
 
@@ -1842,19 +1842,20 @@ img.object-cover {
 /* Mode: --cards (grid 1/2/3) ──────────────────────────────────────────── */
 .iw-block-linked-pages--cards {
     display: grid;
-    grid-template-columns: 1fr;
+    /* minmax(0, ...) keeps a long label from widening its column. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--iw-block-linked-pages-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
     .iw-block-linked-pages--cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 1024px) {
     .iw-block-linked-pages--cards {
-        grid-template-columns: repeat(var(--iw-block-linked-pages-cards-cols, 3), 1fr);
+        grid-template-columns: repeat(var(--iw-block-linked-pages-cards-cols, 3), minmax(0, 1fr));
     }
 }
 
@@ -1872,12 +1873,34 @@ img.object-cover {
     transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
 }
 
+/* Card image: page excerpt image, else its hero image, else the one picked on
+   the link. Padded with the image radius by default, flush with the card
+   edges (`--image-bleed`) when the card has no radius. */
+.iw-block-linked-pages .iw-linked-page-card__image {
+    display: block;
+    overflow: hidden;
+    margin-bottom: var(--iw-linked-page-card-image-gap, 1rem);
+    border-radius: var(--iw-linked-page-card-image-radius, var(--border-imageRadius, var(--border-radius)));
+}
+
+.iw-block-linked-pages .iw-linked-page-card--image-bleed {
+    overflow: hidden;
+}
+
+.iw-block-linked-pages .iw-linked-page-card--image-bleed .iw-linked-page-card__image {
+    margin-top: calc(-1 * var(--iw-linked-page-card-padding, 1.5rem));
+    margin-inline: calc(-1 * var(--iw-linked-page-card-padding, 1.5rem));
+    border-radius: 0;
+}
+
 .iw-block-linked-pages .iw-linked-page-card:hover {
     box-shadow: var(--iw-linked-page-card-hover-shadow, var(--iw-variant-card-shadow-hover, var(--iw-cards-shadow-hover, none)));
 }
 
 .iw-block-linked-pages .iw-linked-page-card__title {
     display: block;
+    /* A label falling back to the raw URL has no break opportunity. */
+    overflow-wrap: break-word;
     font-size: var(--iw-linked-page-card-title-size, var(--iw-cards-title-size, 1.125rem));
     font-weight: var(--iw-linked-page-card-title-weight, 600);
     transition: color var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1910,13 +1933,23 @@ img.object-cover {
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slides {
+    display: grid;
     overflow: hidden;
+    /* The arrows sit on the edges of the block: keep a lane for them so a
+       slide image never runs under one. */
+    padding-inline: calc(var(--iw-block-linked-pages-nav-size, 2.5rem) + var(--iw-block-linked-pages-nav-gap, 0.75rem));
 }
 
+/* Every slide in the same cell: the block takes the height of the tallest
+   one, and a shorter slide (no image, shorter text) centres its content. */
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slide {
+    grid-area: 1 / 1;
+    align-self: center;
+    width: 100%;
     max-width: var(--iw-block-linked-pages-carousel-slide-max-width, 42rem);
     margin-inline: auto;
-    padding: var(--iw-block-linked-pages-carousel-slide-padding, 2rem);
+    /* Top and bottom only: the lane kept for the arrows already spaces the sides. */
+    padding-block: var(--iw-block-linked-pages-carousel-slide-padding, 2rem);
     text-align: center;
 }
 
@@ -1924,6 +1957,10 @@ img.object-cover {
     display: block;
     text-decoration: none;
     color: inherit;
+}
+
+.iw-block-linked-pages--carousel .iw-block-linked-pages__slide-image {
+    margin-bottom: var(--iw-block-linked-pages-carousel-image-gap, 1.25rem);
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slide-title {

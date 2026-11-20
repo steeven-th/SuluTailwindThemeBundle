@@ -51,6 +51,15 @@
                                 <property name="excerpt" type="text_area">
                                     <meta><title>iw_sulu_tailwind_theme.excerpt</title></meta>
                                 </property>
+                                <property name="image" type="single_media_selection">
+                                    <meta>
+                                        <title>iw_sulu_tailwind_theme.image</title>
+                                        <info_text>iw_sulu_tailwind_theme.block.linked_pages_image_info</info_text>
+                                    </meta>
+                                    <params>
+                                        <param name="types" value="image"/>
+                                    </params>
+                                </property>
                             </properties>
                         </type>
                     </types>
@@ -77,6 +86,27 @@
         <section name="settings">
             <meta><title>iw_sulu_tailwind_theme.settings</title></meta>
             <properties>
+                <!-- Only the cards and carousel styles show images. An empty style
+                     renders as cards, hence the negative condition. -->
+                <property name="imageRatio" type="single_select" colspan="6"
+                          visibleCondition="__parent.style != 'list' AND __parent.style != 'minimal'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.article_image_ratio</title>
+                        <info_text>iw_sulu_tailwind_theme.block.linked_pages_image_ratio_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues('_', 'iw_sulu_tailwind_theme.block.article_image_ratio_default')"/>
+                    </params>
+                </property>
+                <property name="hideImages" type="checkbox" colspan="6"
+                          visibleCondition="__parent.style != 'list' AND __parent.style != 'minimal'">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block.linked_pages_hide_images</title>
+                        <info_text>iw_sulu_tailwind_theme.block.linked_pages_hide_images_info</info_text>
+                    </meta>
+                </property>
                 <xi:include href="../fragments/block-spacing.xml"
                             xpointer="xmlns(sulu=http://schemas.sulu.io/template/template) xpointer(/sulu:properties/sulu:property)"/>
                 <xi:include href="../fragments/block-radius.xml"
