@@ -1,0 +1,203 @@
+<?xml version="1.0" ?>
+<!--
+    Admin form: Blocks tab, Cards sub-tab.
+
+    The shape of every card a block draws: cards, documents, testimonials,
+    linked pages, articles, key figures, timeline. Their colours come from the
+    variant of the block. The Cards tab of the default settings is for cards
+    drawn outside blocks, and no block reads it.
+
+    An empty field leaves each block on the value it ships with.
+-->
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>iw_theme_config_block_cards</key>
+
+    <properties>
+        <!-- Copies the other set of card settings into this one, after a confirm. -->
+        <property name="copyFromListingCards" type="iw_theme_copy_card_settings">
+            <params>
+                <param name="direction" value="to_blocks"/>
+            </params>
+        </property>
+
+        <section name="blockCardsShape">
+            <meta>
+                <title>iw_sulu_tailwind_theme.block_cards_section_shape</title>
+                <info_text>iw_sulu_tailwind_theme.block_cards_section_shape_info</info_text>
+            </meta>
+            <properties>
+                <property name="blockCardTitleSize" type="number" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.card_title_size</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_title_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0.5"/>
+                        <param name="max" value="4"/>
+                        <param name="step" value="0.0625"/>
+                    </params>
+                </property>
+
+                <property name="blockCardTextSize" type="number" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.card_text_size</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_text_size_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="min" value="0.5"/>
+                        <param name="max" value="3"/>
+                        <param name="step" value="0.0625"/>
+                    </params>
+                </property>
+
+                <!-- The space between the edge of the card and its text. Empty
+                     keeps the padding each block ships with, which differ (1rem
+                     to 2rem). `variant` drops it on the cards the variant paints
+                     neither a background nor a border on. No `0` on purpose:
+                     on a painted card it glues the text to the edge, and the
+                     space round the image has a field of its own. -->
+                <property name="blockCardPadding" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.articles_card_padding</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_padding_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value=""/>
+                        <param name="values" type="collection">
+                            <param name=""><meta><title>iw_sulu_tailwind_theme.block_card_padding_block</title></meta></param>
+                            <param name="variant"><meta><title>iw_sulu_tailwind_theme.block_card_padding_variant</title></meta></param>
+                            <param name="0.5rem"><meta><title>8 px (0.5rem · p-2)</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px (0.75rem · p-3)</title></meta></param>
+                            <param name="1rem"><meta><title>16 px (1rem · p-4)</title></meta></param>
+                            <param name="1.25rem"><meta><title>20 px (1.25rem · p-5)</title></meta></param>
+                            <param name="1.5rem"><meta><title>24 px (1.5rem · p-6)</title></meta></param>
+                            <param name="2rem"><meta><title>32 px (2rem · p-8)</title></meta></param>
+                            <param name="2.5rem"><meta><title>40 px (2.5rem · p-10)</title></meta></param>
+                            <param name="3rem"><meta><title>48 px (3rem · p-12)</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <section name="blockCardsImage">
+            <meta>
+                <title>iw_sulu_tailwind_theme.block_cards_section_image</title>
+            </meta>
+            <properties>
+                <property name="blockCardImageRatio" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.articles_card_image_ratio</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_image_ratio_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="16:9"/>
+                        <param name="values" type="expression"
+                               value="service('itech_world.sulu_tailwind_theme.image_ratios').getSelectValues(':')"/>
+                    </params>
+                </property>
+
+
+                <!-- `auto` lays the image edge to edge on a card without radius
+                     and inside the padding otherwise, which is what the article
+                     blocks always did. `0` lays it edge to edge. -->
+                <property name="blockCardImageInset" type="single_select" colspan="4">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.block_card_image_inset</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_image_inset_info</info_text>
+                    </meta>
+                    <params>
+                        <param name="default_value" value="auto"/>
+                        <param name="values" type="collection">
+                            <param name="auto"><meta><title>iw_sulu_tailwind_theme.block_card_image_placement_auto</title></meta></param>
+                            <param name="padding"><meta><title>iw_sulu_tailwind_theme.block_card_image_inset_padding</title></meta></param>
+                            <param name="0"><meta><title>iw_sulu_tailwind_theme.block_card_image_inset_none</title></meta></param>
+                            <param name="0.5rem"><meta><title>8 px (0.5rem)</title></meta></param>
+                            <param name="0.75rem"><meta><title>12 px (0.75rem)</title></meta></param>
+                            <param name="1rem"><meta><title>16 px (1rem)</title></meta></param>
+                            <param name="1.25rem"><meta><title>20 px (1.25rem)</title></meta></param>
+                            <param name="1.5rem"><meta><title>24 px (1.5rem)</title></meta></param>
+                            <param name="2rem"><meta><title>32 px (2rem)</title></meta></param>
+                            <param name="2.5rem"><meta><title>40 px (2.5rem)</title></meta></param>
+                            <param name="3rem"><meta><title>48 px (3rem)</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="blockCardHoverImage" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_image</title></meta>
+                    <params>
+                        <param name="default_value" value="zoom"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_none</title></meta></param>
+                            <param name="zoom"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom</title></meta></param>
+                            <param name="zoom-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_zoom_strong</title></meta></param>
+                            <param name="grayscale"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_grayscale</title></meta></param>
+                            <param name="brightness"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_image_brightness</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+            </properties>
+        </section>
+
+        <section name="blockCardsHover">
+            <meta>
+                <title>iw_sulu_tailwind_theme.block_cards_section_hover</title>
+            </meta>
+            <properties>
+                <property name="blockCardHoverTransform" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform</title></meta>
+                    <params>
+                        <param name="default_value" value="lift"/>
+                        <param name="values" type="collection">
+                            <param name="none"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_none</title></meta></param>
+                            <param name="lift"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift</title></meta></param>
+                            <param name="lift-strong"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_lift_strong</title></meta></param>
+                            <param name="scale-up"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_up</title></meta></param>
+                            <param name="scale-down"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_scale_down</title></meta></param>
+                            <param name="tilt"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_transform_tilt</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="blockCardHoverDuration" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_duration</title></meta>
+                    <params>
+                        <param name="default_value" value="300ms"/>
+                        <param name="values" type="collection">
+                            <param name="150ms"><meta><title>150ms</title></meta></param>
+                            <param name="300ms"><meta><title>300ms</title></meta></param>
+                            <param name="500ms"><meta><title>500ms</title></meta></param>
+                            <param name="700ms"><meta><title>700ms</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <property name="blockCardHoverEasing" type="single_select" colspan="4">
+                    <meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing</title></meta>
+                    <params>
+                        <param name="default_value" value="ease-out"/>
+                        <param name="values" type="collection">
+                            <param name="linear"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_linear</title></meta></param>
+                            <param name="ease-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_out</title></meta></param>
+                            <param name="ease-in-out"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_ease_in_out</title></meta></param>
+                            <param name="bounce"><meta><title>iw_sulu_tailwind_theme.articles_card_hover_easing_bounce</title></meta></param>
+                        </param>
+                    </params>
+                </property>
+
+                <!-- The geometry only. The colour of the shadow is the one the
+                     variant of the block picks. -->
+                <property name="blockCardShadow" type="iw_theme_shadow_editor" colspan="12">
+                    <meta>
+                        <title>iw_sulu_tailwind_theme.components_label_shadow</title>
+                        <info_text>iw_sulu_tailwind_theme.block_card_shadow_info</info_text>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>

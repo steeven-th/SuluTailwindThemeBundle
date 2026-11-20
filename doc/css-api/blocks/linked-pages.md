@@ -4,7 +4,7 @@ Collection of curated outbound links (internal pages and/or external URLs) with 
 
 The `.iw-linked-page-card` subcomponent is used by `--cards`.
 
-`--cards` and `--carousel` show an image per link: the one picked on the link, else the excerpt image of the linked page, else its hero image. The block settings pick its ratio (16:9 by default) or hide the images.
+`--cards` and `--carousel` show an image per link: the one picked on the link, else the excerpt image of the linked page, else its hero image. The block settings pick its ratio (the one of **Blocks > Cards** by default), the margin around it, or hide the images.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../../css-conventions.md`](../../css-conventions.md).
 
@@ -28,7 +28,9 @@ The `.iw-linked-page-card` subcomponent is used by `--cards`.
 |-------|------|
 | `.iw-linked-page-card` | Single card `<a>`. Owns surface + hover shadow. |
 | `.iw-linked-page-card--has-image` | The card shows an image. |
-| `.iw-linked-page-card--image-bleed` | The image touches the card edges. Set when the card has no radius, the image otherwise sits inside the padding with the image radius. |
+| `.iw-linked-page-card--image-bleed` | The image touches the card edges. Set from the margin around the image of the block, else of **Blocks > Cards**: always for *None*, when the card has no radius for *Automatic*. The bottom corners keep the image radius unless the variant draws a card border. |
+| `.iw-image-inset--<value>` | Margin round the image picked by the block (`0_5rem` to `3rem`), over the one of **Blocks > Cards**. Sets `--iw-card-image-inset`. A margin of none lays the image edge to edge instead. |
+| `.iw-linked-page-card--image-<effect>` | Image hover effect from **Blocks > Cards** (`zoom`, `zoom-strong`, `grayscale`, `brightness`). Absent for `none`. |
 | `.iw-linked-page-card__image` | Image box above the title, cropped to the block ratio. |
 | `.iw-linked-page-card__title` | Card title. Hover triggers color transition to `--link-hover`. |
 | `.iw-linked-page-card__excerpt` | Optional 3-line excerpt below the title. |
@@ -90,7 +92,7 @@ The `.iw-linked-page-card` subcomponent is used by `--cards`.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `--iw-linked-page-card-padding` | `1.5rem` | Card inner padding. A bleeding image pulls itself out of it by the same amount. |
+| `--iw-linked-page-card-padding` | `var(--iw-block-card-padding, 1.5rem)` | Card inner padding. Unset, it follows **Blocks > Cards > Padding**. A bleeding image pulls itself out of it by the same amount. |
 | `--iw-linked-page-card-image-gap` | `1rem` | Space between the image and the title. |
 | `--iw-linked-page-card-image-radius` | `var(--border-imageRadius, var(--border-radius))` | Radius of a padded image. A bleeding image has none. |
 | `--iw-linked-page-card-border` | `var(--iw-variant-hr-color, var(--color-border, #e5e7eb))` | Card border color (1px solid). |
@@ -98,7 +100,7 @@ The `.iw-linked-page-card` subcomponent is used by `--cards`.
 | `--iw-linked-page-card-link-color` | `var(--iw-variant-link-color, inherit)` | Default text color inside the card. |
 | `--iw-linked-page-card-link-hover` | `var(--iw-variant-link-hover, inherit)` | Hover text color (title + lists + minimal). |
 | `--iw-linked-page-card-hover-shadow` | medium shadow | Box-shadow applied on card hover. |
-| `--iw-linked-page-card-transition-duration` | `0.3s` | Transition for box-shadow and color. |
+| `--iw-linked-page-card-transition-duration` | `var(--iw-cards-hover-duration, 0.3s)` | Transition of the hover movement and shadow. The movement itself is `--iw-cards-hover-transform`, both from **Blocks > Cards**. |
 | `--iw-linked-page-card-title-size` | `1.125rem` | Title font-size. |
 | `--iw-linked-page-card-title-weight` | `600` | Title font-weight. |
 | `--iw-linked-page-card-excerpt-margin-top` | `0.5rem` | Spacing above the excerpt. |

@@ -48,9 +48,9 @@ names.
 
 | Family | Admin setting | Token | Applies to |
 |---|---|---|---|
-| Article cards | Components > Cards > **Card spacing** (`cardGap`) | `--iw-cards-gap` | Article list (cards / grid / list), article carousel, article featured |
-| Images | Defaults > Blocks > **Gap between images** (`defaults.imageGap`) | `--iw-blocks-image-gap` | Text + images mosaic, gallery grid / masonry / slider |
-| Other components | Defaults > Blocks > **Gap between components** (`defaults.componentGap`) | `--iw-blocks-component-gap` | Accordion, documents, linked pages, testimonials, key figures |
+| Cards outside blocks | Default settings > Cards outside blocks > **Card spacing** (`cardGap`) | `--iw-cards-gap` | Article listing pages. Inside a block, `--iw-cards-gap` is the component gap |
+| Images | Blocks > Defaults > **Gap between images** (`defaults.imageGap`) | `--iw-blocks-image-gap` | Text + images mosaic, gallery grid / masonry / slider |
+| Components | Blocks > Defaults > **Gap between components** (`defaults.componentGap`) | `--iw-blocks-component-gap` | Accordion, documents, linked pages, testimonials, key figures, article list, article carousel, article featured |
 
 All three offer the same scale:
 
@@ -106,12 +106,14 @@ The gallery exposes two explicit gap states as BEM modifiers: `.iw-block-gallery
 ## Card type
 
 Five families of card ship five title sizes, from 1.0625rem to 1.25rem, because
-each was written where its block was. Two site-wide tokens line them up:
+each was written where its block was. Two tokens line them up, set twice: once
+for the cards of blocks, once for the cards outside them. Each block section
+(`.iw-block`) declares the tokens again with the Blocks > Cards value.
 
 | Admin setting | Token | Sizes |
 |---|---|---|
-| Components > Cards > **Title size** (`cardTitleSize`) | `--iw-cards-title-size` | The title of every card |
-| Components > Cards > **Text size** (`cardTextSize`) | `--iw-cards-text-size` | The text or excerpt of every card |
+| Blocks > Cards > **Title size** (`blockCardTitleSize`), Cards outside blocks > **Title size** (`cardTitleSize`) | `--iw-cards-title-size` | The title of every card |
+| Blocks > Cards > **Text size** (`blockCardTextSize`), Cards outside blocks > **Text size** (`cardTextSize`) | `--iw-cards-text-size` | The text or excerpt of every card |
 
 Each family keeps a variable of its own in front of the token, so one family can
 still be tuned alone from a stylesheet:
@@ -141,9 +143,9 @@ per block, the Cards block reads tokens:
 
 | Token | From |
 |---|---|
-| `--iw-cards-hover-transform` | Components > Cards > **Hover transform** (`cardHoverTransform`) |
-| `--iw-cards-hover-duration` | Components > Cards > **Duration** (`cardHoverDuration`) |
-| `--iw-cards-hover-easing` | Components > Cards > **Easing** (`cardHoverEasing`) |
+| `--iw-cards-hover-transform` | Blocks > Cards > **Hover transform** (`blockCardHoverTransform`) in a block, Cards outside blocks (`cardHoverTransform`) elsewhere |
+| `--iw-cards-hover-duration` | Blocks > Cards > **Duration** (`blockCardHoverDuration`), Cards outside blocks (`cardHoverDuration`) |
+| `--iw-cards-hover-easing` | Blocks > Cards > **Easing** (`blockCardHoverEasing`), Cards outside blocks (`cardHoverEasing`) |
 
 `cardHoverTransform` defaults to `lift`, the small rise the Cards block has
 always drawn. A card you can click that answers nothing on hover reads as broken
@@ -154,13 +156,14 @@ not a site-wide one: it says how a particular card sits on its page.
 
 Colours are a separate matter and do not belong here: a card inside a block
 takes them from the colour variant, which is what makes a block coherent with
-itself. Only the type and the hover are site-wide.
+itself. The colours of the Cards outside blocks tab are reset to `initial` on
+`.iw-block`.
 
 ## Split block gap
 
 Blocks built from two content zones - text + images, form + widget, map + info,
 CTA + accessory - share a single gap token so the whole site breathes the same
-way. It is set in the admin under **Settings > Themes > Default settings > Blocks >
+way. It is set in the admin under **Settings > Themes > Blocks > Defaults >
 Gap between zones** (`defaults.blockGap`) and compiled to `--iw-blocks-gap`.
 
 | Level (admin) | Tailwind | Value |

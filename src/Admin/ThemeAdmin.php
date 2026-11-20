@@ -573,6 +573,19 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.blocks_group')
             );
 
+            // ── Edit form: blocks, cards tab ───────────────────────
+            // The shape of every card a block draws. Their colours stay in
+            // the variants, and the Cards tab of the default settings only
+            // reaches cards drawn outside blocks.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.block_cards', '/cards')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_block_cards')
+                    ->setTabTitle('iw_sulu_tailwind_theme.blocks_group_cards')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.blocks_group')
+            );
+
             // ── Edit form: menu group (second row of tabs) ─────────
             $viewCollection->add(
                 $this->viewBuilderFactory->createViewBuilder(

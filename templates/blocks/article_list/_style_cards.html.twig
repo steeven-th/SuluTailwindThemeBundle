@@ -18,25 +18,32 @@
         'past': pastEvents|default([]),
     }[source|default('articles')]|default([]) %}
 
-    {# Image collides with the item edges when no inner radius is requested,
-       otherwise the L4 card pads the image with its own radius inside. #}
-    {# The block's own ratio, else the theme's card ratio. #}
-    {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.cardImageRatio|default('16_9')) %}
+    {# The block's own ratio, else the one of Blocks > Cards. #}
+    {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.blockCardImageRatio|default('16_9')) %}
 
     {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
     {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
+    {# Margin round the image: the block choice, else Blocks > Cards. `auto`
+       lays it edge to edge on a card without radius and inside the padding
+       otherwise, `padding` follows the padding, `0` lays it edge to edge, which
+       is what squares its corners against a border. #}
+    {% set imageInset = cardImageInset|default(iw_sulu_tailwind_theme.blockCardImageInset|default('auto'))|default('auto') %}
+    {% set imageBleed = imageInset == '0' or (imageInset == 'auto' and not hasCardRadius) %}
+    {% set insetClass = (not imageBleed and cardImageInset|default('') not in ['', 'auto', 'padding', '0']) ? 'iw-image-inset--' ~ cardImageInset|replace({'.': '_'}) : '' %}
 
     {% if articleItems is iterable and articleItems|length > 0 %}
         <div class="iw-block-article-list iw-block-article-list--cards{% if pickedRatio.portrait %} iw-block-article-list--portrait{% endif %}">
             {% for article in articleItems %}
-                <div class="iw-block-article-list__item iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}">
+                <div class="iw-block-article-list__item iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }} {{ insetClass }}">
                     {% include '@ItechWorldSuluTailwindTheme/articles/common/_article_card.html.twig' with {
                         article: article,
                         imageRatio: pickedRatio.key,
                         showDate: true,
                         showExcerpt: true,
                         showCategory: true,
-                        cardImagePadded: hasCardRadius,
+                        cardImagePadded: not imageBleed,
+                        cardHoverImage: iw_sulu_tailwind_theme.blockCardHoverImage|default('zoom'),
+                        cardHoverTransform: iw_sulu_tailwind_theme.blockCardHoverTransform|default('lift'),
                         imageSizes: iw_sulu_tailwind_theme_image_sizes(pickedRatio.portrait ? {768: 1/2, 1024: 1/3} : {768: 1/2}),
                     } only %}
                 </div>

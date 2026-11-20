@@ -16,8 +16,8 @@
         {% set parentBlockKey = _key %}
         {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
         {% set showImages = not (hideImages|default(false)) %}
-        {# The block's own ratio, else 16:9. The theme Cards tab is for cards outside blocks. #}
-        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), '16_9') %}
+        {# The block's own ratio, else the one of Blocks > Cards. #}
+        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.blockCardImageRatio|default('16_9')) %}
         <div
             data-controller="slider"
             data-slider-mode-value="carousel"

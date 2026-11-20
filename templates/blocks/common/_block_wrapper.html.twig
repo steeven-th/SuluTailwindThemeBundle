@@ -97,8 +97,11 @@
 {% set ctaBlockKey = _key|default(null) %}
 {% set ctaButtonsView = ctaBlockKey is not null ? view.blocks[ctaBlockKey].ctaButtons|default([]) : [] %}
 
+{#- `iw-block` scopes the card settings of Blocks > Cards: the theme compiler
+    gives every card variable its block value there, so no block reads the
+    Cards tab, which is for cards drawn outside blocks. -#}
 <section
-    class="block {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
+    class="block iw-block {{ variantClass }} {{ sectionContainerClass }} {{ sectionMaxWidthClass }} {{ mtClass }} {{ mbClass }} {{ ptClass }} {{ pbClass }} {{ plClass }} {{ prClass }} {{ radiusClass }} {% if radiusClass %}sm:overflow-hidden{% endif %}"
     {{ bgAttr|raw }}
     {{ borderAttr|raw }}
     data-controller="lightbox"

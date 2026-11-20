@@ -1,6 +1,6 @@
 # Block variants — CSS API
 
-Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Variants**. Each variant has a stable **slug** (its identifier), separate from its user-facing label.
+Block variants are per-section color schemes (e.g., light, accent, dark) defined in **Settings > Themes > Blocks > Variants**. Each variant has a stable **slug** (its identifier), separate from its user-facing label.
 
 > Conventions: strict BEM, `iw-` prefix. See [`../css-conventions.md`](../css-conventions.md).
 
@@ -53,7 +53,7 @@ Each `.iw-variant--{slug}` class sets the following custom properties from the v
 | `--iw-variant-card-paragraph-color` | `cardParagraph` | Running-text colour inside a card. Falls back to `--iw-variant-paragraph-color` |
 | `--iw-variant-card-border` | `cardBorder` | Border colour of a card. A [gradient](../gradients.md) is drawn as a ring instead, see [Gradient surfaces](#gradient-surfaces) |
 | `--iw-variant-card-border-width` | `cardBorderWidth` | `1px`, `2px` or `3px` |
-| `--iw-variant-card-shadow` | `cardShadowColor` | The shadow the cards of this block cast, shape from **Components > Cards** and colour from here. `none` when the variant names no colour |
+| `--iw-variant-card-shadow` | `cardShadowColor` | The shadow the cards of this block cast, shape from **Blocks > Cards** and colour from here. `none` when the variant names no colour |
 | `--iw-variant-card-shadow-hover` | `cardShadowHoverColor` | The same, on hover. A shadow that only appears under the pointer is often the one that most needs its own colour |
 | `--iw-variant-subtle-bg` | *(computed)* | Subtle background for inline code, table headers, `<pre>` blocks |
 | `--iw-variant-block-border` | `blockBorder` | Border color of the block section |
@@ -160,15 +160,15 @@ black, written in the stylesheet, so a dark variant chose its own background
 and then lost its shadow in it. `cardShadowColor` fixes that.
 
 Only the **colour** belongs to the variant. How far a card lifts is a decision
-about the site, taken once under **Components > Cards**, while what it lifts
+about the blocks, taken once under **Blocks > Cards**, while what it lifts
 against depends on the surface underneath it. The chain ends on the original
 black, so a theme that sets no colour keeps the shadow it had.
 
 Inside a block the variant decides, saying nothing included: a variant that
 names no shadow colour emits `none`, and the site-wide setting does not leak
 into it. That setting - `--iw-cards-shadow` and its hover twin, under
-**Components > Cards** beside the geometry - answers for the cards no variant
-reaches, an article listing page carrying none.
+**Default settings > Cards outside blocks** beside its own geometry - answers
+for the cards no variant reaches, an article listing page carrying none.
 
 The colour is written into the value rather than left to a `var()` chain: the
 `var()` inside a custom property is substituted where the property is declared,
@@ -178,7 +178,7 @@ The colour reaches cards alone. The shadow sizes are shared with the
 back-to-top button, the gallery navigation, the article filters, the table of
 contents, the pagination and the tags, and none of those takes a card setting.
 
-The **shape** is a geometry set once under **Components > Cards**: horizontal
+The **shape** is a geometry set once under **Blocks > Cards**: horizontal
 and vertical offset, blur, spread, an opacity at rest and one on hover, and how
 much the shadow grows under the pointer. Two opacities rather than one
 multiplier, because that is what makes the commonest arrangement of all

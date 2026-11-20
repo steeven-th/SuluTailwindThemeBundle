@@ -348,7 +348,7 @@ The compiler also emits theme-default utility classes (plus `sm:` variants) that
 
 ## Block default variables
 
-Generated from the **Settings > Themes > Default settings > Blocks** sub-tab.
+Generated from the **Settings > Themes > Blocks > Defaults** sub-tab.
 These are the site-wide defaults shared by every block that are not tied to a
 single component (components have their own tab).
 
@@ -357,7 +357,7 @@ single component (components have their own tab).
 | `--iw-blocks-gap` | Gap between the two content zones of a split block (text + images, form + widget, map + info, CTA + accessory). Halved below the `md` breakpoint by the `.iw-split-gap` utility | `1.5rem` |
 | `--iw-blocks-title-gap` | Space between a block's titles group and its content, consumed by `.iw-block__titles` | `1.5rem` |
 | `--iw-blocks-image-gap` | Spacing inside an image grid (text + images mosaic, gallery grid / masonry / slider), overridable per block from the block's own Image spacing field | `1.5rem` |
-| `--iw-blocks-component-gap` | Spacing inside the component grids that are not article cards (accordion, documents, linked pages, testimonials, key figures) | `1.5rem` |
+| `--iw-blocks-component-gap` | Spacing inside every component grid of a block (accordion, documents, linked pages, testimonials, key figures, article cards) | `1.5rem` |
 | `--iw-blocks-max-width` | Maximum width of a block's content, so a short paragraph does not stretch across the whole container. `none` leaves blocks as wide as the page container | `var(--container-3xl, 48rem)` |
 | `--iw-surface-content-padding-x` / `-y` | Space between the content surface and what sits on it, horizontally and vertically. Applied only where the variant paints that surface, so a block with no content background or border keeps its layout | `1.5rem` |
 | `--iw-surface-paragraph-padding-x` / `-y` | Same, for the paragraph surface. The defaults are the values the compiler used to write in, so an upgrade moves nothing | `1.5rem` / `1rem` |
@@ -403,5 +403,25 @@ See [`transverse.md#grid-spacing`](./transverse.md#grid-spacing),
 [`transverse.md#split-block-gap`](./transverse.md#split-block-gap),
 [`transverse.md#block-titles-gap`](./transverse.md#block-titles-gap) and
 [`transverse.md#block-maximum-width`](./transverse.md#block-maximum-width) for
-the per-block override variables. Article card grids keep their own token,
-`--iw-cards-gap`, set under Components > Cards.
+the per-block override variables.
+
+## Block card variables
+
+Generated from the **Settings > Themes > Blocks > Cards** sub-tab, on the
+`.iw-block` class every block section carries. There, each `--iw-cards-*` and
+`--iw-article-card-*` variable of the **Cards outside blocks** tab is declared
+again with its Blocks > Cards value, or `initial` so the card falls back to the
+value it ships with. No block reads the Cards outside blocks tab.
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `--iw-block-card-padding` | Padding shared by every card family of a block, read before each family's own default. `initial` when Blocks > Cards keeps each block's padding. In the *Per variant* mode, set to `0` on `.iw-block.iw-variant--<slug>` for the variants that paint neither a background nor a border on their cards | `1.5rem` |
+| `--iw-card-image-inset` | Margin round a card image placed with a margin. `initial` follows the padding: the image is pulled out of the padding by the difference, so the text keeps its space. A block overrides it with an `iw-image-inset--<value>` class (`0_5rem` to `3rem`) | `0.75rem` |
+| `--iw-block-card-bleed-radius` | Bottom radius of a card image flush with the card edges. Unset, the image radius. `0` on the variants that draw a card border | `0` |
+| `--iw-cards-title-size` / `--iw-cards-text-size` | Text sizes of the cards of blocks | `1.25rem` |
+| `--iw-cards-hover-transform` / `-duration` / `-easing` | Hover movement of the cards of blocks | `translateY(-4px)` |
+| `--iw-cards-gap` | Inside a block, the component gap (`--iw-blocks-component-gap`) | |
+
+The shadow shape of Blocks > Cards reaches the cards through the variants
+(`--iw-variant-card-shadow*`), which give it their colour. A block section
+without a variant casts none.

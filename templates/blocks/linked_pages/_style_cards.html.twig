@@ -16,12 +16,18 @@
         {% set parentBlockKey = _key %}
         {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
         {% set showImages = not (hideImages|default(false)) %}
-        {# The block's own ratio, else 16:9. The theme Cards tab is for cards outside blocks. #}
-        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), '16_9') %}
-        {# Same rule as the article blocks: without a card radius the image
-           touches the card edges, with one it sits inside the padding. #}
+        {# The block's own ratio, else the one of Blocks > Cards. #}
+        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.blockCardImageRatio|default('16_9')) %}
         {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
         {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
+        {# Margin round the image: the block choice, else Blocks > Cards. `auto`
+           lays it edge to edge on a card without radius and inside the padding
+           otherwise, `padding` follows the padding, `0` lays it edge to edge, which
+           is what squares its corners against a border. #}
+        {% set imageInset = cardImageInset|default(iw_sulu_tailwind_theme.blockCardImageInset|default('auto'))|default('auto') %}
+        {% set imageBleed = imageInset == '0' or (imageInset == 'auto' and not hasCardRadius) %}
+        {% set insetClass = (not imageBleed and cardImageInset|default('') not in ['', 'auto', 'padding', '0']) ? 'iw-image-inset--' ~ cardImageInset|replace({'.': '_'}) : '' %}
+        {% set hoverImage = iw_sulu_tailwind_theme.blockCardHoverImage|default('zoom') %}
         <div class="iw-block-linked-pages iw-block-linked-pages--cards">
             {% for link in links %}
                 {% set linkView = linksView[loop.index0].link|default({}) %}
@@ -70,7 +76,9 @@
                     {% set cardClasses = ['iw-linked-page-card', 'iw-surface--card', iw_sulu_tailwind_theme_radius_class('card', cardRadius|default(''))] %}
                     {% if imageMedia %}
                         {% set cardClasses = cardClasses|merge(['iw-linked-page-card--has-image']) %}
-                        {% if not hasCardRadius %}{% set cardClasses = cardClasses|merge(['iw-linked-page-card--image-bleed']) %}{% endif %}
+                        {% if imageBleed %}{% set cardClasses = cardClasses|merge(['iw-linked-page-card--image-bleed']) %}{% endif %}
+                        {% if insetClass %}{% set cardClasses = cardClasses|merge([insetClass]) %}{% endif %}
+                        {% if hoverImage != 'none' %}{% set cardClasses = cardClasses|merge(['iw-linked-page-card--image-' ~ hoverImage]) %}{% endif %}
                     {% endif %}
 
                     <a
