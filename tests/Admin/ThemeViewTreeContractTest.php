@@ -147,9 +147,9 @@ final class ThemeViewTreeContractTest extends TestCase
     /**
      * The tabs of the first row read from the general to the particular.
      *
-     * The order is a decision rather than an accident: a variant combines
-     * colours and surfaces defined before it, so it comes after them and
-     * before the block defaults that use it. Nothing enforces it at runtime -
+     * The order is a decision rather than an accident: the blocks group
+     * combines colours, surfaces, radii and buttons defined before it, so it
+     * comes after all of them. Nothing enforces it at runtime -
      * Sulu sorts by `tabOrder` and treats a missing one as zero, so a tab
      * added without one lands wherever the declarations happen to fall.
      */
@@ -160,8 +160,8 @@ final class ThemeViewTreeContractTest extends TestCase
             ThemeAdmin::EDIT_FORM_VIEW . '.details',
             ThemeAdmin::EDIT_FORM_VIEW . '.colors_group',
             ThemeAdmin::EDIT_FORM_VIEW . '.typography',
-            ThemeAdmin::EDIT_FORM_VIEW . '.variants',
             ThemeAdmin::EDIT_FORM_VIEW . '.defaults_group',
+            ThemeAdmin::EDIT_FORM_VIEW . '.blocks_group',
             ThemeAdmin::EDIT_FORM_VIEW . '.menu_group',
             ThemeAdmin::EDIT_FORM_VIEW . '.footer',
             ThemeAdmin::EDIT_FORM_VIEW . '.pages',

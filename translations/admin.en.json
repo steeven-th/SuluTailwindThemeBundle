@@ -239,7 +239,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Bounce",
 
     "iw_sulu_tailwind_theme.defaults": "Defaults",
-    "iw_sulu_tailwind_theme.defaults_general": "Spacing and radius",
+    "iw_sulu_tailwind_theme.defaults_general": "Radius",
     "iw_sulu_tailwind_theme.borders_radii": "Border radii",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Card radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Image radius",
@@ -266,7 +266,7 @@
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraph - vertical padding",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Space at the top and bottom, between the edge of the paragraph surface and its text.",
 
-    "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocks",
+    "iw_sulu_tailwind_theme.defaults_section_blocks": "Gaps and maximum width",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Gap between zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "Applies to blocks with two content zones (text + images, form + widget, map + info, text + key figures). The gap is halved on mobile.",
     "iw_sulu_tailwind_theme.defaults_titleGap": "Gap between titles and content",
@@ -338,6 +338,8 @@
     "iw_sulu_tailwind_theme.defaults_spacing_xlarge": "Extra large - 48 px (gap-12)",
 
     "iw_sulu_tailwind_theme.variants": "Variants",
+    "iw_sulu_tailwind_theme.blocks_group": "Blocks",
+    "iw_sulu_tailwind_theme.blocks_group_defaults": "Defaults",
     "iw_sulu_tailwind_theme.variants_info": "Define color variants for content blocks",
     "iw_sulu_tailwind_theme.variant": "Variant",
     "iw_sulu_tailwind_theme.variant_label": "Label",
@@ -1608,7 +1610,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_padding_info": "Space between the edge of the filter panel and its content. Also applies to the table of contents. Empty, the default spacing applies.",
     "iw_sulu_tailwind_theme.components_sidebar_gap_info": "Space between the groups of the filter panel (search, sort, categories, tags) and between the entries of the table of contents. Empty, the default gap applies.",
     "iw_sulu_tailwind_theme.components_label_current": "Current item",
-    "iw_sulu_tailwind_theme.components_section_cards": "Cards",
+    "iw_sulu_tailwind_theme.components_section_cards": "Cards outside blocks",
     "iw_sulu_tailwind_theme.card_title_color": "Title color (empty = auto)",
     "iw_sulu_tailwind_theme.card_title_hover_color": "Title color on hover (empty = primary)",
     "iw_sulu_tailwind_theme.card_text_color": "Text color (empty = auto)",

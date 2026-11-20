@@ -239,7 +239,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Rebond",
 
     "iw_sulu_tailwind_theme.defaults": "Réglages par défaut",
-    "iw_sulu_tailwind_theme.defaults_general": "Espacements et rayons",
+    "iw_sulu_tailwind_theme.defaults_general": "Rayons",
     "iw_sulu_tailwind_theme.borders_radii": "Rayons de bordure",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Rayon des cards",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Rayon des images",
@@ -266,7 +266,7 @@
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Paragraphe - espacement vertical",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Espace en haut et en bas, entre le bord du fond de paragraphe et son texte.",
 
-    "iw_sulu_tailwind_theme.defaults_section_blocks": "Blocs",
+    "iw_sulu_tailwind_theme.defaults_section_blocks": "Écarts et largeur maximale",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Espacement entre les zones",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "S'applique aux blocs à deux zones de contenu (texte + images, formulaire + widget, carte + informations, texte + chiffres clés). L'espacement est réduit de moitié sur mobile.",
     "iw_sulu_tailwind_theme.defaults_titleGap": "Espacement titres / contenu",
@@ -338,6 +338,8 @@
     "iw_sulu_tailwind_theme.defaults_spacing_xlarge": "Très large - 48 px (gap-12)",
 
     "iw_sulu_tailwind_theme.variants": "Variantes",
+    "iw_sulu_tailwind_theme.blocks_group": "Blocs",
+    "iw_sulu_tailwind_theme.blocks_group_defaults": "Défauts",
     "iw_sulu_tailwind_theme.variants_info": "Définissez des variantes de couleur pour les blocs de contenu",
     "iw_sulu_tailwind_theme.variant": "Variante",
     "iw_sulu_tailwind_theme.variant_label": "Libellé",
@@ -1700,7 +1702,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_padding_info": "Espace entre le bord du panneau de filtres et son contenu. S'applique aussi au sommaire. Vide, l'espacement par défaut s'applique.",
     "iw_sulu_tailwind_theme.components_sidebar_gap_info": "Espace entre les groupes du panneau de filtres (recherche, tri, catégories, tags) et entre les entrées du sommaire. Vide, l'écart par défaut s'applique.",
     "iw_sulu_tailwind_theme.components_label_current": "Élément courant",
-    "iw_sulu_tailwind_theme.components_section_cards": "Cartes",
+    "iw_sulu_tailwind_theme.components_section_cards": "Cartes hors blocs",
     "iw_sulu_tailwind_theme.card_title_color": "Couleur du titre (vide = auto)",
     "iw_sulu_tailwind_theme.card_title_hover_color": "Couleur du titre au survol (vide = primaire)",
     "iw_sulu_tailwind_theme.card_text_color": "Couleur du texte (vide = auto)",

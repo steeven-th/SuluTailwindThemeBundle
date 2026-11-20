@@ -239,7 +239,7 @@
     "iw_sulu_tailwind_theme.buttons_hoverEasing_bounce": "Federn",
 
     "iw_sulu_tailwind_theme.defaults": "Standardwerte",
-    "iw_sulu_tailwind_theme.defaults_general": "Abstände und Radien",
+    "iw_sulu_tailwind_theme.defaults_general": "Radien",
     "iw_sulu_tailwind_theme.borders_radii": "Eckenradien",
     "iw_sulu_tailwind_theme.borders_cardRadius": "Karten-Radius",
     "iw_sulu_tailwind_theme.borders_imageRadius": "Bild-Radius",
@@ -266,7 +266,7 @@
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY": "Absatz - vertikaler Innenabstand",
     "iw_sulu_tailwind_theme.defaults_paragraphPaddingY_info": "Abstand oben und unten, zwischen dem Rand der Absatzfläche und ihrem Text.",
 
-    "iw_sulu_tailwind_theme.defaults_section_blocks": "Blöcke",
+    "iw_sulu_tailwind_theme.defaults_section_blocks": "Abstände und maximale Breite",
     "iw_sulu_tailwind_theme.defaults_blockGap": "Abstand zwischen den Bereichen",
     "iw_sulu_tailwind_theme.defaults_blockGap_info": "Gilt für Blöcke mit zwei Inhaltsbereichen (Text + Bilder, Formular + Widget, Karte + Infos, Text + Kennzahlen). Auf Mobilgeräten wird der Abstand halbiert.",
     "iw_sulu_tailwind_theme.defaults_titleGap": "Abstand zwischen Titeln und Inhalt",
@@ -338,6 +338,8 @@
     "iw_sulu_tailwind_theme.defaults_spacing_xlarge": "Sehr groß - 48 px (gap-12)",
 
     "iw_sulu_tailwind_theme.variants": "Varianten",
+    "iw_sulu_tailwind_theme.blocks_group": "Blöcke",
+    "iw_sulu_tailwind_theme.blocks_group_defaults": "Standardwerte",
     "iw_sulu_tailwind_theme.variants_info": "Farbvarianten für Inhaltsblöcke definieren",
     "iw_sulu_tailwind_theme.variant": "Variante",
     "iw_sulu_tailwind_theme.variant_label": "Bezeichnung",
@@ -1602,7 +1604,7 @@
     "iw_sulu_tailwind_theme.components_sidebar_padding_info": "Abstand zwischen dem Rand des Filterpanels und seinem Inhalt. Gilt auch für das Inhaltsverzeichnis. Leer gilt der Standardabstand.",
     "iw_sulu_tailwind_theme.components_sidebar_gap_info": "Abstand zwischen den Gruppen des Filterpanels (Suche, Sortierung, Kategorien, Tags) und zwischen den Einträgen des Inhaltsverzeichnisses. Leer gilt der Standardabstand.",
     "iw_sulu_tailwind_theme.components_label_current": "Aktuelles Element",
-    "iw_sulu_tailwind_theme.components_section_cards": "Karten",
+    "iw_sulu_tailwind_theme.components_section_cards": "Karten außerhalb von Blöcken",
     "iw_sulu_tailwind_theme.card_title_color": "Titelfarbe (leer = automatisch)",
     "iw_sulu_tailwind_theme.card_title_hover_color": "Titelfarbe beim Hover (leer = Primärfarbe)",
     "iw_sulu_tailwind_theme.card_text_color": "Textfarbe (leer = automatisch)",
