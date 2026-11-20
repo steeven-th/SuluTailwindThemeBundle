@@ -15,14 +15,20 @@
            rebound to the sub-block index inside the loop scope. #}
         {% set parentBlockKey = _key %}
         {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        {% set showImages = not (hideImages|default(false)) %}
+        {# The block's own ratio, else the one of Blocks > Cards. #}
+        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.blockCardImageRatio|default('16_9')) %}
         <div
             data-controller="slider"
             data-slider-mode-value="carousel"
+            data-slider-equal-height-value="true"
             data-slider-autoplay-value="true"
             data-slider-interval-value="5000"
             class="iw-block-linked-pages iw-block-linked-pages--carousel"
         >
-            {# Slides — the `hidden` class is toggled by the slider controller. #}
+            {# Grid stack: every slide sits in the same cell, so the block keeps the
+               height of the tallest one, whether a slide has an image or not. The
+               controller holds inactive slides back with `invisible`. #}
             <div class="iw-block-linked-pages__slides">
                 {% for link in links %}
                     {% set linkView = linksView[loop.index0].link|default({}) %}
@@ -35,12 +41,26 @@
                         {% set linkRel = linkView.rel|default('') %}
                         {% set linkLabel = linkView.title|default('') %}
                         {% set linkExcerpt = link.excerpt|default('') %}
-                        {# Fallback: pull title and/or excerpt from the linked page when not explicitly provided #}
+                        {# The image picked on the link wins over the one of the page. #}
+                        {% set linkImage = showImages ? link.image|default(null) : null %}
+                        {# Fallback: pull title, excerpt and image from the linked page when not explicitly provided #}
                         {% set isPage = linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
-                        {% if isPage and (linkLabel is empty or linkExcerpt is empty) %}
-                            {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerpt': 'excerpt'}) %}
+                        {% if isPage and (linkLabel is empty or linkExcerpt is empty or (showImages and linkImage is empty)) %}
+                            {# Every excerpt alias needs an `excerpt.` path: an alias mapped to the bare `excerpt`
+                               resolves nothing and empties the other excerpt aliases. #}
+                            {% set linkedPage = sulu_page_load(linkView.href, {
+                                'title': 'title',
+                                'excerptDescription': 'excerpt.description',
+                                'excerptImage': 'excerpt.image',
+                                'heroImage': 'heroImage',
+                            }) %}
                             {% if linkLabel is empty %}{% set linkLabel = linkedPage.title|default('') %}{% endif %}
-                            {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerpt.description|default('') %}{% endif %}
+                            {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerptDescription|default('')|striptags|trim %}{% endif %}
+                            {# `heroImage` only exists on templates carrying the hero fragment,
+                               the others resolve it to null. #}
+                            {% if showImages and linkImage is empty %}
+                                {% set linkImage = linkedPage.excerptImage|default(linkedPage.excerpt.image|default(linkedPage.heroImage|default(null))) %}
+                            {% endif %}
                         {% endif %}
                         {# Fallback: pull the media title (or filename) when linking to a media asset #}
                         {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
@@ -53,10 +73,11 @@
                         {% endif %}
                         {# Last-resort fallback: show the URL itself if no label could be resolved #}
                         {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
+                        {% set imageMedia = linkImage is not empty ? sulu_resolve_media(linkImage, app.request.locale) : null %}
 
                         <div
                             data-slider-target="slide"
-                            class="iw-block-linked-pages__slide {{ loop.first ? '' : 'hidden' }}"
+                            class="iw-block-linked-pages__slide {{ loop.first ? '' : 'invisible pointer-events-none' }}"
                         >
                             <a
                                 href="{{ linkUrl }}"
@@ -64,6 +85,19 @@
                                 {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
                                 class="iw-block-linked-pages__slide-link"
                             >
+                                {% if imageMedia %}
+                                    {# Empty alt: the title below already names the link.
+                                       The slide is capped at 42rem, hence the sizes. #}
+                                    {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                        media: imageMedia,
+                                        format: pickedRatio.format,
+                                        ratio: pickedRatio.token,
+                                        alt: '',
+                                        radiusClass: iw_sulu_tailwind_theme_radius_class('image', ''),
+                                        pictureClasses: 'iw-block-linked-pages__slide-image',
+                                        sizes: '(min-width: 672px) 672px, 100vw',
+                                    }) }}
+                                {% endif %}
                                 <span class="iw-block-linked-pages__slide-title">{{ linkLabel }}</span>
                                 {% if linkExcerpt is not empty %}
                                     <p class="iw-block-linked-pages__slide-excerpt">{{ linkExcerpt }}</p>

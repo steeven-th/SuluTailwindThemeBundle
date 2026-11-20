@@ -1725,7 +1725,7 @@ img.object-cover {
     display: flex;
     align-items: center;
     gap: var(--iw-document-card-gap, 1rem);
-    padding: var(--iw-document-card-padding, 1rem);
+    padding: var(--iw-document-card-padding, var(--iw-block-card-padding, 1rem));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-document-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-document-card-bg, var(--iw-variant-card-bg, transparent));
@@ -1744,7 +1744,7 @@ img.object-cover {
     flex-direction: column;
     text-align: center;
     gap: var(--iw-document-card-gap-grid, 0.75rem);
-    padding: var(--iw-document-card-padding-grid, 1.5rem);
+    padding: var(--iw-document-card-padding-grid, var(--iw-block-card-padding, 1.5rem));
 }
 
 .iw-block-document--grid .iw-document-card:hover {
@@ -1831,7 +1831,7 @@ img.object-cover {
    - --list     : vertical list with divider rules
    - --minimal  : stacked plain links
 
-   The .iw-linked-page-card subcomponent is shared by --cards and --carousel.
+   The .iw-linked-page-card subcomponent belongs to --cards.
    Element rules are scoped via the block selector (specificity 0,2,0) so they
    sit on par with per-variant rules emitted by ThemeCompiler. */
 
@@ -1842,19 +1842,20 @@ img.object-cover {
 /* Mode: --cards (grid 1/2/3) ──────────────────────────────────────────── */
 .iw-block-linked-pages--cards {
     display: grid;
-    grid-template-columns: 1fr;
+    /* minmax(0, ...) keeps a long label from widening its column. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--iw-block-linked-pages-cards-gap, var(--iw-blocks-component-gap, 1.5rem));
 }
 
 @media (min-width: 640px) {
     .iw-block-linked-pages--cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 1024px) {
     .iw-block-linked-pages--cards {
-        grid-template-columns: repeat(var(--iw-block-linked-pages-cards-cols, 3), 1fr);
+        grid-template-columns: repeat(var(--iw-block-linked-pages-cards-cols, 3), minmax(0, 1fr));
     }
 }
 
@@ -1862,22 +1863,66 @@ img.object-cover {
 .iw-block-linked-pages .iw-linked-page-card {
     display: block;
     height: 100%;
-    padding: var(--iw-linked-page-card-padding, 1.5rem);
+    padding: var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-linked-page-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-linked-page-card-bg, var(--iw-variant-card-bg, transparent));
     background-image: var(--iw-linked-page-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-linked-page-card-link-color, var(--iw-variant-link-color, inherit));
     text-decoration: none;
-    transition: box-shadow var(--iw-linked-page-card-transition-duration, 0.3s) ease;
+    /* Movement, timing and image effect come from Blocks > Cards, like every
+       card of a block. */
+    transition: transform var(--iw-linked-page-card-transition-duration, var(--iw-cards-hover-duration, 0.3s)) var(--iw-cards-hover-easing, ease),
+        box-shadow var(--iw-linked-page-card-transition-duration, var(--iw-cards-hover-duration, 0.3s)) var(--iw-cards-hover-easing, ease);
+}
+
+.iw-block-linked-pages .iw-linked-page-card__image img {
+    transition: transform var(--iw-cards-hover-duration, 0.3s) var(--iw-cards-hover-easing, ease),
+        filter var(--iw-cards-hover-duration, 0.3s) var(--iw-cards-hover-easing, ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iw-block-linked-pages .iw-linked-page-card,
+    .iw-block-linked-pages .iw-linked-page-card__image img {
+        transition: none;
+    }
+}
+
+/* Card image: the one picked on the link, else the excerpt image of the page,
+   else its hero image. Padded with the image radius, or flush with the card
+   edges (`--image-bleed`) as Blocks > Cards or the block decide. The compiled
+   theme rounds the bottom corners of a flush image when the variant draws no
+   card border. */
+.iw-block-linked-pages .iw-linked-page-card__image {
+    display: block;
+    overflow: hidden;
+    /* A margin of its own (Blocks > Cards or the block) pulls the image out of
+       the padding by the difference, so the text keeps its space. */
+    margin-top: calc(var(--iw-card-image-inset, var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem))) - var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem)));
+    margin-inline: calc(var(--iw-card-image-inset, var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem))) - var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem)));
+    margin-bottom: var(--iw-linked-page-card-image-gap, 1rem);
+    border-radius: var(--iw-linked-page-card-image-radius, var(--border-imageRadius, var(--border-radius)));
+}
+
+.iw-block-linked-pages .iw-linked-page-card--image-bleed {
+    overflow: hidden;
+}
+
+.iw-block-linked-pages .iw-linked-page-card--image-bleed .iw-linked-page-card__image {
+    margin-top: calc(-1 * var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem)));
+    margin-inline: calc(-1 * var(--iw-linked-page-card-padding, var(--iw-block-card-padding, 1.5rem)));
+    border-radius: 0;
 }
 
 .iw-block-linked-pages .iw-linked-page-card:hover {
+    transform: var(--iw-cards-hover-transform, translateY(-2px));
     box-shadow: var(--iw-linked-page-card-hover-shadow, var(--iw-variant-card-shadow-hover, var(--iw-cards-shadow-hover, none)));
 }
 
 .iw-block-linked-pages .iw-linked-page-card__title {
     display: block;
+    /* A label falling back to the raw URL has no break opportunity. */
+    overflow-wrap: break-word;
     font-size: var(--iw-linked-page-card-title-size, var(--iw-cards-title-size, 1.125rem));
     font-weight: var(--iw-linked-page-card-title-weight, 600);
     transition: color var(--iw-linked-page-card-transition-duration, 0.3s) ease;
@@ -1904,19 +1949,40 @@ img.object-cover {
     opacity: 0.5;
 }
 
+/* Margin round a card image picked by a block, over the one of Blocks > Cards.
+   Shared by every block offering the field. */
+.iw-image-inset--0_5rem { --iw-card-image-inset: 0.5rem; }
+.iw-image-inset--0_75rem { --iw-card-image-inset: 0.75rem; }
+.iw-image-inset--1rem { --iw-card-image-inset: 1rem; }
+.iw-image-inset--1_25rem { --iw-card-image-inset: 1.25rem; }
+.iw-image-inset--1_5rem { --iw-card-image-inset: 1.5rem; }
+.iw-image-inset--2rem { --iw-card-image-inset: 2rem; }
+.iw-image-inset--2_5rem { --iw-card-image-inset: 2.5rem; }
+.iw-image-inset--3rem { --iw-card-image-inset: 3rem; }
+
 /* Mode: --carousel ────────────────────────────────────────────────────── */
 .iw-block-linked-pages--carousel {
     position: relative;
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slides {
+    display: grid;
     overflow: hidden;
+    /* The arrows sit on the edges of the block: keep a lane for them so a
+       slide image never runs under one. */
+    padding-inline: calc(var(--iw-block-linked-pages-nav-size, 2.5rem) + var(--iw-block-linked-pages-nav-gap, 0.75rem));
 }
 
+/* Every slide in the same cell: the block takes the height of the tallest
+   one, and a shorter slide (no image, shorter text) centres its content. */
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slide {
+    grid-area: 1 / 1;
+    align-self: center;
+    width: 100%;
     max-width: var(--iw-block-linked-pages-carousel-slide-max-width, 42rem);
     margin-inline: auto;
-    padding: var(--iw-block-linked-pages-carousel-slide-padding, 2rem);
+    /* Top and bottom only: the lane kept for the arrows already spaces the sides. */
+    padding-block: var(--iw-block-linked-pages-carousel-slide-padding, 2rem);
     text-align: center;
 }
 
@@ -1924,6 +1990,10 @@ img.object-cover {
     display: block;
     text-decoration: none;
     color: inherit;
+}
+
+.iw-block-linked-pages--carousel .iw-block-linked-pages__slide-image {
+    margin-bottom: var(--iw-block-linked-pages-carousel-image-gap, 1.25rem);
 }
 
 .iw-block-linked-pages--carousel .iw-block-linked-pages__slide-title {
@@ -2117,7 +2187,7 @@ img.object-cover {
    The author rule below keeps the separator colour: a line INSIDE the card is
    a separator, not its frame. */
 .iw-block-testimonial--cards .iw-testimonial {
-    padding: var(--iw-testimonial-padding, 1.5rem);
+    padding: var(--iw-testimonial-padding, var(--iw-block-card-padding, 1.5rem));
     background-color: var(--iw-testimonial-card-bg, var(--iw-variant-card-bg, transparent));
     background-image: var(--iw-testimonial-card-bg-image, var(--iw-variant-card-bg-image, none));
     border: var(--iw-variant-card-border-width, 0) solid
@@ -2536,7 +2606,7 @@ img.object-cover {
    border and no background whatsoever, which no variant could fix - the surface
    settings had nothing to paint. */
 .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
-    padding: var(--iw-key-figure-card-padding, 1.5rem);
+    padding: var(--iw-key-figure-card-padding, var(--iw-block-card-padding, 1.5rem));
     background-color: var(--iw-key-figure-card-bg, var(--iw-variant-card-bg, transparent));
     background-image: var(--iw-key-figure-card-bg-image, var(--iw-variant-card-bg-image, none));
     color: var(--iw-key-figure-card-color, var(--iw-variant-card-paragraph-color, var(--iw-variant-paragraph-color, inherit)));
@@ -2550,7 +2620,7 @@ img.object-cover {
 
 @media (min-width: 768px) {
     .iw-block-key-figures--grid-2x2 .iw-key-figure--card {
-        padding: var(--iw-key-figure-card-padding-md, 2rem);
+        padding: var(--iw-key-figure-card-padding-md, var(--iw-block-card-padding, 2rem));
     }
 }
 
@@ -2714,7 +2784,7 @@ img.object-cover {
 
 .iw-block-key-figures--timeline .iw-key-figure__timeline-card {
     margin-left: 3rem;
-    padding: var(--iw-key-figure-timeline-card-padding, 1.5rem);
+    padding: var(--iw-key-figure-timeline-card-padding, var(--iw-block-card-padding, 1.5rem));
     border: var(--iw-variant-card-border-width, 0) solid
         var(--iw-block-key-figures-timeline-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-block-key-figures-timeline-card-bg, var(--iw-variant-card-bg, transparent));
@@ -2847,7 +2917,7 @@ img.object-cover {
 .iw-timeline-step__card {
     flex: 1 1 auto;
     min-width: 0;
-    padding: var(--iw-timeline-card-padding, 1.5rem);
+    padding: var(--iw-timeline-card-padding, var(--iw-block-card-padding, 1.5rem));
     border: var(--iw-timeline-card-border-width, var(--iw-variant-card-border-width, 0)) solid
         var(--iw-timeline-card-border, var(--iw-variant-card-border, transparent));
     background-color: var(--iw-timeline-card-bg, var(--iw-variant-card-bg, transparent));
@@ -3452,7 +3522,7 @@ img.object-cover {
 
 /* Body — content wrapper for --main and --horizontal */
 .iw-block-article-featured .iw-featured-article-card__body {
-    padding: var(--iw-featured-article-card-body-padding, 1.25rem);
+    padding: var(--iw-featured-article-card-body-padding, var(--iw-block-card-padding, 1.25rem));
 }
 
 .iw-block-article-featured .iw-featured-article-card__body--horizontal {
@@ -6943,7 +7013,7 @@ aside .iw-toc {
     flex: 1 1 auto;
     flex-direction: column;
     gap: 0.5rem;
-    padding: var(--iw-card-padding, 1.25rem);
+    padding: var(--iw-card-padding, var(--iw-block-card-padding, 1.25rem));
 }
 
 .iw-card__head {
@@ -7041,8 +7111,8 @@ aside .iw-toc {
 
 .iw-card__banner {
     /* Flush against the body: the card clips the top corners through its own
-       radius and overflow, and the bottom ones must stay square or the banner
-       cuts a notch out of the card. */
+       radius and overflow. The bottom ones are square here, the compiled theme
+       rounds them inside a block whose variant draws no card border. */
     border-end-start-radius: 0;
     border-end-end-radius: 0;
 }

@@ -6,6 +6,13 @@
     <key>iw_theme_config_cards</key>
 
     <properties>
+        <!-- Copies the other set of card settings into this one, after a confirm. -->
+        <property name="copyFromBlockCards" type="iw_theme_copy_card_settings">
+            <params>
+                <param name="direction" value="to_cards"/>
+            </params>
+        </property>
+
         <section name="cardsAppearance">
             <meta>
                 <title>iw_sulu_tailwind_theme.cards_section_appearance</title>

@@ -338,6 +338,73 @@ A project setting `--iw-document-card-bg` or `--iw-card-bg` needs no change.
 
 ---
 
+## Block cards get a tab of their own (breaking, admin, visual)
+
+The Cards tab of the default settings used to reach some blocks and not
+others: the text sizes reached the cards, documents, testimonials, linked pages
+and article blocks, the shadow shape most of them, the ratio and the padding
+only the article blocks. Nobody could tell what a setting would change.
+
+The rule is now one sentence: a block reads its own settings, its variant and
+the **Blocks** tab, nothing else.
+
+- **Admin**: a **Blocks** tab of the first row holds **Variants** (formerly a
+  tab of its own), **Defaults** (formerly *Default settings > Blocks*, plus
+  the block and surface paddings formerly under *Spacing and radius*, now
+  called *Radius*) and a new **Cards** sub-tab. The Cards tab of the default
+  settings becomes **Cards outside blocks**. The old admin addresses
+  (`/variants`, `/defaults/blocks`) are gone, with no redirect.
+- **Blocks > Cards** sets the shape of every card a block draws: title and text
+  sizes, padding, image ratio, margin around the image, image hover effect, hover movement and timing, shadow shape. The colours stay in
+  the variants.
+- **Padding** is the space between the edge of a card and its text. *As the
+  block* keeps the padding each card family ships with, *Per variant* drops it
+  on the cards a variant paints neither a background nor a border on, and a
+  value applies to every card family through `--iw-block-card-padding`. There
+  is no zero: on a painted card it glued the text to the edge.
+- **Margin around the image**: *Automatic* (flush with the card edges when the
+  card has no radius, inside the padding otherwise, the previous behaviour),
+  *As the padding*, *None* (flush with the card edges) or a length, which
+  pulls the image out of the padding while the text keeps its own. The article
+  list, article carousel and linked pages blocks can override it. A flush
+  image is cut by the card, so its top corners follow the card border, and
+  keeps rounded bottom corners unless the variant draws a card border, the
+  banner of the cards block included.
+- **Copy buttons**: each of the two card tabs has one copying the other into
+  it, after a confirm.
+
+Every block section carries the class `iw-block`, where the theme gives each
+`--iw-cards-*` and `--iw-article-card-*` variable its Blocks > Cards value, or
+`initial` so the card falls back to its own default. Colours of the Cards tab
+are reset there too: inside a block, the variant decides.
+
+### Writing the values down
+
+A theme saved before has nothing in Blocks > Cards, so its block cards would
+fall back to the field defaults. Copy what they used to borrow:
+
+```bash
+php bin/adminconsole iw-sulu:theme:migrate-block-cards --dry-run
+php bin/adminconsole iw-sulu:theme:migrate-block-cards
+php bin/adminconsole iw-sulu:theme:compile
+```
+
+It copies the text sizes, the image ratio, the hover and the shadow shape. It
+never overwrites a value already set, so it can run twice.
+
+### What still changes after the migration (breaking, visual)
+
+- **Article cards in blocks** took their padding from the Cards tab. They now
+  keep 1rem unless Blocks > Cards sets one: the padding is not copied, since
+  in Blocks > Cards it reaches every card family.
+- **Article grids and carousels in blocks** take the component gap of
+  Blocks > Defaults, like every other grid of a block, instead of the card gap
+  of the Cards tab.
+- **Article cards in blocks** now take the hover movement of Blocks > Cards.
+  They had none.
+- **Linked page cards** take the hover movement and the image hover effect of
+  Blocks > Cards.
+
 ## Radius split: `paragraphImageRadius` → `paragraphRadius` / `cardRadius` / `imageRadius`
 
 The single per-block "Paragraph / Image radius" field coupled three different
@@ -567,7 +634,8 @@ for a more panoramic hero.
 
 The `article_list` (grid, cards) and `article_carousel` blocks used to crop
 every image to 16:9 whatever the theme said, which cut A4 posters down to a
-strip. They now read the theme's card ratio (**Cards** tab), and each block can
+strip. They now read the card ratio of **Blocks > Cards** (see
+[Block cards get a tab of their own](#block-cards-get-a-tab-of-their-own-breaking-admin-visual)), and each block can
 pick its own under **Settings > Image ratio**. On a theme whose card ratio is
 16:9 nothing changes. On any other, published blocks take the theme's ratio
 after the upgrade, a portrait one with one more column. The `list` style keeps

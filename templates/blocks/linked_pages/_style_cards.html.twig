@@ -15,6 +15,19 @@
            rebound to the sub-block index inside the loop scope. #}
         {% set parentBlockKey = _key %}
         {% set linksView = view.blocks[parentBlockKey].links|default([]) %}
+        {% set showImages = not (hideImages|default(false)) %}
+        {# The block's own ratio, else the one of Blocks > Cards. #}
+        {% set pickedRatio = iw_sulu_tailwind_theme_image_ratio(imageRatio|default(''), iw_sulu_tailwind_theme.blockCardImageRatio|default('16_9')) %}
+        {% set effectiveCardRadius = iw_sulu_tailwind_theme_effective_radius('card', cardRadius|default('')) %}
+        {% set hasCardRadius = effectiveCardRadius is not empty and effectiveCardRadius != 'rounded-none' %}
+        {# Margin round the image: the block choice, else Blocks > Cards. `auto`
+           lays it edge to edge on a card without radius and inside the padding
+           otherwise, `padding` follows the padding, `0` lays it edge to edge, which
+           is what squares its corners against a border. #}
+        {% set imageInset = cardImageInset|default(iw_sulu_tailwind_theme.blockCardImageInset|default('auto'))|default('auto') %}
+        {% set imageBleed = imageInset == '0' or (imageInset == 'auto' and not hasCardRadius) %}
+        {% set insetClass = (not imageBleed and cardImageInset|default('') not in ['', 'auto', 'padding', '0']) ? 'iw-image-inset--' ~ cardImageInset|replace({'.': '_'}) : '' %}
+        {% set hoverImage = iw_sulu_tailwind_theme.blockCardHoverImage|default('zoom') %}
         <div class="iw-block-linked-pages iw-block-linked-pages--cards">
             {% for link in links %}
                 {% set linkView = linksView[loop.index0].link|default({}) %}
@@ -26,12 +39,26 @@
                     {% set linkRel = linkView.rel|default('') %}
                     {% set linkLabel = linkView.title|default('') %}
                     {% set linkExcerpt = link.excerpt|default('') %}
-                    {# Fallback: pull title and/or excerpt from the linked page when not explicitly provided #}
+                    {# The image picked on the link wins over the one of the page. #}
+                    {% set linkImage = showImages ? link.image|default(null) : null %}
+                    {# Fallback: pull title, excerpt and image from the linked page when not explicitly provided #}
                     {% set isPage = linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
-                    {% if isPage and (linkLabel is empty or linkExcerpt is empty) %}
-                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerpt': 'excerpt'}) %}
+                    {% if isPage and (linkLabel is empty or linkExcerpt is empty or (showImages and linkImage is empty)) %}
+                        {# Every excerpt alias needs an `excerpt.` path: an alias mapped to the bare `excerpt`
+                           resolves nothing and empties the other excerpt aliases. #}
+                        {% set linkedPage = sulu_page_load(linkView.href, {
+                            'title': 'title',
+                            'excerptDescription': 'excerpt.description',
+                            'excerptImage': 'excerpt.image',
+                            'heroImage': 'heroImage',
+                        }) %}
                         {% if linkLabel is empty %}{% set linkLabel = linkedPage.title|default('') %}{% endif %}
-                        {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerpt.description|default('') %}{% endif %}
+                        {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerptDescription|default('')|striptags|trim %}{% endif %}
+                        {# `heroImage` only exists on templates carrying the hero fragment,
+                           the others resolve it to null. #}
+                        {% if showImages and linkImage is empty %}
+                            {% set linkImage = linkedPage.excerptImage|default(linkedPage.excerpt.image|default(linkedPage.heroImage|default(null))) %}
+                        {% endif %}
                     {% endif %}
                     {# Fallback: pull the media title (or filename) when linking to a media asset #}
                     {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
@@ -44,13 +71,33 @@
                     {% endif %}
                     {# Last-resort fallback: show the URL itself if no label could be resolved #}
                     {% if linkLabel is empty %}{% set linkLabel = linkUrl %}{% endif %}
+                    {% set imageMedia = linkImage is not empty ? sulu_resolve_media(linkImage, app.request.locale) : null %}
+
+                    {% set cardClasses = ['iw-linked-page-card', 'iw-surface--card', iw_sulu_tailwind_theme_radius_class('card', cardRadius|default(''))] %}
+                    {% if imageMedia %}
+                        {% set cardClasses = cardClasses|merge(['iw-linked-page-card--has-image']) %}
+                        {% if imageBleed %}{% set cardClasses = cardClasses|merge(['iw-linked-page-card--image-bleed']) %}{% endif %}
+                        {% if insetClass %}{% set cardClasses = cardClasses|merge([insetClass]) %}{% endif %}
+                        {% if hoverImage != 'none' %}{% set cardClasses = cardClasses|merge(['iw-linked-page-card--image-' ~ hoverImage]) %}{% endif %}
+                    {% endif %}
 
                     <a
                         href="{{ linkUrl }}"
                         {% if linkTarget != '_self' %}target="{{ linkTarget }}"{% endif %}
                         {% if linkRel is not empty %}rel="{{ linkRel }}"{% elseif linkTarget == '_blank' %}rel="noopener noreferrer"{% endif %}
-                        class="iw-linked-page-card iw-surface--card {{ iw_sulu_tailwind_theme_radius_class('card', cardRadius|default('')) }}"
+                        class="{{ cardClasses|join(' ')|trim }}"
                     >
+                        {% if imageMedia %}
+                            {# Empty alt: the title next to it already names the link. #}
+                            {{ include('@ItechWorldSuluTailwindTheme/blocks/common/_image.html.twig', {
+                                media: imageMedia,
+                                format: pickedRatio.format,
+                                ratio: pickedRatio.token,
+                                alt: '',
+                                pictureClasses: 'iw-linked-page-card__image',
+                                sizes: iw_sulu_tailwind_theme_image_sizes({640: 1/2, 1024: 1/3}),
+                            }) }}
+                        {% endif %}
                         <span class="iw-linked-page-card__title">{{ linkLabel }}</span>
                         {% if linkExcerpt is not empty %}
                             <p class="iw-linked-page-card__excerpt">{{ linkExcerpt }}</p>

@@ -78,13 +78,13 @@ A clickable card draws its action as a `<span>` carrying the button style, since
 | `--iw-card-bg` | `--iw-variant-card-bg`, then `transparent` | Card background. The enclosed-unit cascade every card in the bundle uses. Nothing is drawn until the variant fills the card surface. |
 | `--iw-card-border` | `--iw-variant-card-border` | Card border colour. Draws only when the variant gives it one, so a bare variant gets no hairline nobody asked for. |
 | Highlighted card frame | `--iw-variant-accent-border` / `-width`, then the card ones | A card put forward keeps the frame of its neighbours unless the accent surface names one of its own. |
-| `--iw-card-padding` | `1.25rem` | Padding of the body. |
+| `--iw-card-padding` | `var(--iw-block-card-padding, 1.25rem)` | Padding of the body. Unset, it follows **Blocks > Cards > Padding**. |
 | `--iw-card-icon-size` / `--iw-card-icon-size-stacked` | `1.6rem` / `3rem` | Pictogram size. |
-| `--iw-card-title-size` / `--iw-card-text-size` | `1.0625rem` / `0.9375rem` | Type scale inside a card. Both read the theme values (`--iw-cards-title-size`, `--iw-cards-text-size`) first, set under **Defaults > Cards**. |
+| `--iw-card-title-size` / `--iw-card-text-size` | `1.0625rem` / `0.9375rem` | Type scale inside a card. Both read the theme values (`--iw-cards-title-size`, `--iw-cards-text-size`) first, set under **Blocks > Cards**. |
 | `--iw-cards-title-scale-medium` / `--iw-cards-title-scale-large` / `--iw-cards-title-scale-xlarge` | `1.25` / `1.5` / `2.25` | What the three title-size modifiers multiply the title by. Two pixels separated a default title from its text, which reads as an accident rather than as a hierarchy, and raising the theme value grew every card of the site. |
 | `--iw-card-number-size` | `1.75rem` | Size of the position number. |
 | `--iw-card-shadow` / `--iw-card-shadow-hover` | `--iw-variant-card-shadow*`, then `--iw-cards-shadow*` | Per-block override of either shadow. Behind it the variant of the block decides, and behind that the site-wide setting for cards no variant reaches. |
-| `--iw-card-shadow-color` | the colour already in the value | Replaces the colour of whichever shadow applies, for a project singling out one block. The colour itself is chosen per variant (**Cards > Shadow colour**) and site-wide under **Components > Cards**, and the opacity is applied to it with `color-mix()` - a hex or a palette reference carries no alpha of its own. |
+| `--iw-card-shadow-color` | the colour already in the value | Replaces the colour of whichever shadow applies, for a project singling out one block. The colour itself is chosen per variant (**Cards > Shadow colour**), and the opacity is applied to it with `color-mix()` - a hex or a palette reference carries no alpha of its own. |
 | `--iw-card-horizontal-visual` | `6rem` | Width of the visual column in the horizontal layout. |
 
 ---

@@ -386,8 +386,12 @@ class ThemeCompiler
         $css .= $this->generateBlockVariantClasses(
             $tokens['blockVariants'] ?? [],
             $buttonList,
-            CardShadow::fromTokens($tokens),
+            CardShadow::fromTokens(self::blockCardTokens($tokens)),
         );
+
+        // Cards drawn by blocks. After the variants, so the padding a variant
+        // drops in the `variant` mode wins over the block-wide one.
+        $css .= $this->generateBlockCardRules($tokens);
 
         // Text color utility classes. After the variant classes on purpose: a
         // color the editor picked explicitly must win over `.iw-highlight`,
@@ -977,6 +981,187 @@ class ThemeCompiler
     }
 
     /**
+     * The card settings of the blocks, under the keys the Cards tab uses.
+     *
+     * Blocks > Cards stores its fields as `blockCard*`. Renamed to the `card*`
+     * keys, they feed the same readers as the Cards tab (CardShadow, the hover
+     * catalogue) without those readers knowing about blocks. A field never
+     * saved stays absent, so each reader lands on its own default rather than
+     * on the value of the Cards tab.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return array<string, mixed> The block card settings, keyed `card*`
+     */
+    public static function blockCardTokens(array $tokens): array
+    {
+        $mapped = [];
+        foreach (self::BLOCK_CARD_KEYS as $blockKey => $cardKey) {
+            if (\array_key_exists($blockKey, $tokens)) {
+                $mapped[$cardKey] = $tokens[$blockKey];
+            }
+        }
+
+        return $mapped;
+    }
+
+    /**
+     * Fields of Blocks > Cards, mapped to their twin in the Cards tab.
+     *
+     * Also the list the copy buttons of the two tabs walk, see
+     * `CopyCardSettings.js`.
+     *
+     * @var array<string, string>
+     */
+    public const BLOCK_CARD_KEYS = [
+        'blockCardTitleSize' => 'cardTitleSize',
+        'blockCardTextSize' => 'cardTextSize',
+        'blockCardPadding' => 'cardPadding',
+        'blockCardImageRatio' => 'cardImageRatio',
+        'blockCardHoverImage' => 'cardHoverImage',
+        'blockCardHoverTransform' => 'cardHoverTransform',
+        'blockCardHoverDuration' => 'cardHoverDuration',
+        'blockCardHoverEasing' => 'cardHoverEasing',
+        'blockCardShadow' => 'cardShadow',
+    ];
+
+    /**
+     * The card variables as a block sees them.
+     *
+     * The Cards tab publishes its settings on :root for the cards drawn
+     * outside blocks. A block section carries `iw-block`, and this rule gives
+     * every one of those variables the value of Blocks > Cards there, or
+     * `initial` when that tab leaves it empty. `initial` makes the variable
+     * guaranteed-invalid, so each card falls back to the value it ships with
+     * instead of inheriting the one of the Cards tab. Colours are reset the
+     * same way: inside a block they belong to the variant.
+     *
+     * The padding of the cards is shared through `--iw-block-card-padding`,
+     * which every card family of a block reads before its own default. In the
+     * `variant` mode it is dropped to 0 on the variants that paint neither a
+     * background nor a border on their cards, where it would only push the
+     * text away from nothing.
+     *
+     * @param array<string, mixed> $tokens Flat theme token map
+     *
+     * @return string CSS rules
+     */
+    private function generateBlockCardRules(array $tokens): string
+    {
+        $card = self::blockCardTokens($tokens);
+
+        $css = "/* Cards drawn by blocks (Blocks > Cards). No block reads the Cards tab. */\n";
+        $css .= ".iw-block {\n";
+
+        // Sizes: empty keeps each card family on its own size.
+        foreach (['cardTitleSize' => 'title', 'cardTextSize' => 'text'] as $key => $part) {
+            $size = trim((string) ($card[$key] ?? ''));
+            if ('' !== $size && preg_match('/^\d+(\.\d+)?$/', $size)) {
+                $size .= 'rem';
+            }
+            $css .= "  --iw-cards-{$part}-size: " . ('' === $size ? 'initial' : $size) . ";\n";
+        }
+
+        // Padding: empty and `variant` keep each card family on its own.
+        $padding = trim((string) ($card['cardPadding'] ?? ''));
+        // `0` is no longer offered: on a painted card it glued the text to the
+        // edge. A theme saved with it falls back to each block's own padding,
+        // as the field now shows it.
+        $fixedPadding = !\in_array($padding, ['', 'variant', '0'], true);
+        $css .= '  --iw-block-card-padding: ' . ($fixedPadding ? $padding : 'initial') . ";\n";
+        // Article cards keep 1rem when the blocks leave it to each family,
+        // the value their listing twin ships with.
+        $css .= "  --iw-article-card-padding: var(--iw-block-card-padding, 1rem);\n";
+        // Margin round an image sitting inside the padding. Only a length
+        // reaches the variable: `auto` and `padding` follow the padding, and
+        // the templates lay a `0` image edge to edge, which also squares its
+        // corners.
+        $inset = trim((string) ($tokens['blockCardImageInset'] ?? ''));
+        $isLength = 1 === preg_match('/^\d+(\.\d+)?rem$/', $inset);
+        $css .= '  --iw-card-image-inset: ' . ($isLength ? $inset : 'initial') . ";\n";
+
+        // Grids: the component gap of Blocks > Defaults, like every other grid
+        // of a block.
+        $css .= "  --iw-cards-gap: var(--iw-blocks-component-gap, 1.5rem);\n";
+
+        // Hover. A theme never saved holds no key and lands on the field
+        // defaults, as the Cards tab does.
+        $duration = ButtonEffectCatalog::resolveDuration((string) ($card['cardHoverDuration'] ?? ButtonEffectCatalog::DEFAULT_DURATION));
+        $easing = ButtonEffectCatalog::resolveEasing((string) ($card['cardHoverEasing'] ?? ButtonEffectCatalog::DEFAULT_EASING));
+        $transform = ButtonEffectCatalog::resolveTransform((string) ($card['cardHoverTransform'] ?? 'lift'));
+        $css .= "  --iw-cards-hover-transform: {$transform};\n";
+        $css .= "  --iw-cards-hover-duration: {$duration};\n";
+        $css .= "  --iw-cards-hover-easing: {$easing};\n";
+        $css .= "  --iw-article-card-hover-duration: {$duration};\n";
+        $css .= "  --iw-article-card-hover-easing: {$easing};\n";
+
+        // A block section without a variant casts no shadow, as a variant
+        // naming no shadow colour does.
+        $css .= "  --iw-cards-shadow: none;\n";
+        $css .= "  --iw-cards-shadow-hover: none;\n";
+
+        // Colours and surface of the Cards tab: the variant decides here.
+        foreach ([
+            '--iw-article-card-surface',
+            '--iw-article-card-border',
+            '--iw-article-card-hover-border-color',
+            '--iw-article-card-title-color',
+            '--iw-article-card-title-hover-color',
+            '--iw-article-card-text-color',
+            '--iw-article-card-badge-bg',
+            '--iw-article-card-badge-bg-image',
+            '--iw-article-card-badge-text',
+        ] as $variable) {
+            $css .= "  {$variable}: initial;\n";
+        }
+        $css .= "}\n";
+
+        // An image with a margin of its own, in an article card: pulled out of
+        // the padding by the difference, so the text keeps its space.
+        $pad = 'var(--iw-article-card-padding, 0px)';
+        $pull = "calc(var(--iw-card-image-inset, {$pad}) - {$pad})";
+        $css .= ".iw-block .iw-article-card:not(.iw-article-card--image-bleed):not(.iw-article-card--horizontal) .iw-article-card__image {\n";
+        $css .= "  margin: {$pull} {$pull} 0;\n";
+        $css .= "}\n";
+        $css .= ".iw-block .iw-article-card--horizontal:not(.iw-article-card--image-bleed) .iw-article-card__image {\n";
+        $css .= "  margin: {$pull} 0 {$pull} {$pull};\n";
+        $css .= "}\n";
+
+        // A bleeding image keeps rounded bottom corners, unless the variant
+        // draws a border round the card: the image would then cut a curve
+        // into a straight line.
+        $css .= "/* Bottom corners of a card image touching the card edges */\n";
+        $css .= ".iw-block .iw-article-card--image-bleed:not(.iw-article-card--horizontal) .iw-article-card__image,\n";
+        $css .= ".iw-block .iw-block-linked-pages .iw-linked-page-card--image-bleed .iw-linked-page-card__image,\n";
+        $css .= ".iw-block .iw-card__banner {\n";
+        $css .= "  overflow: hidden;\n";
+        $css .= "  border-end-start-radius: var(--iw-block-card-bleed-radius, var(--border-imageRadius, var(--border-radius)));\n";
+        $css .= "  border-end-end-radius: var(--iw-block-card-bleed-radius, var(--border-imageRadius, var(--border-radius)));\n";
+        $css .= "}\n";
+        foreach (VariantResolver::normalizeVariants($tokens['blockVariants'] ?? []) as $props) {
+            if (\is_array($props) && '' !== trim((string) ($props['cardBorder'] ?? ''))) {
+                $css .= ".iw-block.iw-variant--{$props['slug']} { --iw-block-card-bleed-radius: 0; }\n";
+            }
+        }
+
+        if ('variant' === $padding) {
+            foreach (VariantResolver::normalizeVariants($tokens['blockVariants'] ?? []) as $props) {
+                if (!\is_array($props)) {
+                    continue;
+                }
+                // A transparent background paints nothing, as no colour at all.
+                $painted = !\in_array(trim((string) ($props['cardBg'] ?? '')), ['', 'none', 'transparent'], true)
+                    || '' !== trim((string) ($props['cardBorder'] ?? ''));
+                if (!$painted) {
+                    $css .= ".iw-block.iw-variant--{$props['slug']} { --iw-block-card-padding: 0; }\n";
+                }
+            }
+        }
+
+        return $css . "\n";
+    }
+
+    /**
      * Image hover effect presets for article cards.
      *
      * Each entry is a tuple [base, hover] of CSS declarations to apply on the
@@ -1127,6 +1312,11 @@ class ThemeCompiler
                 $css .= ".iw-article-card--image-{$key} .iw-article-card__image img { {$effect['base']} }\n";
             }
             $css .= ".iw-article-card--image-{$key}:hover .iw-article-card__image img { {$effect['hover']} }\n";
+            // Linked page cards take the same effects, picked in Blocks > Cards.
+            if ('' !== $effect['base']) {
+                $css .= ".iw-linked-page-card--image-{$key} .iw-linked-page-card__image img { {$effect['base']} }\n";
+            }
+            $css .= ".iw-linked-page-card--image-{$key}:hover .iw-linked-page-card__image img { {$effect['hover']} }\n";
         }
         $css .= "\n";
 

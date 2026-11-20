@@ -211,6 +211,11 @@ class ThemeFormMapper
         'cardHoverDuration', 'cardHoverEasing',
         'cardTitleColor', 'cardTitleHoverColor', 'cardTextColor', 'cardBadgeBg', 'cardBadgeText',
         'cardTitleSize', 'cardTextSize',
+        // Cards drawn by blocks (Blocks > Cards), twins of the card* keys above.
+        'blockCardTitleSize', 'blockCardTextSize', 'blockCardPadding',
+        'blockCardImageRatio', 'blockCardImageInset', 'blockCardHoverImage',
+        'blockCardHoverTransform', 'blockCardHoverDuration', 'blockCardHoverEasing',
+        'blockCardShadow',
         // Site-wide image delivery (picture avif/webp pipeline).
         'imageAvif',
         // Credit and AI label of the images: how the credit shows, and the

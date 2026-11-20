@@ -26,7 +26,7 @@ use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
  * for the Theme configuration management.
  *
  * Provides a full CRUD interface with separate form tabs for:
- * details, colors, typography, buttons, defaults, variants, and menu.
+ * details, colors, typography, defaults, blocks, menu, footer, pages and articles.
  */
 class ThemeAdmin extends Admin
 {
@@ -276,7 +276,7 @@ class ThemeAdmin extends Admin
      * Configures the Sulu admin views for theme configuration management.
      *
      * Creates a list view, add form (with details tab only), and edit form
-     * (with details, colors, typography, buttons, defaults, variants, and menu tabs).
+     * (with details, colors, typography, defaults, blocks, menu, footer, pages and articles tabs).
      *
      * @param ViewCollection $viewCollection The view collection to configure
      */
@@ -464,16 +464,6 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
-            // ── Edit form: defaults, blocks tab ────────────────────
-            $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults_blocks', '/blocks')
-                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
-                    ->setFormKey('iw_theme_config_defaults_blocks')
-                    ->setTabTitle('iw_sulu_tailwind_theme.defaults_section_blocks')
-                    ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
-            );
-
             // ── Edit form: defaults, images tab ────────────────────
             // Every image of the site, whatever renders it: the formats it is
             // served in, its credit and AI label, the picture the site is
@@ -498,8 +488,9 @@ class ThemeAdmin extends Admin
             );
 
             // ── Edit form: cards tab ───────────────────────────────
-            // Site-wide card appearance, which the cards block, an article
-            // listing and a related row all read.
+            // Cards drawn outside blocks: article listings, related rows,
+            // search results. No block reads it, the cards of blocks have a
+            // tab of their own in the blocks group.
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.cards', '/cards')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
@@ -543,15 +534,56 @@ class ThemeAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '.defaults_group')
             );
 
-            // ── Edit form: variants tab ────────────────────────────
+            // ── Edit form: blocks group (second row of tabs) ───────
+            // Everything a block reads from the theme sits here and nowhere
+            // else: its colours in the variants, its shape in the defaults
+            // and the cards. The Cards tab of the default settings is for
+            // cards drawn outside blocks. After the default settings, since
+            // blocks also use the radii and buttons defined there.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createViewBuilder(
+                    static::EDIT_FORM_VIEW . '.blocks_group',
+                    '/blocks',
+                    'iw_sulu_tailwind_theme.nested_tabs',
+                )
+                    ->setOption('tabTitle', 'iw_sulu_tailwind_theme.blocks_group')
+                    ->setOption('tabOrder', 55)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+
+            // ── Edit form: blocks, variants tab ────────────────────
+            // First tab of the group: a block is set up by picking its variant.
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.variants', '/variants')
                     ->setResourceKey(ThemeConfig::RESOURCE_KEY)
                     ->setFormKey('iw_theme_config_variants')
                     ->setTabTitle('iw_sulu_tailwind_theme.variants')
-                    ->setTabOrder(40)
+                    ->setTabPriority(10)
                     ->addToolbarActions($formToolbarActions)
-                    ->setParent(static::EDIT_FORM_VIEW)
+                    ->setParent(static::EDIT_FORM_VIEW . '.blocks_group')
+            );
+
+            // ── Edit form: blocks, defaults tab ────────────────────
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.defaults_blocks', '/defaults')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_defaults_blocks')
+                    ->setTabTitle('iw_sulu_tailwind_theme.blocks_group_defaults')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.blocks_group')
+            );
+
+            // ── Edit form: blocks, cards tab ───────────────────────
+            // The shape of every card a block draws. Their colours stay in
+            // the variants, and the Cards tab of the default settings only
+            // reaches cards drawn outside blocks.
+            $viewCollection->add(
+                $this->viewBuilderFactory->createFormViewBuilder(static::EDIT_FORM_VIEW . '.block_cards', '/cards')
+                    ->setResourceKey(ThemeConfig::RESOURCE_KEY)
+                    ->setFormKey('iw_theme_config_block_cards')
+                    ->setTabTitle('iw_sulu_tailwind_theme.blocks_group_cards')
+                    ->addToolbarActions($formToolbarActions)
+                    ->setParent(static::EDIT_FORM_VIEW . '.blocks_group')
             );
 
             // ── Edit form: menu group (second row of tabs) ─────────

@@ -61,7 +61,7 @@ tints, and the table cells, stripes and hover, which stack over the data.
 | Hover backgrounds | Tags, back-to-top button, controls over media | `--iw-tag-hover-bg-image`, `--iw-back-to-top-hover-bg-image`, in `--iw-gallery-nav-bg-hover` itself |
 | Text | Variant title and highlight colors, button label and hover label, title editor words | clipped to the glyphs, see [Text and pictograms](#text-and-pictograms) |
 | Borders | Button border and hover border, variant card border, article card border and hover border | drawn as a ring, see [Borders](#borders) |
-| Article cards | Surface (Components > Cards) | `background-image` on `.iw-article-card` |
+| Article cards outside blocks | Surface (Default settings > Cards outside blocks) | `background-image` on `.iw-article-card` |
 
 Each background keeps its color variable, set to the gradient's fallback (or
 `transparent` for a translucent gradient), and gets an `-image` variable

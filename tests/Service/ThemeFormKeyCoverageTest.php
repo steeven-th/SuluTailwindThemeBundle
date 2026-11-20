@@ -33,7 +33,7 @@ final class ThemeFormKeyCoverageTest extends TestCase
      *
      * @var list<string>
      */
-    private const DISPLAY_ONLY_TYPES = ['heading', 'iw_theme_required_buttons_notice'];
+    private const DISPLAY_ONLY_TYPES = ['heading', 'iw_theme_required_buttons_notice', 'iw_theme_copy_card_settings'];
 
     /**
      * Prefixes the mapper carries wholesale, whatever the field is called.

@@ -88,6 +88,33 @@ final class ExcerptPropertyPathContractTest extends TestCase
     }
 
     /**
+     * No property map asks for the whole excerpt under a bare `excerpt` path.
+     *
+     * Only a path starting with `excerpt.` reaches the excerpt resolver. A bare
+     * `'excerpt': 'excerpt'` in a `sulu_page_load()` map resolves nothing, and it
+     * empties the other excerpt aliases of the same map on top of that. The
+     * linked pages block read the page description that way, and no card ever
+     * showed it.
+     */
+    #[Test]
+    public function noPropertyMapReadsTheBareExcerpt(): void
+    {
+        foreach (self::templateFiles(self::root() . '/templates') as $path) {
+            $source = (string) \file_get_contents($path);
+
+            self::assertDoesNotMatchRegularExpression(
+                "/'\\w+'\\s*:\\s*'excerpt'/",
+                $source,
+                \sprintf(
+                    '%s maps an alias to the bare "excerpt" path. Ask for each field instead, '
+                    . 'e.g. \'excerptDescription\': \'excerpt.description\'.',
+                    self::relative($path),
+                ),
+            );
+        }
+    }
+
+    /**
      * Every chain that reads the excerpt image also reads it nested.
      *
      * The listing page and the event sources hand the cards items built by

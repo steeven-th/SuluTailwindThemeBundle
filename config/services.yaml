@@ -543,6 +543,13 @@ services:
         tags:
             - { name: 'console.command' }
 
+    ItechWorld\SuluTailwindThemeBundle\Command\BlockCardsMigrateCommand:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@itech_world.sulu_tailwind_theme.repository'
+        tags:
+            - { name: 'console.command' }
+
     ItechWorld\SuluTailwindThemeBundle\Command\FooterColorsMigrateCommand:
         arguments:
             - '@doctrine.orm.entity_manager'

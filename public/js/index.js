@@ -26,6 +26,7 @@ import ShadowEditor from './components/ShadowEditor/ShadowEditor';
 import ButtonStylePicker from './components/ButtonStylePicker/ButtonStylePicker';
 import ButtonPreview from './components/ButtonPreview/ButtonPreview';
 import RequiredButtonsNotice from './components/RequiredButtonsNotice/RequiredButtonsNotice';
+import CopyCardSettings from './components/CopyCardSettings/CopyCardSettings';
 import WeightPicker from './components/WeightPicker/WeightPicker';
 import ArticleStylePicker from './components/ArticleStylePicker/ArticleStylePicker';
 import TitleEditor from './components/TitleEditor/TitleEditor';
@@ -123,6 +124,7 @@ initializer.addUpdateConfigHook('iw_sulu_tailwind_theme', (config: Object, initi
     fieldRegistry.add('iw_theme_button_style_picker', ButtonStylePicker);
     fieldRegistry.add('iw_theme_button_preview', ButtonPreview);
     fieldRegistry.add('iw_theme_required_buttons_notice', RequiredButtonsNotice);
+    fieldRegistry.add('iw_theme_copy_card_settings', CopyCardSettings);
     fieldRegistry.add('iw_theme_weight_picker', WeightPicker);
     fieldRegistry.add('iw_theme_article_style_picker', ArticleStylePicker);
     fieldRegistry.add('iw_theme_title_editor', TitleEditor);
