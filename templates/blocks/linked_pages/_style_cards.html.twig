@@ -29,9 +29,11 @@
                     {# Fallback: pull title and/or excerpt from the linked page when not explicitly provided #}
                     {% set isPage = linkView.provider|default('') == 'page' and linkView.href|default('') is not empty %}
                     {% if isPage and (linkLabel is empty or linkExcerpt is empty) %}
-                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerpt': 'excerpt'}) %}
+                        {# Every excerpt alias needs an `excerpt.` path: an alias mapped to the bare `excerpt`
+                           resolves nothing and empties the other excerpt aliases. #}
+                        {% set linkedPage = sulu_page_load(linkView.href, {'title': 'title', 'excerptDescription': 'excerpt.description'}) %}
                         {% if linkLabel is empty %}{% set linkLabel = linkedPage.title|default('') %}{% endif %}
-                        {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerpt.description|default('') %}{% endif %}
+                        {% if linkExcerpt is empty %}{% set linkExcerpt = linkedPage.excerptDescription|default('')|striptags|trim %}{% endif %}
                     {% endif %}
                     {# Fallback: pull the media title (or filename) when linking to a media asset #}
                     {% if linkLabel is empty and linkView.provider|default('') == 'media' and linkView.href|default('') is not empty %}
